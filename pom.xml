@@ -37,6 +37,7 @@
         <hutool.version>5.5.3</hutool.version>
         <commons-pool2.version>2.5.0</commons-pool2.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
+        <logstash.version>6.5</logstash.version>
     </properties>
 
     <dependencies>
@@ -207,6 +208,12 @@
             <groupId>eu.bitwalker</groupId>
             <artifactId>UserAgentUtils</artifactId>
             <version>1.21</version>
+        </dependency>
+        <!-- logstash -->
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash.version}</version>
         </dependency>
     </dependencies>
 

@@ -11,6 +11,17 @@
             <charset>${log.charset}</charset>
         </encoder>
     </appender>
+<!-- 整合logstash -->
+    <appender name="stash" class="net.logstash.logback.appender.LogstashAccessTcpSocketAppender">
+        <destination>10.100.6.140:4560</destination>
+        <!-- encoder is required -->
+        <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder" />
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+
+    </appender>
+    <root level="DEBUG">
+        <appender-ref ref="stash" />
+    </root>
 
     <!--普通日志输出到控制台-->
     <root level="info">
