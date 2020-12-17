@@ -16,7 +16,7 @@
 package com.lwohvye.modules.system.service.mapstruct;
 
 import com.lwohvye.base.BaseMapper;
-import com.lwohvye.modules.system.domain.main.Role;
+import com.lwohvye.modules.main.system.domain.Role;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

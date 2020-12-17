@@ -15,12 +15,12 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
-import com.lwohvye.modules.system.repository.main.DictDetailRepository;
-import com.lwohvye.modules.system.repository.main.DictRepository;
+import com.lwohvye.modules.main.system.repository.DictDetailRepository;
+import com.lwohvye.modules.main.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.mapstruct.DictDetailMapper;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.modules.system.domain.main.Dict;
-import com.lwohvye.modules.system.domain.main.DictDetail;
+import com.lwohvye.modules.main.system.domain.Dict;
+import com.lwohvye.modules.main.system.domain.DictDetail;
 import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;

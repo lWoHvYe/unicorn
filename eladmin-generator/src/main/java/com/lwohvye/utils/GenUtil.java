@@ -17,8 +17,8 @@ package com.lwohvye.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.*;
-import com.lwohvye.domain.main.ColumnInfo;
-import com.lwohvye.domain.main.GenConfig;
+import com.lwohvye.main.domain.ColumnInfo;
+import com.lwohvye.main.domain.GenConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
 

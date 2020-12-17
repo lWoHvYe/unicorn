@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.mnt.service;
 
-import com.lwohvye.modules.mnt.domain.main.Deploy;
-import com.lwohvye.modules.mnt.domain.main.DeployHistory;
+import com.lwohvye.modules.main.mnt.domain.Deploy;
+import com.lwohvye.modules.main.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.service.dto.DeployDto;
 import com.lwohvye.modules.mnt.service.dto.DeployQueryCriteria;
 import org.springframework.data.domain.Pageable;

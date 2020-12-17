@@ -15,7 +15,7 @@
  */
 package com.lwohvye.rest;
 
-import com.lwohvye.domain.main.GenConfig;
+import com.lwohvye.main.domain.GenConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;

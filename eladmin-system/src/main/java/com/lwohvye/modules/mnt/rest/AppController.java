@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.modules.mnt.domain.main.App;
+import com.lwohvye.modules.main.mnt.domain.App;
 import com.lwohvye.modules.mnt.service.AppService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -16,7 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.system.domain.main.Dict;
+import com.lwohvye.modules.main.system.domain.Dict;
 import com.lwohvye.modules.system.service.DictService;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
 import io.swagger.annotations.Api;

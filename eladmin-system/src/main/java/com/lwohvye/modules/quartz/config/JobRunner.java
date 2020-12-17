@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.quartz.config;
 
-import com.lwohvye.modules.quartz.domain.main.QuartzJob;
-import com.lwohvye.modules.quartz.repository.main.QuartzJobRepository;
+import com.lwohvye.modules.main.quartz.domain.QuartzJob;
+import com.lwohvye.modules.main.quartz.repository.QuartzJobRepository;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.modules.quartz.utils.QuartzManage;
 import org.slf4j.Logger;

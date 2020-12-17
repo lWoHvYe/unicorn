@@ -16,8 +16,8 @@
 package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.modules.system.domain.main.Dict;
-import com.lwohvye.modules.system.repository.main.DictRepository;
+import com.lwohvye.modules.main.system.domain.Dict;
+import com.lwohvye.modules.main.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.DictService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.modules.system.service.dto.DictDto;

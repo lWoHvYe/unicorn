@@ -16,8 +16,8 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.mnt.domain.main.App;
-import com.lwohvye.modules.mnt.repository.main.AppRepository;
+import com.lwohvye.modules.main.mnt.domain.App;
+import com.lwohvye.modules.main.mnt.repository.AppRepository;
 import com.lwohvye.modules.mnt.service.AppService;
 import com.lwohvye.modules.mnt.service.mapstruct.AppMapper;
 import com.lwohvye.utils.FileUtil;

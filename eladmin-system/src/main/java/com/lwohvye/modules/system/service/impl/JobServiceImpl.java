@@ -17,9 +17,9 @@ package com.lwohvye.modules.system.service.impl;
 
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.modules.system.domain.main.Job;
-import com.lwohvye.modules.system.repository.main.JobRepository;
-import com.lwohvye.modules.system.repository.main.UserRepository;
+import com.lwohvye.modules.main.system.domain.Job;
+import com.lwohvye.modules.main.system.repository.JobRepository;
+import com.lwohvye.modules.main.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.JobService;
 import com.lwohvye.modules.system.service.dto.JobDto;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;

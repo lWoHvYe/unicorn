@@ -16,7 +16,7 @@
 package com.lwohvye.modules.quartz.utils;
 
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.quartz.domain.main.QuartzJob;
+import com.lwohvye.modules.main.quartz.domain.QuartzJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;

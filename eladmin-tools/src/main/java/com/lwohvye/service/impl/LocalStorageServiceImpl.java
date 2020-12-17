@@ -17,9 +17,9 @@ package com.lwohvye.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.config.FileProperties;
-import com.lwohvye.domain.main.LocalStorage;
+import com.lwohvye.main.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.repository.main.LocalStorageRepository;
+import com.lwohvye.main.repository.LocalStorageRepository;
 import com.lwohvye.service.LocalStorageService;
 import com.lwohvye.service.dto.LocalStorageDto;
 import com.lwohvye.service.dto.LocalStorageQueryCriteria;

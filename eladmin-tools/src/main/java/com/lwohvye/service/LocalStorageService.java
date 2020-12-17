@@ -17,7 +17,7 @@ package com.lwohvye.service;
 
 import com.lwohvye.service.dto.LocalStorageDto;
 import com.lwohvye.service.dto.LocalStorageQueryCriteria;
-import com.lwohvye.domain.main.LocalStorage;
+import com.lwohvye.main.domain.LocalStorage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;

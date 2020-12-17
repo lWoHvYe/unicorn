@@ -16,8 +16,8 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.modules.mnt.domain.main.Database;
-import com.lwohvye.modules.mnt.repository.main.DatabaseRepository;
+import com.lwohvye.modules.main.mnt.domain.Database;
+import com.lwohvye.modules.main.mnt.repository.DatabaseRepository;
 import com.lwohvye.modules.mnt.service.mapstruct.DatabaseMapper;
 import com.lwohvye.modules.mnt.util.SqlUtils;
 import com.lwohvye.utils.FileUtil;

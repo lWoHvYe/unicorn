@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.modules.mnt.domain.main.ServerDeploy;
+import com.lwohvye.modules.main.mnt.domain.ServerDeploy;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;

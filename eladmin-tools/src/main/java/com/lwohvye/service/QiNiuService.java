@@ -16,8 +16,8 @@
 package com.lwohvye.service;
 
 import com.lwohvye.service.dto.QiniuQueryCriteria;
-import com.lwohvye.domain.main.QiniuConfig;
-import com.lwohvye.domain.main.QiniuContent;
+import com.lwohvye.main.domain.QiniuConfig;
+import com.lwohvye.main.domain.QiniuContent;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 

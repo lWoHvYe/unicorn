@@ -21,7 +21,7 @@ import com.lwohvye.utils.enums.CodeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.domain.main.vo.EmailVo;
+import com.lwohvye.main.domain.vo.EmailVo;
 import com.lwohvye.service.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

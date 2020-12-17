@@ -18,7 +18,7 @@ package com.lwohvye.modules.system.rest;
 import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.base.BaseEntity;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.system.domain.main.Dept;
+import com.lwohvye.modules.main.system.domain.Dept;
 import com.lwohvye.modules.system.service.DeptService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;

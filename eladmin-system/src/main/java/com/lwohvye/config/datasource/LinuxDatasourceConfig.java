@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Configuration
 @EnableTransactionManagement
-// TODO: 2020/12/17 不能再限制模块了。看看怎么配置
+// 从数据源的repository统一放在 com.lwohvye.modules.linux 包下
 @EnableJpaRepositories(
         //实体管理
         entityManagerFactoryRef = "entityManagerFactoryLinux",
@@ -29,10 +29,7 @@ import java.util.Map;
         transactionManagerRef = "transactionManagerLinux",
         //实体扫描,设置Repository所在位置
         basePackages = {
-                "com.lwohvye.repository.linux",
-                "com.lwohvye.modules.mnt.repository.linux",
-                "com.lwohvye.modules.quartz.repository.linux",
-                "com.lwohvye.modules.system.repository.linux"
+                "com.lwohvye.modules.linux"
         })
 public class LinuxDatasourceConfig {
 
@@ -54,10 +51,7 @@ public class LinuxDatasourceConfig {
                 .dataSource(linuxDataSource)
                 .properties(getVendorProperties())
                 .packages(
-                        "com.lwohvye.domain.linux",
-                        "com.lwohvye.modules.mnt.domain.linux",
-                        "com.lwohvye.modules.quartz.domain.linux",
-                        "com.lwohvye.modules.system.domain.linux"
+                        "com.lwohvye.modules.linux"
                 )
                 .persistenceUnit("linuxPersistenceUnit")
                 .build();

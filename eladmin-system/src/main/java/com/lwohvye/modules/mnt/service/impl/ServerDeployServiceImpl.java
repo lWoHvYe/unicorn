@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.mnt.service.impl;
 
-import com.lwohvye.modules.mnt.domain.main.ServerDeploy;
-import com.lwohvye.modules.mnt.repository.main.ServerDeployRepository;
+import com.lwohvye.modules.main.mnt.domain.ServerDeploy;
+import com.lwohvye.modules.main.mnt.repository.ServerDeployRepository;
 import com.lwohvye.modules.mnt.service.mapstruct.ServerDeployMapper;
 import com.lwohvye.modules.mnt.util.ExecuteShellUtil;
 import com.lwohvye.utils.FileUtil;

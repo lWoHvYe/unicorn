@@ -16,7 +16,7 @@
 package com.lwohvye.modules.quartz.rest;
 
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.quartz.domain.main.QuartzJob;
+import com.lwohvye.modules.main.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.service.QuartzJobService;
 import com.lwohvye.modules.quartz.service.dto.JobQueryCriteria;
 import io.swagger.annotations.Api;

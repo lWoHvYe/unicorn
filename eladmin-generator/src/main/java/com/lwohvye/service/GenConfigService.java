@@ -15,7 +15,7 @@
  */
 package com.lwohvye.service;
 
-import com.lwohvye.domain.main.GenConfig;
+import com.lwohvye.main.domain.GenConfig;
 
 /**
  * @author Zheng Jie

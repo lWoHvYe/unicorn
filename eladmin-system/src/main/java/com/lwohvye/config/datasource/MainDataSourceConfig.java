@@ -26,10 +26,8 @@ import java.util.Map;
         entityManagerFactoryRef = "entityManagerFactoryMain",
         transactionManagerRef = "transactionManagerMain",
         basePackages = {
-                "com.lwohvye.repository.main",
-                "com.lwohvye.modules.mnt.repository.main",
-                "com.lwohvye.modules.quartz.repository.main",
-                "com.lwohvye.modules.system.repository.main"
+                "com.lwohvye.main",
+                "com.lwohvye.modules.main"
         })
 public class MainDataSourceConfig {
 
@@ -53,10 +51,8 @@ public class MainDataSourceConfig {
                 .dataSource(mainDataSource)
                 .properties(getVendorProperties())
                 .packages(
-                        "com.lwohvye.domain.main",
-                        "com.lwohvye.modules.mnt.domain.main",
-                        "com.lwohvye.modules.quartz.domain.main",
-                        "com.lwohvye.modules.system.domain.main"
+                        "com.lwohvye.main",
+                        "com.lwohvye.modules.main"
                 )
                 .persistenceUnit("mainPersistenceUnit")
                 .build();

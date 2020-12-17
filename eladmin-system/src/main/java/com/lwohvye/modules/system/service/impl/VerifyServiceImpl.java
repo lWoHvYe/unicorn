@@ -22,7 +22,7 @@ import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.domain.main.vo.EmailVo;
+import com.lwohvye.main.domain.vo.EmailVo;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.service.VerifyService;
 import com.lwohvye.utils.RedisUtils;

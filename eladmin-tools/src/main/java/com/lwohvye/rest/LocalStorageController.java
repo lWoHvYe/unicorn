@@ -17,7 +17,7 @@ package com.lwohvye.rest;
 
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.annotation.Log;
-import com.lwohvye.domain.main.LocalStorage;
+import com.lwohvye.main.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.service.LocalStorageService;
 import com.lwohvye.service.dto.LocalStorageQueryCriteria;

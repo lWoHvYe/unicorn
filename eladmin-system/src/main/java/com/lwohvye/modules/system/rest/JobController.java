@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.rest;
 
 import com.lwohvye.base.BaseEntity;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.system.domain.main.Job;
+import com.lwohvye.modules.main.system.domain.Job;
 import com.lwohvye.modules.system.service.JobService;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
 import io.swagger.annotations.Api;

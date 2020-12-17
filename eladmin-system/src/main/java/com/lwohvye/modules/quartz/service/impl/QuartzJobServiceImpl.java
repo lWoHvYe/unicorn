@@ -17,10 +17,10 @@ package com.lwohvye.modules.quartz.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.quartz.domain.main.QuartzJob;
-import com.lwohvye.modules.quartz.domain.main.QuartzLog;
-import com.lwohvye.modules.quartz.repository.main.QuartzJobRepository;
-import com.lwohvye.modules.quartz.repository.main.QuartzLogRepository;
+import com.lwohvye.modules.main.quartz.domain.QuartzJob;
+import com.lwohvye.modules.main.quartz.domain.QuartzLog;
+import com.lwohvye.modules.main.quartz.repository.QuartzJobRepository;
+import com.lwohvye.modules.main.quartz.repository.QuartzLogRepository;
 import com.lwohvye.modules.quartz.service.QuartzJobService;
 import com.lwohvye.modules.quartz.service.dto.JobQueryCriteria;
 import com.lwohvye.modules.quartz.utils.QuartzManage;

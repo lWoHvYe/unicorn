@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.modules.mnt.domain.main.Database;
+import com.lwohvye.modules.main.mnt.domain.Database;
 import com.lwohvye.modules.mnt.util.SqlUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

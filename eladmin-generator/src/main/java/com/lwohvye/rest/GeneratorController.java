@@ -15,7 +15,7 @@
  */
 package com.lwohvye.rest;
 
-import com.lwohvye.domain.main.ColumnInfo;
+import com.lwohvye.main.domain.ColumnInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;

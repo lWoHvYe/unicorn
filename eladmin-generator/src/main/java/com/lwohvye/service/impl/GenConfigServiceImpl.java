@@ -15,8 +15,8 @@
  */
 package com.lwohvye.service.impl;
 
-import com.lwohvye.domain.main.GenConfig;
-import com.lwohvye.repository.main.GenConfigRepository;
+import com.lwohvye.main.domain.GenConfig;
+import com.lwohvye.main.repository.GenConfigRepository;
 import com.lwohvye.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.service.GenConfigService;

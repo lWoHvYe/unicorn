@@ -15,8 +15,8 @@
  */
 package com.lwohvye.service;
 
-import com.lwohvye.domain.main.ColumnInfo;
-import com.lwohvye.domain.main.GenConfig;
+import com.lwohvye.main.domain.ColumnInfo;
+import com.lwohvye.main.domain.GenConfig;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;

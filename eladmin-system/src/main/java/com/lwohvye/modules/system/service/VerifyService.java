@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
-import com.lwohvye.domain.main.vo.EmailVo;
+import com.lwohvye.main.domain.vo.EmailVo;
 
 /**
  * @author Zheng Jie
