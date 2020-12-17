@@ -8,6 +8,9 @@
 
 </div>
 
+后台运行jar
+nohup java -jar eladmin-system-2.6.jar --spring.profiles.active=dev > log.file 2>&1 &
+
 #### 项目简介
 一个基于 Spring Boot 2.1.0 、 Spring Boot Jpa、 JWT、Spring Security、Redis、Vue的前后端分离的后台管理系统
 

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>eladmin</artifactId>
-        <groupId>me.zhengjie</groupId>
+        <groupId>com.lwohvye</groupId>
         <version>2.6</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -21,7 +21,7 @@
     <dependencies>
         <!-- 同时需要common模块和logging模块只需要引入logging模块即可 -->
         <dependency>
-            <groupId>me.zhengjie</groupId>
+            <groupId>com.lwohvye</groupId>
             <artifactId>eladmin-logging</artifactId>
             <version>2.6</version>
         </dependency>
@@ -45,6 +45,10 @@
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
             <version>${alipay.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
         </dependency>
     </dependencies>
 </project>
