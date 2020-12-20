@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @EnableAsync
 @RestController
-//@Api(hidden = true)
+@Api(hidden = true)
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")

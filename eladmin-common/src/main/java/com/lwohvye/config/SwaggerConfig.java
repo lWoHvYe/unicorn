@@ -88,8 +88,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .description("一个简单且易上手的 Spring boot 后台管理框架")
-                .title("lWoHvYe 接口文档")
+                .description("1101100_1010111_1101111_1001000_1110110_1011001_1100101")
+                .title("lWoHvYe")
                 .version("2.6.4")
                 .build();
     }
