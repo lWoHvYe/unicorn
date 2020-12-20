@@ -160,6 +160,32 @@ public class QueryHelp {
                             list.add(cb.between(getExpression(attributeName, join, root).as((Class<? extends Comparable>) between.get(0).getClass()),
                                     (Comparable) between.get(0), (Comparable) between.get(1)));
                             break;
+                        case NOT_IN:
+                            if (CollUtil.isNotEmpty((Collection<Long>) val)) {
+                                list.add(cb.not(getExpression(attributeName, join, root).in((Collection<Long>) val)));
+                            }
+                            break;
+                        case LIKE_STR:
+                            list.add(cb.like(getExpression(attributeName, join, root)
+                                    .as(String.class), val.toString()));
+                            break;
+                        case IN_OR_ISNULL:
+                            if (CollUtil.isNotEmpty((Collection<Long>) val)) {
+                                list.add(
+//                                        在集合中
+                                        cb.or(getExpression(attributeName, join, root).in((Collection<Long>) val)
+//                                                或值为null
+                                                , cb.isNull(getExpression(attributeName, join, root))
+//                                                或值为空字符串
+                                                , cb.equal(getExpression(attributeName, join, root).as(String.class), ""))
+                                );
+                            }
+                            break;
+                        case IS_OR_NULL:
+                            list.add((Long) val == -1L ?
+                                    cb.isNull(getExpression(attributeName, join, root).as((Class<? extends Comparable>) fieldType)) :
+                                    cb.equal(getExpression(attributeName, join, root).as((Class<? extends Comparable>) fieldType), val));
+                            break;
                         default: break;
                     }
                 }

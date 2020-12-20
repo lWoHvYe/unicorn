@@ -73,6 +73,14 @@ public @interface Query {
         ,NOT_NULL
         // 为空
         ,IS_NULL
+        // why 不在指定集合中，不建议使用。因为集合会很大，对效率影响较大
+        ,NOT_IN
+        // why 两个分别用于自定义通配符的like
+        ,LIKE_STR
+        // why 业务需要，在指定集合内或值为空
+        ,IN_OR_ISNULL
+        // why 传非-1时，使用EQUAL,传-1时，使用IS_NULL。将not in 转为left join + 关联表id为null
+        ,IS_OR_NULL
     }
 
     /**
