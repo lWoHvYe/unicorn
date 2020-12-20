@@ -26,16 +26,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.data.domain.Pageable;
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.schema.AlternateTypeRule;
 import springfox.documentation.schema.AlternateTypeRuleConvention;
-import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,8 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
  * @date 2018-11-23
  */
 @Configuration
-@EnableSwagger2
+//@EnableSwagger2
+@EnableOpenApi
 public class SwaggerConfig {
 
     @Value("${jwt.header}")
@@ -78,7 +77,8 @@ public class SwaggerConfig {
                 .enable(enabled)
                 .apiInfo(apiInfo())
                 .select()
-                .paths(Predicates.not(PathSelectors.regex("/error.*")))
+//                .paths(Predicates.not(PathSelectors.regex("/error.*")))
+                .paths(PathSelectors.any())
                 .build()
 //                .globalOperationParameters(pars)
                 //添加登陆认证
@@ -89,17 +89,17 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .description("一个简单且易上手的 Spring boot 后台管理框架")
-                .title("EL-ADMIN 接口文档")
-                .version("2.6")
+                .title("lWoHvYe 接口文档")
+                .version("2.6.4")
                 .build();
     }
 
-    private List<ApiKey> securitySchemes() {
+    private List<SecurityScheme> securitySchemes() {
         //设置请求头信息
-        List<ApiKey> apiKeys = new ArrayList<>();
-        ApiKey apiKey = new ApiKey(tokenHeader, tokenHeader, "header");
-        apiKeys.add(apiKey);
-        return apiKeys;
+        var securitySchemes = new ArrayList<SecurityScheme>();
+        var apiKey = new ApiKey(tokenHeader, tokenHeader, "header");
+        securitySchemes.add(apiKey);
+        return securitySchemes;
     }
 
     private List<SecurityContext> securityContexts() {

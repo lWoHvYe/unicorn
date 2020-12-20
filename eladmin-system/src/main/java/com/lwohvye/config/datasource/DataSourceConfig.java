@@ -21,7 +21,7 @@ public class DataSourceConfig {
     @Bean(name = "mainDataSource")
     @Qualifier("mainDataSource")
     @ConfigurationProperties(prefix="spring.datasource.druid.main")
-    public DataSource MainDataSource() {
+    public DataSource mainDataSource() {
         return DataSourceBuilder.create().type(DruidDataSource.class).build();
     }
 
