@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.system.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import com.lwohvye.base.BaseDTO;
@@ -55,12 +55,12 @@ public class UserDto extends BaseDTO implements Serializable {
 
     private String avatarPath;
 
-    @JsonIgnore
+    @JSONField(serialize = false)
     private String password;
 
     private Boolean enabled;
 
-    @JsonIgnore
+    @JSONField(serialize = false)
     private Boolean isAdmin = false;
 
     private Date pwdResetTime;
