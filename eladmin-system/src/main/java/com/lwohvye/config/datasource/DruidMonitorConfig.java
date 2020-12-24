@@ -1,4 +1,4 @@
-package com.lwohvye.springboot.dubboprovider.common.datasource;
+package com.lwohvye.config.datasource;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
