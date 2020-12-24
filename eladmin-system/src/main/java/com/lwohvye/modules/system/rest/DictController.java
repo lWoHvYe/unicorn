@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.rest;
 
+import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.Dict;
 import com.lwohvye.modules.system.service.DictService;
@@ -83,7 +84,7 @@ public class DictController {
     @ApiOperation("修改字典")
     @PutMapping
     @PreAuthorize("@el.check('dict:edit')")
-    public ResponseEntity<Object> update(@Validated(Dict.Update.class) @RequestBody Dict resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dict resources){
         dictService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

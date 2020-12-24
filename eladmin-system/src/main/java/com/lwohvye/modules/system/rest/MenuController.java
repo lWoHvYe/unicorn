@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.Menu;
 import com.lwohvye.modules.system.service.MenuService;
@@ -125,7 +126,7 @@ public class MenuController {
     @ApiOperation("修改菜单")
     @PutMapping
     @PreAuthorize("@el.check('menu:edit')")
-    public ResponseEntity<Object> update(@Validated(Menu.Update.class) @RequestBody Menu resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Menu resources){
         menuService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

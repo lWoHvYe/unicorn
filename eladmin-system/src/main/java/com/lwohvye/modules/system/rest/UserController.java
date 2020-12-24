@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.annotation.Log;
-import com.lwohvye.base.BaseEntity;
+import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.User;
@@ -46,7 +46,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -114,7 +116,7 @@ public class UserController {
     @ApiOperation("修改用户")
     @PutMapping
     @PreAuthorize("@el.check('user:edit')")
-    public ResponseEntity<Object> update(@Validated(User.Update.class) @RequestBody User resources) throws Exception {
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody User resources) throws Exception {
         checkLevel(resources);
         userService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -123,7 +125,7 @@ public class UserController {
     @Log("修改用户：个人中心")
     @ApiOperation("修改用户：个人中心")
     @PutMapping(value = "center")
-    public ResponseEntity<Object> center(@Validated(User.Update.class) @RequestBody User resources){
+    public ResponseEntity<Object> center(@Validated(Update.class) @RequestBody User resources){
         if(!resources.getId().equals(SecurityUtils.getCurrentUserId())){
             throw new BadRequestException("不能修改他人资料");
         }

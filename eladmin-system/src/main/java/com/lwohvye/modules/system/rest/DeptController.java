@@ -16,7 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.base.BaseEntity;
+import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.Dept;
 import com.lwohvye.modules.system.service.DeptService;
@@ -92,7 +92,7 @@ public class DeptController {
     @ApiOperation("修改部门")
     @PutMapping
     @PreAuthorize("@el.check('dept:edit')")
-    public ResponseEntity<Object> update(@Validated(BaseEntity.Update.class) @RequestBody Dept resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dept resources){
         deptService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

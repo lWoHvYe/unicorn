@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.lang.Dict;
+import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.Role;
 import com.lwohvye.modules.system.service.RoleService;
@@ -105,7 +106,7 @@ public class RoleController {
     @ApiOperation("修改角色")
     @PutMapping
     @PreAuthorize("@el.check('roles:edit')")
-    public ResponseEntity<Object> update(@Validated(Role.Update.class) @RequestBody Role resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Role resources){
         getLevels(resources.getLevel());
         roleService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -36,6 +36,7 @@
         <druid.version>1.1.22</druid.version>
         <hutool.version>5.5.3</hutool.version>
         <commons-pool2.version>2.5.0</commons-pool2.version>
+        <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <!--logstash要用5系列版本。6系列整合方式暂未知-->
         <logstash.version>5.3</logstash.version>

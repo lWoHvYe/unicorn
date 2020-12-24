@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.quartz.rest;
 
+import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.service.QuartzJobService;
@@ -92,7 +93,7 @@ public class QuartzJobController {
     @ApiOperation("修改定时任务")
     @PutMapping
     @PreAuthorize("@el.check('timing:edit')")
-    public ResponseEntity<Object> update(@Validated(QuartzJob.Update.class) @RequestBody QuartzJob resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody QuartzJob resources){
         quartzJobService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

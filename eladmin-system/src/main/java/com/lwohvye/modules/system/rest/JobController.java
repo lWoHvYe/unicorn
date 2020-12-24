@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.system.rest;
 
-import com.lwohvye.base.BaseEntity;
+import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.Job;
 import com.lwohvye.modules.system.service.JobService;
@@ -77,7 +77,7 @@ public class JobController {
     @ApiOperation("修改岗位")
     @PutMapping
     @PreAuthorize("@el.check('job:edit')")
-    public ResponseEntity<Object> update(@Validated(BaseEntity.Update.class) @RequestBody Job resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Job resources){
         jobService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
