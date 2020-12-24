@@ -46,9 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -116,7 +114,7 @@ public class UserController {
     @ApiOperation("修改用户")
     @PutMapping
     @PreAuthorize("@el.check('user:edit')")
-    public ResponseEntity<Object> update(@Validated(BaseEntity.Update.class) @RequestBody User resources){
+    public ResponseEntity<Object> update(@Validated(User.Update.class) @RequestBody User resources) throws Exception {
         checkLevel(resources);
         userService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -125,7 +123,7 @@ public class UserController {
     @Log("修改用户：个人中心")
     @ApiOperation("修改用户：个人中心")
     @PutMapping(value = "center")
-    public ResponseEntity<Object> center(@Validated(BaseEntity.Update.class) @RequestBody User resources){
+    public ResponseEntity<Object> center(@Validated(User.Update.class) @RequestBody User resources){
         if(!resources.getId().equals(SecurityUtils.getCurrentUserId())){
             throw new BadRequestException("不能修改他人资料");
         }
