@@ -1,5 +1,5 @@
 server:
-  port: 8000
+  port: 8081
 
 spring:
   freemarker:
@@ -23,7 +23,7 @@ spring:
 
   redis:
     #数据库索引
-    database: ${REDIS_DB:0}
+    database: ${REDIS_DB:4}
     host: ${REDIS_HOST:10.100.6.140}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:}
