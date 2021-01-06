@@ -29,13 +29,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>14</java.version>
+        <java.version>15</java.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <swagger.version>3.0.0</swagger.version>
-        <fastjson.version>1.2.70</fastjson.version>
-        <druid.version>1.1.22</druid.version>
-        <hutool.version>5.5.3</hutool.version>
-        <commons-pool2.version>2.5.0</commons-pool2.version>
+        <fastjson.version>1.2.75</fastjson.version>
+        <druid.version>1.2.4</druid.version>
+        <hutool.version>5.5.6</hutool.version>
+        <commons-pool2.version>2.9.0</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <!--logstash要用5系列版本。6系列整合方式暂未知-->
