@@ -15,29 +15,31 @@
  */
 package com.lwohvye.modules.system.rest;
 
+import com.lwohvye.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.Dict;
 import com.lwohvye.modules.system.service.DictService;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.annotation.Log;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
 
 /**
-* @author Zheng Jie
-* @date 2019-04-10
-*/
+ * @author Zheng Jie
+ * @date 2019-04-10
+ */
 @RestController
 @RequiredArgsConstructor
 @Api(tags = "系统：字典管理")
@@ -57,44 +59,44 @@ public class DictController {
     @ApiOperation("查询字典")
     @GetMapping(value = "/all")
     @PreAuthorize("@el.check('dict:list')")
-    public ResponseEntity<Object> queryAll(){
-        return new ResponseEntity<>(dictService.queryAll(new DictQueryCriteria()),HttpStatus.OK);
+    public ResponseEntity<Object> queryAll() {
+        return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(new DictQueryCriteria())), HttpStatus.OK);
     }
 
     @ApiOperation("查询字典")
     @GetMapping
     @PreAuthorize("@el.check('dict:list')")
-    public ResponseEntity<Object> query(DictQueryCriteria resources, Pageable pageable){
-        return new ResponseEntity<>(dictService.queryAll(resources,pageable),HttpStatus.OK);
+    public ResponseEntity<Object> query(DictQueryCriteria resources, Pageable pageable) {
+        return new ResponseEntity<>(ResultInfo.successPage(dictService.queryAll(resources, pageable)), HttpStatus.OK);
     }
 
     @Log("新增字典")
     @ApiOperation("新增字典")
     @PostMapping
     @PreAuthorize("@el.check('dict:add')")
-    public ResponseEntity<Object> create(@Validated @RequestBody Dict resources){
+    public ResponseEntity<Object> create(@Validated @RequestBody Dict resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
         dictService.create(resources);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
 
     @Log("修改字典")
     @ApiOperation("修改字典")
     @PutMapping
     @PreAuthorize("@el.check('dict:edit')")
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dict resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dict resources) {
         dictService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
 
     @Log("删除字典")
     @ApiOperation("删除字典")
     @DeleteMapping
     @PreAuthorize("@el.check('dict:del')")
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids){
+    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         dictService.delete(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 }
