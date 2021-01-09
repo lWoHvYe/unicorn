@@ -8,6 +8,7 @@ import com.lwohvye.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -32,6 +33,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * 处理所有未知异常 Throwable
+     *
      * @param e
      * @return ResponseEntity
      */
@@ -44,6 +46,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * 处理实体已存在异常 EntityExistException
+     *
      * @param e
      * @return ResponseEntity
      */
@@ -56,6 +59,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * 处理实体不存在异常 EntityNotFoundException
+     *
      * @param e
      * @return ResponseEntity
      */
@@ -68,6 +72,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * 处理自定义异常 BadRequestException
+     *
      * @param e
      * @return ResponseEntity
      */
@@ -80,6 +85,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * 处理无权限访问异常 AccessDeniedException
+     *
      * @param e
      * @return ResponseEntity
      */
@@ -92,6 +98,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * 处理请求方法不支持的异常 HttpRequestMethodNotSupportedException
+     *
      * @param e
      * @return ResponseEntity
      */
@@ -104,6 +111,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * 处理请求参数不正确的异常 HttpRequestMethodNotSupportedException
+     *
      * @param e
      * @return ResponseEntity
      */
@@ -117,6 +125,20 @@ public class ApiGlobalExceptionHandler {
             message = str[1] + ":" + message;
         }
         return buildResponseEntity(ResultInfo.validateFailed(message), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * @description 添加或更新的数据中有非空字段设置为null。或者未使用级联删除外键，均会出此异常
+     * @params [e]
+     * @return org.springframework.http.ResponseEntity<com.lwohvye.utils.result.ResultInfo>
+     * @author Hongyan Wang
+     * @date 2021/1/9 21:42
+     */
+    @ResponseBody
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ResultInfo> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.error(ThrowableUtil.getStackTrace(e));
+        return buildResponseEntity(ResultInfo.methodNotAllowed(e.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     private ResponseEntity<ResultInfo> buildResponseEntity(ResultInfo resultInfo, HttpStatus httpStatus) {
