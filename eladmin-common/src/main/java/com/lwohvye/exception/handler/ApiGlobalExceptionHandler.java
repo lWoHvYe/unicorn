@@ -128,9 +128,9 @@ public class ApiGlobalExceptionHandler {
     }
 
     /**
+     * @return org.springframework.http.ResponseEntity<com.lwohvye.utils.result.ResultInfo>
      * @description 添加或更新的数据中有非空字段设置为null。或者未使用级联删除外键，均会出此异常
      * @params [e]
-     * @return org.springframework.http.ResponseEntity<com.lwohvye.utils.result.ResultInfo>
      * @author Hongyan Wang
      * @date 2021/1/9 21:42
      */
@@ -138,7 +138,7 @@ public class ApiGlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ResultInfo> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.error(ThrowableUtil.getStackTrace(e));
-        return buildResponseEntity(ResultInfo.methodNotAllowed(e.getMessage()), HttpStatus.UNPROCESSABLE_ENTITY);
+        return buildResponseEntity(ResultInfo.methodNotAllowed(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<ResultInfo> buildResponseEntity(ResultInfo resultInfo, HttpStatus httpStatus) {
