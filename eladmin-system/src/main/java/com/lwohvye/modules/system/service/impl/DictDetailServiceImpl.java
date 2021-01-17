@@ -93,6 +93,6 @@ public class DictDetailServiceImpl implements DictDetailService {
 
     public void delCaches(DictDetail dictDetail){
         Dict dict = dictRepository.findById(dictDetail.getDict().getId()).orElseGet(Dict::new);
-        redisUtils.del("dict::name:" + dict.getName());
+        redisUtils.del(CacheKey.DICT_NAME + dict.getName());
     }
 }

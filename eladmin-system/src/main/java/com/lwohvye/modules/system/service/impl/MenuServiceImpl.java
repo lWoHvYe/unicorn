@@ -40,7 +40,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -93,7 +92,6 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 用户角色改变时需清理缓存
-     *
      * @param currentUserId /
      * @return /
      */
@@ -343,17 +341,16 @@ public class MenuServiceImpl implements MenuService {
 
     /**
      * 清理缓存
-     *
      * @param id 菜单ID
      */
-    public void delCaches(Long id) {
+    public void delCaches(Long id){
         List<User> users = userRepository.findByMenuId(id);
-        redisUtils.del("menu::id:" + id);
-        redisUtils.delByKeys("menu::user:", users.stream().map(User::getId).collect(Collectors.toSet()));
+        redisUtils.del(CacheKey.MENU_ID + id);
+        redisUtils.delByKeys(CacheKey.MENU_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
         // 清除 Role 缓存
-        List<Role> roles = roleService.findInMenuId(new ArrayList<Long>() {{
+        List<Role> roles = roleService.findInMenuId(new ArrayList<Long>(){{
             add(id);
         }});
-        redisUtils.delByKeys("role::id:", roles.stream().map(Role::getId).collect(Collectors.toSet()));
+        redisUtils.delByKeys(CacheKey.ROLE_ID, roles.stream().map(Role::getId).collect(Collectors.toSet()));
     }
 }
