@@ -15,20 +15,21 @@
  */
 package com.lwohvye.service.impl;
 
-import cn.hutool.extra.mail.Mail;
 import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.extra.mail.MailUtil;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.main.repository.EmailRepository;
-import com.lwohvye.utils.EncryptUtils;
-import lombok.RequiredArgsConstructor;
 import com.lwohvye.main.domain.EmailConfig;
 import com.lwohvye.main.domain.vo.EmailVo;
+import com.lwohvye.main.repository.EmailRepository;
 import com.lwohvye.service.EmailService;
+import com.lwohvye.utils.EncryptUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
 /**
@@ -79,23 +80,26 @@ public class EmailServiceImpl implements EmailService {
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
-        account.setFrom(emailConfig.getUser()+"<"+emailConfig.getFromUser()+">");
-        // ssl方式发送
-        account.setSslEnable(true);
+//        部分邮箱 user和fromUser需一致
+        account.setFrom(emailConfig.getUser()+" <"+emailConfig.getFromUser()+">");
+        // ssl方式发送-----不使用
+//        account.setSslEnable(true);
+        account.setSslEnable(false);
         // 使用STARTTLS安全连接
         account.setStarttlsEnable(true);
         String content = emailVo.getContent();
         // 发送
         try {
-            int size = emailVo.getTos().size();
-            Mail.create(account)
-                    .setTos(emailVo.getTos().toArray(new String[size]))
-                    .setTitle(emailVo.getSubject())
-                    .setContent(content)
-                    .setHtml(true)
-                    //关闭session
-                    .setUseGlobalSession(false)
-                    .send();
+//            int size = emailVo.getTos().size();
+//            Mail.create(account)
+//                    .setTos(emailVo.getTos().toArray(new String[size]))
+//                    .setTitle(emailVo.getSubject())
+//                    .setContent(content)
+//                    .setHtml(true)
+//                    //关闭session
+//                    .setUseGlobalSession(false)
+//                    .send();
+            MailUtil.send(account, emailVo.getTos(), emailVo.getSubject(), content, true);
         }catch (Exception e){
             throw new BadRequestException(e.getMessage());
         }
