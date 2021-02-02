@@ -13,9 +13,9 @@ import java.util.List;
 public interface IResultInfo<T> extends Serializable {
     long getBusinessCode();
 
-    List<T> getResultSet();
+    List<T> getContent();
 
     String getDescription();
 
-    long getCount();
+    long getTotalElements();
 }

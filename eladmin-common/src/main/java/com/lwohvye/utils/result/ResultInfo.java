@@ -1,5 +1,6 @@
 package com.lwohvye.utils.result;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
@@ -16,24 +17,40 @@ import java.util.Map;
 public class ResultInfo<T> implements IResultInfo<T> {
     private static final long serialVersionUID = -7313465544799377989L;
     private long businessCode;
-    private List<T> resultSet;
+    private List<T> content;
+    private T result;
+    private Map resultMap;
     private String description;
-    private long count;
+    private long totalElements;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime currentTime;
 
-    public ResultInfo(long businessCode, List<T> resultSet, String description) {
+    public ResultInfo(long businessCode, T t, String description) {
         this.businessCode = businessCode;
-        this.resultSet = resultSet;
+        this.result = t;
         this.description = description;
-        this.count = resultSet.size();
         currentTime = LocalDateTime.now();
     }
 
-    public ResultInfo(long businessCode, Map<String, Object> page, String description) {
+    public ResultInfo(long businessCode, List<T> resultSet, String description) {
         this.businessCode = businessCode;
-        this.resultSet = (List<T>) page.get("content");
-        this.count = (Long) page.get("totalElements");
+        this.content = resultSet;
+        this.description = description;
+        this.totalElements = resultSet.size();
+        currentTime = LocalDateTime.now();
+    }
+
+    public ResultInfo(long businessCode, Map<String, Object> objectMap, String description) {
+        this.businessCode = businessCode;
+//        考虑map可以不是page的情况
+        var content = objectMap.get("content");
+        if (ObjectUtil.isNotNull(content) && content instanceof List)
+            this.content = (List<T>) content;
+        else
+            this.resultMap = objectMap;
+        var totalElements = objectMap.get("totalElements");
+        if (ObjectUtil.isNotNull(totalElements) && totalElements instanceof Long)
+            this.totalElements = (Long) totalElements;
         this.description = description;
         currentTime = LocalDateTime.now();
     }
@@ -46,7 +63,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @date 2021/1/9 9:39
      */
     public static <T> ResultInfo<T> success() {
-        return new ResultInfo<T>(ResultCode.SUCCESS.getCode(), new ArrayList<>(), "");
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), new ArrayList<>(), "");
     }
 
     /**
@@ -57,20 +74,23 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> success(List<T> resultSet) {
-        return new ResultInfo<T>(ResultCode.SUCCESS.getCode(), resultSet, "");
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), resultSet, "");
     }
 
     /**
      * 成功返回单一实体结果集。还是采用List的方式
      *
-     * @param result
+     * @param t
      * @param <T>
      * @return
      */
-    public static <T> ResultInfo<T> success(T result) {
-        List<T> list = new ArrayList<>();
-        list.add(result);
-        return new ResultInfo<T>(ResultCode.SUCCESS.getCode(), list, "");
+    public static <T> ResultInfo<T> success(T t) {
+//        如果是Map，走分页
+        if (t instanceof Map)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (Map<String, Object>) t, "");
+        if (t instanceof List)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (List<T>) t, "");
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, "");
     }
 
     /**
@@ -81,7 +101,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> successPage(Map<String, Object> page) {
-        return new ResultInfo<T>(ResultCode.SUCCESS.getCode(), page, "");
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, "");
     }
 
     /**
@@ -93,7 +113,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> success(List<T> resultSet, String description) {
-        return new ResultInfo<T>(ResultCode.SUCCESS.getCode(), resultSet, description);
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), resultSet, description);
     }
 
     /**
@@ -104,7 +124,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> failed(String description) {
-        return new ResultInfo<T>(ResultCode.FAILED.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.FAILED.getCode(), new ArrayList<>(), description);
     }
 
     /**
@@ -114,7 +134,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> unauthorized() {
-        return new ResultInfo<T>(ResultCode.UNAUTHORIZED.getCode(), new ArrayList<>(), ResultCode.UNAUTHORIZED.getDescription());
+        return new ResultInfo<>(ResultCode.UNAUTHORIZED.getCode(), new ArrayList<>(), ResultCode.UNAUTHORIZED.getDescription());
     }
 
     /**
@@ -125,7 +145,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> forbidden(String description) {
-        return new ResultInfo<T>(ResultCode.FORBIDDEN.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.FORBIDDEN.getCode(), new ArrayList<>(), description);
     }
 
     /**
@@ -135,7 +155,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> validateFailed() {
-        return new ResultInfo<T>(ResultCode.VALIDATE_FAILED.getCode(), new ArrayList<>(), ResultCode.VALIDATE_FAILED.getDescription());
+        return new ResultInfo<>(ResultCode.VALIDATE_FAILED.getCode(), new ArrayList<>(), ResultCode.VALIDATE_FAILED.getDescription());
     }
 
     /**
@@ -146,7 +166,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> validateFailed(String description) {
-        return new ResultInfo<T>(ResultCode.VALIDATE_FAILED.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.VALIDATE_FAILED.getCode(), new ArrayList<>(), description);
     }
 
     /**
@@ -157,6 +177,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> methodNotAllowed(String description) {
-        return new ResultInfo<T>(ResultCode.METHOD_NOT_ALLOWED.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.METHOD_NOT_ALLOWED.getCode(), new ArrayList<>(), description);
     }
 }
