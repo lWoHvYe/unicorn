@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import com.lwohvye.modules.system.service.MonitorService;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class MonitorController {
     @GetMapping
     @ApiOperation("查询服务监控")
     @PreAuthorize("@el.check('monitor:list')")
-    public ResponseEntity<Object> query(){
-        return new ResponseEntity<>(serverService.getServers(),HttpStatus.OK);
+    public ResponseEntity<Object> query() {
+        return new ResponseEntity<>(serverService.getServers(), HttpStatus.OK);
     }
 }

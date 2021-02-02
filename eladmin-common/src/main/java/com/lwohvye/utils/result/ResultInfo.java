@@ -3,6 +3,7 @@ package com.lwohvye.utils.result;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,6 +56,14 @@ public class ResultInfo<T> implements IResultInfo<T> {
         currentTime = LocalDateTime.now();
     }
 
+    public ResultInfo(long businessCode, Page<T> page, String description) {
+        this.businessCode = businessCode;
+        this.content = page.getContent();
+        this.totalElements = page.getTotalElements();
+        this.description = description;
+        currentTime = LocalDateTime.now();
+    }
+
     /**
      * @return com.lwohvye.utils.result.ResultInfo<T>
      * @description 只是返回成功状态。无其他结果集
@@ -90,6 +99,9 @@ public class ResultInfo<T> implements IResultInfo<T> {
             return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (Map<String, Object>) t, "");
         if (t instanceof List)
             return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (List<T>) t, "");
+        if (t instanceof Page)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (Page<T>) t, "");
+
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, "");
     }
 

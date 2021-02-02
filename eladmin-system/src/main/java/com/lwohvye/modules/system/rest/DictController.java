@@ -67,7 +67,7 @@ public class DictController {
     @GetMapping
     @PreAuthorize("@el.check('dict:list')")
     public ResponseEntity<Object> query(DictQueryCriteria resources, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.successPage(dictService.queryAll(resources, pageable)), HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(resources, pageable)), HttpStatus.OK);
     }
 
     @Log("新增字典")

@@ -20,6 +20,7 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.main.system.domain.Job;
 import com.lwohvye.modules.system.service.JobService;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +31,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
 
 /**
-* @author Zheng Jie
-* @date 2019-03-29
-*/
+ * @author Zheng Jie
+ * @date 2019-03-29
+ */
 @RestController
 @RequiredArgsConstructor
 @Api(tags = "系统：岗位管理")
@@ -57,39 +59,39 @@ public class JobController {
     @ApiOperation("查询岗位")
     @GetMapping
     @PreAuthorize("@el.check('job:list','user:list')")
-    public ResponseEntity<Object> query(JobQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(jobService.queryAll(criteria, pageable),HttpStatus.OK);
+    public ResponseEntity<Object> query(JobQueryCriteria criteria, Pageable pageable) {
+        return new ResponseEntity<>(ResultInfo.success(jobService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增岗位")
     @ApiOperation("新增岗位")
     @PostMapping
     @PreAuthorize("@el.check('job:add')")
-    public ResponseEntity<Object> create(@Validated @RequestBody Job resources){
+    public ResponseEntity<Object> create(@Validated @RequestBody Job resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
         jobService.create(resources);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
 
     @Log("修改岗位")
     @ApiOperation("修改岗位")
     @PutMapping
     @PreAuthorize("@el.check('job:edit')")
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Job resources){
+    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Job resources) {
         jobService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
 
     @Log("删除岗位")
     @ApiOperation("删除岗位")
     @DeleteMapping
     @PreAuthorize("@el.check('job:del')")
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids){
+    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         // 验证是否被用户关联
         jobService.verification(ids);
         jobService.delete(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 }

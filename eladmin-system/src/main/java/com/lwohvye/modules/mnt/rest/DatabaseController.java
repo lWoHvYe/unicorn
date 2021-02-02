@@ -17,6 +17,7 @@ package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.modules.main.mnt.domain.Database;
 import com.lwohvye.modules.mnt.util.SqlUtils;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +64,7 @@ public class DatabaseController {
     @GetMapping
 	@PreAuthorize("@el.check('database:list')")
     public ResponseEntity<Object> query(DatabaseQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(databaseService.queryAll(criteria,pageable),HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(databaseService.queryAll(criteria,pageable)),HttpStatus.OK);
     }
 
     @Log("新增数据库")
@@ -72,7 +73,7 @@ public class DatabaseController {
 	@PreAuthorize("@el.check('database:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody Database resources){
 		databaseService.create(resources);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(ResultInfo.success(),HttpStatus.CREATED);
     }
 
     @Log("修改数据库")
@@ -81,7 +82,7 @@ public class DatabaseController {
 	@PreAuthorize("@el.check('database:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody Database resources){
         databaseService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(ResultInfo.success(),HttpStatus.NO_CONTENT);
     }
 
     @Log("删除数据库")
@@ -90,7 +91,7 @@ public class DatabaseController {
 	@PreAuthorize("@el.check('database:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<String> ids){
         databaseService.delete(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(),HttpStatus.OK);
     }
 
 	@Log("测试数据库链接")

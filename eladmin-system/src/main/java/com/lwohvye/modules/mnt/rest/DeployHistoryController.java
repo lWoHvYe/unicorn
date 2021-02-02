@@ -16,6 +16,7 @@
 package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.modules.mnt.service.DeployHistoryService;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class DeployHistoryController {
     @GetMapping
 	@PreAuthorize("@el.check('deployHistory:list')")
     public ResponseEntity<Object> query(DeployHistoryQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(deployhistoryService.queryAll(criteria,pageable),HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(deployhistoryService.queryAll(criteria,pageable)),HttpStatus.OK);
     }
 
     @Log("删除DeployHistory")
@@ -62,6 +63,6 @@ public class DeployHistoryController {
     @PreAuthorize("@el.check('deployHistory:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<String> ids){
         deployhistoryService.delete(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(),HttpStatus.OK);
     }
 }

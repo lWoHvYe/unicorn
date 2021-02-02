@@ -16,6 +16,7 @@
 package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.modules.main.mnt.domain.ServerDeploy;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +29,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author zhanghouying
+ * @date 2019-08-24
+ */
 @RestController
 @Api(tags = "运维：服务器管理")
 @RequiredArgsConstructor
@@ -53,43 +55,43 @@ public class ServerDeployController {
 
     @ApiOperation(value = "查询服务器")
     @GetMapping
-	@PreAuthorize("@el.check('serverDeploy:list')")
-    public ResponseEntity<Object> query(ServerDeployQueryCriteria criteria, Pageable pageable){
-    	return new ResponseEntity<>(serverDeployService.queryAll(criteria,pageable),HttpStatus.OK);
+    @PreAuthorize("@el.check('serverDeploy:list')")
+    public ResponseEntity<Object> query(ServerDeployQueryCriteria criteria, Pageable pageable) {
+        return new ResponseEntity<>(ResultInfo.success(serverDeployService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增服务器")
     @ApiOperation(value = "新增服务器")
     @PostMapping
-	@PreAuthorize("@el.check('serverDeploy:add')")
-    public ResponseEntity<Object> create(@Validated @RequestBody ServerDeploy resources){
+    @PreAuthorize("@el.check('serverDeploy:add')")
+    public ResponseEntity<Object> create(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.create(resources);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
 
     @Log("修改服务器")
     @ApiOperation(value = "修改服务器")
     @PutMapping
-	@PreAuthorize("@el.check('serverDeploy:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody ServerDeploy resources){
+    @PreAuthorize("@el.check('serverDeploy:edit')")
+    public ResponseEntity<Object> update(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
 
     @Log("删除服务器")
     @ApiOperation(value = "删除Server")
-	@DeleteMapping
-	@PreAuthorize("@el.check('serverDeploy:del')")
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids){
+    @DeleteMapping
+    @PreAuthorize("@el.check('serverDeploy:del')")
+    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         serverDeployService.delete(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 
-	@Log("测试连接服务器")
-	@ApiOperation(value = "测试连接服务器")
-	@PostMapping("/testConnect")
-	@PreAuthorize("@el.check('serverDeploy:add')")
-	public ResponseEntity<Object> testConnect(@Validated @RequestBody ServerDeploy resources){
-		return new ResponseEntity<>(serverDeployService.testConnect(resources),HttpStatus.CREATED);
-	}
+    @Log("测试连接服务器")
+    @ApiOperation(value = "测试连接服务器")
+    @PostMapping("/testConnect")
+    @PreAuthorize("@el.check('serverDeploy:add')")
+    public ResponseEntity<Object> testConnect(@Validated @RequestBody ServerDeploy resources) {
+        return new ResponseEntity<>(ResultInfo.success(serverDeployService.testConnect(resources)), HttpStatus.CREATED);
+    }
 }

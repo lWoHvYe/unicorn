@@ -16,6 +16,7 @@
 package com.lwohvye.modules.security.rest;
 
 import com.lwohvye.modules.security.service.OnlineUserService;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Set;
@@ -43,8 +45,8 @@ public class OnlineController {
     @ApiOperation("查询在线用户")
     @GetMapping
     @PreAuthorize("@el.check()")
-    public ResponseEntity<Object> query(String filter, Pageable pageable){
-        return new ResponseEntity<>(onlineUserService.getAll(filter, pageable),HttpStatus.OK);
+    public ResponseEntity<Object> query(String filter, Pageable pageable) {
+        return new ResponseEntity<>(ResultInfo.success(onlineUserService.getAll(filter, pageable)), HttpStatus.OK);
     }
 
     @ApiOperation("导出数据")
@@ -63,6 +65,6 @@ public class OnlineController {
             key = EncryptUtils.desDecrypt(key);
             onlineUserService.kickOut(key);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 }

@@ -16,6 +16,7 @@
 package com.lwohvye.rest;
 
 import com.lwohvye.main.domain.GenConfig;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,14 @@ public class GenConfigController {
 
     @ApiOperation("查询")
     @GetMapping(value = "/{tableName}")
-    public ResponseEntity<Object> query(@PathVariable String tableName){
-        return new ResponseEntity<>(genConfigService.find(tableName), HttpStatus.OK);
+    public ResponseEntity<Object> query(@PathVariable String tableName) {
+        return new ResponseEntity<>(ResultInfo.success(genConfigService.find(tableName)), HttpStatus.OK);
     }
 
     @ApiOperation("修改")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated @RequestBody GenConfig genConfig){
-        return new ResponseEntity<>(genConfigService.update(genConfig.getTableName(), genConfig),HttpStatus.OK);
+    public ResponseEntity<Object> update(@Validated @RequestBody GenConfig genConfig) {
+        genConfigService.update(genConfig.getTableName(), genConfig);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 }
