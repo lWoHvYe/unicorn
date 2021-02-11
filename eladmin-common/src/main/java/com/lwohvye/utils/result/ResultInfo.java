@@ -26,6 +26,13 @@ public class ResultInfo<T> implements IResultInfo<T> {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime currentTime;
 
+    /**
+     * @return
+     * @description 普通实体，用result字段返回
+     * @params [businessCode, t, description]
+     * @author Hongyan Wang
+     * @date 2021/2/6 8:33
+     */
     public ResultInfo(long businessCode, T t, String description) {
         this.businessCode = businessCode;
         this.result = t;
@@ -33,6 +40,13 @@ public class ResultInfo<T> implements IResultInfo<T> {
         currentTime = LocalDateTime.now();
     }
 
+    /**
+     * @return
+     * @description list类依旧参照分页。包含content和totalElements
+     * @params [businessCode, resultSet, description]
+     * @author Hongyan Wang
+     * @date 2021/2/6 8:36
+     */
     public ResultInfo(long businessCode, List<T> resultSet, String description) {
         this.businessCode = businessCode;
         this.content = resultSet;
@@ -41,6 +55,13 @@ public class ResultInfo<T> implements IResultInfo<T> {
         currentTime = LocalDateTime.now();
     }
 
+    /**
+     * @return
+     * @description map根据是否是page，如果是page类。返回content和totalElements；如果是普通map，返回resultMap
+     * @params [businessCode, objectMap, description]
+     * @author Hongyan Wang
+     * @date 2021/2/6 8:37
+     */
     public ResultInfo(long businessCode, Map<String, Object> objectMap, String description) {
         this.businessCode = businessCode;
 //        考虑map可以不是page的情况
@@ -48,6 +69,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
         if (ObjectUtil.isNotNull(content) && content instanceof List)
             this.content = (List<T>) content;
         else
+//            不是page用resultMap字段返回
             this.resultMap = objectMap;
         var totalElements = objectMap.get("totalElements");
         if (ObjectUtil.isNotNull(totalElements) && totalElements instanceof Long)
@@ -56,6 +78,13 @@ public class ResultInfo<T> implements IResultInfo<T> {
         currentTime = LocalDateTime.now();
     }
 
+    /**
+     * @return
+     * @description page类返回content和totalElements
+     * @params [businessCode, page, description]
+     * @author Hongyan Wang
+     * @date 2021/2/6 8:38
+     */
     public ResultInfo(long businessCode, Page<T> page, String description) {
         this.businessCode = businessCode;
         this.content = page.getContent();
@@ -87,7 +116,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * 成功返回单一实体结果集。还是采用List的方式
+     * 通用成功返回方式。支持map、list、page和单一实体，但都会套个壳，针对不需要壳的场景不适用
      *
      * @param t
      * @param <T>
@@ -97,23 +126,14 @@ public class ResultInfo<T> implements IResultInfo<T> {
 //        如果是Map，走分页
         if (t instanceof Map)
             return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (Map<String, Object>) t, "");
+//        List类，一般是非分页查询
         if (t instanceof List)
             return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (List<T>) t, "");
+//        分页可能不是转成map的
         if (t instanceof Page)
             return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (Page<T>) t, "");
 
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, "");
-    }
-
-    /**
-     * 成功返回分页结果集
-     *
-     * @param page
-     * @param <T>
-     * @return
-     */
-    public static <T> ResultInfo<T> successPage(Map<String, Object> page) {
-        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, "");
     }
 
     /**

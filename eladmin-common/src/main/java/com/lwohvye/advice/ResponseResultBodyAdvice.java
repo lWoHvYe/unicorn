@@ -39,6 +39,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     /**
      * 当类或者方法使用了 @ResponseResultBody 就会调用这个方法
      */
+    // TODO: 2021/2/4 当前已将数据返回都使用ResultInfo.success的方式。可以着手整合这种方式了，但原来返回的是 ResponseEntity。处理方式待定
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         if (body instanceof ResultInfo) {
