@@ -65,13 +65,13 @@ task:
     queue-capacity: 50
 
 #七牛云
-qiniu:
+#qiniu:
   # 文件大小 /M
-  max-size: 15
+#  max-size: 15
 
 #邮箱验证码有效时间/秒
-code:
-  expiration: 300
+#code:
+#  expiration: 300
 
 #密码加密传输，前端公钥加密，后端私钥解密
 rsa:

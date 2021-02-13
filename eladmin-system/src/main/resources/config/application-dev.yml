@@ -165,7 +165,7 @@ login:
     #  验证码宽度
     height: 36
     # 内容长度
-    length: 2
+    length: 4
     # 字体名称，为空则使用默认字体
     font-name:
     # 字体大小
@@ -190,12 +190,12 @@ jwt:
   renew: 3600000
 
 #是否允许生成代码，生产环境设置为false
-generator:
-  enabled: true
+#generator:
+#  enabled: true
 
 #是否开启 swagger-ui
-swagger:
-  enabled: true
+#swagger:
+#  enabled: true
 
 # IP 本地解析
 ip:

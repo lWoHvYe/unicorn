@@ -52,13 +52,13 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @EnableOpenApi
 public class SwaggerConfig {
 
-    @Value("${jwt.header}")
+    @Value("${jwt.header:Authorization}")
     private String tokenHeader;
 
-    @Value("${jwt.token-start-with}")
+    @Value("${jwt.token-start-with:Bearer }")
     private String tokenStartWith;
 
-    @Value("${swagger.enabled}")
+    @Value("${swagger.enabled:true}")
     private Boolean enabled;
 
     @Bean

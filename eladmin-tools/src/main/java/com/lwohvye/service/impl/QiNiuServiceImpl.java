@@ -61,7 +61,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     private final QiNiuConfigRepository qiNiuConfigRepository;
     private final QiniuContentRepository qiniuContentRepository;
 
-    @Value("${qiniu.max-size}")
+    @Value("${qiniu.max-size:20}")
     private Long maxSize;
 
     @Override

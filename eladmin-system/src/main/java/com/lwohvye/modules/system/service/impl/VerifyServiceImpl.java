@@ -39,7 +39,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class VerifyServiceImpl implements VerifyService {
 
-    @Value("${code.expiration}")
+    @Value("${code.expiration:250}")
     private Long expiration;
     private final RedisUtils redisUtils;
 

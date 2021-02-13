@@ -46,7 +46,7 @@ public class GeneratorController {
     private final GeneratorService generatorService;
     private final GenConfigService genConfigService;
 
-    @Value("${generator.enabled}")
+    @Value("${generator.enabled:true}")
     private Boolean generatorEnabled;
 
     @ApiOperation("查询数据库数据")
