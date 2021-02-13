@@ -22,7 +22,7 @@ import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.main.domain.vo.EmailVo;
+import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.service.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

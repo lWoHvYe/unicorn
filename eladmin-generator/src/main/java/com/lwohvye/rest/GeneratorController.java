@@ -15,7 +15,7 @@
  */
 package com.lwohvye.rest;
 
-import com.lwohvye.main.domain.ColumnInfo;
+import com.lwohvye.domain.ColumnInfo;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.main.system.repository;
 
-import com.lwohvye.modules.main.system.domain.Job;
+import com.lwohvye.modules.system.domain.Job;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

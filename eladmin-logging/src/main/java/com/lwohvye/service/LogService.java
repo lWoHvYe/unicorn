@@ -16,7 +16,7 @@
 package com.lwohvye.service;
 
 import com.lwohvye.service.dto.LogQueryCriteria;
-import com.lwohvye.main.domain.Log;
+import com.lwohvye.domain.Log;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;

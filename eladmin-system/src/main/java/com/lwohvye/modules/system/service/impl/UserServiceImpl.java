@@ -18,9 +18,10 @@ package com.lwohvye.modules.system.service.impl;
 import com.lwohvye.config.FileProperties;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
+import com.lwohvye.modules.linux.system.repository.LinuxUserRepository;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.UserCacheClean;
-import com.lwohvye.modules.main.system.domain.User;
+import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.main.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.JobSmallDto;
@@ -37,6 +38,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
@@ -60,15 +62,19 @@ public class UserServiceImpl implements UserService {
     private final UserCacheClean userCacheClean;
     private final OnlineUserService onlineUserService;
 
+    private final LinuxUserRepository linuxUserRepository;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
-        Page<User> page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<User> page = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(userMapper::toDto));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
-        List<User> users = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
+        List<User> users = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return userMapper.toDto(users);
     }
 
@@ -76,7 +82,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(key = "'id:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public UserDto findById(long id) {
-        User user = userRepository.findById(id).orElseGet(User::new);
+        User user = linuxUserRepository.findById(id).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", id);
         return userMapper.toDto(user);
     }
@@ -84,10 +90,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void create(User resources) {
-        if (userRepository.findByUsername(resources.getUsername()) != null) {
+        if (linuxUserRepository.findByUsername(resources.getUsername()) != null) {
             throw new EntityExistException(User.class, "username", resources.getUsername());
         }
-        if (userRepository.findByEmail(resources.getEmail()) != null) {
+        if (linuxUserRepository.findByEmail(resources.getEmail()) != null) {
             throw new EntityExistException(User.class, "email", resources.getEmail());
         }
         if (userRepository.findByPhone(resources.getPhone()) != null) {
@@ -99,11 +105,11 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(User resources) throws Exception {
-        User user = userRepository.findById(resources.getId()).orElseGet(User::new);
+        User user = linuxUserRepository.findById(resources.getId()).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", resources.getId());
-        User user1 = userRepository.findByUsername(resources.getUsername());
-        User user2 = userRepository.findByEmail(resources.getEmail());
-        User user3 = userRepository.findByPhone(resources.getPhone());
+        User user1 = linuxUserRepository.findByUsername(resources.getUsername());
+        User user2 = linuxUserRepository.findByEmail(resources.getEmail());
+        User user3 = linuxUserRepository.findByPhone(resources.getPhone());
         if (user1 != null && !user.getId().equals(user1.getId())) {
             throw new EntityExistException(User.class, "username", resources.getUsername());
         }
@@ -120,7 +126,7 @@ public class UserServiceImpl implements UserService {
             redisUtils.del(CacheKey.ROLE_AUTH + resources.getId());
         }
         // 如果用户被禁用，则清除用户登录信息
-        if(!resources.getEnabled()){
+        if (!resources.getEnabled()) {
             onlineUserService.kickOutForUsername(resources.getUsername());
         }
         user.setUsername(resources.getUsername());
@@ -140,8 +146,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCenter(User resources) {
-        User user = userRepository.findById(resources.getId()).orElseGet(User::new);
-        User user1 = userRepository.findByPhone(resources.getPhone());
+        User user = linuxUserRepository.findById(resources.getId()).orElseGet(User::new);
+        User user1 = linuxUserRepository.findByPhone(resources.getPhone());
         if (user1 != null && !user.getId().equals(user1.getId())) {
             throw new EntityExistException(User.class, "phone", resources.getPhone());
         }
@@ -167,7 +173,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserDto findByName(String userName) {
-        User user = userRepository.findByUsername(userName);
+        User user = linuxUserRepository.findByUsername(userName);
         if (user == null) {
             throw new EntityNotFoundException(User.class, "name", userName);
         } else {
@@ -185,7 +191,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> updateAvatar(MultipartFile multipartFile) {
-        User user = userRepository.findByUsername(SecurityUtils.getCurrentUsername());
+        User user = linuxUserRepository.findByUsername(SecurityUtils.getCurrentUsername());
         String oldPath = user.getAvatarPath();
         File file = FileUtil.upload(multipartFile, properties.getPath().getAvatar());
         user.setAvatarPath(Objects.requireNonNull(file).getPath());
@@ -196,9 +202,11 @@ public class UserServiceImpl implements UserService {
         }
         @NotBlank String username = user.getUsername();
         flushCache(username);
-        return new HashMap<String, String>(1) {{
-            put("avatar", file.getName());
-        }};
+        return new HashMap<String, String>(1) {
+            {
+                put("avatar", file.getName());
+            }
+        };
     }
 
     @Override

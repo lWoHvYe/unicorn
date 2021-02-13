@@ -16,7 +16,8 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.modules.main.mnt.domain.DeployHistory;
+import com.lwohvye.modules.linux.mnt.repository.LinuxDeployHistoryRepository;
+import com.lwohvye.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.main.mnt.repository.DeployHistoryRepository;
 import com.lwohvye.modules.mnt.service.DeployHistoryService;
 import com.lwohvye.modules.mnt.service.mapstruct.DeployHistoryMapper;
@@ -43,39 +44,41 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DeployHistoryServiceImpl implements DeployHistoryService {
 
-    private final DeployHistoryRepository deployhistoryRepository;
-    private final DeployHistoryMapper deployhistoryMapper;
+    private final DeployHistoryRepository deployHistoryRepository;
+    private final DeployHistoryMapper deployHistoryMapper;
+
+    private final LinuxDeployHistoryRepository linuxDeployHistoryRepository;
 
     @Override
     public Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable){
-        Page<DeployHistory> page = deployhistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
-        return PageUtil.toPage(page.map(deployhistoryMapper::toDto));
+        Page<DeployHistory> page = linuxDeployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+        return PageUtil.toPage(page.map(deployHistoryMapper::toDto));
     }
 
     @Override
     public List<DeployHistoryDto> queryAll(DeployHistoryQueryCriteria criteria){
-        return deployhistoryMapper.toDto(deployhistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+        return deployHistoryMapper.toDto(linuxDeployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
     public DeployHistoryDto findById(String id) {
-        DeployHistory deployhistory = deployhistoryRepository.findById(id).orElseGet(DeployHistory::new);
+        DeployHistory deployhistory = linuxDeployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
         ValidationUtil.isNull(deployhistory.getId(),"DeployHistory","id",id);
-        return deployhistoryMapper.toDto(deployhistory);
+        return deployHistoryMapper.toDto(deployhistory);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void create(DeployHistory resources) {
         resources.setId(IdUtil.simpleUUID());
-        deployhistoryRepository.save(resources);
+        deployHistoryRepository.save(resources);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<String> ids) {
         for (String id : ids) {
-            deployhistoryRepository.deleteById(id);
+            deployHistoryRepository.deleteById(id);
         }
     }
 

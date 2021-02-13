@@ -16,7 +16,8 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.main.mnt.domain.App;
+import com.lwohvye.modules.linux.mnt.repository.LinuxAppRepository;
+import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.main.mnt.repository.AppRepository;
 import com.lwohvye.modules.mnt.service.AppService;
 import com.lwohvye.modules.mnt.service.mapstruct.AppMapper;
@@ -46,20 +47,22 @@ public class AppServiceImpl implements AppService {
     private final AppRepository appRepository;
     private final AppMapper appMapper;
 
+    private final LinuxAppRepository linuxAppRepository;
+
     @Override
     public Object queryAll(AppQueryCriteria criteria, Pageable pageable){
-        Page<App> page = appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+        Page<App> page = linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(appMapper::toDto));
     }
 
     @Override
     public List<AppDto> queryAll(AppQueryCriteria criteria){
-        return appMapper.toDto(appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+        return appMapper.toDto(linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
     public AppDto findById(Long id) {
-		App app = appRepository.findById(id).orElseGet(App::new);
+		App app = linuxAppRepository.findById(id).orElseGet(App::new);
         ValidationUtil.isNull(app.getId(),"App","id",id);
         return appMapper.toDto(app);
     }
@@ -75,7 +78,7 @@ public class AppServiceImpl implements AppService {
     @Transactional(rollbackFor = Exception.class)
     public void update(App resources) {
         verification(resources);
-        App app = appRepository.findById(resources.getId()).orElseGet(App::new);
+        App app = linuxAppRepository.findById(resources.getId()).orElseGet(App::new);
         ValidationUtil.isNull(app.getId(),"App","id",resources.getId());
         app.copy(resources);
         appRepository.save(app);

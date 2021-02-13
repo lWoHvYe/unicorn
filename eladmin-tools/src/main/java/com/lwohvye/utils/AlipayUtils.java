@@ -17,7 +17,7 @@ package com.lwohvye.utils;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
-import com.lwohvye.main.domain.AlipayConfig;
+import com.lwohvye.domain.AlipayConfig;
 import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;

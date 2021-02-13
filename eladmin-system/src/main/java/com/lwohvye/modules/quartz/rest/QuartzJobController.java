@@ -17,7 +17,7 @@ package com.lwohvye.modules.quartz.rest;
 
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.main.quartz.domain.QuartzJob;
+import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.service.QuartzJobService;
 import com.lwohvye.modules.quartz.service.dto.JobQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;

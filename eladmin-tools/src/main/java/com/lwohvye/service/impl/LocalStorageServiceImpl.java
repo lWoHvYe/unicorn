@@ -17,8 +17,9 @@ package com.lwohvye.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.config.FileProperties;
-import com.lwohvye.main.domain.LocalStorage;
+import com.lwohvye.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.linux.repository.LinuxLocalStorageRepository;
 import com.lwohvye.main.repository.LocalStorageRepository;
 import com.lwohvye.service.LocalStorageService;
 import com.lwohvye.service.dto.LocalStorageDto;
@@ -52,20 +53,25 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     private final LocalStorageMapper localStorageMapper;
     private final FileProperties properties;
 
+    private final LinuxLocalStorageRepository linuxLocalStorageRepository;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable){
-        Page<LocalStorage> page = localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+        Page<LocalStorage> page = linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(localStorageMapper::toDto));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria){
-        return localStorageMapper.toDto(localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+        return localStorageMapper.toDto(linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public LocalStorageDto findById(Long id){
-        LocalStorage localStorage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);
+        LocalStorage localStorage = linuxLocalStorageRepository.findById(id).orElseGet(LocalStorage::new);
         ValidationUtil.isNull(localStorage.getId(),"LocalStorage","id",id);
         return localStorageMapper.toDto(localStorage);
     }
@@ -100,7 +106,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(LocalStorage resources) {
-        LocalStorage localStorage = localStorageRepository.findById(resources.getId()).orElseGet(LocalStorage::new);
+        LocalStorage localStorage = linuxLocalStorageRepository.findById(resources.getId()).orElseGet(LocalStorage::new);
         ValidationUtil.isNull( localStorage.getId(),"LocalStorage","id",resources.getId());
         localStorage.copy(resources);
         localStorageRepository.save(localStorage);
@@ -110,7 +116,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
-            LocalStorage storage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);
+            LocalStorage storage = linuxLocalStorageRepository.findById(id).orElseGet(LocalStorage::new);
             FileUtil.del(storage.getPath());
             localStorageRepository.delete(storage);
         }

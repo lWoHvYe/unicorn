@@ -18,7 +18,7 @@ package com.lwohvye.modules.system.rest;
 import cn.hutool.core.lang.Dict;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.main.system.domain.Role;
+import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;

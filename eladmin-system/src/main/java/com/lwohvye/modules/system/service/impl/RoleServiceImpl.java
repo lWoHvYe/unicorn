@@ -18,10 +18,12 @@ package com.lwohvye.modules.system.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
+import com.lwohvye.modules.linux.system.repository.LinuxRoleRepository;
+import com.lwohvye.modules.linux.system.repository.LinuxUserRepository;
 import com.lwohvye.modules.security.service.UserCacheClean;
-import com.lwohvye.modules.main.system.domain.Menu;
-import com.lwohvye.modules.main.system.domain.Role;
-import com.lwohvye.modules.main.system.domain.User;
+import com.lwohvye.modules.system.domain.Menu;
+import com.lwohvye.modules.system.domain.Role;
+import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.main.system.repository.RoleRepository;
 import com.lwohvye.modules.main.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.RoleService;
@@ -64,20 +66,26 @@ public class RoleServiceImpl implements RoleService {
     private final UserRepository userRepository;
     private final UserCacheClean userCacheClean;
 
+    private final LinuxRoleRepository linuxRoleRepository;
+    private final LinuxUserRepository linuxUserRepository;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
-        return roleMapper.toDto(roleRepository.findAll(sort));
+        return roleMapper.toDto(linuxRoleRepository.findAll(sort));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll(RoleQueryCriteria criteria) {
-        return roleMapper.toDto(roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return roleMapper.toDto(linuxRoleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(RoleQueryCriteria criteria, Pageable pageable) {
-        Page<Role> page = roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<Role> page = linuxRoleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(roleMapper::toDto));
     }
 
@@ -85,7 +93,7 @@ public class RoleServiceImpl implements RoleService {
     @Cacheable(key = "'id:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public RoleDto findById(long id) {
-        Role role = roleRepository.findById(id).orElseGet(Role::new);
+        Role role = linuxRoleRepository.findById(id).orElseGet(Role::new);
         ValidationUtil.isNull(role.getId(), "Role", "id", id);
         return roleMapper.toDto(role);
     }
@@ -93,7 +101,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void create(Role resources) {
-        if (roleRepository.findByName(resources.getName()) != null) {
+        if (linuxRoleRepository.findByName(resources.getName()) != null) {
             throw new EntityExistException(Role.class, "username", resources.getName());
         }
         roleRepository.save(resources);
@@ -102,10 +110,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Role resources) {
-        Role role = roleRepository.findById(resources.getId()).orElseGet(Role::new);
+        Role role = linuxRoleRepository.findById(resources.getId()).orElseGet(Role::new);
         ValidationUtil.isNull(role.getId(), "Role", "id", resources.getId());
 
-        Role role1 = roleRepository.findByName(resources.getName());
+        Role role1 = linuxRoleRepository.findByName(resources.getName());
 
         if (role1 != null && !role1.getId().equals(role.getId())) {
             throw new EntityExistException(Role.class, "username", resources.getName());
@@ -121,9 +129,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateMenu(Role resources, RoleDto roleDTO) {
         Role role = roleMapper.toEntity(roleDTO);
-        List<User> users = userRepository.findByRoleId(role.getId());
+        List<User> users = linuxUserRepository.findByRoleId(role.getId());
         // 更新菜单
         role.setMenus(resources.getMenus());
         delCaches(resources.getId(), users);
@@ -148,8 +157,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<RoleSmallDto> findByUsersId(Long id) {
-        return roleSmallMapper.toDto(new ArrayList<>(roleRepository.findByUserId(id)));
+        return roleSmallMapper.toDto(new ArrayList<>(linuxRoleRepository.findByUserId(id)));
     }
 
     @Override
@@ -166,6 +176,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Cacheable(key = "'auth:' + #p0.id")
+    @Transactional(rollbackFor = Exception.class)
     public List<GrantedAuthority> mapToGrantedAuthorities(UserDto user) {
         Set<String> permissions = new HashSet<>();
         // 如果是管理员直接返回
@@ -174,7 +185,7 @@ public class RoleServiceImpl implements RoleService {
             return permissions.stream().map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         }
-        Set<Role> roles = roleRepository.findByUserId(user.getId());
+        Set<Role> roles = linuxRoleRepository.findByUserId(user.getId());
         permissions = roles.stream().flatMap(role -> role.getMenus().stream())
                 .filter(menu -> StringUtils.isNotBlank(menu.getPermission()))
                 .map(Menu::getPermission).collect(Collectors.toSet());
@@ -198,14 +209,14 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public void verification(Set<Long> ids) {
-        if (userRepository.countByRoles(ids) > 0) {
+        if (linuxUserRepository.countByRoles(ids) > 0) {
             throw new BadRequestException("所选角色存在用户关联，请解除关联再试！");
         }
     }
 
     @Override
     public List<Role> findInMenuId(List<Long> menuIds) {
-        return roleRepository.findInMenuId(menuIds);
+        return linuxRoleRepository.findInMenuId(menuIds);
     }
 
     /**
@@ -213,7 +224,7 @@ public class RoleServiceImpl implements RoleService {
      * @param id /
      */
     public void delCaches(Long id, List<User> users) {
-        users = CollectionUtil.isEmpty(users) ? userRepository.findByRoleId(id) : users;
+        users = CollectionUtil.isEmpty(users) ? linuxUserRepository.findByRoleId(id) : users;
         if (CollectionUtil.isNotEmpty(users)) {
             users.forEach(item -> userCacheClean.cleanUserCache(item.getUsername()));
             Set<Long> userIds = users.stream().map(User::getId).collect(Collectors.toSet());

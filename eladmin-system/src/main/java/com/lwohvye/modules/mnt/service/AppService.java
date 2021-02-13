@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.service;
 
-import com.lwohvye.modules.main.mnt.domain.App;
+import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.service.dto.AppDto;
 import com.lwohvye.modules.mnt.service.dto.AppQueryCriteria;
 import org.springframework.data.domain.Pageable;

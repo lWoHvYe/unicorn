@@ -15,7 +15,7 @@
  */
 package com.lwohvye.rest;
 
-import com.lwohvye.main.domain.GenConfig;
+import com.lwohvye.domain.GenConfig;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

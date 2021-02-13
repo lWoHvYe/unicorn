@@ -17,7 +17,9 @@ package com.lwohvye.modules.system.service.impl;
 
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.modules.main.system.domain.Job;
+import com.lwohvye.modules.linux.system.repository.LinuxJobRepository;
+import com.lwohvye.modules.linux.system.repository.LinuxUserRepository;
+import com.lwohvye.modules.system.domain.Job;
 import com.lwohvye.modules.main.system.repository.JobRepository;
 import com.lwohvye.modules.main.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.JobService;
@@ -39,9 +41,9 @@ import java.io.IOException;
 import java.util.*;
 
 /**
-* @author Zheng Jie
-* @date 2019-03-29
-*/
+ * @author Zheng Jie
+ * @date 2019-03-29
+ */
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "job")
@@ -52,32 +54,38 @@ public class JobServiceImpl implements JobService {
     private final RedisUtils redisUtils;
     private final UserRepository userRepository;
 
+    private final LinuxJobRepository linuxJobRepository;
+    private final LinuxUserRepository linuxUserRepository;
+
     @Override
-    public Map<String,Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
-        Page<Job> page = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
-        return PageUtil.toPage(page.map(jobMapper::toDto).getContent(),page.getTotalElements());
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
+        Page<Job> page = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        return PageUtil.toPage(page.map(jobMapper::toDto).getContent(), page.getTotalElements());
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<JobDto> queryAll(JobQueryCriteria criteria) {
-        List<Job> list = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder));
+        List<Job> list = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return jobMapper.toDto(list);
     }
 
     @Override
     @Cacheable(key = "'id:' + #p0")
+    @Transactional(rollbackFor = Exception.class)
     public JobDto findById(Long id) {
-        Job job = jobRepository.findById(id).orElseGet(Job::new);
-        ValidationUtil.isNull(job.getId(),"Job","id",id);
+        Job job = linuxJobRepository.findById(id).orElseGet(Job::new);
+        ValidationUtil.isNull(job.getId(), "Job", "id", id);
         return jobMapper.toDto(job);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void create(Job resources) {
-        Job job = jobRepository.findByName(resources.getName());
-        if(job != null){
-            throw new EntityExistException(Job.class,"name",resources.getName());
+        Job job = linuxJobRepository.findByName(resources.getName());
+        if (job != null) {
+            throw new EntityExistException(Job.class, "name", resources.getName());
         }
         jobRepository.save(resources);
     }
@@ -86,12 +94,12 @@ public class JobServiceImpl implements JobService {
     @CacheEvict(key = "'id:' + #p0.id")
     @Transactional(rollbackFor = Exception.class)
     public void update(Job resources) {
-        Job job = jobRepository.findById(resources.getId()).orElseGet(Job::new);
-        Job old = jobRepository.findByName(resources.getName());
-        if(old != null && !old.getId().equals(resources.getId())){
-            throw new EntityExistException(Job.class,"name",resources.getName());
+        Job job = linuxJobRepository.findById(resources.getId()).orElseGet(Job::new);
+        Job old = linuxJobRepository.findByName(resources.getName());
+        if (old != null && !old.getId().equals(resources.getId())) {
+            throw new EntityExistException(Job.class, "name", resources.getName());
         }
-        ValidationUtil.isNull( job.getId(),"Job","id",resources.getId());
+        ValidationUtil.isNull(job.getId(), "Job", "id", resources.getId());
         resources.setId(job.getId());
         jobRepository.save(resources);
     }
@@ -108,7 +116,7 @@ public class JobServiceImpl implements JobService {
     public void download(List<JobDto> jobDtos, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
         for (JobDto jobDTO : jobDtos) {
-            Map<String,Object> map = new LinkedHashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();
             map.put("岗位名称", jobDTO.getName());
             map.put("岗位状态", jobDTO.getEnabled() ? "启用" : "停用");
             map.put("创建日期", jobDTO.getCreateTime());
@@ -119,7 +127,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void verification(Set<Long> ids) {
-        if(userRepository.countByJobs(ids) > 0){
+        if (linuxUserRepository.countByJobs(ids) > 0) {
             throw new BadRequestException("所选的岗位中存在用户关联，请解除关联再试！");
         }
     }

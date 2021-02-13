@@ -18,8 +18,9 @@ package com.lwohvye.service.impl;
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.main.domain.EmailConfig;
-import com.lwohvye.main.domain.vo.EmailVo;
+import com.lwohvye.domain.EmailConfig;
+import com.lwohvye.domain.vo.EmailVo;
+import com.lwohvye.linux.repository.LinuxEmailRepository;
 import com.lwohvye.main.repository.EmailRepository;
 import com.lwohvye.service.EmailService;
 import com.lwohvye.utils.EncryptUtils;
@@ -43,6 +44,8 @@ public class EmailServiceImpl implements EmailService {
 
     private final EmailRepository emailRepository;
 
+    private final LinuxEmailRepository linuxEmailRepository;
+
     @Override
     @CachePut(key = "'config'")
     @Transactional(rollbackFor = Exception.class)
@@ -58,7 +61,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     @Cacheable(key = "'config'")
     public EmailConfig find() {
-        Optional<EmailConfig> emailConfig = emailRepository.findById(1L);
+        Optional<EmailConfig> emailConfig = linuxEmailRepository.findById(1L);
         return emailConfig.orElseGet(EmailConfig::new);
     }
 

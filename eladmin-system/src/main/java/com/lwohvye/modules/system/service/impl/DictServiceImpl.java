@@ -16,7 +16,8 @@
 package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.modules.main.system.domain.Dict;
+import com.lwohvye.modules.linux.system.repository.LinuxDictRepository;
+import com.lwohvye.modules.system.domain.Dict;
 import com.lwohvye.modules.main.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.DictService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
@@ -48,15 +49,19 @@ public class DictServiceImpl implements DictService {
     private final DictMapper dictMapper;
     private final RedisUtils redisUtils;
 
+    private final LinuxDictRepository linuxDictRepository;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictQueryCriteria dict, Pageable pageable){
-        Page<Dict> page = dictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
+        Page<Dict> page = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
         return PageUtil.toPage(page.map(dictMapper::toDto));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<DictDto> queryAll(DictQueryCriteria dict) {
-        List<Dict> list = dictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb));
+        List<Dict> list = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb));
         return dictMapper.toDto(list);
     }
 
@@ -71,7 +76,7 @@ public class DictServiceImpl implements DictService {
     public void update(Dict resources) {
         // 清理缓存
         delCaches(resources);
-        Dict dict = dictRepository.findById(resources.getId()).orElseGet(Dict::new);
+        Dict dict = linuxDictRepository.findById(resources.getId()).orElseGet(Dict::new);
         ValidationUtil.isNull( dict.getId(),"Dict","id",resources.getId());
         resources.setId(dict.getId());
         dictRepository.save(resources);
@@ -81,7 +86,7 @@ public class DictServiceImpl implements DictService {
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         // 清理缓存
-        List<Dict> dicts = dictRepository.findByIdIn(ids);
+        List<Dict> dicts = linuxDictRepository.findByIdIn(ids);
         for (Dict dict : dicts) {
             delCaches(dict);
         }

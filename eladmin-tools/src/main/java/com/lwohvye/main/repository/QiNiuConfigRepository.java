@@ -15,7 +15,7 @@
  */
 package com.lwohvye.main.repository;
 
-import com.lwohvye.main.domain.QiniuConfig;
+import com.lwohvye.domain.QiniuConfig;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

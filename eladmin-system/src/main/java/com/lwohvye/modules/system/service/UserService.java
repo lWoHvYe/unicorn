@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.service;
 
 import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
-import com.lwohvye.modules.main.system.domain.User;
+import com.lwohvye.modules.system.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;

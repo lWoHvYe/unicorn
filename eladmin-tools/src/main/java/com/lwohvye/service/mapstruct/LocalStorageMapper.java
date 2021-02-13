@@ -17,7 +17,7 @@ package com.lwohvye.service.mapstruct;
 
 import com.lwohvye.base.BaseMapper;
 import com.lwohvye.service.dto.LocalStorageDto;
-import com.lwohvye.main.domain.LocalStorage;
+import com.lwohvye.domain.LocalStorage;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

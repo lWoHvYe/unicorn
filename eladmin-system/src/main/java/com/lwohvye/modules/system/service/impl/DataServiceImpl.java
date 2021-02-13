@@ -16,7 +16,7 @@
 package com.lwohvye.modules.system.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.modules.main.system.domain.Dept;
+import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.service.DataService;
 import com.lwohvye.modules.system.service.DeptService;
 import com.lwohvye.modules.system.service.RoleService;

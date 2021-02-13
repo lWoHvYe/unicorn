@@ -17,7 +17,7 @@ package com.lwohvye.aspect;
 
 import com.lwohvye.service.LogService;
 import lombok.extern.slf4j.Slf4j;
-import com.lwohvye.main.domain.Log;
+import com.lwohvye.domain.Log;
 import com.lwohvye.utils.RequestHolder;
 import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.StringUtils;

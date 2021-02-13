@@ -15,13 +15,15 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import com.lwohvye.modules.linux.system.repository.LinuxDictDetailRepository;
+import com.lwohvye.modules.linux.system.repository.LinuxDictRepository;
 import com.lwohvye.modules.main.system.repository.DictDetailRepository;
 import com.lwohvye.modules.main.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.mapstruct.DictDetailMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.modules.main.system.domain.Dict;
-import com.lwohvye.modules.main.system.domain.DictDetail;
+import com.lwohvye.modules.system.domain.Dict;
+import com.lwohvye.modules.system.domain.DictDetail;
 import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.modules.system.service.DictDetailService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
@@ -48,9 +50,13 @@ public class DictDetailServiceImpl implements DictDetailService {
     private final DictDetailMapper dictDetailMapper;
     private final RedisUtils redisUtils;
 
+    private final LinuxDictRepository linuxDictRepository;
+    private final LinuxDictDetailRepository linuxDictDetailRepository;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> queryAll(DictDetailQueryCriteria criteria, Pageable pageable) {
-        Page<DictDetail> page = dictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+        Page<DictDetail> page = linuxDictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(dictDetailMapper::toDto));
     }
 
@@ -65,7 +71,7 @@ public class DictDetailServiceImpl implements DictDetailService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(DictDetail resources) {
-        DictDetail dictDetail = dictDetailRepository.findById(resources.getId()).orElseGet(DictDetail::new);
+        DictDetail dictDetail = linuxDictDetailRepository.findById(resources.getId()).orElseGet(DictDetail::new);
         ValidationUtil.isNull( dictDetail.getId(),"DictDetail","id",resources.getId());
         resources.setId(dictDetail.getId());
         dictDetailRepository.save(resources);
@@ -75,21 +81,22 @@ public class DictDetailServiceImpl implements DictDetailService {
 
     @Override
     @Cacheable(key = "'name:' + #p0")
+    @Transactional(rollbackFor = Exception.class)
     public List<DictDetailDto> getDictByName(String name) {
-        return dictDetailMapper.toDto(dictDetailRepository.findByDictName(name));
+        return dictDetailMapper.toDto(linuxDictDetailRepository.findByDictName(name));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
-        DictDetail dictDetail = dictDetailRepository.findById(id).orElseGet(DictDetail::new);
+        DictDetail dictDetail = linuxDictDetailRepository.findById(id).orElseGet(DictDetail::new);
         // 清理缓存
         delCaches(dictDetail);
         dictDetailRepository.deleteById(id);
     }
 
     public void delCaches(DictDetail dictDetail){
-        Dict dict = dictRepository.findById(dictDetail.getDict().getId()).orElseGet(Dict::new);
+        Dict dict = linuxDictRepository.findById(dictDetail.getDict().getId()).orElseGet(Dict::new);
         redisUtils.del(CacheKey.DICT_NAME + dict.getName());
     }
 }

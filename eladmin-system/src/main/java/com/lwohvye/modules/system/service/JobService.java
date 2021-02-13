@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.service;
 
 import com.lwohvye.modules.system.service.dto.JobDto;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
-import com.lwohvye.modules.main.system.domain.Job;
+import com.lwohvye.modules.system.domain.Job;
 import org.springframework.data.domain.Pageable;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

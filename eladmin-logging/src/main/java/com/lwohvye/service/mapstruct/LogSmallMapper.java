@@ -16,7 +16,7 @@
 package com.lwohvye.service.mapstruct;
 
 import com.lwohvye.base.BaseMapper;
-import com.lwohvye.main.domain.Log;
+import com.lwohvye.domain.Log;
 import com.lwohvye.service.dto.LogSmallDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

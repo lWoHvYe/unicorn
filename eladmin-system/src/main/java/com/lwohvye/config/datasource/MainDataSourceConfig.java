@@ -51,6 +51,10 @@ public class MainDataSourceConfig {
                 .dataSource(mainDataSource)
                 .properties(getVendorProperties())
                 .packages(
+                        "com.lwohvye.domain",
+                        "com.lwohvye.modules.mnt.domain",
+                        "com.lwohvye.modules.quartz.domain",
+                        "com.lwohvye.modules.system.domain",
                         "com.lwohvye.main",
                         "com.lwohvye.modules.main"
                 )

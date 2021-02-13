@@ -15,7 +15,7 @@
  */
 package com.lwohvye.main.repository;
 
-import com.lwohvye.main.domain.AlipayConfig;
+import com.lwohvye.domain.AlipayConfig;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

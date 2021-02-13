@@ -15,7 +15,8 @@
  */
 package com.lwohvye.modules.mnt.service.impl;
 
-import com.lwohvye.modules.main.mnt.domain.ServerDeploy;
+import com.lwohvye.modules.linux.mnt.repository.LinuxServerDeployRepository;
+import com.lwohvye.modules.mnt.domain.ServerDeploy;
 import com.lwohvye.modules.main.mnt.repository.ServerDeployRepository;
 import com.lwohvye.modules.mnt.service.mapstruct.ServerDeployMapper;
 import com.lwohvye.modules.mnt.util.ExecuteShellUtil;
@@ -46,27 +47,29 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     private final ServerDeployRepository serverDeployRepository;
     private final ServerDeployMapper serverDeployMapper;
 
+    private final LinuxServerDeployRepository linuxServerDeployRepository;
+
     @Override
     public Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable){
-        Page<ServerDeploy> page = serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+        Page<ServerDeploy> page = linuxServerDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(serverDeployMapper::toDto));
     }
 
     @Override
     public List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria){
-        return serverDeployMapper.toDto(serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+        return serverDeployMapper.toDto(linuxServerDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
     public ServerDeployDto findById(Long id) {
-        ServerDeploy server = serverDeployRepository.findById(id).orElseGet(ServerDeploy::new);
+        ServerDeploy server = linuxServerDeployRepository.findById(id).orElseGet(ServerDeploy::new);
         ValidationUtil.isNull(server.getId(),"ServerDeploy","id",id);
         return serverDeployMapper.toDto(server);
     }
 
     @Override
     public ServerDeployDto findByIp(String ip) {
-        ServerDeploy deploy = serverDeployRepository.findByIp(ip);
+        ServerDeploy deploy = linuxServerDeployRepository.findByIp(ip);
         return serverDeployMapper.toDto(deploy);
     }
 
@@ -94,7 +97,7 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(ServerDeploy resources) {
-        ServerDeploy serverDeploy = serverDeployRepository.findById(resources.getId()).orElseGet(ServerDeploy::new);
+        ServerDeploy serverDeploy = linuxServerDeployRepository.findById(resources.getId()).orElseGet(ServerDeploy::new);
         ValidationUtil.isNull( serverDeploy.getId(),"ServerDeploy","id",resources.getId());
 		serverDeploy.copy(resources);
         serverDeployRepository.save(serverDeploy);

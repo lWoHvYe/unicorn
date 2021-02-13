@@ -27,8 +27,9 @@ import java.util.Map;
         entityManagerFactoryRef = "entityManagerFactoryLinux",
         //事务管理
         transactionManagerRef = "transactionManagerLinux",
-        //实体扫描,设置Repository所在位置
+        //实体扫描,设置Repository所在位置。每个数据源唯一
         basePackages = {
+                "com.lwohvye.linux",
                 "com.lwohvye.modules.linux"
         })
 public class LinuxDatasourceConfig {
@@ -50,7 +51,14 @@ public class LinuxDatasourceConfig {
         return builder
                 .dataSource(linuxDataSource)
                 .properties(getVendorProperties())
+//                配置实体所在的位置。多数据源可共用
+//                需要分包时，包名为com.lwohvye.modules.linux.xxxx.domain
+//                不需要分包时，包名为com.lwohvye.modules.domain。使用其他的可能扫描不到
                 .packages(
+                        "com.lwohvye.domain",
+                        "com.lwohvye.modules.mnt.domain",
+                        "com.lwohvye.modules.quartz.domain",
+                        "com.lwohvye.modules.system.domain",
                         "com.lwohvye.modules.linux"
                 )
                 .persistenceUnit("linuxPersistenceUnit")

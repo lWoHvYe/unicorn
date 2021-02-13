@@ -15,8 +15,8 @@
  */
 package com.lwohvye.service;
 
-import com.lwohvye.main.domain.vo.EmailVo;
-import com.lwohvye.main.domain.EmailConfig;
+import com.lwohvye.domain.vo.EmailVo;
+import com.lwohvye.domain.EmailConfig;
 
 /**
  * @author Zheng Jie

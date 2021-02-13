@@ -18,7 +18,7 @@ package com.lwohvye.modules.system.rest;
 import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.main.system.domain.Menu;
+import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.service.MenuService;
 import com.lwohvye.modules.system.service.dto.MenuDto;
 import com.lwohvye.modules.system.service.dto.MenuQueryCriteria;

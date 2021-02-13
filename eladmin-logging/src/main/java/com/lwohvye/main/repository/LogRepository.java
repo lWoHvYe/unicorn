@@ -15,7 +15,7 @@
  */
 package com.lwohvye.main.repository;
 
-import com.lwohvye.main.domain.Log;
+import com.lwohvye.domain.Log;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;

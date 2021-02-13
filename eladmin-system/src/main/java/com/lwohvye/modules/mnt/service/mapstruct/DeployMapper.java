@@ -16,7 +16,7 @@
 package com.lwohvye.modules.mnt.service.mapstruct;
 
 import com.lwohvye.base.BaseMapper;
-import com.lwohvye.modules.main.mnt.domain.Deploy;
+import com.lwohvye.modules.mnt.domain.Deploy;
 import com.lwohvye.modules.mnt.service.dto.DeployDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

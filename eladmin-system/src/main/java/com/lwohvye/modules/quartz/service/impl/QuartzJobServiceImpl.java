@@ -17,8 +17,10 @@ package com.lwohvye.modules.quartz.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.main.quartz.domain.QuartzJob;
-import com.lwohvye.modules.main.quartz.domain.QuartzLog;
+import com.lwohvye.modules.linux.quartz.repository.LinuxQuartzJobRepository;
+import com.lwohvye.modules.linux.quartz.repository.LinuxQuartzLogRepository;
+import com.lwohvye.modules.quartz.domain.QuartzJob;
+import com.lwohvye.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.main.quartz.repository.QuartzJobRepository;
 import com.lwohvye.modules.main.quartz.repository.QuartzLogRepository;
 import com.lwohvye.modules.quartz.service.QuartzJobService;
@@ -49,29 +51,32 @@ public class QuartzJobServiceImpl implements QuartzJobService {
     private final QuartzManage quartzManage;
     private final RedisUtils redisUtils;
 
+    private final LinuxQuartzJobRepository linuxQuartzJobRepository;
+    private final LinuxQuartzLogRepository linuxQuartzLogRepository;
+
     @Override
     public Object queryAll(JobQueryCriteria criteria, Pageable pageable){
-        return PageUtil.toPage(quartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable));
+        return PageUtil.toPage(linuxQuartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable));
     }
 
     @Override
     public Object queryAllLog(JobQueryCriteria criteria, Pageable pageable){
-        return PageUtil.toPage(quartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable));
+        return PageUtil.toPage(linuxQuartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable));
     }
 
     @Override
     public List<QuartzJob> queryAll(JobQueryCriteria criteria) {
-        return quartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder));
+        return linuxQuartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder));
     }
 
     @Override
     public List<QuartzLog> queryAllLog(JobQueryCriteria criteria) {
-        return quartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder));
+        return linuxQuartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder));
     }
 
     @Override
     public QuartzJob findById(Long id) {
-        QuartzJob quartzJob = quartzJobRepository.findById(id).orElseGet(QuartzJob::new);
+        QuartzJob quartzJob = linuxQuartzJobRepository.findById(id).orElseGet(QuartzJob::new);
         ValidationUtil.isNull(quartzJob.getId(),"QuartzJob","id",id);
         return quartzJob;
     }

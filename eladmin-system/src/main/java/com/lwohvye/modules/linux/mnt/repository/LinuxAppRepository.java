@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.linux.mnt.repository;
 
-import com.lwohvye.modules.linux.mnt.domain.LinuxApp;
+import com.lwohvye.modules.mnt.domain.App;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -23,5 +23,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 * @author zhanghouying
 * @date 2019-08-24
 */
-public interface LinuxAppRepository extends JpaRepository<LinuxApp, Long>, JpaSpecificationExecutor<LinuxApp> {
+public interface LinuxAppRepository extends JpaRepository<App, Long>, JpaSpecificationExecutor<App> {
 }

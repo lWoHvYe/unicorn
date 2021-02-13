@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.modules.main.mnt.domain.Deploy;
-import com.lwohvye.modules.main.mnt.domain.DeployHistory;
+import com.lwohvye.modules.mnt.domain.Deploy;
+import com.lwohvye.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.service.DeployService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;

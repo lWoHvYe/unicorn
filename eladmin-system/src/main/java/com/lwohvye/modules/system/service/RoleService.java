@@ -19,7 +19,7 @@ import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.dto.UserDto;
-import com.lwohvye.modules.main.system.domain.Role;
+import com.lwohvye.modules.system.domain.Role;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import javax.servlet.http.HttpServletResponse;

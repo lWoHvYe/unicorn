@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.quartz.config;
 
-import com.lwohvye.modules.main.quartz.domain.QuartzJob;
-import com.lwohvye.modules.main.quartz.repository.QuartzJobRepository;
+import com.lwohvye.modules.linux.quartz.repository.LinuxQuartzJobRepository;
+import com.lwohvye.modules.quartz.domain.QuartzJob;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.modules.quartz.utils.QuartzManage;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobRunner implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(JobRunner.class);
-    private final QuartzJobRepository quartzJobRepository;
+    private final LinuxQuartzJobRepository linuxQuartzJobRepository;
     private final QuartzManage quartzManage;
 
     /**
@@ -46,7 +46,7 @@ public class JobRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments applicationArguments) {
         log.info("--------------------注入定时任务---------------------");
-        List<QuartzJob> quartzJobs = quartzJobRepository.findByIsPauseIsFalse();
+        List<QuartzJob> quartzJobs = linuxQuartzJobRepository.findByIsPauseIsFalse();
         quartzJobs.forEach(quartzManage::addJob);
         log.info("--------------------定时任务注入完成---------------------");
     }

@@ -16,7 +16,8 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.modules.main.mnt.domain.Database;
+import com.lwohvye.modules.linux.mnt.repository.LinuxDatabaseRepository;
+import com.lwohvye.modules.mnt.domain.Database;
 import com.lwohvye.modules.main.mnt.repository.DatabaseRepository;
 import com.lwohvye.modules.mnt.service.mapstruct.DatabaseMapper;
 import com.lwohvye.modules.mnt.util.SqlUtils;
@@ -49,20 +50,22 @@ public class DatabaseServiceImpl implements DatabaseService {
     private final DatabaseRepository databaseRepository;
     private final DatabaseMapper databaseMapper;
 
+    private final LinuxDatabaseRepository linuxDatabaseRepository;
+
     @Override
     public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable){
-        Page<Database> page = databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+        Page<Database> page = linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(databaseMapper::toDto));
     }
 
     @Override
     public List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria){
-        return databaseMapper.toDto(databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+        return databaseMapper.toDto(linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
     }
 
     @Override
     public DatabaseDto findById(String id) {
-        Database database = databaseRepository.findById(id).orElseGet(Database::new);
+        Database database = linuxDatabaseRepository.findById(id).orElseGet(Database::new);
         ValidationUtil.isNull(database.getId(),"Database","id",id);
         return databaseMapper.toDto(database);
     }
@@ -77,7 +80,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(Database resources) {
-        Database database = databaseRepository.findById(resources.getId()).orElseGet(Database::new);
+        Database database = linuxDatabaseRepository.findById(resources.getId()).orElseGet(Database::new);
         ValidationUtil.isNull(database.getId(),"Database","id",resources.getId());
         database.copy(resources);
         databaseRepository.save(database);

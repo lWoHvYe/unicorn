@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * 这个可以借鉴的是，通过以某个类型为切点，可以在方法执行前后做些事情。不同于日志
  * @date 2020/1/14 13:45
  */
-// TODO: 2021/1/9 ControllerAopAspect和ResultModel可能需要重做。使用统一异常处理+ResultInfo的形式。更加通用
+// TODO: 2021/1/9 ControllerAopAspect和ResultModel可能需要重做。使用统一异常处理+ResultInfo的形式。更加通用。该方法已不使用
 @Order(2)
 @Component
 @Aspect

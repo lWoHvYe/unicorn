@@ -18,7 +18,7 @@ package com.lwohvye.modules.system.rest;
 import com.lwohvye.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.main.system.domain.Dict;
+import com.lwohvye.modules.system.domain.Dict;
 import com.lwohvye.modules.system.service.DictService;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;

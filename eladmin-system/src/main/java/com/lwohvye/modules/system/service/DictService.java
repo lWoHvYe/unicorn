@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.service;
 
 import com.lwohvye.modules.system.service.dto.DictDto;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
-import com.lwohvye.modules.main.system.domain.Dict;
+import com.lwohvye.modules.system.domain.Dict;
 import org.springframework.data.domain.Pageable;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

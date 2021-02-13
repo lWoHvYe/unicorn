@@ -15,7 +15,7 @@
  */
 package com.lwohvye.main.repository;
 
-import com.lwohvye.main.domain.EmailConfig;
+import com.lwohvye.domain.EmailConfig;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

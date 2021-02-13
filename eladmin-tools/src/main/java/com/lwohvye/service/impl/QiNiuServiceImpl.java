@@ -17,6 +17,8 @@ package com.lwohvye.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.linux.repository.LinuxQiNiuConfigRepository;
+import com.lwohvye.linux.repository.LinuxQiniuContentRepository;
 import com.lwohvye.main.repository.QiNiuConfigRepository;
 import com.lwohvye.main.repository.QiniuContentRepository;
 import com.lwohvye.utils.FileUtil;
@@ -32,8 +34,8 @@ import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.main.domain.QiniuConfig;
-import com.lwohvye.main.domain.QiniuContent;
+import com.lwohvye.domain.QiniuConfig;
+import com.lwohvye.domain.QiniuContent;
 import com.lwohvye.service.dto.QiniuQueryCriteria;
 import com.lwohvye.utils.QiNiuUtil;
 import com.lwohvye.service.QiNiuService;
@@ -61,13 +63,16 @@ public class QiNiuServiceImpl implements QiNiuService {
     private final QiNiuConfigRepository qiNiuConfigRepository;
     private final QiniuContentRepository qiniuContentRepository;
 
+    private final LinuxQiNiuConfigRepository linuxQiNiuConfigRepository;
+    private final LinuxQiniuContentRepository linuxQiniuContentRepository;
+
     @Value("${qiniu.max-size:20}")
     private Long maxSize;
 
     @Override
     @Cacheable(key = "'config'")
     public QiniuConfig find() {
-        Optional<QiniuConfig> qiniuConfig = qiNiuConfigRepository.findById(1L);
+        Optional<QiniuConfig> qiniuConfig = linuxQiNiuConfigRepository.findById(1L);
         return qiniuConfig.orElseGet(QiniuConfig::new);
     }
 
@@ -85,12 +90,12 @@ public class QiNiuServiceImpl implements QiNiuService {
 
     @Override
     public Object queryAll(QiniuQueryCriteria criteria, Pageable pageable){
-        return PageUtil.toPage(qiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable));
+        return PageUtil.toPage(linuxQiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable));
     }
 
     @Override
     public List<QiniuContent> queryAll(QiniuQueryCriteria criteria) {
-        return qiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder));
+        return linuxQiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder));
     }
 
     @Override
@@ -107,14 +112,14 @@ public class QiNiuServiceImpl implements QiNiuService {
         String upToken = auth.uploadToken(qiniuConfig.getBucket());
         try {
             String key = file.getOriginalFilename();
-            if(qiniuContentRepository.findByKey(key) != null) {
+            if(linuxQiniuContentRepository.findByKey(key) != null) {
                 key = QiNiuUtil.getKey(key);
             }
             Response response = uploadManager.put(file.getBytes(), key, upToken);
             //解析上传成功的结果
 
             DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
-            QiniuContent content = qiniuContentRepository.findByKey(FileUtil.getFileNameNoEx(putRet.key));
+            QiniuContent content = linuxQiniuContentRepository.findByKey(FileUtil.getFileNameNoEx(putRet.key));
             if(content == null){
                 //存入数据库
                 QiniuContent qiniuContent = new QiniuContent();
@@ -134,7 +139,7 @@ public class QiNiuServiceImpl implements QiNiuService {
 
     @Override
     public QiniuContent findByContentId(Long id) {
-        QiniuContent qiniuContent = qiniuContentRepository.findById(id).orElseGet(QiniuContent::new);
+        QiniuContent qiniuContent = linuxQiniuContentRepository.findById(id).orElseGet(QiniuContent::new);
         ValidationUtil.isNull(qiniuContent.getId(),"QiniuContent", "id",id);
         return qiniuContent;
     }
@@ -192,7 +197,7 @@ public class QiNiuServiceImpl implements QiNiuService {
             QiniuContent qiniuContent;
             FileInfo[] items = fileListIterator.next();
             for (FileInfo item : items) {
-                if(qiniuContentRepository.findByKey(FileUtil.getFileNameNoEx(item.key)) == null){
+                if(linuxQiniuContentRepository.findByKey(FileUtil.getFileNameNoEx(item.key)) == null){
                     qiniuContent = new QiniuContent();
                     qiniuContent.setSize(FileUtil.getSize(Integer.parseInt(item.fsize+"")));
                     qiniuContent.setSuffix(FileUtil.getExtensionName(item.key));

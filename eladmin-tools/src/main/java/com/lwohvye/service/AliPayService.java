@@ -15,8 +15,8 @@
  */
 package com.lwohvye.service;
 
-import com.lwohvye.main.domain.vo.TradeVo;
-import com.lwohvye.main.domain.AlipayConfig;
+import com.lwohvye.domain.vo.TradeVo;
+import com.lwohvye.domain.AlipayConfig;
 
 /**
  * @author Zheng Jie

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.main.repository;
 
-import com.lwohvye.main.domain.ColumnInfo;
+import com.lwohvye.domain.ColumnInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
