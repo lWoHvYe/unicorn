@@ -32,14 +32,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author zhanghouying
+ * @date 2019-08-24
+ */
 @Service
 @RequiredArgsConstructor
 public class AppServiceImpl implements AppService {
@@ -50,41 +51,44 @@ public class AppServiceImpl implements AppService {
     private final LinuxAppRepository linuxAppRepository;
 
     @Override
-    public Object queryAll(AppQueryCriteria criteria, Pageable pageable){
-        Page<App> page = linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public Object queryAll(AppQueryCriteria criteria, Pageable pageable) {
+        Page<App> page = linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(appMapper::toDto));
     }
 
     @Override
-    public List<AppDto> queryAll(AppQueryCriteria criteria){
-        return appMapper.toDto(linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public List<AppDto> queryAll(AppQueryCriteria criteria) {
+        return appMapper.toDto(linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public AppDto findById(Long id) {
-		App app = linuxAppRepository.findById(id).orElseGet(App::new);
-        ValidationUtil.isNull(app.getId(),"App","id",id);
+        App app = linuxAppRepository.findById(id).orElseGet(App::new);
+        ValidationUtil.isNull(app.getId(), "App", "id", id);
         return appMapper.toDto(app);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(App resources) {
         verification(resources);
         appRepository.save(resources);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(App resources) {
         verification(resources);
-        App app = linuxAppRepository.findById(resources.getId()).orElseGet(App::new);
-        ValidationUtil.isNull(app.getId(),"App","id",resources.getId());
+        App app = appRepository.findById(resources.getId()).orElseGet(App::new);
+        ValidationUtil.isNull(app.getId(), "App", "id", resources.getId());
         app.copy(resources);
         appRepository.save(app);
     }
 
-    private void verification(App resources){
+    private void verification(App resources) {
         String opt = "/opt";
         String home = "/home";
         if (!(resources.getUploadPath().startsWith(opt) || resources.getUploadPath().startsWith(home))) {
@@ -99,7 +103,7 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             appRepository.deleteById(id);
@@ -110,7 +114,7 @@ public class AppServiceImpl implements AppService {
     public void download(List<AppDto> queryAll, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
         for (AppDto appDto : queryAll) {
-            Map<String,Object> map = new LinkedHashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();
             map.put("应用名称", appDto.getName());
             map.put("端口", appDto.getPort());
             map.put("上传目录", appDto.getUploadPath());

@@ -34,14 +34,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author zhanghouying
+ * @date 2019-08-24
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -53,62 +54,65 @@ public class DatabaseServiceImpl implements DatabaseService {
     private final LinuxDatabaseRepository linuxDatabaseRepository;
 
     @Override
-    public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable){
-        Page<Database> page = linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable) {
+        Page<Database> page = linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(databaseMapper::toDto));
     }
 
     @Override
-    public List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria){
-        return databaseMapper.toDto(linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria) {
+        return databaseMapper.toDto(linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public DatabaseDto findById(String id) {
         Database database = linuxDatabaseRepository.findById(id).orElseGet(Database::new);
-        ValidationUtil.isNull(database.getId(),"Database","id",id);
+        ValidationUtil.isNull(database.getId(), "Database", "id", id);
         return databaseMapper.toDto(database);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(Database resources) {
         resources.setId(IdUtil.simpleUUID());
         databaseRepository.save(resources);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(Database resources) {
-        Database database = linuxDatabaseRepository.findById(resources.getId()).orElseGet(Database::new);
-        ValidationUtil.isNull(database.getId(),"Database","id",resources.getId());
+        Database database = databaseRepository.findById(resources.getId()).orElseGet(Database::new);
+        ValidationUtil.isNull(database.getId(), "Database", "id", resources.getId());
         database.copy(resources);
         databaseRepository.save(database);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<String> ids) {
         for (String id : ids) {
             databaseRepository.deleteById(id);
         }
     }
 
-	@Override
-	public boolean testConnection(Database resources) {
-		try {
-			return SqlUtils.testConnection(resources.getJdbcUrl(), resources.getUserName(), resources.getPwd());
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			return false;
-		}
-	}
+    @Override
+    public boolean testConnection(Database resources) {
+        try {
+            return SqlUtils.testConnection(resources.getJdbcUrl(), resources.getUserName(), resources.getPwd());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
 
     @Override
     public void download(List<DatabaseDto> queryAll, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
         for (DatabaseDto databaseDto : queryAll) {
-            Map<String,Object> map = new LinkedHashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();
             map.put("数据库名称", databaseDto.getName());
             map.put("数据库连接地址", databaseDto.getJdbcUrl());
             map.put("用户名", databaseDto.getUserName());
