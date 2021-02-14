@@ -33,13 +33,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Map;
 
 /**
-* @author Zheng Jie
-* @date 2019-04-10
-*/
+ * @author Zheng Jie
+ * @date 2019-04-10
+ */
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "dict")
@@ -54,14 +55,14 @@ public class DictDetailServiceImpl implements DictDetailService {
     private final LinuxDictDetailRepository linuxDictDetailRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> queryAll(DictDetailQueryCriteria criteria, Pageable pageable) {
-        Page<DictDetail> page = linuxDictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public Map<String, Object> queryAll(DictDetailQueryCriteria criteria, Pageable pageable) {
+        Page<DictDetail> page = linuxDictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(dictDetailMapper::toDto));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(DictDetail resources) {
         dictDetailRepository.save(resources);
         // 清理缓存
@@ -69,10 +70,10 @@ public class DictDetailServiceImpl implements DictDetailService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(DictDetail resources) {
-        DictDetail dictDetail = linuxDictDetailRepository.findById(resources.getId()).orElseGet(DictDetail::new);
-        ValidationUtil.isNull( dictDetail.getId(),"DictDetail","id",resources.getId());
+        DictDetail dictDetail = dictDetailRepository.findById(resources.getId()).orElseGet(DictDetail::new);
+        ValidationUtil.isNull(dictDetail.getId(), "DictDetail", "id", resources.getId());
         resources.setId(dictDetail.getId());
         dictDetailRepository.save(resources);
         // 清理缓存
@@ -80,22 +81,22 @@ public class DictDetailServiceImpl implements DictDetailService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     @Cacheable(key = "'name:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
     public List<DictDetailDto> getDictByName(String name) {
         return dictDetailMapper.toDto(linuxDictDetailRepository.findByDictName(name));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Long id) {
-        DictDetail dictDetail = linuxDictDetailRepository.findById(id).orElseGet(DictDetail::new);
+        DictDetail dictDetail = dictDetailRepository.findById(id).orElseGet(DictDetail::new);
         // 清理缓存
         delCaches(dictDetail);
         dictDetailRepository.deleteById(id);
     }
 
-    public void delCaches(DictDetail dictDetail){
+    public void delCaches(DictDetail dictDetail) {
         Dict dict = linuxDictRepository.findById(dictDetail.getDict().getId()).orElseGet(Dict::new);
         redisUtils.del(CacheKey.DICT_NAME + dict.getName());
     }

@@ -61,8 +61,8 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>
     </logger>
-
-    <logger name="jdbc.connection" level="OFF" additivity="false">
+    <!--设置DEBUG可以查看连接的打开与关闭-->
+    <logger name="jdbc.connection" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>
     </logger>
@@ -72,7 +72,7 @@
         <appender-ref ref="LOGSTASH"/>
     </logger>
 
-    <logger name="jdbc.audit" level="OFF" additivity="false">
+    <logger name="jdbc.audit" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>
     </logger>

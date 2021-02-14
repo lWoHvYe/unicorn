@@ -67,7 +67,7 @@ public class MenuServiceImpl implements MenuService {
     private final LinuxUserRepository linuxUserRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<MenuDto> queryAll(MenuQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "menuSort");
         if (isQuery) {
@@ -90,8 +90,8 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
     public MenuDto findById(long id) {
         Menu menu = linuxMenuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
@@ -105,8 +105,8 @@ public class MenuServiceImpl implements MenuService {
      * @return /
      */
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     @Cacheable(key = "'user:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> findByUser(Long currentUserId) {
         List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
@@ -115,13 +115,13 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(Menu resources) {
-        if (linuxMenuRepository.findByTitle(resources.getTitle()) != null) {
+        if (menuRepository.findByTitle(resources.getTitle()) != null) {
             throw new EntityExistException(Menu.class, "title", resources.getTitle());
         }
         if (StringUtils.isNotBlank(resources.getComponentName())) {
-            if (linuxMenuRepository.findByComponentName(resources.getComponentName()) != null) {
+            if (menuRepository.findByComponentName(resources.getComponentName()) != null) {
                 throw new EntityExistException(Menu.class, "componentName", resources.getComponentName());
             }
         }
@@ -142,12 +142,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(Menu resources) {
         if (resources.getId().equals(resources.getPid())) {
             throw new BadRequestException("上级不能为自己");
         }
-        Menu menu = linuxMenuRepository.findById(resources.getId()).orElseGet(Menu::new);
+        Menu menu = menuRepository.findById(resources.getId()).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Permission", "id", resources.getId());
 
         if (resources.getIFrame()) {
@@ -156,7 +156,7 @@ public class MenuServiceImpl implements MenuService {
                 throw new BadRequestException("外链必须以http://或者https://开头");
             }
         }
-        Menu menu1 = linuxMenuRepository.findByTitle(resources.getTitle());
+        Menu menu1 = menuRepository.findByTitle(resources.getTitle());
 
         if (menu1 != null && !menu1.getId().equals(menu.getId())) {
             throw new EntityExistException(Menu.class, "title", resources.getTitle());
@@ -171,7 +171,7 @@ public class MenuServiceImpl implements MenuService {
         Long newPid = resources.getPid();
 
         if (StringUtils.isNotBlank(resources.getComponentName())) {
-            menu1 = linuxMenuRepository.findByComponentName(resources.getComponentName());
+            menu1 = menuRepository.findByComponentName(resources.getComponentName());
             if (menu1 != null && !menu1.getId().equals(menu.getId())) {
                 throw new EntityExistException(Menu.class, "componentName", resources.getComponentName());
             }
@@ -197,7 +197,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Set<Menu> getChildMenus(List<Menu> menuList, Set<Menu> menuSet) {
         for (Menu menu : menuList) {
             menuSet.add(menu);
@@ -210,7 +210,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<Menu> menuSet) {
         for (Menu menu : menuSet) {
             // 清理缓存
@@ -222,7 +222,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<MenuDto> getMenus(Long pid) {
         List<Menu> menus;
         if (pid != null && !pid.equals(0L)) {
@@ -234,7 +234,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<MenuDto> getSuperior(MenuDto menuDto, List<Menu> menus) {
         if (menuDto.getPid() == null) {
             menus.addAll(linuxMenuRepository.findByPidIsNull());
@@ -322,6 +322,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Menu findOne(Long id) {
         Menu menu = linuxMenuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);

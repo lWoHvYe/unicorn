@@ -60,7 +60,7 @@ public class LogServiceImpl implements LogService {
     private final LinuxLogRepository linuxLogRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Object queryAll(LogQueryCriteria criteria, Pageable pageable) {
         Page<Log> page = linuxLogRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
         String status = "ERROR";
@@ -71,20 +71,20 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<Log> queryAll(LogQueryCriteria criteria) {
         return linuxLogRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
         Page<Log> page = linuxLogRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
         return PageUtil.toPage(page.map(logSmallMapper::toDto));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, Log log) {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -140,6 +140,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Object findByErrDetail(Long id) {
         Log log = linuxLogRepository.findById(id).orElseGet(Log::new);
         ValidationUtil.isNull(log.getId(), "Log", "id", id);
@@ -166,13 +167,13 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delAllByError() {
         logRepository.deleteByLogType("ERROR");
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delAllByInfo() {
         logRepository.deleteByLogType("INFO");
     }

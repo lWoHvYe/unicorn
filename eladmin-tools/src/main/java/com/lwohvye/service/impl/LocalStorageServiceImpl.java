@@ -42,9 +42,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
-* @author Zheng Jie
-* @date 2019-09-05
-*/
+ * @author Zheng Jie
+ * @date 2019-09-05
+ */
 @Service
 @RequiredArgsConstructor
 public class LocalStorageServiceImpl implements LocalStorageService {
@@ -56,34 +56,34 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     private final LinuxLocalStorageRepository linuxLocalStorageRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable){
-        Page<LocalStorage> page = linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable) {
+        Page<LocalStorage> page = linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(localStorageMapper::toDto));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria){
-        return localStorageMapper.toDto(linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria) {
+        return localStorageMapper.toDto(linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public LocalStorageDto findById(Long id){
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public LocalStorageDto findById(Long id) {
         LocalStorage localStorage = linuxLocalStorageRepository.findById(id).orElseGet(LocalStorage::new);
-        ValidationUtil.isNull(localStorage.getId(),"LocalStorage","id",id);
+        ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", id);
         return localStorageMapper.toDto(localStorage);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public LocalStorage create(String name, MultipartFile multipartFile) {
         FileUtil.checkSize(properties.getMaxSize(), multipartFile.getSize());
         String suffix = FileUtil.getExtensionName(multipartFile.getOriginalFilename());
         String type = FileUtil.getFileType(suffix);
-        File file = FileUtil.upload(multipartFile, properties.getPath().getPath() + type +  File.separator);
-        if(ObjectUtil.isNull(file)){
+        File file = FileUtil.upload(multipartFile, properties.getPath().getPath() + type + File.separator);
+        if (ObjectUtil.isNull(file)) {
             throw new BadRequestException("上传失败");
         }
         try {
@@ -97,26 +97,26 @@ public class LocalStorageServiceImpl implements LocalStorageService {
                     FileUtil.getSize(multipartFile.getSize())
             );
             return localStorageRepository.save(localStorage);
-        }catch (Exception e){
+        } catch (Exception e) {
             FileUtil.del(file);
             throw e;
         }
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(LocalStorage resources) {
-        LocalStorage localStorage = linuxLocalStorageRepository.findById(resources.getId()).orElseGet(LocalStorage::new);
-        ValidationUtil.isNull( localStorage.getId(),"LocalStorage","id",resources.getId());
+        LocalStorage localStorage = localStorageRepository.findById(resources.getId()).orElseGet(LocalStorage::new);
+        ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", resources.getId());
         localStorage.copy(resources);
         localStorageRepository.save(localStorage);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
-            LocalStorage storage = linuxLocalStorageRepository.findById(id).orElseGet(LocalStorage::new);
+            LocalStorage storage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);
             FileUtil.del(storage.getPath());
             localStorageRepository.delete(storage);
         }
@@ -126,7 +126,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     public void download(List<LocalStorageDto> queryAll, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
         for (LocalStorageDto localStorageDTO : queryAll) {
-            Map<String,Object> map = new LinkedHashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();
             map.put("文件名", localStorageDTO.getRealName());
             map.put("备注名", localStorageDTO.getName());
             map.put("文件类型", localStorageDTO.getType());

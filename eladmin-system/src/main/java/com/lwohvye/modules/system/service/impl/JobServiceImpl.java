@@ -58,22 +58,22 @@ public class JobServiceImpl implements JobService {
     private final LinuxUserRepository linuxUserRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
         Page<Job> page = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(jobMapper::toDto).getContent(), page.getTotalElements());
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<JobDto> queryAll(JobQueryCriteria criteria) {
         List<Job> list = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return jobMapper.toDto(list);
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
     public JobDto findById(Long id) {
         Job job = linuxJobRepository.findById(id).orElseGet(Job::new);
         ValidationUtil.isNull(job.getId(), "Job", "id", id);
@@ -81,9 +81,9 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(Job resources) {
-        Job job = linuxJobRepository.findByName(resources.getName());
+        Job job = jobRepository.findByName(resources.getName());
         if (job != null) {
             throw new EntityExistException(Job.class, "name", resources.getName());
         }
@@ -91,11 +91,11 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     @CacheEvict(key = "'id:' + #p0.id")
-    @Transactional(rollbackFor = Exception.class)
     public void update(Job resources) {
-        Job job = linuxJobRepository.findById(resources.getId()).orElseGet(Job::new);
-        Job old = linuxJobRepository.findByName(resources.getName());
+        Job job = jobRepository.findById(resources.getId()).orElseGet(Job::new);
+        Job old = jobRepository.findByName(resources.getName());
         if (old != null && !old.getId().equals(resources.getId())) {
             throw new EntityExistException(Job.class, "name", resources.getName());
         }
@@ -105,7 +105,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         jobRepository.deleteAllByIdIn(ids);
         // 删除缓存

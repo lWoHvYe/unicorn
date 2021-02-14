@@ -37,9 +37,9 @@ import java.io.IOException;
 import java.util.*;
 
 /**
-* @author Zheng Jie
-* @date 2019-04-10
-*/
+ * @author Zheng Jie
+ * @date 2019-04-10
+ */
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "dict")
@@ -52,41 +52,41 @@ public class DictServiceImpl implements DictService {
     private final LinuxDictRepository linuxDictRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> queryAll(DictQueryCriteria dict, Pageable pageable){
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    public Map<String, Object> queryAll(DictQueryCriteria dict, Pageable pageable) {
         Page<Dict> page = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
         return PageUtil.toPage(page.map(dictMapper::toDto));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<DictDto> queryAll(DictQueryCriteria dict) {
         List<Dict> list = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb));
         return dictMapper.toDto(list);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(Dict resources) {
         dictRepository.save(resources);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(Dict resources) {
         // 清理缓存
         delCaches(resources);
-        Dict dict = linuxDictRepository.findById(resources.getId()).orElseGet(Dict::new);
-        ValidationUtil.isNull( dict.getId(),"Dict","id",resources.getId());
+        Dict dict = dictRepository.findById(resources.getId()).orElseGet(Dict::new);
+        ValidationUtil.isNull(dict.getId(), "Dict", "id", resources.getId());
         resources.setId(dict.getId());
         dictRepository.save(resources);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         // 清理缓存
-        List<Dict> dicts = linuxDictRepository.findByIdIn(ids);
+        List<Dict> dicts = dictRepository.findByIdIn(ids);
         for (Dict dict : dicts) {
             delCaches(dict);
         }
@@ -97,9 +97,9 @@ public class DictServiceImpl implements DictService {
     public void download(List<DictDto> dictDtos, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
         for (DictDto dictDTO : dictDtos) {
-            if(CollectionUtil.isNotEmpty(dictDTO.getDictDetails())){
+            if (CollectionUtil.isNotEmpty(dictDTO.getDictDetails())) {
                 for (DictDetailDto dictDetail : dictDTO.getDictDetails()) {
-                    Map<String,Object> map = new LinkedHashMap<>();
+                    Map<String, Object> map = new LinkedHashMap<>();
                     map.put("字典名称", dictDTO.getName());
                     map.put("字典描述", dictDTO.getDescription());
                     map.put("字典标签", dictDetail.getLabel());
@@ -108,7 +108,7 @@ public class DictServiceImpl implements DictService {
                     list.add(map);
                 }
             } else {
-                Map<String,Object> map = new LinkedHashMap<>();
+                Map<String, Object> map = new LinkedHashMap<>();
                 map.put("字典名称", dictDTO.getName());
                 map.put("字典描述", dictDTO.getDescription());
                 map.put("字典标签", null);
@@ -120,7 +120,7 @@ public class DictServiceImpl implements DictService {
         FileUtil.downloadExcel(list, response);
     }
 
-    public void delCaches(Dict dict){
+    public void delCaches(Dict dict) {
         redisUtils.del(CacheKey.DICT_NAME + dict.getName());
     }
 }

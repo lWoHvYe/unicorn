@@ -65,14 +65,14 @@ public class UserServiceImpl implements UserService {
     private final LinuxUserRepository linuxUserRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
         Page<User> page = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(userMapper::toDto));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
         List<User> users = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return userMapper.toDto(users);
@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(key = "'id:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public UserDto findById(long id) {
         User user = linuxUserRepository.findById(id).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", id);
@@ -88,12 +88,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(User resources) {
-        if (linuxUserRepository.findByUsername(resources.getUsername()) != null) {
+        if (userRepository.findByUsername(resources.getUsername()) != null) {
             throw new EntityExistException(User.class, "username", resources.getUsername());
         }
-        if (linuxUserRepository.findByEmail(resources.getEmail()) != null) {
+        if (userRepository.findByEmail(resources.getEmail()) != null) {
             throw new EntityExistException(User.class, "email", resources.getEmail());
         }
         if (userRepository.findByPhone(resources.getPhone()) != null) {
@@ -103,13 +103,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(User resources) throws Exception {
-        User user = linuxUserRepository.findById(resources.getId()).orElseGet(User::new);
+        User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", resources.getId());
-        User user1 = linuxUserRepository.findByUsername(resources.getUsername());
-        User user2 = linuxUserRepository.findByEmail(resources.getEmail());
-        User user3 = linuxUserRepository.findByPhone(resources.getPhone());
+        User user1 = userRepository.findByUsername(resources.getUsername());
+        User user2 = userRepository.findByEmail(resources.getEmail());
+        User user3 = userRepository.findByPhone(resources.getPhone());
         if (user1 != null && !user.getId().equals(user1.getId())) {
             throw new EntityExistException(User.class, "username", resources.getUsername());
         }
@@ -144,10 +144,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void updateCenter(User resources) {
-        User user = linuxUserRepository.findById(resources.getId()).orElseGet(User::new);
-        User user1 = linuxUserRepository.findByPhone(resources.getPhone());
+        User user = userRepository.findById(resources.getId()).orElseGet(User::new);
+        User user1 = userRepository.findByPhone(resources.getPhone());
         if (user1 != null && !user.getId().equals(user1.getId())) {
             throw new EntityExistException(User.class, "phone", resources.getPhone());
         }
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             // 清理缓存
@@ -171,7 +171,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public UserDto findByName(String userName) {
         User user = linuxUserRepository.findByUsername(userName);
         if (user == null) {
@@ -182,16 +182,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void updatePass(String username, String pass) {
         userRepository.updatePass(username, pass, new Date());
         flushCache(username);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public Map<String, String> updateAvatar(MultipartFile multipartFile) {
-        User user = linuxUserRepository.findByUsername(SecurityUtils.getCurrentUsername());
+        User user = userRepository.findByUsername(SecurityUtils.getCurrentUsername());
         String oldPath = user.getAvatarPath();
         File file = FileUtil.upload(multipartFile, properties.getPath().getAvatar());
         user.setAvatarPath(Objects.requireNonNull(file).getPath());
@@ -202,7 +202,7 @@ public class UserServiceImpl implements UserService {
         }
         @NotBlank String username = user.getUsername();
         flushCache(username);
-        return new HashMap<String, String>(1) {
+        return new HashMap<>(1) {
             {
                 put("avatar", file.getName());
             }
@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void updateEmail(String username, String email) {
         userRepository.updateEmail(username, email);
         flushCache(username);

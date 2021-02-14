@@ -2,13 +2,12 @@ package com.lwohvye.utils.result;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lwohvye.exception.BadRequestException;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 通用返回对象
@@ -66,11 +65,19 @@ public class ResultInfo<T> implements IResultInfo<T> {
         this.businessCode = businessCode;
 //        考虑map可以不是page的情况
         var content = objectMap.get("content");
-        if (ObjectUtil.isNotNull(content) && content instanceof List)
-            this.content = (List<T>) content;
-        else
+//        content可能是List。也可能是Set
+        if (ObjectUtil.isNotNull(content)) {
+            if (content instanceof List)
+                this.content = (List<T>) content;
+            else if (content instanceof Set)
+//                Set类型转成List
+                this.content = new ArrayList<>((Set<T>) content);
+            else
+                throw new BadRequestException("content类型有误，请求兼容新类型" + content.getClass());
+        } else {
 //            不是page用resultMap字段返回
             this.resultMap = objectMap;
+        }
         var totalElements = objectMap.get("totalElements");
         if (ObjectUtil.isNotNull(totalElements) && totalElements instanceof Long)
             this.totalElements = (Long) totalElements;

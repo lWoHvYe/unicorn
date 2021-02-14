@@ -70,28 +70,28 @@ public class RoleServiceImpl implements RoleService {
     private final LinuxUserRepository linuxUserRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
         return roleMapper.toDto(linuxRoleRepository.findAll(sort));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<RoleDto> queryAll(RoleQueryCriteria criteria) {
         return roleMapper.toDto(linuxRoleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Object queryAll(RoleQueryCriteria criteria, Pageable pageable) {
         Page<Role> page = linuxRoleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(roleMapper::toDto));
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
     public RoleDto findById(long id) {
         Role role = linuxRoleRepository.findById(id).orElseGet(Role::new);
         ValidationUtil.isNull(role.getId(), "Role", "id", id);
@@ -99,21 +99,21 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(Role resources) {
-        if (linuxRoleRepository.findByName(resources.getName()) != null) {
+        if (roleRepository.findByName(resources.getName()) != null) {
             throw new EntityExistException(Role.class, "username", resources.getName());
         }
         roleRepository.save(resources);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(Role resources) {
-        Role role = linuxRoleRepository.findById(resources.getId()).orElseGet(Role::new);
+        Role role = roleRepository.findById(resources.getId()).orElseGet(Role::new);
         ValidationUtil.isNull(role.getId(), "Role", "id", resources.getId());
 
-        Role role1 = linuxRoleRepository.findByName(resources.getName());
+        Role role1 = roleRepository.findByName(resources.getName());
 
         if (role1 != null && !role1.getId().equals(role.getId())) {
             throw new EntityExistException(Role.class, "username", resources.getName());
@@ -129,10 +129,10 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void updateMenu(Role resources, RoleDto roleDTO) {
         Role role = roleMapper.toEntity(roleDTO);
-        List<User> users = linuxUserRepository.findByRoleId(role.getId());
+        List<User> users = userRepository.findByRoleId(role.getId());
         // 更新菜单
         role.setMenus(resources.getMenus());
         delCaches(resources.getId(), users);
@@ -140,14 +140,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void untiedMenu(Long menuId) {
         // 更新菜单
         roleRepository.untiedMenu(menuId);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             // 更新相关缓存
@@ -157,12 +157,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<RoleSmallDto> findByUsersId(Long id) {
         return roleSmallMapper.toDto(new ArrayList<>(linuxRoleRepository.findByUserId(id)));
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Integer findByRoles(Set<Role> roles) {
         if (roles.size() == 0) {
             return Integer.MAX_VALUE;
@@ -175,8 +176,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     @Cacheable(key = "'auth:' + #p0.id")
-    @Transactional(rollbackFor = Exception.class)
     public List<GrantedAuthority> mapToGrantedAuthorities(UserDto user) {
         Set<String> permissions = new HashSet<>();
         // 如果是管理员直接返回
@@ -215,12 +216,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<Role> findInMenuId(List<Long> menuIds) {
         return linuxRoleRepository.findInMenuId(menuIds);
     }
 
     /**
      * 清理缓存
+     *
      * @param id /
      */
     public void delCaches(Long id, List<User> users) {

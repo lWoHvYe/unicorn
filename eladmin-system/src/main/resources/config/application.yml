@@ -42,6 +42,7 @@ spring:
       hibernate:
         ddl-auto: none
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        enable_lazy_no_trans: true
     open-in-view: true
 
   redis:
@@ -52,6 +53,10 @@ spring:
     password: ${REDIS_PWD:}
     #连接超时时间
     timeout: 5000
+
+#  # 全局懒加载。
+#  main:
+#    lazy-initialization: true
 
 task:
   pool:
@@ -64,8 +69,8 @@ task:
     # 队列容量
     queue-capacity: 50
 
-#七牛云
-#qiniu:
+  #七牛云
+  #qiniu:
   # 文件大小 /M
 #  max-size: 15
 

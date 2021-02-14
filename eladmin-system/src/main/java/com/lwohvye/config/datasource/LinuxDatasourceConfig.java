@@ -15,6 +15,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +71,7 @@ public class LinuxDatasourceConfig {
         jpaProperties.put("hibernate.hbm2ddl.auto", "none");
         jpaProperties.put("hibernate.dialect", env.getProperty("spring.jpa.hibernate.dialect"));
         jpaProperties.put("hibernate.current_session_context_class", "org.springframework.orm.hibernate5.SpringSessionContext");
+        jpaProperties.put("hibernate.enable_lazy_load_no_trans", env.getProperty("spring.jpa.hibernate.enable_lazy_load_no_trans"));
         //注意在此处进行驼峰策略的配置，我也试过在yml中进行配置奈何就是不管用，可能是因为带入了多数据源的问题
         jpaProperties.put("hibernate.physical_naming_strategy", SpringPhysicalNamingStrategy.class.getName());
         jpaProperties.put("hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName());
@@ -77,7 +79,7 @@ public class LinuxDatasourceConfig {
     }
 
     @Bean(name = "transactionManagerLinux")
-    PlatformTransactionManager transactionManagerLinux(EntityManagerFactoryBuilder builder) {
-        return new JpaTransactionManager(entityManagerFactoryLinux(builder).getObject());
+    PlatformTransactionManager transactionManagerLinux(@Qualifier("entityManagerFactoryLinux") EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
     }
 }

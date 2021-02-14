@@ -65,7 +65,7 @@ public class DeptServiceImpl implements DeptService {
     private final LinuxRoleRepository linuxRoleRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<DeptDto> queryAll(DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "deptSort");
         String dataScopeType = SecurityUtils.getDataScopeType();
@@ -102,8 +102,8 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
     public DeptDto findById(Long id) {
         Dept dept = linuxDeptRepository.findById(id).orElseGet(Dept::new);
         ValidationUtil.isNull(dept.getId(), "Dept", "id", id);
@@ -111,19 +111,19 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<Dept> findByPid(long pid) {
         return linuxDeptRepository.findByPid(pid);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Set<Dept> findByRoleId(Long id) {
         return linuxDeptRepository.findByRoleId(id);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(Dept resources) {
         deptRepository.save(resources);
         // 计算子节点数目
@@ -133,7 +133,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void update(Dept resources) {
         // 旧的部门
         Long oldPid = findById(resources.getId()).getPid();
@@ -141,7 +141,7 @@ public class DeptServiceImpl implements DeptService {
         if (resources.getPid() != null && resources.getId().equals(resources.getPid())) {
             throw new BadRequestException("上级不能为自己");
         }
-        Dept dept = linuxDeptRepository.findById(resources.getId()).orElseGet(Dept::new);
+        Dept dept = deptRepository.findById(resources.getId()).orElseGet(Dept::new);
         ValidationUtil.isNull(dept.getId(), "Dept", "id", resources.getId());
         resources.setId(dept.getId());
         deptRepository.save(resources);
@@ -153,7 +153,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void delete(Set<DeptDto> deptDtos) {
         for (DeptDto deptDto : deptDtos) {
             // 清理缓存
@@ -177,7 +177,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Set<DeptDto> getDeleteDepts(List<Dept> menuList, Set<DeptDto> deptDtos) {
         for (Dept dept : menuList) {
             deptDtos.add(deptMapper.toDto(dept));
@@ -190,7 +190,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<Long> getDeptChildren(List<Dept> deptList) {
         List<Long> list = new ArrayList<>();
         deptList.forEach(dept -> {
@@ -207,7 +207,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public List<DeptDto> getSuperior(DeptDto deptDto, List<Dept> depts) {
         if (deptDto.getPid() == null) {
             depts.addAll(linuxDeptRepository.findByPidIsNull());
@@ -254,7 +254,6 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void verification(Set<DeptDto> deptDtos) {
         Set<Long> deptIds = deptDtos.stream().map(DeptDto::getId).collect(Collectors.toSet());
         if (linuxUserRepository.countByDepts(deptIds) > 0) {
