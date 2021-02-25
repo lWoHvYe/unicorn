@@ -39,6 +39,8 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
+
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -57,11 +59,11 @@ import java.util.Map;
 public class RedisConfig extends CachingConfigurerSupport {
 
     /**
-     *  设置 redis 数据默认过期时间，默认2小时
-     *  设置@cacheable 序列化方式
+     * 设置 redis 数据默认过期时间，默认2小时
+     * 设置@cacheable 序列化方式
      */
     @Bean
-    public RedisCacheConfiguration redisCacheConfiguration(){
+    public RedisCacheConfiguration redisCacheConfiguration() {
         FastJsonRedisSerializer<Object> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
         RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig();
         configuration = configuration.serializeValuesWith(RedisSerializationContext.
@@ -91,28 +93,36 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     /**
-     * 自定义缓存key生成策略，默认将使用该策略
+     * 自定义缓存key生成策略，默认将使用该策略。针对查询，使用toString作为key
+     * 列表查询：放入缓存（包含条件筛选）
+     * 新增操作：清除列表查询缓存。暂不做加入缓存操作
+     * 修改操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
+     * 删除操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
      */
     @Bean
     @Override
     public KeyGenerator keyGenerator() {
-        return (target, method, params) -> {
-            Map<String,Object> container = new HashMap<>(3);
+        return (Object target, Method method, Object... params) -> {
+            Map<String, Object> container = new HashMap<>(3);
             Class<?> targetClassClass = target.getClass();
-            // 类地址
-            container.put("class",targetClassClass.toGenericString());
-            // 方法名称
-            container.put("methodName",method.getName());
-            // 包名称
-            container.put("package",targetClassClass.getPackage());
+            var methodName = method.getName();
+            // 类地址。可根据需要决定是否放入摘要中
+            container.put("class", targetClassClass.toGenericString());
+            // 方法名称。可根据需要决定是否放入摘要中
+            container.put("methodName", methodName);
+            // 包名称。可根据需要决定是否放入摘要中
+            container.put("package", targetClassClass.getPackage());
             // 参数列表
             for (int i = 0; i < params.length; i++) {
-                container.put(String.valueOf(i),params[i]);
+                container.put(String.valueOf(i), params[i]);
             }
             // 转为JSON字符串
             String jsonString = JSON.toJSONString(container);
             // 做SHA256 Hash计算，得到一个SHA256摘要作为Key
-            return DigestUtils.sha256Hex(jsonString);
+            var sha256Hex = DigestUtils.sha256Hex(jsonString);
+            var classSimpleName = targetClassClass.getSimpleName();
+//            使用类名 + 方法名 + 摘要 做key，便于识别
+            return classSimpleName + "::" + methodName + "::" + sha256Hex;
         };
     }
 
@@ -149,10 +159,10 @@ public class RedisConfig extends CachingConfigurerSupport {
 /**
  * Value 序列化
  *
- * @author /
  * @param <T>
+ * @author /
  */
- class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
+class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
 
     private final Class<T> clazz;
 
