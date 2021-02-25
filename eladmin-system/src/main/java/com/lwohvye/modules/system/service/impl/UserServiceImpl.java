@@ -52,7 +52,9 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+//配置该类缓存的公共前缀
 @CacheConfig(cacheNames = "user")
+// TODO: 2021/2/25 Redis的使用方式需较大的调整
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -65,6 +67,7 @@ public class UserServiceImpl implements UserService {
     private final LinuxUserRepository linuxUserRepository;
 
     @Override
+    @Cacheable
     @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
         Page<User> page = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
@@ -88,6 +91,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+//    @C 清理缓存
     @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
     public void create(User resources) {
         if (userRepository.findByUsername(resources.getUsername()) != null) {
@@ -104,6 +108,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+//    清理缓存。内部逻辑调整
     public void update(User resources) throws Exception {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", resources.getId());
@@ -145,6 +150,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+//    清理缓存。内部逻辑调整
     public void updateCenter(User resources) {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         User user1 = userRepository.findByPhone(resources.getPhone());
@@ -161,17 +167,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+//    清理缓存。内部逻辑调整
     public void delete(Set<Long> ids) {
-        for (Long id : ids) {
-            // 清理缓存
-            UserDto user = findById(id);
-            delCaches(user.getId(), user.getUsername());
-        }
+//        for (Long id : ids) {
+//            // 清理缓存
+//            UserDto user = findById(id);
+//            delCaches(user.getId(), user.getUsername());
+//        }
+//        清理所有user相关key，因为查询加上了缓存
         userRepository.deleteAllByIdIn(ids);
     }
 
     @Override
     @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+//    加入缓存
     public UserDto findByName(String userName) {
         User user = linuxUserRepository.findByUsername(userName);
         if (user == null) {
@@ -183,6 +192,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+//    清理缓存
     public void updatePass(String username, String pass) {
         userRepository.updatePass(username, pass, new Date());
         flushCache(username);
@@ -190,6 +200,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+//    清理缓存
     public Map<String, String> updateAvatar(MultipartFile multipartFile) {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUsername());
         String oldPath = user.getAvatarPath();
@@ -211,6 +222,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+//    清理缓存
     public void updateEmail(String username, String email) {
         userRepository.updateEmail(username, email);
         flushCache(username);

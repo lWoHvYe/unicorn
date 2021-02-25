@@ -103,8 +103,8 @@ public class RedisConfig extends CachingConfigurerSupport {
     @Override
     public KeyGenerator keyGenerator() {
         return (Object target, Method method, Object... params) -> {
-            Map<String, Object> container = new HashMap<>(3);
-            Class<?> targetClassClass = target.getClass();
+            var container = new HashMap<String, Object>(3);
+            var targetClassClass = target.getClass();
             var methodName = method.getName();
             // 类地址。可根据需要决定是否放入摘要中
             container.put("class", targetClassClass.toGenericString());
