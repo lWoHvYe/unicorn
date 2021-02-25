@@ -56,20 +56,20 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     private final LinuxLocalStorageRepository linuxLocalStorageRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable) {
         Page<LocalStorage> page = linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(localStorageMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria) {
         return localStorageMapper.toDto(linuxLocalStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public LocalStorageDto findById(Long id) {
         LocalStorage localStorage = linuxLocalStorageRepository.findById(id).orElseGet(LocalStorage::new);
         ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", id);
@@ -77,7 +77,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public LocalStorage create(String name, MultipartFile multipartFile) {
         FileUtil.checkSize(properties.getMaxSize(), multipartFile.getSize());
         String suffix = FileUtil.getExtensionName(multipartFile.getOriginalFilename());
@@ -104,7 +104,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(LocalStorage resources) {
         LocalStorage localStorage = localStorageRepository.findById(resources.getId()).orElseGet(LocalStorage::new);
         ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", resources.getId());
@@ -113,7 +113,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
             LocalStorage storage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);

@@ -55,31 +55,31 @@ public class QuartzJobServiceImpl implements QuartzJobService {
     private final LinuxQuartzLogRepository linuxQuartzLogRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(JobQueryCriteria criteria, Pageable pageable) {
         return PageUtil.toPage(linuxQuartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAllLog(JobQueryCriteria criteria, Pageable pageable) {
         return PageUtil.toPage(linuxQuartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<QuartzJob> queryAll(JobQueryCriteria criteria) {
         return linuxQuartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<QuartzLog> queryAllLog(JobQueryCriteria criteria) {
         return linuxQuartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public QuartzJob findById(Long id) {
         QuartzJob quartzJob = linuxQuartzJobRepository.findById(id).orElseGet(QuartzJob::new);
         ValidationUtil.isNull(quartzJob.getId(), "QuartzJob", "id", id);
@@ -87,7 +87,7 @@ public class QuartzJobServiceImpl implements QuartzJobService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(QuartzJob resources) {
         if (!CronExpression.isValidExpression(resources.getCronExpression())) {
             throw new BadRequestException("cron表达式格式错误");
@@ -97,7 +97,7 @@ public class QuartzJobServiceImpl implements QuartzJobService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(QuartzJob resources) {
         if (!CronExpression.isValidExpression(resources.getCronExpression())) {
             throw new BadRequestException("cron表达式格式错误");
@@ -113,7 +113,7 @@ public class QuartzJobServiceImpl implements QuartzJobService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void updateIsPause(QuartzJob quartzJob) {
         if (quartzJob.getIsPause()) {
             quartzManage.resumeJob(quartzJob);
@@ -131,7 +131,7 @@ public class QuartzJobServiceImpl implements QuartzJobService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             QuartzJob quartzJob = findById(id);

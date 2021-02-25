@@ -58,21 +58,21 @@ public class JobServiceImpl implements JobService {
     private final LinuxUserRepository linuxUserRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
         Page<Job> page = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(jobMapper::toDto).getContent(), page.getTotalElements());
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<JobDto> queryAll(JobQueryCriteria criteria) {
         List<Job> list = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return jobMapper.toDto(list);
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
     public JobDto findById(Long id) {
         Job job = linuxJobRepository.findById(id).orElseGet(Job::new);
@@ -81,7 +81,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(Job resources) {
         Job job = jobRepository.findByName(resources.getName());
         if (job != null) {
@@ -91,7 +91,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @CacheEvict(key = "'id:' + #p0.id")
     public void update(Job resources) {
         Job job = jobRepository.findById(resources.getId()).orElseGet(Job::new);
@@ -105,7 +105,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         jobRepository.deleteAllByIdIn(ids);
         // 删除缓存

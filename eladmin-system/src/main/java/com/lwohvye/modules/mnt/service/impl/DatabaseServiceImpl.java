@@ -54,20 +54,20 @@ public class DatabaseServiceImpl implements DatabaseService {
     private final LinuxDatabaseRepository linuxDatabaseRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable) {
         Page<Database> page = linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(databaseMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria) {
         return databaseMapper.toDto(linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public DatabaseDto findById(String id) {
         Database database = linuxDatabaseRepository.findById(id).orElseGet(Database::new);
         ValidationUtil.isNull(database.getId(), "Database", "id", id);
@@ -75,14 +75,14 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(Database resources) {
         resources.setId(IdUtil.simpleUUID());
         databaseRepository.save(resources);
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(Database resources) {
         Database database = databaseRepository.findById(resources.getId()).orElseGet(Database::new);
         ValidationUtil.isNull(database.getId(), "Database", "id", resources.getId());
@@ -91,7 +91,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<String> ids) {
         for (String id : ids) {
             databaseRepository.deleteById(id);

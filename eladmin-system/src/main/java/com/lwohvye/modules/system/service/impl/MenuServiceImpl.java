@@ -67,7 +67,7 @@ public class MenuServiceImpl implements MenuService {
     private final LinuxUserRepository linuxUserRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> queryAll(MenuQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "menuSort");
         if (isQuery) {
@@ -90,7 +90,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
     public MenuDto findById(long id) {
         Menu menu = linuxMenuRepository.findById(id).orElseGet(Menu::new);
@@ -105,7 +105,7 @@ public class MenuServiceImpl implements MenuService {
      * @return /
      */
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'user:' + #p0")
     public List<MenuDto> findByUser(Long currentUserId) {
         List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
@@ -115,7 +115,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(Menu resources) {
         if (menuRepository.findByTitle(resources.getTitle()) != null) {
             throw new EntityExistException(Menu.class, "title", resources.getTitle());
@@ -142,7 +142,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(Menu resources) {
         if (resources.getId().equals(resources.getPid())) {
             throw new BadRequestException("上级不能为自己");
@@ -197,7 +197,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Set<Menu> getChildMenus(List<Menu> menuList, Set<Menu> menuSet) {
         for (Menu menu : menuList) {
             menuSet.add(menu);
@@ -210,7 +210,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Menu> menuSet) {
         for (Menu menu : menuSet) {
             // 清理缓存
@@ -222,7 +222,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> getMenus(Long pid) {
         List<Menu> menus;
         if (pid != null && !pid.equals(0L)) {
@@ -234,7 +234,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> getSuperior(MenuDto menuDto, List<Menu> menus) {
         if (menuDto.getPid() == null) {
             menus.addAll(linuxMenuRepository.findByPidIsNull());
@@ -322,7 +322,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Menu findOne(Long id) {
         Menu menu = linuxMenuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);

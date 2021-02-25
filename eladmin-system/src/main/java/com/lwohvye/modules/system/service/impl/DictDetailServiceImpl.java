@@ -55,14 +55,14 @@ public class DictDetailServiceImpl implements DictDetailService {
     private final LinuxDictDetailRepository linuxDictDetailRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictDetailQueryCriteria criteria, Pageable pageable) {
         Page<DictDetail> page = linuxDictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(dictDetailMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(DictDetail resources) {
         dictDetailRepository.save(resources);
         // 清理缓存
@@ -70,7 +70,7 @@ public class DictDetailServiceImpl implements DictDetailService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(DictDetail resources) {
         DictDetail dictDetail = dictDetailRepository.findById(resources.getId()).orElseGet(DictDetail::new);
         ValidationUtil.isNull(dictDetail.getId(), "DictDetail", "id", resources.getId());
@@ -81,14 +81,14 @@ public class DictDetailServiceImpl implements DictDetailService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'name:' + #p0")
     public List<DictDetailDto> getDictByName(String name) {
         return dictDetailMapper.toDto(linuxDictDetailRepository.findByDictName(name));
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         DictDetail dictDetail = dictDetailRepository.findById(id).orElseGet(DictDetail::new);
         // 清理缓存

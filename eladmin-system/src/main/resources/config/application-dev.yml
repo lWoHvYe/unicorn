@@ -1,11 +1,12 @@
 #配置数据源
 spring:
-  datasource:
-    druid:
+  shardingsphere:
+    datasource:
+      names: master,slave0,slave1
 #     主数据源
-      main:
-        db-type: com.alibaba.druid.pool.DruidDataSource
-        driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
         url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         username: ${DB_USER:root}
         password: ${DB_PWD:root}
@@ -50,9 +51,9 @@ spring:
             config:
               multi-statement-allow: true
 #     分数据源
-      linux:
-        db-type: com.alibaba.druid.pool.DruidDataSource
-        driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      slave0:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
         url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
 #        从库改用只读账号
         username: ${DB_USER:reader}
@@ -100,54 +101,67 @@ spring:
           wall:
             config:
               multi-statement-allow: true
-      db-type: com.alibaba.druid.pool.DruidDataSource
-      driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      url: jdbc:log4jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
-      username: ${DB_USER:root}
-      password: ${DB_PWD:123456}
-      # 初始连接数
-      initial-size: 5
-      # 最小连接数
-      min-idle: 15
-      # 最大连接数
-      max-active: 30
-      # 是否自动回收超时连接
-      remove-abandoned: true
-      # 超时时间(以秒数为单位)
-      remove-abandoned-timeout: 180
-      # 获取连接超时时间
-      max-wait: 3000
-      # 连接有效性检测时间
-      time-between-eviction-runs-millis: 60000
-      # 连接在池中最小生存的时间
-      min-evictable-idle-time-millis: 300000
-      # 连接在池中最大生存的时间
-      max-evictable-idle-time-millis: 900000
-      # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
-      test-while-idle: true
-      # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
-      test-on-borrow: true
-      # 是否在归还到池中前进行检验
-      test-on-return: false
-      # 检测连接是否有效
-      validation-query: select 1
-      # 配置监控统计
-      webStatFilter:
-        enabled: true
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        reset-enable: false
-      filter:
-        stat:
+      #     分数据源
+      slave1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3307}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        #        从库改用只读账号
+        username: ${DB_USER:reader}
+        password: ${DB_PWD:123456}
+        # 初始连接数
+        initial-size: 5
+        # 最小连接数
+        min-idle: 15
+        # 最大连接数
+        max-active: 30
+        # 获取连接超时时间
+        max-wait: 5000
+        # 连接有效性检测时间
+        time-between-eviction-runs-millis: 60000
+        # 连接在池中最小生存的时间
+        min-evictable-idle-time-millis: 300000
+        # 连接在池中最大生存的时间
+        max-evictable-idle-time-millis: 900000
+        # 是否自动回收超时连接
+        remove-abandoned: true
+        # 超时时间(以秒数为单位)
+        remove-abandoned-timeout: 180
+        # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
+        test-while-idle: true
+        # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
+        test-on-borrow: true
+        # 是否在归还到池中前进行检验
+        test-on-return: false
+        # 检测连接是否有效
+        validation-query: select 1
+        # 配置监控统计
+        webStatFilter:
           enabled: true
-          # 记录慢SQL
-          log-slow-sql: true
-          slow-sql-millis: 1000
-          merge-sql: true
-        wall:
-          config:
-            multi-statement-allow: true
+        stat-view-servlet:
+          enabled: true
+          url-pattern: /druid/*
+          reset-enable: false
+        filter:
+          stat:
+            enabled: true
+            # 记录慢SQL
+            log-slow-sql: true
+            slow-sql-millis: 1000
+            merge-sql: true
+          wall:
+            config:
+              multi-statement-allow: true
+#    主从配置
+    masterslave:
+      load-balance-algorithm-type: round_robin
+      name: ms
+      master-data-source-name: master
+      slave-data-source-names: slave0,slave1
+
+    props:
+      sql:
+        show：true
 
 # 登录相关配置
 login:

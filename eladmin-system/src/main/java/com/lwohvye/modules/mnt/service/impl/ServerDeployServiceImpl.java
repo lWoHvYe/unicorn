@@ -51,20 +51,20 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     private final LinuxServerDeployRepository linuxServerDeployRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
         Page<ServerDeploy> page = linuxServerDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(serverDeployMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria) {
         return serverDeployMapper.toDto(linuxServerDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ServerDeployDto findById(Long id) {
         ServerDeploy server = linuxServerDeployRepository.findById(id).orElseGet(ServerDeploy::new);
         ValidationUtil.isNull(server.getId(), "ServerDeploy", "id", id);
@@ -72,7 +72,7 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ServerDeployDto findByIp(String ip) {
         ServerDeploy deploy = linuxServerDeployRepository.findByIp(ip);
         return serverDeployMapper.toDto(deploy);
@@ -94,13 +94,13 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(ServerDeploy resources) {
         serverDeployRepository.save(resources);
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(ServerDeploy resources) {
         ServerDeploy serverDeploy = serverDeployRepository.findById(resources.getId()).orElseGet(ServerDeploy::new);
         ValidationUtil.isNull(serverDeploy.getId(), "ServerDeploy", "id", resources.getId());
@@ -109,7 +109,7 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             serverDeployRepository.deleteById(id);

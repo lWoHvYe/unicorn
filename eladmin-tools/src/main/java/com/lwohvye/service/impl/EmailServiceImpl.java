@@ -59,7 +59,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'config'")
     public EmailConfig find() {
         Optional<EmailConfig> emailConfig = linuxEmailRepository.findById(1L);

@@ -48,7 +48,7 @@ public class AliPayServiceImpl implements AliPayService {
     private final LinuxAliPayRepository linuxAliPayRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'config'")
     public AlipayConfig find() {
         Optional<AlipayConfig> alipayConfig = linuxAliPayRepository.findById(1L);
@@ -56,7 +56,7 @@ public class AliPayServiceImpl implements AliPayService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @CachePut(key = "'config'")
 //    @Transactional(rollbackFor = Exception.class)
     public AlipayConfig config(AlipayConfig alipayConfig) {

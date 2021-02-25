@@ -71,7 +71,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     private Long maxSize;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'config'")
     public QiniuConfig find() {
         Optional<QiniuConfig> qiniuConfig = linuxQiNiuConfigRepository.findById(1L);
@@ -79,7 +79,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     @CachePut(key = "'config'")
     public QiniuConfig config(QiniuConfig qiniuConfig) {
         qiniuConfig.setId(1L);
@@ -91,19 +91,19 @@ public class QiNiuServiceImpl implements QiNiuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(QiniuQueryCriteria criteria, Pageable pageable) {
         return PageUtil.toPage(linuxQiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<QiniuContent> queryAll(QiniuQueryCriteria criteria) {
         return linuxQiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public QiniuContent upload(MultipartFile file, QiniuConfig qiniuConfig) {
         FileUtil.checkSize(maxSize, file.getSize());
         if (qiniuConfig.getId() == null) {
@@ -142,7 +142,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public QiniuContent findByContentId(Long id) {
         QiniuContent qiniuContent = linuxQiniuContentRepository.findById(id).orElseGet(QiniuContent::new);
         ValidationUtil.isNull(qiniuContent.getId(), "QiniuContent", "id", id);
@@ -165,7 +165,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(QiniuContent content, QiniuConfig config) {
         //构造一个带指定Zone对象的配置类
         Configuration cfg = new Configuration(QiNiuUtil.getRegion(config.getZone()));
@@ -180,7 +180,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void synchronize(QiniuConfig config) {
         if (config.getId() == null) {
             throw new BadRequestException("请先添加相应配置，再操作");
@@ -224,7 +224,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(String type) {
         qiNiuConfigRepository.update(type);
     }

@@ -52,27 +52,27 @@ public class DictServiceImpl implements DictService {
     private final LinuxDictRepository linuxDictRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictQueryCriteria dict, Pageable pageable) {
         Page<Dict> page = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
         return PageUtil.toPage(page.map(dictMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<DictDto> queryAll(DictQueryCriteria dict) {
         List<Dict> list = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb));
         return dictMapper.toDto(list);
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(Dict resources) {
         dictRepository.save(resources);
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(Dict resources) {
         // 清理缓存
         delCaches(resources);
@@ -83,7 +83,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         // 清理缓存
         List<Dict> dicts = dictRepository.findByIdIn(ids);

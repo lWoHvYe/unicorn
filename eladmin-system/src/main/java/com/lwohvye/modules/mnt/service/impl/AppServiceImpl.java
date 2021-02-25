@@ -51,20 +51,20 @@ public class AppServiceImpl implements AppService {
     private final LinuxAppRepository linuxAppRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(AppQueryCriteria criteria, Pageable pageable) {
         Page<App> page = linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(appMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<AppDto> queryAll(AppQueryCriteria criteria) {
         return appMapper.toDto(linuxAppRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public AppDto findById(Long id) {
         App app = linuxAppRepository.findById(id).orElseGet(App::new);
         ValidationUtil.isNull(app.getId(), "App", "id", id);
@@ -72,14 +72,14 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(App resources) {
         verification(resources);
         appRepository.save(resources);
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(App resources) {
         verification(resources);
         App app = appRepository.findById(resources.getId()).orElseGet(App::new);
@@ -103,7 +103,7 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             appRepository.deleteById(id);

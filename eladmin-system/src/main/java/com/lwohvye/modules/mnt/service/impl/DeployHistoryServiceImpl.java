@@ -51,20 +51,20 @@ public class DeployHistoryServiceImpl implements DeployHistoryService {
     private final LinuxDeployHistoryRepository linuxDeployHistoryRepository;
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         Page<DeployHistory> page = linuxDeployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(deployHistoryMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<DeployHistoryDto> queryAll(DeployHistoryQueryCriteria criteria) {
         return deployHistoryMapper.toDto(linuxDeployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public DeployHistoryDto findById(String id) {
         DeployHistory deployhistory = linuxDeployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
         ValidationUtil.isNull(deployhistory.getId(), "DeployHistory", "id", id);
@@ -72,14 +72,14 @@ public class DeployHistoryServiceImpl implements DeployHistoryService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(DeployHistory resources) {
         resources.setId(IdUtil.simpleUUID());
         deployHistoryRepository.save(resources);
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<String> ids) {
         for (String id : ids) {
             deployHistoryRepository.deleteById(id);

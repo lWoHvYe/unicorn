@@ -68,14 +68,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
         Page<User> page = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(userMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
         List<User> users = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return userMapper.toDto(users);
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Cacheable(key = "'id:' + #p0")
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public UserDto findById(long id) {
         User user = linuxUserRepository.findById(id).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", id);
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
 //    @C 清理缓存
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(User resources) {
         if (userRepository.findByUsername(resources.getUsername()) != null) {
             throw new EntityExistException(User.class, "username", resources.getUsername());
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
 //    清理缓存。内部逻辑调整
     public void update(User resources) throws Exception {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
 //    清理缓存。内部逻辑调整
     public void updateCenter(User resources) {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
@@ -166,7 +166,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
 //    清理缓存。内部逻辑调整
     public void delete(Set<Long> ids) {
 //        for (Long id : ids) {
@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
 //    加入缓存
     public UserDto findByName(String userName) {
         User user = linuxUserRepository.findByUsername(userName);
@@ -191,7 +191,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
 //    清理缓存
     public void updatePass(String username, String pass) {
         userRepository.updatePass(username, pass, new Date());
@@ -199,7 +199,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
 //    清理缓存
     public Map<String, String> updateAvatar(MultipartFile multipartFile) {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUsername());
@@ -221,7 +221,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
 //    清理缓存
     public void updateEmail(String username, String email) {
         userRepository.updateEmail(username, email);

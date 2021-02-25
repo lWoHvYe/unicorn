@@ -73,20 +73,20 @@ public class DeployServiceImpl implements DeployService {
 
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployQueryCriteria criteria, Pageable pageable) {
         Page<Deploy> page = linuxDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(deployMapper::toDto));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public List<DeployDto> queryAll(DeployQueryCriteria criteria) {
         return deployMapper.toDto(linuxDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public DeployDto findById(Long id) {
         Deploy deploy = linuxDeployRepository.findById(id).orElseGet(Deploy::new);
         ValidationUtil.isNull(deploy.getId(), "Deploy", "id", id);
@@ -94,13 +94,13 @@ public class DeployServiceImpl implements DeployService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void create(Deploy resources) {
         deployRepository.save(resources);
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void update(Deploy resources) {
         Deploy deploy = deployRepository.findById(resources.getId()).orElseGet(Deploy::new);
         ValidationUtil.isNull(deploy.getId(), "Deploy", "id", resources.getId());
@@ -109,7 +109,7 @@ public class DeployServiceImpl implements DeployService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerMain", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             deployRepository.deleteById(id);
@@ -347,7 +347,7 @@ public class DeployServiceImpl implements DeployService {
     }
 
     @Override
-    @Transactional(value = "transactionManagerLinux", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public String serverReduction(DeployHistory resources) {
         Long deployId = resources.getDeployId();
         Deploy deployInfo = linuxDeployRepository.findById(deployId).orElseGet(Deploy::new);
