@@ -18,12 +18,11 @@ package com.lwohvye.modules.mnt.service.impl;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.linux.mnt.repository.LinuxDeployRepository;
 import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.domain.Deploy;
 import com.lwohvye.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.domain.ServerDeploy;
-import com.lwohvye.modules.main.mnt.repository.DeployRepository;
+import com.lwohvye.modules.mnt.repository.DeployRepository;
 import com.lwohvye.modules.mnt.service.DeployHistoryService;
 import com.lwohvye.modules.mnt.service.DeployService;
 import com.lwohvye.modules.mnt.service.ServerDeployService;
@@ -64,8 +63,6 @@ public class DeployServiceImpl implements DeployService {
     private final ServerDeployService serverDeployService;
     private final DeployHistoryService deployHistoryService;
 
-    private final LinuxDeployRepository linuxDeployRepository;
-
     /**
      * 循环次数
      */
@@ -75,20 +72,20 @@ public class DeployServiceImpl implements DeployService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployQueryCriteria criteria, Pageable pageable) {
-        Page<Deploy> page = linuxDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<Deploy> page = deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(deployMapper::toDto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DeployDto> queryAll(DeployQueryCriteria criteria) {
-        return deployMapper.toDto(linuxDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return deployMapper.toDto(deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DeployDto findById(Long id) {
-        Deploy deploy = linuxDeployRepository.findById(id).orElseGet(Deploy::new);
+        Deploy deploy = deployRepository.findById(id).orElseGet(Deploy::new);
         ValidationUtil.isNull(deploy.getId(), "Deploy", "id", id);
         return deployMapper.toDto(deploy);
     }
@@ -350,7 +347,7 @@ public class DeployServiceImpl implements DeployService {
     @Transactional(rollbackFor = Exception.class)
     public String serverReduction(DeployHistory resources) {
         Long deployId = resources.getDeployId();
-        Deploy deployInfo = linuxDeployRepository.findById(deployId).orElseGet(Deploy::new);
+        Deploy deployInfo = deployRepository.findById(deployId).orElseGet(Deploy::new);
         String deployDate = DateUtil.format(resources.getDeployDate(), DatePattern.PURE_DATETIME_PATTERN);
         App app = deployInfo.getApp();
         if (app == null) {

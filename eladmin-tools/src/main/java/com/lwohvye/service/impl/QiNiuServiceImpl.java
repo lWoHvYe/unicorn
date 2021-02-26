@@ -16,15 +16,14 @@
 package com.lwohvye.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.lwohvye.domain.QiniuConfig;
+import com.lwohvye.domain.QiniuContent;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.linux.repository.LinuxQiNiuConfigRepository;
-import com.lwohvye.linux.repository.LinuxQiniuContentRepository;
-import com.lwohvye.main.repository.QiNiuConfigRepository;
-import com.lwohvye.main.repository.QiniuContentRepository;
-import com.lwohvye.utils.FileUtil;
-import com.lwohvye.utils.PageUtil;
-import com.lwohvye.utils.QueryHelp;
-import com.lwohvye.utils.ValidationUtil;
+import com.lwohvye.repository.QiNiuConfigRepository;
+import com.lwohvye.repository.QiniuContentRepository;
+import com.lwohvye.service.QiNiuService;
+import com.lwohvye.service.dto.QiniuQueryCriteria;
+import com.lwohvye.utils.*;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
@@ -34,11 +33,6 @@ import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.domain.QiniuConfig;
-import com.lwohvye.domain.QiniuContent;
-import com.lwohvye.service.dto.QiniuQueryCriteria;
-import com.lwohvye.utils.QiNiuUtil;
-import com.lwohvye.service.QiNiuService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
@@ -64,9 +58,6 @@ public class QiNiuServiceImpl implements QiNiuService {
     private final QiNiuConfigRepository qiNiuConfigRepository;
     private final QiniuContentRepository qiniuContentRepository;
 
-    private final LinuxQiNiuConfigRepository linuxQiNiuConfigRepository;
-    private final LinuxQiniuContentRepository linuxQiniuContentRepository;
-
     @Value("${qiniu.max-size:20}")
     private Long maxSize;
 
@@ -74,7 +65,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'config'")
     public QiniuConfig find() {
-        Optional<QiniuConfig> qiniuConfig = linuxQiNiuConfigRepository.findById(1L);
+        Optional<QiniuConfig> qiniuConfig = qiNiuConfigRepository.findById(1L);
         return qiniuConfig.orElseGet(QiniuConfig::new);
     }
 
@@ -93,13 +84,13 @@ public class QiNiuServiceImpl implements QiNiuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(QiniuQueryCriteria criteria, Pageable pageable) {
-        return PageUtil.toPage(linuxQiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
+        return PageUtil.toPage(qiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<QiniuContent> queryAll(QiniuQueryCriteria criteria) {
-        return linuxQiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
+        return qiniuContentRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
     }
 
     @Override
@@ -144,7 +135,7 @@ public class QiNiuServiceImpl implements QiNiuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public QiniuContent findByContentId(Long id) {
-        QiniuContent qiniuContent = linuxQiniuContentRepository.findById(id).orElseGet(QiniuContent::new);
+        QiniuContent qiniuContent = qiniuContentRepository.findById(id).orElseGet(QiniuContent::new);
         ValidationUtil.isNull(qiniuContent.getId(), "QiniuContent", "id", id);
         return qiniuContent;
     }

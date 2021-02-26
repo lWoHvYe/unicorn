@@ -26,7 +26,7 @@ import com.lwohvye.service.GeneratorService;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.GenUtil;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.main.repository.ColumnInfoRepository;
+import com.lwohvye.repository.ColumnInfoRepository;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.StringUtils;
 import org.slf4j.Logger;

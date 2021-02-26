@@ -22,7 +22,7 @@ import cn.hutool.extra.template.TemplateUtil;
 import com.lwohvye.config.thread.ThreadPoolExecutorUtil;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
-import com.lwohvye.modules.main.quartz.repository.QuartzLogRepository;
+import com.lwohvye.modules.quartz.repository.QuartzLogRepository;
 import com.lwohvye.modules.quartz.service.QuartzJobService;
 import com.lwohvye.utils.RedisUtils;
 import com.lwohvye.utils.SpringContextHolder;

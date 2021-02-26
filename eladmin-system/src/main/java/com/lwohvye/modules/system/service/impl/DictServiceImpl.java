@@ -16,9 +16,8 @@
 package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.modules.linux.system.repository.LinuxDictRepository;
 import com.lwohvye.modules.system.domain.Dict;
-import com.lwohvye.modules.main.system.repository.DictRepository;
+import com.lwohvye.modules.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.DictService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.modules.system.service.dto.DictDto;
@@ -49,19 +48,17 @@ public class DictServiceImpl implements DictService {
     private final DictMapper dictMapper;
     private final RedisUtils redisUtils;
 
-    private final LinuxDictRepository linuxDictRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictQueryCriteria dict, Pageable pageable) {
-        Page<Dict> page = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
+        Page<Dict> page = dictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
         return PageUtil.toPage(page.map(dictMapper::toDto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DictDto> queryAll(DictQueryCriteria dict) {
-        List<Dict> list = linuxDictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb));
+        List<Dict> list = dictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb));
         return dictMapper.toDto(list);
     }
 

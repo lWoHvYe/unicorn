@@ -19,16 +19,13 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.modules.linux.system.repository.LinuxMenuRepository;
-import com.lwohvye.modules.linux.system.repository.LinuxRoleRepository;
-import com.lwohvye.modules.linux.system.repository.LinuxUserRepository;
 import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.MenuMetaVo;
 import com.lwohvye.modules.system.domain.vo.MenuVo;
-import com.lwohvye.modules.main.system.repository.MenuRepository;
-import com.lwohvye.modules.main.system.repository.UserRepository;
+import com.lwohvye.modules.system.repository.MenuRepository;
+import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.MenuService;
 import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.dto.MenuDto;
@@ -63,9 +60,6 @@ public class MenuServiceImpl implements MenuService {
     private final RoleService roleService;
     private final RedisUtils redisUtils;
 
-    private final LinuxMenuRepository linuxMenuRepository;
-    private final LinuxUserRepository linuxUserRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> queryAll(MenuQueryCriteria criteria, Boolean isQuery) throws Exception {
@@ -86,14 +80,14 @@ public class MenuServiceImpl implements MenuService {
                 }
             }
         }
-        return menuMapper.toDto(linuxMenuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort));
+        return menuMapper.toDto(menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
     public MenuDto findById(long id) {
-        Menu menu = linuxMenuRepository.findById(id).orElseGet(Menu::new);
+        Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
         return menuMapper.toDto(menu);
     }
@@ -110,7 +104,7 @@ public class MenuServiceImpl implements MenuService {
     public List<MenuDto> findByUser(Long currentUserId) {
         List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
-        LinkedHashSet<Menu> menus = linuxMenuRepository.findByRoleIdsAndTypeNot(roleIds, 2);
+        LinkedHashSet<Menu> menus = menuRepository.findByRoleIdsAndTypeNot(roleIds, 2);
         return menus.stream().map(menuMapper::toDto).collect(Collectors.toList());
     }
 
@@ -201,7 +195,7 @@ public class MenuServiceImpl implements MenuService {
     public Set<Menu> getChildMenus(List<Menu> menuList, Set<Menu> menuSet) {
         for (Menu menu : menuList) {
             menuSet.add(menu);
-            List<Menu> menus = linuxMenuRepository.findByPid(menu.getId());
+            List<Menu> menus = menuRepository.findByPid(menu.getId());
             if (menus != null && menus.size() != 0) {
                 getChildMenus(menus, menuSet);
             }
@@ -226,9 +220,9 @@ public class MenuServiceImpl implements MenuService {
     public List<MenuDto> getMenus(Long pid) {
         List<Menu> menus;
         if (pid != null && !pid.equals(0L)) {
-            menus = linuxMenuRepository.findByPid(pid);
+            menus = menuRepository.findByPid(pid);
         } else {
-            menus = linuxMenuRepository.findByPidIsNull();
+            menus = menuRepository.findByPidIsNull();
         }
         return menuMapper.toDto(menus);
     }
@@ -237,10 +231,10 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> getSuperior(MenuDto menuDto, List<Menu> menus) {
         if (menuDto.getPid() == null) {
-            menus.addAll(linuxMenuRepository.findByPidIsNull());
+            menus.addAll(menuRepository.findByPidIsNull());
             return menuMapper.toDto(menus);
         }
-        menus.addAll(linuxMenuRepository.findByPid(menuDto.getPid()));
+        menus.addAll(menuRepository.findByPid(menuDto.getPid()));
         return getSuperior(findById(menuDto.getPid()), menus);
     }
 
@@ -324,7 +318,7 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Menu findOne(Long id) {
-        Menu menu = linuxMenuRepository.findById(id).orElseGet(Menu::new);
+        Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
         return menu;
     }
@@ -348,7 +342,7 @@ public class MenuServiceImpl implements MenuService {
 
     private void updateSubCnt(Long menuId) {
         if (menuId != null) {
-            int count = linuxMenuRepository.countByPid(menuId);
+            int count = menuRepository.countByPid(menuId);
             menuRepository.updateSubCntById(count, menuId);
         }
     }
@@ -359,7 +353,7 @@ public class MenuServiceImpl implements MenuService {
      * @param id 菜单ID
      */
     public void delCaches(Long id) {
-        List<User> users = linuxUserRepository.findByMenuId(id);
+        List<User> users = userRepository.findByMenuId(id);
         redisUtils.del(CacheKey.MENU_ID + id);
         redisUtils.delByKeys(CacheKey.MENU_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
         // 清除 Role 缓存

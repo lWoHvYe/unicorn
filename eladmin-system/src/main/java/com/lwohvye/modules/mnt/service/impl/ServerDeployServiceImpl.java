@@ -15,9 +15,11 @@
  */
 package com.lwohvye.modules.mnt.service.impl;
 
-import com.lwohvye.modules.linux.mnt.repository.LinuxServerDeployRepository;
 import com.lwohvye.modules.mnt.domain.ServerDeploy;
-import com.lwohvye.modules.main.mnt.repository.ServerDeployRepository;
+import com.lwohvye.modules.mnt.repository.ServerDeployRepository;
+import com.lwohvye.modules.mnt.service.ServerDeployService;
+import com.lwohvye.modules.mnt.service.dto.ServerDeployDto;
+import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.ServerDeployMapper;
 import com.lwohvye.modules.mnt.util.ExecuteShellUtil;
 import com.lwohvye.utils.FileUtil;
@@ -25,9 +27,6 @@ import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.modules.mnt.service.ServerDeployService;
-import com.lwohvye.modules.mnt.service.dto.ServerDeployDto;
-import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,25 +47,23 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     private final ServerDeployRepository serverDeployRepository;
     private final ServerDeployMapper serverDeployMapper;
 
-    private final LinuxServerDeployRepository linuxServerDeployRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
-        Page<ServerDeploy> page = linuxServerDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<ServerDeploy> page = serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(serverDeployMapper::toDto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria) {
-        return serverDeployMapper.toDto(linuxServerDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return serverDeployMapper.toDto(serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerDeployDto findById(Long id) {
-        ServerDeploy server = linuxServerDeployRepository.findById(id).orElseGet(ServerDeploy::new);
+        ServerDeploy server = serverDeployRepository.findById(id).orElseGet(ServerDeploy::new);
         ValidationUtil.isNull(server.getId(), "ServerDeploy", "id", id);
         return serverDeployMapper.toDto(server);
     }
@@ -74,7 +71,7 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerDeployDto findByIp(String ip) {
-        ServerDeploy deploy = linuxServerDeployRepository.findByIp(ip);
+        ServerDeploy deploy = serverDeployRepository.findByIp(ip);
         return serverDeployMapper.toDto(deploy);
     }
 

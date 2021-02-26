@@ -16,9 +16,11 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.modules.linux.mnt.repository.LinuxDatabaseRepository;
 import com.lwohvye.modules.mnt.domain.Database;
-import com.lwohvye.modules.main.mnt.repository.DatabaseRepository;
+import com.lwohvye.modules.mnt.repository.DatabaseRepository;
+import com.lwohvye.modules.mnt.service.DatabaseService;
+import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
+import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.DatabaseMapper;
 import com.lwohvye.modules.mnt.util.SqlUtils;
 import com.lwohvye.utils.FileUtil;
@@ -27,9 +29,6 @@ import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.lwohvye.modules.mnt.service.DatabaseService;
-import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
-import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,25 +50,23 @@ public class DatabaseServiceImpl implements DatabaseService {
     private final DatabaseRepository databaseRepository;
     private final DatabaseMapper databaseMapper;
 
-    private final LinuxDatabaseRepository linuxDatabaseRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable) {
-        Page<Database> page = linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<Database> page = databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(databaseMapper::toDto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria) {
-        return databaseMapper.toDto(linuxDatabaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return databaseMapper.toDto(databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DatabaseDto findById(String id) {
-        Database database = linuxDatabaseRepository.findById(id).orElseGet(Database::new);
+        Database database = databaseRepository.findById(id).orElseGet(Database::new);
         ValidationUtil.isNull(database.getId(), "Database", "id", id);
         return databaseMapper.toDto(database);
     }

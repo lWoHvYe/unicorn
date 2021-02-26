@@ -18,14 +18,11 @@ package com.lwohvye.modules.system.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.linux.system.repository.LinuxDeptRepository;
-import com.lwohvye.modules.linux.system.repository.LinuxRoleRepository;
-import com.lwohvye.modules.linux.system.repository.LinuxUserRepository;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
-import com.lwohvye.modules.main.system.repository.DeptRepository;
-import com.lwohvye.modules.main.system.repository.RoleRepository;
-import com.lwohvye.modules.main.system.repository.UserRepository;
+import com.lwohvye.modules.system.repository.DeptRepository;
+import com.lwohvye.modules.system.repository.RoleRepository;
+import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.DeptService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
@@ -60,10 +57,6 @@ public class DeptServiceImpl implements DeptService {
     private final RedisUtils redisUtils;
     private final RoleRepository roleRepository;
 
-    private final LinuxDeptRepository linuxDeptRepository;
-    private final LinuxUserRepository linuxUserRepository;
-    private final LinuxRoleRepository linuxRoleRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DeptDto> queryAll(DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
@@ -93,7 +86,7 @@ public class DeptServiceImpl implements DeptService {
                 }
             }
         }
-        List<DeptDto> list = deptMapper.toDto(linuxDeptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort));
+        List<DeptDto> list = deptMapper.toDto(deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort));
         // 如果为空，就代表为自定义权限或者本级权限，就需要去重，不理解可以注释掉，看查询结果
         if (StringUtils.isBlank(dataScopeType)) {
             return deduplication(list);
@@ -105,7 +98,7 @@ public class DeptServiceImpl implements DeptService {
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
     public DeptDto findById(Long id) {
-        Dept dept = linuxDeptRepository.findById(id).orElseGet(Dept::new);
+        Dept dept = deptRepository.findById(id).orElseGet(Dept::new);
         ValidationUtil.isNull(dept.getId(), "Dept", "id", id);
         return deptMapper.toDto(dept);
     }
@@ -113,13 +106,13 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<Dept> findByPid(long pid) {
-        return linuxDeptRepository.findByPid(pid);
+        return deptRepository.findByPid(pid);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Set<Dept> findByRoleId(Long id) {
-        return linuxDeptRepository.findByRoleId(id);
+        return deptRepository.findByRoleId(id);
     }
 
     @Override
@@ -181,7 +174,7 @@ public class DeptServiceImpl implements DeptService {
     public Set<DeptDto> getDeleteDepts(List<Dept> menuList, Set<DeptDto> deptDtos) {
         for (Dept dept : menuList) {
             deptDtos.add(deptMapper.toDto(dept));
-            List<Dept> depts = linuxDeptRepository.findByPid(dept.getId());
+            List<Dept> depts = deptRepository.findByPid(dept.getId());
             if (depts != null && depts.size() != 0) {
                 getDeleteDepts(depts, deptDtos);
             }
@@ -195,7 +188,7 @@ public class DeptServiceImpl implements DeptService {
         List<Long> list = new ArrayList<>();
         deptList.forEach(dept -> {
                     if (dept != null && dept.getEnabled()) {
-                        List<Dept> depts = linuxDeptRepository.findByPid(dept.getId());
+                        List<Dept> depts = deptRepository.findByPid(dept.getId());
                         if (deptList.size() != 0) {
                             list.addAll(getDeptChildren(depts));
                         }
@@ -210,10 +203,10 @@ public class DeptServiceImpl implements DeptService {
     @Transactional(rollbackFor = Exception.class)
     public List<DeptDto> getSuperior(DeptDto deptDto, List<Dept> depts) {
         if (deptDto.getPid() == null) {
-            depts.addAll(linuxDeptRepository.findByPidIsNull());
+            depts.addAll(deptRepository.findByPidIsNull());
             return deptMapper.toDto(depts);
         }
-        depts.addAll(linuxDeptRepository.findByPid(deptDto.getPid()));
+        depts.addAll(deptRepository.findByPid(deptDto.getPid()));
         return getSuperior(findById(deptDto.getPid()), depts);
     }
 
@@ -256,17 +249,17 @@ public class DeptServiceImpl implements DeptService {
     @Override
     public void verification(Set<DeptDto> deptDtos) {
         Set<Long> deptIds = deptDtos.stream().map(DeptDto::getId).collect(Collectors.toSet());
-        if (linuxUserRepository.countByDepts(deptIds) > 0) {
+        if (userRepository.countByDepts(deptIds) > 0) {
             throw new BadRequestException("所选部门存在用户关联，请解除后再试！");
         }
-        if (linuxRoleRepository.countByDepts(deptIds) > 0) {
+        if (roleRepository.countByDepts(deptIds) > 0) {
             throw new BadRequestException("所选部门存在角色关联，请解除后再试！");
         }
     }
 
     private void updateSubCnt(Long deptId) {
         if (deptId != null) {
-            int count = linuxDeptRepository.countByPid(deptId);
+            int count = deptRepository.countByPid(deptId);
             deptRepository.updateSubCntById(count, deptId);
         }
     }
@@ -294,7 +287,7 @@ public class DeptServiceImpl implements DeptService {
      * @param id /
      */
     public void delCaches(Long id) {
-        List<User> users = linuxUserRepository.findByRoleDeptId(id);
+        List<User> users = userRepository.findByRoleDeptId(id);
         // 删除数据权限
         redisUtils.delByKeys(CacheKey.DATA_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
         redisUtils.del(CacheKey.DEPT_ID + id);

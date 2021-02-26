@@ -18,11 +18,10 @@ package com.lwohvye.modules.system.service.impl;
 import com.lwohvye.config.FileProperties;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
-import com.lwohvye.modules.linux.system.repository.LinuxUserRepository;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.User;
-import com.lwohvye.modules.main.system.repository.UserRepository;
+import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.JobSmallDto;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
@@ -64,20 +63,18 @@ public class UserServiceImpl implements UserService {
     private final UserCacheClean userCacheClean;
     private final OnlineUserService onlineUserService;
 
-    private final LinuxUserRepository linuxUserRepository;
-
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
-        Page<User> page = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<User> page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(userMapper::toDto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
-        List<User> users = linuxUserRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
+        List<User> users = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return userMapper.toDto(users);
     }
 
@@ -85,7 +82,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable(key = "'id:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public UserDto findById(long id) {
-        User user = linuxUserRepository.findById(id).orElseGet(User::new);
+        User user = userRepository.findById(id).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", id);
         return userMapper.toDto(user);
     }
@@ -182,7 +179,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
 //    加入缓存
     public UserDto findByName(String userName) {
-        User user = linuxUserRepository.findByUsername(userName);
+        User user = userRepository.findByUsername(userName);
         if (user == null) {
             throw new EntityNotFoundException(User.class, "name", userName);
         } else {

@@ -16,18 +16,17 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.modules.linux.mnt.repository.LinuxDeployHistoryRepository;
 import com.lwohvye.modules.mnt.domain.DeployHistory;
-import com.lwohvye.modules.main.mnt.repository.DeployHistoryRepository;
+import com.lwohvye.modules.mnt.repository.DeployHistoryRepository;
 import com.lwohvye.modules.mnt.service.DeployHistoryService;
+import com.lwohvye.modules.mnt.service.dto.DeployHistoryDto;
+import com.lwohvye.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.DeployHistoryMapper;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.modules.mnt.service.dto.DeployHistoryDto;
-import com.lwohvye.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,25 +47,23 @@ public class DeployHistoryServiceImpl implements DeployHistoryService {
     private final DeployHistoryRepository deployHistoryRepository;
     private final DeployHistoryMapper deployHistoryMapper;
 
-    private final LinuxDeployHistoryRepository linuxDeployHistoryRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
-        Page<DeployHistory> page = linuxDeployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<DeployHistory> page = deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(deployHistoryMapper::toDto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DeployHistoryDto> queryAll(DeployHistoryQueryCriteria criteria) {
-        return deployHistoryMapper.toDto(linuxDeployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return deployHistoryMapper.toDto(deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public DeployHistoryDto findById(String id) {
-        DeployHistory deployhistory = linuxDeployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
+        DeployHistory deployhistory = deployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
         ValidationUtil.isNull(deployhistory.getId(), "DeployHistory", "id", id);
         return deployHistoryMapper.toDto(deployhistory);
     }

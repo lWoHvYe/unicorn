@@ -17,11 +17,9 @@ package com.lwohvye.modules.system.service.impl;
 
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.modules.linux.system.repository.LinuxJobRepository;
-import com.lwohvye.modules.linux.system.repository.LinuxUserRepository;
 import com.lwohvye.modules.system.domain.Job;
-import com.lwohvye.modules.main.system.repository.JobRepository;
-import com.lwohvye.modules.main.system.repository.UserRepository;
+import com.lwohvye.modules.system.repository.JobRepository;
+import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.JobService;
 import com.lwohvye.modules.system.service.dto.JobDto;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
@@ -54,20 +52,17 @@ public class JobServiceImpl implements JobService {
     private final RedisUtils redisUtils;
     private final UserRepository userRepository;
 
-    private final LinuxJobRepository linuxJobRepository;
-    private final LinuxUserRepository linuxUserRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
-        Page<Job> page = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        Page<Job> page = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(jobMapper::toDto).getContent(), page.getTotalElements());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<JobDto> queryAll(JobQueryCriteria criteria) {
-        List<Job> list = linuxJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
+        List<Job> list = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return jobMapper.toDto(list);
     }
 
@@ -75,7 +70,7 @@ public class JobServiceImpl implements JobService {
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
     public JobDto findById(Long id) {
-        Job job = linuxJobRepository.findById(id).orElseGet(Job::new);
+        Job job = jobRepository.findById(id).orElseGet(Job::new);
         ValidationUtil.isNull(job.getId(), "Job", "id", id);
         return jobMapper.toDto(job);
     }
@@ -127,7 +122,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void verification(Set<Long> ids) {
-        if (linuxUserRepository.countByJobs(ids) > 0) {
+        if (userRepository.countByJobs(ids) > 0) {
             throw new BadRequestException("所选的岗位中存在用户关联，请解除关联再试！");
         }
     }

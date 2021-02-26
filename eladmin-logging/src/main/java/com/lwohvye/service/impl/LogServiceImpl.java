@@ -19,8 +19,7 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.lwohvye.domain.Log;
-import com.lwohvye.linux.repository.LinuxLogRepository;
-import com.lwohvye.main.repository.LogRepository;
+import com.lwohvye.repository.LogRepository;
 import com.lwohvye.service.LogService;
 import com.lwohvye.service.dto.LogQueryCriteria;
 import com.lwohvye.service.mapstruct.LogErrorMapper;
@@ -57,12 +56,10 @@ public class LogServiceImpl implements LogService {
     private final LogErrorMapper logErrorMapper;
     private final LogSmallMapper logSmallMapper;
 
-    private final LinuxLogRepository linuxLogRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(LogQueryCriteria criteria, Pageable pageable) {
-        Page<Log> page = linuxLogRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
+        Page<Log> page = logRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
         String status = "ERROR";
         if (status.equals(criteria.getLogType())) {
             return PageUtil.toPage(page.map(logErrorMapper::toDto));
@@ -73,13 +70,13 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<Log> queryAll(LogQueryCriteria criteria) {
-        return linuxLogRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)));
+        return logRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
-        Page<Log> page = linuxLogRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
+        Page<Log> page = logRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
         return PageUtil.toPage(page.map(logSmallMapper::toDto));
     }
 
@@ -142,7 +139,7 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object findByErrDetail(Long id) {
-        Log log = linuxLogRepository.findById(id).orElseGet(Log::new);
+        Log log = logRepository.findById(id).orElseGet(Log::new);
         ValidationUtil.isNull(log.getId(), "Log", "id", id);
         byte[] details = log.getExceptionDetail();
         return Dict.create().set("exception", new String(ObjectUtil.isNotNull(details) ? details : "".getBytes()));

@@ -16,7 +16,7 @@
 package com.lwohvye.service.impl;
 
 import com.lwohvye.domain.GenConfig;
-import com.lwohvye.main.repository.GenConfigRepository;
+import com.lwohvye.repository.GenConfigRepository;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.service.GenConfigService;
 import org.springframework.stereotype.Service;

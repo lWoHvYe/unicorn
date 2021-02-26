@@ -19,13 +19,12 @@ import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
-import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.linux.repository.LinuxAliPayRepository;
-import com.lwohvye.main.repository.AliPayRepository;
-import lombok.RequiredArgsConstructor;
-import com.lwohvye.domain.vo.TradeVo;
 import com.lwohvye.domain.AlipayConfig;
+import com.lwohvye.domain.vo.TradeVo;
+import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.repository.AliPayRepository;
 import com.lwohvye.service.AliPayService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,13 +44,11 @@ public class AliPayServiceImpl implements AliPayService {
 
     private final AliPayRepository aliPayRepository;
 
-    private final LinuxAliPayRepository linuxAliPayRepository;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'config'")
     public AlipayConfig find() {
-        Optional<AlipayConfig> alipayConfig = linuxAliPayRepository.findById(1L);
+        Optional<AlipayConfig> alipayConfig = aliPayRepository.findById(1L);
         return alipayConfig.orElseGet(AlipayConfig::new);
     }
 
