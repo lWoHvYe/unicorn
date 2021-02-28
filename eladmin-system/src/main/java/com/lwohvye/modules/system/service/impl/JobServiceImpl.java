@@ -49,10 +49,10 @@ public class JobServiceImpl implements JobService {
 
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
-    private final RedisUtils redisUtils;
     private final UserRepository userRepository;
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
         Page<Job> page = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
@@ -76,6 +76,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(Job resources) {
         Job job = jobRepository.findByName(resources.getName());
@@ -87,7 +88,8 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(key = "'id:' + #p0.id")
+//    @CacheEvict(key = "'id:' + #p0.id")
+    @CacheEvict(allEntries = true)
     public void update(Job resources) {
         Job job = jobRepository.findById(resources.getId()).orElseGet(Job::new);
         Job old = jobRepository.findByName(resources.getName());
@@ -100,11 +102,10 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         jobRepository.deleteAllByIdIn(ids);
-        // 删除缓存
-        redisUtils.delByKeys(CacheKey.JOB_ID, ids);
     }
 
     @Override

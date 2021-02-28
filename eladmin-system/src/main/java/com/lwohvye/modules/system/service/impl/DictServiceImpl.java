@@ -26,6 +26,8 @@ import com.lwohvye.modules.system.service.mapstruct.DictMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,9 +48,9 @@ public class DictServiceImpl implements DictService {
 
     private final DictRepository dictRepository;
     private final DictMapper dictMapper;
-    private final RedisUtils redisUtils;
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictQueryCriteria dict, Pageable pageable) {
         Page<Dict> page = dictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
@@ -63,16 +65,16 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(Dict resources) {
         dictRepository.save(resources);
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(Dict resources) {
-        // 清理缓存
-        delCaches(resources);
         Dict dict = dictRepository.findById(resources.getId()).orElseGet(Dict::new);
         ValidationUtil.isNull(dict.getId(), "Dict", "id", resources.getId());
         resources.setId(dict.getId());
@@ -80,13 +82,9 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
-        // 清理缓存
-        List<Dict> dicts = dictRepository.findByIdIn(ids);
-        for (Dict dict : dicts) {
-            delCaches(dict);
-        }
         dictRepository.deleteByIdIn(ids);
     }
 
@@ -117,7 +115,4 @@ public class DictServiceImpl implements DictService {
         FileUtil.downloadExcel(list, response);
     }
 
-    public void delCaches(Dict dict) {
-        redisUtils.del(CacheKey.DICT_NAME + dict.getName());
-    }
 }

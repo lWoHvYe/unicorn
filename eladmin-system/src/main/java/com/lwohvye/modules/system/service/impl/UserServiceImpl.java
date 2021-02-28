@@ -31,6 +31,7 @@ import com.lwohvye.modules.system.service.mapstruct.UserMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -88,7 +89,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-//    @C 清理缓存
+//  先简单处理，清理该域中所有缓存
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(User resources) {
         if (userRepository.findByUsername(resources.getUsername()) != null) {
@@ -105,7 +107,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    清理缓存。内部逻辑调整
+    @CacheEvict(allEntries = true)
     public void update(User resources) throws Exception {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", resources.getId());
@@ -141,13 +143,11 @@ public class UserServiceImpl implements UserService {
         user.setNickName(resources.getNickName());
         user.setGender(resources.getGender());
         userRepository.save(user);
-        // 清除缓存
-        delCaches(user.getId(), user.getUsername());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    清理缓存。内部逻辑调整
+    @CacheEvict(allEntries = true)
     public void updateCenter(User resources) {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         User user1 = userRepository.findByPhone(resources.getPhone());
@@ -158,26 +158,18 @@ public class UserServiceImpl implements UserService {
         user.setPhone(resources.getPhone());
         user.setGender(resources.getGender());
         userRepository.save(user);
-        // 清理缓存
-        delCaches(user.getId(), user.getUsername());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    清理缓存。内部逻辑调整
+    @CacheEvict(allEntries = true)
     public void delete(Set<Long> ids) {
-//        for (Long id : ids) {
-//            // 清理缓存
-//            UserDto user = findById(id);
-//            delCaches(user.getId(), user.getUsername());
-//        }
-//        清理所有user相关key，因为查询加上了缓存
         userRepository.deleteAllByIdIn(ids);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    加入缓存
+    @Cacheable
     public UserDto findByName(String userName) {
         User user = userRepository.findByUsername(userName);
         if (user == null) {
@@ -189,7 +181,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    清理缓存
+    @CacheEvict(allEntries = true)
     public void updatePass(String username, String pass) {
         userRepository.updatePass(username, pass, new Date());
         flushCache(username);
@@ -197,7 +189,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    清理缓存
+    @CacheEvict(allEntries = true)
     public Map<String, String> updateAvatar(MultipartFile multipartFile) {
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUsername());
         String oldPath = user.getAvatarPath();
@@ -219,7 +211,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    清理缓存
+    @CacheEvict(allEntries = true)
     public void updateEmail(String username, String email) {
         userRepository.updateEmail(username, email);
         flushCache(username);
@@ -243,16 +235,6 @@ public class UserServiceImpl implements UserService {
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
-    }
-
-    /**
-     * 清理缓存
-     *
-     * @param id /
-     */
-    public void delCaches(Long id, String username) {
-        redisUtils.del(CacheKey.USER_ID + id);
-        flushCache(username);
     }
 
     /**

@@ -35,6 +35,7 @@ import com.lwohvye.modules.system.service.mapstruct.MenuMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,7 @@ public class MenuServiceImpl implements MenuService {
     private final RedisUtils redisUtils;
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> queryAll(MenuQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "menuSort");
@@ -109,6 +111,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(Menu resources) {
         if (menuRepository.findByTitle(resources.getTitle()) != null) {
@@ -136,6 +139,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(Menu resources) {
         if (resources.getId().equals(resources.getPid())) {
@@ -204,6 +208,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Menu> menuSet) {
         for (Menu menu : menuSet) {
@@ -216,6 +221,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> getMenus(Long pid) {
         List<Menu> menus;
@@ -316,6 +322,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Menu findOne(Long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);

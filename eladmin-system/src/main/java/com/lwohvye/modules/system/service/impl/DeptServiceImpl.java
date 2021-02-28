@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.exception.BadRequestException;
@@ -31,6 +32,7 @@ import com.lwohvye.utils.*;
 import com.lwohvye.utils.enums.DataScopeEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,7 @@ public class DeptServiceImpl implements DeptService {
     private final RoleRepository roleRepository;
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<DeptDto> queryAll(DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "deptSort");
@@ -95,8 +98,8 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = "'id:' + #p0")
+    @Transactional(rollbackFor = Exception.class)
     public DeptDto findById(Long id) {
         Dept dept = deptRepository.findById(id).orElseGet(Dept::new);
         ValidationUtil.isNull(dept.getId(), "Dept", "id", id);
@@ -104,28 +107,32 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<Dept> findByPid(long pid) {
         return deptRepository.findByPid(pid);
     }
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Set<Dept> findByRoleId(Long id) {
         return deptRepository.findByRoleId(id);
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(Dept resources) {
         deptRepository.save(resources);
         // 计算子节点数目
         resources.setSubCount(0);
-        // 清理缓存
+        // 更新节点数
         updateSubCnt(resources.getPid());
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(Dept resources) {
         // 旧的部门
@@ -146,6 +153,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<DeptDto> deptDtos) {
         for (DeptDto deptDto : deptDtos) {
@@ -170,6 +178,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
+//    此类List入参的不建议缓存
     @Transactional(rollbackFor = Exception.class)
     public Set<DeptDto> getDeleteDepts(List<Dept> menuList, Set<DeptDto> deptDtos) {
         for (Dept dept : menuList) {
@@ -189,7 +198,7 @@ public class DeptServiceImpl implements DeptService {
         deptList.forEach(dept -> {
                     if (dept != null && dept.getEnabled()) {
                         List<Dept> depts = deptRepository.findByPid(dept.getId());
-                        if (deptList.size() != 0) {
+                        if (CollUtil.isNotEmpty(deptList)) {
                             list.addAll(getDeptChildren(depts));
                         }
                         list.add(dept.getId());

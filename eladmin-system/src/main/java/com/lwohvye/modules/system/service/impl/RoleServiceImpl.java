@@ -34,6 +34,7 @@ import com.lwohvye.modules.system.service.mapstruct.RoleSmallMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +66,7 @@ public class RoleServiceImpl implements RoleService {
     private final UserCacheClean userCacheClean;
 
     @Override
+    @Cacheable(key = "'all-roles'")
     @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
@@ -78,6 +80,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(RoleQueryCriteria criteria, Pageable pageable) {
         Page<Role> page = roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
@@ -94,6 +97,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(Role resources) {
         if (roleRepository.findByName(resources.getName()) != null) {
@@ -103,6 +107,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(Role resources) {
         Role role = roleRepository.findById(resources.getId()).orElseGet(Role::new);
@@ -124,6 +129,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void updateMenu(Role resources, RoleDto roleDTO) {
         Role role = roleMapper.toEntity(roleDTO);
@@ -135,6 +141,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void untiedMenu(Long menuId) {
         // 更新菜单
@@ -142,6 +149,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
@@ -152,6 +160,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public List<RoleSmallDto> findByUsersId(Long id) {
         return roleSmallMapper.toDto(new ArrayList<>(roleRepository.findByUserId(id)));
