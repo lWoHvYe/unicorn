@@ -42,6 +42,9 @@ import cn.hutool.core.util.IdUtil;
 <#if !auto && pkColumnType = 'String'>
 import cn.hutool.core.util.IdUtil;
 </#if>
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import PageUtil;
@@ -61,12 +64,15 @@ import java.util.LinkedHashMap;
 **/
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "${changeClassName}")
 public class ${className}ServiceImpl implements ${className}Service {
 
     private final ${className}Repository ${changeClassName}Repository;
     private final ${className}Mapper ${changeClassName}Mapper;
 
     @Override
+    @Cacheable
+    @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> queryAll(${className}QueryCriteria criteria, Pageable pageable){
         Page<${className}> page = ${changeClassName}Repository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(${changeClassName}Mapper::toDto));
@@ -86,6 +92,7 @@ public class ${className}ServiceImpl implements ${className}Service {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public ${className}Dto create(${className} resources) {
 <#if !auto && pkColumnType = 'Long'>
@@ -108,6 +115,7 @@ public class ${className}ServiceImpl implements ${className}Service {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(${className} resources) {
         ${className} ${changeClassName} = ${changeClassName}Repository.findById(resources.get${pkCapitalColName}()).orElseGet(${className}::new);
@@ -130,6 +138,7 @@ public class ${className}ServiceImpl implements ${className}Service {
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     public void deleteAll(${pkColumnType}[] ids) {
         for (${pkColumnType} ${pkChangeColName} : ids) {
             ${changeClassName}Repository.deleteById(${pkChangeColName});
