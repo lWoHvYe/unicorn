@@ -55,7 +55,7 @@ public interface LogService {
     Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable);
 
     /**
-     * 保存日志数据
+     * 保存日志数据。异步写日志
      * @param username 用户
      * @param browser 浏览器
      * @param ip 请求IP

@@ -20,6 +20,7 @@ import com.lwohvye.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;
 import com.lwohvye.modules.system.service.*;
@@ -82,7 +83,10 @@ public class UserController {
     public ResponseEntity<Object> query(UserQueryCriteria criteria, Pageable pageable) {
         if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
             criteria.getDeptIds().add(criteria.getDeptId());
-            criteria.getDeptIds().addAll(deptService.getDeptChildren(deptService.findByPid(criteria.getDeptId())));
+            // 先查找是否存在子节点
+            List<Dept> data = deptService.findByPid(criteria.getDeptId());
+            // 然后把子节点的ID都加入到集合中
+            criteria.getDeptIds().addAll(deptService.getDeptChildren(data));
         }
         // 数据权限
         List<Long> dataScopes = dataService.getDeptIds(userService.findByName(SecurityUtils.getCurrentUsername()));

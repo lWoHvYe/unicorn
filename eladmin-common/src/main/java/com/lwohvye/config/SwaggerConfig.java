@@ -64,23 +64,14 @@ public class SwaggerConfig {
     @Bean
     @SuppressWarnings("all")
     public Docket createRestApi() {
-//        ParameterBuilder ticketPar = new ParameterBuilder();
-////        List<Parameter> pars = new ArrayList<>();
-////        ticketPar.name(tokenHeader).description("token")
-////                .modelRef(new ModelRef("string"))
-////                .parameterType("header")
-////                .defaultValue(tokenStartWith + " ")
-////                .required(true)
-////                .build();
-//        pars.add(ticketPar.build());
         return new Docket(DocumentationType.SWAGGER_2)
                 .enable(enabled)
+                .pathMapping("/")
                 .apiInfo(apiInfo())
                 .select()
 //                .paths(Predicates.not(PathSelectors.regex("/error.*")))
                 .paths(PathSelectors.any())
                 .build()
-//                .globalOperationParameters(pars)
                 //添加登陆认证
                 .securitySchemes(securitySchemes())
                 .securityContexts(securityContexts());
@@ -107,14 +98,14 @@ public class SwaggerConfig {
         List<SecurityContext> securityContexts = new ArrayList<>();
         // ^(?!auth).*$ 表示所有包含auth的接口不需要使用securitySchemes即不需要带token
         // ^标识开始  ()里是一子表达式  ?!/auth表示匹配不是/auth的位置，匹配上则添加请求头，注意路径已/开头  .表示任意字符  *表示前面的字符匹配多次 $标识结束
-        securityContexts.add(getContextByPath("^(?!/auth).*$"));
+        securityContexts.add(getContextByPath());
         return securityContexts;
     }
 
-    private SecurityContext getContextByPath(String pathRegex) {
+    private SecurityContext getContextByPath() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())
-                .forPaths(PathSelectors.regex(pathRegex))
+                .forPaths(PathSelectors.regex("^(?!/auth).*$"))
                 .build();
     }
 
