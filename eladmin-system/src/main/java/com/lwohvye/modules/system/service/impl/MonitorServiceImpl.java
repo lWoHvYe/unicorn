@@ -17,6 +17,7 @@ package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.date.BetweenFormater;
 import cn.hutool.core.date.DateUtil;
+import me.zhengjie.exception.BadRequestException;
 import com.lwohvye.modules.system.service.MonitorService;
 import com.lwohvye.utils.ElAdminConstant;
 import com.lwohvye.utils.FileUtil;
@@ -91,7 +92,11 @@ public class MonitorServiceImpl implements MonitorService {
         diskInfo.put("total", total > 0 ? FileUtil.getSize(total) : "?");
         diskInfo.put("available", FileUtil.getSize(available));
         diskInfo.put("used", FileUtil.getSize(used));
-        diskInfo.put("usageRate", df.format(used/(double)total * 100));
+        if(total != 0){
+            diskInfo.put("usageRate", df.format(used/(double)total * 100));
+        } else {
+            diskInfo.put("usageRate", 0);
+        }
         return diskInfo;
     }
 
