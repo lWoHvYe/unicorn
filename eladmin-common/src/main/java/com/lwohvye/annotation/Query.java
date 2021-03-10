@@ -30,6 +30,7 @@ public @interface Query {
 
     // Dong ZhaoYang 2017/8/7 基本对象的属性名
     String propName() default "";
+
     // Dong ZhaoYang 2017/8/7 查询方式
     Type type() default Type.EQUAL;
 
@@ -66,21 +67,23 @@ public @interface Query {
         // jie 2019/6/4 包含
         , IN
         // 不等于
-        ,NOT_EQUAL
+        , NOT_EQUAL
         // between
-        ,BETWEEN
+        , BETWEEN
         // 不为空
-        ,NOT_NULL
+        , NOT_NULL
         // 为空
-        ,IS_NULL
+        , IS_NULL
         // why 不在指定集合中，不建议使用。因为集合会很大，对效率影响较大
-        ,NOT_IN
+        , NOT_IN
         // why 两个分别用于自定义通配符的like
-        ,LIKE_STR
+        , LIKE_STR
         // why 业务需要，在指定集合内或值为空
-        ,IN_OR_ISNULL
+        , IN_OR_ISNULL
         // why 传非-1时，使用EQUAL,传-1时，使用IS_NULL。将not in 转为left join + 关联表id为null
-        ,IS_OR_NULL
+        , IS_OR_NULL,
+        // why List的 IN模糊
+        IN_INNER_LIKE
     }
 
     /**
@@ -88,7 +91,9 @@ public @interface Query {
      * 适用于简单连接查询，复杂的请自定义该注解，或者使用sql查询
      */
     enum Join {
-        /** jie 2019-6-4 13:18:30 */
+        /**
+         * jie 2019-6-4 13:18:30
+         */
         LEFT, RIGHT, INNER
     }
 
