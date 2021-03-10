@@ -203,6 +203,7 @@ public class QueryHelp {
 //                                设置or查询
                                 list.add(cb.or(predicates));
                             }
+                            break;
                         default:
                             break;
                     }
