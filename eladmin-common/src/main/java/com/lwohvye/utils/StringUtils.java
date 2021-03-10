@@ -32,9 +32,8 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -253,10 +252,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         try {
             InetAddress candidateAddress = null;
             // 遍历所有的网络接口
-            for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
                 NetworkInterface anInterface = interfaces.nextElement();
                 // 在所有的接口下再遍历IP
-                for (Enumeration<InetAddress> inetAddresses = anInterface.getInetAddresses(); inetAddresses.hasMoreElements();) {
+                for (Enumeration<InetAddress> inetAddresses = anInterface.getInetAddresses(); inetAddresses.hasMoreElements(); ) {
                     InetAddress inetAddr = inetAddresses.nextElement();
                     // 排除loopback类型地址
                     if (!inetAddr.isLoopbackAddress()) {
@@ -282,5 +281,17 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    public static List<Long> parseStrToArrLong(String str) {
+        return StringUtils.isNotEmpty(str) ? Arrays.stream(str.split(",")).map(Long::parseLong).collect(Collectors.toList()) : new ArrayList<>();
+    }
+
+    public static List<Integer> parseStrToArrInteger(String str) {
+        return StringUtils.isNotEmpty(str) ? Arrays.stream(str.split(",")).map(Integer::parseInt).collect(Collectors.toList()) : new ArrayList<>();
+    }
+
+    public static List<String> parseStrToArrString(String str) {
+        return StringUtils.isNotEmpty(str) ? Arrays.stream(str.split(",")).collect(Collectors.toList()) : new ArrayList<>();
     }
 }
