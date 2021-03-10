@@ -15,8 +15,11 @@
  */
 package com.lwohvye.modules.system.service.dto;
 
+import cn.hutool.core.util.StrUtil;
+import com.lwohvye.utils.StringUtils;
 import lombok.Data;
 import com.lwohvye.annotation.Query;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -46,4 +49,20 @@ public class UserQueryCriteria implements Serializable {
 
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> createTime;
+
+    private String usernameStr;
+
+    @Query(propName = "username", type = Query.Type.IN_INNER_LIKE)
+    private List<String> usernames;
+
+    /**
+     * @description 重写set方法。将前端传的逗号分割的username，转成字符集合，并设置到另一个字段中
+     * @params [usernameStr]
+     * @return void
+     * @author Hongyan Wang
+     * @date 2021/3/10 22:12
+     */
+    public void setUsernameStr(String usernameStr) {
+        this.usernames = StrUtil.isNotEmpty(usernameStr) ? StringUtils.parseStrToArrString(usernameStr) : null;
+    }
 }
