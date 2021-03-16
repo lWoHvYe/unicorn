@@ -1,5 +1,7 @@
 package com.lwohvye.config.redis;
 
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * @author Hongyan Wang
@@ -55,15 +59,27 @@ public class RedisAutoConfiguration {
     }
 
     /**
-     * 获取mainRedis的StringRedisTemplate实例
+     * 获取mainRedis的RedisTemplate实例
      *
      * @param redisConnectionFactory 使用@Qulifier指定需要的factory
      * @return template
      */
     @Primary
-    @Bean("mainStringRedisTemplate")
-    public static StringRedisTemplate getMainStringRedisTemplate(@Qualifier(value = "mainRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
-        var template = new StringRedisTemplate();
+    @Bean("mainRedisTemplate")
+    public static RedisTemplate<Object, Object> getMainStringRedisTemplate(@Qualifier(value = "mainRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
+        var template = new RedisTemplate<>();
+        //序列化
+        var fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+        // value值的序列化采用fastJsonRedisSerializer
+        template.setValueSerializer(fastJsonRedisSerializer);
+        template.setHashValueSerializer(fastJsonRedisSerializer);
+        // 全局开启AutoType，这里方便开发，使用全局的方式
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        // 建议使用这种方式，小范围指定白名单
+        // ParserConfig.getGlobalInstance().addAccept("com.lwohvye.domain");
+        // key的序列化采用StringRedisSerializer
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }
@@ -74,9 +90,21 @@ public class RedisAutoConfiguration {
         return factory.redisConnectionFactory();
     }
 
-    @Bean("slaveStringRedisTemplate")
-    public static StringRedisTemplate getSlaveStringRedisTemplate(@Qualifier(value = "slaveRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
-        var template = new StringRedisTemplate();
+    @Bean("slaveRedisTemplate")
+    public static RedisTemplate<Object, Object> getSlaveStringRedisTemplate(@Qualifier(value = "slaveRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
+        var template = new RedisTemplate<>();
+        //序列化
+        var fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+        // value值的序列化采用fastJsonRedisSerializer
+        template.setValueSerializer(fastJsonRedisSerializer);
+        template.setHashValueSerializer(fastJsonRedisSerializer);
+        // 全局开启AutoType，这里方便开发，使用全局的方式
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        // 建议使用这种方式，小范围指定白名单
+        // ParserConfig.getGlobalInstance().addAccept("com.lwohvye.domain");
+        // key的序列化采用StringRedisSerializer
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }
@@ -87,9 +115,21 @@ public class RedisAutoConfiguration {
         return factory.redisConnectionFactory();
     }
 
-    @Bean("main2StringRedisTemplate")
-    public static StringRedisTemplate getMain2StringRedisTemplate(@Qualifier(value = "main2RedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
-        var template = new StringRedisTemplate();
+    @Bean("main2RedisTemplate")
+    public static RedisTemplate<Object, Object> getMain2StringRedisTemplate(@Qualifier(value = "main2RedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
+        var template = new RedisTemplate<>();
+        //序列化
+        var fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+        // value值的序列化采用fastJsonRedisSerializer
+        template.setValueSerializer(fastJsonRedisSerializer);
+        template.setHashValueSerializer(fastJsonRedisSerializer);
+        // 全局开启AutoType，这里方便开发，使用全局的方式
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        // 建议使用这种方式，小范围指定白名单
+        // ParserConfig.getGlobalInstance().addAccept("com.lwohvye.domain");
+        // key的序列化采用StringRedisSerializer
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
         template.setConnectionFactory(redisConnectionFactory);
         return template;
     }

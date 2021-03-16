@@ -19,7 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.*;
@@ -38,6 +41,24 @@ public class RedisUtils {
     private RedisTemplate<Object, Object> redisTemplate;
     @Value("${jwt.online-key:online-token-}")
     private String onlineKey;
+
+    //    分布式锁前缀
+    @Value("${local.redis.lock-prefix:redis-lock-}")
+    private String LOCK_PREFIX;
+
+    //    分布式锁失效时间
+    @Value("${local.redis.lock-expire:200000}")
+    private long LOCK_EXPIRE;
+
+    //默认Redis数据源
+    @Autowired
+    @Qualifier("mainRedisTemplate")
+    RedisTemplate<Object, Object> mainRedisTemplate;
+
+    // TODO: 2021/3/17 初步认为需改构造。当需要指定数据源时，使用有参构造
+    public RedisUtils() {
+        this.redisTemplate = mainRedisTemplate;
+    }
 
     public RedisUtils(RedisTemplate<Object, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -213,7 +234,7 @@ public class RedisUtils {
     public List<Object> multiGet(List<String> keys) {
         List list = redisTemplate.opsForValue().multiGet(Sets.newHashSet(keys));
         List resultList = Lists.newArrayList();
-        Optional.ofNullable(list).ifPresent(e-> list.forEach(ele-> Optional.ofNullable(ele).ifPresent(resultList::add)));
+        Optional.ofNullable(list).ifPresent(e -> list.forEach(ele -> Optional.ofNullable(ele).ifPresent(resultList::add)));
         return resultList;
     }
 
@@ -704,5 +725,38 @@ public class RedisUtils {
         log.debug("成功删除缓存：" + keys.toString());
         log.debug("缓存删除数量：" + count + "个");
         log.debug("--------------------------------------------");
+    }
+
+    /**
+     * 最终加强分布式锁
+     *
+     * @param key key值
+     * @return 是否获取到
+     */
+    public boolean lock(String key) {
+        String lock = LOCK_PREFIX + key;
+        // 利用lambda表达式
+        return (Boolean) redisTemplate.execute(new RedisCallback<Object>() {
+            @Override
+            public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                long expireAt = System.currentTimeMillis() + LOCK_EXPIRE + 1;
+                Boolean acquire = redisConnection.setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
+                if (acquire) {
+                    return true;
+                } else {
+                    byte[] value = redisConnection.get(lock.getBytes());
+                    if (Objects.nonNull(value) && value.length > 0) {
+                        long expireTime = Long.parseLong(new String(value));
+                        if (expireTime < System.currentTimeMillis()) {
+                            // 如果锁已经过期
+                            byte[] oldValue = redisConnection.getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + LOCK_EXPIRE + 1).getBytes());
+                            // 防止死锁
+                            return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
+                        }
+                    }
+                }
+                return false;
+            }
+        });
     }
 }
