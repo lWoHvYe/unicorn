@@ -45,15 +45,6 @@ spring:
         enable_lazy_no_trans: true
     open-in-view: true
 
-  redis:
-    #数据库索引
-    database: ${REDIS_DB:4}
-    host: ${REDIS_HOST:10.100.6.140}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PWD:}
-    #连接超时时间
-    timeout: 5000
-
 #  # 全局懒加载。
 #  main:
 #    lazy-initialization: true

@@ -163,6 +163,50 @@ spring:
       sql:
         show：true
 
+# redis配置
+  main-redis:
+    #数据库索引
+    database: ${REDIS_DB:4}
+    host: ${REDIS_HOST:10.100.6.140}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:}
+    #连接超时时间
+    timeout: 5000
+    lettuce:
+      pool:
+#        连接池最大连接数
+        max-active: 10
+#        连接池最大空闲连接数
+        max-idle: 5
+#        连接池最小空闲连接数
+        min-idle: 1
+  slave-redis:
+    #数据库索引
+    database: ${REDIS_DB:4}
+    host: ${REDIS_HOST:10.100.6.140}
+    port: ${REDIS_PORT:6380}
+    password: ${REDIS_PWD:}
+    #连接超时时间
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 1
+  main2-redis:
+    #数据库索引
+    database: ${REDIS_DB:6}
+    host: ${REDIS_HOST:10.100.6.140}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PWD:}
+    #连接超时时间
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 5
+        min-idle: 1
+
 # 登录相关配置
 login:
   # 登录缓存
