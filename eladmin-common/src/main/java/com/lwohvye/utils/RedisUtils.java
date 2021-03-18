@@ -19,8 +19,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -49,16 +47,6 @@ public class RedisUtils {
     //    分布式锁失效时间
     @Value("${local.redis.lock-expire:200000}")
     private long LOCK_EXPIRE;
-
-    //默认Redis数据源
-    @Autowired
-    @Qualifier("mainRedisTemplate")
-    RedisTemplate<Object, Object> mainRedisTemplate;
-
-    // TODO: 2021/3/17 初步认为需改构造。当需要指定数据源时，使用有参构造
-    public RedisUtils() {
-        this.redisTemplate = mainRedisTemplate;
-    }
 
     public RedisUtils(RedisTemplate<Object, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;

@@ -17,13 +17,11 @@ package com.lwohvye.config;
 
 import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import lombok.extern.slf4j.Slf4j;
 import com.lwohvye.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
@@ -34,9 +32,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
@@ -45,7 +41,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Zheng Jie
@@ -71,7 +66,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         return configuration;
     }
 
-    @SuppressWarnings("all")
+    // @SuppressWarnings("all")
 //    @Bean(name = "redisTemplate")
 //    @ConditionalOnMissingBean(name = "redisTemplate")
 //    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
