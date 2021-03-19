@@ -15,21 +15,17 @@
  */
 package com.lwohvye.modules.security.service;
 
-import cn.hutool.core.util.ObjectUtil;
+import com.lwohvye.config.redis.MultiRedisUtils;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -46,18 +42,7 @@ public class OnlineUserService {
 
     private final SecurityProperties properties;
     private final RedisUtils redisUtils;
-
-    @Autowired
-    @Qualifier(value = "main2RedisTemplate")
-    private RedisTemplate<Object, Object> main2RedisTemplate;
-
-    private RedisUtils main2RedisUtils;
-
-    @PostConstruct
-    public void init() {
-        if (ObjectUtil.isNull(main2RedisUtils))
-            main2RedisUtils = new RedisUtils(main2RedisTemplate);
-    }
+    private final MultiRedisUtils main2RedisUtils;
 
     /**
      * 保存在线用户信息

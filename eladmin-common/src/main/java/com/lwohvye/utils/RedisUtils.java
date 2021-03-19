@@ -36,7 +36,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings({"unchecked", "all"})
 public class RedisUtils {
     private static final Logger log = LoggerFactory.getLogger(RedisUtils.class);
-    private RedisTemplate<Object, Object> redisTemplate;
+//    允许同一包下，及子类访问
+    protected RedisTemplate<Object, Object> redisTemplate;
     @Value("${jwt.online-key:online-token-}")
     private String onlineKey;
 

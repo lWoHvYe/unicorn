@@ -21,6 +21,7 @@ import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.config.RsaProperties;
+import com.lwohvye.config.redis.MultiRedisUtils;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
@@ -80,18 +81,7 @@ public class AuthorizationController {
     @Resource
     private LoginProperties loginProperties;
 
-    @Autowired
-    @Qualifier(value = "main2RedisTemplate")
-    private RedisTemplate<Object, Object> main2RedisTemplate;
-
-    private RedisUtils main2RedisUtils;
-
-    //  构造方法  ——> @Autowired —— > @PostConstruct ——> 静态方法 （按此顺序加载）
-    @PostConstruct
-    public void init() {
-        if (ObjectUtil.isNull(main2RedisUtils))
-            main2RedisUtils = new RedisUtils(main2RedisTemplate);
-    }
+    private final MultiRedisUtils main2RedisUtils;
 
     @ApiOperation("登录授权")
     @AnonymousPostMapping(value = "/login")
