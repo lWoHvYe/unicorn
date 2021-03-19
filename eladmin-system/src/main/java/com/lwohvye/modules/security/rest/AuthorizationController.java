@@ -16,6 +16,7 @@
 package com.lwohvye.modules.security.rest;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
@@ -28,16 +29,19 @@ import com.lwohvye.modules.security.security.TokenProvider;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.dto.AuthUserDto;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
+import com.lwohvye.utils.RedisUtils;
+import com.lwohvye.utils.RsaUtils;
+import com.lwohvye.utils.SecurityUtils;
+import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.result.ResultInfo;
 import com.wf.captcha.base.Captcha;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.lwohvye.utils.RsaUtils;
-import com.lwohvye.utils.RedisUtils;
-import com.lwohvye.utils.SecurityUtils;
-import com.lwohvye.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,8 +49,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -72,15 +80,28 @@ public class AuthorizationController {
     @Resource
     private LoginProperties loginProperties;
 
+    @Autowired
+    @Qualifier(value = "main2RedisTemplate")
+    private RedisTemplate<Object, Object> main2RedisTemplate;
+
+    private RedisUtils main2RedisUtils;
+
+    //  构造方法  ——> @Autowired —— > @PostConstruct ——> 静态方法 （按此顺序加载）
+    @PostConstruct
+    public void init() {
+        if (ObjectUtil.isNull(main2RedisUtils))
+            main2RedisUtils = new RedisUtils(main2RedisTemplate);
+    }
+
     @ApiOperation("登录授权")
     @AnonymousPostMapping(value = "/login")
     public ResponseEntity<Object> login(@Validated @RequestBody AuthUserDto authUser, HttpServletRequest request) throws Exception {
         // 密码解密
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, authUser.getPassword());
         // 查询验证码
-        String code = (String) redisUtils.get(authUser.getUuid());
+        String code = (String) main2RedisUtils.get(authUser.getUuid());
         // 清除验证码
-        redisUtils.del(authUser.getUuid());
+        main2RedisUtils.del(authUser.getUuid());
         if (StringUtils.isBlank(code)) {
             throw new BadRequestException("验证码不存在或已过期");
         }
@@ -131,7 +152,7 @@ public class AuthorizationController {
             captchaValue = captchaValue.split("\\.")[0];
         }
         // 保存
-        redisUtils.set(uuid, captchaValue, loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
+        main2RedisUtils.set(uuid, captchaValue, loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
         // 验证码信息
         Map<String, Object> imgResult = new HashMap<>(2) {
             {
