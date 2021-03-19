@@ -18,9 +18,11 @@ package com.lwohvye.modules.security.security;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
+import com.lwohvye.config.redis.MultiRedisUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.utils.RedisUtils;
@@ -29,6 +31,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.*;
@@ -39,18 +42,15 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
     private final RedisUtils redisUtils;
+    private final MultiRedisUtils main2RedisUtils;
     public static final String AUTHORITIES_KEY = "user";
     private JwtParser jwtParser;
     private JwtBuilder jwtBuilder;
-
-    public TokenProvider(SecurityProperties properties, RedisUtils redisUtils) {
-        this.properties = properties;
-        this.redisUtils = redisUtils;
-    }
 
     @Override
     public void afterPropertiesSet() {
@@ -102,14 +102,14 @@ public class TokenProvider implements InitializingBean {
      */
     public void checkRenewal(String token) {
         // 判断是否续期token,计算token的过期时间
-        long time = redisUtils.getExpire(properties.getOnlineKey() + token) * 1000;
+        long time = main2RedisUtils.getExpire(properties.getOnlineKey() + token) * 1000;
         Date expireDate = DateUtil.offset(new Date(), DateField.MILLISECOND, (int) time);
         // 判断当前时间与过期时间的时间差
         long differ = expireDate.getTime() - System.currentTimeMillis();
         // 如果在续期检查的范围内，则续期
         if (differ <= properties.getDetect()) {
             long renew = time + properties.getRenew();
-            redisUtils.expire(properties.getOnlineKey() + token, renew, TimeUnit.MILLISECONDS);
+            main2RedisUtils.expire(properties.getOnlineKey() + token, renew, TimeUnit.MILLISECONDS);
         }
     }
 
