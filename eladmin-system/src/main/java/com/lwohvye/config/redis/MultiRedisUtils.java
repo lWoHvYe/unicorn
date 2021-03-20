@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * RedisUtils的一个子类。使用另一个Redis数据源
+ */
 @Component
 public class MultiRedisUtils extends RedisUtils {
 
