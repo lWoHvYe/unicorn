@@ -9,10 +9,10 @@
 </div>
 
 后台运行jar
-nohup java -jar eladmin-system-2.6.jar --spring.profiles.active=dev > log.file 2>&1 &
+nohup java -jar eladmin-system-2.6.8.jar --spring.profiles.active=dev > log.file 2>&1 &
 
 #### 项目简介
-一个基于 Spring Boot 2.1.0 、 Spring Boot Jpa、 JWT、Spring Security、Redis、Vue的前后端分离的后台管理系统
+一个基于 Spring Boot 2.4.2 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、Vue的前后端分离的后台管理系统
 
 **开发文档：**  [https://el-admin.vip](https://el-admin.vip)
 
@@ -38,6 +38,8 @@ nohup java -jar eladmin-system-2.6.jar --spring.profiles.active=dev > log.file 2
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 支持在线用户管理与服务器性能监控，支持限制单用户登录
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
+- 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）
+- Redis多数据源支持，集群中，可将Token存入特定的Redis中，其他缓存到各自的Redis。即实现了集群间的Session共享，有减少集群各节点间的影响
 
 ####  系统功能
 - 用户管理：提供用户的相关配置，新增用户后，默认密码为123456
