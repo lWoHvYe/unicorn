@@ -16,6 +16,7 @@
 package com.lwohvye.modules.security.service;
 
 import com.lwohvye.config.redis.AuthRedisUtils;
+import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
@@ -43,6 +44,7 @@ public class OnlineUserService {
     private final SecurityProperties properties;
     private final RedisUtils redisUtils;
     private final AuthRedisUtils authRedisUtils;
+    private final AuthSlaveRedisUtils authSlaveRedisUtils;
 
     /**
      * 保存在线用户信息
@@ -87,11 +89,11 @@ public class OnlineUserService {
      * @return /
      */
     public List<OnlineUserDto> getAll(String filter) {
-        List<String> keys = authRedisUtils.scan(properties.getOnlineKey() + "*");
+        List<String> keys = authSlaveRedisUtils.scan(properties.getOnlineKey() + "*");
         Collections.reverse(keys);
         List<OnlineUserDto> onlineUserDtos = new ArrayList<>();
         for (String key : keys) {
-            OnlineUserDto onlineUserDto = (OnlineUserDto) authRedisUtils.get(key);
+            OnlineUserDto onlineUserDto = (OnlineUserDto) authSlaveRedisUtils.get(key);
             if (StringUtils.isNotBlank(filter)) {
                 if (onlineUserDto.toString().contains(filter)) {
                     onlineUserDtos.add(onlineUserDto);
@@ -153,7 +155,7 @@ public class OnlineUserService {
      * @return /
      */
     public OnlineUserDto getOne(String key) {
-        return (OnlineUserDto) authRedisUtils.get(key);
+        return (OnlineUserDto) authSlaveRedisUtils.get(key);
     }
 
     /**

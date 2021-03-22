@@ -203,6 +203,18 @@ spring:
       max-active: 10
       max-idle: 5
       min-idle: 1
+  auth-slave-redis:
+    #数据库索引
+    database: ${REDIS_DB:6}
+    host: ${REDIS_HOST:10.100.6.140}
+    port: ${REDIS_PORT:6380}
+    password: ${REDIS_PWD:}
+    #连接超时时间
+    timeout: 5000
+    pool:
+      max-active: 10
+      max-idle: 5
+      min-idle: 1
 
 # 登录相关配置
 login:

@@ -22,7 +22,8 @@ import org.springframework.data.redis.core.RedisTemplate;
         {
                 RedisAutoConfiguration.MainRedisProperties.class,
                 RedisAutoConfiguration.SlaveRedisProperties.class,
-                RedisAutoConfiguration.AuthRedisProperties.class
+                RedisAutoConfiguration.AuthRedisProperties.class,
+                RedisAutoConfiguration.AuthSlaveRedisProperties.class
         }
 )
 public class RedisAutoConfiguration {
@@ -41,6 +42,10 @@ public class RedisAutoConfiguration {
 
     @ConfigurationProperties(prefix = "spring.auth-redis")
     public static class AuthRedisProperties extends RedisProperties {
+    }
+
+    @ConfigurationProperties(prefix = "spring.auth-slave-redis")
+    public static class AuthSlaveRedisProperties extends RedisProperties {
     }
 
     /**
@@ -87,6 +92,17 @@ public class RedisAutoConfiguration {
 
     @Bean("authRedisTemplate")
     public static RedisTemplate<Object, Object> getAuthRedisTemplate(@Qualifier(value = "authRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
+        return createRedisTemplate(redisConnectionFactory);
+    }
+
+    @Bean("authSlaveRedisConnectionFactory")
+    public static RedisConnectionFactory getAuthSlaveRedisConnectionFactory(AuthSlaveRedisProperties authSlaveRedisProperties) {
+        var factory = new RedisConnectionConfiguration(authSlaveRedisProperties);
+        return factory.redisConnectionFactory();
+    }
+
+    @Bean("authSlaveRedisTemplate")
+    public static RedisTemplate<Object, Object> getAuthSlaveRedisTemplate(@Qualifier(value = "authSlaveRedisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
         return createRedisTemplate(redisConnectionFactory);
     }
 
