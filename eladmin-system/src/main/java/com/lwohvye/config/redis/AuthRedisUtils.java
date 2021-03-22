@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
- * RedisUtils的一个子类。使用另一个Redis数据源
+ * RedisUtils的一个子类。使用另一个Redis数据源。做单点登陆。存储token
  */
 @Component
-public class MultiRedisUtils extends RedisUtils {
+public class AuthRedisUtils extends RedisUtils {
 
     @Autowired
-    @Qualifier(value = "main2RedisTemplate")
-    private RedisTemplate<Object, Object> main2RedisTemplate;
+    @Qualifier(value = "authRedisTemplate")
+    private RedisTemplate<Object, Object> authRedisTemplate;
 
-    public MultiRedisUtils(RedisTemplate<Object, Object> redisTemplate) {
+    public AuthRedisUtils(RedisTemplate<Object, Object> redisTemplate) {
         super(redisTemplate);
     }
 
@@ -26,6 +26,6 @@ public class MultiRedisUtils extends RedisUtils {
     @PostConstruct
     public void init() {
 //        为父类的该属性重新赋值。注意该属性需设置为public/protected
-        super.redisTemplate = main2RedisTemplate;
+        super.redisTemplate = authRedisTemplate;
     }
 }

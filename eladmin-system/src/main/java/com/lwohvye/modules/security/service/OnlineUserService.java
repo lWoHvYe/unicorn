@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.security.service;
 
-import com.lwohvye.config.redis.MultiRedisUtils;
+import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
@@ -42,7 +42,7 @@ public class OnlineUserService {
 
     private final SecurityProperties properties;
     private final RedisUtils redisUtils;
-    private final MultiRedisUtils main2RedisUtils;
+    private final AuthRedisUtils authRedisUtils;
 
     /**
      * 保存在线用户信息
@@ -62,7 +62,7 @@ public class OnlineUserService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        main2RedisUtils.set(properties.getOnlineKey() + token, onlineUserDto, properties.getTokenValidityInSeconds() / 1000);
+        authRedisUtils.set(properties.getOnlineKey() + token, onlineUserDto, properties.getTokenValidityInSeconds() / 1000);
     }
 
     /**
@@ -87,11 +87,11 @@ public class OnlineUserService {
      * @return /
      */
     public List<OnlineUserDto> getAll(String filter) {
-        List<String> keys = main2RedisUtils.scan(properties.getOnlineKey() + "*");
+        List<String> keys = authRedisUtils.scan(properties.getOnlineKey() + "*");
         Collections.reverse(keys);
         List<OnlineUserDto> onlineUserDtos = new ArrayList<>();
         for (String key : keys) {
-            OnlineUserDto onlineUserDto = (OnlineUserDto) main2RedisUtils.get(key);
+            OnlineUserDto onlineUserDto = (OnlineUserDto) authRedisUtils.get(key);
             if (StringUtils.isNotBlank(filter)) {
                 if (onlineUserDto.toString().contains(filter)) {
                     onlineUserDtos.add(onlineUserDto);
@@ -111,7 +111,7 @@ public class OnlineUserService {
      */
     public void kickOut(String key) {
         key = properties.getOnlineKey() + key;
-        main2RedisUtils.del(key);
+        authRedisUtils.del(key);
     }
 
     /**
@@ -121,7 +121,7 @@ public class OnlineUserService {
      */
     public void logout(String token) {
         String key = properties.getOnlineKey() + token;
-        main2RedisUtils.del(key);
+        authRedisUtils.del(key);
     }
 
     /**
@@ -153,7 +153,7 @@ public class OnlineUserService {
      * @return /
      */
     public OnlineUserDto getOne(String key) {
-        return (OnlineUserDto) main2RedisUtils.get(key);
+        return (OnlineUserDto) authRedisUtils.get(key);
     }
 
     /**

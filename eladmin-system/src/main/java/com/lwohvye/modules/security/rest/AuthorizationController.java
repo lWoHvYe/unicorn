@@ -20,7 +20,7 @@ import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.config.RsaProperties;
-import com.lwohvye.config.redis.MultiRedisUtils;
+import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
@@ -70,7 +70,7 @@ import java.util.concurrent.TimeUnit;
 public class AuthorizationController {
     private final SecurityProperties properties;
     private final RedisUtils redisUtils;
-    private final MultiRedisUtils main2RedisUtils;
+    private final AuthRedisUtils authRedisUtils;
     private final OnlineUserService onlineUserService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -83,9 +83,9 @@ public class AuthorizationController {
         // 密码解密
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, authUser.getPassword());
         // 查询验证码
-        String code = (String) main2RedisUtils.get(authUser.getUuid());
+        String code = (String) authRedisUtils.get(authUser.getUuid());
         // 清除验证码
-        main2RedisUtils.del(authUser.getUuid());
+        authRedisUtils.del(authUser.getUuid());
         if (StringUtils.isBlank(code)) {
             throw new BadRequestException("验证码不存在或已过期");
         }
@@ -136,7 +136,7 @@ public class AuthorizationController {
             captchaValue = captchaValue.split("\\.")[0];
         }
         // 保存
-        main2RedisUtils.set(uuid, captchaValue, loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
+        authRedisUtils.set(uuid, captchaValue, loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
         // 验证码信息
         Map<String, Object> imgResult = new HashMap<>(2) {
             {
