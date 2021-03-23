@@ -91,6 +91,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-access</artifactId>
         </dependency>
+        <!--kafka-->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
