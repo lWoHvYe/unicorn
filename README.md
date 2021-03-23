@@ -8,6 +8,10 @@
 
 </div>
 
+## 首先感谢eladmin的作者。
+
+#### 当基础服务使用时。要移除system模块当AppRun.java。并修改pom.xml中当内容。注释一部分，打jar包，而不是打web服务包。
+
 后台运行jar
 nohup java -jar eladmin-system-2.6.8.jar --spring.profiles.active=dev > log.file 2>&1 &
 
