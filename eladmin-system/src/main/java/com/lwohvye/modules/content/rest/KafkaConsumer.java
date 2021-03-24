@@ -81,7 +81,7 @@ public class KafkaConsumer {
     @KafkaListener(topics = "topic1", errorHandler = "consumerAwareErrorHandler")
     public void onMessage5(List<ConsumerRecord<?, ?>> records) throws Exception {
         System.out.println("批量消费一次...");
-        throw new Exception("批量消费-模拟异常");
+//        throw new Exception("批量消费-模拟异常");
     }
 
     //------消息过滤

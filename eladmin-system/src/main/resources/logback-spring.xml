@@ -81,4 +81,10 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>
     </logger>
+    <!--暂时❎该部分日志。有需要再打开-->
+    <logger name="org.apache.kafka.clients.consumer.internals.ConsumerCoordinator" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH"/>
+    </logger>
+
 </configuration>
