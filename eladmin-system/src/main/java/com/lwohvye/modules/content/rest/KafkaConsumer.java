@@ -1,5 +1,9 @@
 package com.lwohvye.modules.content.rest;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +16,9 @@ import org.springframework.kafka.listener.ConsumerAwareListenerErrorHandler;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class KafkaConsumer {
@@ -24,6 +30,7 @@ public class KafkaConsumer {
     }
 
 //    指定消费对象
+
     /**
      * @return void
      * @Title 指定topic、partition、offset消费
@@ -40,7 +47,7 @@ public class KafkaConsumer {
     @KafkaListener(id = "consumer1", groupId = "felix-group", topicPartitions = {
             @TopicPartition(topic = "topic1", partitions = {"0"}),
             @TopicPartition(topic = "topic2", partitions = "0", partitionOffsets = @PartitionOffset(partition = "1", initialOffset = "8"))
-    })
+    }, errorHandler = "consumerAwareErrorHandler")
     public void onMessage2(ConsumerRecord<?, ?> record) {
         System.out.println("topic:" + record.topic() + "|partition:" + record.partition() + "|offset:" + record.offset() + "|value:" + record.value());
     }
@@ -50,7 +57,7 @@ public class KafkaConsumer {
     public void onMessage3(List<ConsumerRecord<?, ?>> records) {
         System.out.println(">>>批量消费一次，records.size()=" + records.size());
         for (ConsumerRecord<?, ?> record : records) {
-            System.out.println(record.value());
+            System.out.println("批量消费内容：" + record.value());
         }
     }
 
@@ -60,15 +67,15 @@ public class KafkaConsumer {
     public ConsumerAwareListenerErrorHandler consumerAwareErrorHandler() {
         return (message, exception, consumer) -> {
             System.out.println("消费异常：" + message.getPayload());
-            return null;
+            return message.getPayload();
         };
     }
 
     // 将这个异常处理器的BeanName放到@KafkaListener注解的errorHandler属性里面
-    @KafkaListener(topics = {"topic1"}, errorHandler = "consumerAwareErrorHandler")
-    public void onMessage4(ConsumerRecord<?, ?> record) throws Exception {
-        throw new Exception("简单消费-模拟异常");
-    }
+//    @KafkaListener(topics = {"topic1"}, errorHandler = "consumerAwareErrorHandler")
+//    public void onMessage4(ConsumerRecord<?, ?> record) throws Exception {
+//        throw new Exception("简单消费-模拟异常");
+//    }
 
     // 批量消费也一样，异常处理器的message.getPayload()也可以拿到各条消息的信息
     @KafkaListener(topics = "topic1", errorHandler = "consumerAwareErrorHandler")
@@ -79,7 +86,7 @@ public class KafkaConsumer {
 
     //------消息过滤
     @Autowired
-    ConsumerFactory consumerFactory;
+    private ConsumerFactory consumerFactory;
 
     // 消息过滤器
     @Bean
@@ -90,11 +97,18 @@ public class KafkaConsumer {
         factory.setAckDiscarded(true);
         // 消息过滤策略
         factory.setRecordFilterStrategy(consumerRecord -> {
-            if (Integer.parseInt(consumerRecord.value().toString()) % 2 == 0) {
-                return false;
-            }
+//            根据具体需求设置
             //返回true消息则被过滤
-            return true;
+            var value = consumerRecord.value();
+            if (value instanceof Collection) {
+                return CollUtil.isEmpty((Iterable<?>) value);
+            } else if (value instanceof Map) {
+                return MapUtil.isEmpty((Map<?, ?>) value);
+            } else if (value instanceof String) {
+                return CharSequenceUtil.isEmpty((CharSequence) value);
+            } else {
+                return ObjectUtil.isEmpty(value);
+            }
         });
         return factory;
     }
@@ -102,7 +116,7 @@ public class KafkaConsumer {
     // 消息过滤监听
     @KafkaListener(topics = {"topic1"}, containerFactory = "filterContainerFactory")
     public void onMessage6(ConsumerRecord<?, ?> record) {
-        System.out.println(record.value());
+        System.out.println("过滤监听：" + record.value());
     }
 
 //    ------消息转发

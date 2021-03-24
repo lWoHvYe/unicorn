@@ -62,7 +62,7 @@
         <appender-ref ref="LOGSTASH"/>
     </logger>
     <!--设置DEBUG可以查看连接的打开与关闭-->
-    <logger name="jdbc.connection" level="INFO" additivity="false">
+    <logger name="jdbc.connection" level="OFF" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>
     </logger>
@@ -73,6 +73,11 @@
     </logger>
 
     <logger name="jdbc.audit" level="OFF" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH"/>
+    </logger>
+    <!--kafka日志-->
+    <logger name="org.apache.kafka" level="ERROR" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>
     </logger>

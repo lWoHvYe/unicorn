@@ -219,7 +219,7 @@ spring:
 ###########【Kafka集群】###########
   kafka:
 #    使用zookeeper后，可以只配置集群中的一个节点。但是其他节点的ip为k8s内的ip，在外部无法访问，解决方式待定
-    bootstrap-servers: 10.100.6.140:31090,10.100.6.140:21091,10.100.6.140:31092
+    bootstrap-servers: 10.100.6.140:31090,10.100.6.140:31091,10.100.6.140:31092
   ###########【初始化生产者配置】###########
   # 重试次数
     producer:
@@ -232,6 +232,9 @@ spring:
       properties:
         linger:
           ms: 0
+      # 自定义分区器
+#        partitioner:
+#          class: com.lwohvye.modules.content.config.CustomizePartitioner
   # 当生产端积累的消息达到batch-size或接收到消息linger.ms后,生产者就会将消息提交给kafka
   # linger.ms为0表示每接收到一条消息就提交给kafka,这时候batch-size其实就没用了
   # 生产端缓冲区大小
@@ -239,8 +242,6 @@ spring:
   # Kafka提供的序列化和反序列化类
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-  # 自定义分区器
-  # spring.kafka.producer.properties.partitioner.class=com.felix.kafka.producer.CustomizePartitioner
   ###########【初始化消费者配置】###########
   # 默认的消费组ID
     consumer:
@@ -258,10 +259,7 @@ spring:
   # 是否自动提交offset
       enable-auto-commit: true
   # 提交offset延时(接收到消息后多久提交offset)
-      auto:
-        commit:
-          interval:
-            ms: 1000
+      auto-commit-interval: 1000
   # 当kafka中没有初始offset或offset超出范围时将自动重置offset
   # earliest:重置为分区中最小的offset;
   # latest:重置为分区中最新的offset(消费分区中新产生的数据);
@@ -270,13 +268,13 @@ spring:
   # Kafka提供的序列化和反序列化类
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 批量消费每次最多消费多少条消息
+#      max-poll-records: 50
   # 消费端监听的topic不存在时，项目启动会报错(关掉)
     listener:
       missing-topics-fatal: false
 # 设置批量消费
-# spring.kafka.listener.type=batch
-# 批量消费每次最多消费多少条消息
-# spring.kafka.consumer.max-poll-records=50
+#      type: batch
 
 # 登录相关配置
 login:

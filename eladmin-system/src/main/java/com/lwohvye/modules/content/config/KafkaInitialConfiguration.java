@@ -1,4 +1,4 @@
-package com.lwohvye.modules.content.rest;
+package com.lwohvye.modules.content.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
