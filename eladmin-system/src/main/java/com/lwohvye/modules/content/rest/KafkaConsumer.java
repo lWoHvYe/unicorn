@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.lwohvye.domain.Log;
+import com.lwohvye.repository.LogRepository;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +55,7 @@ public class KafkaConsumer {
     }
 
     //    ------批量消费
-    @KafkaListener(id = "consumer2", groupId = "felix-group", topics = "topic1")
+    @KafkaListener(id = "consumer2", groupId = "felix-group", topics = "topic1", errorHandler = "consumerAwareErrorHandler")
     public void onMessage3(List<ConsumerRecord<?, ?>> records) {
         System.out.println(">>>批量消费一次，records.size()=" + records.size());
         for (ConsumerRecord<?, ?> record : records) {
@@ -78,11 +80,11 @@ public class KafkaConsumer {
 //    }
 
     // 批量消费也一样，异常处理器的message.getPayload()也可以拿到各条消息的信息
-    @KafkaListener(topics = "topic1", errorHandler = "consumerAwareErrorHandler")
-    public void onMessage5(List<ConsumerRecord<?, ?>> records) throws Exception {
-        System.out.println("批量消费一次...");
+//    @KafkaListener(topics = "topic1", errorHandler = "consumerAwareErrorHandler")
+//    public void onMessage5(List<ConsumerRecord<?, ?>> records) throws Exception {
+//        System.out.println("批量消费一次...");
 //        throw new Exception("批量消费-模拟异常");
-    }
+//    }
 
     //------消息过滤
     @Autowired
@@ -131,5 +133,18 @@ public class KafkaConsumer {
     @SendTo("topic2")
     public String onMessage7(ConsumerRecord<?, ?> record) {
         return record.value() + "-forward message";
+    }
+
+    //    -------------------记录鉴权信息-----------------------------
+
+    @Autowired
+    private LogRepository logRepository;
+
+    @KafkaListener(id = "consumer4", groupId = "felix-group", topics = "auth", errorHandler = "consumerAwareErrorHandler")
+    public void saveAuthorizeLog(List<ConsumerRecord<?, ?>> records) {
+        for (ConsumerRecord<?, ?> record : records) {
+            var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(record.toString());
+            logRepository.save(log);
+        }
     }
 }

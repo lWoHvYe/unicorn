@@ -20,6 +20,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -34,6 +35,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Accessors(chain = true)
 @Table(name = "sys_menu")
 public class Menu extends BaseEntity implements Serializable {
 

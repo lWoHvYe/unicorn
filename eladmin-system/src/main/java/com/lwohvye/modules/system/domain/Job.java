@@ -19,6 +19,7 @@ import com.lwohvye.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -33,6 +34,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@Accessors(chain = true)
 @Table(name="sys_job")
 public class Job extends BaseEntity implements Serializable {
 

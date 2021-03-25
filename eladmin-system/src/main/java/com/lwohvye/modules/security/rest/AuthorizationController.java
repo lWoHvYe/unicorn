@@ -16,6 +16,7 @@
 package com.lwohvye.modules.security.rest;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
@@ -39,12 +40,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,13 +74,19 @@ import java.util.concurrent.TimeUnit;
 @Api(tags = "系统：系统授权接口")
 public class AuthorizationController {
     private final SecurityProperties properties;
+    //    缓存
     private final RedisUtils redisUtils;
+    //    鉴权用缓存
     private final AuthRedisUtils authRedisUtils;
     private final OnlineUserService onlineUserService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    //    队列生产者
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
     @Resource
     private LoginProperties loginProperties;
+
 
     @ApiOperation("登录授权")
     @AnonymousPostMapping(value = "/login")
@@ -115,6 +126,18 @@ public class AuthorizationController {
             //踢掉之前已经登录的token
             onlineUserService.checkLoginOnUser(authUser.getUsername(), token);
         }
+//        用户登录成功后，写一条消息
+        kafkaTemplate.send("auth", jwtUserDto.getUser().toString()).addCallback(new ListenableFutureCallback<>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                log.error(StrUtil.format("++++++ 消息发送失败,用户名：{}; 失败原因：{} ++++++", jwtUserDto.getUsername(), throwable.getMessage()));
+            }
+
+            @Override
+            public void onSuccess(SendResult<String, Object> stringObjectSendResult) {
+                log.info(StrUtil.format("++++++ 消息发送成功,用户名：{}; 消息概述：{} ++++++", jwtUserDto.getUsername(), stringObjectSendResult.getRecordMetadata().topic()));
+            }
+        });
         return ResponseEntity.ok(authInfo);
     }
 

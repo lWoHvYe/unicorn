@@ -19,6 +19,7 @@ import com.lwohvye.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -31,6 +32,7 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
+@Accessors(chain = true)
 @Table(name="sys_dict_detail")
 public class DictDetail extends BaseEntity implements Serializable {
 

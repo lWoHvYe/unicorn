@@ -80,6 +80,13 @@ public class LogServiceImpl implements LogService {
         return PageUtil.toPage(page.map(logSmallMapper::toDto));
     }
 
+    /**
+     * @description 日志为异步写的。不影响相关的业务
+     * @params [username, browser, ip, joinPoint, log]
+     * @return void
+     * @author Hongyan Wang
+     * @date 2021/3/25 23:39
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, Log log) {

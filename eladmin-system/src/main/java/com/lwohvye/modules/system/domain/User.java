@@ -19,6 +19,7 @@ import com.lwohvye.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -36,6 +37,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@Accessors(chain = true)
 @Table(name="sys_user")
 public class User extends BaseEntity implements Serializable {
 

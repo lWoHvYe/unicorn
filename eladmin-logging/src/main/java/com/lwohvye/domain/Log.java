@@ -18,6 +18,7 @@ package com.lwohvye.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
@@ -31,6 +32,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @Table(name = "sys_log")
+@Accessors(chain = true)
 @NoArgsConstructor
 public class Log  implements Serializable {
 
