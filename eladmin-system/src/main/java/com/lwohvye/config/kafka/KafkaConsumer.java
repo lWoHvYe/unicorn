@@ -1,4 +1,4 @@
-package com.lwohvye.modules.content.rest;
+package com.lwohvye.config.kafka;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;

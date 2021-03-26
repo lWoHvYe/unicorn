@@ -16,11 +16,11 @@
 package com.lwohvye.modules.security.rest;
 
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.config.RsaProperties;
+import com.lwohvye.config.kafka.KafkaProducerUtils;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
@@ -40,16 +40,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -82,7 +78,7 @@ public class AuthorizationController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     //    队列生产者
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaProducerUtils kafkaProducerUtils;
 
     @Resource
     private LoginProperties loginProperties;
@@ -127,17 +123,7 @@ public class AuthorizationController {
             onlineUserService.checkLoginOnUser(authUser.getUsername(), token);
         }
 //        用户登录成功后，写一条消息
-        kafkaTemplate.send("auth", jwtUserDto.getUser().toString()).addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                log.error(StrUtil.format("++++++ 消息发送失败,用户名：{}; 失败原因：{} ++++++", jwtUserDto.getUsername(), throwable.getMessage()));
-            }
-
-            @Override
-            public void onSuccess(SendResult<String, Object> stringObjectSendResult) {
-                log.info(StrUtil.format("++++++ 消息发送成功,用户名：{}; 消息概述：{} ++++++", jwtUserDto.getUsername(), stringObjectSendResult.getRecordMetadata().topic()));
-            }
-        });
+        kafkaProducerUtils.sendCallbackMessage("auth", jwtUserDto.getUser().toString());
         return ResponseEntity.ok(authInfo);
     }
 

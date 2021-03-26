@@ -1,4 +1,4 @@
-package com.lwohvye.modules.content.rest;
+package com.lwohvye.config.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;

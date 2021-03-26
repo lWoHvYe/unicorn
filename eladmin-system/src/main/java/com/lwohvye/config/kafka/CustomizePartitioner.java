@@ -1,4 +1,4 @@
-package com.lwohvye.modules.content.config;
+package com.lwohvye.config.kafka;
 
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;
