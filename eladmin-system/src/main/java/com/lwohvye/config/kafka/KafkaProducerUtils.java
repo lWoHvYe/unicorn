@@ -9,6 +9,11 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.Objects;
 
+/**
+ * @description 消息队列生产者工具类
+ * @author Hongyan Wang
+ * @date 2021/3/26 23:02
+ */
 @Slf4j
 @Component
 public class KafkaProducerUtils {
