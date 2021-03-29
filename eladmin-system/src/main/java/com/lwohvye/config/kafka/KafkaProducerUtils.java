@@ -80,9 +80,9 @@ public class KafkaProducerUtils {
                 }
             });
 //            operations.send("topic1", "test executeInTransaction");
-            // TODO: 2021/3/26 需要返回值
-            throw new RuntimeException("fail");
-//            return null;
+//            throw new RuntimeException("fail");
+            // TODO: 2021/3/26 需要返回值。类型及功能待确定
+            return true;
         });
 
         // 不声明事务：后面报错但前面消息已经发送成功了
