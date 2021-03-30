@@ -204,6 +204,19 @@ public class QueryHelp {
                                 list.add(cb.or(predicates));
                             }
                             break;
+                        case EQUAL_IN_MULTI:
+                            var predicates = new Predicate[4];
+//                            like val
+                            predicates[0] = cb.like(getExpression(attributeName, join, root).as(String.class), val.toString());
+//                            like val,%
+                            predicates[1] = cb.like(getExpression(attributeName, join, root).as(String.class), val.toString() + ",%");
+//                            like %,val,%
+                            predicates[2] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val.toString() + ",%");
+//                            like %,val
+                            predicates[3] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val.toString());
+//                            设置查询
+                            list.add(cb.or(predicates));
+                            break;
                         default:
                             break;
                     }
