@@ -142,6 +142,10 @@ public class UserServiceImpl implements UserService {
         user.setPhone(resources.getPhone());
         user.setNickName(resources.getNickName());
         user.setGender(resources.getGender());
+//        针对blob类型的值特殊处理
+        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
+//        不确定是否需要进行赋值。理论上传递的是引用。更改会影响到这方
+        user = convertString4BlobUtil.convert(user);
         userRepository.save(user);
     }
 
