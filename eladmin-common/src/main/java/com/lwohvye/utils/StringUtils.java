@@ -15,6 +15,7 @@
  */
 package com.lwohvye.utils;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -293,5 +295,17 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
     public static List<String> parseStrToArrString(String str) {
         return StringUtils.isNotEmpty(str) ? Arrays.stream(str.split(",")).collect(Collectors.toList()) : new ArrayList<>();
+    }
+
+    /**
+     * @return java.lang.String
+     * @description 将使用ISO-8859-1编码导致乱码的中文，使用UTF-8重新编码
+     * 当前用于使用String存储数据库中blob类型属性时，解决返回数据乱码问题
+     * @params [str]
+     * @author Hongyan Wang
+     * @date 2020/11/13 9:40
+     */
+    public static String convertToString(String str) {
+        return StrUtil.isNotEmpty(str) ? new String(str.getBytes(StandardCharsets.ISO_8859_1)) : "";
     }
 }

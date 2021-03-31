@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.domain;
 
+import com.lwohvye.annotation.String4Blob;
 import com.lwohvye.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -38,7 +39,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Accessors(chain = true)
-@Table(name="sys_user")
+@Table(name = "sys_user")
 public class User extends BaseEntity implements Serializable {
 
     @Id
@@ -51,15 +52,15 @@ public class User extends BaseEntity implements Serializable {
     @ManyToMany
     @ApiModelProperty(value = "用户角色")
     @JoinTable(name = "sys_users_roles",
-            joinColumns = {@JoinColumn(name = "user_id",referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id",referencedColumnName = "role_id")})
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
     private Set<Role> roles;
 
     @ManyToMany
     @ApiModelProperty(value = "用户岗位")
     @JoinTable(name = "sys_users_jobs",
-            joinColumns = {@JoinColumn(name = "user_id",referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "job_id",referencedColumnName = "job_id")})
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "job_id", referencedColumnName = "job_id")})
     private Set<Job> jobs;
 
     @OneToOne
@@ -88,7 +89,7 @@ public class User extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "用户性别")
     private String gender;
 
-    @ApiModelProperty(value = "头像真实名称",hidden = true)
+    @ApiModelProperty(value = "头像真实名称", hidden = true)
     private String avatarName;
 
     @ApiModelProperty(value = "头像存储的路径", hidden = true)
@@ -104,6 +105,11 @@ public class User extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "是否为admin账号", hidden = true)
     private Boolean isAdmin = false;
 
+    //    描述信息。数据库中为blob类型。java侧使用String存取，存在乱码问题
+    @String4Blob
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "pwd_reset_time")
     @ApiModelProperty(value = "最后修改密码的时间", hidden = true)
     private Date pwdResetTime;
@@ -118,7 +124,7 @@ public class User extends BaseEntity implements Serializable {
         }
         User user = (User) o;
         return Objects.equals(id, user.id) &&
-                Objects.equals(username, user.username);
+               Objects.equals(username, user.username);
     }
 
     @Override

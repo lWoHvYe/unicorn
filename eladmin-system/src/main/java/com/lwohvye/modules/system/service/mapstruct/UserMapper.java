@@ -15,16 +15,22 @@
  */
 package com.lwohvye.modules.system.service.mapstruct;
 
+import com.lwohvye.annotation.Blob2String;
 import com.lwohvye.base.BaseMapper;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.service.dto.UserDto;
+import com.lwohvye.utils.ConvertBlob2StringUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 /**
  * @author Zheng Jie
  * @date 2018-11-23
  */
-@Mapper(componentModel = "spring",uses = {RoleMapper.class, DeptMapper.class, JobMapper.class},unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = {ConvertBlob2StringUtil.class, RoleMapper.class, DeptMapper.class, JobMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper extends BaseMapper<UserDto, User> {
+    @Override
+    @Mapping(target = "description", source = "description", qualifiedBy = Blob2String.class)
+    UserDto toDto(User entity);
 }
