@@ -37,6 +37,16 @@ import java.util.List;
 @SuppressWarnings({"unchecked", "all"})
 public class QueryHelp {
 
+    /**
+     * @param root  Root根对象对应于from后面的表
+     * @param query Q 外部的criteria对象
+     * @param cb    CriteriaBuilder工厂类，用于创建查询的criteriaQuery对象
+     *              Predicate查询条件的拼接对应于where后面的添加表达式
+     * @return javax.persistence.criteria.Predicate
+     * @description 解析属性上的查询注解。贫瘠相应的查询
+     * @author Hongyan Wang
+     * @date 2021/3/31 11:57
+     */
     public static <R, Q> Predicate getPredicate(Root<R> root, Q query, CriteriaBuilder cb) {
         List<Predicate> list = new ArrayList<>();
         if (query == null) {
