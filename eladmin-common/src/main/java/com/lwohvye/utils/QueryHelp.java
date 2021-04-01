@@ -18,6 +18,7 @@ package com.lwohvye.utils;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.annotation.DataPermission;
 import com.lwohvye.annotation.Query;
 import lombok.extern.slf4j.Slf4j;
@@ -226,6 +227,32 @@ public class QueryHelp {
                             predicates[3] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val.toString());
 //                            设置查询
                             list.add(cb.or(predicates));
+                            break;
+                        case EQUAL_IN_MULTI_JOIN:
+//                            该注解只针对Join查询。非join不处理
+                            if (ObjectUtil.isNull(join))
+                                break;
+                            var arrayList = new ArrayList<Predicate>();
+//                            val是一个实体。里面有多个属性。将其中非空的属性配置进去
+                            for (Field fieldInVal : ReflectUtil.getFields(val.getClass())) {
+                                var fieldValue = ReflectUtil.getFieldValue(val, fieldInVal);
+                                if (ObjectUtil.isNotNull(fieldValue)) {
+                                    Predicate predicate = null;
+//                                    String类型使用Inner like
+                                    if (fieldValue instanceof String)
+                                        predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + fieldValue.toString() + "%");
+//                                    传-1L时。做is null查询。因为long类型一般是主键类，不会为负值
+                                    else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L))
+                                        predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
+                                    else
+//                                        其他的走等于
+                                        predicate = cb.equal(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
+                                    if (ObjectUtil.isNotNull(predicate))
+                                        arrayList.add(predicate);
+                                }
+                            }
+                            if (CollUtil.isNotEmpty(arrayList))
+                                list.add(cb.and(arrayList.toArray(new Predicate[arrayList.size()])));
                             break;
                         default:
                             break;

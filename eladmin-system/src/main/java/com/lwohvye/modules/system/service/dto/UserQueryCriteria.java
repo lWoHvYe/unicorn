@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.service.dto;
 
 import cn.hutool.core.util.StrUtil;
+import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.utils.StringUtils;
 import lombok.Data;
 import com.lwohvye.annotation.Query;
@@ -55,10 +56,14 @@ public class UserQueryCriteria implements Serializable {
     @Query(propName = "username", type = Query.Type.IN_INNER_LIKE)
     private List<String> usernames;
 
+//    前端通过role.field传多个属性。在同一join里通过多条件过滤。针对long类型值为-1的，做is null查询。
+    @Query(propName = "role", type = Query.Type.EQUAL_IN_MULTI_JOIN, joinName = "roles")
+    private Role role;
+
     /**
+     * @return void
      * @description 重写set方法。将前端传的逗号分割的username，转成字符集合，并设置到另一个字段中
      * @params [usernameStr]
-     * @return void
      * @author Hongyan Wang
      * @date 2021/3/10 22:12
      */

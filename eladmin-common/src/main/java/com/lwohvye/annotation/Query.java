@@ -81,11 +81,13 @@ public @interface Query {
         // why 业务需要，在指定集合内或值为空
         , IN_OR_ISNULL
         // why 传非-1时，使用EQUAL,传-1时，使用IS_NULL。将not in 转为left join + 关联表id为null
-        , IS_OR_NULL,
+        , IS_OR_NULL
         // why List的 IN模糊查询INNER_LIKE
-        IN_INNER_LIKE,
+        , IN_INNER_LIKE
         // why 使用逗号分割的多值中，某一个值的筛选
-        EQUAL_IN_MULTI
+        , EQUAL_IN_MULTI
+        // why 原连接查询都是单条件的。针对业务，多条件连接查询，QueryCriteria中使用一个实体来承载属性
+        , EQUAL_IN_MULTI_JOIN
     }
 
     /**
