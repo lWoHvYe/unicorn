@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.FileProperties;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
@@ -133,6 +134,11 @@ public class UserServiceImpl implements UserService {
         if (!resources.getEnabled()) {
             onlineUserService.kickOutForUsername(resources.getUsername());
         }
+
+//        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
+//        不确定是否需要进行赋值。理论上传递的是引用。更改会影响到这方
+//        convertString4BlobUtil.convert(user);
+
         user.setUsername(resources.getUsername());
         user.setEmail(resources.getEmail());
         user.setEnabled(resources.getEnabled());
@@ -142,10 +148,9 @@ public class UserServiceImpl implements UserService {
         user.setPhone(resources.getPhone());
         user.setNickName(resources.getNickName());
         user.setGender(resources.getGender());
-//        针对blob类型的值特殊处理
-        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
-//        不确定是否需要进行赋值。理论上传递的是引用。更改会影响到这方
-        user = convertString4BlobUtil.convert(user);
+        var description = resources.getDescription();
+        if (StrUtil.isNotEmpty(description))
+            user.setDescription(description);
         userRepository.save(user);
     }
 
