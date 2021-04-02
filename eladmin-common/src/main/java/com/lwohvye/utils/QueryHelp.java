@@ -242,9 +242,14 @@ public class QueryHelp {
                                     if (fieldValue instanceof String)
                                         predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + fieldValue.toString() + "%");
 //                                    传-1L时。做is null查询。因为long类型一般是主键类，不会为负值
-                                    else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L))
+                                        // TODO: 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效
+                                    else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L)) {
                                         predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
-                                    else
+                                        list.add(predicate);
+//                                        安全起见。清空一下
+                                        arrayList.clear();
+                                        break;
+                                    } else
 //                                        其他的走等于
                                         predicate = cb.equal(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
                                     if (ObjectUtil.isNotNull(predicate))
