@@ -13,7 +13,6 @@ import java.util.Arrays;
  */
 public class ConvertString4BlobUtil<T> {
     public T convert(T t) {
-//        return StringUtils.convertToString(in);
 //        便利所有属性
         Arrays.stream(ReflectUtil.getFields(t.getClass())).forEach(field -> {
 //            看是否有指定的注解
