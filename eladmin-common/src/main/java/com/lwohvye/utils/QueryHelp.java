@@ -23,6 +23,7 @@ import com.lwohvye.annotation.DataPermission;
 import com.lwohvye.annotation.Query;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.persistence.Id;
 import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -238,12 +239,16 @@ public class QueryHelp {
                                 var fieldValue = ReflectUtil.getFieldValue(val, fieldInVal);
                                 if (ObjectUtil.isNotNull(fieldValue)) {
                                     Predicate predicate = null;
+//                                    Id注解，只会出现在主键上
+                                    var idAnnotation = fieldInVal.getAnnotation(Id.class);
 //                                    String类型使用Inner like
                                     if (fieldValue instanceof String)
                                         predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + fieldValue.toString() + "%");
-//                                    传-1L时。做is null查询。因为long类型一般是主键类，不会为负值
-                                        // TODO: 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效
-                                    else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L)) {
+//                                    传-1L时。做is null查询。额外限制为当对应属性上有id注解的时候。
+                                        // TODO: 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效。
+                                        // TODO: 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
+                                        // TODO: 2021/4/6 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
+                                    else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L) && ObjectUtil.isNotNull(idAnnotation)) {
                                         predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
                                         list.add(predicate);
 //                                        安全起见。清空一下
