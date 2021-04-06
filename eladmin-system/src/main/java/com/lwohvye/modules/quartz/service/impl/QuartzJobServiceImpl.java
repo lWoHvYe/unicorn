@@ -16,6 +16,7 @@
 package com.lwohvye.modules.quartz.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
@@ -148,7 +149,7 @@ public class QuartzJobServiceImpl implements QuartzJobService {
             execution(quartzJob);
             // 获取执行状态，如果执行失败则停止后面的子任务执行
             Boolean result = (Boolean) redisUtils.get(uuid);
-            while (result == null) {
+            while (ObjectUtil.isNull(result)) {
                 // 休眠5秒，再次获取子任务执行情况
                 Thread.sleep(5000);
                 result = (Boolean) redisUtils.get(uuid);
