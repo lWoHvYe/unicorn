@@ -50,7 +50,7 @@ public class QueryHelp {
      * @date 2021/3/31 11:57
      */
     public static <R, Q> Predicate getPredicate(Root<R> root, Q query, CriteriaBuilder cb) {
-        List<Predicate> list = new ArrayList<>();
+        var list = new ArrayList<Predicate>();
         if (query == null) {
             return cb.and(list.toArray(new Predicate[0]));
         }
@@ -58,10 +58,10 @@ public class QueryHelp {
         DataPermission permission = query.getClass().getAnnotation(DataPermission.class);
         if (permission != null) {
             // 获取数据权限
-            List<Long> dataScopes = SecurityUtils.getCurrentUserDataScope();
+            var dataScopes = SecurityUtils.getCurrentUserDataScope();
             if (CollectionUtil.isNotEmpty(dataScopes)) {
                 if (StringUtils.isNotBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
-                    Join join = root.join(permission.joinName(), JoinType.LEFT);
+                    var join = root.join(permission.joinName(), JoinType.LEFT);
                     list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
                 } else if (StringUtils.isBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
                     list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
@@ -69,38 +69,38 @@ public class QueryHelp {
             }
         }
         try {
-            List<Field> fields = getAllFields(query.getClass(), new ArrayList<>());
-            for (Field field : fields) {
+            var fields = getAllFields(query.getClass(), new ArrayList<>());
+            for (var field : fields) {
                 boolean accessible = field.isAccessible();
                 // 设置对象的访问权限，保证对private的属性的访
                 field.setAccessible(true);
                 Query q = field.getAnnotation(Query.class);
                 if (q != null) {
-                    String propName = q.propName();
-                    String joinName = q.joinName();
-                    String blurry = q.blurry();
-                    String attributeName = isBlank(propName) ? field.getName() : propName;
-                    Class<?> fieldType = field.getType();
-                    Object val = field.get(query);
+                    var propName = q.propName();
+                    var joinName = q.joinName();
+                    var blurry = q.blurry();
+                    var attributeName = isBlank(propName) ? field.getName() : propName;
+                    var fieldType = field.getType();
+                    var val = field.get(query);
                     if (ObjectUtil.isNull(val) || "".equals(val)) {
                         continue;
                     }
                     Join join = null;
                     // 模糊多字段
                     if (ObjectUtil.isNotEmpty(blurry)) {
-                        String[] blurrys = blurry.split(",");
-                        List<Predicate> orPredicate = new ArrayList<>();
+                        var blurrys = blurry.split(",");
+                        var orPredicate = new ArrayList<Predicate>();
                         for (String s : blurrys) {
                             orPredicate.add(cb.like(root.get(s)
                                     .as(String.class), "%" + val.toString() + "%"));
                         }
-                        Predicate[] p = new Predicate[orPredicate.size()];
+                        var p = new Predicate[orPredicate.size()];
                         list.add(cb.or(orPredicate.toArray(p)));
                         continue;
                     }
                     if (ObjectUtil.isNotEmpty(joinName)) {
-                        String[] joinNames = joinName.split(">");
-                        for (String name : joinNames) {
+                        var joinNames = joinName.split(">");
+                        for (var name : joinNames) {
                             switch (q.join()) {
                                 case LEFT:
                                     if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
@@ -172,7 +172,7 @@ public class QueryHelp {
                             list.add(cb.isNull(getExpression(attributeName, join, root)));
                             break;
                         case BETWEEN:
-                            List<Object> between = new ArrayList<>((List<Object>) val);
+                            var between = new ArrayList<Object>((List<Object>) val);
                             list.add(cb.between(getExpression(attributeName, join, root).as((Class<? extends Comparable>) between.get(0).getClass()),
                                     (Comparable) between.get(0), (Comparable) between.get(1)));
                             break;
