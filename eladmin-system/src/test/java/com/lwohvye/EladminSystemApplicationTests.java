@@ -19,7 +19,10 @@ public class EladminSystemApplicationTests {
         val person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
         final val name = person.name();
         final val age = person.age();
+//        隐式的继承自Record类。有equals hashCode toString方法
         final val equals = person.equals(person);
+        final val string = person.toString();
+
         final val next = person.listNode().next;
         final val friends = Person.friends;
     }
