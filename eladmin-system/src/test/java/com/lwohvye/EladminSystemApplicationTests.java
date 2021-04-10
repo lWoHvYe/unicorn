@@ -1,5 +1,6 @@
 package com.lwohvye;
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,16 @@ public class EladminSystemApplicationTests {
     }
 
     public static void main(String[] args) {
+        final val friend = new Friend("在一起", 8);
+        val person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
+        final val name = person.name();
+        final val age = person.age();
+        final val equals = person.equals(person);
+        final val next = person.listNode().next;
+        final val friends = Person.friends;
     }
+
+//    Person person;
+
 }
 
