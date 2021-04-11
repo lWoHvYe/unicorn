@@ -111,12 +111,12 @@ public class KafkaConsumerTemplate {
 //            根据具体需求设置
             //返回true消息则被过滤
             var value = consumerRecord.value();
-            if (value instanceof Collection) {
-                return CollUtil.isEmpty((Iterable<?>) value);
-            } else if (value instanceof Map) {
-                return MapUtil.isEmpty((Map<?, ?>) value);
-            } else if (value instanceof String) {
-                return CharSequenceUtil.isEmpty((CharSequence) value);
+            if (value instanceof Collection collection) {
+                return CollUtil.isEmpty(collection);
+            } else if (value instanceof Map map) {
+                return MapUtil.isEmpty(map);
+            } else if (value instanceof String str) {
+                return CharSequenceUtil.isEmpty(str);
             } else {
                 return ObjectUtil.isEmpty(value);
             }

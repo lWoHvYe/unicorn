@@ -82,11 +82,11 @@ public class ResultInfo<T> implements IResultInfo<T> {
         var content = objectMap.get("content");
 //        content可能是List。也可能是Set
         if (ObjectUtil.isNotNull(content)) {
-            if (content instanceof List)
-                this.content = (List<T>) content;
-            else if (content instanceof Set)
+            if (content instanceof List list)
+                this.content = list;
+            else if (content instanceof Set set)
 //                Set类型转成List
-                this.content = new ArrayList<>((Set<T>) content);
+                this.content = new ArrayList(set);
             else
                 throw new BadRequestException("content类型有误，请求兼容新类型" + content.getClass());
         } else {
@@ -94,8 +94,8 @@ public class ResultInfo<T> implements IResultInfo<T> {
             this.resultMap = objectMap;
         }
         var totalElements = objectMap.get("totalElements");
-        if (ObjectUtil.isNotNull(totalElements) && totalElements instanceof Long)
-            this.totalElements = (Long) totalElements;
+        if (ObjectUtil.isNotNull(totalElements) && totalElements instanceof Long total)
+            this.totalElements = total;
         this.description = description;
         currentTime = LocalDateTime.now();
     }
@@ -146,14 +146,14 @@ public class ResultInfo<T> implements IResultInfo<T> {
      */
     public static <T> ResultInfo<T> success(T t) {
 //        如果是Map，走分页
-        if (t instanceof Map)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (Map<String, Object>) t, "");
+        if (t instanceof Map map)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), map, "");
 //        List类，一般是非分页查询
-        if (t instanceof List)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (List<T>) t, "");
+        if (t instanceof List list)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), list, "");
 //        分页可能不是转成map的
-        if (t instanceof Page)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), (Page<T>) t, "");
+        if (t instanceof Page page)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, "");
 
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, "");
     }

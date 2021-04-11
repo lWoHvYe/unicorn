@@ -59,8 +59,8 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     public final ResponseEntity<ResultInfo<?>> exceptionHandler(Exception ex, WebRequest request) {
         log.error("ExceptionHandler: {}", ex.getMessage());
         HttpHeaders headers = new HttpHeaders();
-        if (ex instanceof BadRequestException) {
-            return this.handleResultException((BadRequestException) ex, headers, request);
+        if (ex instanceof BadRequestException e) {
+            return this.handleResultException(e, headers, request);
         }
         return this.handleException(ex, headers, request);
     }

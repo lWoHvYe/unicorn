@@ -203,8 +203,7 @@ public class QueryHelp {
                                     cb.equal(getExpression(attributeName, join, root).as((Class<? extends Comparable>) fieldType), val));
                             break;
                         case IN_INNER_LIKE:
-                            if (val instanceof List) {
-                                var objList = (List) val;
+                            if (val instanceof List objList) {
 //                                构建数组
                                 var predicates = new Predicate[objList.size()];
                                 for (int i = 0; i < objList.size(); i++) {
