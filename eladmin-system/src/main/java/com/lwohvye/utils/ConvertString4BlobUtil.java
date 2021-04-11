@@ -35,9 +35,9 @@ public class ConvertString4BlobUtil<T> {
             if (ObjectUtil.isNotNull(annotation)) {
                 var value = ReflectUtil.getFieldValue(t, field);
 //                只处理String 类型的值
-                if (ObjectUtil.isNotEmpty(value) && value instanceof String) {
+                if (ObjectUtil.isNotEmpty(value) && value instanceof String str) {
 //                    正确转码一下
-                    var convertVal = StringUtils.convertToString(String.valueOf(value));
+                    var convertVal = StringUtils.convertToString(str);
 //                    设置值
                     ReflectUtil.setFieldValue(t, field, convertVal);
                 }
