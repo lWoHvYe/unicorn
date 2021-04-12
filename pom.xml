@@ -36,6 +36,7 @@
         <fastjson.version>1.2.75</fastjson.version>
         <druid.version>1.2.5</druid.version>
         <hutool.version>5.5.8</hutool.version>
+        <lombok.version>1.18.20</lombok.version>
         <commons-pool2.version>2.9.0</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
@@ -178,6 +179,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -280,7 +282,7 @@
                     <source>16</source>
                     <target>16</target>
                     <!--<release>16</release>-->
-                    <fork>true</fork>
+                    <!--<fork>true</fork>-->
                     <!-- The flowing is for lombok version before 1.18.20 -->
                     <!--             <compilerArgs>
                                         &lt;!&ndash; <arg>&#45;&#45;enable-preview</arg>&ndash;&gt;
@@ -310,7 +312,7 @@
                             <!-- Support for Java 16
                             https://github.com/rzwitserloot/lombok/issues/2681#
                             -->
-                            <version>1.18.20</version>
+                            <version>${lombok.version}</version>
                         </path>
                         <!--4mapstruct-->
                         <path>
