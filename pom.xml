@@ -276,6 +276,7 @@
             <compilerArgs>设置在fork设置为true时传递给编译器的参数。
             -->
             <plugin>
+                <!-- maven-compiler-plugin应该是默认使用的。所以可以不显示的配置。这里保留主要是为了记录 ——add-opens=... 配置的方式 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>

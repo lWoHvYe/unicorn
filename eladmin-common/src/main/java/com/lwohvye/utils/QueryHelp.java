@@ -71,6 +71,7 @@ public class QueryHelp {
         try {
             var fields = getAllFields(query.getClass(), new ArrayList<>());
             for (var field : fields) {
+//                field.canAccess()
                 boolean accessible = field.isAccessible();
                 // 设置对象的访问权限，保证对private的属性的访
                 field.setAccessible(true);

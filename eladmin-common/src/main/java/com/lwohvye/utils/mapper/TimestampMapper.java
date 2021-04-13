@@ -3,6 +3,7 @@ package com.lwohvye.utils.mapper;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ObjectUtil;
+import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
  * @description Timestamp&String
  * @date 2021/4/13 5:07 下午
  */
+@Component
 public class TimestampMapper {
 
     public String asString(Timestamp timestamp) {
