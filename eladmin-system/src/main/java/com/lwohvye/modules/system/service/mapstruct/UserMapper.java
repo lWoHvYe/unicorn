@@ -20,6 +20,7 @@ import com.lwohvye.base.BaseMapper;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.utils.ConvertBlob2StringUtil;
+import com.lwohvye.utils.mapper.TimestampMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -29,6 +30,7 @@ import org.mapstruct.ReportingPolicy;
  * @date 2018-11-23
  */
 @Mapper(componentModel = "spring", uses = {RoleMapper.class, DeptMapper.class, JobMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+//@Mapper(componentModel = "spring", uses = {RoleMapper.class, DeptMapper.class, JobMapper.class, TimestampMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 //若不移除ConvertBlob2StringUtil.class的使用，所以String2String的转换都会走这个方法了。所以还是要配置重新toDto来限制使用范围
 //@Mapper(componentModel = "spring", uses = {ConvertBlob2StringUtil.class, RoleMapper.class, DeptMapper.class, JobMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper extends BaseMapper<UserDto, User> {
