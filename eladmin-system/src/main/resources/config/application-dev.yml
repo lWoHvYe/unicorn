@@ -163,6 +163,14 @@ spring:
       sql:
         show：true
 
+#  monogodb
+  data:
+    mongodb:
+      host: 10.100.6.140:27017
+#      username: test_user
+#      password: pass@123
+      database: eladmin
+
   # redis配置
   main-redis:
     #数据库索引

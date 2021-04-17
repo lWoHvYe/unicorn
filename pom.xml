@@ -35,13 +35,15 @@
         <swagger.version>3.0.0</swagger.version>
         <fastjson.version>1.2.75</fastjson.version>
         <druid.version>1.2.5</druid.version>
-        <hutool.version>5.5.8</hutool.version>
+        <hutool.version>5.6.2</hutool.version>
         <lombok.version>1.18.20</lombok.version>
         <commons-pool2.version>2.9.0</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <!--logstash要用5系列版本。6系列整合方式暂未知-->
         <logstash.version>5.3</logstash.version>
+        <!--   mongo    -->
+        <mongo-driver.version></mongo-driver.version>
     </properties>
 
     <dependencies>
@@ -250,6 +252,11 @@
             <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
             <version>4.1.1</version>
         </dependency>
+        <!--mongodb-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -322,6 +329,8 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <!--https://docs.spring.io/spring-boot/docs/2.4.4/reference/html/appendix-configuration-metadata.html#configuration-metadata-annotation-processor-->
+                    <proc>none</proc>
                 </configuration>
             </plugin>
         </plugins>
@@ -342,6 +351,10 @@
             <releases>
                 <enabled>true</enabled>
             </releases>
+        </repository>
+        <repository>
+            <id>sonatype-snapshot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </repository>
     </repositories>
 
