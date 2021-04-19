@@ -245,10 +245,16 @@
             <version>${logstash.version}</version>
         </dependency>
         <!--分库分表中间件-->
+        <!-- https://mvnrepository.com/artifact/org.apache.shardingsphere/shardingsphere-sharding-spring-boot-starter -->
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
-            <version>4.1.1</version>
+            <artifactId>shardingsphere-sharding-spring-boot-starter</artifactId>
+            <version>5.0.0-alpha</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+            <version>5.0.0-alpha</version>
         </dependency>
         <!--mongodb-->
         <dependency>

@@ -2,12 +2,12 @@
 spring:
   shardingsphere:
     datasource:
-      names: master,slave0,slave1
+      names: write_ds,read_ds_0,read_ds_1
       #     主数据源
-      master:
+      write_ds:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        jdbc-url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         username: ${DB_USER:root}
         password: ${DB_PWD:root}
         # 初始连接数
@@ -51,10 +51,10 @@ spring:
             config:
               multi-statement-allow: true
       #     分数据源
-      slave0:
+      read_ds_0:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        jdbc-url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -102,10 +102,10 @@ spring:
             config:
               multi-statement-allow: true
       #     分数据源
-      slave1:
+      read_ds_1:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3307}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        jdbc-url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3307}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -152,16 +152,19 @@ spring:
           wall:
             config:
               multi-statement-allow: true
-    #    主从配置
-    masterslave:
-      load-balance-algorithm-type: round_robin
-      name: ms
-      master-data-source-name: master
-      slave-data-source-names: slave0,slave1
-
+#    规则    主从配置
+    rules:
+      read-write-splitting:
+        load-balancers:
+          round_robin:
+            type: ROUND_ROBIN
+        data-sources:
+          pr_ds:
+            write-data-source-name: write_ds
+            read-data-source-names: read_ds_0,read_ds_1
+            load-balancer-name: round_robin
     props:
-      sql:
-        show：true
+      sql-show：true
 
   #  monogodb
   data:
