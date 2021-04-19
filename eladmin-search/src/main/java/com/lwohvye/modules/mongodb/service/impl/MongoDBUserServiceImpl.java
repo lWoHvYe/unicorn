@@ -1,10 +1,10 @@
-package com.lwohvye.modules.system.service.impl;
+package com.lwohvye.modules.mongodb.service.impl;
 
-import com.lwohvye.modules.system.domain.MongoDBUser;
+import com.lwohvye.modules.mongodb.domain.MongoDBUser;
+import com.lwohvye.modules.mongodb.repository.MongoDBUserRepository;
+import com.lwohvye.modules.mongodb.service.MongoDBUserService;
 import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.repository.MongoDBUserRepository;
 import com.lwohvye.modules.system.repository.UserRepository;
-import com.lwohvye.modules.system.service.MongoDBUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

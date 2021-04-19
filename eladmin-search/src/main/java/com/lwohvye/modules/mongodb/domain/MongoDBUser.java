@@ -1,4 +1,4 @@
-package com.lwohvye.modules.system.domain;
+package com.lwohvye.modules.mongodb.domain;
 
 import lombok.Getter;
 import lombok.Setter;

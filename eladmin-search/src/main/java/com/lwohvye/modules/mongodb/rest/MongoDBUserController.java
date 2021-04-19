@@ -1,7 +1,7 @@
-package com.lwohvye.modules.system.rest;
+package com.lwohvye.modules.mongodb.rest;
 
 import com.lwohvye.annotation.AnonymousAccess;
-import com.lwohvye.modules.system.service.MongoDBUserService;
+import com.lwohvye.modules.mongodb.service.MongoDBUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Hongyan Wang
  * @date 2021年04月18日 22:16
  */
-@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mongodb/user")
