@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.4</version>
+        <version>2.4.5</version>
     </parent>
 
     <properties>
@@ -42,8 +42,6 @@
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <!--logstash要用5系列版本。6系列整合方式暂未知-->
         <logstash.version>5.3</logstash.version>
-        <!--   mongo    -->
-        <mongo-driver.version></mongo-driver.version>
     </properties>
 
     <dependencies>

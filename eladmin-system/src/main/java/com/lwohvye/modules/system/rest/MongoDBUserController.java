@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Hongyan Wang
  * @date 2021年04月18日 22:16
  */
+@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mongodb/user")
