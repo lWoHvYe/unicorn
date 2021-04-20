@@ -22,6 +22,8 @@ public class MongoDBUserServiceImpl implements MongoDBUserService {
 
     private final UserRepository userRepository;
 
+    // TODO: 2021/4/20 各种类找不到。已排除shardingsphere。。。
+
     @Override
     public Object findAll() {
         return mongoDBUserRepository.findAll();
