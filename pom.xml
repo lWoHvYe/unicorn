@@ -163,7 +163,7 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- druid数据源驱动 -->
+        <!-- druid数据源驱动 ; 注：使用shardingsphere时。这里不能用druid但spring-boot-starter -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>

@@ -28,7 +28,7 @@
                         {
                         "project": "lwohvye-eladmin",
                         "level": "%level",
-                        "service": "eladmin-starter",
+                        "service": "eladmin-search",
                         "pid": "${PID:-}",
                         "thread": "%thread",
                         "class": "%logger",

@@ -12,10 +12,6 @@
     <artifactId>eladmin-starter</artifactId>
     <name>启动模块-基础</name>
 
-    <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.lwohvye</groupId>
