@@ -19,8 +19,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.lwohvye.domain.Log;
-import com.lwohvye.repository.LogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,17 +140,5 @@ public class KafkaConsumerTemplate {
     @SendTo("topic2")
     public String onMessage302(ConsumerRecord<?, ?> record) {
         return record.value() + "-forward message";
-    }
-
-    //    -------------------记录鉴权信息-----------------------------
-    @Autowired
-    private LogRepository logRepository;
-
-    @KafkaListener(id = "consumer4", groupId = "felix-group", topics = "auth", errorHandler = "consumerAwareErrorHandler")
-    public void saveAuthorizeLog(List<ConsumerRecord<?, ?>> records) {
-        for (ConsumerRecord<?, ?> record : records) {
-            var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(record.toString());
-            logRepository.save(log);
-        }
     }
 }

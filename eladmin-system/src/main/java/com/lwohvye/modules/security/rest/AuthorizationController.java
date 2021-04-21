@@ -16,12 +16,14 @@
 package com.lwohvye.modules.security.rest;
 
 import cn.hutool.core.util.IdUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.config.kafka.KafkaProducerUtils;
 import com.lwohvye.config.redis.AuthRedisUtils;
+import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
@@ -42,9 +44,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,6 +78,7 @@ public class AuthorizationController {
     private final RedisUtils redisUtils;
     //    鉴权用缓存
     private final AuthRedisUtils authRedisUtils;
+    private final AuthSlaveRedisUtils authSlaveRedisUtils;
     private final OnlineUserService onlineUserService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -87,10 +92,16 @@ public class AuthorizationController {
     @ApiOperation("登录授权")
     @AnonymousPostMapping(value = "/login")
     public ResponseEntity<Object> login(@Validated @RequestBody AuthUserDto authUser, HttpServletRequest request) throws Exception {
+
+        var username = authUser.getUsername();
+        String lockUserKey = username + "||authLocked||";
+        if (authSlaveRedisUtils.hasKey(lockUserKey))
+            throw new BadRequestException("用户已被锁定，请稍后再试");
+
         // 密码解密
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, authUser.getPassword());
         // 查询验证码
-        String code = (String) authRedisUtils.get(authUser.getUuid());
+        String code = (String) authSlaveRedisUtils.get(authUser.getUuid());
         // 清除验证码
         authRedisUtils.del(authUser.getUuid());
         if (StringUtils.isBlank(code)) {
@@ -100,8 +111,23 @@ public class AuthorizationController {
             throw new BadRequestException("验证码错误");
         }
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(authUser.getUsername(), password);
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+                new UsernamePasswordAuthenticationToken(username, password);
+
+        Authentication authentication;
+        try {
+            authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        } catch (BadCredentialsException e) {
+            String ip = StringUtils.getIp(request);
+            var infoMap = new JSONObject();
+            infoMap.put("ip", ip);
+            infoMap.put("lockUserKey", lockUserKey);
+            infoMap.put("username", username);
+//            发送消息
+            kafkaProducerUtils.sendCallbackMessage("auth-failed", infoMap.toJSONString());
+
+            throw e;
+        }
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         // 生成令牌与第三方系统获取令牌方式
         // UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
@@ -120,10 +146,10 @@ public class AuthorizationController {
         };
         if (loginProperties.isSingleLogin()) {
             //踢掉之前已经登录的token
-            onlineUserService.checkLoginOnUser(authUser.getUsername(), token);
+            onlineUserService.checkLoginOnUser(username, token);
         }
 //        用户登录成功后，写一条消息
-        kafkaProducerUtils.sendCallbackMessage("auth", jwtUserDto.getUser().toString());
+        kafkaProducerUtils.sendCallbackMessage("auth-log", jwtUserDto.getUser().toString());
         return ResponseEntity.ok(authInfo);
     }
 
