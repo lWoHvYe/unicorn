@@ -48,7 +48,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,10 +90,15 @@ public class AuthorizationController {
 
     @ApiOperation("登录授权")
     @AnonymousPostMapping(value = "/login")
+    // TODO: 2021/4/21 登陆失败限制、ip限制、手机验证码
     public ResponseEntity<Object> login(@Validated @RequestBody AuthUserDto authUser, HttpServletRequest request) throws Exception {
 
         var username = authUser.getUsername();
         String lockUserKey = username + "||authLocked||";
+//        var lockUser = authRedisUtils.get(lockUserKey);
+//        if (ObjectUtil.isNotNull(lockUser) && lockUser instanceof Collection col ? CollUtil.isNotEmpty(col) : ObjectUtil.isNotEmpty(lockUser)) {
+//        if (ObjectUtil.isNotEmpty(lockUser)) {
+        // TODO: 2021/4/22 改用延时消息队列来做。错误一定次数后，修改用户状态为锁定，然后延时消息。一小时后解除
         if (authSlaveRedisUtils.hasKey(lockUserKey))
             throw new BadRequestException("用户已被锁定，请稍后再试");
 
