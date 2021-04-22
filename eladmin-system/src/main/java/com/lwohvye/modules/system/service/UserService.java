@@ -86,6 +86,13 @@ public interface UserService {
     void updateEmail(String username, String email);
 
     /**
+     * 修改状态
+     * @param username 用户名
+     * @param enabled 是否锁定
+     */
+    void updateEnabled(String username, Boolean enabled);
+
+    /**
      * 查询全部
      * @param criteria 条件
      * @param pageable 分页参数

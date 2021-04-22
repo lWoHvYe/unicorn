@@ -1,10 +1,13 @@
 package com.lwohvye.modules.system.service.local;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.lwohvye.config.kafka.KafkaProducerUtils;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.domain.Log;
+import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.repository.LogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -40,10 +43,16 @@ public class AuthMQService {
     @Autowired
     private AuthSlaveRedisUtils authSlaveRedisUtils;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private KafkaProducerUtils kafkaProducerUtils;
+
     @KafkaListener(id = "authFailedConsumer", groupId = "felix-group", topics = "auth-failed", errorHandler = "consumerAwareErrorHandler")
     public void solveAuthFailed(List<ConsumerRecord<?, ?>> records) {
         for (ConsumerRecord<?, ?> record : records) {
-            Object value = record.value();
+            var value = record.value();
             if (value instanceof String infoStr) {
                 var infoJson = JSONObject.parseObject(infoStr);
                 var ip = infoJson.getString("ip");
@@ -54,6 +63,7 @@ public class AuthMQService {
                 var countKey = "failed-count";
                 var byKey = authSlaveRedisUtils.hget(authFailedKey, countKey);
                 var failCount = ObjectUtil.isNotEmpty(byKey) ? (Integer) byKey : 0;
+                log.info("fail-count" + failCount);
                 if (failCount < 5) {
                     failCount += 1;
                     if (ObjectUtil.equal(failCount, 1)) {
@@ -64,10 +74,24 @@ public class AuthMQService {
                         authRedisUtils.hset(authFailedKey, countKey, failCount);
                     }
                 } else {
+//                  修改状态为锁定
+                    userService.updateEnabled(username, false);
 //                超过5次锁定一小时
-                    authRedisUtils.set(lockUserKey, "登陆限制-_-", 60 * 60L);
+                    // TODO: 2021/4/22 延时队列
+//                    kafkaProducerUtils.sendCallbackMessage("unlock-user", username);
                 }
             }
         }
     }
+
+
+    @KafkaListener(id = "unlockUserConsumer", groupId = "felix-group", topics = "unlock-user", errorHandler = "consumerAwareErrorHandler")
+    public void unlockUser(List<ConsumerRecord<?, ?>> records) {
+        for (ConsumerRecord<?, ?> record : records) {
+            var value = record.value();
+            if (value instanceof String username)
+                userService.updateEnabled(username, true);
+        }
+    }
+
 }

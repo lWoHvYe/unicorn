@@ -226,6 +226,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(allEntries = true)
+    public void updateEnabled(String username, Boolean enabled) {
+        userRepository.updateEnabled(username, enabled);
+        flushCache(username);
+    }
+
+    @Override
     public void download(List<UserDto> queryAll, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
         for (UserDto userDTO : queryAll) {
