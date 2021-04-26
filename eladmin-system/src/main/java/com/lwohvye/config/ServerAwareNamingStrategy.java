@@ -33,6 +33,15 @@ public class ServerAwareNamingStrategy extends SpringPhysicalNamingStrategy impl
         this.context.setRootObject(applicationContext);
     }
 
+    /**
+     * @description 使用映射表名后，需注意。尽量不要用原生sql,要用hql替代
+     * 除了@Table注解。@JoinTable注解也试用
+     * @author Hongyan Wang
+     * @date 2021/4/23 11:06 上午
+     * @param name
+     * @param jdbcEnvironment
+     * @return org.hibernate.boot.model.naming.Identifier
+     */
     @Override
     public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment jdbcEnvironment) {
         String nameStr = name.getText();
