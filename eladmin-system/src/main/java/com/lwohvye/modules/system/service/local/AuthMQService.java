@@ -2,12 +2,12 @@ package com.lwohvye.modules.system.service.local;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.domain.Log;
 import com.lwohvye.modules.kafka.entity.DelayMessage;
-import com.lwohvye.modules.kafka.enums.KafkaConstants;
 import com.lwohvye.modules.kafka.service.KafkaProducerService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.repository.LogRepository;
@@ -83,13 +83,11 @@ public class AuthMQService {
                     userService.updateEnabled(username, false);
 //                  超过5次锁定一小时
                     var delayMessage = new DelayMessage();
-                    delayMessage.setActualTopic("unlock-user").setContext(username).setTime(5L).setUnit(TimeUnit.MINUTES);
-                    kafkaProducerService.sendCallbackMessage(KafkaConstants.KAFKA_TOPIC_MESSAGE_DELAY, JSONObject.toJSONString(delayMessage));
+                    delayMessage.setActualTopic("unlock-user").setContext(username);
+                    var amqpMsgEntity = new AmqpMsgEntity().setMsgData(JSONObject.toJSONString(delayMessage)).setExpire(1L).setTimeUnit(TimeUnit.HOURS);
+//                    延时消息发给RabbitMQ
+                    rabbitMQProducerService.sendTTLMsg(amqpMsgEntity);
 //                超过5次锁定一小时
-                    // TODO: 2021/4/22 延时队列
-                    // TODO: 2021/4/27 延时通过RabbitMQ实现。
-//                    rabbitMQProducer
-//                    kafkaProducerUtils.sendCallbackMessage("unlock-user", username);
                 }
             }
         }
@@ -100,8 +98,11 @@ public class AuthMQService {
     public void unlockUser(List<ConsumerRecord<?, ?>> records) {
         for (ConsumerRecord<?, ?> record : records) {
             var value = record.value();
-            if (value instanceof String username)
+            if (value instanceof String delayMessageStr) {
+                var delayMessage = JSONObject.parseObject(delayMessageStr, DelayMessage.class);
+                var username = delayMessage.getContext();
                 userService.updateEnabled(username, true);
+            }
         }
     }
 

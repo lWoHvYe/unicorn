@@ -275,11 +275,12 @@ spring:
       missing-topics-fatal: false
       # 设置批量消费
       type: batch
+
   ##### RabbitMQ ####
   rabbitmq:
     host: 10.100.6.140 # rabbitmq的连接地址
     port: 5672 # rabbitmq的连接端口号
-    virtual-host: /rabbit # rabbitmq的虚拟host
+    virtual-host: /eladmin # rabbitmq的虚拟host
     username: admin # rabbitmq的用户名
     password: admin # rabbitmq的密码
 
