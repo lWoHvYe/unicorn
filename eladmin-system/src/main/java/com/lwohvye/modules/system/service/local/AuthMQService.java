@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.kafka.KafkaProducerUtils;
+import com.lwohvye.config.rabbitmq.RabbitMQProducer;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.domain.Log;
@@ -49,6 +50,9 @@ public class AuthMQService {
     @Autowired
     private KafkaProducerUtils kafkaProducerUtils;
 
+    @Autowired
+    private RabbitMQProducer rabbitMQProducer;
+
     @KafkaListener(id = "authFailedConsumer", groupId = "felix-group", topics = "auth-failed", errorHandler = "consumerAwareErrorHandler")
     public void solveAuthFailed(List<ConsumerRecord<?, ?>> records) {
         for (ConsumerRecord<?, ?> record : records) {
@@ -79,6 +83,7 @@ public class AuthMQService {
 //                超过5次锁定一小时
                     // TODO: 2021/4/22 延时队列
                     // TODO: 2021/4/27 延时通过RabbitMQ实现。
+//                    rabbitMQProducer
 //                    kafkaProducerUtils.sendCallbackMessage("unlock-user", username);
                 }
             }
