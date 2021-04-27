@@ -78,6 +78,7 @@ public class AuthMQService {
                     userService.updateEnabled(username, false);
 //                超过5次锁定一小时
                     // TODO: 2021/4/22 延时队列
+                    // TODO: 2021/4/27 延时通过RabbitMQ实现。
 //                    kafkaProducerUtils.sendCallbackMessage("unlock-user", username);
                 }
             }
