@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.config.kafka;
+package com.lwohvye.modules.kafka.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-public class KafkaProducerUtils {
+public class KafkaProducerService {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 

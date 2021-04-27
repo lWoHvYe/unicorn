@@ -13,12 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.config.kafka;
+package com.lwohvye.modules.kafka.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class KafkaConsumerTemplate {
+public class KafkaConsumerService {
     // 消费监听
     @KafkaListener(topics = {"topic1"})
     public void onMessage1(ConsumerRecord<?, ?> record) {
@@ -141,4 +142,47 @@ public class KafkaConsumerTemplate {
     public String onMessage302(ConsumerRecord<?, ?> record) {
         return record.value() + "-forward message";
     }
+
+    /**
+     * @description 如果需要延时，会发给另一个。然后阻塞到时间抵达，然后再发过来
+     * @author Hongyan Wang
+     * @date 2021/4/24 20:27
+     * @param cr
+     * @return java.lang.String
+     */
+    @KafkaListener(topics = "myJob")
+    @SendTo("myJob-delay")
+    public String onMessage5Delay(ConsumerRecord<?, ?> cr) {
+        // 传入参数
+        String json = (String) cr.value();
+        JSONObject data = JSONObject.parseObject(json);
+        long msToDelay = data.getLong("msToDelay");
+//        如果需要延时，就转到另一队列
+        if (msToDelay > 0) {
+            // 发送到 @SendTo
+            data.put("until", System.currentTimeMillis() + msToDelay);
+            return data.toString();
+        }
+
+        // 正常处理
+        // do real work
+
+        return null;
+    }
+
+    @KafkaListener(topics = "myJob-delay")
+    @SendTo("myJob")
+    public String delayMessage1(ConsumerRecord<?, ?> cr) throws InterruptedException {
+        // 传入参数
+        String json = (String) cr.value();
+        JSONObject data = JSONObject.parseObject(json);
+        Long until = data.getLong("until");
+        // 阻塞直到 until
+        while (System.currentTimeMillis() < until) {
+            Thread.sleep(Math.max(0, until - System.currentTimeMillis()));
+        }
+        // 转移到 @SendTo
+        return json;
+    }
+
 }

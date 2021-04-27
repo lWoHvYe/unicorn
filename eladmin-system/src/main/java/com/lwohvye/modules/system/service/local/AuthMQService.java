@@ -1,13 +1,14 @@
 package com.lwohvye.modules.system.service.local;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.lwohvye.config.kafka.KafkaProducerUtils;
-import com.lwohvye.config.rabbitmq.RabbitMQProducer;
+import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.domain.Log;
+import com.lwohvye.modules.kafka.entity.DelayMessage;
+import com.lwohvye.modules.kafka.enums.KafkaConstants;
+import com.lwohvye.modules.kafka.service.KafkaProducerService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.repository.LogRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Hongyan Wang
@@ -48,10 +50,10 @@ public class AuthMQService {
     private UserService userService;
 
     @Autowired
-    private KafkaProducerUtils kafkaProducerUtils;
+    private KafkaProducerService kafkaProducerService;
 
     @Autowired
-    private RabbitMQProducer rabbitMQProducer;
+    private RabbitMQProducerService rabbitMQProducerService;
 
     @KafkaListener(id = "authFailedConsumer", groupId = "felix-group", topics = "auth-failed", errorHandler = "consumerAwareErrorHandler")
     public void solveAuthFailed(List<ConsumerRecord<?, ?>> records) {
@@ -60,7 +62,6 @@ public class AuthMQService {
             if (value instanceof String infoStr) {
                 var infoJson = JSONObject.parseObject(infoStr);
                 var ip = infoJson.getString("ip");
-                var lockUserKey = infoJson.getString("lockUserKey");
                 var username = infoJson.getString("username");
                 //          使用 用户名 + ip 作为key
                 String authFailedKey = username + "||authFailed||" + ip;
@@ -80,6 +81,10 @@ public class AuthMQService {
                 } else {
 //                  修改状态为锁定
                     userService.updateEnabled(username, false);
+//                  超过5次锁定一小时
+                    var delayMessage = new DelayMessage();
+                    delayMessage.setActualTopic("unlock-user").setContext(username).setTime(5L).setUnit(TimeUnit.MINUTES);
+                    kafkaProducerService.sendCallbackMessage(KafkaConstants.KAFKA_TOPIC_MESSAGE_DELAY, JSONObject.toJSONString(delayMessage));
 //                超过5次锁定一小时
                     // TODO: 2021/4/22 延时队列
                     // TODO: 2021/4/27 延时通过RabbitMQ实现。

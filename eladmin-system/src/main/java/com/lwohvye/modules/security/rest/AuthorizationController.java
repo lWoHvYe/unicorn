@@ -21,7 +21,7 @@ import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.config.RsaProperties;
-import com.lwohvye.config.kafka.KafkaProducerUtils;
+import com.lwohvye.modules.kafka.service.KafkaProducerService;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.exception.BadRequestException;
@@ -82,7 +82,7 @@ public class AuthorizationController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     //    队列生产者
-    private final KafkaProducerUtils kafkaProducerUtils;
+    private final KafkaProducerService kafkaProducerService;
 
     @Resource
     private LoginProperties loginProperties;
@@ -127,8 +127,7 @@ public class AuthorizationController {
             infoMap.put("lockUserKey", lockUserKey);
             infoMap.put("username", username);
 //            发送消息
-            kafkaProducerUtils.sendCallbackMessage("auth-failed", infoMap.toJSONString());
-
+            kafkaProducerService.sendCallbackMessage("auth-failed", infoMap.toJSONString());
             throw e;
         }
 
@@ -153,7 +152,7 @@ public class AuthorizationController {
             onlineUserService.checkLoginOnUser(username, token);
         }
 //        用户登录成功后，写一条消息
-        kafkaProducerUtils.sendCallbackMessage("auth-log", jwtUserDto.getUser().toString());
+        kafkaProducerService.sendCallbackMessage("auth-log", jwtUserDto.getUser().toString());
         return ResponseEntity.ok(authInfo);
     }
 
