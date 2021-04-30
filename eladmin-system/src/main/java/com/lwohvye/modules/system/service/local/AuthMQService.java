@@ -2,13 +2,12 @@ package com.lwohvye.modules.system.service.local;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
-import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.domain.Log;
 import com.lwohvye.modules.kafka.entity.DelayMessage;
-import com.lwohvye.modules.kafka.service.KafkaProducerService;
+import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.repository.LogRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +47,6 @@ public class AuthMQService {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private KafkaProducerService kafkaProducerService;
 
     @Autowired
     private RabbitMQProducerService rabbitMQProducerService;

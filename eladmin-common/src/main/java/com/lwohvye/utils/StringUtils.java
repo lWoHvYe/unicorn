@@ -82,7 +82,9 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      *
      * @return toCamelCase(" hello_world ") == "helloWorld"
      * toCapitalizeCamelCase("hello_world") == "HelloWorld"
+     * toCapitalizeCamelCase("helloWorld") == "HelloWorld"  首字母转大写
      * toUnderScoreCase("helloWorld") = "hello_world"
+     * toUnderScoreCase("HelloWorld") = "hello_world"  首字母转小写
      */
     public static String toCamelCase(String s) {
         if (s == null) {

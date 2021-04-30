@@ -1,4 +1,5 @@
 #配置数据源
+# todo 读写分离有了。下一步分库分表
 spring:
   shardingsphere:
     datasource:
