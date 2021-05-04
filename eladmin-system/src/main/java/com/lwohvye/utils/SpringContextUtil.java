@@ -1,5 +1,6 @@
 package com.lwohvye.utils;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -8,21 +9,24 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
- * @description 可用来获取IOC注册的Bean
  * @author Super Idol lv
+ * @description 可用来获取IOC注册的Bean
+ * 使用 Class.forName(String s)时，传的是类的全路径（包含包）
+ * 上面几种获取bean的。传的是bean的名称（首字母小写）
+ * 针对接口，需要获取相关的实现类，因为注解是在实现类上的
  * @date 2021-04-30
  */
 @Component
 public class SpringContextUtil implements ApplicationContextAware {
-    private static ApplicationContext applicationContext = null;
+//    Spring应用上下文环境
+    private static ApplicationContext applicationContext;
 
-    public SpringContextUtil() {
-    }
+//    public SpringContextUtil() {
+//    }
 
     public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-        if (applicationContext == null) {
+        if (ObjectUtil.isNull(applicationContext))
             applicationContext = arg0;
-        }
     }
 
     public static ApplicationContext getApplicationContext() {
@@ -30,9 +34,8 @@ public class SpringContextUtil implements ApplicationContextAware {
     }
 
     public static void setAppCtx(ApplicationContext webAppCtx) {
-        if (webAppCtx != null) {
+        if (ObjectUtil.isNotNull(webAppCtx))
             applicationContext = webAppCtx;
-        }
     }
 
     /**
@@ -42,7 +45,7 @@ public class SpringContextUtil implements ApplicationContextAware {
         return getApplicationContext().getBean(clazz);
     }
 
-    public static <T> T getBean(String name, Class<T> clazz) throws ClassNotFoundException {
+    public static <T> T getBean(String name, Class<T> clazz) {
         if (StrUtil.isBlank(name)) {
             return getApplicationContext().getBean(clazz);
         } else {
@@ -50,13 +53,13 @@ public class SpringContextUtil implements ApplicationContextAware {
         }
     }
 
-    public static final Object getBean(String beanName) {
+    public static Object getBean(String beanName) {
         return getApplicationContext().getBean(beanName);
     }
 
-    public static final Object getBean(String beanName, String className) throws ClassNotFoundException {
-        Class clz = Class.forName(className);
-        return getApplicationContext().getBean(beanName, clz.getClass());
+    public static Object getBean(String beanName, String className) throws ClassNotFoundException {
+        Class<?> clz = Class.forName(className);
+        return getApplicationContext().getBean(beanName, clz);
     }
 
     public static boolean containsBean(String name) {
