@@ -15,10 +15,13 @@
  */
 package com.lwohvye.config.kafka;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.listener.ConsumerAwareListenerErrorHandler;
 
+@Slf4j
 @Configuration
 public class KafkaInitialConfiguration {
     // 创建一个名为testtopic的Topic并设置分区数为8，分区副本数为2
@@ -32,5 +35,15 @@ public class KafkaInitialConfiguration {
     @Bean
     public NewTopic updateTopic() {
         return new NewTopic("testtopic", 10, (short) 2);
+    }
+
+    //-----------统一异常处理 ConsumerAwareListenerErrorHandler 异常处理器
+    // 新建一个异常处理器，用@Bean注入
+    @Bean
+    public ConsumerAwareListenerErrorHandler consumerAwareErrorHandler() {
+        return (message, exception, consumer) -> {
+            log.error("消费异常：" + message.getPayload());
+            return message.getPayload();
+        };
     }
 }

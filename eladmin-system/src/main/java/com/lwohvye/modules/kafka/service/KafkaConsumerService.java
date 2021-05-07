@@ -29,7 +29,6 @@ import org.springframework.kafka.annotation.PartitionOffset;
 import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.listener.ConsumerAwareListenerErrorHandler;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
@@ -46,7 +45,7 @@ import java.util.Map;
 @Component
 public class KafkaConsumerService {
     // 消费监听
-    @KafkaListener(topics = {"topic1"})
+    @KafkaListener(topics = {"topic2"})
     public void onMessage1(ConsumerRecord<?, ?> record) {
         // 消费的哪个topic、partition的消息,打印出消息内容
         log.info("简单消费：" + record.topic() + "-" + record.partition() + "-" + record.value());
@@ -86,13 +85,14 @@ public class KafkaConsumerService {
 
     //-----------统一异常处理 ConsumerAwareListenerErrorHandler 异常处理器
     // 新建一个异常处理器，用@Bean注入
-    @Bean
-    public ConsumerAwareListenerErrorHandler consumerAwareErrorHandler() {
-        return (message, exception, consumer) -> {
-            log.error("消费异常：" + message.getPayload());
-            return message.getPayload();
-        };
-    }
+//    移至其他类中
+//    @Bean
+//    public ConsumerAwareListenerErrorHandler consumerAwareErrorHandler() {
+//        return (message, exception, consumer) -> {
+//            log.error("消费异常：" + message.getPayload());
+//            return message.getPayload();
+//        };
+//    }
 
     //------消息过滤
     @Autowired
@@ -144,11 +144,11 @@ public class KafkaConsumerService {
     }
 
     /**
+     * @param cr
+     * @return java.lang.String
      * @description 如果需要延时，会发给另一个。然后阻塞到时间抵达，然后再发过来
      * @author Hongyan Wang
      * @date 2021/4/24 20:27
-     * @param cr
-     * @return java.lang.String
      */
     @KafkaListener(topics = "myJob")
     @SendTo("myJob-delay")
