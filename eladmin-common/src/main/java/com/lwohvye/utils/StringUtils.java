@@ -91,7 +91,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             return null;
         }
 
-        s = s.toLowerCase();
+//        先统一转了小写。如果传个驼峰的进来，就会把驼峰转成小写，所以移除掉
+//        s = s.toLowerCase();
 
         StringBuilder sb = new StringBuilder(s.length());
         boolean upperCase = false;
