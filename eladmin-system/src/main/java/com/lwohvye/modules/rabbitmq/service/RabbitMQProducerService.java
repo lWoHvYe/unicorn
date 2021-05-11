@@ -33,6 +33,10 @@ public class RabbitMQProducerService {
     /**
      * @param amqpMsgEntity
      * @description 发送延时消息
+     * 由于队列的先进先出特性，只有当过期的消息到了队列的顶端（队首），才会被真正的丢弃或者进入死信队列。
+     * 所以在考虑使用RabbitMQ来实现延迟任务队列的时候，需要确保业务上每个任务的延迟时间是一致的。
+     * 如果遇到不同的任务类型需要不同的延时的话，需要为每一种不同延迟时间的消息建立单独的消息队列。
+     *
      * @author Hongyan Wang
      * @date 2021/4/27 2:49 下午
      */
