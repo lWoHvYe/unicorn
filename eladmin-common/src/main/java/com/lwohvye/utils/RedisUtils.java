@@ -15,6 +15,8 @@
  */
 package com.lwohvye.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -24,6 +26,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -36,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings({"unchecked", "all"})
 public class RedisUtils {
     private static final Logger log = LoggerFactory.getLogger(RedisUtils.class);
-//    允许同一包下，及子类访问
+    //    允许同一包下，及子类访问
     protected RedisTemplate<Object, Object> redisTemplate;
     @Value("${jwt.online-key:online-token-}")
     private String onlineKey;
@@ -748,4 +752,74 @@ public class RedisUtils {
             }
         });
     }
+
+//  ---------------------------------------------Redis分布式锁。基于lua脚本-------------------------------------------------------------------
+
+    private static final Long SUCCESS = 1L;
+    //    加锁lua
+    private static String luaScript1 = "if redis.call(‘setNx‘,KEYS[1],ARGV[1])  then " +
+                                       "   if redis.call(‘get‘,KEYS[1])==ARGV[1] then " +
+                                       "      return redis.call(‘expire‘,KEYS[1],ARGV[2]) " +
+                                       "   else " +
+                                       "      return 0 " +
+                                       "   end " +
+                                       "end";
+    private RedisScript<String> lockRedisScript = new DefaultRedisScript<>(luaScript1, String.class);
+
+    //    解锁lua
+    private static String luaScript2 = "if redis.call(‘get‘, KEYS[1]) == ARGV[1] then" +
+                                       "   return redis.call(‘del‘, KEYS[1]) " +
+                                       "else " +
+                                       "   return 0 " +
+                                       "end";
+    private RedisScript<String> unLockRedisScript = new DefaultRedisScript<>(luaScript2, String.class);
+
+    /**
+     * 获取锁
+     *
+     * @param lockKey    redis的key
+     * @param value      redis的value要求是随机串，防止释放其他请求的锁
+     * @param expireTime redis的key 的过期时间  单位（秒) 防止死锁，导致其他请求无法正常执行业务（适当设置长一些，避免业务执行完之前过期）
+     * @return
+     */
+    public boolean lock(String lockKey, String value, long expireTime) {
+        if (ObjectUtil.isNull(expireTime))
+//            设置默认过期时间
+            expireTime = LOCK_EXPIRE;
+        if (StrUtil.isEmpty(lockKey))
+            throw new RuntimeException("分布式锁的key不可为空");
+//        添加默认前缀
+        lockKey = LOCK_PREFIX + lockKey;
+
+        Object result = redisTemplate.execute(lockRedisScript, Collections.singletonList(lockKey), value, String.valueOf(expireTime));
+        return SUCCESS.equals(result);
+
+    }
+
+    /**
+     * 释放锁
+     *
+     * @param lockKey redis的key
+     * @param value   redis的value  只有value比对一致，才能确定是本请求 加的锁 才能正常释放
+     * @return
+     */
+    public boolean unlock(String lockKey, String value) {
+
+        if (StrUtil.isEmpty(lockKey))
+            throw new RuntimeException("分布式锁的key不可为空");
+//        添加默认前缀
+        lockKey = LOCK_PREFIX + lockKey;
+
+        try {
+            Object result = redisTemplate.execute(unLockRedisScript, Collections.singletonList(lockKey), value);
+            if (SUCCESS.equals(result)) {
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("分布式锁解锁失败。原因：{}，key值：{}, value值：{}", e.getMessage(), lockKey, value);
+        }
+        return false;
+    }
+
+//    -------------------------------------------------------------------------------------------------------------------------------------
 }
