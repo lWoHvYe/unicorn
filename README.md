@@ -10,7 +10,7 @@
 
 ## 首先感谢eladmin的作者。
 
-#### 当基础服务使用时。要移除system模块当AppRun.java。并修改pom.xml中当内容。注释一部分，打jar包，而不是打web服务包。
+
 
 后台运行jar
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.9.jar >nohup.out 2>&1 &
@@ -85,10 +85,12 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
     - config 自定义权限实现、redis配置、swagger配置、Rsa配置等
     - exception 项目统一异常的处理
     - utils 系统通用工具类
-- eladmin-system 系统核心模块（系统启动入口）
+- eladmin-system 系统核心模块
 	- config 配置跨域与静态资源，与数据权限
 	    - thread 线程池相关
 	- modules 系统相关模块(登录授权、系统监控、定时任务、运维管理等)
+
+- eladmin-starter 系统启动入口。相关示例
 - eladmin-logging 系统日志模块
 - eladmin-tools 系统第三方工具模块
 - eladmin-generator 系统代码生成模块
