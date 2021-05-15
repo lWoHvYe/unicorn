@@ -230,6 +230,12 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(allEntries = true)
     public void updateEnabled(String username, Boolean enabled) {
         userRepository.updateEnabled(username, enabled);
+//        状态更新后，需清除相关信息
+        try {
+            onlineUserService.kickOutForUsername(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         flushCache(username);
     }
 
