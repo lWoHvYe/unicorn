@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.lwohvye</groupId>
@@ -23,7 +23,10 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.5</version>
+        <version>2.5.0</version>
+        <!--<relativePath/>设定一个空值将始终从仓库中获取，不从本地路径获取。
+        查找顺序：relativePath元素中的地址–本地仓库–远程仓库-->
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
@@ -160,6 +163,8 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <!--scope元素主要用来控制依赖的使用范围，指定当前包的依赖范围和依赖的传递性，也就是哪些依赖在哪些classpath中可用。
+            常见的可选值有：compile, provided, runtime, test, system等。-->
             <scope>runtime</scope>
         </dependency>
 
@@ -179,7 +184,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
+            <!--optional是Maven依赖jar时的一个选项，表示该依赖是可选的，项目之间依赖不传递。不设置optional（默认）或者optional是false，表示传递依赖。-->
             <optional>true</optional>
         </dependency>
 
