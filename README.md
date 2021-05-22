@@ -15,6 +15,13 @@
 后台运行jar
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.10.jar >nohup.out 2>&1 &
 
+```
+当前在Spring Boot 2.5版本存在报错：（使用Idea时正常，jar运行时报错）
+java.lang.IllegalStateException: No subdirectories found for mandatory directory location 'file:./config/*/'
+解决方式为添加启动参数    --spring.config.location=optional:classpath:/,optional:classpath:/config/,optional:file:./,optional:file:./config/
+参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
+```
+
 #### 项目简介
 一个基于 Spring Boot 2.4.2 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、Vue的前后端分离的后台管理系统
 
