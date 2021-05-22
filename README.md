@@ -13,7 +13,7 @@
 
 
 后台运行jar
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.9.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.10.jar >nohup.out 2>&1 &
 
 #### 项目简介
 一个基于 Spring Boot 2.4.2 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、Vue的前后端分离的后台管理系统
