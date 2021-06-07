@@ -77,8 +77,10 @@ public class DictServiceImpl implements DictService {
     public void update(Dict resources) {
         Dict dict = dictRepository.findById(resources.getId()).orElseGet(Dict::new);
         ValidationUtil.isNull(dict.getId(), "Dict", "id", resources.getId());
-        resources.setId(dict.getId());
-        dictRepository.save(resources);
+//        名称及描述允许置空
+        dict.setName(resources.getName());
+        dict.setDescription(resources.getDescription());
+        dictRepository.save(dict);
     }
 
     @Override
