@@ -352,3 +352,7 @@ file:
   # 文件大小 /M
   maxSize: 100
   avatarMaxSize: 5
+#  系统名称
+local:
+  sys:
+    name: X0X

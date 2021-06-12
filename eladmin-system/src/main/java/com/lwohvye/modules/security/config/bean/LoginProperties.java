@@ -78,7 +78,6 @@ public class LoginProperties {
         Captcha captcha;
         synchronized (this) {
             switch (loginCode.getCodeType()) {
-                // jdk15开始无法使用算术验证码
                 case arithmetic:
                     // 算术类型 https://gitee.com/whvse/EasyCaptcha
                     captcha = new FixedArithmeticCaptcha(loginCode.getWidth(), loginCode.getHeight());

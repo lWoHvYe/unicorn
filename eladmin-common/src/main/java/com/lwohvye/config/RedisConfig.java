@@ -15,6 +15,7 @@
  */
 package com.lwohvye.config;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.lwohvye.utils.serializer.FastJsonRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +113,7 @@ public class RedisConfig extends CachingConfigurerSupport {
             var sha256Hex = DigestUtils.sha256Hex(jsonString);
             var classSimpleName = targetClassClass.getSimpleName();
 //            使用类名 + 方法名 + 摘要 做key，便于识别
-            return classSimpleName + "::" + methodName + "::" + sha256Hex;
+            return LocalCoreConfig.SYS_NAME + classSimpleName + "::" + methodName + "::" + sha256Hex;
         };
     }
 

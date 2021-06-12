@@ -16,11 +16,12 @@
 package com.lwohvye.modules.security.security;
 
 import cn.hutool.core.util.StrUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
+import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
-import com.lwohvye.modules.security.service.OnlineUserService;
+import com.lwohvye.modules.security.utils.SecuritySysUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -71,7 +72,7 @@ public class TokenFilter extends GenericFilterBean {
             OnlineUserDto onlineUserDto = null;
             boolean cleanUserCache = false;
             try {
-                onlineUserDto = onlineUserService.getOne(properties.getOnlineKey() + token);
+                onlineUserDto = onlineUserService.getOne(SecuritySysUtil.getAuthToken(properties, token));
             } catch (ExpiredJwtException e) {
                 log.error(e.getMessage());
                 cleanUserCache = true;

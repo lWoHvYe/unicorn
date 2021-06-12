@@ -20,6 +20,7 @@ import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
+import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,7 @@ public class OnlineUserService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        authRedisUtils.set(properties.getOnlineKey() + token, onlineUserDto, properties.getTokenValidityInSeconds() / 1000);
+        authRedisUtils.set(SecuritySysUtil.getAuthToken(properties, token), onlineUserDto, properties.getTokenValidityInSeconds() / 1000);
     }
 
     /**
@@ -89,7 +90,7 @@ public class OnlineUserService {
      * @return /
      */
     public List<OnlineUserDto> getAll(String filter) {
-        List<String> keys = authSlaveRedisUtils.scan(properties.getOnlineKey() + "*");
+        List<String> keys = authSlaveRedisUtils.scan(SecuritySysUtil.getAuthToken(properties, "*"));
         Collections.reverse(keys);
         List<OnlineUserDto> onlineUserDtos = new ArrayList<>();
         for (String key : keys) {
@@ -112,7 +113,7 @@ public class OnlineUserService {
      * @param key /
      */
     public void kickOut(String key) {
-        key = properties.getOnlineKey() + key;
+        key = SecuritySysUtil.getAuthToken(properties, key);
         authRedisUtils.del(key);
     }
 
@@ -122,7 +123,7 @@ public class OnlineUserService {
      * @param token /
      */
     public void logout(String token) {
-        String key = properties.getOnlineKey() + token;
+        String key = SecuritySysUtil.getAuthToken(properties, token);
         authRedisUtils.del(key);
     }
 

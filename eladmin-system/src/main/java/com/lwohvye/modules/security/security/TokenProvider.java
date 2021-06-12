@@ -19,6 +19,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.config.redis.AuthRedisUtils;
+import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -102,14 +103,14 @@ public class TokenProvider implements InitializingBean {
      */
     public void checkRenewal(String token) {
         // 判断是否续期token,计算token的过期时间
-        long time = authRedisUtils.getExpire(properties.getOnlineKey() + token) * 1000;
+        long time = authRedisUtils.getExpire(SecuritySysUtil.getAuthToken(properties, token)) * 1000;
         Date expireDate = DateUtil.offset(new Date(), DateField.MILLISECOND, (int) time);
         // 判断当前时间与过期时间的时间差
         long differ = expireDate.getTime() - System.currentTimeMillis();
         // 如果在续期检查的范围内，则续期
         if (differ <= properties.getDetect()) {
             long renew = time + properties.getRenew();
-            authRedisUtils.expire(properties.getOnlineKey() + token, renew, TimeUnit.MILLISECONDS);
+            authRedisUtils.expire(SecuritySysUtil.getAuthToken(properties, token), renew, TimeUnit.MILLISECONDS);
         }
     }
 
