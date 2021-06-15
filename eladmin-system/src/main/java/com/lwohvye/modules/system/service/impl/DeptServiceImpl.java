@@ -259,13 +259,12 @@ public class DeptServiceImpl implements DeptService {
 
     @Override
     public void verification(Set<DeptDto> deptDtos) {
-        Set<Long> deptIds = deptDtos.stream().map(DeptDto::getId).collect(Collectors.toSet());
-        if (userRepository.countByDepts(deptIds) > 0) {
+//        dto 2 entity
+        var deptList = deptMapper.toEntity(new ArrayList<>(deptDtos));
+        if (userRepository.existsByDeptIn(deptList))
             throw new BadRequestException("所选部门存在用户关联，请解除后再试！");
-        }
-        if (roleRepository.countByDepts(deptIds) > 0) {
+        if (roleRepository.existsByDeptsIn(deptList))
             throw new BadRequestException("所选部门存在角色关联，请解除后再试！");
-        }
     }
 
     private void updateSubCnt(Long deptId) {

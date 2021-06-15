@@ -15,12 +15,16 @@
  */
 package com.lwohvye.modules.system.repository;
 
+import com.lwohvye.modules.system.domain.Dept;
+import com.lwohvye.modules.system.domain.Job;
+import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -126,6 +130,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query(value = "SELECT count(1) FROM sys_user u, sys_users_jobs j WHERE u.user_id = j.user_id AND j.job_id IN ?1", nativeQuery = true)
     int countByJobs(Set<Long> ids);
 
+    Boolean existsByJobsIn(Collection<Job> jobs);
+
     /**
      * 根据部门查询
      *
@@ -136,6 +142,19 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     int countByDepts(Set<Long> deptIds);
 
     /**
+     * @description 优化：使用exists判断是否存在
+     * @author Hongyan Wang
+     * @date 2021/6/15 1:27 下午
+     * @param deptIds
+     * @return java.lang.Boolean
+     */
+    // 这种有连接查询。但除了id还支持别的 select user0_.user_id as col_0_0_ from sys_user user0_ left outer join sys_dept dept1_ on user0_.dept_id=dept1_.dept_id where dept1_.dept_id in (17 , 2) limit 1
+    Boolean existsByDept_IdIn(Collection<Long> deptIds);
+
+    // 这种无连接查询。但只支持id      select user0_.user_id as col_0_0_ from sys_user user0_ where user0_.dept_id in (2 , 17) limit 1
+    Boolean existsByDeptIn(Collection<Dept> depts);
+
+    /**
      * 根据角色查询
      *
      * @param ids /
@@ -144,5 +163,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query(value = "SELECT count(1) FROM sys_user u, sys_users_roles r WHERE " +
                    "u.user_id = r.user_id AND r.role_id in ?1", nativeQuery = true)
     int countByRoles(Set<Long> ids);
+
+    Boolean existsByRolesIn(Collection<Role> roles);
 
 }

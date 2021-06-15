@@ -15,12 +15,14 @@
  */
 package com.lwohvye.modules.system.repository;
 
+import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -68,6 +70,18 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
     @Query(value = "select count(1) from sys_role r, sys_roles_depts d where " +
             "r.role_id = d.role_id and d.dept_id in ?1",nativeQuery = true)
     int countByDepts(Set<Long> deptIds);
+
+    /**
+     * @description 这里会多连一张表。虽然也只是通过dept.id筛选。这里主要验证in一个entity类型的变量
+     * @author Hongyan Wang
+     * @date 2021/6/15 2:14 下午
+     * @param depts
+     * @return java.lang.Boolean
+     */
+//    select role0_.role_id as col_0_0_ from sys_role role0_ left outer join sys_roles_depts depts1_
+//    on role0_.role_id=depts1_.role_id left outer join sys_dept dept2_ on depts1_.dept_id=dept2_.dept_id
+//    where dept2_.dept_id in (5) limit 1
+    Boolean existsByDeptsIn(Collection<Dept> depts);
 
     /**
      * 根据菜单Id查询
