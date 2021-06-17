@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
@@ -27,7 +28,7 @@ import java.util.Set;
 * @author Zheng Jie
 * @date 2019-03-25
 */
-public interface DeptService {
+public interface DeptService extends BaseService {
 
     /**
      * 查询所有数据

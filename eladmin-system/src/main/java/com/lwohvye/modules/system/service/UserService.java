@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.modules.system.domain.User;
@@ -30,7 +31,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-11-23
  */
-public interface UserService {
+public interface UserService extends BaseService {
 
     /**
      * 根据ID查询

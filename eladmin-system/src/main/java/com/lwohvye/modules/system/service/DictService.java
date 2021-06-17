@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.DictDto;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
 import com.lwohvye.modules.system.domain.Dict;
@@ -29,7 +30,7 @@ import java.util.Set;
 * @author Zheng Jie
 * @date 2019-04-10
 */
-public interface DictService {
+public interface DictService extends BaseService {
 
     /**
      * 分页查询

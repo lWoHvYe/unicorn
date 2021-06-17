@@ -14,4 +14,8 @@ public class LocalCoreConfig {
     public void setSysName(String sysName) {
         SYS_NAME = StrUtil.isNotEmpty(sysName) ? "[-" + sysName + "-]::" : "";
     }
+
+    public static String getSysName() {
+        return SYS_NAME;
+    }
 }

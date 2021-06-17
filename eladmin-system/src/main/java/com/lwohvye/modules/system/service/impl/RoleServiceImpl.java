@@ -66,7 +66,7 @@ public class RoleServiceImpl implements RoleService {
     private final UserCacheClean userCacheClean;
 
     @Override
-    @Cacheable(key = "'all-roles'")
+    @Cacheable(key = " #root.target.getSysName() + 'all-roles'")
     @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
@@ -89,7 +89,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = "'id:' + #p0")
+    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     public RoleDto findById(long id) {
         Role role = roleRepository.findById(id).orElseGet(Role::new);
         ValidationUtil.isNull(role.getId(), "Role", "id", id);
@@ -181,7 +181,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = "'auth:' + #p0.id")
+    @Cacheable(key = " #root.target.getSysName() + 'auth:' + #p0.id")
     public List<GrantedAuthority> mapToGrantedAuthorities(UserDto user) {
         Set<String> permissions = new HashSet<>();
         // 如果是管理员直接返回

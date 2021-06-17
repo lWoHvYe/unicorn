@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.JobDto;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.modules.system.domain.Job;
@@ -29,7 +30,7 @@ import java.util.Set;
 * @author Zheng Jie
 * @date 2019-03-29
 */
-public interface JobService {
+public interface JobService extends BaseService {
 
     /**
      * 根据ID查询

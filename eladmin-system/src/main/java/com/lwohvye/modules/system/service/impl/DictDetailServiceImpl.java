@@ -78,7 +78,7 @@ public class DictDetailServiceImpl implements DictDetailService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = "'name:' + #p0")
+    @Cacheable(key = " #root.target.getSysName() + 'name:' + #p0")
     public List<DictDetailDto> getDictByName(String name) {
         return dictDetailMapper.toDto(dictDetailRepository.findByDictName(name));
     }

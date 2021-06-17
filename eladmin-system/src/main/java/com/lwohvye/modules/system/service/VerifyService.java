@@ -15,13 +15,14 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.domain.vo.EmailVo;
 
 /**
  * @author Zheng Jie
  * @date 2018-12-26
  */
-public interface VerifyService {
+public interface VerifyService extends BaseService {
 
     /**
      * 发送验证码

@@ -98,7 +98,7 @@ public class DeptServiceImpl implements DeptService {
     }
 
     @Override
-    @Cacheable(key = "'id:' + #p0")
+    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public DeptDto findById(Long id) {
         Dept dept = deptRepository.findById(id).orElseGet(Dept::new);

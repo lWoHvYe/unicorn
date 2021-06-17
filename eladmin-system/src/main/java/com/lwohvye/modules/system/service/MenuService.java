@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.MenuDto;
 import com.lwohvye.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.modules.system.domain.Menu;
@@ -28,7 +29,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-12-17
  */
-public interface MenuService {
+public interface MenuService extends BaseService {
 
     /**
      * 查询全部数据

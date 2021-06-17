@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(key = "'id:' + #p0")
+    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public UserDto findById(long id) {
         User user = userRepository.findById(id).orElseGet(User::new);

@@ -87,7 +87,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = "'id:' + #p0")
+    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     public MenuDto findById(long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
@@ -102,7 +102,7 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = "'user:' + #p0")
+    @Cacheable(key = " #root.target.getSysName() + 'user:' + #p0")
     public List<MenuDto> findByUser(Long currentUserId) {
         List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());

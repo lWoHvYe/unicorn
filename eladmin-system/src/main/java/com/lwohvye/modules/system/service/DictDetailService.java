@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.modules.system.domain.DictDetail;
@@ -26,7 +27,7 @@ import java.util.Map;
 * @author Zheng Jie
 * @date 2019-04-10
 */
-public interface DictDetailService {
+public interface DictDetailService extends BaseService {
 
     /**
      * 创建

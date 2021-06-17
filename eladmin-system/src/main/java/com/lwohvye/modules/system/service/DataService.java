@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.UserDto;
 
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
  * @author Zheng Jie
  * @date 2020-05-07
  */
-public interface DataService {
+public interface DataService extends BaseService {
 
     /**
      * 获取数据权限

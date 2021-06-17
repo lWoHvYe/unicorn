@@ -15,13 +15,15 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
+
 import java.util.Map;
 
 /**
  * @author Zheng Jie
  * @date 2020-05-02
  */
-public interface MonitorService {
+public interface MonitorService extends BaseService {
 
     /**
     * 查询数据分页

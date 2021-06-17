@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service;
 
+import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
@@ -31,7 +32,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-12-03
  */
-public interface RoleService {
+public interface RoleService extends BaseService {
 
     /**
      * 查询全部数据
