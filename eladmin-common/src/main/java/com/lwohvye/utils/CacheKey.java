@@ -15,6 +15,8 @@
  */
 package com.lwohvye.utils;
 
+import com.lwohvye.config.LocalCoreConfig;
+
 /**
  * @author: liaojinlong
  * @date: 2020/6/11 15:49
@@ -25,34 +27,34 @@ public interface CacheKey {
     /**
      * 用户
      */
-    String USER_ID = "user::id:";
+    String USER_ID = "user::" + LocalCoreConfig.SYS_NAME + "id:";
     /**
      * 数据
      */
-    String DATA_USER = "data::user:";
+    String DATA_USER = "data::" + LocalCoreConfig.SYS_NAME + "user:";
     /**
      * 菜单
      */
-    String MENU_ID = "menu::id:";
-    String MENU_USER = "menu::user:";
+    String MENU_ID = "menu::" + LocalCoreConfig.SYS_NAME + "id:";
+    String MENU_USER = "menu::" + LocalCoreConfig.SYS_NAME + "user:";
     /**
      * 角色授权
      */
-    String ROLE_AUTH = "role::auth:";
+    String ROLE_AUTH = "role::" + LocalCoreConfig.SYS_NAME + "auth:";
     /**
      * 角色信息
      */
-    String ROLE_ID = "role::id:";
+    String ROLE_ID = "role::" + LocalCoreConfig.SYS_NAME + "id:";
     /**
      * 部门
      */
-    String DEPT_ID = "dept::id:";
+    String DEPT_ID = "dept::" + LocalCoreConfig.SYS_NAME + "id:";
     /**
      * 岗位
      */
-    String JOB_ID = "job::id:";
+    String JOB_ID = "job::" + LocalCoreConfig.SYS_NAME + "id:";
     /**
      * 数据字典
      */
-    String DICT_NAME = "dict::name:";
+    String DICT_NAME = "dict::" + LocalCoreConfig.SYS_NAME + "name:";
 }
