@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * @description AuthenticationEntryPoint 用来解决匿名（未登陆）用户访问无权限资源时的异常
  * @author Zheng Jie
  */
 @Component
@@ -34,6 +35,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
         // 当用户尝试访问安全的REST资源而不提供任何凭据时，将调用此方法发送401 响应
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException==null?"Unauthorized":authException.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException == null ? "Unauthorized" : authException.getMessage());
     }
 }
