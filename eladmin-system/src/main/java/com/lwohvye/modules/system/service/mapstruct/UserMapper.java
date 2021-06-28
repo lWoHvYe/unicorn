@@ -32,6 +32,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", uses = {RoleMapper.class, DeptMapper.class, JobMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 //@Mapper(componentModel = "spring", uses = {RoleMapper.class, DeptMapper.class, JobMapper.class, TimestampMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 //若不移除ConvertBlob2StringUtil.class的使用，所以String2String的转换都会走这个方法了。所以还是要配置重新toDto来限制使用范围
+//使用uses指定的转换规则，会自动使用，mapstruct会根据入和出自动使用转换规则，但使用maven的compile会报错，也就是说自动编译可以，但使用maven不行，原因未知
 //@Mapper(componentModel = "spring", uses = {ConvertBlob2StringUtil.class, RoleMapper.class, DeptMapper.class, JobMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper extends BaseMapper<UserDto, User> {
 //    @Override

@@ -15,6 +15,12 @@
  */
 package com.lwohvye.base;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.List;
 
 /**
@@ -25,6 +31,7 @@ public interface BaseMapper<D, E> {
 
     /**
      * DTO转Entity
+     *
      * @param dto /
      * @return /
      */
@@ -32,6 +39,7 @@ public interface BaseMapper<D, E> {
 
     /**
      * Entity转DTO
+     *
      * @param entity /
      * @return /
      */
@@ -39,15 +47,30 @@ public interface BaseMapper<D, E> {
 
     /**
      * DTO集合转Entity集合
+     *
      * @param dtoList /
      * @return /
      */
-    List <E> toEntity(List<D> dtoList);
+    List<E> toEntity(List<D> dtoList);
 
     /**
      * Entity集合转DTO集合
+     *
      * @param entityList /
      * @return /
      */
-    List <D> toDto(List<E> entityList);
+    List<D> toDto(List<E> entityList);
+
+    //    通用的JSONObject/JSONArray与String互转的方法。当入是A出是B时，会自动调用相关的规则，这里配置会作为默认的转换规则。欲使用其他的，可使用@Mapping(target="",expression="java(method...)")
+    default JSONObject convertString2JSONObject(String in) {
+        return StrUtil.isNotBlank(in) ? JSONObject.parseObject(in) : new JSONObject();
+    }
+
+    default JSONArray convertString2JSONArray(String in) {
+        return StrUtil.isNotBlank(in) ? JSONArray.parseArray(in) : new JSONArray();
+    }
+
+    default String convertJSON2String(JSON in) {
+        return ObjectUtil.isNotNull(in) ? in.toJSONString() : "";
+    }
 }
