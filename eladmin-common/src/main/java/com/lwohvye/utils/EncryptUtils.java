@@ -30,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 
 public class EncryptUtils {
 
-    private static final String STR_PARAM = "Passw0rd";
+    private static final String STR_PARAM = "Passw0rd-lWoHvYe";
 
     private static Cipher cipher;
 
@@ -41,8 +41,7 @@ public class EncryptUtils {
             return null;
         }
         cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
-        String strKey = "Passw0rd";
-        return new DESKeySpec(strKey.getBytes(StandardCharsets.UTF_8));
+        return new DESKeySpec(STR_PARAM.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -53,8 +52,7 @@ public class EncryptUtils {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
         SecretKey secretKey = keyFactory.generateSecret(desKeySpec);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, IV);
-        return byte2hex(
-                cipher.doFinal(source.getBytes(StandardCharsets.UTF_8))).toUpperCase();
+        return byte2hex(cipher.doFinal(source.getBytes(StandardCharsets.UTF_8))).toUpperCase();
     }
 
     /**
