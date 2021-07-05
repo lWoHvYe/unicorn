@@ -9,6 +9,31 @@
     <packaging>pom</packaging>
     <version>2.6.10</version>
 
+    <name>EL-ADMIN 管理系统</name>
+    <url>https://github.com/lWoHvYe/eladmin</url>
+    <description>A Spring Boot Project With Jpa JWT Security and so on</description>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>lWoHvYe</name>
+            <email>lWoHvYe@outlook.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/lWoHvYe/eladmin.git</connection>
+        <developerConnection>scm:git:ssh://github.com/lWoHvYe/eladmin.git</developerConnection>
+        <url>https://github.com/lWoHvYe/eladmin/tree/main</url>
+        <tag>eladmin-v2.6.10</tag>
+    </scm>
+
     <modules>
         <module>eladmin-common</module>
         <module>eladmin-logging</module>
@@ -16,9 +41,6 @@
         <module>eladmin-tools</module>
         <module>eladmin-generator</module>
     </modules>
-
-    <name>EL-ADMIN 后台管理</name>
-    <url>http://auauz.net</url>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -45,6 +67,9 @@
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <!--logstash要用5系列版本。6系列整合方式暂未知-->
         <logstash.version>5.3</logstash.version>
+        <argLine>
+            -Dfile.encoding=UTF-8
+        </argLine>
     </properties>
 
     <dependencies>
@@ -68,6 +93,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>wildfly-common</artifactId>
+                    <groupId>org.wildfly.common</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!--Spring boot 测试-->
@@ -143,6 +174,20 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
             <version>${swagger.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mapstruct</artifactId>
+                    <groupId>org.mapstruct</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>swagger-annotations</artifactId>
+                    <groupId>io.swagger</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>swagger-models</artifactId>
+                    <groupId>io.swagger</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
@@ -158,6 +203,12 @@
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
             <version>3.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>javassist</artifactId>
+                    <groupId>org.javassist</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--Mysql依赖包-->
         <dependency>
@@ -242,6 +293,12 @@
             <groupId>nl.basjes.parse.useragent</groupId>
             <artifactId>yauaa</artifactId>
             <version>5.23</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-collections4</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- logstash -->
         <dependency>
@@ -325,6 +382,71 @@
                     <!--<proc>none</proc>-->
                 </configuration>
             </plugin>
+            <!--自动发布插件-->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <!-- java8版本导致javadoc打包编译失败时候,maven-javadoc-plugin大于3.0.0添加-->
+                        <configuration>
+                            <doclint>none</doclint>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
         </plugins>
         <!--todo 针对异常
         java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.lang.String java.lang.NamedPackage.name accessible: module java.base does not "opens java.lang" to unnamed module @7bfcd12c
@@ -364,10 +486,18 @@
         </pluginRepository>
     </pluginRepositories>
     <distributionManagement>
+        <!--        <repository>-->
+        <!--            <id>github</id>-->
+        <!--            <name>GitHub OWNER Apache Maven Packages</name>-->
+        <!--            <url>https://maven.pkg.github.com/lWoHvYe/eladmin</url>-->
+        <!--        </repository>-->
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
         <repository>
-            <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/lWoHvYe/eladmin</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 </project>
