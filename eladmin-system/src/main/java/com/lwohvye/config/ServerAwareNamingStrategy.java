@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2020-2022 lWoHvYe
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package com.lwohvye.config;
 
 import cn.hutool.core.util.ObjectUtil;
@@ -34,18 +49,18 @@ public class ServerAwareNamingStrategy extends SpringPhysicalNamingStrategy impl
     }
 
     /**
+     * @param name
+     * @param jdbcEnvironment
+     * @return org.hibernate.boot.model.naming.Identifier
      * @description 使用映射表名后，需注意。尽量不要用原生sql,要用hql替代
      * 除了@Table注解。@JoinTable注解也试用
      * @author Hongyan Wang
      * @date 2021/4/23 11:06 上午
-     * @param name
-     * @param jdbcEnvironment
-     * @return org.hibernate.boot.model.naming.Identifier
      */
     @Override
     public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment jdbcEnvironment) {
         String nameStr = name.getText();
-//        格式 #{xxx:x}  获取xxx的值，若获取不到使用x的值
+//        格式 #{xxx:y}  获取xxx的值，若获取不到使用y的值
         var prefix = ParserContext.TEMPLATE_EXPRESSION.getExpressionPrefix();
         var suffix = ParserContext.TEMPLATE_EXPRESSION.getExpressionSuffix();
         if (StrUtil.isNotBlank(nameStr) && nameStr.startsWith(prefix) && nameStr.endsWith(suffix)) {

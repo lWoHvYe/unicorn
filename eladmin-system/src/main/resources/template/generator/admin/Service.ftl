@@ -1,5 +1,5 @@
 /*
-*  Copyright 2019-2020 Zheng Jie
+*  Copyright 2019-2022 lWoHvYe
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package ${package}.service;
 
 import ${package}.domain.${className};
+import com.lwohvye.base.BaseService;
 import ${package}.service.dto.${className}Dto;
 import ${package}.service.dto.${className}QueryCriteria;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 * @author ${author}
 * @date ${date}
 **/
-public interface ${className}Service {
+public interface ${className}Service extends BaseService {
 
     /**
     * 查询数据分页

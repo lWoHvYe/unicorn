@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2020-2022 lWoHvYe
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package com.lwohvye.modules.rabbitmq.service;
 
 import cn.hutool.core.util.ObjectUtil;
@@ -37,7 +52,6 @@ public class RabbitMQProducerService {
      * 所以在考虑使用RabbitMQ来实现延迟任务队列的时候，需要确保业务上每个任务的延迟时间是一致的。
      * 如果遇到不同的任务类型需要不同的延时的话，需要为每一种不同延迟时间的消息建立单独的消息队列。
      * 解决方式是使用延迟插件。可根据需要调整
-     *
      * @author Hongyan Wang
      * @date 2021/4/27 2:49 下午
      */
