@@ -72,7 +72,10 @@ public class QueryHelp {
             var fields = getAllFields(query.getClass(), new ArrayList<>());
             for (var field : fields) {
 //                field.canAccess()
-                boolean accessible = field.isAccessible();
+                var accessible = field.canAccess(null);
+//                boolean accessible = field.isAccessible();
+                if (ObjectUtil.notEqual(accessible, field.isAccessible()))
+                    throw new RuntimeException("编码有误" + field.toString() + accessible);
                 // 设置对象的访问权限，保证对private的属性的访
                 field.setAccessible(true);
                 Query q = field.getAnnotation(Query.class);

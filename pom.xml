@@ -93,12 +93,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-undertow</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>wildfly-common</artifactId>
-                    <groupId>org.wildfly.common</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!--Spring boot 测试-->
@@ -130,7 +124,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-            <version>${commons-pool2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -243,12 +236,12 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>3.17</version>
+            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.17</version>
+            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
@@ -292,7 +285,7 @@
         <dependency>
             <groupId>nl.basjes.parse.useragent</groupId>
             <artifactId>yauaa</artifactId>
-            <version>5.23</version>
+            <version>6.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-collections4</artifactId>
