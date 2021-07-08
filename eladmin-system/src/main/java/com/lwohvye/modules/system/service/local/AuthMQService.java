@@ -84,6 +84,7 @@ public class AuthMQService {
                 var byKey = authSlaveRedisUtils.hget(authFailedKey, countKey);
                 var failCount = ObjectUtil.isNotEmpty(byKey) ? (Integer) byKey : 0;
                 log.info("fail-count" + failCount);
+                // TODO: 2021/7/5 需要加锁。但消息是顺序消费的，也许不加也行
                 if (failCount < 5) {
                     failCount += 1;
                     if (ObjectUtil.equal(failCount, 1)) {

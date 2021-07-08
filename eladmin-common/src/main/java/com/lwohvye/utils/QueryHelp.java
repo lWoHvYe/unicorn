@@ -71,8 +71,8 @@ public class QueryHelp {
         try {
             var fields = getAllFields(query.getClass(), new ArrayList<>());
             for (var field : fields) {
-//                field.canAccess()
-                var accessible = field.canAccess(null);
+//                field.canAccess(filed对应的查询器实例)
+                var accessible = field.canAccess(query);
 //                boolean accessible = field.isAccessible();
                 if (ObjectUtil.notEqual(accessible, field.isAccessible()))
                     throw new RuntimeException("编码有误" + field.toString() + accessible);

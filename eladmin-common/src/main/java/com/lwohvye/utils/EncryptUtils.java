@@ -30,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 
 public class EncryptUtils {
 
-    private static final String STR_PARAM = "Passw0rd-lWoHvYe";
+    private static final String STR_PARAM = "P244w0rd";
 
     private static Cipher cipher;
 
