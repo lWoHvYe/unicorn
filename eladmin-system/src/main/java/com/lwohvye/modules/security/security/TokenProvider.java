@@ -108,7 +108,7 @@ public class TokenProvider implements InitializingBean {
         // 判断当前时间与过期时间的时间差
 //        long differ = expireDate.getTime() - System.currentTimeMillis();
         // 如果在续期检查的范围内，则续期
-        // TODO: 2021/6/30 time和differ理论上是一样的。可略去部分逻辑
+        // 2021/6/30 time和differ理论上是一样的。可略去部分逻辑
 //        if (differ <= properties.getDetect()) {
         if (expireTime <= properties.getDetect()) {
             long renew = expireTime + properties.getRenew();

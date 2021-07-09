@@ -7,7 +7,7 @@
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
     <packaging>pom</packaging>
-    <version>2.6.10</version>
+    <version>2.6.11</version>
 
     <name>EL-ADMIN 管理系统</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
@@ -31,7 +31,7 @@
         <connection>scm:git:git://github.com/lWoHvYe/eladmin.git</connection>
         <developerConnection>scm:git:ssh://github.com/lWoHvYe/eladmin.git</developerConnection>
         <url>https://github.com/lWoHvYe/eladmin/tree/main</url>
-        <tag>eladmin-v2.6.10</tag>
+        <tag>eladmin-v2.6.11</tag>
     </scm>
 
     <modules>
@@ -58,9 +58,9 @@
         <java.version>16</java.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <swagger.version>3.0.0</swagger.version>
-        <fastjson.version>1.2.75</fastjson.version>
-        <druid.version>1.2.5</druid.version>
-        <hutool.version>5.6.5</hutool.version>
+        <fastjson.version>1.2.76</fastjson.version>
+        <druid.version>1.2.6</druid.version>
+        <hutool.version>5.7.3</hutool.version>
         <lombok.version>1.18.20</lombok.version>
         <commons-pool2.version>2.9.0</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
@@ -195,7 +195,7 @@
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <exclusions>
                 <exclusion>
                     <artifactId>javassist</artifactId>

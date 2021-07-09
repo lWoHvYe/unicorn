@@ -13,13 +13,13 @@
 
 
 后台运行jar
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.10.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.11.jar >nohup.out 2>&1 &
 
 若外置依赖启动参数需添加。外置依赖可以大大减少jar包的体积。方便后续更新部署
 ```shell
 -Dloader.path=lib 
 #启动示例
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.10.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.11.jar >nohup.out 2>&1 &
 ```
 | key                | 目的                                                         |
 | ------------------ | ------------------------------------------------------------ |

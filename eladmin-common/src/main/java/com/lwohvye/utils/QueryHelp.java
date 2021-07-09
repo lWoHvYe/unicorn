@@ -74,6 +74,7 @@ public class QueryHelp {
 //                field.canAccess(filed对应的查询器实例)
                 var accessible = field.canAccess(query);
 //                boolean accessible = field.isAccessible();
+                // TODO: 2021/7/9 下面这两行，确认无误后，记得移除
                 if (ObjectUtil.notEqual(accessible, field.isAccessible()))
                     throw new RuntimeException("编码有误" + field.toString() + accessible);
                 // 设置对象的访问权限，保证对private的属性的访

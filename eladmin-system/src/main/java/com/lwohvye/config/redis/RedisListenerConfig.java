@@ -28,7 +28,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @Configuration
 public class RedisListenerConfig {
 
-    // TODO: 2021/6/4 待验证。多redis场景
+    // 2021/6/4 待验证。多redis场景： 大致无问题
 
     /**
      * @param connectionFactory
