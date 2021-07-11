@@ -15,8 +15,6 @@
  */
 package com.lwohvye.modules.security.security;
 
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.modules.security.utils.SecuritySysUtil;
@@ -26,7 +24,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
-import com.lwohvye.utils.RedisUtils;
+import com.lwohvye.utils.redis.RedisUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

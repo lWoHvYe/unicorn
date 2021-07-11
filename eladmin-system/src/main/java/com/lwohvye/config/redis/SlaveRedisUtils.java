@@ -15,7 +15,7 @@
  */
 package com.lwohvye.config.redis;
 
-import com.lwohvye.utils.RedisUtils;
+import com.lwohvye.utils.redis.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;

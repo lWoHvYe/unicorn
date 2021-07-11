@@ -59,8 +59,9 @@
         <log4jdbc.version>1.16</log4jdbc.version>
         <swagger.version>3.0.0</swagger.version>
         <fastjson.version>1.2.76</fastjson.version>
-        <druid.version>1.2.6</druid.version>
+        <druid.version>1.2.5</druid.version>
         <hutool.version>5.7.3</hutool.version>
+        <fastutil.version>8.5.4</fastutil.version>
         <lombok.version>1.18.20</lombok.version>
         <commons-pool2.version>2.9.0</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->

@@ -32,6 +32,7 @@ import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.modules.system.service.mapstruct.RoleMapper;
 import com.lwohvye.modules.system.service.mapstruct.RoleSmallMapper;
 import com.lwohvye.utils.*;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;

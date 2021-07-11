@@ -32,7 +32,7 @@ import com.lwohvye.modules.security.security.TokenProvider;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.dto.AuthUserDto;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.utils.RedisUtils;
+import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.StringUtils;

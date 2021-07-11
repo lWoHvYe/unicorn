@@ -33,6 +33,7 @@ import com.lwohvye.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.mapstruct.MenuMapper;
 import com.lwohvye.utils.*;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;

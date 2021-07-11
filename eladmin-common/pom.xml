@@ -23,5 +23,12 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
+        <!--     基础类型集合，主要用于支持long类型key    -->
+        <!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil -->
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>${fastutil.version}</version>
+        </dependency>
     </dependencies>
 </project>

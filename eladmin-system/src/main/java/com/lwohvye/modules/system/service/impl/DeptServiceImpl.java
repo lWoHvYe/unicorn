@@ -30,6 +30,7 @@ import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.DeptMapper;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.enums.DataScopeEnum;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;

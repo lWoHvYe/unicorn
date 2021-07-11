@@ -28,7 +28,7 @@ import com.lwohvye.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.quartz.repository.QuartzLogRepository;
 import com.lwohvye.modules.quartz.service.QuartzJobService;
 import com.lwohvye.service.EmailService;
-import com.lwohvye.utils.RedisUtils;
+import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.ThrowableUtil;
