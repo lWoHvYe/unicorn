@@ -156,7 +156,7 @@ public class QuartzJobServiceImpl implements QuartzJobService {
                 result = (Boolean) redisUtils.get(uuid);
             }
             if (!result) {
-                redisUtils.del(uuid);
+                redisUtils.delete(uuid);
                 break;
             }
         }

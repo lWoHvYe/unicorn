@@ -75,7 +75,7 @@ public class VerifyServiceImpl implements VerifyService {
         if(value == null || !value.toString().equals(code)){
             throw new BadRequestException("无效验证码");
         } else {
-            redisUtils.del(key);
+            redisUtils.delete(key);
         }
     }
 }

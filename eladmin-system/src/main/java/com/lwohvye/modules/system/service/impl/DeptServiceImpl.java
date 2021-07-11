@@ -300,7 +300,7 @@ public class DeptServiceImpl implements DeptService {
     public void delCaches(Long id) {
         List<User> users = userRepository.findByRoleDeptId(id);
         // 删除数据权限
-        redisUtils.delByKeys(CacheKey.DATA_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
-        redisUtils.del(CacheKey.DEPT_ID + id);
+        redisUtils.delByKeys4Business(CacheKey.DATA_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
+        redisUtils.delete(CacheKey.DEPT_ID + id);
     }
 }

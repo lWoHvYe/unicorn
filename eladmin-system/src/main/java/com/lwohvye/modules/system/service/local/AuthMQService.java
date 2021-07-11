@@ -81,7 +81,7 @@ public class AuthMQService {
                 //          使用 用户名 + ip 作为key
                 String authFailedKey = username + "||authFailed||" + ip;
                 var countKey = "failed-count";
-                var byKey = authSlaveRedisUtils.hget(authFailedKey, countKey);
+                var byKey = authSlaveRedisUtils.hGet(authFailedKey, countKey);
                 var failCount = ObjectUtil.isNotEmpty(byKey) ? (Integer) byKey : 0;
                 log.info("fail-count" + failCount);
                 // TODO: 2021/7/5 需要加锁。但消息是顺序消费的，也许不加也行
@@ -89,10 +89,10 @@ public class AuthMQService {
                     failCount += 1;
                     if (ObjectUtil.equal(failCount, 1)) {
 //                        新建时设置过期时间5分钟
-                        authRedisUtils.hset(authFailedKey, countKey, failCount, 5 * 60L);
+                        authRedisUtils.hPut(authFailedKey, countKey, failCount, 5 * 60L);
                     } else {
 //                        更新时只更新值。过期时间不做改动
-                        authRedisUtils.hset(authFailedKey, countKey, failCount);
+                        authRedisUtils.hPut(authFailedKey, countKey, failCount);
                     }
                 } else {
 //                  修改状态为锁定

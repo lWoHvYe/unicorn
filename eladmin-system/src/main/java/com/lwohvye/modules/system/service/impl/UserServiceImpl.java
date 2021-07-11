@@ -129,9 +129,9 @@ public class UserServiceImpl implements UserService {
         }
         // 如果用户的角色改变
         if (!resources.getRoles().equals(user.getRoles())) {
-            redisUtils.del(CacheKey.DATA_USER + resources.getId());
-            redisUtils.del(CacheKey.MENU_USER + resources.getId());
-            redisUtils.del(CacheKey.ROLE_AUTH + resources.getId());
+            redisUtils.delete(CacheKey.DATA_USER + resources.getId());
+            redisUtils.delete(CacheKey.MENU_USER + resources.getId());
+            redisUtils.delete(CacheKey.ROLE_AUTH + resources.getId());
         }
         // 如果用户被禁用，则清除用户登录信息
         if (!resources.getEnabled()) {

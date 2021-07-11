@@ -362,14 +362,14 @@ public class MenuServiceImpl implements MenuService {
      */
     public void delCaches(Long id) {
         List<User> users = userRepository.findByMenuId(id);
-        redisUtils.del(CacheKey.MENU_ID + id);
-        redisUtils.delByKeys(CacheKey.MENU_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
+        redisUtils.delete(CacheKey.MENU_ID + id);
+        redisUtils.delByKeys4Business(CacheKey.MENU_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
         // 清除 Role 缓存
         List<Role> roles = roleService.findInMenuId(new ArrayList<>() {
             {
                 add(id);
             }
         });
-        redisUtils.delByKeys(CacheKey.ROLE_ID, roles.stream().map(Role::getId).collect(Collectors.toSet()));
+        redisUtils.delByKeys4Business(CacheKey.ROLE_ID, roles.stream().map(Role::getId).collect(Collectors.toSet()));
     }
 }

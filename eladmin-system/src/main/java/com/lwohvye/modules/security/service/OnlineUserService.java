@@ -115,7 +115,7 @@ public class OnlineUserService {
      */
     public void kickOut(String key) {
         key = SecuritySysUtil.getAuthToken(properties, key);
-        authRedisUtils.del(key);
+        authRedisUtils.delete(key);
     }
 
     /**
@@ -125,7 +125,7 @@ public class OnlineUserService {
      */
     public void logout(String token) {
         String key = SecuritySysUtil.getAuthToken(properties, token);
-        authRedisUtils.del(key);
+        authRedisUtils.delete(key);
     }
 
     /**

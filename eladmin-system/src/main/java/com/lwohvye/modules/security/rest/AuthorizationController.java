@@ -107,7 +107,7 @@ public class AuthorizationController {
         // 查询验证码
         String code = (String) authSlaveRedisUtils.get(authUser.getUuid());
         // 清除验证码
-        authRedisUtils.del(authUser.getUuid());
+        authRedisUtils.delete(authUser.getUuid());
         if (StringUtils.isBlank(code)) {
             throw new BadRequestException("验证码不存在或已过期");
         }
