@@ -15,6 +15,7 @@
  */
 package com.lwohvye.utils;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
@@ -82,9 +83,9 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      *
      * @return toCamelCase(" hello_world ") == "helloWorld"
      * toCapitalizeCamelCase("hello_world") == "HelloWorld"
-     * toCapitalizeCamelCase("helloWorld") == "HelloWorld"  首字母转大写
+     * toCapitalizeCamelCase("helloWorld") == "HelloWorld"  下划线转驼峰,且首字母转大写
      * toUnderScoreCase("helloWorld") = "hello_world"
-     * toUnderScoreCase("HelloWorld") = "hello_world"  首字母转小写
+     * toUnderScoreCase("HelloWorld") = "hello_world"  驼峰转下划线，且首字母转小写
      */
     public static String toCamelCase(String s) {
         if (s == null) {
@@ -163,6 +164,38 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * @param s
+     * @return java.lang.String
+     * @description 只把首字母转小写。
+     * @author Hongyan Wang
+     * @date 2021/7/13 11:53 上午
+     */
+    public static String lowerFirstChar(String s) {
+        if (CharSequenceUtil.isEmpty(s))
+            return s;
+        var chars = s.toCharArray();
+        if (Character.isUpperCase(chars[0]))
+            chars[0] += 32;
+        return String.valueOf(chars);
+    }
+
+    /**
+     * @param s
+     * @return java.lang.String
+     * @description 只把首字母转大写。
+     * @author Hongyan Wang
+     * @date 2021/7/13 11:54 上午
+     */
+    public static String upperFirstChar(String s) {
+        if (CharSequenceUtil.isEmpty(s))
+            return s;
+        var chars = s.toCharArray();
+        if (Character.isLowerCase(chars[0]))
+            chars[0] -= 32;
+        return String.valueOf(chars);
     }
 
     /**
