@@ -30,6 +30,7 @@ import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -374,6 +375,31 @@ public class RedisUtils {
     public void set(String key, String value) {
         redisTemplate.opsForValue().set(key, value);
     }
+
+//    private static String luaCpMoreScript =
+//            """
+//                    if redis.call('exists',KEYS[1]) == 0 or redis.call('get',KEYS[1]) < ARGV[1] then
+//                       return redis.call('set',KEYS[1],ARGV[1])
+//                    else
+//                       return 0
+//                    end
+//                    """;
+//    private RedisScript<String> cpMoreRedisScript = new DefaultRedisScript<>(luaCpMoreScript, String.class);
+//
+//    /**
+//     * @param key
+//     * @param value
+//     * @return boolean
+//     * @description 比原值大时再更新。true表示进行了更新。但redis的比较是string维度的，所以废弃
+//     * @author Hongyan Wang
+//     * @date 2021/7/17 9:59
+//     */
+//    public boolean setIfLarger(String key, Long value) {
+//        if (StrUtil.isEmpty(key))
+//            throw new RuntimeException("key不可为空");
+//        Object result = redisTemplate.execute(cpMoreRedisScript, Collections.singletonList(key), value);
+//        return SUCCESS.equals(result);
+//    }
 
     /**
      * 普通缓存放入并设置时间
@@ -1865,6 +1891,57 @@ public class RedisUtils {
         return redisTemplate.opsForZSet().scan(key, options);
     }
 
+
+    // key不存在 member不存在 原分数比新分数低（长度+比较，非负）
+    // Redis中的不存在nil，对应lua中的false
+    // ZADD命令，返回被成功添加的新成员的数量，不包括那些被更新的、已经存在的成员
+    private static String luaHgScoreScript =
+            """
+                    local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
+                    if ( not rsc ) or string.len(rsc) < string.len(ARGV[1]) or ( string.len(rsc) == string.len(ARGV[1]) and rsc < ARGV[1] ) then
+                       redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
+                       retrun 1
+                    else
+                       return 0
+                    end
+                    """;
+    private RedisScript<String> hgScoreRedisScript = new DefaultRedisScript<>(luaHgScoreScript, String.class);
+
+    /**
+     * @param key
+     * @param value
+     * @param score
+     * @return boolean
+     * @description 当本次分数比Redis中高时，再更新。
+     * @author Hongyan Wang
+     * @date 2021/7/17 11:52
+     */
+    public boolean zAddIfHigherScore(String key, Object value, double score) {
+        Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
+        // 当前限定分数非负，否则不易比较大小（因为返回的是String），当前用长度和比较两个方面共同确定结果，因为String长度短的排在前面
+        Assert.state(score >= 0.0d, "分数不可为负值，请期待后续支持");
+        Object result = redisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), score, value);
+        return SUCCESS.equals(result);
+    }
+
+    private static String luaLwScoreScript =
+            """
+                    local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
+                    if ( not rsc ) or string.len(rsc) > string.len(ARGV[1]) or ( string.len(rsc) == string.len(ARGV[1]) and rsc > ARGV[1] ) then
+                       redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
+                       retrun 1
+                    else
+                       return 0
+                    end
+                    """;
+    private RedisScript<String> lwScoreRedisScript = new DefaultRedisScript<>(luaLwScoreScript, String.class);
+    public boolean zAddIfLowerScore(String key, Object value, double score) {
+        Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
+        // 当前限定分数非负，否则不易比较大小（因为返回的是String），当前用长度和比较两个方面共同确定结果，因为String长度短的排在前面
+        Assert.state(score >= 0.0d, "分数不可为负值，请期待后续支持");
+        Object result = redisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), score, value);
+        return SUCCESS.equals(result);
+    }
 //       endregion
 
     /**
@@ -1921,22 +1998,28 @@ public class RedisUtils {
 
     private static final Long SUCCESS = 1L;
     //    加锁lua
-    private static String luaScript1 = "if redis.call(‘setNx‘,KEYS[1],ARGV[1])  then " +
-                                       "   if redis.call(‘get‘,KEYS[1])==ARGV[1] then " +
-                                       "      return redis.call(‘expire‘,KEYS[1],ARGV[2]) " +
-                                       "   else " +
-                                       "      return 0 " +
-                                       "   end " +
-                                       "end";
-    private RedisScript<String> lockRedisScript = new DefaultRedisScript<>(luaScript1, String.class);
+    private static String luaLockScript =
+            """
+                    if redis.call('setNx',KEYS[1],ARGV[1])  then 
+                       if redis.call('get',KEYS[1])==ARGV[1] then 
+                          return redis.call('expire',KEYS[1],ARGV[2]) 
+                       else 
+                          return 0 
+                       end 
+                    end 
+                    """;
+    private RedisScript<String> lockRedisScript = new DefaultRedisScript<>(luaLockScript, String.class);
 
     //    解锁lua
-    private static String luaScript2 = "if redis.call(‘get‘, KEYS[1]) == ARGV[1] then" +
-                                       "   return redis.call(‘del‘, KEYS[1]) " +
-                                       "else " +
-                                       "   return 0 " +
-                                       "end";
-    private RedisScript<String> unLockRedisScript = new DefaultRedisScript<>(luaScript2, String.class);
+    private static String luaUnlockScript =
+            """ 
+                    if redis.call('get', KEYS[1]) == ARGV[1] then 
+                       return redis.call('del', KEYS[1]) 
+                    else 
+                       return 0 
+                    end 
+                    """;
+    private RedisScript<String> unLockRedisScript = new DefaultRedisScript<>(luaUnlockScript, String.class);
 
     /**
      * 获取锁
