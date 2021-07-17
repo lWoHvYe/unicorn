@@ -1,5 +1,4 @@
 #配置数据源
-# todo 读写分离有了。下一步分库分表
 spring:
   shardingsphere:
     datasource:
@@ -163,6 +162,25 @@ spring:
     props:
       sql:
         show：true
+
+#    分库
+#    sharding:
+#      ####默认数据库策略
+#      #https://shardingsphere.apache.org/document/current/cn/user-manual/shardingsphere-jdbc/configuration/built-in-algorithm/sharding/
+#      default-database-strategy:
+#        inline:
+#          # 基于 id，需保证所有表都有这个字段才行
+#          sharding-column: id
+#          algorithm-expression: ds$->{id % 2}
+#
+#      ####主从规则
+#      master-slave-rules:
+#        ds0:
+#          master-data-source-name: primary-ds
+#          slave-data-source-names: replica-ds-0,replica-ds-1
+#        ds1:
+#          master-data-source-name: primary-ds-2
+#          slave-data-source-names: replica-ds-2-0,replica-ds-2-1
 
   # redis配置
   main-redis:
