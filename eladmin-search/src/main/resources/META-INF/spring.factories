@@ -1,1 +1,2 @@
-com.lwohvye.modules.mongodb.service.MongoDBUserService=com.lwohvye.modules.mongodb.service.impl.MongoDBUserServiceIOCImpl
+#com.lwohvye.modules.mongodb.service.MongoDBUserService=com.lwohvye.modules.mongodb.service.impl.MongoDBUserServiceIOCImpl
+com.lwohvye.modules.mongodb.service.MongoDBUserService=com.lwohvye.modules.mongodb.service.impl.MongoDBUserServiceImpl

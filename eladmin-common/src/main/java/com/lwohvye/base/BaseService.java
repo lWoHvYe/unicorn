@@ -16,6 +16,7 @@
 package com.lwohvye.base;
 
 import com.lwohvye.config.LocalCoreConfig;
+import com.lwohvye.exception.NeedImplementException;
 
 /**
  * @author Hongyan Wang
@@ -27,5 +28,15 @@ public interface BaseService {
     //接口中可以有静态方法、默认方法、私有方法
     default String getSysName() {
         return LocalCoreConfig.getSysName();
+    }
+
+    /**
+     * @description 部分场景下，在类初始化完成后，执行部分额外操作
+     *              通过抛异常的方式，限制必须手动实现
+     * @author Hongyan Wang
+     * @date 2021/7/18 19:06
+     */
+    default void doInit() {
+        throw new NeedImplementException("Can't use default method, Please Implement it by yourself !");
     }
 }

@@ -5,7 +5,7 @@ import com.lwohvye.modules.mongodb.repository.MongoDBUserRepository;
 import com.lwohvye.modules.mongodb.service.MongoDBUserService;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
@@ -15,12 +15,13 @@ import java.util.stream.Collectors;
  * @date 2021年04月17日 13:53
  */
 @Service
-@RequiredArgsConstructor
 public class MongoDBUserServiceImpl implements MongoDBUserService {
 
-    private final MongoDBUserRepository mongoDBUserRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    private final UserRepository userRepository;
+    @Autowired
+    private MongoDBUserRepository mongoDBUserRepository;
 
     @Override
     public Object findAll() {
