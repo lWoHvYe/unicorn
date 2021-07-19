@@ -40,10 +40,11 @@ spring:
   jpa:
     properties:
       hibernate:
-        ddl-auto: none
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         enable_lazy_no_trans: true
     open-in-view: true
+    hibernate:
+      ddl-auto: none
 
 #  # 全局懒加载。
 #  main:

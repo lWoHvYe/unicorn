@@ -40,13 +40,14 @@ spring:
   jpa:
     properties:
       hibernate:
-        ddl-auto: none
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         enable_lazy_no_trans: true
 #        指定表名解析。spring下可不加。会自动使用
 #        naming:
 #          physical-strategy: com.lwohvye.config.ServerAwareNamingStrategy
     open-in-view: true
+    hibernate:
+      ddl-auto: none
 
 #  # 全局懒加载。
 #  main:
