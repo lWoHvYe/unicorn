@@ -84,6 +84,27 @@ public class ApiGlobalExceptionHandler {
     }
 
     /**
+     * @param e
+     * @return org.springframework.http.ResponseEntity<com.topdraw.common.ResultInfo>
+     * @description 使用Assert可能抛出的异常
+     * @author Hongyan Wang
+     * @date 2021/6/1 1:14 下午
+     */
+    @ResponseBody
+    @ExceptionHandler(value = IllegalStateException.class)
+    public ResponseEntity<ResultInfo> illegalStateException(IllegalStateException e) {
+        log.error(ThrowableUtil.getStackTrace(e));
+        return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<ResultInfo> illegalArgumentException(IllegalArgumentException e) {
+        log.error(ThrowableUtil.getStackTrace(e));
+        return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * 处理无权限访问异常 AccessDeniedException
      *
      * @param e
