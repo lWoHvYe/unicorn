@@ -27,6 +27,7 @@ import com.lwohvye.modules.system.service.*;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
+import com.lwohvye.service.VerifyService;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;

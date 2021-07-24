@@ -13,9 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.system.rest;
+package com.lwohvye.rest;
 
-import com.lwohvye.modules.system.service.VerifyService;
+import com.lwohvye.service.VerifyService;
 import com.lwohvye.utils.enums.CodeBiEnum;
 import com.lwohvye.utils.enums.CodeEnum;
 import com.lwohvye.utils.result.ResultInfo;
@@ -37,7 +37,7 @@ import java.util.Objects;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/code")
-@Api(tags = "系统：验证码管理")
+@Api(tags = "工具：验证码管理")
 public class VerifyController {
 
     private final VerifyService verificationCodeService;

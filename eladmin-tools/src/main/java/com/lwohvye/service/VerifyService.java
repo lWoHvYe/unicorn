@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.system.service;
+package com.lwohvye.service;
 
 import com.lwohvye.base.BaseService;
 import com.lwohvye.domain.vo.EmailVo;
