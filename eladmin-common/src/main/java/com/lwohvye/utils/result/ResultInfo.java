@@ -123,7 +123,32 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @date 2021/1/9 9:39
      */
     public static <T> ResultInfo<T> success() {
-        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), new ArrayList<>(), "");
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), new ArrayList<>(), "操作成功");
+    }
+
+    /**
+     * 通用成功返回方式。支持map、list、page和单一实体，但都会套个壳，针对不需要壳的场景不适用
+     *
+     * @param t
+     * @param <T>
+     * @return
+     */
+    public static <T> ResultInfo<T> success(T t){
+        return ResultInfo.success(t, "");
+    }
+
+    public static <T> ResultInfo<T> success(T t, String description) {
+//        如果是Map，走分页
+        if (t instanceof Map map)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), map, description);
+//        List类，一般是非分页查询
+        if (t instanceof List list)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), list, description);
+//        分页可能不是转成map的
+        if (t instanceof Page page)
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, description);
+
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, description);
     }
 
     /**
@@ -135,27 +160,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
      */
     public static <T> ResultInfo<T> success(List<T> resultSet) {
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), resultSet, "");
-    }
-
-    /**
-     * 通用成功返回方式。支持map、list、page和单一实体，但都会套个壳，针对不需要壳的场景不适用
-     *
-     * @param t
-     * @param <T>
-     * @return
-     */
-    public static <T> ResultInfo<T> success(T t) {
-//        如果是Map，走分页
-        if (t instanceof Map map)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), map, "");
-//        List类，一般是非分页查询
-        if (t instanceof List list)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), list, "");
-//        分页可能不是转成map的
-        if (t instanceof Page page)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, "");
-
-        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, "");
     }
 
     /**
