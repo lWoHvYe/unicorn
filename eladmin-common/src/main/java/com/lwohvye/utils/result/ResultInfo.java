@@ -145,17 +145,21 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      */
     public static <T> ResultInfo<T> success(T t) {
+        return ResultInfo.success(t, "");
+    }
+
+    public static <T> ResultInfo<T> success(T t, String description) {
 //        如果是Map，走分页
         if (t instanceof Map map)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), map, "");
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), map, description);
 //        List类，一般是非分页查询
         if (t instanceof List list)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), list, "");
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), list, description);
 //        分页可能不是转成map的
         if (t instanceof Page page)
-            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, "");
+            return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, description);
 
-        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, "");
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, description);
     }
 
     /**

@@ -120,7 +120,7 @@ public class RedisUtils {
     }
 
     /**
-     * 指定缓存失效时间
+     * 指定缓存失效时间。在指定长的时间之后过期
      *
      * @param key  键
      * @param time 时间(秒)
@@ -157,7 +157,7 @@ public class RedisUtils {
     }
 
     /**
-     * 设置过期时间
+     * 设置过期时间。在指定的时刻过期
      *
      * @param key
      * @param date
