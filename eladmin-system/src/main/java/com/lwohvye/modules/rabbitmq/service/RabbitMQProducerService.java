@@ -16,6 +16,7 @@
 package com.lwohvye.modules.rabbitmq.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.rabbitmq.QueueEnum;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
@@ -71,4 +72,24 @@ public class RabbitMQProducerService {
                 });
     }
 
+    /**
+     * @param commonEntity
+     * @description 通过延迟插件实现延迟消息
+     * @author Hongyan Wang
+     * @date 2021/7/26 1:17 下午
+     */
+    public void sendDelayMsg(AmqpMsgEntity commonEntity) {
+        amqpTemplate.convertAndSend(QueueEnum.QUEUE_DATA_SYNC_DELAY.getExchange(),
+                QueueEnum.QUEUE_DATA_SYNC_DELAY.getRouteKey(), JSON.toJSONString(commonEntity),
+                message -> {
+                    var expire = commonEntity.getExpire();
+                    var timeUnit = commonEntity.getTimeUnit();
+                    if (ObjectUtil.isNotEmpty(expire) && ObjectUtil.isNotEmpty(timeUnit)) {
+                        Long expireMill = TimeUnit.MILLISECONDS.convert(expire, timeUnit);
+                        //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
+                        message.getMessageProperties().setHeader("x-delay", expireMill);
+                    }
+                    return message;
+                });
+    }
 }

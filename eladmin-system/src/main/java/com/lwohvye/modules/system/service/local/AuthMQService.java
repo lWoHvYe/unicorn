@@ -102,7 +102,7 @@ public class AuthMQService {
                     delayMessage.setActualTopic("unlock-user").setContext(username);
                     var amqpMsgEntity = new AmqpMsgEntity().setMsgData(JSONObject.toJSONString(delayMessage)).setExpire(1L).setTimeUnit(TimeUnit.HOURS);
 //                    延时消息发给RabbitMQ
-                    rabbitMQProducerService.sendTTLMsg(amqpMsgEntity);
+                    rabbitMQProducerService.sendDelayMsg(amqpMsgEntity);
 //                超过5次锁定一小时
                 }
             }

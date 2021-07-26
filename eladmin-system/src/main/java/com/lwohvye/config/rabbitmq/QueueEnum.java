@@ -28,7 +28,12 @@ public enum QueueEnum {
     /**
      * 消息通知ttl队列
      */
-    QUEUE_DATA_SYNC_TTL("data.sync.direct.ttl", "data.sync.ttl", "data.sync.ttl");
+    QUEUE_DATA_SYNC_TTL("data.sync.direct.ttl", "data.sync.ttl", "data.sync.ttl"),
+
+    /**
+     * 延迟插件队列
+     */
+    QUEUE_DATA_SYNC_DELAY("data.sync.delay", "data.common.delay", "data.common.delay");
 
     /**
      * 交换名称

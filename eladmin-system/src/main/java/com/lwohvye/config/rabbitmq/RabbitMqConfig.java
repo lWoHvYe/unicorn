@@ -19,6 +19,9 @@ import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 public class RabbitMqConfig {
     /**
@@ -85,5 +88,38 @@ public class RabbitMqConfig {
                 .bind(dataSyncTtlQueue)
                 .to(dataSyncTtlDirect)
                 .with(QueueEnum.QUEUE_DATA_SYNC_TTL.getRouteKey());
+    }
+
+    /**
+     * 延迟队列-插件
+     * @return q
+     */
+    @Bean
+    public Queue dataDelayQueue(){
+        return QueueBuilder.durable(QueueEnum.QUEUE_DATA_SYNC_DELAY.getName()).build();
+    }
+
+    /**
+     * 延迟队列交换机-插件
+     * @return ex
+     */
+    @Bean
+    public CustomExchange dataDelayExchange() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-delayed-type","direct");
+        return new CustomExchange(QueueEnum.QUEUE_DATA_SYNC_DELAY.getExchange(), "x-delayed-message", true, false, args);
+    }
+
+    /**
+     * 给延时队列绑定交换机-插件
+     * @return binding
+     */
+    @Bean
+    public Binding delayBinding(Queue dataDelayQueue, CustomExchange dataDelayExchange) {
+        return BindingBuilder
+                .bind(dataDelayQueue)
+                .to(dataDelayExchange)
+                .with(QueueEnum.QUEUE_DATA_SYNC_DELAY.getRouteKey())
+                .noargs();
     }
 }
