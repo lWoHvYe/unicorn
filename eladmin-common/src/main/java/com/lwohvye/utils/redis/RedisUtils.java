@@ -48,6 +48,7 @@ public class RedisUtils {
     //    允许同一包下，及子类访问
     protected RedisTemplate<Object, Object> redisTemplate;
 
+    // Redis lua的执行出错，是因为Redis的Value的序列化使用的Json相关的。针对lua相关的操作，可以使用StringRedisTemplate
     protected StringRedisTemplate stringRedisTemplate;
 
     @Value("${jwt.online-key:online-token-}")
@@ -1902,14 +1903,14 @@ public class RedisUtils {
     private static String luaHgScoreScript =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
-                    if ( not rsc ) or string.len(rsc) < string.len(ARGV[1]) or ( string.len(rsc) == string.len(ARGV[1]) and rsc < ARGV[1] ) then
+                    if ( not rsc ) or ( tonumber(rsc) < tonumber(ARGV[1]) ) then
                        redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
-                       retrun 1
+                       return 1
                     else
                        return 0
                     end
                     """;
-    private RedisScript<String> hgScoreRedisScript = new DefaultRedisScript<>(luaHgScoreScript, String.class);
+    private RedisScript<Long> hgScoreRedisScript = new DefaultRedisScript<>(luaHgScoreScript, Long.class);
 
     /**
      * @param key
@@ -1922,29 +1923,26 @@ public class RedisUtils {
      */
     public boolean zAddIfHigherScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
-        // 当前限定分数非负，否则不易比较大小（因为返回的是String），当前用长度和比较两个方面共同确定结果，因为String长度短的排在前面
-        Assert.state(score >= 0.0d, "分数不可为负值，请期待后续支持");
-        Object result = redisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), score, value);
+        // 用StringRedisTemplate，则k v 都要是String
+        Object result = stringRedisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), String.valueOf(score), value);
         return SUCCESS.equals(result);
     }
 
     private static String luaLwScoreScript =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
-                    if ( not rsc ) or string.len(rsc) > string.len(ARGV[1]) or ( string.len(rsc) == string.len(ARGV[1]) and rsc > ARGV[1] ) then
+                    if ( not rsc ) or ( tonumber(rsc) > tonumber(ARGV[1]) ) then
                        redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
-                       retrun 1
+                       return 1
                     else
                        return 0
                     end
                     """;
-    private RedisScript<String> lwScoreRedisScript = new DefaultRedisScript<>(luaLwScoreScript, String.class);
+    private RedisScript<Long> lwScoreRedisScript = new DefaultRedisScript<>(luaLwScoreScript, Long.class);
 
     public boolean zAddIfLowerScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
-        // 当前限定分数非负，否则不易比较大小（因为返回的是String），当前用长度和比较两个方面共同确定结果，因为String长度短的排在前面
-        Assert.state(score >= 0.0d, "分数不可为负值，请期待后续支持");
-        Object result = redisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), score, value);
+        Object result = stringRedisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), String.valueOf(score), value);
         return SUCCESS.equals(result);
     }
 //       endregion
