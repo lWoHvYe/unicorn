@@ -80,7 +80,7 @@ public @interface Query {
         , LIKE_STR
         // why 业务需要，在指定集合内或值为空
         , IN_OR_ISNULL
-        // why 传非-1时，使用EQUAL,传-1时，使用IS_NULL。将not in 转为left join + 关联表id为null
+        // why 传非-1时，使用EQUAL,传-1时，使用IS_NULL。将not in 转为left join + 关联表id为null。只支持数值类型
         , IS_OR_NULL
         // why List的 IN模糊查询INNER_LIKE
         , IN_INNER_LIKE

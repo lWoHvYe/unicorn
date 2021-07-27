@@ -1898,9 +1898,9 @@ public class RedisUtils {
     private static String luaHgScoreScript =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
-                    if ( not rsc ) or string.len(rsc) < string.len(ARGV[1]) or ( string.len(rsc) == string.len(ARGV[1]) and rsc < ARGV[1] ) then
+                    if ( not rsc ) or tonumber(rsc) < tonumber(ARGV[1]) then
                        redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
-                       retrun 1
+                       return 1
                     else
                        return 0
                     end
@@ -1927,9 +1927,9 @@ public class RedisUtils {
     private static String luaLwScoreScript =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
-                    if ( not rsc ) or string.len(rsc) > string.len(ARGV[1]) or ( string.len(rsc) == string.len(ARGV[1]) and rsc > ARGV[1] ) then
+                    if ( not rsc ) or tonumber(rsc) > tonumber(ARGV[1]) then
                        redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
-                       retrun 1
+                       return 1
                     else
                        return 0
                     end
