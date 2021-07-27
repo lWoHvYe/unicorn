@@ -19,6 +19,7 @@ import com.lwohvye.utils.redis.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -33,8 +34,11 @@ public class SlaveRedisUtils extends RedisUtils {
     @Qualifier(value = "slaveRedisTemplate")
     private RedisTemplate<Object, Object> authSlaveRedisTemplate;
 
-    public SlaveRedisUtils(RedisTemplate<Object, Object> redisTemplate) {
-        super(redisTemplate);
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    public SlaveRedisUtils(RedisTemplate<Object, Object> redisTemplate, StringRedisTemplate stringRedisTemplate) {
+        super(redisTemplate, stringRedisTemplate);
     }
 
     //  构造方法  ——> @Autowired —— > @PostConstruct ——> 静态方法 （按此顺序加载）

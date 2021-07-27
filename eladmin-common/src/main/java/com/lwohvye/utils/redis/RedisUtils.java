@@ -47,6 +47,10 @@ public class RedisUtils {
     private static final Logger log = LoggerFactory.getLogger(RedisUtils.class);
     //    允许同一包下，及子类访问
     protected RedisTemplate<Object, Object> redisTemplate;
+
+    // Redis lua的执行出错，是因为Redis的Value的序列化使用的Json相关的。针对lua相关的操作，可以使用StringRedisTemplate
+    protected StringRedisTemplate stringRedisTemplate;
+
     @Value("${jwt.online-key:online-token-}")
     private String onlineKey;
 
@@ -58,8 +62,9 @@ public class RedisUtils {
     @Value("${local.redis.lock-expire:200000}")
     private long LOCK_EXPIRE;
 
-    public RedisUtils(RedisTemplate<Object, Object> redisTemplate) {
+    public RedisUtils(RedisTemplate<Object, Object> redisTemplate, StringRedisTemplate stringRedisTemplate) {
         this.redisTemplate = redisTemplate;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
 
@@ -1898,14 +1903,14 @@ public class RedisUtils {
     private static String luaHgScoreScript =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
-                    if ( not rsc ) or tonumber(rsc) < tonumber(ARGV[1]) then
+                    if ( not rsc ) or ( tonumber(rsc) < tonumber(ARGV[1]) ) then
                        redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
                        return 1
                     else
                        return 0
                     end
                     """;
-    private RedisScript<String> hgScoreRedisScript = new DefaultRedisScript<>(luaHgScoreScript, String.class);
+    private RedisScript<Long> hgScoreRedisScript = new DefaultRedisScript<>(luaHgScoreScript, Long.class);
 
     /**
      * @param key
@@ -1918,28 +1923,26 @@ public class RedisUtils {
      */
     public boolean zAddIfHigherScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
-        // 当前限定分数非负，否则不易比较大小（因为返回的是String），当前用长度和比较两个方面共同确定结果，因为String长度短的排在前面
-        Assert.state(score >= 0.0d, "分数不可为负值，请期待后续支持");
-        Object result = redisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), score, value);
+        // 用StringRedisTemplate，则k v 都要是String
+        Object result = stringRedisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), String.valueOf(score), value);
         return SUCCESS.equals(result);
     }
 
     private static String luaLwScoreScript =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
-                    if ( not rsc ) or tonumber(rsc) > tonumber(ARGV[1]) then
+                    if ( not rsc ) or ( tonumber(rsc) > tonumber(ARGV[1]) ) then
                        redis.call('ZADD',KEYS[1],ARGV[1],ARGV[2])
                        return 1
                     else
                        return 0
                     end
                     """;
-    private RedisScript<String> lwScoreRedisScript = new DefaultRedisScript<>(luaLwScoreScript, String.class);
+    private RedisScript<Long> lwScoreRedisScript = new DefaultRedisScript<>(luaLwScoreScript, Long.class);
+
     public boolean zAddIfLowerScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
-        // 当前限定分数非负，否则不易比较大小（因为返回的是String），当前用长度和比较两个方面共同确定结果，因为String长度短的排在前面
-        Assert.state(score >= 0.0d, "分数不可为负值，请期待后续支持");
-        Object result = redisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), score, value);
+        Object result = stringRedisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), String.valueOf(score), value);
         return SUCCESS.equals(result);
     }
 //       endregion
@@ -2008,7 +2011,7 @@ public class RedisUtils {
                        end 
                     end 
                     """;
-    private RedisScript<String> lockRedisScript = new DefaultRedisScript<>(luaLockScript, String.class);
+    private RedisScript<Long> lockRedisScript = new DefaultRedisScript<>(luaLockScript, Long.class);
 
     //    解锁lua
     private static String luaUnlockScript =
@@ -2019,7 +2022,7 @@ public class RedisUtils {
                        return 0 
                     end 
                     """;
-    private RedisScript<String> unLockRedisScript = new DefaultRedisScript<>(luaUnlockScript, String.class);
+    private RedisScript<Long> unLockRedisScript = new DefaultRedisScript<>(luaUnlockScript, Long.class);
 
     /**
      * 获取锁
@@ -2029,7 +2032,7 @@ public class RedisUtils {
      * @param expireTime redis的key 的过期时间  单位（秒) 防止死锁，导致其他请求无法正常执行业务（适当设置长一些，避免业务执行完之前过期）
      * @return
      */
-    public boolean lock(String lockKey, String value, long expireTime) {
+    public boolean lock(String lockKey, String value, Long expireTime) {
         if (ObjectUtil.isNull(expireTime))
 //            设置默认过期时间
             expireTime = LOCK_EXPIRE;
@@ -2038,7 +2041,7 @@ public class RedisUtils {
 //        添加默认前缀
         lockKey = LOCK_PREFIX + lockKey;
 
-        Object result = redisTemplate.execute(lockRedisScript, Collections.singletonList(lockKey), value, String.valueOf(expireTime));
+        Object result = stringRedisTemplate.execute(lockRedisScript, Collections.singletonList(lockKey), value, String.valueOf(expireTime));
         return SUCCESS.equals(result);
 
     }
@@ -2058,7 +2061,7 @@ public class RedisUtils {
         lockKey = LOCK_PREFIX + lockKey;
 
         try {
-            Object result = redisTemplate.execute(unLockRedisScript, Collections.singletonList(lockKey), value);
+            Object result = stringRedisTemplate.execute(unLockRedisScript, Collections.singletonList(lockKey), value);
             if (SUCCESS.equals(result)) {
                 return true;
             }
