@@ -1921,6 +1921,7 @@ public class RedisUtils {
      * @author Hongyan Wang
      * @date 2021/7/17 11:52
      */
+    // TODO: 2021/7/28 这里存入的value为 001，通过其他方法存入的为 "001"，是不一样的，这点需特别注意，要想保持一致，可能需要手动在前后拼双引号
     public boolean zAddIfHigherScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
         // 用StringRedisTemplate，则k v 都要是String
