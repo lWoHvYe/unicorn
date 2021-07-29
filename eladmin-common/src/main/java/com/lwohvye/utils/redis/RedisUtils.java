@@ -1612,6 +1612,8 @@ public class RedisUtils {
     }
 
     /**
+     * 移除元素
+     *
      * @param key
      * @param values
      * @return
@@ -1921,11 +1923,15 @@ public class RedisUtils {
      * @author Hongyan Wang
      * @date 2021/7/17 11:52
      */
-    // TODO: 2021/7/28 这里存入的value为 001，通过其他方法存入的为 "001"，是不一样的，这点需特别注意，要想保持一致，可能需要手动在前后拼双引号
+    // TODO: 2021/7/28 当value类型为String时 这里存入的value为 001，通过其他方法存入的为 "001"，是不一样的，这点需特别注意，要想保持一致，lua相关的需要手动在前后拼双引号    "\"" + value + "\""
+    //  当value类型为long时，lua存入的值不带L，但通过其他方法存入的带L。其他类型的也同理，需要进行处理
+    // lua相关的，需要注意引号的问题
     public boolean zAddIfHigherScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
+        if (value instanceof String)
+            value = "\"" + value + "\"";
         // 用StringRedisTemplate，则k v 都要是String
-        Object result = stringRedisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), String.valueOf(score), value);
+        Object result = stringRedisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), String.valueOf(score), String.valueOf(value));
         return SUCCESS.equals(result);
     }
 
@@ -1943,7 +1949,9 @@ public class RedisUtils {
 
     public boolean zAddIfLowerScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
-        Object result = stringRedisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), String.valueOf(score), value);
+        if (value instanceof String)
+            value = "\"" + value + "\"";
+        Object result = stringRedisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), String.valueOf(score), String.valueOf(value));
         return SUCCESS.equals(result);
     }
 //       endregion
@@ -2024,6 +2032,26 @@ public class RedisUtils {
                     end 
                     """;
     private RedisScript<Long> unLockRedisScript = new DefaultRedisScript<>(luaUnlockScript, Long.class);
+
+    /**
+     * @param lockKey
+     * @param value
+     * @param expireTime
+     * @description lua-加锁
+     * @author Hongyan Wang
+     * @date 2021/7/29 1:13 下午
+     */
+    public void doLock(String lockKey, String value, Long expireTime) {
+        while (!lock(lockKey, value, expireTime)) {
+            try {
+                // 视业务调整sleep时间
+                Thread.sleep(100);
+                log.error(lockKey + ":等待获取锁中...");
+            } catch (InterruptedException e) {
+                log.error("等待锁出错，锁名称:{}，原因:{}", lockKey, e.getMessage());
+            }
+        }
+    }
 
     /**
      * 获取锁
