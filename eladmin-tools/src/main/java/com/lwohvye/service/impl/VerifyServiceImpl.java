@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.system.service.impl;
+package com.lwohvye.service.impl;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.RandomUtil;
@@ -24,7 +24,7 @@ import cn.hutool.extra.template.TemplateUtil;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.system.service.VerifyService;
+import com.lwohvye.service.VerifyService;
 import com.lwohvye.utils.redis.RedisUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

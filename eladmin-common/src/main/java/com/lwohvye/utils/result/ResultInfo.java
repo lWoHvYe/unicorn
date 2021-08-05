@@ -123,18 +123,7 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @date 2021/1/9 9:39
      */
     public static <T> ResultInfo<T> success() {
-        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), new ArrayList<>(), "");
-    }
-
-    /**
-     * 成功返回不分页结果集
-     *
-     * @param resultSet
-     * @param <T>
-     * @return
-     */
-    public static <T> ResultInfo<T> success(List<T> resultSet) {
-        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), resultSet, "");
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), new ArrayList<>(), "操作成功");
     }
 
     /**
@@ -160,6 +149,18 @@ public class ResultInfo<T> implements IResultInfo<T> {
             return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, description);
 
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, description);
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, description);
+    }
+
+    /**
+     * 成功返回不分页结果集
+     *
+     * @param resultSet
+     * @param <T>
+     * @return
+     */
+    public static <T> ResultInfo<T> success(List<T> resultSet) {
+        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), resultSet, "");
     }
 
     /**

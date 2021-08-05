@@ -9,31 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>eladmin-generator</artifactId>
-    <name>代码生成模块</name>
-
-    <properties>
-        <configuration.version>1.10</configuration.version>
-    </properties>
+    <artifactId>eladmin-api</artifactId>
+    <name>Api基础模块-服务拆分</name>
 
     <dependencies>
         <dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>eladmin-common</artifactId>
             <version>${project.core.version}</version>
-        </dependency>
-
-        <!--模板引擎-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-freemarker</artifactId>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/commons-configuration/commons-configuration -->
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>${configuration.version}</version>
         </dependency>
     </dependencies>
 </project>
