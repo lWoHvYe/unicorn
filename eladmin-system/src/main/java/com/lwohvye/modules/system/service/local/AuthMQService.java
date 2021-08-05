@@ -23,6 +23,7 @@ import com.lwohvye.domain.Log;
 import com.lwohvye.modules.kafka.entity.DelayMessage;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
+import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.repository.LogRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,9 @@ public class AuthMQService {
     private UserService userService;
 
     @Autowired
+    private UserCacheClean userCacheClean;
+
+    @Autowired
     private RabbitMQProducerService rabbitMQProducerService;
 
     @KafkaListener(id = "authFailedConsumer", groupId = "felix-group", topics = "auth-failed", errorHandler = "consumerAwareErrorHandler")
@@ -97,6 +101,8 @@ public class AuthMQService {
                 } else {
 //                  修改状态为锁定
                     userService.updateEnabled(username, false);
+//                  删除缓存中的用户信息
+                    userCacheClean.cleanUserCache(username);
 //                  超过5次锁定一小时
                     var delayMessage = new DelayMessage();
                     delayMessage.setActualTopic("unlock-user").setContext(username);
@@ -119,6 +125,8 @@ public class AuthMQService {
                 var delayMessage = JSONObject.parseObject(delayMessageStr, DelayMessage.class);
                 var username = delayMessage.getContext();
                 userService.updateEnabled(username, true);
+//              删除缓存中的用户信息
+                userCacheClean.cleanUserCache(username);
             }
         }
     }
