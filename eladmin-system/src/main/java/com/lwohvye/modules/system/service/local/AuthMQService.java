@@ -100,7 +100,8 @@ public class AuthMQService {
 //                  超过5次锁定一小时
                     var delayMessage = new DelayMessage();
                     delayMessage.setActualTopic("unlock-user").setContext(username);
-                    var amqpMsgEntity = new AmqpMsgEntity().setMsgData(JSONObject.toJSONString(delayMessage)).setExpire(1L).setTimeUnit(TimeUnit.HOURS);
+                    var amqpMsgEntity = new AmqpMsgEntity().setMsgType("auth_locked").setMsgData(JSONObject.toJSONString(delayMessage))
+                            .setExpire(1L).setTimeUnit(TimeUnit.HOURS);
 //                    延时消息发给RabbitMQ
                     rabbitMQProducerService.sendDelayMsg(amqpMsgEntity);
 //                超过5次锁定一小时

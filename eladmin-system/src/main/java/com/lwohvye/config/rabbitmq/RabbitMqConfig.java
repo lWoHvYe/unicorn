@@ -53,7 +53,7 @@ public class RabbitMqConfig {
      */
     @Bean
     public Queue dataSyncQueue() {
-        return new Queue(QueueEnum.QUEUE_DATA_SYNC.getName());
+        return new Queue(QueueEnum.QUEUE_DATA_SYNC.getQueueName());
     }
 
     /**
@@ -62,7 +62,7 @@ public class RabbitMqConfig {
     @Bean
     public Queue dataSyncTtlQueue() {
         return QueueBuilder
-                .durable(QueueEnum.QUEUE_DATA_SYNC_TTL.getName())
+                .durable(QueueEnum.QUEUE_DATA_SYNC_TTL.getQueueName())
                 .withArgument("x-dead-letter-exchange", QueueEnum.QUEUE_DATA_SYNC.getExchange())//到期后转发的交换机
                 .withArgument("x-dead-letter-routing-key", QueueEnum.QUEUE_DATA_SYNC.getRouteKey())//到期后转发的路由键
                 .build();
@@ -96,7 +96,7 @@ public class RabbitMqConfig {
      */
     @Bean
     public Queue dataDelayQueue(){
-        return QueueBuilder.durable(QueueEnum.QUEUE_DATA_SYNC_DELAY.getName()).build();
+        return QueueBuilder.durable(QueueEnum.QUEUE_DATA_SYNC_DELAY.getQueueName()).build();
     }
 
     /**

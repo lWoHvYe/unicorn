@@ -29,8 +29,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-@RabbitListener(queues = "data.sync")
-public class RabbitMQConsumerService {
+// 监听延迟插件相关队列的消息
+@RabbitListener(queues = "data.common.delay")
+public class RabbitMQDelayMsgConsumerService {
 
     @Autowired
     private KafkaProducerService kafkaProducerService;
@@ -46,8 +47,8 @@ public class RabbitMQConsumerService {
             var delayMessage = JSONObject.parseObject(msgData, DelayMessage.class);
             kafkaProducerService.sendCallbackMessage(delayMessage.getActualTopic(), JSON.toJSONString(delayMessage));
         } finally {
-            log.info(amqpMsgEntityStr);
-            // TODO: 2021/4/27 处理完成，根据结果记录相关表。并邮件通知
+            log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, amqpMsgEntityStr);
+            // TODO: 2021/4/27 处理完成，根据结果记录相关表。若处理报错，需邮件通知
         }
     }
 

@@ -42,15 +42,15 @@ public enum QueueEnum {
     /**
      * 队列名称
      */
-    private String name;
+    private String queueName;
     /**
      * 路由键
      */
     private String routeKey;
 
-    QueueEnum(String exchange, String name, String routeKey) {
+    QueueEnum(String exchange, String queueName, String routeKey) {
         this.exchange = exchange;
-        this.name = name;
+        this.queueName = queueName;
         this.routeKey = routeKey;
     }
 }
