@@ -149,7 +149,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
             return new ResultInfo<>(ResultCode.SUCCESS.getCode(), page, description);
 
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, description);
-        return new ResultInfo<>(ResultCode.SUCCESS.getCode(), t, description);
     }
 
     /**
