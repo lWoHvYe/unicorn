@@ -12,6 +12,8 @@
 
 
 
+启动类及配置，参照 eladmin-starter模块
+
 后台运行jar
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.12.jar >nohup.out 2>&1 &
 
@@ -91,13 +93,19 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 
 - `eladmin-common` 为系统的公共模块，各种工具类，公共配置存在该模块
 
-- `eladmin-system` 为系统核心模块也是项目入口模块，也是最终需要打包部署的模块
+- `eladmin-api` 基础实体及接口模块，方便后续服务拆分
+
+- `eladmin-system` 为系统核心模块，包含管理侧权限配置等。包含api模块service层的具体实现
 
 - `eladmin-logging` 为系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
 - `eladmin-tools` 为第三方工具模块，包含：图床、邮件、云存储、本地存储、支付宝
 
 - `eladmin-generator` 为系统的代码生成模块，代码生成的模板在 system 模块中
+
+- `eladmin-starter` 启动类,项目入口，包含模块及组建配置
+
+- `eladmin-search` 通过mongodb进行最基础的检索，SPI相关demo
 
 #### 详细结构
 
