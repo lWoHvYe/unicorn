@@ -15,6 +15,8 @@
  */
 package com.lwohvye.modules.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lwohvye.annotation.String4Blob;
 import com.lwohvye.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
@@ -68,13 +70,20 @@ public class User extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "用户部门")
     private Dept dept;
 
+    // @JsonAlias注解需要依赖于setter、getter，而@JsonProperty注解不需要
     @NotBlank
     @Column(unique = true)
     @ApiModelProperty(value = "用户名称")
+    // @JsonAlias注解，实现:json转模型时，使json中的特定key能转化为特定的模型属性
+    // 但是模型转json时，对应的转换后的key仍然与属性名一致
+    @JsonAlias(value = {"userName", "uName"})
     private String username;
 
     @NotBlank
     @ApiModelProperty(value = "用户昵称")
+    // @JsonProperty注解，实现：json转模型时，使json中的特定key能转化为指定的模型属性；
+    // 同样的，模型转json时，对应的转换后的key为指定的key
+    @JsonProperty(value = "nickName")
     private String nickName;
 
     @Email
