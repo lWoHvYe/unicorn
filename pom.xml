@@ -188,6 +188,23 @@
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>${io.swagger.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--    swagger-core依赖该包，部分原因，需单独升级依赖版本    -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.1.1-android</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>${io.swagger.version}</version>
         </dependency>
@@ -211,6 +228,10 @@
                 </exclusion>
                 <exclusion>
                     <artifactId>swagger-models</artifactId>
+                    <groupId>io.swagger</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>swagger-core</artifactId>
                     <groupId>io.swagger</groupId>
                 </exclusion>
             </exclusions>
@@ -254,6 +275,19 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>5.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-compress</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--  5.0.0版本的poi依赖的commons-compress版本为1.20，存在bug，故单独引入1.21  -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
