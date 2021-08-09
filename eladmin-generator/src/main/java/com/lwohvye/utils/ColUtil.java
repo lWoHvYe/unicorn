@@ -15,9 +15,15 @@
  */
 package com.lwohvye.utils;
 
-import org.apache.commons.configuration.*;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * sql字段转java
@@ -44,8 +50,16 @@ public class ColUtil {
      * 获取配置信息
      */
     public static PropertiesConfiguration getConfig() {
+        var file = new File("generator.properties");
+        var propertiesBuilderParameters = new Parameters().properties();
+        propertiesBuilderParameters.setFile(file);
+        propertiesBuilderParameters.setThrowExceptionOnMissing(true);
+
+        var builder = new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class);
+        builder.configure(propertiesBuilderParameters);
+
         try {
-            return new PropertiesConfiguration("generator.properties");
+            return builder.getConfiguration();
         } catch (ConfigurationException e) {
             log.error(e.getMessage(), e);
         }

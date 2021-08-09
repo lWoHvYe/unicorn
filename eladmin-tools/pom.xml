@@ -15,7 +15,7 @@
     <properties>
         <mail.version>1.4.7</mail.version>
         <qiniu.version>7.8.0</qiniu.version>
-        <alipay.version>4.15.20.ALL</alipay.version>
+        <alipay.version>4.16.2.ALL</alipay.version>
     </properties>
 
     <dependencies>
