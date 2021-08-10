@@ -69,8 +69,10 @@
         <commons-pool2.version>2.9.0</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <!--logstash要用5系列版本。6系列整合方式暂未知-->
-        <logstash.version>5.3</logstash.version>
+
+        <!--logstash有所依赖，需要使用management统一管理依赖-->
+        <logstash.version>6.6</logstash.version>
+        <logback.version>1.2.4</logback.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
@@ -344,8 +346,37 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash.version}</version>
+            <!-- Use runtime scope if the project does not have any compile-time usage of logstash-logback-encoder,
+                such as usage of StructuredArguments/Markers or implementations such as
+                JsonProvider, AppenderListener, JsonFactoryDecorator, JsonGeneratorDecorator, etc
+            <scope>runtime</scope>
+            -->
         </dependency>
     </dependencies>
+    <!--
+        If you are using logstash-logback-encoder in a project (such as spring-boot) that also declares dependencies on any of the above libraries,
+    you might need to tell maven explicitly which versions to use to avoid conflicts. You can do so using maven's dependencyManagement feature.
+    For example, to ensure that maven doesn't pick different versions of logback-core, logback-classic, and logback-access, add this to your project's pom.xml
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-access</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

@@ -14,7 +14,7 @@
         </encoder>
     </appender>
     <!--输出到logstash的appender。用Access系列未知原因无法输出到logstash-->
-    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+    <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <!--可以访问的logstash日志收集端口-->
         <destination>10.100.6.140:4560</destination>
         <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -42,49 +42,49 @@
     </appender>
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </root>
     <!--    下面这部分用于控制输出的连接信息。只输出sql，不输出结果和连接创建等信息。那几个OFF级别的设置实现-->
     <!--监控sql日志输出 -->
     <logger name="jdbc.sqlonly" level="INFO" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
 
     <logger name="jdbc.resultset" level="ERROR" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
 
     <!--  如想看到表格数据，将OFF改为INFO  -->
     <logger name="jdbc.resultsettable" level="OFF" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
     <!--设置DEBUG可以查看连接的打开与关闭-->
     <logger name="jdbc.connection" level="OFF" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
 
     <logger name="jdbc.sqltiming" level="OFF" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
 
     <logger name="jdbc.audit" level="OFF" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
     <!--kafka日志-->
     <logger name="org.apache.kafka" level="ERROR" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
     <!--暂时❎该部分日志。有需要再打开-->
     <logger name="org.apache.kafka.clients.consumer.internals.ConsumerCoordinator" level="OFF" additivity="false">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="stash"/>
     </logger>
 
 </configuration>
