@@ -73,6 +73,9 @@
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>6.6</logstash.version>
         <logback.version>1.2.4</logback.version>
+        <!--    kafka    -->
+        <kafka.version>2.8.0</kafka.version>
+        <spring-kafka.version>2.7.5</spring-kafka.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
