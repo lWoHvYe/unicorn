@@ -2041,16 +2041,27 @@ public class RedisUtils {
      * @author Hongyan Wang
      * @date 2021/7/29 1:13 下午
      */
-    public void doLock(String lockKey, String value, Long expireTime) {
+    public boolean doLock(String lockKey, String value, Long expireTime) {
+        // 开始时间
+        var start = System.currentTimeMillis();
+        // 超时500ms，未成功返回失败
+        var timeout = 500L;
         while (!lock(lockKey, value, expireTime)) {
             try {
+
+                // 超时返回失败
+                if (System.currentTimeMillis() - start >= timeout)
+                    return false;
+
                 // 视业务调整sleep时间
-                Thread.sleep(100);
+                Thread.sleep(50);
                 log.error(lockKey + ":等待获取锁中...");
             } catch (InterruptedException e) {
                 log.error("等待锁出错，锁名称:{}，原因:{}", lockKey, e.getMessage());
             }
         }
+        // 到这里一般都是成功了
+        return true;
     }
 
     /**
@@ -2072,7 +2083,6 @@ public class RedisUtils {
 
         Object result = stringRedisTemplate.execute(lockRedisScript, Collections.singletonList(lockKey), value, String.valueOf(expireTime));
         return SUCCESS.equals(result);
-
     }
 
     /**
