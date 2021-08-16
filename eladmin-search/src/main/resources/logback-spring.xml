@@ -16,7 +16,7 @@
     <!--输出到logstash的appender。用Access系列未知原因无法输出到logstash-->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <!--可以访问的logstash日志收集端口-->
-        <destination>10.100.6.140:4560</destination>
+        <destination>192.168.1.140:4560</destination>
         <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp>

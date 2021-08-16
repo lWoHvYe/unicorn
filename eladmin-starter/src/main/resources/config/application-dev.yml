@@ -7,7 +7,7 @@ spring:
       primary-ds:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:192.168.1.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         username: ${DB_USER:root}
         password: ${DB_PWD:root}
         # 初始连接数
@@ -54,7 +54,7 @@ spring:
       replica-ds-0:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:192.168.1.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -105,7 +105,7 @@ spring:
       replica-ds-1:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.100.6.140}:${DB_PORT:3307}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:192.168.1.140}:${DB_PORT:3307}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -186,7 +186,7 @@ spring:
   main-redis:
     #数据库索引
     database: ${REDIS_DB:4}
-    host: ${REDIS_HOST:10.100.6.140}
+    host: ${REDIS_HOST:192.168.1.140}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:}
     #连接超时时间
@@ -201,7 +201,7 @@ spring:
   slave-redis:
     #数据库索引
     database: ${REDIS_DB:4}
-    host: ${REDIS_HOST:10.100.6.140}
+    host: ${REDIS_HOST:192.168.1.140}
     port: ${REDIS_PORT:6380}
     password: ${REDIS_PWD:}
     #连接超时时间
@@ -213,7 +213,7 @@ spring:
   auth-redis:
     #数据库索引
     database: ${REDIS_DB:6}
-    host: ${REDIS_HOST:10.100.6.140}
+    host: ${REDIS_HOST:192.168.1.140}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:}
     #连接超时时间
@@ -225,7 +225,7 @@ spring:
   auth-slave-redis:
     #数据库索引
     database: ${REDIS_DB:6}
-    host: ${REDIS_HOST:10.100.6.140}
+    host: ${REDIS_HOST:192.168.1.140}
     port: ${REDIS_PORT:6380}
     password: ${REDIS_PWD:}
     #连接超时时间
@@ -238,7 +238,7 @@ spring:
   ###########【Kafka集群】###########
   kafka:
     #    使用zookeeper后，可以只配置集群中的一个节点。但是其他节点的ip为k8s内的ip，在外部无法访问，解决方式待定
-    bootstrap-servers: 10.100.6.140:31090,10.100.6.140:31091,10.100.6.140:31092
+    bootstrap-servers: 192.168.1.140:9092
     ###########【初始化生产者配置】###########
     # 重试次数
     producer:
@@ -297,7 +297,7 @@ spring:
 
   ##### RabbitMQ ####
   rabbitmq:
-    host: 10.100.6.140 # rabbitmq的连接地址
+    host: 192.168.1.140 # rabbitmq的连接地址
     port: 5672 # rabbitmq的连接端口号
     virtual-host: /eladmin # rabbitmq的虚拟host
     username: admin # rabbitmq的用户名
