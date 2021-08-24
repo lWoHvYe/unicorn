@@ -30,6 +30,14 @@ public class MultipartConfig {
 
     /**
      * 文件上传临时路径
+     * 若未配置临时路径，当上传大文件时会报错。
+     * 配置该属性后，以下限制无效。大致原因是这个是tomcat的，配置临时目录后临时文件不放到tomcat中
+     spring:
+        servlet:
+            multipart:
+                file-size-threshold: 2KB
+                max-file-size: 100MB
+                max-request-size: 200MB
      */
     @Bean
     MultipartConfigElement multipartConfigElement() {
