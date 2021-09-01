@@ -23,6 +23,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -41,6 +43,10 @@ import java.util.Set;
 @Getter
 @Setter
 @Accessors(chain = true)
+//@DynamicInsert属性:默认为true,表示insert对象的时候,生成动态的insert语句,如果这个字段的值是null就不会加入到insert语句当中。
+@DynamicInsert
+//@DynamicUpdate属性:默认为true,表示update对象的时候,生成动态的update语句,如果这个字段的值是null就不会被加入到update语句中。这个也许不太常用
+//@DynamicUpdate
 @Table(name = "sys_user")
 public class User extends BaseEntity implements Serializable {
 
