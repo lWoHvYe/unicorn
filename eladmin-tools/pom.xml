@@ -15,8 +15,21 @@
     <properties>
         <mail.version>1.4.7</mail.version>
         <qiniu.version>7.8.0</qiniu.version>
-        <alipay.version>4.16.2.ALL</alipay.version>
+        <alipay.version>4.16.21.ALL</alipay.version>
     </properties>
+
+    <!--  无人维护。其中依赖版本过老，考虑其他方式  -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>aliyun-spring-boot-dependencies</artifactId>
+                <version>1.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- 同时需要common模块和logging模块只需要引入logging模块即可 -->
@@ -38,6 +51,12 @@
             <groupId>com.qiniu</groupId>
             <artifactId>qiniu-java-sdk</artifactId>
             <version>${qiniu.version}</version>
+        </dependency>
+
+        <!--    对象存储计划改为阿里云OSS  版本问题  -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>aliyun-oss-spring-boot-starter</artifactId>
         </dependency>
 
         <!--支付宝依赖-->

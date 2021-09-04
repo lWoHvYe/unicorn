@@ -44,6 +44,7 @@ import java.util.Set;
 @Setter
 @Accessors(chain = true)
 //@DynamicInsert属性:默认为true,表示insert对象的时候,生成动态的insert语句,如果这个字段的值是null就不会加入到insert语句当中。
+// 但需注意jpa的save方法返回的实体是不包含那些数据库中配置的默认值的，因为默认值是在整个事务提交时才生的效，所以返回（包含事务内再查询），都不会生效，这个需特别注意。
 @DynamicInsert
 //@DynamicUpdate属性:默认为true,表示update对象的时候,生成动态的update语句,如果这个字段的值是null就不会被加入到update语句中。这个也许不太常用
 //@DynamicUpdate

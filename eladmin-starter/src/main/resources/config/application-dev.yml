@@ -356,6 +356,7 @@ jwt:
 ip:
   local-parsing: true
 
+
 # 文件存储路径
 file:
   mac:
@@ -374,3 +375,11 @@ file:
 local:
   sys:
     name: X0X
+
+# oss配置
+alibaba:
+  cloud:
+    access-key: xx
+    secret-key: xx
+    oss:
+      endpoint: xx
