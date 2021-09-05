@@ -1,6 +1,6 @@
 package com.lwohvye.service.impl;
 
-import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
 import com.lwohvye.service.AliyunOSSService;
 import com.lwohvye.utils.FileUtil;
@@ -27,17 +27,17 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
 
     // 引入starter后，可直接注入
     @Autowired
-    private OSSClient ossClient;
+    private OSS ossClient;
 
     // 存储桶名称
-    @Value("alibaba.cloud.oss.bucket-name:")
+    @Value("${alibaba.cloud.oss.bucket-name:}")
     private String bucketName;
     // 文件目录
-    @Value("alibaba.cloud.oss.file-path:")
+    @Value("${alibaba.cloud.oss.file-path:}")
     private String filePath;
 
     @SneakyThrows
-    public void MultipartUploadFile(MultipartFile file) {
+    public void multipartUploadFile(MultipartFile file) {
 // yourEndpoint填写Bucket所在地域对应的Endpoint。以华东1（杭州）为例，Endpoint填写为https://oss-cn-hangzhou.aliyuncs.com。
 //        String endpoint = "yourEndpoint";
 // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
@@ -47,8 +47,7 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
 // 填写Bucket名称，例如examplebucket。
 //        String bucketName = "bucketName";
 // 填写Object完整路径，例如exampledir/exampleobject.txt。Object完整路径中不能包含Bucket名称。
-        // TODO: 2021/9/5 待确认是否带后缀
-        String objectName = filePath + "/" + file.getOriginalFilename();
+        var objectName = filePath + file.getOriginalFilename();
 
 // 创建OSSClient实例。
 //        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
@@ -85,6 +84,7 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
             long startPos = i * partSize;
             long curPartSize = (i + 1 == partCount) ? (fileLength - startPos) : partSize;
             UploadPartRequest uploadPartRequest;
+            // 这里需注意 try-with-resource的作用范围，如果在setInputStream后就结束，是要出错的
             try (InputStream instream = new FileInputStream(sampleFile)) {
                 // 跳过已经上传的分片。
                 instream.skip(startPos);
@@ -93,15 +93,15 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
                 uploadPartRequest.setKey(objectName);
                 uploadPartRequest.setUploadId(uploadId);
                 uploadPartRequest.setInputStream(instream);
+                // 设置分片大小。除了最后一个分片没有大小限制，其他的分片最小为100 KB。
+                uploadPartRequest.setPartSize(curPartSize);
+                // 设置分片号。每一个上传的分片都有一个分片号，取值范围是1~10000，如果超出此范围，OSS将返回InvalidArgument错误码。
+                uploadPartRequest.setPartNumber(i + 1);
+                // 每个分片不需要按顺序上传，甚至可以在不同客户端上传，OSS会按照分片号排序组成完整的文件。
+                UploadPartResult uploadPartResult = ossClient.uploadPart(uploadPartRequest);
+                // 每次上传分片之后，OSS的返回结果包含PartETag。PartETag将被保存在partETags中。
+                partETags.add(uploadPartResult.getPartETag());
             }
-            // 设置分片大小。除了最后一个分片没有大小限制，其他的分片最小为100 KB。
-            uploadPartRequest.setPartSize(curPartSize);
-            // 设置分片号。每一个上传的分片都有一个分片号，取值范围是1~10000，如果超出此范围，OSS将返回InvalidArgument错误码。
-            uploadPartRequest.setPartNumber(i + 1);
-            // 每个分片不需要按顺序上传，甚至可以在不同客户端上传，OSS会按照分片号排序组成完整的文件。
-            UploadPartResult uploadPartResult = ossClient.uploadPart(uploadPartRequest);
-            // 每次上传分片之后，OSS的返回结果包含PartETag。PartETag将被保存在partETags中。
-            partETags.add(uploadPartResult.getPartETag());
         }
 
 
@@ -117,6 +117,7 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
         log.info("上传结果：{} ", completeMultipartUploadResult.getETag());
 // 关闭OSSClient。 引用starter后，在服务关闭时，会自行shutdown
 //        ossClient.shutdown();
+        log.info("源文件名称：{} || 文件地址：{} ", objectName, completeMultipartUploadResult.getLocation());
     }
 
     @SneakyThrows
@@ -135,9 +136,10 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
 // 创建OSSClient实例。
 //        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
+        var downloadFilePath = System.getProperty("user.dir") + File.separator + downloadPath;
 // 下载请求，10个任务并发下载，启动断点续传。
         DownloadFileRequest downloadFileRequest = new DownloadFileRequest(bucketName, ossUri);
-        downloadFileRequest.setDownloadFile(downloadPath);
+        downloadFileRequest.setDownloadFile(downloadFilePath);
         downloadFileRequest.setPartSize(1 * 1024 * 1024);
         downloadFileRequest.setTaskNum(10);
         downloadFileRequest.setEnableCheckpoint(true);
@@ -145,10 +147,10 @@ public class AliyunOSSServiceImpl implements AliyunOSSService {
 //downloadFileRequest.setCheckpointFile("D:\\localpath\\examplefile.txt.dcp");
 
 // 下载文件。
-        DownloadFileResult downloadRes = ossClient.downloadFile(downloadFileRequest);
+        var downloadRes = ossClient.downloadFile(downloadFileRequest);
 // 下载成功时，会返回文件元信息。
-        ObjectMetadata objectMetadata = downloadRes.getObjectMetadata();
-        log.info("下载成功，ETag: {} || LastModified: {} || UserMetadata: {} ",
+        var objectMetadata = downloadRes.getObjectMetadata();
+        log.info("下载成功，FilePath：{} || ETag: {} || LastModified: {} || UserMetadata: {} ", downloadFilePath,
                 objectMetadata.getETag(), objectMetadata.getLastModified(), objectMetadata.getUserMetadata().get("meta"));
 
 // 关闭OSSClient。

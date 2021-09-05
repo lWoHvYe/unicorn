@@ -14,7 +14,7 @@ public interface AliyunOSSService {
      * @date 2021/9/5 17:12
      * @param file
      */
-    void MultipartUploadFile(MultipartFile file);
+    void multipartUploadFile(MultipartFile file);
 
     /**
      * @description 断点续传下载
