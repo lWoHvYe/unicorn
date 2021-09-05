@@ -383,3 +383,7 @@ alibaba:
     secret-key: xx
     oss:
       endpoint: xx
+      # 自定义属性 bucketName
+      bucket-name: xx
+      # 自定义属性 filePath
+      file-path: xx/xx/

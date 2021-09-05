@@ -16,6 +16,7 @@
         <mail.version>1.4.7</mail.version>
         <qiniu.version>7.8.0</qiniu.version>
         <alipay.version>4.16.21.ALL</alipay.version>
+        <aliyun.oss.version>3.12.0</aliyun.oss.version>
     </properties>
 
     <!--  无人维护。其中依赖版本过老，考虑其他方式  -->
@@ -57,6 +58,17 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>aliyun-oss-spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>aliyun-sdk-oss</artifactId>
+                    <groupId>com.aliyun.oss</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>${aliyun.oss.version}</version>
         </dependency>
 
         <!--支付宝依赖-->
