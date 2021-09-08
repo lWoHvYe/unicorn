@@ -254,7 +254,7 @@ public class MenuServiceImpl implements MenuService {
         // 但双层循环，执行了 n^2 次，待优化
         // 一次优化，将双层循环 调整成 一次聚合 + 单层循环
         var trees = new CopyOnWriteArrayList<MenuDto>();
-        Set<Long> ids = new HashSet<>();
+//        Set<Long> ids = new HashSet<>();
         // 根据上级id做聚合
         var listMap = menuDtos.parallelStream()
                 .filter(menuDto -> {
@@ -276,9 +276,10 @@ public class MenuServiceImpl implements MenuService {
         });
 
         // TODO: 2021/9/8 没有0级，即pid = null的，如何处理，及逻辑调整
-        if (trees.isEmpty()) {
-            return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
-        }
+        // 老版本可能第一级的pid = 0，下面是兼容原数据，新版第一级是null，统一后，下面的逻辑可移除
+//        if (trees.isEmpty()) {
+//            return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
+//        }
         return trees.stream().sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
     }
 
