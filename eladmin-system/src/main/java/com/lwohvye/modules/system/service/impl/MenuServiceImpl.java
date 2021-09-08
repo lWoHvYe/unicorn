@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -247,7 +248,10 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuDto> buildTree(List<MenuDto> menuDtos) {
-        List<MenuDto> trees = new ArrayList<>();
+        // 这里主要是利用了实体是引用传递的理念。在将实体add进集合后，对原实体对修改，对集合中对实体同样生效（因为指向同一内存地址）
+        // 较传统的一级一级递归查询，效率更高  1次查询 + n^2次循环 与 1 + 1+n 次查询 的差异
+        // 但双层循环，执行了 n^2 次，待优化
+        var trees = new CopyOnWriteArrayList<MenuDto>();
         Set<Long> ids = new HashSet<>();
         for (MenuDto menuDTO : menuDtos) {
             if (menuDTO.getPid() == null) {
@@ -264,9 +268,9 @@ public class MenuServiceImpl implements MenuService {
             }
         }
         if (trees.size() == 0) {
-            trees = menuDtos.stream().filter(s -> !ids.contains(s.getId())).collect(Collectors.toList());
+            return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).collect(Collectors.toList());
         }
-        return trees;
+        return trees.stream().sorted(Comparator.comparing(MenuDto::getMenuSort)).collect(Collectors.toList());
     }
 
     @Override
