@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.exception.BadRequestException;
@@ -68,7 +69,7 @@ public class MenuServiceImpl implements MenuService {
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> queryAll(MenuQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "menuSort");
-        if(Boolean.TRUE.equals(isQuery)){
+        if (Boolean.TRUE.equals(isQuery)) {
             criteria.setPidIsNull(true);
             List<Field> fields = QueryHelp.getAllFields(criteria.getClass(), new ArrayList<>());
             for (Field field : fields) {
@@ -251,26 +252,34 @@ public class MenuServiceImpl implements MenuService {
         // 这里主要是利用了实体是引用传递的理念。在将实体add进集合后，对原实体对修改，对集合中对实体同样生效（因为指向同一内存地址）
         // 较传统的一级一级递归查询，效率更高  1次查询 + n^2次循环 与 1 + 1+n 次查询 的差异
         // 但双层循环，执行了 n^2 次，待优化
+        // 一次优化，将双层循环 调整成 一次聚合 + 单层循环
         var trees = new CopyOnWriteArrayList<MenuDto>();
         Set<Long> ids = new HashSet<>();
-        for (MenuDto menuDTO : menuDtos) {
-            if (menuDTO.getPid() == null) {
-                trees.add(menuDTO);
-            }
-            for (MenuDto it : menuDtos) {
-                if (menuDTO.getId().equals(it.getPid())) {
-                    if (menuDTO.getChildren() == null) {
-                        menuDTO.setChildren(new ArrayList<>());
-                    }
-                    menuDTO.getChildren().add(it);
-                    ids.add(it.getId());
-                }
-            }
+        // 根据上级id做聚合
+        var listMap = menuDtos.parallelStream()
+                .filter(menuDto -> {
+                    var pid = menuDto.getPid();
+                    if (ObjectUtil.isNotNull(pid))
+                        return true;
+                    trees.add(menuDto);
+                    return false;
+                }).collect(Collectors.groupingBy(MenuDto::getPid));
+        // 遍历并设置 子级
+        // peek、map不会修改遍历的对象，需要将最终的结果进行赋值
+        // forEach是操作的遍历的对象，对于引用类型的实体，需要注意这一点
+        // 下面的逻辑里，要用forEach
+        menuDtos.parallelStream().forEach(menuDto -> {
+            var id = menuDto.getId();
+            var childList = listMap.get(id);
+            if (CollUtil.isNotEmpty(childList))
+                menuDto.setChildren(childList);
+        });
+
+        // TODO: 2021/9/8 没有0级，即pid = null的，如何处理，及逻辑调整
+        if (trees.isEmpty()) {
+            return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
         }
-        if (trees.size() == 0) {
-            return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).collect(Collectors.toList());
-        }
-        return trees.stream().sorted(Comparator.comparing(MenuDto::getMenuSort)).collect(Collectors.toList());
+        return trees.stream().sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
     }
 
     @Override

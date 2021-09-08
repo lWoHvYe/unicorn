@@ -46,6 +46,8 @@ public class RabbitMQDelayMsgConsumerService {
                 return;
             var delayMessage = JSONObject.parseObject(msgData, DelayMessage.class);
             kafkaProducerService.sendCallbackMessage(delayMessage.getActualTopic(), JSON.toJSONString(delayMessage));
+        } catch (Exception e) {
+            log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", e.getMessage(), amqpMsgEntityStr);
         } finally {
             log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, amqpMsgEntityStr);
             // TODO: 2021/4/27 处理完成，根据结果记录相关表。若处理报错，需邮件通知
