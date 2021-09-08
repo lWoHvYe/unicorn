@@ -31,6 +31,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 // 监听延迟插件相关队列的消息
 @RabbitListener(queues = "data.common.delay")
+// 支持多种配置方式 property placeholders and SpEL  https://docs.spring.io/spring-amqp/docs/current/reference/html/#choose-container
+//@RabbitListener(queues = "#{'${property.with.comma.delimited.queue.names}'.split(',')}" )
+// 还可调用静态和非静态方法
+// SpEL https://www.lwohvye.com/2021/06/11/spring-%e8%a1%a8%e8%be%be%e5%bc%8f%e8%af%ad%e8%a8%80-spel/
+//@RabbitListener(queues = "#{T(全类名).静态方法名}")
+//@RabbitListener(queues = "#{beanName.方法名}")
 public class RabbitMQDelayMsgConsumerService {
 
     @Autowired
