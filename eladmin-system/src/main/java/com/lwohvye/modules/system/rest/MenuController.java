@@ -67,6 +67,7 @@ public class MenuController {
     public ResponseEntity<Object> buildMenus() {
         List<MenuDto> menuDtoList = menuService.findByUser(SecurityUtils.getCurrentUserId());
         List<MenuDto> menuDtos = menuService.buildTree(menuDtoList);
+//        List<MenuDto> menuDtos = menuService.buildTree2(menuDtoList);
         return new ResponseEntity<>(menuService.buildMenus(menuDtos), HttpStatus.OK);
     }
 
