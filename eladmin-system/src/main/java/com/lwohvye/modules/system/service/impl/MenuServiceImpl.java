@@ -110,7 +110,7 @@ public class MenuServiceImpl implements MenuService {
         List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
         LinkedHashSet<Menu> menus = menuRepository.findByRoleIdsAndTypeNot(roleIds, 2);
-        return menus.stream().map(menuMapper::toDto).collect(Collectors.toList());
+        return menus.stream().map(menuMapper::toDto).toList();
     }
 
     @Override
@@ -203,7 +203,7 @@ public class MenuServiceImpl implements MenuService {
         for (Menu menu : menuList) {
             menuSet.add(menu);
             List<Menu> menus = menuRepository.findByPid(menu.getId());
-            if (menus != null && menus.size() != 0) {
+            if (menus != null && !menus.isEmpty()) {
                 getChildMenus(menus, menuSet);
             }
         }
@@ -252,7 +252,7 @@ public class MenuServiceImpl implements MenuService {
         // 这里主要是利用了实体是引用传递的理念。在将实体add进集合后，对原实体对修改，对集合中对实体同样生效（因为指向同一内存地址）
         // 较传统的一级一级递归查询，效率更高  1次查询 + n^2次循环 与 1 + 1+n 次查询 的差异
         // 但双层循环，执行了 n^2 次，待优化
-        // 一次优化，将双层循环 调整成 一次聚合 + 单层循环
+        // 一次优化，将双层循环 调整成 一次聚合 + 单层循环（但效率较之前几乎没变化，见buildTree2）
         var trees = new CopyOnWriteArrayList<MenuDto>();
 //        Set<Long> ids = new HashSet<>();
         // 根据上级id做聚合
@@ -284,9 +284,36 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public List<MenuDto> buildTree2(List<MenuDto> menuDtos) {
+        // 这里主要是利用了实体是引用传递的理念。在将实体add进集合后，对原实体对修改，对集合中对实体同样生效（因为指向同一内存地址）
+        // 较传统的一级一级递归查询，效率更高  1次查询 + n^2次循环 与 1 + 1+n 次查询 的差异
+        // 但双层循环，执行了 n^2 次，待优化
+        var trees = new CopyOnWriteArrayList<MenuDto>();
+        Set<Long> ids = new HashSet<>();
+        menuDtos.parallelStream().forEach(menuDto -> {
+            if (menuDto.getPid() == null) {
+                trees.add(menuDto);
+            }
+            for (MenuDto it : menuDtos) {
+                if (menuDto.getId().equals(it.getPid())) {
+                    if (menuDto.getChildren() == null) {
+                        menuDto.setChildren(new ArrayList<>());
+                    }
+                    menuDto.getChildren().add(it);
+                    ids.add(it.getId());
+                }
+            }
+        });
+        if (trees.isEmpty()) {
+            return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
+        }
+        return trees.stream().sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
+    }
+
+    @Override
     public List<MenuVo> buildMenus(List<MenuDto> menuDtos) {
-        List<MenuVo> list = new LinkedList<>();
-        menuDtos.forEach(menuDTO -> {
+        List<MenuVo> list = new CopyOnWriteArrayList<>();
+        menuDtos.parallelStream().forEach(menuDTO -> {
                     if (menuDTO != null) {
                         List<MenuDto> menuDtoList = menuDTO.getChildren();
                         MenuVo menuVo = new MenuVo();
@@ -295,7 +322,7 @@ public class MenuServiceImpl implements MenuService {
                         menuVo.setPath(menuDTO.getPid() == null ? "/" + menuDTO.getPath() : menuDTO.getPath());
                         menuVo.setHidden(menuDTO.getHidden());
                         // 如果不是外链
-                        if (!menuDTO.getIFrame()) {
+                        if (Boolean.FALSE.equals(menuDTO.getIFrame())) {
                             if (menuDTO.getPid() == null) {
                                 menuVo.setComponent(StringUtils.isEmpty(menuDTO.getComponent()) ? "Layout" : menuDTO.getComponent());
                                 // 如果不是一级菜单，并且菜单类型为目录，则代表是多级菜单
@@ -315,7 +342,7 @@ public class MenuServiceImpl implements MenuService {
                             MenuVo menuVo1 = new MenuVo();
                             menuVo1.setMeta(menuVo.getMeta());
                             // 非外链
-                            if (!menuDTO.getIFrame()) {
+                            if (Boolean.FALSE.equals(menuDTO.getIFrame())) {
                                 menuVo1.setPath("index");
                                 menuVo1.setName(menuVo.getName());
                                 menuVo1.setComponent(menuVo.getComponent());
