@@ -252,7 +252,7 @@ public class MenuServiceImpl implements MenuService {
         // 这里主要是利用了实体是引用传递的理念。在将实体add进集合后，对原实体对修改，对集合中对实体同样生效（因为指向同一内存地址）
         // 较传统的一级一级递归查询，效率更高  1次查询 + n^2次循环 与 1 + 1+n 次查询 的差异
         // 但双层循环，执行了 n^2 次，待优化
-        // 一次优化，将双层循环 调整成 一次聚合 + 单层循环（但效率较之前几乎没变化，见buildTree2）
+        // 一次优化，将双层循环 调整成 一次聚合 + 单层循环（聚合的时间开销并不大，随着数据量的增加，效率提升明显，空间换时间）
         var trees = new CopyOnWriteArrayList<MenuDto>();
 //        Set<Long> ids = new HashSet<>();
         // 根据上级id做聚合
