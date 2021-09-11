@@ -22,6 +22,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -60,13 +61,20 @@ public interface MenuRepository extends JpaRepository<Menu, Long>, JpaSpecificat
     /**
      * 根据角色ID与菜单类型查询菜单
      * @param roleIds roleIDs
-     * @param type 类型
+     * @param typeNot 类型
      * @return /
      */
     @Query(value = "SELECT m.* FROM sys_menu m, sys_roles_menus r WHERE " +
             "m.menu_id = r.menu_id AND r.role_id IN ?1 AND type != ?2 order by m.menu_sort asc",nativeQuery = true)
-    LinkedHashSet<Menu> findByRoleIdsAndTypeNot(Set<Long> roleIds, int type);
+    LinkedHashSet<Menu> findByRoleIdsAndTypeNot(Set<Long> roleIds, int typeNot);
 
+    @Query(value = "SELECT m.* FROM sys_menu m, sys_roles_menus r WHERE " +
+                   "m.menu_id = r.menu_id AND r.role_id IN ?1 AND m.pid is null AND type != ?2 order by m.menu_sort asc",nativeQuery = true)
+    Optional<LinkedHashSet<Menu>> findByRoleIdsAndPidIsNullAndTypeNot(Set<Long> roleIds, int typeNot);
+
+    @Query(value = "SELECT m.* FROM sys_menu m, sys_roles_menus r WHERE " +
+                   "m.menu_id = r.menu_id AND r.role_id IN ?1 AND m.pid = ?2 AND type != ?3 order by m.menu_sort asc",nativeQuery = true)
+    Optional<LinkedHashSet<Menu>> findByRoleIdsAndPidAndTypeNot(Set<Long> roleIds, Long pid, int typeNot);
     /**
      * 获取节点数量
      * @param id /

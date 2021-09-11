@@ -76,6 +76,8 @@ public interface MenuService extends BaseService {
 
     List<MenuDto> buildTree2(List<MenuDto> menuDtos);
 
+    List<MenuDto> buildTree3(Long currentUserId);
+
     /**
      * 构建菜单树
      * @param menuDtos /

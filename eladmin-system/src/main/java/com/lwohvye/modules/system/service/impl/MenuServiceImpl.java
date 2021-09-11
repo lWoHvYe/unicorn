@@ -247,6 +247,7 @@ public class MenuServiceImpl implements MenuService {
         return getSuperior(findById(menuDto.getPid()), menus);
     }
 
+    // 一次查询，聚合 + 单次循环。效率较优
     @Override
     public List<MenuDto> buildTree(List<MenuDto> menuDtos) {
         // 这里主要是利用了实体是引用传递的理念。在将实体add进集合后，对原实体对修改，对集合中对实体同样生效（因为指向同一内存地址）
@@ -283,6 +284,7 @@ public class MenuServiceImpl implements MenuService {
         return trees.stream().sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
     }
 
+    // 一次查询，嵌套循环处理。大幅减少数据库IO
     @Override
     public List<MenuDto> buildTree2(List<MenuDto> menuDtos) {
         // 这里主要是利用了实体是引用传递的理念。在将实体add进集合后，对原实体对修改，对集合中对实体同样生效（因为指向同一内存地址）
@@ -308,6 +310,31 @@ public class MenuServiceImpl implements MenuService {
             return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
         }
         return trees.stream().sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
+    }
+
+    // 递归，多次调用数据库。不建议
+    @Override
+    public List<MenuDto> buildTree3(Long currentUserId) {
+        List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
+        Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
+        return menuRepository.findByRoleIdsAndPidIsNullAndTypeNot(roleIds, 2).orElseGet(LinkedHashSet::new)
+                .parallelStream().map(menu -> {
+                    var dto = menuMapper.toDto(menu);
+                    var id = dto.getId();
+                    dto.setChildren(getChild4CurUser(id, roleIds));
+                    return dto;
+                }).toList();
+
+    }
+
+    private List<MenuDto> getChild4CurUser(Long pid, Set<Long> roleIds) {
+        return menuRepository.findByRoleIdsAndPidAndTypeNot(roleIds, pid, 2).orElseGet(LinkedHashSet::new)
+                .parallelStream().map(menu -> {
+                    var dto = menuMapper.toDto(menu);
+                    var id = dto.getId();
+                    dto.setChildren(getChild4CurUser(id, roleIds));
+                    return dto;
+                }).toList();
     }
 
     @Override
