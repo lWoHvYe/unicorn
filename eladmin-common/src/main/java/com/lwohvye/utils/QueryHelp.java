@@ -36,6 +36,7 @@ import java.util.List;
  * @date 2019-6-4 14:59:48
  */
 @Slf4j
+// @SuppressWarnings 抑制警告
 @SuppressWarnings({"unchecked", "all"})
 public class QueryHelp {
 
@@ -74,9 +75,8 @@ public class QueryHelp {
 //                field.canAccess(filed对应的查询器实例)
                 var accessible = field.canAccess(query);
 //                boolean accessible = field.isAccessible();
-                // TODO: 2021/7/9 下面这两行，确认无误后，记得移除
-                if (ObjectUtil.notEqual(accessible, field.isAccessible()))
-                    throw new RuntimeException("编码有误" + field.toString() + accessible);
+//                if (ObjectUtil.notEqual(accessible, field.isAccessible()))
+//                    throw new RuntimeException("编码有误" + field.toString() + accessible);
                 // 设置对象的访问权限，保证对private的属性的访
                 field.setAccessible(true);
                 Query q = field.getAnnotation(Query.class);
@@ -306,11 +306,11 @@ public class QueryHelp {
                                     throw new RuntimeException("暂不支持该类型，请期待后续支持：" + queryType);
                             }
 //                                    String类型使用Inner like
-                        } else if (fieldValue instanceof String) {
-                            predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + fieldValue.toString() + "%");
+                        } else if (fieldValue instanceof String str) {
+                            predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + fieldValue + "%");
 //                                    传-1L时。做is null查询。额外限制为当对应属性上有id注解的时候。
-                            // TODO: 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效。
-                            // TODO: 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
+                            // 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效。
+                            // 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
                             // TODO: 2021/4/6 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
                         } else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L) && ObjectUtil.isNotNull(idAnnotation)) {
                             predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));

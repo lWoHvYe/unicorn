@@ -195,6 +195,9 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
+@EnableRetry //开启重试机制
+//开启 @ConfigurationProperties 注解
+@EnableConfigurationProperties
 public class AppRun {
 
     public static void main(String[] args) {
@@ -204,13 +207,6 @@ public class AppRun {
     @Bean
     public SpringContextHolder springContextHolder() {
         return new SpringContextHolder();
-    }
-
-    @Bean
-    public ServletWebServerFactory webServerFactory() {
-        TomcatServletWebServerFactory fa = new TomcatServletWebServerFactory();
-        fa.addConnectorCustomizers(connector -> connector.setProperty("relaxedQueryChars", "[]{}"));
-        return fa;
     }
 
     /**

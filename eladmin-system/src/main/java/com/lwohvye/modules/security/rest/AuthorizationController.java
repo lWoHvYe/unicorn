@@ -98,7 +98,7 @@ public class AuthorizationController {
 //        var lockUser = authRedisUtils.get(lockUserKey);
 //        if (ObjectUtil.isNotNull(lockUser) && lockUser instanceof Collection col ? CollUtil.isNotEmpty(col) : ObjectUtil.isNotEmpty(lockUser)) {
 //        if (ObjectUtil.isNotEmpty(lockUser)) {
-        // TODO: 2021/4/22 改用延时消息队列来做。错误一定次数后，修改用户状态为锁定，然后延时消息。一小时后解除
+        // 改用延时消息队列来做。错误一定次数后，修改用户状态为锁定，然后延时消息。一小时后解除
 //        if (authSlaveRedisUtils.hasKey(lockUserKey))
 //            throw new BadRequestException("用户已被锁定，请稍后再试");
 

@@ -170,14 +170,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer findByRoles(Set<Role> roles) {
-        if (roles.size() == 0) {
+        if (roles.isEmpty()) {
             return Integer.MAX_VALUE;
         }
         Set<RoleDto> roleDtos = new HashSet<>();
         for (Role role : roles) {
             roleDtos.add(findById(role.getId()));
         }
-        return Collections.min(roleDtos.stream().map(RoleDto::getLevel).collect(Collectors.toList()));
+        return Collections.min(roleDtos.stream().map(RoleDto::getLevel).toList());
     }
 
     @Override
@@ -195,8 +195,8 @@ public class RoleServiceImpl implements RoleService {
         }
         Set<Role> roles = roleRepository.findByUserId(user.getId());
         permissions = roles.stream().flatMap(role -> role.getMenus().stream())
-                .filter(menu -> StringUtils.isNotBlank(menu.getPermission()))
-                .map(Menu::getPermission).collect(Collectors.toSet());
+                .map(Menu::getPermission)
+                .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
         return permissions.stream().map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }

@@ -38,6 +38,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.method.HandlerMethod;
@@ -158,26 +159,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             AnonymousAccess anonymousAccess = handlerMethod.getMethodAnnotation(AnonymousAccess.class);
             if (null != anonymousAccess) {
                 List<RequestMethod> requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
-                RequestMethodEnum request = RequestMethodEnum.find(requestMethods.size() == 0 ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
+                RequestMethodEnum request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
+                var patternsCondition = infoEntry.getKey().getPatternsCondition();
+                Assert.notNull(patternsCondition, "系统错误，请联系相关人员排查");
+                var patterns = patternsCondition.getPatterns();
                 switch (Objects.requireNonNull(request)) {
-                    case GET:
-                        get.addAll(infoEntry.getKey().getPatternsCondition().getPatterns());
-                        break;
-                    case POST:
-                        post.addAll(infoEntry.getKey().getPatternsCondition().getPatterns());
-                        break;
-                    case PUT:
-                        put.addAll(infoEntry.getKey().getPatternsCondition().getPatterns());
-                        break;
-                    case PATCH:
-                        patch.addAll(infoEntry.getKey().getPatternsCondition().getPatterns());
-                        break;
-                    case DELETE:
-                        delete.addAll(infoEntry.getKey().getPatternsCondition().getPatterns());
-                        break;
-                    default:
-                        all.addAll(infoEntry.getKey().getPatternsCondition().getPatterns());
-                        break;
+                    case GET -> get.addAll(patterns);
+                    case POST -> post.addAll(patterns);
+                    case PUT -> put.addAll(patterns);
+                    case PATCH -> patch.addAll(patterns);
+                    case DELETE -> delete.addAll(patterns);
+                    default -> all.addAll(patterns);
                 }
             }
         }

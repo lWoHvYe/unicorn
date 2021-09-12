@@ -19,6 +19,7 @@ package com.lwohvye.config.rabbitmq;
 import lombok.Getter;
 
 @Getter
+// TODO: 2021/9/12 交换机、路由键、队列 几者间的关系很复杂，这种一对一对一的定义方式，有待进行优化
 public enum QueueEnum {
     /**
      * 消息通知队列

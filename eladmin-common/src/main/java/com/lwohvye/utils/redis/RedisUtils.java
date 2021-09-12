@@ -705,11 +705,11 @@ public class RedisUtils {
      * 获取存储在哈希表中指定字段的值
      *
      * @param key
-     * @param field
+     * @param item
      * @return
      */
-    public Object hGet(String key, String field) {
-        return redisTemplate.opsForHash().get(key, field);
+    public Object hGet(String key, String item) {
+        return redisTemplate.opsForHash().get(key, item);
     }
 
     /**
@@ -726,11 +726,11 @@ public class RedisUtils {
      * 获取所有给定字段的值
      *
      * @param key
-     * @param fields
+     * @param  items
      * @return
      */
-    public List<Object> hMultiGet(String key, Collection<Object> fields) {
-        return redisTemplate.opsForHash().multiGet(key, fields);
+    public List<Object> hMultiGet(String key, Collection<Object> items) {
+        return redisTemplate.opsForHash().multiGet(key,  items);
     }
 
     /**
@@ -783,10 +783,10 @@ public class RedisUtils {
             return false;
         }
     }
-
-    public void hPut(String key, String hashKey, String value) {
-        redisTemplate.opsForHash().put(key, hashKey, value);
-    }
+//
+//    public void hPut(String key, String hashKey, String value) {
+//        redisTemplate.opsForHash().put(key, hashKey, value);
+//    }
 
     /**
      * HashSet
@@ -842,11 +842,11 @@ public class RedisUtils {
      * 删除一个或多个哈希表字段
      *
      * @param key
-     * @param fields
+     * @param items
      * @return
      */
-    public Long hDelete(String key, Object... fields) {
-        return redisTemplate.opsForHash().delete(key, fields);
+    public Long hDelete(String key, Object... items) {
+        return redisTemplate.opsForHash().delete(key, items);
     }
 
     /**
@@ -864,11 +864,11 @@ public class RedisUtils {
      * 查看哈希表 key 中，指定的字段是否存在
      *
      * @param key
-     * @param field
+     * @param item
      * @return
      */
-    public boolean hExists(String key, String field) {
-        return redisTemplate.opsForHash().hasKey(key, field);
+    public boolean hExists(String key, String item) {
+        return redisTemplate.opsForHash().hasKey(key, item);
     }
 
     /**
@@ -1923,7 +1923,7 @@ public class RedisUtils {
      * @author Hongyan Wang
      * @date 2021/7/17 11:52
      */
-    // TODO: 2021/7/28 当value类型为String时 这里存入的value为 001，通过其他方法存入的为 "001"，是不一样的，这点需特别注意，要想保持一致，lua相关的需要手动在前后拼双引号    "\"" + value + "\""
+    //  当value类型为String时 这里存入的value为 001，通过其他方法存入的为 "001"，是不一样的，这点需特别注意，要想保持一致，lua相关的需要手动在前后拼双引号    "\"" + value + "\""
     //  当value类型为long时，lua存入的值不带L，但通过其他方法存入的带L。其他类型的也同理，需要进行处理
     // lua相关的，需要注意引号的问题
     public boolean zAddIfHigherScore(String key, Object value, double score) {

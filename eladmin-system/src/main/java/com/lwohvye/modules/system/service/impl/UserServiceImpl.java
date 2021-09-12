@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
             redisUtils.delete(CacheKey.ROLE_AUTH + resources.getId());
         }
         // 如果用户被禁用，则清除用户登录信息
-        if (!resources.getEnabled()) {
+        if (Boolean.FALSE.equals(resources.getEnabled())) {
             onlineUserService.kickOutForUsername(resources.getUsername());
         }
 
@@ -254,14 +254,14 @@ public class UserServiceImpl implements UserService {
     public void download(List<UserDto> queryAll, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
         for (UserDto userDTO : queryAll) {
-            List<String> roles = userDTO.getRoles().stream().map(RoleSmallDto::getName).collect(Collectors.toList());
+            List<String> roles = userDTO.getRoles().stream().map(RoleSmallDto::getName).toList();
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("用户名", userDTO.getUsername());
             map.put("角色", roles);
             map.put("部门", userDTO.getDept().getName());
-            map.put("岗位", userDTO.getJobs().stream().map(JobSmallDto::getName).collect(Collectors.toList()));
+            map.put("岗位", userDTO.getJobs().stream().map(JobSmallDto::getName).toList());
             map.put("邮箱", userDTO.getEmail());
-            map.put("状态", userDTO.getEnabled() ? "启用" : "禁用");
+            map.put("状态", Boolean.TRUE.equals(userDTO.getEnabled()) ? "启用" : "禁用");
             map.put("手机号码", userDTO.getPhone());
             map.put("修改密码的时间", userDTO.getPwdResetTime());
             map.put("创建日期", userDTO.getCreateTime());

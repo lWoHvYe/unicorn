@@ -276,7 +276,6 @@ public class MenuServiceImpl implements MenuService {
                 menuDto.setChildren(childList);
         });
 
-        // TODO: 2021/9/8 没有0级，即pid = null的，如何处理，及逻辑调整
         // 老版本可能第一级的pid = 0，下面是兼容原数据，新版第一级是null，统一后，下面的逻辑可移除
 //        if (trees.isEmpty()) {
 //            return menuDtos.stream().filter(s -> !ids.contains(s.getId())).sorted(Comparator.comparing(MenuDto::getMenuSort)).toList();
