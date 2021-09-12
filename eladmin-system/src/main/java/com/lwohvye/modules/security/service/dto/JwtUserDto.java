@@ -16,11 +16,12 @@
 package com.lwohvye.modules.security.service.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import com.lwohvye.modules.system.service.dto.UserDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class JwtUserDto implements UserDetails {
 
-    private final UserDto user;
+    private final UserInnerDto user;
 
     private final List<Long> dataScopes;
 

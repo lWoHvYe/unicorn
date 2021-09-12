@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.security.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.exception.BadRequestException;
@@ -24,7 +25,7 @@ import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.system.service.DataService;
 import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.UserService;
-import com.lwohvye.modules.system.service.dto.UserDto;
+import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -67,8 +68,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         JwtUserDto jwtUserDto = null;
         if (loginProperties.isCacheEnable() && authSlaveRedisUtils.hHasKey(USER_CACHE_KEY, username)) {
 //            jwtUserDto = userDtoCache.get(username);
-            jwtUserDto = (JwtUserDto) authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
-
+            var cacheUser = (String)authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
+            jwtUserDto = JSONObject.parseObject(cacheUser, JwtUserDto.class);
             // 检查dataScope是否修改
             List<Long> dataScopes = jwtUserDto.getDataScopes();
             dataScopes.clear();
@@ -76,9 +77,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             searchDb = false;
         }
         if (searchDb) {
-            UserDto user;
+            UserInnerDto user;
             try {
-                user = userService.findByName(username);
+                var dto = userService.findByName(username);
+                user = new UserInnerDto(dto);
             } catch (EntityNotFoundException e) {
                 // SpringSecurity会自动转换UsernameNotFoundException为BadCredentialsException
                 throw new UsernameNotFoundException("", e);
@@ -95,7 +97,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         roleService.mapToGrantedAuthorities(user)
                 );
 //                userDtoCache.put(username, jwtUserDto);
-                authRedisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto);
+                // 不能直接存对象，会报错。。。。com.alibaba.fastjson.JSONException: autoType is not support.
+                // https://github.com/alibaba/fastjson/wiki/enable_autotype      但已经开启了，原因未知
+                authRedisUtils.hPut(USER_CACHE_KEY, username, JSONObject.toJSONString(jwtUserDto));
             }
         }
         return jwtUserDto;
