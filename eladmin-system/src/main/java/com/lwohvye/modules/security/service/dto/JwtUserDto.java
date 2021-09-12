@@ -38,7 +38,8 @@ public class JwtUserDto implements UserDetails {
 
     private final List<Long> dataScopes;
 
-    @JSONField(serialize = false)
+    // TODO: 2021/9/12 尚未确定不做序列化的原因，但若放到redis中，需要进行序列化
+//    @JSONField(serialize = false)
     private final List<GrantedAuthority> authorities;
 
     public Set<String> getRoles() {

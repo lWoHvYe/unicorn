@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.security.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
@@ -85,7 +86,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 // SpringSecurity会自动转换UsernameNotFoundException为BadCredentialsException
                 throw new UsernameNotFoundException("", e);
             }
-            if (user == null) {
+            if (ObjectUtil.isNotNull(user.getId())) {
                 throw new UsernameNotFoundException("");
             } else {
                 if (Boolean.FALSE.equals(user.getEnabled())) {
