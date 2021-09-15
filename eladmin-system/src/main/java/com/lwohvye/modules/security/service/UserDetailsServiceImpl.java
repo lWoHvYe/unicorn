@@ -71,10 +71,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //            jwtUserDto = userDtoCache.get(username);
             var cacheUser = (String)authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
             jwtUserDto = JSONObject.parseObject(cacheUser, JwtUserDto.class);
+
+            // TODO: 2021/9/15  List<GrantedAuthority> 反序列化时，有误，故需重新设置。虽然使用了缓存，但把IO从2提到了3，后续试着优化
+            var authorities = jwtUserDto.getAuthorities();
+            authorities.clear();
+            var userInner = jwtUserDto.getUser();
+            authorities.addAll(roleService.mapToGrantedAuthorities(userInner.getId(), userInner.getIsAdmin()));
+
             // 检查dataScope是否修改
             List<Long> dataScopes = jwtUserDto.getDataScopes();
             dataScopes.clear();
-            dataScopes.addAll(dataService.getDeptIds(jwtUserDto.getUser()));
+            dataScopes.addAll(dataService.getDeptIds(userInner));
             searchDb = false;
         }
         if (searchDb) {
@@ -92,6 +99,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 if (Boolean.FALSE.equals(user.getEnabled())) {
                     throw new BadRequestException("账号未激活！");
                 }
+                // 2021/9/15 这里到authorities 序列化后，反序列化时，会有误。已初步解决
                 jwtUserDto = new JwtUserDto(
                         user,
                         dataService.getDeptIds(user),

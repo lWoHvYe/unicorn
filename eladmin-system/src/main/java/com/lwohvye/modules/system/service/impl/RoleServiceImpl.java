@@ -186,14 +186,29 @@ public class RoleServiceImpl implements RoleService {
 //    需注意是 target.xxx 不带前面的 #
     @Cacheable(key = " #root.target.getSysName() + 'auth:' + #p0.id")
     public List<GrantedAuthority> mapToGrantedAuthorities(UserDto user) {
+        var userId = user.getId();
+        var isAdmin = user.getIsAdmin();
+
+        return genAuthorities(userId, isAdmin);
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Cacheable(key = " target.getSysName() + 'auth:' + #p0")
+    public List<GrantedAuthority> mapToGrantedAuthorities(Long userId, Boolean isAdmin) {
+        return genAuthorities(userId, isAdmin);
+    }
+
+    private List<GrantedAuthority> genAuthorities(Long userId, Boolean isAdmin) {
         Set<String> permissions = new HashSet<>();
         // 如果是管理员直接返回
-        if (user.getIsAdmin()) {
+        if (isAdmin) {
             permissions.add("admin");
             return permissions.stream().map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         }
-        Set<Role> roles = roleRepository.findByUserId(user.getId());
+        Set<Role> roles = roleRepository.findByUserId(userId);
         permissions = roles.stream().flatMap(role -> role.getMenus().stream())
                 .map(Menu::getPermission)
                 .filter(StringUtils::isNotBlank).collect(Collectors.toSet());

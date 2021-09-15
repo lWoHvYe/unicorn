@@ -122,6 +122,8 @@ public interface RoleService extends BaseService {
      */
     List<GrantedAuthority> mapToGrantedAuthorities(UserDto user);
 
+    List<GrantedAuthority> mapToGrantedAuthorities(Long userId,Boolean isAdmin);
+
     /**
      * 验证是否被用户关联
      * @param ids /
