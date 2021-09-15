@@ -56,7 +56,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--        <java.version>15</java.version>-->
-        <java.version>16</java.version>
+        <java.version>17</java.version>
         <project.core.version>2.6.13</project.core.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <swagger.version>3.0.0</swagger.version>
@@ -528,16 +528,17 @@
         <!--todo 针对异常
         java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.lang.String java.lang.NamedPackage.name accessible: module java.base does not "opens java.lang" to unnamed module @7bfcd12c
         需要在jvm 中添加启动参数
-        &#45;&#45;add-opens java.base/java.lang=ALL-UNNAMED
+        ——add-opens java.base/java.lang=ALL-UNNAMED
         如果反射代码在命名模块中，则ALL-UNNAMED可以用其名称替换。
-        如果要添加的标志太多，则可以考虑使用封装终止开关 &#45;&#45;permit-illegal-access。它将允许类路径上的所有代码反射所有已命名的模块
-        针对Java16下，无法反射java.base包下的内容的情况，在mvn的运行环境中添加如下配置
+        如果要添加的标志太多，则可以考虑使用封装终止开关 ——permit-illegal-access。它将允许类路径上的所有代码反射所有已命名的模块
+        针对Java 16下，无法反射java.base包下的内容的情况，在mvn的运行环境中添加如下配置
         ——illegal-access
         该参数有四个可选值：
         permit：默认值，允许通过反射访问，因此会提示像上面一样的警告，这个是首次非法访问警告，后续不警告
         warn：每次非法访问都会警告
         debug：在warn的基础上加入了类似e.printStackTrace()的功能
         deny：禁止所有的非法访问除了使用特别的命令行参数排除的模块，比如使用——add-opens排除某些模块使其能够通过非法反射访问
+        但Java 17移除了 illegal-access，需要在mvn中使用add-opens配置
         -->
     </build>
 

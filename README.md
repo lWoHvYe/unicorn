@@ -41,6 +41,13 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
 ```
 
+Java 17，发布中央仓库，需要在maven的vm中配置 
+--add-opens java.base/java.lang=ALL-UNNAMED
+--add-opens java.base/java.lang.reflect=ALL-UNNAMED
+--add-opens java.base/java.util=ALL-UNNAMED
+--add-opens java.base/java.text=ALL-UNNAMED
+--add-opens java.desktop/java.awt.font=ALL-UNNAMED
+
 #### 项目简介
 一个基于 Spring Boot 2.4.2 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、Vue的前后端分离的后台管理系统
 
