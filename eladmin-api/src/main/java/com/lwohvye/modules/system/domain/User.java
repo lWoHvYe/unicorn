@@ -25,6 +25,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -54,7 +55,10 @@ public class User extends BaseEntity implements Serializable {
     @Id
     @Column(name = "user_id")
     @NotNull(groups = Update.class)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // 在jpa insert操作时，可以指定插入对主键id
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "lid")
+    @GenericGenerator(name = "lid", strategy = "com.lwohvye.config.LocalInsertGenerator")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value = "ID", hidden = true)
     private Long id;
 

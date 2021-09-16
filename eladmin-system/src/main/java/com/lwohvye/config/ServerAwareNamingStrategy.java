@@ -31,7 +31,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
-
+/**
+ * @description Jpa在映射实体和表的关系时，提供了一个入口，用于对绑定做一些操作
+ * @author Hongyan Wang
+ */
 @Slf4j
 @Component
 public class ServerAwareNamingStrategy extends SpringPhysicalNamingStrategy implements ApplicationContextAware {
