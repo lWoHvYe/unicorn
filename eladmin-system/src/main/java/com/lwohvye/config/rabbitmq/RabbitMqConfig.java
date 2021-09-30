@@ -24,6 +24,9 @@ import java.util.Map;
 
 @Configuration
 public class RabbitMqConfig {
+
+    public static final String TOPIC_SYNC_EXCHANGE = "sync_topic_exchange";
+
     /**
      * 消费队列所绑定的交换机
      */
@@ -92,26 +95,29 @@ public class RabbitMqConfig {
 
     /**
      * 延迟队列-插件
+     *
      * @return q
      */
     @Bean
-    public Queue dataDelayQueue(){
+    public Queue dataDelayQueue() {
         return QueueBuilder.durable(QueueEnum.QUEUE_DATA_SYNC_DELAY.getQueueName()).build();
     }
 
     /**
      * 延迟队列交换机-插件
+     *
      * @return ex
      */
     @Bean
     public CustomExchange dataDelayExchange() {
         Map<String, Object> args = new HashMap<>();
-        args.put("x-delayed-type","direct");
+        args.put("x-delayed-type", "direct");
         return new CustomExchange(QueueEnum.QUEUE_DATA_SYNC_DELAY.getExchange(), "x-delayed-message", true, false, args);
     }
 
     /**
      * 给延时队列绑定交换机-插件
+     *
      * @return binding
      */
     @Bean
@@ -121,5 +127,19 @@ public class RabbitMqConfig {
                 .to(dataDelayExchange)
                 .with(QueueEnum.QUEUE_DATA_SYNC_DELAY.getRouteKey())
                 .noargs();
+    }
+
+    /**
+     * @description topic交换机。支持路由通配符 *代表一个单词 #代表零个或多个单词
+     * @author Hongyan Wang
+     * @date 2021/9/30 10:25 上午
+     * @return org.springframework.amqp.core.TopicExchange
+     */
+    @Bean
+    public TopicExchange topicYExchange() {
+        return ExchangeBuilder
+                .topicExchange(TOPIC_SYNC_EXCHANGE)
+                .durable(true)
+                .build();
     }
 }

@@ -29,6 +29,9 @@ import org.springframework.stereotype.Component;
  * 使用 Class.forName(String s)时，传的是类的全路径（包含包）
  * 上面几种获取bean的。传的是bean的名称（首字母小写）
  * 针对接口，需要获取相关的实现类，因为注解是在实现类上的
+ *
+ * 项目中已有相关的实现，可考虑整合一下
+ * @see SpringContextHolder
  * @date 2021-04-30
  */
 @Component

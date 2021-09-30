@@ -63,8 +63,8 @@
         <io.swagger.version>1.6.2</io.swagger.version>
         <fastjson.version>1.2.78</fastjson.version>
         <druid.version>1.2.6</druid.version>
-        <hutool.version>5.7.11</hutool.version>
-        <fastutil.version>8.5.4</fastutil.version>
+        <hutool.version>5.7.13</hutool.version>
+        <fastutil.version>8.5.6</fastutil.version>
         <lombok.version>1.18.20</lombok.version>
         <commons-pool2.version>2.9.0</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
