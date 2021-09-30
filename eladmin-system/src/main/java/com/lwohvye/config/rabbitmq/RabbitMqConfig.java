@@ -27,6 +27,8 @@ public class RabbitMqConfig {
 
     public static final String TOPIC_SYNC_EXCHANGE = "sync_topic_exchange";
 
+    public static final String TOPIC_SYNC_DELAY_EXCHANGE = "sync_delay_topic_exchange";
+
     /**
      * 消费队列所绑定的交换机
      */
@@ -105,7 +107,7 @@ public class RabbitMqConfig {
 
     /**
      * 延迟队列交换机-插件
-     *
+     * direct模式
      * @return ex
      */
     @Bean
@@ -130,10 +132,10 @@ public class RabbitMqConfig {
     }
 
     /**
+     * @return org.springframework.amqp.core.TopicExchange
      * @description topic交换机。支持路由通配符 *代表一个单词 #代表零个或多个单词
      * @author Hongyan Wang
      * @date 2021/9/30 10:25 上午
-     * @return org.springframework.amqp.core.TopicExchange
      */
     @Bean
     public TopicExchange topicYExchange() {
@@ -141,5 +143,18 @@ public class RabbitMqConfig {
                 .topicExchange(TOPIC_SYNC_EXCHANGE)
                 .durable(true)
                 .build();
+    }
+
+    /**
+     * 延迟队列交换机-插件
+     * topic模式
+     * https://github.com/rabbitmq/rabbitmq-delayed-message-exchange
+     * @return ex
+     */
+    @Bean
+    public CustomExchange topicDelayExchange() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-delayed-type", "topic");
+        return new CustomExchange(TOPIC_SYNC_DELAY_EXCHANGE, "x-delayed-message", true, false, args);
     }
 }

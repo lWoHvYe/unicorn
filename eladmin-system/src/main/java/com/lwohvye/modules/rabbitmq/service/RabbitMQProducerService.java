@@ -19,6 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.rabbitmq.QueueEnum;
+import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-
+// 发消息时指定了 交换机和路由键。 所以可以把发消息 和 队列的绑定分开，发消息方定义交换机、消费方定义队列 及队列与交换机、路由键的绑定。提高灵活性。
 @Component
 @Slf4j
 public class RabbitMQProducerService {
@@ -89,6 +90,22 @@ public class RabbitMQProducerService {
                         //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
                         message.getMessageProperties().setHeader("x-delay", expireMill);
                     }
+                    return message;
+                });
+    }
+
+    /**
+     * @param commonEntity
+     * @description 延迟消息，topic模式
+     * @author Hongyan Wang
+     * @date 2021/9/30 1:38 下午
+     */
+    public void sendSyncDelayMsg(AmqpMsgEntity commonEntity) {
+        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_SYNC_DELAY_EXCHANGE, "xxx.xxx",
+                JSON.toJSONString(commonEntity),
+                message -> {
+                    // 延迟 500ms
+                    message.getMessageProperties().setHeader("x-delay", 500L);
                     return message;
                 });
     }
