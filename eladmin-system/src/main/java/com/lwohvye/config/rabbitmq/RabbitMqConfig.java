@@ -108,6 +108,7 @@ public class RabbitMqConfig {
     /**
      * 延迟队列交换机-插件
      * direct模式
+     *
      * @return ex
      */
     @Bean
@@ -149,6 +150,7 @@ public class RabbitMqConfig {
      * 延迟队列交换机-插件
      * topic模式
      * https://github.com/rabbitmq/rabbitmq-delayed-message-exchange
+     *
      * @return ex
      */
     @Bean
@@ -157,4 +159,66 @@ public class RabbitMqConfig {
         args.put("x-delayed-type", "topic");
         return new CustomExchange(TOPIC_SYNC_DELAY_EXCHANGE, "x-delayed-message", true, false, args);
     }
+
+    // region 消费失败后，重试一定次数，之后转发到死信队列中
+
+    public static final String EXCHANGE_TOPICS_INFORM = "exchange_topics_inform";
+    private static final String DEAD_INFO_EXCHANGE = "x-dead-letter-exchange";
+
+    public static final String QUEUE_INFORM_EMAIL = "queue_inform_email";
+    public static final String ROUTE_KEY_EMAIL = "inform.#.email.#";
+
+    public static final String DEAD_INFO_QUEUE = "dead_info_queue";
+    public static final String DEAD_ROUTE_KEY = "dead_info_dev";
+
+    //声明交换机
+    @Bean
+    public Exchange exchangeTopicsInform() {
+        return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS_INFORM).durable(true).build();
+    }
+
+    //声明QUEUE_INFORM_EMAIL队列，配置死信队列需要的参数
+    @Bean
+    public Queue queueInformEmail() {
+//        Map<String, Object> map = new HashMap<>();
+        // key固定，value根据业务
+//        map.put("x-dead-letter-exchange", DEAD_INFO_EXCHANGE);
+//        map.put("x-dead-letter-routing-key", DEAD_ROUTE_KEY);
+//        return new Queue(QUEUE_INFORM_EMAIL, true, false, false, map);
+        return QueueBuilder
+                .durable(QUEUE_INFORM_EMAIL)
+//                .withArguments(map)
+                // 可以配置个时间，到时间后自动转发到死信队列 ms
+                .withArgument("x-message-ttl", 10000)
+                // 满足要求后转发的死信交换机及路由键
+                .withArgument("x-dead-letter-exchange", DEAD_INFO_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", DEAD_ROUTE_KEY)
+                .build();
+    }
+
+    //ROUTE_KEY_EMAIL队列绑定交换机，指定routingKey
+    @Bean
+    public Binding bindingQueueInformEmail(Queue queueInformEmail, Exchange exchangeTopicsInform) {
+        return BindingBuilder.bind(queueInformEmail).to(exchangeTopicsInform).with(ROUTE_KEY_EMAIL).noargs();
+    }
+
+
+    //以下为死信队列
+    // 交换机
+    @Bean
+    public Exchange deadInfoExchange() {
+        return ExchangeBuilder.directExchange(DEAD_INFO_EXCHANGE).durable(true).build();
+    }
+
+    @Bean
+    public Queue deadInfoQueue() {
+        return QueueBuilder.durable(DEAD_INFO_QUEUE).build();
+    }
+
+    @Bean
+    public Binding deadInfoQueueBind(Queue deadInfoQueue, Exchange deadInfoExchange) {
+        return BindingBuilder.bind(deadInfoQueue).to(deadInfoExchange).with(DEAD_ROUTE_KEY).noargs();
+    }
+
+    // endregion
 }
