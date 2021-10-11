@@ -60,7 +60,7 @@
         <project.core.version>2.6.13</project.core.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <swagger.version>3.0.0</swagger.version>
-        <io.swagger.version>1.6.2</io.swagger.version>
+        <io.swagger.version>1.6.3</io.swagger.version>
         <fastjson.version>1.2.78</fastjson.version>
         <druid.version>1.2.8</druid.version>
         <hutool.version>5.7.13</hutool.version>
