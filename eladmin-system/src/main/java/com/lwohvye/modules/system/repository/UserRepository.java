@@ -142,11 +142,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     int countByDepts(Set<Long> deptIds);
 
     /**
-     * @description 优化：使用exists判断是否存在
-     * @author Hongyan Wang
-     * @date 2021/6/15 1:27 下午
      * @param deptIds
      * @return java.lang.Boolean
+     * @description 优化：使用exists判断是否存在
+     * @date 2021/6/15 1:27 下午
      */
     // 这种有连接查询。但除了id还支持别的 select user0_.user_id as col_0_0_ from sys_user user0_ left outer join sys_dept dept1_ on user0_.dept_id=dept1_.dept_id where dept1_.dept_id in (17 , 2) limit 1
     Boolean existsByDept_IdIn(Collection<Long> deptIds);

@@ -61,7 +61,6 @@ public class AuthRetryService {
      * @Recover – 兜底方法，即多次重试后还是失败就会执行这个方法
      * <p>
      * Spring-Retry 的功能丰富在于其重试策略和退避策略，还有兜底，监听器等操作。
-     * @author Hongyan Wang
      * @date 2021/4/23 1:13 下午
      */
     @Retryable(value = IllegalAccessException.class, maxAttempts = 5,

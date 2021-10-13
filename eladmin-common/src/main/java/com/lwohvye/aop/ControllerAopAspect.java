@@ -29,8 +29,6 @@ public class ControllerAopAspect {
 
     /**
      * @description 定义切点，使用指定实体类ResultModel为返回值的public方法作为切点
-     * @params []
-     * @author Hongyan Wang
      * @date 2020/1/14 14:24
      */
     @Pointcut("execution(public com.lwohvye.*.ResultModel *(..))")
@@ -63,7 +61,7 @@ public class ControllerAopAspect {
 //            result.setCode(ResultModel.NEED_PERMISSION);
 //        }
 
-        if (throwable instanceof BadRequestException){
+        if (throwable instanceof BadRequestException) {
             result.setMsg(ResultModel.BAD_REQUEST_MSG);
             result.setCode(ResultModel.BAD_REQUEST);
         }

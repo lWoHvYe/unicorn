@@ -39,7 +39,6 @@ public class DruidMonitorConfig {
      * @return
      * @description 配置一个管理后台的Servlet
      * @params
-     * @author Hongyan Wang
      * @date 2020/1/3 10:09
      */
     @Bean
@@ -61,7 +60,6 @@ public class DruidMonitorConfig {
      * @return org.springframework.boot.web.servlet.FilterRegistrationBean
      * @description 配置一个Web监控的filter
      * @params []
-     * @author Hongyan Wang
      * @date 2020/1/3 10:10
      */
     @Bean

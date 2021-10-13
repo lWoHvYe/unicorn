@@ -32,8 +32,7 @@ public interface BaseService {
 
     /**
      * @description 部分场景下，在类初始化完成后，执行部分额外操作
-     *              通过抛异常的方式，限制必须手动实现
-     * @author Hongyan Wang
+     * 通过抛异常的方式，限制必须手动实现
      * @date 2021/7/18 19:06
      */
     default void doInit() {

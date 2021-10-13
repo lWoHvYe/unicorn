@@ -31,9 +31,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
+
 /**
- * @description Jpa在映射实体和表的关系时，提供了一个入口，用于对绑定做一些操作
  * @author Hongyan Wang
+ * @description Jpa在映射实体和表的关系时，提供了一个入口，用于对绑定做一些操作
  */
 @Slf4j
 @Component
@@ -57,7 +58,6 @@ public class ServerAwareNamingStrategy extends SpringPhysicalNamingStrategy impl
      * @return org.hibernate.boot.model.naming.Identifier
      * @description 使用映射表名后，需注意。尽量不要用原生sql,要用hql替代
      * 除了@Table注解。@JoinTable注解也试用
-     * @author Hongyan Wang
      * @date 2021/4/23 11:06 上午
      */
     @Override

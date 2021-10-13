@@ -45,7 +45,7 @@ public class RedisListenerConfig {
      * x：过期事件，当某个键过期并删除时会产生该事件；
      * e：驱逐事件，当某个键因maxmemore策略而被删除时，产生该事件；
      * A：g$lshzxe的别名，因此”AKE”意味着所有事件。
-     * @author Hongyan Wang
+     
      * @date 2021/6/4 1:46 下午
      */
     @Bean

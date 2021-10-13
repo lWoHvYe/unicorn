@@ -16,7 +16,6 @@ public class SecuritySysUtil {
      * @param token
      * @return java.lang.String
      * @description AuthToken格式
-     * @author Hongyan Wang
      * @date 2021/6/12 3:31 下午
      */
     public static String getAuthToken(SecurityProperties properties, String token) {

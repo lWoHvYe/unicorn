@@ -54,9 +54,9 @@ public class KafkaConsumerService {
 //    指定消费对象
 
     /**
-     * @return void
-     * @Title 指定topic、partition、offset消费
-     * @Description 同时监听topic1和topic2，监听topic1的0号分区、topic2的 "0号和1号" 分区，指向1号分区的offset初始值为8
+     * @param record
+     * @title 指定topic、partition、offset消费
+     * @description 同时监听topic1和topic2，监听topic1的0号分区、topic2的 "0号和1号" 分区，指向1号分区的offset初始值为8
      * 属性解释：
      * ① id：消费者ID；
      * ② groupId：消费组ID；
@@ -64,7 +64,6 @@ public class KafkaConsumerService {
      * ④ topicPartitions：可配置更加详细的监听信息，可指定topic、parition、offset监听。
      * 上面onMessage2监听的含义：监听topic1的0号分区，同时监听topic2的0号分区和topic2的1号分区里面offset从8开始的消息。
      * 注意：topics和topicPartitions不能同时使用；
-     * @Param [record]
      **/
     @KafkaListener(id = "consumer1", groupId = "felix-group", topicPartitions = {
             @TopicPartition(topic = "topic1", partitions = {"0"}),
@@ -132,10 +131,9 @@ public class KafkaConsumerService {
 //    ------消息转发
 
     /**
-     * @return void
-     * @Title 消息转发。使用@SendTo注解
-     * @Description 从topic1接收到的消息经过处理后转发到topic2
-     * @Param [record]
+     * @param record
+     * @title 消息转发。使用@SendTo注解
+     * @description 从topic1接收到的消息经过处理后转发到topic2
      **/
     @KafkaListener(topics = {"topic1"})
     @SendTo("topic2")
@@ -147,7 +145,6 @@ public class KafkaConsumerService {
      * @param cr
      * @return java.lang.String
      * @description 如果需要延时，会发给另一个。然后阻塞到时间抵达，然后再发过来
-     * @author Hongyan Wang
      * @date 2021/4/24 20:27
      */
     @KafkaListener(topics = "myJob")
@@ -170,6 +167,12 @@ public class KafkaConsumerService {
         return null;
     }
 
+    /**
+     * @param cr
+     * @return java.lang.String
+     * @description 一种定时的方式，采用sleep阻塞
+     * @date 2021/10/13 10:19 下午
+     */
     @KafkaListener(topics = "myJob-delay")
     @SendTo("myJob")
     public String delayMessage1(ConsumerRecord<?, ?> cr) throws InterruptedException {

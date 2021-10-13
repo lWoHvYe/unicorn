@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019-2020 Zheng Jie
+ *  Copyright 2019-2022 Zheng Jie
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ public class QueryHelp {
      *              Predicate查询条件的拼接对应于where后面的添加表达式
      * @return javax.persistence.criteria.Predicate
      * @description 解析属性上的查询注解。贫瘠相应的查询
-     * @author Hongyan Wang
      * @date 2021/3/31 11:57
      */
     public static <R, Q> Predicate getPredicate(Root<R> root, Q query, CriteriaBuilder cb) {
@@ -125,7 +124,6 @@ public class QueryHelp {
      * @param join
      * @return javax.persistence.criteria.Join
      * @description 解析joinType
-     * @author Hongyan Wang
      * @date 2021/6/24 10:52 上午
      */
     private static <R> Join analyzeJoinType(Root<R> root, Query q, String joinName, Object val, Join join) {
@@ -172,7 +170,6 @@ public class QueryHelp {
      * @param val
      * @param join
      * @description 解析query.type()。抽取主要为了方便调用
-     * @author Hongyan Wang
      * @date 2021/6/24 10:52 上午
      */
     private static <R> void analyzeQueryType(Root<R> root, CriteriaBuilder cb, ArrayList<Predicate> list, Query q, String attributeName, Class<? extends Comparable> fieldType, Object val, Join join) {

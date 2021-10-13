@@ -39,7 +39,6 @@ public class RabbitMQProducerService {
     /**
      * @param amqpMsgEntity
      * @description 发送消息
-     * @author Hongyan Wang
      * @date 2021/4/27 2:49 下午
      */
     public void sendMsg(AmqpMsgEntity amqpMsgEntity) {
@@ -54,7 +53,6 @@ public class RabbitMQProducerService {
      * 所以在考虑使用RabbitMQ来实现延迟任务队列的时候，需要确保业务上每个任务的延迟时间是一致的。
      * 如果遇到不同的任务类型需要不同的延时的话，需要为每一种不同延迟时间的消息建立单独的消息队列。
      * 解决方式是使用延迟插件。可根据需要调整
-     * @author Hongyan Wang
      * @date 2021/4/27 2:49 下午
      */
     public void sendTTLMsg(AmqpMsgEntity amqpMsgEntity) {
@@ -76,7 +74,6 @@ public class RabbitMQProducerService {
     /**
      * @param commonEntity
      * @description 通过延迟插件实现延迟消息
-     * @author Hongyan Wang
      * @date 2021/7/26 1:17 下午
      */
     public void sendDelayMsg(AmqpMsgEntity commonEntity) {
@@ -97,7 +94,6 @@ public class RabbitMQProducerService {
     /**
      * @param commonEntity
      * @description 延迟消息，topic模式
-     * @author Hongyan Wang
      * @date 2021/9/30 1:38 下午
      */
     public void sendSyncDelayMsg(AmqpMsgEntity commonEntity) {

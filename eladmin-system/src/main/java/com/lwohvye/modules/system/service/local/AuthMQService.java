@@ -74,6 +74,11 @@ public class AuthMQService {
     @Autowired
     private RabbitMQProducerService rabbitMQProducerService;
 
+    /**
+     * @param records
+     * @description 消费登录验证不通过的消息
+     * @date 2021/10/13 10:22 下午
+     */
     @KafkaListener(id = "authFailedConsumer", groupId = "felix-group", topics = "auth-failed", errorHandler = "consumerAwareErrorHandler")
     public void solveAuthFailed(List<ConsumerRecord<?, ?>> records) {
         for (ConsumerRecord<?, ?> record : records) {

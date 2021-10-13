@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2020-2022 lWoHvYe
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package com.lwohvye.exception.handler;
 
 import com.lwohvye.exception.BadRequestException;
@@ -87,7 +102,6 @@ public class ApiGlobalExceptionHandler {
      * @param e
      * @return org.springframework.http.ResponseEntity<com.topdraw.common.ResultInfo>
      * @description 使用Assert可能抛出的异常
-     * @author Hongyan Wang
      * @date 2021/6/1 1:14 下午
      */
     @ResponseBody
@@ -152,7 +166,6 @@ public class ApiGlobalExceptionHandler {
      * @return org.springframework.http.ResponseEntity<com.lwohvye.utils.result.ResultInfo>
      * @description 添加或更新的数据中有非空字段设置为null。或者未使用级联删除外键，均会出此异常
      * @params [e]
-     * @author Hongyan Wang
      * @date 2021/1/9 21:42
      */
     @ResponseBody

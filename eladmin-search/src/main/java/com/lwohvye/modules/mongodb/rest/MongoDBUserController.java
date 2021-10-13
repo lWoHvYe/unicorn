@@ -31,7 +31,6 @@ public class MongoDBUserController {
 
     /**
      * @description 启动成功后调用，执行部分初始化
-     * @author Hongyan Wang
      * @date 2021/7/18 18:48
      */
     //    @PostConstruct

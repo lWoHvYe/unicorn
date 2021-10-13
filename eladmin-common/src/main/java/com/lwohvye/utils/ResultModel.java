@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.Serializable;
 
 /**
- * @author Hongyan Wang
  * @packageName com.lwohvye.util
  * @className ResultBean
  * @description 通用的数据返回，及数据获取异常处理，优化返回逻辑

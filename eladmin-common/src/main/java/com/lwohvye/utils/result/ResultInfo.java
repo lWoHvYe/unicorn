@@ -44,7 +44,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      * @description 普通实体，用result字段返回
      * @params [businessCode, t, description]
-     * @author Hongyan Wang
      * @date 2021/2/6 8:33
      */
     public ResultInfo(long businessCode, T t, String description) {
@@ -58,7 +57,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      * @description list类依旧参照分页。包含content和totalElements
      * @params [businessCode, resultSet, description]
-     * @author Hongyan Wang
      * @date 2021/2/6 8:36
      */
     public ResultInfo(long businessCode, List<T> resultSet, String description) {
@@ -73,7 +71,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      * @description map根据是否是page，如果是page类。返回content和totalElements；如果是普通map，返回resultMap
      * @params [businessCode, objectMap, description]
-     * @author Hongyan Wang
      * @date 2021/2/6 8:37
      */
     public ResultInfo(long businessCode, Map<String, Object> objectMap, String description) {
@@ -104,7 +101,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return
      * @description page类返回content和totalElements
      * @params [businessCode, page, description]
-     * @author Hongyan Wang
      * @date 2021/2/6 8:38
      */
     public ResultInfo(long businessCode, Page<T> page, String description) {
@@ -119,7 +115,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
      * @return com.lwohvye.utils.result.ResultInfo<T>
      * @description 只是返回成功状态。无其他结果集
      * @params []
-     * @author Hongyan Wang
      * @date 2021/1/9 9:39
      */
     public static <T> ResultInfo<T> success() {
