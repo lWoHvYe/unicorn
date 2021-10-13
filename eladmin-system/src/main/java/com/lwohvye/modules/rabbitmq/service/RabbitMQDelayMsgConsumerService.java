@@ -37,6 +37,14 @@ import org.springframework.stereotype.Component;
 // SpEL https://www.lwohvye.com/2021/06/11/spring-%e8%a1%a8%e8%be%be%e5%bc%8f%e8%af%ad%e8%a8%80-spel/
 //@RabbitListener(queues = "#{T(全类名).静态方法名}")
 //@RabbitListener(queues = "#{beanName.方法名}")
+
+// 当将@RabbitListener注解放在类上时，一些情况下会报 org.springframework.amqp.AmqpException: No method found for class [B
+// 相关原因参见：https://jira.spring.io/browse/AMQP-573
+// 可使用将@RabbitListener放到方法上的方式。因为类型推断只适用于方法级别的@RabbitListener
+// 使用@Payload注解可以获取消息中的body信息，使用@Headers注解可以获取消息中的headers信息，也可以使用@Header获取单个header属性
+
+// @RabbitListener 可以标注在类上面，需配合 @RabbitHandler 注解一起使用
+// @RabbitListener 标注在类上面表示当有收到消息的时候，就交给 @RabbitHandler 的方法处理，具体使用哪个方法处理，根据 MessageConverter 转换后的参数类型
 public class RabbitMQDelayMsgConsumerService {
 
     @Autowired
