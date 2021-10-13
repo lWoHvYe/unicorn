@@ -41,7 +41,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
     private LocalDateTime currentTime;
 
     /**
-     * @return
      * @description 普通实体，用result字段返回
      * @params [businessCode, t, description]
      * @date 2021/2/6 8:33
@@ -54,7 +53,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @return
      * @description list类依旧参照分页。包含content和totalElements
      * @params [businessCode, resultSet, description]
      * @date 2021/2/6 8:36
@@ -68,7 +66,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @return
      * @description map根据是否是page，如果是page类。返回content和totalElements；如果是普通map，返回resultMap
      * @params [businessCode, objectMap, description]
      * @date 2021/2/6 8:37
@@ -98,7 +95,6 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @return
      * @description page类返回content和totalElements
      * @params [businessCode, page, description]
      * @date 2021/2/6 8:38

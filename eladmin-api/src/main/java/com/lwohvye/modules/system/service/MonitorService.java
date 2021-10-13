@@ -26,8 +26,9 @@ import java.util.Map;
 public interface MonitorService extends BaseService {
 
     /**
-    * 查询数据分页
-    * @return Map<String,Object>
-    */
-    Map<String,Object> getServers();
+     * 查询数据分页
+     *
+     * @return Map
+     */
+    Map<String, Object> getServers();
 }

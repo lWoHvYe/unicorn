@@ -100,7 +100,7 @@ public class ApiGlobalExceptionHandler {
 
     /**
      * @param e
-     * @return org.springframework.http.ResponseEntity<com.topdraw.common.ResultInfo>
+     * @return org.springframework.http.ResponseEntity
      * @description 使用Assert可能抛出的异常
      * @date 2021/6/1 1:14 下午
      */
@@ -163,7 +163,7 @@ public class ApiGlobalExceptionHandler {
     }
 
     /**
-     * @return org.springframework.http.ResponseEntity<com.lwohvye.utils.result.ResultInfo>
+     * @return org.springframework.http.ResponseEntity
      * @description 添加或更新的数据中有非空字段设置为null。或者未使用级联删除外键，均会出此异常
      * @params [e]
      * @date 2021/1/9 21:42

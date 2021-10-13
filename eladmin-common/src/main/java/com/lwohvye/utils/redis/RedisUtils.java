@@ -91,7 +91,7 @@ public class RedisUtils {
     /**
      * 删除缓存
      *
-     * @param key 可以传一个值 或多个
+     * @param keys 可以传一个值 或多个
      */
     public void delete(String... keys) {
         if (keys != null && keys.length > 0) {
@@ -521,8 +521,8 @@ public class RedisUtils {
      * 设置ASCII码, 字符串'a'的ASCII码是97, 转为二进制是'01100001', 此方法是将二进制第offset位值变为value
      *
      * @param key
-     * @param postion 位置
-     * @param value   值,true为1, false为0
+     * @param offset 位置
+     * @param value  值,true为1, false为0
      * @return
      */
     public boolean setBit(String key, long offset, boolean value) {
@@ -666,7 +666,7 @@ public class RedisUtils {
      * 增加(自增长), 负数则为自减
      *
      * @param key
-     * @param value
+     * @param increment
      * @return
      */
     public Long incrBy(String key, long increment) {
@@ -675,7 +675,7 @@ public class RedisUtils {
 
     /**
      * @param key
-     * @param value
+     * @param increment
      * @return
      */
     public Double incrByFloat(String key, double increment) {
@@ -941,7 +941,7 @@ public class RedisUtils {
      * 通过索引 获取list中的值
      *
      * @param key   键
-     * @param index 索引 index>=0时， 0 表头，1 第二个元素，依次类推；index<0时，-1，表尾，-2倒数第二个元素，依次类推
+     * @param index 索引 index不小于0时， 0 表头，1 第二个元素，依次类推；index小于0时，-1，表尾，-2倒数第二个元素，依次类推
      * @return
      */
     public Object lGetByIndex(String key, long index) {
@@ -1178,8 +1178,8 @@ public class RedisUtils {
      * 删除集合中值等于value得元素
      *
      * @param key
-     * @param count count=0, 删除所有值等于value的元素; count>0, 从头部开始删除第一个值等于value的元素;
-     *              count<0, 从尾部开始删除第一个值等于value的元素;
+     * @param count count等于0, 删除所有值等于value的元素; count大于0, 从头部开始删除第一个值等于value的元素;
+     *              count小于0, 从尾部开始删除第一个值等于value的元素;
      * @param value
      * @return
      */
@@ -1502,10 +1502,7 @@ public class RedisUtils {
     /**
      * 获取集合所有元素
      *
-     * @param otherKeys
-     * @param destKey
      * @param key
-     * @return
      */
     public Set<Object> setMembers(String key) {
         try {
@@ -1520,7 +1517,6 @@ public class RedisUtils {
      * 随机获取集合中的一个元素
      *
      * @param key
-     * @return
      */
     public Object sRandomMember(String key) {
         return redisTemplate.opsForSet().randomMember(key);
@@ -1531,7 +1527,6 @@ public class RedisUtils {
      *
      * @param key
      * @param count
-     * @return
      */
     public List<Object> sRandomMembers(String key, long count) {
         return redisTemplate.opsForSet().randomMembers(key, count);
@@ -1542,7 +1537,6 @@ public class RedisUtils {
      *
      * @param key
      * @param count
-     * @return
      */
     public Set<Object> sDistinctRandomMembers(String key, long count) {
         return redisTemplate.opsForSet().distinctRandomMembers(key, count);
@@ -1551,7 +1545,6 @@ public class RedisUtils {
     /**
      * @param key
      * @param options
-     * @return
      */
     public Cursor<Object> sScan(String key, ScanOptions options) {
         return redisTemplate.opsForSet().scan(key, options);
@@ -1567,7 +1560,6 @@ public class RedisUtils {
      * @param key
      * @param value
      * @param score
-     * @return
      */
     public Boolean zAdd(String key, Object value, double score) {
         return redisTemplate.opsForZSet().add(key, value, score);
@@ -1588,7 +1580,6 @@ public class RedisUtils {
     /**
      * @param key
      * @param values
-     * @return
      */
     public Long zAdd(String key, Set<ZSetOperations.TypedTuple<Object>> values) {
         return redisTemplate.opsForZSet().add(key, values);
@@ -1610,7 +1601,6 @@ public class RedisUtils {
      *
      * @param key
      * @param values
-     * @return
      */
     public Long zRemove(String key, Object... values) {
         return redisTemplate.opsForZSet().remove(key, values);
@@ -1622,7 +1612,6 @@ public class RedisUtils {
      * @param key
      * @param value
      * @param delta
-     * @return
      */
     public Double zIncrementScore(String key, Object value, double delta) {
         return redisTemplate.opsForZSet().incrementScore(key, value, delta);
