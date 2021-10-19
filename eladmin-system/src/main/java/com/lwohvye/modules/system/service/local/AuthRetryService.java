@@ -26,10 +26,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthRetryService {
 
-    // TODO: 2021/10/19 @Retryable是否一定需要接口实现，待确定
-
     /**
-     * @description ------------------------------------------------------------------------------------------------------
+     * @description
+     * ------------------------------------------------------------------------------------------------------
      * @EnableRetry – 表示开启重试机制
      * 对于@EnableRetry中的proxyTargetClass参数，是控制是否使用Cglib动态代理，默认的情况下为false，表示使用Jdk动态代理。
      * ------------------------------------------------------------------------------------------------------
@@ -68,6 +67,9 @@ public class AuthRetryService {
      * <p>
      * Spring-Retry 的功能丰富在于其重试策略和退避策略，还有兜底，监听器等操作。
      * 由于@Retryable注解是通过切面实现的，因此要避免@Retryable 注解的方法的调用方和被调用方处于同一个类中，这样会使@Retryable 注解失效
+     * ------------------------------------------------------------------------------------------------------
+     * @Retryable标记的方法，不必是接口的实现，但调用方需在另一个类中
+     * @Recover标记的方法需与@Retryable标记的方法在同一类中
      * @date 2021/4/23 1:13 下午
      */
     @Retryable(value = IllegalAccessException.class, maxAttempts = 5,
