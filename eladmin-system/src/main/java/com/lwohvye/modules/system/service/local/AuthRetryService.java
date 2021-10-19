@@ -17,18 +17,56 @@ package com.lwohvye.modules.system.service.local;
 
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.remoting.RemoteAccessException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
 public class AuthRetryService {
 
+    // https://github.com/spring-projects/spring-retry
+    // 使用RetryTemplate是另一种重试的配置方式，较注解的方式复杂，但更为灵活。一般用注解但方式。
+    {
+        RetryTemplate.builder()
+                .maxAttempts(10)
+                // 指数递增延迟
+                .exponentialBackoff(100, 2, 10000)
+                .retryOn(IOException.class)
+                .traversingCauses()
+                .build();
+
+        RetryTemplate.builder()
+                // 固定延迟
+                .fixedBackoff(10)
+                .withinMillis(3000)
+                .build();
+
+        RetryTemplate.builder()
+                .infiniteRetry()
+                .retryOn(IOException.class)
+                .uniformRandomBackoff(1000, 3000)
+                .build();
+
+        RetryTemplate template = RetryTemplate.builder()
+                .maxAttempts(3)
+                .fixedBackoff(1000)
+                .retryOn(RemoteAccessException.class)
+                .build();
+
+        template.execute(ctx -> {
+            // ... do something
+            return null;
+        });
+    }
+
     /**
-     * @description
-     * ------------------------------------------------------------------------------------------------------
+     * @description -----------------------------------------------------------------------------------------
      * @EnableRetry – 表示开启重试机制
      * 对于@EnableRetry中的proxyTargetClass参数，是控制是否使用Cglib动态代理，默认的情况下为false，表示使用Jdk动态代理。
      * ------------------------------------------------------------------------------------------------------
