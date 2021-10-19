@@ -26,9 +26,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthRetryService {
 
+    // TODO: 2021/10/19 @Retryable是否一定需要接口实现，待确定
+
     /**
-     * @description
+     * @description ------------------------------------------------------------------------------------------------------
      * @EnableRetry – 表示开启重试机制
+     * 对于@EnableRetry中的proxyTargetClass参数，是控制是否使用Cglib动态代理，默认的情况下为false，表示使用Jdk动态代理。
+     * ------------------------------------------------------------------------------------------------------
      * @Retryable – 表示这个方法需要重试，它有很丰富的参数，可以满足你对重试的需求
      * recover：指定兜底/补偿的方法名。如果不指定，默认对照 @Recover 标识的，第一入参为重试异常，其余入参和出参一致的方法；
      * interceptor：指定方法切面 bean， org.aopalliance.intercept.MethodInterceptor 实现类
@@ -47,6 +51,7 @@ public class AuthRetryService {
      * CompositeRetryPolicy 可以组合多个重试策略
      * NeverRetryPolicy 从不重试（也是一种重试策略哈）
      * AlwaysRetryPolicy 总是重试
+     * ------------------------------------------------------------------------------------------------------
      * @Backoff – 表示重试中的退避策略
      * value / delay：两者都标识延迟时间，为 0则对应 NoBackOffPolicy 策略。
      * maxDelay：最大延迟时间
@@ -58,20 +63,29 @@ public class AuthRetryService {
      * ExponentialRandomBackOffPolicy 在上面那个策略上增加随机性
      * UniformRandomBackOffPolicy 这个跟上面的区别就是，上面的延迟会不停递增，这个只会在固定的区间随机
      * StatelessBackOffPolicy 这个说明是无状态的，所谓无状态就是对上次的退避无感知
+     * ------------------------------------------------------------------------------------------------------
      * @Recover – 兜底方法，即多次重试后还是失败就会执行这个方法
      * <p>
      * Spring-Retry 的功能丰富在于其重试策略和退避策略，还有兜底，监听器等操作。
+     * 由于@Retryable注解是通过切面实现的，因此要避免@Retryable 注解的方法的调用方和被调用方处于同一个类中，这样会使@Retryable 注解失效
      * @date 2021/4/23 1:13 下午
      */
     @Retryable(value = IllegalAccessException.class, maxAttempts = 5,
             backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
-    public void retryService() throws IllegalAccessException {
+    public void retryService(String str) throws IllegalAccessException {
         log.info("service method...      start");
         if (RandomUtil.randomBoolean())
             throw new IllegalAccessException("manual exception");
         log.info("service method...      end");
     }
 
+    /**
+     * @param e
+     * @description 在@Retryable多次重试失败后，调用该方法。
+     * 要触发@Recover标记的方法，@Retryable标记的方法不能有返回值，只能是void才能触发。
+     * @Recover标记的方法的第一入参要与发生的异常一至，才会被调用
+     * @date 2021/10/19 16:03
+     */
     @Recover
     public void recover(IllegalAccessException e) {
         log.error("service retry after Recover => {}", e.getMessage());
