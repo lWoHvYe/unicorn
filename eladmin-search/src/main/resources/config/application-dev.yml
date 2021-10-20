@@ -61,7 +61,10 @@ spring:
       # username: test_user
       # password: pass@123
       database: eladmin
-
+    elasticsearch:
+      client:
+        reactive:
+          endpoints: 192.168.1.140:9200
   # redis配置
   main-redis:
     #数据库索引

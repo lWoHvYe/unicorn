@@ -60,7 +60,7 @@ public class MongoDBUserController {
     @GetMapping
     @AnonymousAccess
     public ResponseEntity getAllUser() {
-        return new ResponseEntity<>(mongoDBUserService.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(mongoDBUserService.queryAll(), HttpStatus.OK);
     }
 
     @PostMapping

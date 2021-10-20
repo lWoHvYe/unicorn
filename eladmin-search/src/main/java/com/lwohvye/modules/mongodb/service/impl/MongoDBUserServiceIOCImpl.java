@@ -39,7 +39,7 @@ public class MongoDBUserServiceIOCImpl implements MongoDBUserService {
 
 
     @Override
-    public Object findAll() {
+    public Object queryAll() {
         log.info("进入IOC实现");
         return mongoDBUserRepository.findAll();
     }
@@ -47,7 +47,7 @@ public class MongoDBUserServiceIOCImpl implements MongoDBUserService {
     @Override
     public void updateUsers() {
         log.info("进入IOC实现");
-        mongoDBUserRepository.deleteAll();
+//        mongoDBUserRepository.deleteAll();
 //        Updates an existing document or inserts a new document, depending on its document parameter
 //If the document does not contain an _id field, then the save() method calls the insert() method. During the operation, the mongo shell will create an ObjectId and assign it to the _id field.
         userRepository.findAll().parallelStream().forEach(user -> {

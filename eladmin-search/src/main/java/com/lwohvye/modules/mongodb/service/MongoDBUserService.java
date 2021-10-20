@@ -8,7 +8,7 @@ import com.lwohvye.base.BaseService;
  */
 public interface MongoDBUserService extends BaseService {
 
-    Object findAll();
+    Object queryAll();
 
     void updateUsers();
 

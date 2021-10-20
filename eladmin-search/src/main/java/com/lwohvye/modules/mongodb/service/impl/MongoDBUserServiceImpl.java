@@ -24,7 +24,7 @@ public class MongoDBUserServiceImpl implements MongoDBUserService {
     private MongoDBUserRepository mongoDBUserRepository;
 
     @Override
-    public Object findAll() {
+    public Object queryAll() {
         return mongoDBUserRepository.findAll();
     }
 
