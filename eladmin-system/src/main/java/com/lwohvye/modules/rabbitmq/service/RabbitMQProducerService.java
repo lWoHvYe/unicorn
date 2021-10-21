@@ -18,7 +18,6 @@ package com.lwohvye.modules.rabbitmq.service;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.lwohvye.config.rabbitmq.QueueEnum;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +41,12 @@ public class RabbitMQProducerService {
      * @date 2021/4/27 2:49 下午
      */
     public void sendMsg(AmqpMsgEntity amqpMsgEntity) {
-        amqpTemplate.convertAndSend(QueueEnum.QUEUE_DATA_SYNC.getExchange(), QueueEnum.QUEUE_DATA_SYNC.getRouteKey(), JSONObject.toJSONString(amqpMsgEntity));
+        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.DATA_SYNC_ROUTE_KEY, JSONObject.toJSONString(amqpMsgEntity));
 
+    }
+
+    public void sendMsg(String exchangeName, String routeKey, AmqpMsgEntity amqpMsgEntity) {
+        amqpTemplate.convertAndSend(exchangeName, routeKey, JSONObject.toJSONString(amqpMsgEntity));
     }
 
     /**
@@ -57,7 +60,7 @@ public class RabbitMQProducerService {
      */
     public void sendTTLMsg(AmqpMsgEntity amqpMsgEntity) {
         //给延迟队列发送消息
-        amqpTemplate.convertAndSend(QueueEnum.QUEUE_DATA_SYNC_TTL.getExchange(), QueueEnum.QUEUE_DATA_SYNC_TTL.getRouteKey(), JSONObject.toJSONString(amqpMsgEntity),
+        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_TTL_EXCHANGE, RabbitMqConfig.DATA_SYNC_TTL_ROUTE_KEY, JSONObject.toJSONString(amqpMsgEntity),
                 message -> {
 //                    将延时转为毫秒值
                     var expire = amqpMsgEntity.getExpire();
@@ -77,8 +80,22 @@ public class RabbitMQProducerService {
      * @date 2021/7/26 1:17 下午
      */
     public void sendDelayMsg(AmqpMsgEntity commonEntity) {
-        amqpTemplate.convertAndSend(QueueEnum.QUEUE_DATA_SYNC_DELAY.getExchange(),
-                QueueEnum.QUEUE_DATA_SYNC_DELAY.getRouteKey(), JSON.toJSONString(commonEntity),
+        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_EXCHANGE,
+                RabbitMqConfig.DATA_SYNC_ROUTE_KEY, JSON.toJSONString(commonEntity),
+                message -> {
+                    var expire = commonEntity.getExpire();
+                    var timeUnit = commonEntity.getTimeUnit();
+                    if (ObjectUtil.isNotEmpty(expire) && ObjectUtil.isNotEmpty(timeUnit)) {
+                        Long expireMill = TimeUnit.MILLISECONDS.convert(expire, timeUnit);
+                        //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
+                        message.getMessageProperties().setHeader("x-delay", expireMill);
+                    }
+                    return message;
+                });
+    }
+
+    public void sendDelayMsg(String exchangeName, String routeKey, AmqpMsgEntity commonEntity) {
+        amqpTemplate.convertAndSend(exchangeName, routeKey, JSON.toJSONString(commonEntity),
                 message -> {
                     var expire = commonEntity.getExpire();
                     var timeUnit = commonEntity.getTimeUnit();

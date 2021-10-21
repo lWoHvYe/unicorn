@@ -15,12 +15,13 @@
  */
 package com.lwohvye.modules.rabbitmq.service;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.lwohvye.modules.kafka.entity.DelayMessage;
-import com.lwohvye.modules.kafka.service.KafkaProducerService;
+import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.modules.system.service.local.AuthMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 // 监听延迟插件相关队列的消息
-@RabbitListener(queues = "data.common.delay")
+@RabbitListener(queues = RabbitMqConfig.DATA_COMMON_DELAY_QUEUE)
 // 支持多种配置方式 property placeholders and SpEL  https://docs.spring.io/spring-amqp/docs/current/reference/html/#choose-container
 //@RabbitListener(queues = "#{'${property.with.comma.delimited.queue.names}'.split(',')}" )
 // 还可调用静态和非静态方法
@@ -48,7 +49,7 @@ import org.springframework.stereotype.Component;
 public class RabbitMQDelayMsgConsumerService {
 
     @Autowired
-    private KafkaProducerService kafkaProducerService;
+    private AuthMQService authMQService;
 
     @RabbitHandler
     public void handle(String amqpMsgEntityStr) {
@@ -58,8 +59,12 @@ public class RabbitMQDelayMsgConsumerService {
         try {
             if (StrUtil.isBlank(msgData))
                 return;
-            var delayMessage = JSONObject.parseObject(msgData, DelayMessage.class);
-            kafkaProducerService.sendCallbackMessage(delayMessage.getActualTopic(), JSON.toJSONString(delayMessage));
+            // 鉴权类
+            if (ObjectUtil.equals(msgType, "auth")) {
+                var extraData = amqpMsgEntity.getExtraData();
+                if (StrUtil.isNotBlank(extraData))
+                    ReflectUtil.invoke(authMQService, extraData, msgData);
+            }
         } catch (Exception e) {
             log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", e.getMessage(), amqpMsgEntityStr);
         } finally {

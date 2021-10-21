@@ -25,9 +25,35 @@ import java.util.Map;
 @Configuration
 public class RabbitMqConfig {
 
+    // region 交换机
+    // direct交换机
+    public static final String DIRECT_SYNC_EXCHANGE = "sync_direct_exchange";
+    // topic交换机
     public static final String TOPIC_SYNC_EXCHANGE = "sync_topic_exchange";
-
+    // 延迟队列交换机
+    public static final String DIRECT_SYNC_TTL_EXCHANGE = "sync_direct_ttl_exchange";
+    // 延迟队列交换机-插件版
+    public static final String DIRECT_SYNC_DELAY_EXCHANGE = "sync_delay_direct_exchange";
     public static final String TOPIC_SYNC_DELAY_EXCHANGE = "sync_delay_topic_exchange";
+    // endregion
+
+    // region 路由键
+    public static final String DATA_SYNC_ROUTE_KEY = "data.sync";
+
+    public static final String DATA_SYNC_TTL_ROUTE_KEY = "data.sync.ttl";
+
+    public static final String DATA_COMMON_DELAY_ROUTE_KEY = "data.common.delay";
+
+    public static final String AUTH_LOCAL_ROUTE_KEY = "auth.local";
+    // endregion
+
+    // region 队列
+    public static final String DATA_SYNC_QUEUE = "data.sync.queue";
+
+    public static final String DATA_SYNC_TTL_QUEUE = "data.sync.ttl.queue";
+
+    public static final String DATA_COMMON_DELAY_QUEUE = "data.common.delay.queue";
+    // endregion
 
     /**
      * 消费队列所绑定的交换机
@@ -35,7 +61,7 @@ public class RabbitMqConfig {
     @Bean
     DirectExchange dataSyncDirect() {
         return ExchangeBuilder
-                .directExchange(QueueEnum.QUEUE_DATA_SYNC.getExchange())
+                .directExchange(DIRECT_SYNC_EXCHANGE)
                 .durable(true)
                 .build();
     }
@@ -47,7 +73,7 @@ public class RabbitMqConfig {
     @Bean
     DirectExchange dataSyncTtlDirect() {
         return ExchangeBuilder
-                .directExchange(QueueEnum.QUEUE_DATA_SYNC_TTL.getExchange())
+                .directExchange(DIRECT_SYNC_TTL_EXCHANGE)
                 .durable(true)
                 .build();
     }
@@ -58,7 +84,7 @@ public class RabbitMqConfig {
      */
     @Bean
     public Queue dataSyncQueue() {
-        return new Queue(QueueEnum.QUEUE_DATA_SYNC.getQueueName());
+        return new Queue(DATA_SYNC_QUEUE);
     }
 
     /**
@@ -67,9 +93,9 @@ public class RabbitMqConfig {
     @Bean
     public Queue dataSyncTtlQueue() {
         return QueueBuilder
-                .durable(QueueEnum.QUEUE_DATA_SYNC_TTL.getQueueName())
-                .withArgument("x-dead-letter-exchange", QueueEnum.QUEUE_DATA_SYNC.getExchange())//到期后转发的交换机
-                .withArgument("x-dead-letter-routing-key", QueueEnum.QUEUE_DATA_SYNC.getRouteKey())//到期后转发的路由键
+                .durable(DATA_SYNC_TTL_QUEUE)
+                .withArgument("x-dead-letter-exchange", DIRECT_SYNC_EXCHANGE)//到期后转发的交换机
+                .withArgument("x-dead-letter-routing-key", DATA_SYNC_ROUTE_KEY)//到期后转发的路由键
                 .build();
     }
 
@@ -81,7 +107,7 @@ public class RabbitMqConfig {
         return BindingBuilder
                 .bind(dataSyncQueue)
                 .to(dataSyncDirect)
-                .with(QueueEnum.QUEUE_DATA_SYNC.getRouteKey());
+                .with(DATA_SYNC_ROUTE_KEY);
     }
 
     /**
@@ -92,7 +118,7 @@ public class RabbitMqConfig {
         return BindingBuilder
                 .bind(dataSyncTtlQueue)
                 .to(dataSyncTtlDirect)
-                .with(QueueEnum.QUEUE_DATA_SYNC_TTL.getRouteKey());
+                .with(DATA_SYNC_TTL_ROUTE_KEY);
     }
 
     /**
@@ -102,7 +128,7 @@ public class RabbitMqConfig {
      */
     @Bean
     public Queue dataDelayQueue() {
-        return QueueBuilder.durable(QueueEnum.QUEUE_DATA_SYNC_DELAY.getQueueName()).build();
+        return QueueBuilder.durable(DATA_COMMON_DELAY_QUEUE).build();
     }
 
     /**
@@ -115,7 +141,7 @@ public class RabbitMqConfig {
     public CustomExchange dataDelayExchange() {
         Map<String, Object> args = new HashMap<>();
         args.put("x-delayed-type", "direct");
-        return new CustomExchange(QueueEnum.QUEUE_DATA_SYNC_DELAY.getExchange(), "x-delayed-message", true, false, args);
+        return new CustomExchange(DIRECT_SYNC_DELAY_EXCHANGE, "x-delayed-message", true, false, args);
     }
 
     /**
@@ -124,12 +150,20 @@ public class RabbitMqConfig {
      * @return binding
      */
     @Bean
-    public Binding delayBinding(Queue dataDelayQueue, CustomExchange dataDelayExchange) {
+    public Binding delayBinding(CustomExchange dataDelayExchange, Queue dataDelayQueue) {
         return BindingBuilder
                 .bind(dataDelayQueue)
                 .to(dataDelayExchange)
-                .with(QueueEnum.QUEUE_DATA_SYNC_DELAY.getRouteKey())
+                .with(DATA_COMMON_DELAY_ROUTE_KEY)
                 .noargs();
+    }
+
+    @Bean
+    public Binding delayBinding2(DirectExchange dataSyncDirect, Queue dataDelayQueue) {
+        return BindingBuilder
+                .bind(dataDelayQueue)
+                .to(dataSyncDirect)
+                .with(AUTH_LOCAL_ROUTE_KEY);
     }
 
     /**
@@ -197,7 +231,7 @@ public class RabbitMqConfig {
 
     //ROUTE_KEY_EMAIL队列绑定交换机，指定routingKey
     @Bean
-    public Binding bindingQueueInformEmail(Queue queueInformEmail, Exchange exchangeTopicsInform) {
+    public Binding bindingQueueInformEmail(Exchange exchangeTopicsInform, Queue queueInformEmail) {
         return BindingBuilder.bind(queueInformEmail).to(exchangeTopicsInform).with(ROUTE_KEY_EMAIL).noargs();
     }
 
@@ -215,7 +249,7 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public Binding deadInfoQueueBind(Queue deadInfoQueue, Exchange deadInfoExchange) {
+    public Binding deadInfoQueueBind(Exchange deadInfoExchange, Queue deadInfoQueue) {
         return BindingBuilder.bind(deadInfoQueue).to(deadInfoExchange).with(DEAD_ROUTE_KEY).noargs();
     }
 

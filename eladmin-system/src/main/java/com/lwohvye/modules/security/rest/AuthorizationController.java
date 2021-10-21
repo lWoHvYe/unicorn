@@ -21,10 +21,12 @@ import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.config.RsaProperties;
+import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.kafka.service.KafkaProducerService;
+import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
@@ -32,10 +34,10 @@ import com.lwohvye.modules.security.security.TokenProvider;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.dto.AuthUserDto;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.StringUtils;
+import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.result.ResultInfo;
 import com.wf.captcha.base.Captcha;
 import io.swagger.annotations.Api;
@@ -82,7 +84,7 @@ public class AuthorizationController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     //    队列生产者
-    private final KafkaProducerService kafkaProducerService;
+    private final RabbitMQProducerService rabbitMQProducerService;
 
     @Resource
     private LoginProperties loginProperties;
@@ -126,8 +128,9 @@ public class AuthorizationController {
             infoMap.put("ip", ip);
             infoMap.put("lockUserKey", lockUserKey);
             infoMap.put("username", username);
+            var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(infoMap.toJSONString()).setExtraData("solveAuthFailed");
 //            发送消息
-            kafkaProducerService.sendCallbackMessage("auth-failed", infoMap.toJSONString());
+            rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
             throw e;
         }
 
@@ -152,7 +155,8 @@ public class AuthorizationController {
             onlineUserService.checkLoginOnUser(username, token);
         }
 //        用户登录成功后，写一条消息
-        kafkaProducerService.sendCallbackMessage("auth-log", jwtUserDto.getUser().toString());
+        var authSuccessMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
+        rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
         return ResponseEntity.ok(authInfo);
     }
 
