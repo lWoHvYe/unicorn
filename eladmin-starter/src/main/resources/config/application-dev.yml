@@ -7,7 +7,7 @@ spring:
       primary-ds:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:192.168.1.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         username: ${DB_USER:root}
         password: ${DB_PWD:root}
         # 初始连接数
@@ -54,7 +54,7 @@ spring:
       replica-ds-0:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:192.168.1.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -105,7 +105,7 @@ spring:
       replica-ds-1:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:192.168.1.140}:${DB_PORT:3307}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -186,7 +186,7 @@ spring:
   main-redis:
     #数据库索引
     database: ${REDIS_DB:4}
-    host: ${REDIS_HOST:192.168.1.140}
+    host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:}
     #连接超时时间
@@ -201,8 +201,8 @@ spring:
   slave-redis:
     #数据库索引
     database: ${REDIS_DB:4}
-    host: ${REDIS_HOST:192.168.1.140}
-    port: ${REDIS_PORT:6380}
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:}
     #连接超时时间
     timeout: 5000
@@ -213,7 +213,7 @@ spring:
   auth-redis:
     #数据库索引
     database: ${REDIS_DB:6}
-    host: ${REDIS_HOST:192.168.1.140}
+    host: ${REDIS_HOST:127.0.0.1}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:}
     #连接超时时间
@@ -225,8 +225,8 @@ spring:
   auth-slave-redis:
     #数据库索引
     database: ${REDIS_DB:6}
-    host: ${REDIS_HOST:192.168.1.140}
-    port: ${REDIS_PORT:6380}
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
     password: ${REDIS_PWD:}
     #连接超时时间
     timeout: 5000
@@ -235,69 +235,9 @@ spring:
       max-idle: 5
       min-idle: 1
 
-  ###########【Kafka集群】###########
-  kafka:
-    #    使用zookeeper后，可以只配置集群中的一个节点。但是其他节点的ip为k8s内的ip，在外部无法访问，解决方式待定
-    bootstrap-servers: 192.168.1.140:9092
-    ###########【初始化生产者配置】###########
-    # 重试次数
-    producer:
-      retries: 0
-      # 应答级别:多少个分区副本备份完成时向生产者发送ack确认(可选0、1、all/-1)
-      acks: 1
-      # 批量大小
-      batch-size: 1638
-      # 提交延时
-      properties:
-        linger:
-          ms: 0
-      # 自定义分区器
-      #        partitioner:
-      #          class: com.lwohvye.config.kafka.CustomizePartitioner
-      # 当生产端积累的消息达到batch-size或接收到消息linger.ms后,生产者就会将消息提交给kafka
-      # linger.ms为0表示每接收到一条消息就提交给kafka,这时候batch-size其实就没用了
-      # 生产端缓冲区大小
-      buffer-memory: 335544
-      # Kafka提供的序列化和反序列化类
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    ###########【初始化消费者配置】###########
-    # 默认的消费组ID
-    consumer:
-      properties:
-        group:
-          id: defaultConsumerGroup
-        # 消费会话超时时间(超过这个时间consumer没有发送心跳,就会触发rebalance操作)
-        session:
-          timeout:
-            ms: 120000
-        # 消费请求超时时间
-        request:
-          timeout:
-            ms: 180000
-      # 是否自动提交offset
-      enable-auto-commit: true
-      # 提交offset延时(接收到消息后多久提交offset)
-      auto-commit-interval: 1000
-      # 当kafka中没有初始offset或offset超出范围时将自动重置offset
-      # earliest:重置为分区中最小的offset;
-      # latest:重置为分区中最新的offset(消费分区中新产生的数据);
-      # none:只要有一个分区不存在已提交的offset,就抛出异常;
-      auto-offset-reset: latest
-      # Kafka提供的序列化和反序列化类
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      # 批量消费每次最多消费多少条消息
-      max-poll-records: 50
-    # 消费端监听的topic不存在时，项目启动会报错(关掉)
-    listener:
-      missing-topics-fatal: false
-      # 设置批量消费
-      type: batch
-
   ##### RabbitMQ ####
   rabbitmq:
-    host: 192.168.1.140 # rabbitmq的连接地址
+    host: 127.0.0.1 # rabbitmq的连接地址
     port: 5672 # rabbitmq的连接端口号
     virtual-host: /eladmin # rabbitmq的虚拟host
     username: admin # rabbitmq的用户名
