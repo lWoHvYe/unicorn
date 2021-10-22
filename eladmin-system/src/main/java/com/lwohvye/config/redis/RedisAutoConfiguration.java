@@ -128,10 +128,17 @@ public class RedisAutoConfiguration {
         // value值的序列化采用fastJsonRedisSerializer
         template.setValueSerializer(fastJsonRedisSerializer);
         template.setHashValueSerializer(fastJsonRedisSerializer);
+        //当一个类中包含了一个接口（或抽象类）的时候，在使用fastjson进行序列化的时候，会将子类型抹去，只保留接口（抽象类）的类型，使得反序列化时无法拿到原始类型。
+        //为了解决这个问题呢，fastjson引入了AutoType，即在序列化的时候，把原始类型记录下来。
         // 全局开启AutoType，这里方便开发，使用全局的方式 https://github.com/alibaba/fastjson/wiki/enable_autotype
-        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+//        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
         // 建议使用这种方式，小范围指定白名单
-        // ParserConfig.getGlobalInstance().addAccept("com.lwohvye.domain");
+        var parserConfig = ParserConfig.getGlobalInstance();
+        parserConfig.addAccept("com.lwohvye.domain");
+        parserConfig.addAccept("com.lwohvye.modules");
+        // 开启safeMode https://github.com/alibaba/fastjson/wiki/fastjson_safemode
+//        ParserConfig.getGlobalInstance().setSafeMode(true);
+
         // key的序列化采用StringRedisSerializer
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
