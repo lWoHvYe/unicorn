@@ -15,9 +15,8 @@
  */
 package com.lwohvye.config;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
-import com.lwohvye.utils.serializer.FastJsonRedisSerializer;
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

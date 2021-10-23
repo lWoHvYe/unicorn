@@ -71,6 +71,7 @@ public class DeptController {
     public ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids) {
         Set<DeptDto> deptDtos = new LinkedHashSet<>();
         for (Long id : ids) {
+            // TODO: 2021/10/23 从缓存中取出了JSONObject   5fix 
             DeptDto deptDto = deptService.findById(id);
             List<DeptDto> depts = deptService.getSuperior(deptDto, new ArrayList<>());
             deptDtos.addAll(depts);

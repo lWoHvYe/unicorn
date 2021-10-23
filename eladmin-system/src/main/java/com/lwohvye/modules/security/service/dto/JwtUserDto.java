@@ -15,11 +15,15 @@
  */
 package com.lwohvye.modules.security.service.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
+import com.lwohvye.utils.SpringContextHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
@@ -56,6 +60,21 @@ public class JwtUserDto implements UserDetails {
     @JSONField(serialize = false)
     public String getUsername() {
         return user.getUsername();
+    }
+
+    public List<GrantedAuthority> getAuthorities() {
+        authorities.clear();
+        authorities.addAll(SpringContextHolder.getBean(RoleService.class)
+                .mapToGrantedAuthorities(user.getId(), user.getIsAdmin())
+                .stream().map(grantedAuthorityObj -> {
+                    if(grantedAuthorityObj instanceof GrantedAuthority grantedAuthority)
+                        return grantedAuthority;
+                    // TODO: 2021/10/23 先简单处理，从缓存中取出时，会丢失类型信息，变成JSONObject。当前只用到SimpleGranteAuthority,后续用到别的需同步调整
+                    if (grantedAuthorityObj instanceof JSONObject authorityJon)
+                        return authorityJon.toJavaObject(SimpleGrantedAuthority.class);
+                    return grantedAuthorityObj;
+                }).toList());
+        return authorities;
     }
 
     @JSONField(serialize = false)

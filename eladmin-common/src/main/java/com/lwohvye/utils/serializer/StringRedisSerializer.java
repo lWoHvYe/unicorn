@@ -18,6 +18,7 @@ package com.lwohvye.utils.serializer;
 import cn.hutool.core.lang.Assert;
 import com.alibaba.fastjson.JSON;
 import com.lwohvye.utils.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.nio.charset.Charset;
@@ -49,10 +50,11 @@ public class StringRedisSerializer implements RedisSerializer<Object> {
     @Override
     public byte[] serialize(Object object) {
         String string = JSON.toJSONString(object);
-        if (StringUtils.isBlank(string)) {
-            return null;
-        }
-        string = string.replace("\"", "");
+        if (StringUtils.isBlank(string))
+            return new byte[0];
+//        string = string.replace("\"", "");
+        // 反序列化
+        StringEscapeUtils.unescapeJava(string);
         return string.getBytes(charset);
     }
 }

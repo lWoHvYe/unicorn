@@ -16,7 +16,8 @@
 package com.lwohvye.config.redis;
 
 import com.alibaba.fastjson.parser.ParserConfig;
-import com.lwohvye.utils.serializer.FastJsonRedisSerializer;
+import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
+import com.lwohvye.handler.GrantedAuthorityAutoTypeCheckHandler;
 import com.lwohvye.utils.serializer.StringRedisSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -133,11 +134,13 @@ public class RedisAutoConfiguration {
         // 全局开启AutoType，这里方便开发，使用全局的方式 https://github.com/alibaba/fastjson/wiki/enable_autotype
 //        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
         // 建议使用这种方式，小范围指定白名单
-        var parserConfig = ParserConfig.getGlobalInstance();
-        parserConfig.addAccept("com.lwohvye.domain");
-        parserConfig.addAccept("com.lwohvye.modules");
+//        var parserConfig = ParserConfig.getGlobalInstance();
+//        parserConfig.addAccept("com.lwohvye.domain");
+//        parserConfig.addAccept("com.lwohvye.modules.");
         // 开启safeMode https://github.com/alibaba/fastjson/wiki/fastjson_safemode
 //        ParserConfig.getGlobalInstance().setSafeMode(true);
+        // 示例-autoTypeCheckHandler的添加
+        ParserConfig.getGlobalInstance().addAutoTypeCheckHandler(new GrantedAuthorityAutoTypeCheckHandler());
 
         // key的序列化采用StringRedisSerializer
         template.setKeySerializer(new StringRedisSerializer());

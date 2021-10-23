@@ -15,13 +15,17 @@
  */
 package com.lwohvye.modules.security.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
 import com.lwohvye.modules.security.utils.SecuritySysUtil;
-import com.lwohvye.utils.*;
+import com.lwohvye.utils.EncryptUtils;
+import com.lwohvye.utils.FileUtil;
+import com.lwohvye.utils.PageUtil;
+import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -157,7 +161,11 @@ public class OnlineUserService {
      * @return /
      */
     public OnlineUserDto getOne(String key) {
-        return (OnlineUserDto) authSlaveRedisUtils.get(key);
+        // TODO: 2021/10/23 开启safeMode后，这种方式取出的是JSONObject
+        var userObj = authSlaveRedisUtils.get(key);
+        // 先转成JSONObject，再转成onlineUser
+        if (!Objects.isNull(userObj) && userObj instanceof JSONObject userJSONObj) return userJSONObj.toJavaObject(OnlineUserDto.class);
+        return null;
     }
 
     /**
@@ -165,7 +173,7 @@ public class OnlineUserService {
      *
      * @param userName 用户名
      */
-    public void checkLoginOnUser(String userName, String igoreToken) {
+    public void checkLoginOnUser(String userName, String ignoreToken) {
         List<OnlineUserDto> onlineUserDtos = getAll(userName);
         if (onlineUserDtos == null || onlineUserDtos.isEmpty()) {
             return;
@@ -174,11 +182,8 @@ public class OnlineUserService {
             if (onlineUserDto.getUserName().equals(userName)) {
                 try {
                     String token = EncryptUtils.desDecrypt(onlineUserDto.getKey());
-                    if (StringUtils.isNotBlank(igoreToken) && !igoreToken.equals(token)) {
+                    if (StringUtils.isBlank(ignoreToken) || !ignoreToken.equals(token))
                         this.kickOut(token);
-                    } else if (StringUtils.isBlank(igoreToken)) {
-                        this.kickOut(token);
-                    }
                 } catch (Exception e) {
                     log.error("checkUser is error", e);
                 }

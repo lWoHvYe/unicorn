@@ -32,6 +32,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,11 +73,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             var cacheUser = (String)authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
             jwtUserDto = JSONObject.parseObject(cacheUser, JwtUserDto.class);
 
-            // TODO: 2021/9/15  List<GrantedAuthority> 反序列化时，有误，故需重新设置。虽然使用了缓存，但把IO从2提到了3，后续试着优化
-            var authorities = jwtUserDto.getAuthorities();
-            authorities.clear();
             var userInner = jwtUserDto.getUser();
-            authorities.addAll(roleService.mapToGrantedAuthorities(userInner.getId(), userInner.getIsAdmin()));
 
             // 检查dataScope是否修改
             List<Long> dataScopes = jwtUserDto.getDataScopes();
@@ -103,11 +100,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 jwtUserDto = new JwtUserDto(
                         user,
                         dataService.getDeptIds(user),
-                        roleService.mapToGrantedAuthorities(user)
+                        new ArrayList<>()
                 );
 //                userDtoCache.put(username, jwtUserDto);
                 // 不能直接存对象，会报错。。。。com.alibaba.fastjson.JSONException: autoType is not support.
-                // https://github.com/alibaba/fastjson/wiki/enable_autotype      但已经开启了，原因未知
                 authRedisUtils.hPut(USER_CACHE_KEY, username, JSONObject.toJSONString(jwtUserDto));
             }
         }
