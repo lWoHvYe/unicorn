@@ -72,11 +72,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //            jwtUserDto = userDtoCache.get(username);
             // 取出时，一般是未转换的JSONObject
             var cacheUserObj = authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
-            if (!Objects.isNull(cacheUserObj) && cacheUserObj instanceof JSONObject userJon)
+            if (Objects.isNull(cacheUserObj))
+                return null;
+            if (cacheUserObj instanceof JSONObject userJon)
                 // TODO: 2021/10/23 直接转会报错 java.lang.IllegalArgumentException: argument type mismatch 。暂使用其他方式
 //                jwtUserDto = userJon.toJavaObject(JwtUserDto.class);
                 jwtUserDto = JSONObject.parseObject(userJon.toJSONString(), JwtUserDto.class);
+            else if (cacheUserObj instanceof JwtUserDto jwtUser)
+                jwtUserDto = jwtUser;
             else return null;
+
             var userInner = jwtUserDto.getUser();
 
             // 检查dataScope是否修改

@@ -161,10 +161,15 @@ public class OnlineUserService {
      * @return /
      */
     public OnlineUserDto getOne(String key) {
-        // TODO: 2021/10/23 开启safeMode后，这种方式取出的是JSONObject
+        // TODO: 2021/10/23 开启safeMode后，从redis中取出的是JSON（JSONObject、JSONArray）对象
         var userObj = authSlaveRedisUtils.get(key);
         // 先转成JSONObject，再转成onlineUser
-        if (!Objects.isNull(userObj) && userObj instanceof JSONObject userJSONObj) return userJSONObj.toJavaObject(OnlineUserDto.class);
+        if (Objects.isNull(userObj))
+            return null;
+        if (userObj instanceof JSONObject userJSONObj)
+            return userJSONObj.toJavaObject(OnlineUserDto.class);
+        if (userObj instanceof OnlineUserDto onlineUser)
+            return onlineUser;
         return null;
     }
 

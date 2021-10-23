@@ -15,9 +15,8 @@
  */
 package com.lwohvye.config.redis;
 
-import com.alibaba.fastjson.parser.ParserConfig;
-import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
-import com.lwohvye.handler.GrantedAuthorityAutoTypeCheckHandler;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.lwohvye.utils.serializer.FastJsonRedisSerializer;
 import com.lwohvye.utils.serializer.StringRedisSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -139,8 +138,8 @@ public class RedisAutoConfiguration {
 //        parserConfig.addAccept("com.lwohvye.modules.");
         // 开启safeMode https://github.com/alibaba/fastjson/wiki/fastjson_safemode
 //        ParserConfig.getGlobalInstance().setSafeMode(true);
-        // 示例-autoTypeCheckHandler的添加
-        ParserConfig.getGlobalInstance().addAutoTypeCheckHandler(new GrantedAuthorityAutoTypeCheckHandler());
+        // 示例-autoTypeCheckHandler的添加。非safeMode模式下，不要开启下面的配置
+//        ParserConfig.getGlobalInstance().addAutoTypeCheckHandler(new GrantedAuthorityAutoTypeCheckHandler());
 
         // key的序列化采用StringRedisSerializer
         template.setKeySerializer(new StringRedisSerializer());
