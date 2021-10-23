@@ -26,6 +26,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,9 +43,9 @@ public class JwtUserDto implements UserDetails {
 
     private final List<Long> dataScopes;
 
-    // TODO: 2021/9/12 尚未确定不做序列化的原因，但若放到redis中，需要进行序列化
-//    @JSONField(serialize = false)
-    private final List<GrantedAuthority> authorities;
+    // 不做序列化，使用时进行转换
+    @JSONField(serialize = false)
+    private final List<GrantedAuthority> authorities = new ArrayList<>();
 
     public Set<String> getRoles() {
         return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
@@ -69,7 +70,7 @@ public class JwtUserDto implements UserDetails {
                 .stream().map(grantedAuthorityObj -> {
                     if(grantedAuthorityObj instanceof GrantedAuthority grantedAuthority)
                         return grantedAuthority;
-                    // TODO: 2021/10/23 先简单处理，从缓存中取出时，会丢失类型信息，变成JSONObject。当前只用到SimpleGranteAuthority,后续用到别的需同步调整
+                    // TODO: 2021/10/23 先简单处理，开启safeMode后，从缓存中取出时，结果JSON类型。当前只用到SimpleGranteAuthority,后续用到别的需同步调整
                     if (grantedAuthorityObj instanceof JSONObject authorityJon)
                         return authorityJon.toJavaObject(SimpleGrantedAuthority.class);
                     return grantedAuthorityObj;

@@ -32,8 +32,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Zheng Jie
@@ -70,9 +70,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         JwtUserDto jwtUserDto = null;
         if (loginProperties.isCacheEnable() && authSlaveRedisUtils.hHasKey(USER_CACHE_KEY, username)) {
 //            jwtUserDto = userDtoCache.get(username);
-            var cacheUser = (String)authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
-            jwtUserDto = JSONObject.parseObject(cacheUser, JwtUserDto.class);
-
+            // 取出时，一般是未转换的JSONObject
+            var cacheUserObj = authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
+            if (!Objects.isNull(cacheUserObj) && cacheUserObj instanceof JSONObject userJon)
+                // TODO: 2021/10/23 直接转会报错 java.lang.IllegalArgumentException: argument type mismatch 。暂使用其他方式
+//                jwtUserDto = userJon.toJavaObject(JwtUserDto.class);
+                jwtUserDto = JSONObject.parseObject(userJon.toJSONString(), JwtUserDto.class);
+            else return null;
             var userInner = jwtUserDto.getUser();
 
             // 检查dataScope是否修改
@@ -99,12 +103,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 // 2021/9/15 这里到authorities 序列化后，反序列化时，会有误。已初步解决
                 jwtUserDto = new JwtUserDto(
                         user,
-                        dataService.getDeptIds(user),
-                        new ArrayList<>()
+                        dataService.getDeptIds(user)
                 );
 //                userDtoCache.put(username, jwtUserDto);
-                // 不能直接存对象，会报错。。。。com.alibaba.fastjson.JSONException: autoType is not support.
-                authRedisUtils.hPut(USER_CACHE_KEY, username, JSONObject.toJSONString(jwtUserDto));
+                // 存进去JwtUser，取出时为JSONObject，需自行处理
+                authRedisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto);
             }
         }
         return jwtUserDto;
