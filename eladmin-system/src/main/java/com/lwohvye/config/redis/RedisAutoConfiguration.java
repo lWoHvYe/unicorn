@@ -15,7 +15,6 @@
  */
 package com.lwohvye.config.redis;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.lwohvye.utils.serializer.FastJsonRedisSerializer;
 import com.lwohvye.utils.serializer.StringRedisSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -149,3 +148,16 @@ public class RedisAutoConfiguration {
         return template;
     }
 }
+// https://github.com/alibaba/fastjson/wiki/fastjson_safemode
+// 这部分未用到，仅作为示例使用
+//public class GrantedAuthorityAutoTypeCheckHandler implements ParserConfig.AutoTypeCheckHandler {
+//
+//    public Class<?> handler(String typeName, Class<?> expectClass, int features) {
+//        return switch (typeName) {
+//            case "JaasGrantedAuthority" -> JaasGrantedAuthority.class;
+//            case "SimpleGrantedAuthority" -> SimpleGrantedAuthority.class;
+//            case "SwitchUserGrantedAuthority" -> SwitchUserGrantedAuthority.class;
+//            default -> GrantedAuthority.class;
+//        };
+//    }
+//}

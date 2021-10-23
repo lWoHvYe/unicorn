@@ -16,7 +16,6 @@
 package com.lwohvye.modules.security.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.exception.BadRequestException;
@@ -70,20 +69,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         JwtUserDto jwtUserDto = null;
         if (loginProperties.isCacheEnable() && authSlaveRedisUtils.hHasKey(USER_CACHE_KEY, username)) {
 //            jwtUserDto = userDtoCache.get(username);
-            // 取出时，一般是未转换的JSONObject
+            // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
             var cacheUserObj = authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
             if (Objects.isNull(cacheUserObj))
                 return null;
-            if (cacheUserObj instanceof JSONObject userJon)
-                // TODO: 2021/10/23 直接转会报错 java.lang.IllegalArgumentException: argument type mismatch 。暂使用其他方式
+//            if (cacheUserObj instanceof JSONObject userJon)
+            // 2021/10/23 直接转会报错 java.lang.IllegalArgumentException: argument type mismatch 。暂使用其他方式
 //                jwtUserDto = userJon.toJavaObject(JwtUserDto.class);
-                jwtUserDto = JSONObject.parseObject(userJon.toJSONString(), JwtUserDto.class);
-            else if (cacheUserObj instanceof JwtUserDto jwtUser)
+//                jwtUserDto = JSONObject.parseObject(userJon.toJSONString(), JwtUserDto.class);
+            if (cacheUserObj instanceof JwtUserDto jwtUser)
                 jwtUserDto = jwtUser;
             else return null;
 
             var userInner = jwtUserDto.getUser();
-
             // 检查dataScope是否修改
             List<Long> dataScopes = jwtUserDto.getDataScopes();
             dataScopes.clear();
@@ -111,7 +109,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         dataService.getDeptIds(user)
                 );
 //                userDtoCache.put(username, jwtUserDto);
-                // 存进去JwtUser，取出时为JSONObject，需自行处理
                 authRedisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto);
             }
         }

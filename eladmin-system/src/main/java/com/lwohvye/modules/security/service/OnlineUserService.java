@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.security.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
@@ -161,13 +160,13 @@ public class OnlineUserService {
      * @return /
      */
     public OnlineUserDto getOne(String key) {
-        // TODO: 2021/10/23 开启safeMode后，从redis中取出的是JSON（JSONObject、JSONArray）对象
+        // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
         var userObj = authSlaveRedisUtils.get(key);
-        // 先转成JSONObject，再转成onlineUser
         if (Objects.isNull(userObj))
             return null;
-        if (userObj instanceof JSONObject userJSONObj)
-            return userJSONObj.toJavaObject(OnlineUserDto.class);
+        // 先转成JSONObject，再转成onlineUser
+//        if (userObj instanceof JSONObject userJSONObj)
+//            return userJSONObj.toJavaObject(OnlineUserDto.class);
         if (userObj instanceof OnlineUserDto onlineUser)
             return onlineUser;
         return null;

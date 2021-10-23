@@ -40,6 +40,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -184,7 +185,7 @@ public class RoleServiceImpl implements RoleService {
 //    当使用root对象的属性作为key时，可以将“#root”省略，因为Spring默认使用的就是root对象的属性。
 //    需注意是 target.xxx 不带前面的 #
     @Cacheable(key = " #root.target.getSysName() + 'auth:' + #p0.id")
-    public List mapToGrantedAuthorities(UserDto user) {
+    public List<GrantedAuthority> mapToGrantedAuthorities(UserDto user) {
         var userId = user.getId();
         var isAdmin = user.getIsAdmin();
 
@@ -195,22 +196,24 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = " target.getSysName() + 'auth:' + #p0")
-    public List mapToGrantedAuthorities(Long userId, Boolean isAdmin) {
+    public List<GrantedAuthority> mapToGrantedAuthorities(Long userId, Boolean isAdmin) {
         return genAuthorities(userId, isAdmin);
     }
 
-    private List genAuthorities(Long userId, Boolean isAdmin) {
+    private List<GrantedAuthority> genAuthorities(Long userId, Boolean isAdmin) {
         Set<String> permissions = new HashSet<>();
         // 如果是管理员直接返回
         if (Boolean.TRUE.equals(isAdmin)) {
             permissions.add("admin");
-            return permissions.stream().map(SimpleGrantedAuthority::new).toList();
+            return permissions.stream().map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
         }
         Set<Role> roles = roleRepository.findByUserId(userId);
         permissions = roles.stream().flatMap(role -> role.getMenus().stream())
                 .map(Menu::getPermission)
                 .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
-        return permissions.stream().map(SimpleGrantedAuthority::new).toList();
+        return permissions.stream().map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     @Override
