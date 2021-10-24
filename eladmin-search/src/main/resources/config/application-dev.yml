@@ -118,66 +118,6 @@ spring:
       max-idle: 5
       min-idle: 1
 
-  ###########【Kafka集群】###########
-  kafka:
-    #    使用zookeeper后，可以只配置集群中的一个节点。但是其他节点的ip为k8s内的ip，在外部无法访问，解决方式待定
-    bootstrap-servers: 192.168.1.140:9092
-    ###########【初始化生产者配置】###########
-    # 重试次数
-    producer:
-      retries: 0
-      # 应答级别:多少个分区副本备份完成时向生产者发送ack确认(可选0、1、all/-1)
-      acks: 1
-      # 批量大小
-      batch-size: 1638
-      # 提交延时
-      properties:
-        linger:
-          ms: 0
-      # 自定义分区器
-      #        partitioner:
-      #          class: com.lwohvye.config.kafka.CustomizePartitioner
-      # 当生产端积累的消息达到batch-size或接收到消息linger.ms后,生产者就会将消息提交给kafka
-      # linger.ms为0表示每接收到一条消息就提交给kafka,这时候batch-size其实就没用了
-      # 生产端缓冲区大小
-      buffer-memory: 335544
-      # Kafka提供的序列化和反序列化类
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    ###########【初始化消费者配置】###########
-    # 默认的消费组ID
-    consumer:
-      properties:
-        group:
-          id: defaultConsumerGroup
-        # 消费会话超时时间(超过这个时间consumer没有发送心跳,就会触发rebalance操作)
-        session:
-          timeout:
-            ms: 120000
-        # 消费请求超时时间
-        request:
-          timeout:
-            ms: 180000
-      # 是否自动提交offset
-      enable-auto-commit: true
-      # 提交offset延时(接收到消息后多久提交offset)
-      auto-commit-interval: 1000
-      # 当kafka中没有初始offset或offset超出范围时将自动重置offset
-      # earliest:重置为分区中最小的offset;
-      # latest:重置为分区中最新的offset(消费分区中新产生的数据);
-      # none:只要有一个分区不存在已提交的offset,就抛出异常;
-      auto-offset-reset: latest
-      # Kafka提供的序列化和反序列化类
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      # 批量消费每次最多消费多少条消息
-      max-poll-records: 50
-    # 消费端监听的topic不存在时，项目启动会报错(关掉)
-    listener:
-      missing-topics-fatal: false
-      # 设置批量消费
-      type: batch
-
   ##### RabbitMQ ####
   rabbitmq:
     host: 192.168.1.140 # rabbitmq的连接地址
@@ -187,45 +127,45 @@ spring:
     password: admin # rabbitmq的密码
 
 # 登录相关配置
-login:
+#login:
   # 登录缓存
-  cache-enable: true
+#  cache-enable: true
   #  是否限制单用户登录
-  single-login: false
+#  single-login: false
   #  验证码
-  login-code:
+#  login-code:
     #  验证码类型配置 查看 LoginProperties 类
-    code-type: gif
+#    code-type: gif
     #  登录图形验证码有效时间/分钟
-    expiration: 2
+#    expiration: 2
     #  验证码高度
-    width: 111
+#    width: 111
     #  验证码宽度
-    height: 36
+#    height: 36
     # 内容长度
-    length: 4
+#    length: 4
     # 字体名称，为空则使用默认字体
-    font-name:
+#    font-name:
     # 字体大小
-    font-size: 25
+#    font-size: 25
 
 #jwt
 jwt:
-  header: Authorization
+#  header: Authorization
   # 令牌前缀
-  token-start-with: Bearer
+#  token-start-with: Bearer
   # 必须使用最少88位的Base64对该令牌进行编码
   base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI=
   # 令牌过期时间 此处单位/毫秒 ，默认4小时，可在此网站生成 https://www.convertworld.com/zh-hans/time/milliseconds.html
-  token-validity-in-seconds: 14400000
+#  token-validity-in-seconds: 14400000
   # 在线用户key
-  online-key: online-token-
+#  online-key: online-token-
   # 验证码
-  code-key: code-key-
+#  code-key: code-key-
   # token 续期检查时间范围（默认30分钟，单位毫秒），在token即将过期的一段时间内用户操作了，则给用户的token续期
-  detect: 1800000
+#  detect: 1800000
   # 续期时间范围，默认1小时，单位毫秒
-  renew: 3600000
+#  renew: 3600000
 
 #是否允许生成代码，生产环境设置为false
 #generator:
@@ -251,5 +191,5 @@ file:
     path: C:\eladmin\file\
     avatar: C:\eladmin\avatar\
   # 文件大小 /M
-  maxSize: 100
-  avatarMaxSize: 5
+#  maxSize: 100
+#  avatarMaxSize: 5

@@ -29,7 +29,7 @@ public class LoginCode {
     /**
      * 验证码配置
      */
-    private LoginCodeEnum codeType;
+    private LoginCodeEnum codeType = LoginCodeEnum.gif;
     /**
      * 验证码有效期 分钟
      */

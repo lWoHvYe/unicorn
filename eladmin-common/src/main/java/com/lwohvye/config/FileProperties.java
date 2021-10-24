@@ -29,10 +29,10 @@ import org.springframework.context.annotation.Configuration;
 public class FileProperties {
 
     /** 文件大小限制 */
-    private Long maxSize;
+    private Long maxSize = 100L;
 
     /** 头像大小限制 */
-    private Long avatarMaxSize;
+    private Long avatarMaxSize = 5L;
 
     private ElPath mac;
 

@@ -43,7 +43,7 @@ public class LoginProperties {
     /**
      * 用户登录信息缓存
      */
-    private boolean cacheEnable;
+    private boolean cacheEnable = true;
 
     public boolean isSingleLogin() {
         return singleLogin;

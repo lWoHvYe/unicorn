@@ -29,12 +29,12 @@ public class SecurityProperties {
     /**
      * Request Headers ： Authorization
      */
-    private String header;
+    private String header = "Authorization";
 
     /**
      * 令牌前缀，最后留个空格 Bearer
      */
-    private String tokenStartWith;
+    private String tokenStartWith = "Bearer";
 
     /**
      * 必须使用最少88位的Base64对该令牌进行编码
@@ -44,28 +44,31 @@ public class SecurityProperties {
     /**
      * 令牌过期时间 此处单位/毫秒
      */
-    private Long tokenValidityInSeconds;
+    private Long tokenValidityInSeconds = 14400000L;
 
     /**
      * 在线用户 key，根据 key 查询 redis 中在线用户的数据
      */
-    private String onlineKey;
+    private String onlineKey = "online-token-";
 
     /**
      * 验证码 key
      */
-    private String codeKey;
+    private String codeKey = "code-key-";
 
     /**
      * token 续期检查
      */
-    private Long detect;
+    private Long detect = 1800000L;
 
     /**
      * 续期时间
      */
-    private Long renew;
+    private Long renew = 3600000L;
 
+    /**
+     * 前缀后面要加个空格，这个无法在文件中配置，所以重写下get方法
+     */
     public String getTokenStartWith() {
         return tokenStartWith + " ";
     }
