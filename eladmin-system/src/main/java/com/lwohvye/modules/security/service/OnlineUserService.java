@@ -94,6 +94,7 @@ public class OnlineUserService {
      * @return /
      */
     public List<OnlineUserDto> getAll(String filter) {
+        // TODO: 2021/10/24 String类型的key被加上了双引号，导致此处无法模糊查询，待解决
         List<String> keys = authSlaveRedisUtils.scan(SecuritySysUtil.getAuthToken(properties, "*"));
         Collections.reverse(keys);
         List<OnlineUserDto> onlineUserDtos = new ArrayList<>();

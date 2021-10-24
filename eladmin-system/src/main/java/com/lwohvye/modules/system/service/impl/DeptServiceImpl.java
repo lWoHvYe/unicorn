@@ -173,7 +173,7 @@ public class DeptServiceImpl implements DeptService {
         for (DeptDto deptDTO : deptDtos) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("部门名称", deptDTO.getName());
-            map.put("部门状态", deptDTO.getEnabled() ? "启用" : "停用");
+            map.put("部门状态", Boolean.TRUE.equals(deptDTO.getEnabled()) ? "启用" : "停用");
             map.put("创建日期", deptDTO.getCreateTime());
             list.add(map);
         }
@@ -187,7 +187,7 @@ public class DeptServiceImpl implements DeptService {
         for (Dept dept : menuList) {
             deptDtos.add(deptMapper.toDto(dept));
             List<Dept> depts = deptRepository.findByPid(dept.getId());
-            if (depts != null && depts.size() != 0) {
+            if (depts != null && !depts.isEmpty()) {
                 getDeleteDepts(depts, deptDtos);
             }
         }
@@ -226,7 +226,7 @@ public class DeptServiceImpl implements DeptService {
     public Object buildTree(List<DeptDto> deptDtos) {
         Set<DeptDto> trees = new LinkedHashSet<>();
         Set<DeptDto> depts = new LinkedHashSet<>();
-        List<String> deptNames = deptDtos.stream().map(DeptDto::getName).collect(Collectors.toList());
+        List<String> deptNames = deptDtos.stream().map(DeptDto::getName).toList();
         boolean isChild;
         for (DeptDto deptDTO : deptDtos) {
             isChild = false;
@@ -262,9 +262,9 @@ public class DeptServiceImpl implements DeptService {
     public void verification(Set<DeptDto> deptDtos) {
 //        dto 2 entity
         var deptList = deptMapper.toEntity(new ArrayList<>(deptDtos));
-        if (userRepository.existsByDeptIn(deptList))
+        if (Boolean.TRUE.equals(userRepository.existsByDeptIn(deptList)))
             throw new BadRequestException("所选部门存在用户关联，请解除后再试！");
-        if (roleRepository.existsByDeptsIn(deptList))
+        if (Boolean.TRUE.equals(roleRepository.existsByDeptsIn(deptList)))
             throw new BadRequestException("所选部门存在角色关联，请解除后再试！");
     }
 
