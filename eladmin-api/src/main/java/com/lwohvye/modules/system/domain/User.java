@@ -125,7 +125,8 @@ public class User extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "是否为admin账号", hidden = true)
     private Boolean isAdmin = false;
 
-    //    描述信息。数据库中为blob类型。java侧使用String存取，存在乱码问题。在Mysql8的版本已无该问题。
+    // 描述信息。数据库中为blob类型。java侧使用String存取，存在乱码问题。在Mysql8的版本已无该问题。
+    // 如果只是文本的存储，建议数据库使用text，当需要存储图片或视频等时，再考虑blob（二进制存储）。text无需考虑编码问题
     @String4Blob
     @Column(name = "description")
     private String description;
