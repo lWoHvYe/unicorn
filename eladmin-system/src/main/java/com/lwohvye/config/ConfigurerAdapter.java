@@ -53,6 +53,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     }
 
     // 处理全局跨域
+
     /**
      * 方法类	             方法名称	               必填	        请求头字段	                     说明
      * CorsRegistry	    addMapping	                是	无, 非Cors属性,属于SpringBoot配置	    配置支持跨域的路径
@@ -91,7 +92,15 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         // 使用 fastjson 序列化，会导致 @JsonIgnore 失效，可以使用 @JSONField(serialize = false) 替换
         FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
         List<MediaType> supportMediaTypeList = new ArrayList<>();
-        supportMediaTypeList.add(MediaType.APPLICATION_JSON_UTF8);
+        /**
+         * Public constant media type for {@code application/json;charset=UTF-8}.
+         * @deprecated as of 5.2 in favor of {@link #APPLICATION_JSON}
+         * since major browsers like Chrome
+         * <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=438464">
+         * now comply with the specification</a> and interpret correctly UTF-8 special
+         * characters without requiring a {@code charset=UTF-8} parameter.
+         */
+        supportMediaTypeList.add(MediaType.APPLICATION_JSON);
         FastJsonConfig config = new FastJsonConfig();
         config.setDateFormat("yyyy-MM-dd HH:mm:ss");
         config.setSerializerFeatures(SerializerFeature.DisableCircularReferenceDetect);
