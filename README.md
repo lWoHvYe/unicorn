@@ -255,3 +255,5 @@ nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.4.jar >nohup.out 2>&1 &
 cd /opt/app
 nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.4.jar >nohup.out 2>&1 &
 ```
+#### TODO
+- 整合Redisson（当前无法配置过期通知，待解决）
