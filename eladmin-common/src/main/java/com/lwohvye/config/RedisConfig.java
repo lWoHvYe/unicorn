@@ -17,9 +17,11 @@ package com.lwohvye.config;
 
 import com.alibaba.fastjson.JSON;
 import com.lwohvye.utils.serializer.FastJsonRedisSerializer;
+import com.lwohvye.utils.serializer.StringRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
@@ -30,7 +32,9 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.lang.reflect.Method;
@@ -61,26 +65,35 @@ public class RedisConfig extends CachingConfigurerSupport {
         return configuration;
     }
 
-    // @SuppressWarnings("all")
-//    @Bean(name = "redisTemplate")
-//    @ConditionalOnMissingBean(name = "redisTemplate")
-//    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-//        RedisTemplate<Object, Object> template = new RedisTemplate<>();
-//        //序列化
-//        FastJsonRedisSerializer<Object> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
-//        // value值的序列化采用fastJsonRedisSerializer
-//        template.setValueSerializer(fastJsonRedisSerializer);
-//        template.setHashValueSerializer(fastJsonRedisSerializer);
-//        // 全局开启AutoType，这里方便开发，使用全局的方式
+    @Bean(name = "redisTemplate")
+    @ConditionalOnMissingBean(name = "redisTemplate")
+    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        var template = new RedisTemplate<>();
+        //序列化
+        var fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+        // value值的序列化采用fastJsonRedisSerializer
+        template.setValueSerializer(fastJsonRedisSerializer);
+        template.setHashValueSerializer(fastJsonRedisSerializer);
+        //当一个类中包含了一个接口（或抽象类）的时候，在使用fastjson进行序列化的时候，会将子类型抹去，只保留接口（抽象类）的类型，使得反序列化时无法拿到原始类型。
+        //为了解决这个问题呢，fastjson引入了AutoType，即在序列化的时候，把原始类型记录下来。
+        // 全局开启AutoType，这里方便开发，使用全局的方式 https://github.com/alibaba/fastjson/wiki/enable_autotype
 //        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
-//        // 建议使用这种方式，小范围指定白名单
-//        // ParserConfig.getGlobalInstance().addAccept("com.lwohvye.domain");
-//        // key的序列化采用StringRedisSerializer
-//        template.setKeySerializer(new StringRedisSerializer());
-//        template.setHashKeySerializer(new StringRedisSerializer());
-//        template.setConnectionFactory(redisConnectionFactory);
-//        return template;
-//    }
+        // 建议使用这种方式，小范围指定白名单
+//        var parserConfig = ParserConfig.getGlobalInstance();
+//        parserConfig.addAccept("com.lwohvye.domain");
+//        parserConfig.addAccept("com.lwohvye.modules.");
+        // 开启safeMode https://github.com/alibaba/fastjson/wiki/fastjson_safemode
+//        ParserConfig.getGlobalInstance().setSafeMode(true);
+        // 示例-autoTypeCheckHandler的添加。非safeMode模式下，不要开启下面的配置
+//        ParserConfig.getGlobalInstance().addAutoTypeCheckHandler(new GrantedAuthorityAutoTypeCheckHandler());
+
+        // key的序列化采用StringRedisSerializer
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setConnectionFactory(redisConnectionFactory);
+        template.afterPropertiesSet();
+        return template;
+    }
 
     /**
      * 自定义缓存key生成策略，默认将使用该策略。针对查询，使用toString作为key
@@ -145,71 +158,16 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
 }
-
-///**
-// * Value 序列化
-// *
-// * @param <T>
-// * @author /
-// */
-//class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
+// https://github.com/alibaba/fastjson/wiki/fastjson_safemode
+// 这部分未用到，仅作为示例使用
+//public class GrantedAuthorityAutoTypeCheckHandler implements ParserConfig.AutoTypeCheckHandler {
 //
-//    private final Class<T> clazz;
-//
-//    FastJsonRedisSerializer(Class<T> clazz) {
-//        super();
-//        this.clazz = clazz;
-//    }
-//
-//    @Override
-//    public byte[] serialize(T t) {
-//        if (t == null) {
-//            return new byte[0];
-//        }
-//        return JSON.toJSONString(t, SerializerFeature.WriteClassName).getBytes(StandardCharsets.UTF_8);
-//    }
-//
-//    @Override
-//    public T deserialize(byte[] bytes) {
-//        if (bytes == null || bytes.length <= 0) {
-//            return null;
-//        }
-//        String str = new String(bytes, StandardCharsets.UTF_8);
-//        return JSON.parseObject(str, clazz);
-//    }
-//
-//}
-//
-///**
-// * 重写序列化器
-// *
-// * @author /
-// */
-//class StringRedisSerializer implements RedisSerializer<Object> {
-//
-//    private final Charset charset;
-//
-//    StringRedisSerializer() {
-//        this(StandardCharsets.UTF_8);
-//    }
-//
-//    private StringRedisSerializer(Charset charset) {
-//        Assert.notNull(charset, "Charset must not be null!");
-//        this.charset = charset;
-//    }
-//
-//    @Override
-//    public String deserialize(byte[] bytes) {
-//        return (bytes == null ? null : new String(bytes, charset));
-//    }
-//
-//    @Override
-//    public byte[] serialize(Object object) {
-//        String string = JSON.toJSONString(object);
-//        if (StringUtils.isBlank(string)) {
-//            return null;
-//        }
-//        string = string.replace("\"", "");
-//        return string.getBytes(charset);
+//    public Class<?> handler(String typeName, Class<?> expectClass, int features) {
+//        return switch (typeName) {
+//            case "JaasGrantedAuthority" -> JaasGrantedAuthority.class;
+//            case "SimpleGrantedAuthority" -> SimpleGrantedAuthority.class;
+//            case "SwitchUserGrantedAuthority" -> SwitchUserGrantedAuthority.class;
+//            default -> GrantedAuthority.class;
+//        };
 //    }
 //}

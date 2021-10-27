@@ -22,8 +22,6 @@ import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
-import com.lwohvye.config.redis.AuthRedisUtils;
-import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
@@ -44,6 +42,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -77,9 +76,8 @@ public class AuthorizationController {
     private final SecurityProperties properties;
     //    缓存
     private final RedisUtils redisUtils;
-    //    鉴权用缓存
-    private final AuthRedisUtils authRedisUtils;
-    private final AuthSlaveRedisUtils authSlaveRedisUtils;
+    //    Redisson使用
+    private final RedissonClient redissonClient;
     private final OnlineUserService onlineUserService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -97,19 +95,19 @@ public class AuthorizationController {
 
         var username = authUser.getUsername();
         String lockUserKey = username + "||authLocked||";
-//        var lockUser = authRedisUtils.get(lockUserKey);
+//        var lockUser = redisUtils.get(lockUserKey);
 //        if (ObjectUtil.isNotNull(lockUser) && lockUser instanceof Collection col ? CollUtil.isNotEmpty(col) : ObjectUtil.isNotEmpty(lockUser)) {
 //        if (ObjectUtil.isNotEmpty(lockUser)) {
         // 改用延时消息队列来做。错误一定次数后，修改用户状态为锁定，然后延时消息。一小时后解除
-//        if (authSlaveRedisUtils.hasKey(lockUserKey))
+//        if (redisUtils.hasKey(lockUserKey))
 //            throw new BadRequestException("用户已被锁定，请稍后再试");
 
         // 密码解密
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, authUser.getPassword());
         // 查询验证码
-        String code = (String) authSlaveRedisUtils.get(authUser.getUuid());
+        String code = (String) redisUtils.get(authUser.getUuid());
         // 清除验证码
-        authRedisUtils.delete(authUser.getUuid());
+        redisUtils.delete(authUser.getUuid());
         if (StringUtils.isBlank(code)) {
             throw new BadRequestException("验证码不存在或已过期");
         }
@@ -178,7 +176,7 @@ public class AuthorizationController {
             captchaValue = captchaValue.split("\\.")[0];
         }
         // 保存
-        authRedisUtils.set(uuid, captchaValue, loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
+        redisUtils.set(uuid, captchaValue, loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
         // 验证码信息
         Map<String, Object> imgResult = new HashMap<>(2) {
             {

@@ -20,7 +20,6 @@ import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
-import com.lwohvye.config.redis.SlaveRedisUtils;
 import com.lwohvye.config.thread.ThreadPoolExecutorUtil;
 import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
@@ -63,7 +62,7 @@ public class ExecutionJob extends QuartzJobBean {
         // 获取spring bean
         QuartzLogRepository quartzLogRepository = SpringContextHolder.getBean(QuartzLogRepository.class);
         QuartzJobService quartzJobService = SpringContextHolder.getBean(QuartzJobService.class);
-        RedisUtils redisUtils = SpringContextHolder.getBean(SlaveRedisUtils.class);
+        RedisUtils redisUtils = SpringContextHolder.getBean(RedisUtils.class);
 
         String uuid = quartzJob.getUuid();
 

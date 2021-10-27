@@ -18,14 +18,13 @@ package com.lwohvye.modules.system.service.local;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.lwohvye.config.redis.AuthRedisUtils;
-import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.domain.Log;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.repository.LogRepository;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -54,10 +53,7 @@ public class AuthMQService {
     //    ----------------------登录失败-----------------------------
 
     @Autowired
-    private AuthRedisUtils authRedisUtils;
-
-    @Autowired
-    private AuthSlaveRedisUtils authSlaveRedisUtils;
+    private RedisUtils redisUtils;
 
     @Autowired
     private UserService userService;
@@ -82,7 +78,7 @@ public class AuthMQService {
         //          使用 用户名 + ip 作为key
         String authFailedKey = username + "||authFailed||" + ip;
         var countKey = "failed-count";
-        var byKey = authSlaveRedisUtils.hGet(authFailedKey, countKey);
+        var byKey = redisUtils.hGet(authFailedKey, countKey);
         var failCount = ObjectUtil.isNotEmpty(byKey) ? (Integer) byKey : 0;
         log.info("fail-count" + failCount);
         // TODO: 2021/7/5 需要加锁。但消息是顺序消费的，也许不加也行，但消费者可以有多个，最好加上
@@ -90,10 +86,10 @@ public class AuthMQService {
             failCount += 1;
             if (ObjectUtil.equal(failCount, 1)) {
 //                        新建时设置过期时间5分钟
-                authRedisUtils.hPut(authFailedKey, countKey, failCount, 5 * 60L);
+                redisUtils.hPut(authFailedKey, countKey, failCount, 5 * 60L);
             } else {
 //                        更新时只更新值。过期时间不做改动
-                authRedisUtils.hPut(authFailedKey, countKey, failCount);
+                redisUtils.hPut(authFailedKey, countKey, failCount);
             }
         } else {
 //                  修改状态为锁定

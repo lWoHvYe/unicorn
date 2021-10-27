@@ -16,7 +16,6 @@
 package com.lwohvye.modules.security.security;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -46,7 +45,6 @@ public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
     private final RedisUtils redisUtils;
-    private final AuthRedisUtils authRedisUtils;
     public static final String AUTHORITIES_KEY = "user";
     private JwtParser jwtParser;
     private JwtBuilder jwtBuilder;
@@ -101,7 +99,7 @@ public class TokenProvider implements InitializingBean {
      */
     public void checkRenewal(String token) {
         // 判断是否续期token,计算token的过期时间
-        long expireTime = authRedisUtils.getExpire(SecuritySysUtil.getAuthToken(properties, token)) * 1000;
+        long expireTime = redisUtils.getExpire(SecuritySysUtil.getAuthToken(properties, token)) * 1000;
 //        Date expireDate = DateUtil.offset(new Date(), DateField.MILLISECOND, (int) expireTime);
         // 判断当前时间与过期时间的时间差
 //        long differ = expireDate.getTime() - System.currentTimeMillis();
@@ -110,7 +108,7 @@ public class TokenProvider implements InitializingBean {
 //        if (differ <= properties.getDetect()) {
         if (expireTime <= properties.getDetect()) {
             long renew = expireTime + properties.getRenew();
-            authRedisUtils.expire(SecuritySysUtil.getAuthToken(properties, token), renew, TimeUnit.MILLISECONDS);
+            redisUtils.expire(SecuritySysUtil.getAuthToken(properties, token), renew, TimeUnit.MILLISECONDS);
         }
     }
 

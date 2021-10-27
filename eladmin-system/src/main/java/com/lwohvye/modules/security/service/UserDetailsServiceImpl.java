@@ -16,8 +16,6 @@
 package com.lwohvye.modules.security.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.lwohvye.config.redis.AuthRedisUtils;
-import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
@@ -26,6 +24,7 @@ import com.lwohvye.modules.system.service.DataService;
 import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,9 +43,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserService userService;
     private final RoleService roleService;
     private final DataService dataService;
+    private final RedisUtils redisUtils;
     private final LoginProperties loginProperties;
-    private final AuthRedisUtils authRedisUtils;
-    private final AuthSlaveRedisUtils authSlaveRedisUtils;
 
     public void setEnableCache(boolean enableCache) {
         this.loginProperties.setCacheEnable(enableCache);
@@ -67,10 +65,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public JwtUserDto loadUserByUsername(String username) {
         boolean searchDb = true;
         JwtUserDto jwtUserDto = null;
-        if (loginProperties.isCacheEnable() && authSlaveRedisUtils.hHasKey(USER_CACHE_KEY, username)) {
+        if (loginProperties.isCacheEnable() && redisUtils.hHasKey(USER_CACHE_KEY, username)) {
 //            jwtUserDto = userDtoCache.get(username);
             // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
-            var cacheUserObj = authSlaveRedisUtils.hGet(USER_CACHE_KEY, username);
+            var cacheUserObj = redisUtils.hGet(USER_CACHE_KEY, username);
             if (Objects.isNull(cacheUserObj))
                 return null;
 //            if (cacheUserObj instanceof JSONObject userJon)
@@ -109,7 +107,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         dataService.getDeptIds(user)
                 );
 //                userDtoCache.put(username, jwtUserDto);
-                authRedisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto);
+                redisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto);
             }
         }
         return jwtUserDto;

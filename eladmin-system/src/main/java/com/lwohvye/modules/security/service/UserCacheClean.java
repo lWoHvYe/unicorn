@@ -16,8 +16,8 @@
 
 package com.lwohvye.modules.security.service;
 
-import com.lwohvye.config.redis.AuthRedisUtils;
 import com.lwohvye.utils.StringUtils;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserCacheClean {
 
-    private final AuthRedisUtils authRedisUtils;
+    private final RedisUtils redisUtils;
 
     /**
      * 清理特定用户缓存信息<br>
@@ -40,7 +40,7 @@ public class UserCacheClean {
      */
     public void cleanUserCache(String userName) {
         if (StringUtils.isNotEmpty(userName)) {
-            authRedisUtils.hDelete(UserDetailsServiceImpl.USER_CACHE_KEY, userName);
+            redisUtils.hDelete(UserDetailsServiceImpl.USER_CACHE_KEY, userName);
 //            UserDetailsServiceImpl.userDtoCache.remove(userName);
         }
     }
@@ -50,7 +50,7 @@ public class UserCacheClean {
      * ,如发生角色授权信息变化，可以简便的全部失效缓存
      */
     public void cleanAll() {
-        authRedisUtils.delete(UserDetailsServiceImpl.USER_CACHE_KEY);
+        redisUtils.delete(UserDetailsServiceImpl.USER_CACHE_KEY);
 //        UserDetailsServiceImpl.userDtoCache.clear();
     }
 }

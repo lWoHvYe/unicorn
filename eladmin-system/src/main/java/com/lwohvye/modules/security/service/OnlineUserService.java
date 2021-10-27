@@ -15,8 +15,6 @@
  */
 package com.lwohvye.modules.security.service;
 
-import com.lwohvye.config.redis.AuthRedisUtils;
-import com.lwohvye.config.redis.AuthSlaveRedisUtils;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
@@ -48,8 +46,6 @@ public class OnlineUserService {
 
     private final SecurityProperties properties;
     private final RedisUtils redisUtils;
-    private final AuthRedisUtils authRedisUtils;
-    private final AuthSlaveRedisUtils authSlaveRedisUtils;
 
     /**
      * 保存在线用户信息
@@ -69,7 +65,7 @@ public class OnlineUserService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        authRedisUtils.set(SecuritySysUtil.getAuthToken(properties, token), onlineUserDto, properties.getTokenValidityInSeconds() / 1000);
+        redisUtils.set(SecuritySysUtil.getAuthToken(properties, token), onlineUserDto, properties.getTokenValidityInSeconds() / 1000);
     }
 
     /**
@@ -95,11 +91,11 @@ public class OnlineUserService {
      */
     public List<OnlineUserDto> getAll(String filter) {
         // TODO: 2021/10/24 String类型的key被加上了双引号，导致此处无法模糊查询，待解决
-        List<String> keys = authSlaveRedisUtils.scan(SecuritySysUtil.getAuthToken(properties, "*"));
+        List<String> keys = redisUtils.scan(SecuritySysUtil.getAuthToken(properties, "*"));
         Collections.reverse(keys);
         List<OnlineUserDto> onlineUserDtos = new ArrayList<>();
         for (String key : keys) {
-            OnlineUserDto onlineUserDto = (OnlineUserDto) authSlaveRedisUtils.get(key);
+            OnlineUserDto onlineUserDto = (OnlineUserDto) redisUtils.get(key);
             if (StringUtils.isNotBlank(filter)) {
                 if (onlineUserDto.toString().contains(filter)) {
                     onlineUserDtos.add(onlineUserDto);
@@ -119,7 +115,7 @@ public class OnlineUserService {
      */
     public void kickOut(String key) {
         key = SecuritySysUtil.getAuthToken(properties, key);
-        authRedisUtils.delete(key);
+        redisUtils.delete(key);
     }
 
     /**
@@ -129,7 +125,7 @@ public class OnlineUserService {
      */
     public void logout(String token) {
         String key = SecuritySysUtil.getAuthToken(properties, token);
-        authRedisUtils.delete(key);
+        redisUtils.delete(key);
     }
 
     /**
@@ -162,7 +158,7 @@ public class OnlineUserService {
      */
     public OnlineUserDto getOne(String key) {
         // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
-        var userObj = authSlaveRedisUtils.get(key);
+        var userObj = redisUtils.get(key);
         if (Objects.isNull(userObj))
             return null;
         // 先转成JSONObject，再转成onlineUser
