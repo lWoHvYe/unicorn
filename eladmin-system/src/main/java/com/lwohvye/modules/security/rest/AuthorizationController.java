@@ -193,4 +193,80 @@ public class AuthorizationController {
         onlineUserService.logout(tokenProvider.getToken(request));
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
+
+    /**
+     * @param request
+     * @return org.springframework.http.ResponseEntity<java.lang.Object>
+     * @description Redisson中lock的使用
+     * @date 2021/10/27 13:35
+     */
+    public ResponseEntity<Object> doBusiness5Lock(HttpServletRequest request) {
+        // region   可重入锁
+        // 获取分布式锁。只要锁名称一样，就是同一把锁
+        // 可重入锁：同一线程不必重新获取锁
+        var lock = redissonClient.getLock("lock-red");
+
+        // 枷锁（包含阻塞等待），默认过期时间30s
+        // 注：加锁时可指定过期时间，默认30秒，内部有额外的程序，在实例被关闭前，每30秒进行一次续期。所以若出现故障，最多30秒会自动解锁。
+        // 若显示指定了过期时间，应该就不会再做续期的逻辑。
+        lock.lock();
+        try {
+
+        } finally {
+            // 解锁。
+            lock.unlock();
+        }
+        // endregion
+
+        // region   读写锁
+        //  读写锁：读读共享、读写互斥、写写互斥
+        var rwLock = redissonClient.getReadWriteLock("lock-read_write");
+        //  读锁
+        var rLock = rwLock.readLock();
+        //  写锁
+        var wLock = rwLock.writeLock();
+        // 加读锁
+        rLock.lock();
+        //  加写锁
+        wLock.lock();
+        try {
+
+        } finally {
+            //  解锁
+            rLock.unlock();
+            wLock.unlock();
+        }
+        // endregion
+
+        // region   信号量
+        var semaphore = redissonClient.getSemaphore("semaphore-red");
+        //  实际使用时，release() 和 acquire() 在不同的业务/线程中
+        //  信号量 +1
+        semaphore.release();
+        try {
+            //  信号量 -1。当信号量为0时，会阻塞
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // endregion
+
+        // region   闭锁
+        var countDownLatch = redissonClient.getCountDownLatch("anyCountDownLatch-green");
+        //  等待的量
+        countDownLatch.trySetCount(4L);
+
+        //  减少量；这个在实际业务中，会在其他业务/方法里
+        countDownLatch.countDown();
+
+        try {
+            //  当通过countDown() 减到0时，再执行
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        // endregion
+
+        return null;
+    }
 }
