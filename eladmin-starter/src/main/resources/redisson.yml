@@ -13,7 +13,7 @@ singleServerConfig:
   # 命令重试发送时间间隔，单位：毫秒
   retryInterval: 1500
   # 密码
-  password: null
+  password: redis-psd
   # 单个连接最大订阅数量
   subscriptionsPerConnection: 5
   # 客户端名称
