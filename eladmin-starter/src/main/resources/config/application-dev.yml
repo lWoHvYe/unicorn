@@ -217,6 +217,18 @@ spring:
           enabled: true #是否开启消费者重试（为false时关闭消费者重试，这时消费端代码异常会一直重复收到消息）
           max-attempts: 3 #最大重试次数
           initial-interval: 5000ms
+  ##### 邮箱配置
+  mail:
+    host: xxx.com #SMTP server host
+    username: xxx #login user
+    password: xxx #login password
+    properties:
+      from: xxx@xxx.com #发件人（邮箱）
+
+  servlet:
+    multipart:
+      max-file-size: 20MB #限制单个文件大小
+      max-request-size: 50MB #限制请求总量
 
 # 登录相关配置
 #login:
