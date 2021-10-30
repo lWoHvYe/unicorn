@@ -80,4 +80,9 @@ public class MailUtils {
     public String getMailSendFrom() {
         return mailSender.getJavaMailProperties().getProperty("from");
     }
+
+    public String getMailDefaultTo() {
+        return mailSender.getJavaMailProperties().getProperty("to-dev");
+    }
+
 }

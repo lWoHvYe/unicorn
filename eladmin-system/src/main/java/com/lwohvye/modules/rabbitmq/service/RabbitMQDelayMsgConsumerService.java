@@ -15,13 +15,20 @@
  */
 package com.lwohvye.modules.rabbitmq.service;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.template.Template;
+import cn.hutool.extra.template.TemplateConfig;
+import cn.hutool.extra.template.TemplateEngine;
+import cn.hutool.extra.template.TemplateUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
+import com.lwohvye.domain.vo.MailVo;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.system.service.local.AuthMQService;
+import com.lwohvye.utils.MailUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -51,6 +58,9 @@ public class RabbitMQDelayMsgConsumerService {
     @Autowired
     private AuthMQService authMQService;
 
+    @Autowired
+    private MailUtils mailUtils;
+
     @RabbitHandler
     public void handle(String amqpMsgEntityStr) {
         var amqpMsgEntity = JSONObject.parseObject(amqpMsgEntityStr, AmqpMsgEntity.class);
@@ -67,6 +77,15 @@ public class RabbitMQDelayMsgConsumerService {
             }
         } catch (Exception e) {
             log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", e.getMessage(), amqpMsgEntityStr);
+            var mailVo = new MailVo().setTo(mailUtils.getMailDefaultTo()).setSubject("Consume Msg Error" + this.getClass().getSimpleName());
+            // 基于模版生成正文
+            TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+            Template template = engine.getTemplate("email/noticeEmail.ftl");
+            var text = template.render(Dict.create().setIgnoreNull("errMsg", e.getMessage()));
+
+            mailVo.setText(text);
+            // 邮件通知
+            mailUtils.sendMail(mailVo);
         } finally {
             log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, amqpMsgEntityStr);
             // TODO: 2021/4/27 处理完成，根据结果记录相关表。若处理报错，需邮件通知

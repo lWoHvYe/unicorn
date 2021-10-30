@@ -224,6 +224,7 @@ spring:
     password: xxx #login password
     properties:
       from: xxx@xxx.com #发件人（邮箱）
+      to-dev: xxx@oo.com #信息默认接收人（邮箱）
 
   servlet:
     multipart:
