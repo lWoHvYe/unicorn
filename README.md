@@ -8,9 +8,9 @@
 
 </div>
 
-## 首先感谢eladmin的作者。
+## 首先感谢eladmin的作者以及项目的其他贡献者。
 
-
+本项目在原eladmin项目的基础上，进行了部分扩展及尝试。
 
 启动类及配置，参照 eladmin-starter模块
 
@@ -49,7 +49,7 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 --add-opens java.desktop/java.awt.font=ALL-UNNAMED
 
 #### 项目简介
-一个基于 Spring Boot 2.4.2 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、Vue的前后端分离的后台管理系统
+一个基于 Spring Boot 2.5.6 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
 
 **开发文档：**  [https://el-admin.vip](https://el-admin.vip)
 
@@ -61,8 +61,9 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 
 |     |   后端源码  |   前端源码  |
 |---  |--- | --- |
-|  github   |  https://github.com/elunez/eladmin   |  https://github.com/elunez/eladmin-web   |
-|  码云   |  https://gitee.com/elunez/eladmin   |  https://gitee.com/elunez/eladmin-web   |
+|  原项目-github   |  https://github.com/elunez/eladmin   |  https://github.com/elunez/eladmin-web   |
+|  原项目-码云   |  https://gitee.com/elunez/eladmin   |  https://gitee.com/elunez/eladmin-web   |
+|  github   |   https://github.com/lWoHvYe/eladmin | |
 
 #### 主要特性
 - 使用最新技术栈，社区资源丰富。
@@ -75,8 +76,10 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 支持在线用户管理与服务器性能监控，支持限制单用户登录
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
-- 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）
-- Redis多数据源支持，集群中，可将Token存入特定的Redis中，其他缓存到各自的Redis。即实现了集群间的Session共享，有减少集群各节点间的影响
+- 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。若需要分库分表，可参考[jpa-分库分表](https://github.com/lWoHvYe/spring-boot-jpa-cascade)
+- Redis多数据源支持（已改回单节点并整合Redisson拓展Redis的功能），集群中，可将Token存入特定的Redis中，其他缓存到各自的Redis。即实现了集群间的Session共享，有减少集群各节点间的影响
+- 整合消息队列RabbitMQ，实现消息通知、延迟消息。
+- 基于最新的Java-17。
 
 ####  系统功能
 - 用户管理：提供用户的相关配置，新增用户后，默认密码为123456
@@ -91,6 +94,7 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 - 代码生成：高灵活度生成前后端代码，减少大量重复的工作任务
 - 邮件工具：配合富文本，发送html格式的邮件
 - 七牛云存储：可同步七牛云存储的数据到系统，无需登录七牛云直接操作云数据
+- 阿里云OSS：可实现基础的上传及下载功能
 - 支付宝支付：整合了支付宝支付并且提供了测试账号，可自行测试
 - 服务监控：监控服务器的负载情况
 - 运维管理：一键部署你的应用
@@ -112,7 +116,7 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 
 - `eladmin-starter` 启动类,项目入口，包含模块及组建配置
 
-- `eladmin-search` 通过mongodb进行最基础的检索，SPI相关demo
+- `eladmin-search` 通过mongodb进行最基础的检索，整合elasticsearch，SPI相关demo
 
 #### 详细结构
 
@@ -124,11 +128,15 @@ Java 17，发布中央仓库，需要在maven的vm中配置
     - config 自定义权限实现、redis配置、swagger配置、Rsa配置等
     - exception 项目统一异常的处理
     - utils 系统通用工具类
+- eladmin-api 基础实体及接口模块
+    - annotation 为模块自定义注解
+    - modules 基础实体及接口定义
+    - utils 通用工具类扩展
 - eladmin-system 系统核心模块
 	- config 配置跨域与静态资源，与数据权限
 	    - thread 线程池相关
-	- modules 系统相关模块(登录授权、系统监控、定时任务、运维管理等)
-
+	    - rabbitmq 消息队列相关
+	- modules 系统相关模块(登录授权、消息队列、系统监控、定时任务、运维管理等)
 - eladmin-starter 系统启动入口。相关示例
 - eladmin-logging 系统日志模块
 - eladmin-tools 系统第三方工具模块
@@ -182,10 +190,10 @@ import com.lwohvye.utils.SpringContextHolder;
 import io.swagger.annotations.Api;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
@@ -246,14 +254,16 @@ MapStruct 提供的重要注解 :
 
 部署脚本
 ```shell
-mv -f /opt/upload/eladmin-system-2.6.4.jar /opt/app
+mv -f /opt/upload/eladmin-system-2.6.15.jar /opt/app
 cd /opt/app
-nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.4.jar >nohup.out 2>&1 &
+nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.15.jar >nohup.out 2>&1 &
 ```
 启动脚本
 ```shell
 cd /opt/app
-nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.4.jar >nohup.out 2>&1 &
+nohup /usr/java/jdk-17/bin/java -jar eladmin-system-2.6.15.jar >nohup.out 2>&1 &
 ```
 #### TODO
 - 整合Redisson（当前无法配置过期通知，待解决）
+- 邮件通知相关验证
+- 阿里云OSS进一步整合

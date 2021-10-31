@@ -196,11 +196,26 @@ public class AuthorizationController {
 
     /**
      * @param request
-     * @return org.springframework.http.ResponseEntity<java.lang.Object>
+     * @return org.springframework.http.ResponseEntity
      * @description Redisson中lock的使用
      * @date 2021/10/27 13:35
      */
     public ResponseEntity<Object> doBusiness5Lock(HttpServletRequest request) {
+
+        // ---------------------------------Session相关---------------------------------------
+
+        // 获取Session
+        var session = request.getSession();
+        // SessionId
+        var sessionId = session.getId();
+        log.info("CurSessionId is : {}", sessionId);
+        // 设置属性
+        session.setAttribute("sysName", "el-Auth");
+        // 获取属性
+        var sysName = session.getAttribute("sysName");
+
+        // ---------------------------------锁相关---------------------------------------------
+
         // region   可重入锁
         // 获取分布式锁。只要锁名称一样，就是同一把锁
         // 可重入锁：同一线程不必重新获取锁
@@ -211,7 +226,7 @@ public class AuthorizationController {
         // 若显示指定了过期时间，应该就不会再做续期的逻辑。
         lock.lock();
         try {
-
+            // doSomething...
         } finally {
             // 解锁。
             lock.unlock();
@@ -230,7 +245,7 @@ public class AuthorizationController {
         //  加写锁
         wLock.lock();
         try {
-
+            // doSomething...
         } finally {
             //  解锁
             rLock.unlock();
