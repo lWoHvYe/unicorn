@@ -1,7 +1,7 @@
 <h1 style="text-align: center">EL-ADMIN 后台管理系统</h1>
 <div style="text-align: center">
 
-[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/lWoHvYe/eladmin/blob/master/LICENSE)
+[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/lWoHvYe/eladmin/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/lWoHvYe/eladmin.svg?style=social&label=Stars)](https://github.com/lWoHvYe/eladmin)
 [![GitHub forks](https://img.shields.io/github/forks/lWoHvYe/eladmin.svg?style=social&label=Fork)](https://github.com/lWoHvYe/eladmin)
 
