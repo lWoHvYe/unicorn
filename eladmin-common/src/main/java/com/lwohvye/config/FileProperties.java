@@ -40,7 +40,7 @@ public class FileProperties {
 
     private ElPath windows;
 
-    public ElPath getPath(){
+    public ElPath getOSPath(){
         String os = System.getProperty("os.name");
         if(os.toLowerCase().startsWith(ElAdminConstant.WIN)) {
             return windows;

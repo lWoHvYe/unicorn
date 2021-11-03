@@ -25,6 +25,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -111,11 +112,11 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
     public static String getExtensionName(String filename) {
         if ((filename != null) && (filename.length() > 0)) {
             int dot = filename.lastIndexOf('.');
-            if ((dot > -1) && (dot < (filename.length() - 1))) {
-                return filename.substring(dot + 1);
-            }
+            if ((dot > -1) && (dot < (filename.length() - 1)))
+                return filename.substring(dot + 1).replaceAll("[/\\\\]", "");
         }
-        return filename;
+        // 若不含扩展名，还是试着移除下路径相关的 / 或 \ 。
+        return Objects.requireNonNull(filename).replaceAll("[/\\\\]", "");
     }
 
     /**
@@ -124,12 +125,11 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
     public static String getFileNameNoEx(String filename) {
         if ((filename != null) && (filename.length() > 0)) {
             int dot = filename.lastIndexOf('.');
-            if ((dot > -1) && (dot < (filename.length()))) {
-                return filename.substring(0, dot);
-            }
+            if ((dot > -1) && (dot < (filename.length())))
+                return filename.substring(0, dot).replaceAll("[./\\\\]", "");
         }
         // 移除文件命中的 . / 这些跟目录层级有关的部分
-        return Objects.requireNonNull(filename).replaceAll("[.]|/", "");
+        return Objects.requireNonNull(filename).replaceAll("[./\\\\]", "");
     }
 
     /**
@@ -155,7 +155,7 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
     /**
      * inputStream 转 File
      */
-    static File inputStreamToFile(InputStream ins, String name){
+    static File inputStreamToFile(InputStream ins, String name) {
         File file = new File(SYS_TEM_DIR + name);
         if (file.exists()) {
             return file;
@@ -216,7 +216,7 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
         BigExcelWriter writer = ExcelUtil.getBigWriter(file);
         // 一次性写出内容，使用默认样式，强制输出标题
         writer.write(list, true);
-        SXSSFSheet sheet = (SXSSFSheet)writer.getSheet();
+        SXSSFSheet sheet = (SXSSFSheet) writer.getSheet();
         //上面需要强转SXSSFSheet  不然没有trackAllColumnsForAutoSizing方法
         sheet.trackAllColumnsForAutoSizing();
         //列宽自适应
@@ -265,7 +265,7 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
     public static boolean check(File file1, File file2) {
         String img1Md5 = getMd5(file1);
         String img2Md5 = getMd5(file2);
-        if(img1Md5 != null){
+        if (img1Md5 != null) {
             return img1Md5.equals(img2Md5);
         }
         return false;
