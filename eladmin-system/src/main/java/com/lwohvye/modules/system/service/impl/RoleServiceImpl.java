@@ -22,6 +22,7 @@ import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.domain.User;
+import com.lwohvye.modules.system.handler.AuthHandlerContext;
 import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.RoleService;
@@ -64,6 +65,7 @@ public class RoleServiceImpl implements RoleService {
     private final RoleSmallMapper roleSmallMapper;
     private final RedisUtils redisUtils;
     private final UserRepository userRepository;
+    private final AuthHandlerContext authHandlerContext;
     private final UserCacheClean userCacheClean;
 
     @Override
@@ -198,6 +200,15 @@ public class RoleServiceImpl implements RoleService {
     @Cacheable(key = " target.getSysName() + 'auth:' + #p0")
     public List<GrantedAuthority> mapToGrantedAuthorities(Long userId, Boolean isAdmin) {
         return genAuthorities(userId, isAdmin);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Cacheable(key = " target.getSysName() + 'auth:' + #p0")
+    public List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin) {
+        // admin对应1，非admin对应0
+        var instance = authHandlerContext.getInstance(Boolean.TRUE.equals(isAdmin) ? 1 : 0);
+        return instance.handler(userId);
     }
 
     private List<GrantedAuthority> genAuthorities(Long userId, Boolean isAdmin) {

@@ -138,6 +138,8 @@ public interface RoleService extends BaseService {
 
     List<GrantedAuthority> mapToGrantedAuthorities(Long userId, Boolean isAdmin);
 
+    List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin);
+
     /**
      * 验证是否被用户关联
      *

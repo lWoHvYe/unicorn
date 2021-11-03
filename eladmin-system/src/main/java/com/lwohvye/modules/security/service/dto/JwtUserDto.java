@@ -64,7 +64,7 @@ public class JwtUserDto implements UserDetails {
     public List<GrantedAuthority> getAuthorities() {
         authorities.clear();
         authorities.addAll(SpringContextHolder.getBean(RoleService.class)
-                .mapToGrantedAuthorities(user.getId(), user.getIsAdmin()));
+                .grantedAuthorityGenHandler(user.getId(), user.getIsAdmin()));
         return authorities;
     }
 
