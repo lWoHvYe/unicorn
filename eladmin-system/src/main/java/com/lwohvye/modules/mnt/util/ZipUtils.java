@@ -48,6 +48,11 @@ public class ZipUtils {
 				String fileName = ze.getName();
 				File newFile = new File(outputFolder + File.separator + fileName);
 				System.out.println("file unzip : " + newFile.getAbsoluteFile());
+
+				// 先移除目录相关的特殊字符 . ，再判断文件路径是否包含了输出目录，若不包含，表示文件建到了outputFolder之外，这显然是不允许的
+				if (!newFile.toPath().normalize().startsWith(outputFolder))
+					throw new IOException("Bad zip entry");
+
 				//大部分网络上的源码，这里没有判断子目录
 				if (ze.isDirectory()) {
 					if (!newFile.mkdirs()) {
@@ -82,6 +87,9 @@ public class ZipUtils {
 			while (entry != null) {
 
 				File file = new File(out, entry.getName());
+				// 先移除目录相关的特殊字符 . ，再判断文件路径是否包含了输出目录，若不包含，表示文件建到了out之外，这显然是不允许的
+				if (!file.toPath().normalize().startsWith(out))
+					throw new IOException("Bad zip entry");
 
 				if (entry.isDirectory()) {
 					if (!file.mkdirs()) {

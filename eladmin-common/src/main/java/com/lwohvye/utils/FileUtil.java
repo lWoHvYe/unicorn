@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * File工具类，扩展 hutool 工具包
@@ -127,7 +128,8 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
                 return filename.substring(0, dot);
             }
         }
-        return filename;
+        // 移除文件命中的 . / 这些跟目录层级有关的部分
+        return Objects.requireNonNull(filename).replaceAll("[.]|/", "");
     }
 
     /**

@@ -40,7 +40,7 @@ public class EncryptUtils {
         if (source == null || source.length() == 0){
             return null;
         }
-        cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
+        cipher = Cipher.getInstance("AES/GCM/NoPadding");
         return new DESKeySpec(STR_PARAM.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -49,7 +49,7 @@ public class EncryptUtils {
      */
     public static String desEncrypt(String source) throws Exception {
         DESKeySpec desKeySpec = getDesKeySpec(source);
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("AES");
         SecretKey secretKey = keyFactory.generateSecret(desKeySpec);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, IV);
         return byte2hex(cipher.doFinal(source.getBytes(StandardCharsets.UTF_8))).toUpperCase();
@@ -61,7 +61,7 @@ public class EncryptUtils {
     public static String desDecrypt(String source) throws Exception {
         byte[] src = hex2byte(source.getBytes(StandardCharsets.UTF_8));
         DESKeySpec desKeySpec = getDesKeySpec(source);
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("AES");
         SecretKey secretKey = keyFactory.generateSecret(desKeySpec);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, IV);
         byte[] retByte = cipher.doFinal(src);
