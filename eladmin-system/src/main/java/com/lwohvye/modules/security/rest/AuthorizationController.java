@@ -258,6 +258,7 @@ public class AuthorizationController {
         //  实际使用时，release() 和 acquire() 在不同的业务/线程中
         //  信号量 +1
         semaphore.release();
+
         try {
             //  信号量 -1。当信号量为0时，会阻塞
             semaphore.acquire();
