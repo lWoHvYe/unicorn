@@ -182,10 +182,12 @@ spring:
 #          master-data-source-name: primary-ds-2
 #          slave-data-source-names: replica-ds-2-0,replica-ds-2-1
 
+  # cache配置
+  cache:
+    type: redis
   # redis配置
   redis:
       #详细版的redisson配置可参考：https://github.com/redisson/redisson/tree/master/redisson-spring-boot-starter
-    enable: true
   # Connection URL, will override host, port and password (user will be ignored), e.g. redis://user:password@example.com:6379
     url: redis://127.0.0.1:6379
     timeout: 2000 # 连接或读取超时时长（毫秒）

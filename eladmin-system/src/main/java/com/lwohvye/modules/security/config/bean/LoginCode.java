@@ -37,7 +37,7 @@ public class LoginCode {
     /**
      * 验证码内容长度
      */
-    private int length = 2;
+    private int length = 4;
     /**
      * 验证码宽度
      */
