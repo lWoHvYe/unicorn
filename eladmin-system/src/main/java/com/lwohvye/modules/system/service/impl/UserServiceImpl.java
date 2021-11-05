@@ -26,10 +26,7 @@ import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.UserService;
-import com.lwohvye.modules.system.service.dto.JobSmallDto;
-import com.lwohvye.modules.system.service.dto.RoleSmallDto;
-import com.lwohvye.modules.system.service.dto.UserDto;
-import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
+import com.lwohvye.modules.system.service.dto.*;
 import com.lwohvye.modules.system.service.mapstruct.UserMapper;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -180,6 +177,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Cacheable(key = " #root.target.getSysName() + 'userInfo:' + #p0")
     public UserDto findByName(String userName) {
         User user = userRepository.findByUsername(userName);
         if (user == null) {
@@ -187,6 +185,13 @@ public class UserServiceImpl implements UserService {
         } else {
             return userMapper.toDto(user);
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public UserInnerDto findInnerUserByName(String userName) {
+        // 方法内调用，Spring aop不会生效，所以下面的查询不会走缓存
+        return new UserInnerDto(findByName(userName));
     }
 
     @Override

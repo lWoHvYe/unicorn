@@ -41,7 +41,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserService userService;
-    private final RoleService roleService;
     private final DataService dataService;
     private final RedisUtils redisUtils;
     private final LoginProperties loginProperties;
@@ -89,8 +88,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (searchDb) {
             UserInnerDto user;
             try {
-                var dto = userService.findByName(username);
-                user = new UserInnerDto(dto);
+                user = userService.findInnerUserByName(username);
             } catch (EntityNotFoundException e) {
                 // SpringSecurity会自动转换UsernameNotFoundException为BadCredentialsException
                 throw new UsernameNotFoundException("", e);

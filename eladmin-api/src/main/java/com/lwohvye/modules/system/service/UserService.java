@@ -17,6 +17,7 @@ package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
 import com.lwohvye.modules.system.service.dto.UserDto;
+import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.modules.system.domain.User;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +65,8 @@ public interface UserService extends BaseService {
      * @return /
      */
     UserDto findByName(String userName);
+
+    UserInnerDto findInnerUserByName(String userName);
 
     /**
      * 修改密码
