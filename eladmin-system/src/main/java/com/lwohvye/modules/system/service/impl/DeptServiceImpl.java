@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.exception.BadRequestException;
@@ -197,17 +196,10 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<Long> getDeptChildren(List<Dept> deptList) {
-        List<Long> list = new ArrayList<>();
-        deptList.forEach(dept -> {
-                    if (dept != null && dept.getEnabled()) {
-                        List<Dept> depts = deptRepository.findByPid(dept.getId());
-                        if (CollUtil.isNotEmpty(depts)) {
-                            list.addAll(getDeptChildren(depts));
-                        }
-                        list.add(dept.getId());
-                    }
-                }
-        );
+        var deptIds = deptList.stream().filter(Dept::getEnabled).map(Dept::getId).toList();
+        List<Long> list = new ArrayList<>(deptIds);
+        var optionalDepts = deptRepository.findByPidIn(deptIds);
+        optionalDepts.ifPresent(depts -> list.addAll(getDeptChildren(depts)));
         return list;
     }
 
