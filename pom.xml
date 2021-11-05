@@ -63,7 +63,7 @@
         <io.swagger.version>1.6.3</io.swagger.version>
         <fastjson.version>1.2.78</fastjson.version>
         <druid.version>1.2.8</druid.version>
-        <hutool.version>5.7.14</hutool.version>
+        <hutool.version>5.7.15</hutool.version>
         <fastutil.version>8.5.6</fastutil.version>
         <lombok.version>1.18.20</lombok.version>
         <commons-pool2.version>2.9.0</commons-pool2.version>
@@ -370,6 +370,38 @@
                 JsonProvider, AppenderListener, JsonFactoryDecorator, JsonGeneratorDecorator, etc
             <scope>runtime</scope>
             -->
+        </dependency>
+        <!--   fixed dependencies of plugins with threat    -->
+        <!--   4pdfbox     -->
+        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.24</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>fontbox</artifactId>
+            <version>2.0.24</version>
+        </dependency>
+        <!--    4xmlsec    -->
+        <!-- https://mvnrepository.com/artifact/org.apache.santuario/xmlsec -->
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <!--    4xmlgraphics-commons    -->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>xmlgraphics-commons</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <!--    4batik    -->
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-all</artifactId>
+            <version>1.14</version>
         </dependency>
     </dependencies>
     <!--
