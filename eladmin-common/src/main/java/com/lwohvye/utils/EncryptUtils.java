@@ -34,6 +34,11 @@ import java.util.Base64;
 
 public class EncryptUtils {
 
+    // 只有静态变量及方法的工具类不允许进行实例化
+    private EncryptUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final String STR_PARAM = "P244w0rd-lWoHvYe";
 
     private static Cipher cipher;

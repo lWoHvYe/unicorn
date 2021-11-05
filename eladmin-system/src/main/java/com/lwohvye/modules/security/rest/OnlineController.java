@@ -59,7 +59,7 @@ public class OnlineController {
     @ApiOperation("踢出用户")
     @DeleteMapping
     @PreAuthorize("@el.check()")
-    public ResponseEntity<Object> delete(@RequestBody Set<String> keys) throws Exception {
+    public ResponseEntity<Object> delete(@RequestBody Set<String> keys) {
         for (String key : keys) {
             // 解密Key
             key = EncryptUtils.aesDecrypt(key);

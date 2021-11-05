@@ -37,7 +37,7 @@ import java.util.List;
  */
 @Slf4j
 // @SuppressWarnings 抑制警告
-@SuppressWarnings({"unchecked", "all"})
+//@SuppressWarnings({"unchecked", "all"})
 public class QueryHelp {
 
     /**
@@ -283,28 +283,17 @@ public class QueryHelp {
                         if (ObjectUtil.isNotNull(queryAnnotation)) {
                             var queryType = queryAnnotation.type();
                             var queryAttrName = isBlank(queryAnnotation.propName()) ? fieldInVal.getName() : queryAnnotation.propName();
-                            switch (queryType) {
-                                case EQUAL:
-                                    predicate = cb.equal(getExpression(queryAttrName, join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
-                                    break;
-                                case NOT_EQUAL:
-                                    predicate = cb.notEqual(getExpression(queryAttrName, join, root), fieldValue);
-                                    break;
-                                case INNER_LIKE:
-                                    predicate = cb.like(getExpression(queryAttrName, join, root).as(String.class), "%" + fieldValue.toString() + "%");
-                                    break;
-                                case IN:
-                                    predicate = getExpression(queryAttrName, join, root).in((Collection<? extends Comparable>) fieldValue);
-                                    break;
-                                case NOT_IN:
-                                    predicate = cb.not(getExpression(queryAttrName, join, root).in((Collection<? extends Comparable>) fieldValue));
-                                    break;
-                                default:
-                                    throw new RuntimeException("暂不支持该类型，请期待后续支持：" + queryType);
-                            }
+                            predicate = switch (queryType) {
+                                case EQUAL -> cb.equal(getExpression(queryAttrName, join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
+                                case NOT_EQUAL -> cb.notEqual(getExpression(queryAttrName, join, root), fieldValue);
+                                case INNER_LIKE -> cb.like(getExpression(queryAttrName, join, root).as(String.class), "%" + fieldValue.toString() + "%");
+                                case IN -> getExpression(queryAttrName, join, root).in((Collection<? extends Comparable>) fieldValue);
+                                case NOT_IN -> cb.not(getExpression(queryAttrName, join, root).in((Collection<? extends Comparable>) fieldValue));
+                                default -> throw new RuntimeException("暂不支持该类型，请期待后续支持：" + queryType);
+                            };
 //                                    String类型使用Inner like
                         } else if (fieldValue instanceof String str) {
-                            predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + fieldValue + "%");
+                            predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + str + "%");
 //                                    传-1L时。做is null查询。额外限制为当对应属性上有id注解的时候。
                             // 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效。
                             // 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
@@ -324,7 +313,7 @@ public class QueryHelp {
                     }
                 }
                 if (CollUtil.isNotEmpty(arrayList))
-                    list.add(cb.and(arrayList.toArray(new Predicate[arrayList.size()])));
+                    list.add(cb.and(arrayList.toArray(new Predicate[0])));
                 break;
             default:
                 break;

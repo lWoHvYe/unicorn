@@ -22,7 +22,6 @@ import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -42,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 // TODO: 2021/7/11 与system模块解耦使用。部分配置的方式待调整
 @Component
-@SuppressWarnings({"unchecked", "all"})
+//@SuppressWarnings({"unchecked", "all"})
 public class RedisUtils {
     private static final Logger log = LoggerFactory.getLogger(RedisUtils.class);
     //    允许同一包下，及子类访问
@@ -51,16 +50,13 @@ public class RedisUtils {
     // Redis lua的执行出错，是因为Redis的Value的序列化使用的Json相关的。针对lua相关的操作，可以使用StringRedisTemplate
     protected StringRedisTemplate stringRedisTemplate;
 
-    @Value("${jwt.online-key:online-token-}")
-    private String onlineKey;
-
     //    分布式锁前缀
     @Value("${local.redis.lock-prefix:redis-lock-}")
-    private String LOCK_PREFIX;
+    private String lockPrefix;
 
     //    分布式锁失效时间
     @Value("${local.redis.lock-expire:200000}")
-    private long LOCK_EXPIRE;
+    private long lockExpire;
 
     public RedisUtils(RedisTemplate<Object, Object> redisTemplate, StringRedisTemplate stringRedisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -96,20 +92,16 @@ public class RedisUtils {
     public void delete(String... keys) {
         if (keys != null && keys.length > 0) {
             if (keys.length == 1) {
-                boolean result = redisTemplate.delete(keys[0]);
-                log.debug("--------------------------------------------");
-                log.debug(new StringBuilder("删除缓存：").append(keys[0]).append("，结果：").append(result).toString());
-                log.debug("--------------------------------------------");
+                boolean result = Boolean.TRUE.equals(redisTemplate.delete(keys[0]));
+                log.debug("删除缓存：{} ，结果：{} ", keys[0], result);
             } else {
                 Set<Object> keySet = new HashSet<>();
                 for (String key : keys) {
-                    keySet.addAll(redisTemplate.keys(key));
+                    keySet.addAll(Objects.requireNonNull(redisTemplate.keys(key)));
                 }
-                long count = redisTemplate.delete(keySet);
-                log.debug("--------------------------------------------");
-                log.debug("成功删除缓存：" + keySet.toString());
-                log.debug("缓存删除数量：" + count + "个");
-                log.debug("--------------------------------------------");
+                Long count = redisTemplate.delete(keySet);
+                log.debug("成功删除缓存：{}", keySet);
+                log.debug("缓存删除数量：{} 个", count);
             }
         }
     }
@@ -230,7 +222,7 @@ public class RedisUtils {
      * @param key 键 不能为null
      * @return 时间(秒) 返回0代表为永久有效
      */
-    public long getExpire(Object key) {
+    public Long getExpire(Object key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 
@@ -320,12 +312,11 @@ public class RedisUtils {
                 tmpIndex++;
                 continue;
             }
-            // 获取到满足条件的数据后,就可以退出了
-            if (tmpIndex >= toIndex) {
-                break;
+            // 还未获取到满足条件的数据,继续
+            if (tmpIndex < toIndex) {
+                tmpIndex++;
+                cursor.next();
             }
-            tmpIndex++;
-            cursor.next();
         }
         try {
             RedisConnectionUtils.releaseConnection(rc, factory);
@@ -343,7 +334,7 @@ public class RedisUtils {
      */
     public boolean hasKey(String key) {
         try {
-            return redisTemplate.hasKey(key);
+            return Boolean.TRUE.equals(redisTemplate.hasKey(key));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
@@ -526,7 +517,7 @@ public class RedisUtils {
      * @return
      */
     public boolean setBit(String key, long offset, boolean value) {
-        return redisTemplate.opsForValue().setBit(key, offset, value);
+        return Boolean.TRUE.equals(redisTemplate.opsForValue().setBit(key, offset, value));
     }
 
     /**
@@ -560,7 +551,7 @@ public class RedisUtils {
      * @return 之前已经存在返回false, 不存在返回true
      */
     public boolean setIfAbsent(String key, Object value) {
-        return redisTemplate.opsForValue().setIfAbsent(key, value);
+        return Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, value));
     }
 
     /**
@@ -571,7 +562,7 @@ public class RedisUtils {
      * @date 2021/7/11 0:56
      */
     public boolean setIfPresent(String key, Object value) {
-        return redisTemplate.opsForValue().setIfPresent(key, value);
+        return Boolean.TRUE.equals(redisTemplate.opsForValue().setIfPresent(key, value));
     }
 
     /**
@@ -659,7 +650,7 @@ public class RedisUtils {
      * @return 之前已经存在返回false, 不存在返回true
      */
     public boolean multiSetIfAbsent(Map<String, String> maps) {
-        return redisTemplate.opsForValue().multiSetIfAbsent(maps);
+        return Boolean.TRUE.equals(redisTemplate.opsForValue().multiSetIfAbsent(maps));
     }
 
     /**
@@ -1250,12 +1241,12 @@ public class RedisUtils {
      * @param values 值 可以是多个
      * @return 成功个数
      */
-    public long sSet(String key, Object... values) {
+    public Long sSet(String key, Object... values) {
         try {
             return redisTemplate.opsForSet().add(key, values);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return 0;
+            return 0L;
         }
     }
 
@@ -1289,8 +1280,7 @@ public class RedisUtils {
      */
     public Long sRemove(String key, Object... values) {
         try {
-            Long count = redisTemplate.opsForSet().remove(key, values);
-            return count;
+            return redisTemplate.opsForSet().remove(key, values);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return 0L;
@@ -1354,7 +1344,7 @@ public class RedisUtils {
      */
     public boolean sHasKey(String key, Object value) {
         try {
-            return redisTemplate.opsForSet().isMember(key, value);
+            return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, value));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
@@ -1509,7 +1499,7 @@ public class RedisUtils {
             return redisTemplate.opsForSet().members(key);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return null;
+            return Collections.emptySet();
         }
     }
 
@@ -1885,7 +1875,7 @@ public class RedisUtils {
     // key不存在 member不存在 原分数比新分数低（长度+比较，非负）
     // Redis中的不存在nil，对应lua中的false
     // ZADD命令，返回被成功添加的新成员的数量，不包括那些被更新的、已经存在的成员
-    private static String luaHgScoreScript =
+    private static final String LUA_HG_SCORE_SCRIPT =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
                     if ( not rsc ) or ( tonumber(rsc) < tonumber(ARGV[1]) ) then
@@ -1895,7 +1885,7 @@ public class RedisUtils {
                        return 0
                     end
                     """;
-    private RedisScript<Long> hgScoreRedisScript = new DefaultRedisScript<>(luaHgScoreScript, Long.class);
+    private final RedisScript<Long> hgScoreRedisScript = new DefaultRedisScript<>(LUA_HG_SCORE_SCRIPT, Long.class);
 
     /**
      * @param key
@@ -1917,7 +1907,7 @@ public class RedisUtils {
         return SUCCESS.equals(result);
     }
 
-    private static String luaLwScoreScript =
+    private static final String LUA_LW_SCORE_SCRIPT =
             """
                     local rsc = redis.call('ZSCORE',KEYS[1],ARGV[2])
                     if ( not rsc ) or ( tonumber(rsc) > tonumber(ARGV[1]) ) then
@@ -1927,7 +1917,7 @@ public class RedisUtils {
                        return 0
                     end
                     """;
-    private RedisScript<Long> lwScoreRedisScript = new DefaultRedisScript<>(luaLwScoreScript, Long.class);
+    private final RedisScript<Long> lwScoreRedisScript = new DefaultRedisScript<>(LUA_LW_SCORE_SCRIPT, Long.class);
 
     public boolean zAddIfLowerScore(String key, Object value, double score) {
         Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
@@ -1945,13 +1935,13 @@ public class RedisUtils {
     public void delByKeys4Business(String prefix, Set<Long> ids) {
         Set<Object> keys = new HashSet<>();
         for (Long id : ids) {
-            keys.addAll(redisTemplate.keys(new StringBuffer(prefix).append(id).toString()));
+            keys.addAll(Objects.requireNonNull(redisTemplate.keys(prefix + id)));
         }
-        long count = redisTemplate.delete(keys);
+        var count = redisTemplate.delete(keys);
         // 此处提示可自行删除
         log.debug("--------------------------------------------");
-        log.debug("成功删除缓存：" + keys.toString());
-        log.debug("缓存删除数量：" + count + "个");
+        log.debug("成功删除缓存：{}", keys);
+        log.debug("缓存删除数量：{} 个", count);
         log.debug("--------------------------------------------");
     }
 
@@ -1961,30 +1951,28 @@ public class RedisUtils {
      * @param key key值
      * @return 是否获取到
      */
-    public boolean lock(String key) {
-        String lock = LOCK_PREFIX + key;
+    public Boolean lock(String key) {
+        String lock = lockPrefix + key;
         // 利用lambda表达式
-        return (Boolean) redisTemplate.execute(new RedisCallback<Object>() {
-            @Override
-            public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
-                long expireAt = System.currentTimeMillis() + LOCK_EXPIRE + 1;
-                Boolean acquire = redisConnection.setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
-                if (acquire) {
-                    return true;
-                } else {
-                    byte[] value = redisConnection.get(lock.getBytes());
-                    if (Objects.nonNull(value) && value.length > 0) {
-                        long expireTime = Long.parseLong(new String(value));
-                        if (expireTime < System.currentTimeMillis()) {
-                            // 如果锁已经过期
-                            byte[] oldValue = redisConnection.getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + LOCK_EXPIRE + 1).getBytes());
-                            // 防止死锁
-                            return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
-                        }
+        return (Boolean) redisTemplate.execute((RedisCallback<Object>) redisConnection -> {
+            long expireAt = System.currentTimeMillis() + lockExpire + 1;
+            Boolean acquire = redisConnection.setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
+            if (Boolean.TRUE.equals(acquire)) {
+                return true;
+            } else {
+                byte[] value = redisConnection.get(lock.getBytes());
+                if (Objects.nonNull(value) && value.length > 0) {
+                    long expireTime = Long.parseLong(new String(value));
+                    if (expireTime < System.currentTimeMillis()) {
+                        // 如果锁已经过期
+                        byte[] oldValue = redisConnection.getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + lockExpire + 1).getBytes());
+                        // 防止死锁
+                        assert oldValue != null;
+                        return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
                     }
                 }
-                return false;
             }
+            return false;
         });
     }
 
@@ -1992,7 +1980,7 @@ public class RedisUtils {
 
     private static final Long SUCCESS = 1L;
     //    加锁lua
-    private static String luaLockScript =
+    private static final String LUA_LOCK_SCRIPT =
             """
                     if redis.call('setNx',KEYS[1],ARGV[1])  then 
                        if redis.call('get',KEYS[1])==ARGV[1] then 
@@ -2002,10 +1990,10 @@ public class RedisUtils {
                        end 
                     end 
                     """;
-    private RedisScript<Long> lockRedisScript = new DefaultRedisScript<>(luaLockScript, Long.class);
+    private final RedisScript<Long> lockRedisScript = new DefaultRedisScript<>(LUA_LOCK_SCRIPT, Long.class);
 
     //    解锁lua
-    private static String luaUnlockScript =
+    private static final String LUA_UNLOCK_SCRIPT =
             """ 
                     if redis.call('get', KEYS[1]) == ARGV[1] then 
                        return redis.call('del', KEYS[1]) 
@@ -2013,7 +2001,7 @@ public class RedisUtils {
                        return 0 
                     end 
                     """;
-    private RedisScript<Long> unLockRedisScript = new DefaultRedisScript<>(luaUnlockScript, Long.class);
+    private final RedisScript<Long> unLockRedisScript = new DefaultRedisScript<>(LUA_UNLOCK_SCRIPT, Long.class);
 
     /**
      * @param lockKey
@@ -2056,11 +2044,11 @@ public class RedisUtils {
     public boolean lock(String lockKey, String value, Long expireTime) {
         if (ObjectUtil.isNull(expireTime))
 //            设置默认过期时间
-            expireTime = LOCK_EXPIRE;
+            expireTime = lockExpire;
         if (StrUtil.isEmpty(lockKey))
             throw new RuntimeException("分布式锁的key不可为空");
 //        添加默认前缀
-        lockKey = LOCK_PREFIX + lockKey;
+        lockKey = lockPrefix + lockKey;
 
         Object result = stringRedisTemplate.execute(lockRedisScript, Collections.singletonList(lockKey), value, String.valueOf(expireTime));
         return SUCCESS.equals(result);
@@ -2078,7 +2066,7 @@ public class RedisUtils {
         if (StrUtil.isEmpty(lockKey))
             throw new RuntimeException("分布式锁的key不可为空");
 //        添加默认前缀
-        lockKey = LOCK_PREFIX + lockKey;
+        lockKey = lockPrefix + lockKey;
 
         try {
             Object result = stringRedisTemplate.execute(unLockRedisScript, Collections.singletonList(lockKey), value);
