@@ -7,7 +7,7 @@
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
     <packaging>pom</packaging>
-    <version>2.6.15</version>
+    <version>2.6.16</version>
 
     <name>EL-ADMIN 管理系统</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
@@ -31,7 +31,7 @@
         <connection>scm:git:git://github.com/lWoHvYe/eladmin.git</connection>
         <developerConnection>scm:git:ssh://github.com/lWoHvYe/eladmin.git</developerConnection>
         <url>https://github.com/lWoHvYe/eladmin/tree/main</url>
-        <tag>eladmin-v2.6.15</tag>
+        <tag>eladmin-v2.6.16</tag>
     </scm>
 
     <modules>
@@ -57,7 +57,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--        <java.version>15</java.version>-->
         <java.version>17</java.version>
-        <project.core.version>2.6.15</project.core.version>
+        <project.core.version>2.6.16</project.core.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <swagger.version>3.0.0</swagger.version>
         <io.swagger.version>1.6.3</io.swagger.version>
