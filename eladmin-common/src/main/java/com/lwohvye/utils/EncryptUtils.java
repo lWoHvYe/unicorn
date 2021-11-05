@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019-2020 Zheng Jie
+ *  Copyright 2020-2022 lWoHvYe
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,84 +15,87 @@
  */
 package com.lwohvye.utils;
 
+import lombok.SneakyThrows;
+
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
- * 加密
- * @author Zheng Jie
- * @date 2018-11-23
+ * @author lWoHvYe
+ * @description AES加密
+ * @date 2021-11-05
  */
 
 public class EncryptUtils {
 
-    private static final String STR_PARAM = "P244w0rd";
+    private static final String STR_PARAM = "P244w0rd-lWoHvYe";
 
     private static Cipher cipher;
 
     private static final IvParameterSpec IV = new IvParameterSpec(STR_PARAM.getBytes(StandardCharsets.UTF_8));
 
-    private static DESKeySpec getDesKeySpec(String source) throws Exception {
-        if (source == null || source.length() == 0){
+    @SneakyThrows
+    private static SecretKey getCipherAndSecretKey(String source) {
+        if (source == null || source.length() == 0) {
             return null;
         }
-        cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
-        return new DESKeySpec(STR_PARAM.getBytes(StandardCharsets.UTF_8));
+        // 1.构造密钥生成器，指定为AES算法,不区分大小写
+        var keygen = KeyGenerator.getInstance("AES");
+        // 2.根据ecnodeRules规则初始化密钥生成器
+        // 生成一个128位的随机源,根据传入的字节数组
+        //keygen.init(128, new SecureRandom(encodeRules.getBytes()));
+        var secureRandom = SecureRandom.getInstance("SHA1PRNG");
+        secureRandom.setSeed(STR_PARAM.getBytes(StandardCharsets.UTF_8));
+        keygen.init(128, secureRandom);
+        // 3.产生原始对称密钥
+        var originalKey = keygen.generateKey();
+        // 4.获得原始对称密钥的字节数组
+        var raw = originalKey.getEncoded();
+        // 5.根据字节数组生成AES密钥
+        var keySpec = new SecretKeySpec(raw, "AES");
+        // 6.根据指定算法AES自成密码器
+        cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        return keySpec;
     }
 
     /**
      * 对称加密
      */
-    public static String desEncrypt(String source) throws Exception {
-        DESKeySpec desKeySpec = getDesKeySpec(source);
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey secretKey = keyFactory.generateSecret(desKeySpec);
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, IV);
-        return byte2hex(cipher.doFinal(source.getBytes(StandardCharsets.UTF_8))).toUpperCase();
+    @SneakyThrows
+    public static String aesEncrypt(String source) {
+        var keySpec = getCipherAndSecretKey(source);
+        // 7.初始化密码器，第一个参数为加密(Encrypt_mode)或者解密解密(Decrypt_mode)操作，第二个参数为使用的KEY
+        cipher.init(Cipher.ENCRYPT_MODE, keySpec, IV);
+        // 8.获取加密内容的字节数组(这里要设置为utf-8)不然内容中如果有中文和英文混合中文就会解密为乱码
+        byte[] byteEncode = source.getBytes(StandardCharsets.UTF_8);
+        // 9.根据密码器的初始化方式--加密：将数据加密
+        byte[] byteAES = cipher.doFinal(byteEncode);
+        // 10.将加密后的数据转换为字符串
+        // 这里用Base64Encoder可能会找不到包
+        // 解决办法：
+        // 在项目的Build path中先移除JRE System Library，再添加库JRE System Library，重新编译后就一切正常了。
+        return Base64.getEncoder().encodeToString(byteAES);
     }
 
     /**
      * 对称解密
      */
-    public static String desDecrypt(String source) throws Exception {
-        byte[] src = hex2byte(source.getBytes(StandardCharsets.UTF_8));
-        DESKeySpec desKeySpec = getDesKeySpec(source);
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey secretKey = keyFactory.generateSecret(desKeySpec);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, IV);
-        byte[] retByte = cipher.doFinal(src);
-        return new String(retByte);
-    }
-
-    private static String byte2hex(byte[] inStr) {
-        String stmp;
-        StringBuilder out = new StringBuilder(inStr.length * 2);
-        for (byte b : inStr) {
-            stmp = Integer.toHexString(b & 0xFF);
-            if (stmp.length() == 1) {
-                // 如果是0至F的单位字符串，则添加0
-                out.append("0").append(stmp);
-            } else {
-                out.append(stmp);
-            }
-        }
-        return out.toString();
-    }
-
-    private static byte[] hex2byte(byte[] b) {
-        int size = 2;
-        if ((b.length % size) != 0){
-            throw new IllegalArgumentException("长度不是偶数");
-        }
-        byte[] b2 = new byte[b.length / 2];
-        for (int n = 0; n < b.length; n += size) {
-            String item = new String(b, n, 2);
-            b2[n / 2] = (byte) Integer.parseInt(item, 16);
-        }
-        return b2;
+    @SneakyThrows
+    public static String aesDecrypt(String source) {
+        var keySpec = getCipherAndSecretKey(source);
+        // 7.初始化密码器，第一个参数为加密(Encrypt_mode)或者解密(Decrypt_mode)操作，第二个参数为使用的KEY
+        cipher.init(Cipher.DECRYPT_MODE, keySpec, IV);
+        // 8.将加密并编码后的内容解码成字节数组
+        byte[] byteContent = Base64.getDecoder().decode(source);
+        // 9.解密
+        byte[] byteDecode = cipher.doFinal(byteContent);
+        // 10.将解密后的数据转换为字符串
+        return new String(byteDecode, StandardCharsets.UTF_8);
     }
 }

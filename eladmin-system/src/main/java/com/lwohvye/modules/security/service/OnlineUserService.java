@@ -61,7 +61,7 @@ public class OnlineUserService {
         String address = StringUtils.getCityInfo(ip);
         OnlineUserDto onlineUserDto = null;
         try {
-            onlineUserDto = new OnlineUserDto(jwtUserDto.getUsername(), jwtUserDto.getUser().getNickName(), dept, browser, ip, address, EncryptUtils.desEncrypt(token), new Date());
+            onlineUserDto = new OnlineUserDto(jwtUserDto.getUsername(), jwtUserDto.getUser().getNickName(), dept, browser, ip, address, EncryptUtils.aesEncrypt(token), new Date());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -182,7 +182,7 @@ public class OnlineUserService {
         for (OnlineUserDto onlineUserDto : onlineUserDtos) {
             if (onlineUserDto.getUserName().equals(userName)) {
                 try {
-                    String token = EncryptUtils.desDecrypt(onlineUserDto.getKey());
+                    String token = EncryptUtils.aesDecrypt(onlineUserDto.getKey());
                     if (StringUtils.isBlank(ignoreToken) || !ignoreToken.equals(token))
                         this.kickOut(token);
                 } catch (Exception e) {
@@ -202,7 +202,7 @@ public class OnlineUserService {
         List<OnlineUserDto> onlineUsers = getAll(username);
         for (OnlineUserDto onlineUser : onlineUsers) {
             if (onlineUser.getUserName().equals(username)) {
-                String token = EncryptUtils.desDecrypt(onlineUser.getKey());
+                String token = EncryptUtils.aesDecrypt(onlineUser.getKey());
                 kickOut(token);
             }
         }

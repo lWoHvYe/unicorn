@@ -48,9 +48,9 @@ public class EmailServiceImpl implements EmailService {
     @Transactional(rollbackFor = Exception.class)
     public EmailConfig config(EmailConfig emailConfig, EmailConfig old) throws Exception {
         emailConfig.setId(1L);
-        if(!emailConfig.getPass().equals(old.getPass())){
+        if (!emailConfig.getPass().equals(old.getPass())) {
             // 对称加密
-            emailConfig.setPass(EncryptUtils.desEncrypt(emailConfig.getPass()));
+            emailConfig.setPass(EncryptUtils.aesEncrypt(emailConfig.getPass()));
         }
         return emailRepository.save(emailConfig);
     }
@@ -65,8 +65,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void send(EmailVo emailVo, EmailConfig emailConfig){
-        if(emailConfig.getId() == null){
+    public void send(EmailVo emailVo, EmailConfig emailConfig) {
+        if (emailConfig.getId() == null) {
             throw new BadRequestException("请先配置，再操作");
         }
         // 封装
@@ -79,12 +79,12 @@ public class EmailServiceImpl implements EmailService {
         account.setAuth(true);
         try {
             // 对称解密
-            account.setPass(EncryptUtils.desDecrypt(emailConfig.getPass()));
+            account.setPass(EncryptUtils.aesDecrypt(emailConfig.getPass()));
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
 //        部分邮箱 user和fromUser需一致
-        account.setFrom(emailConfig.getUser()+" <"+emailConfig.getFromUser()+">");
+        account.setFrom(emailConfig.getUser() + " <" + emailConfig.getFromUser() + ">");
         // ssl方式发送-----不使用
 //        account.setSslEnable(true);
         account.setSslEnable(false);
@@ -103,7 +103,7 @@ public class EmailServiceImpl implements EmailService {
 //                    .setUseGlobalSession(false)
 //                    .send();
             MailUtil.send(account, emailVo.getTos(), emailVo.getSubject(), content, true);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
     }

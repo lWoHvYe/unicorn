@@ -62,7 +62,7 @@ public class OnlineController {
     public ResponseEntity<Object> delete(@RequestBody Set<String> keys) throws Exception {
         for (String key : keys) {
             // 解密Key
-            key = EncryptUtils.desDecrypt(key);
+            key = EncryptUtils.aesDecrypt(key);
             onlineUserService.kickOut(key);
         }
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);

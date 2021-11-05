@@ -13,7 +13,7 @@ public class EncryptUtilsTest {
     @Test
     public void testDesEncrypt() {
         try {
-            assertEquals("7772841DC6099402", desEncrypt("123456"));
+            assertEquals("fAbch4/a/zBUwpVsWS+cMw==", aesEncrypt("123456"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -25,7 +25,7 @@ public class EncryptUtilsTest {
     @Test
     public void testDesDecrypt() {
         try {
-            assertEquals("123456", desDecrypt("7772841DC6099402"));
+            assertEquals("123456", aesDecrypt("fAbch4/a/zBUwpVsWS+cMw=="));
         } catch (Exception e) {
             e.printStackTrace();
         }
