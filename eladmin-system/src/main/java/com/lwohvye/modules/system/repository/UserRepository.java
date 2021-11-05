@@ -19,10 +19,11 @@ import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.Job;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.domain.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.Date;
@@ -34,6 +35,14 @@ import java.util.Set;
  * @date 2018-11-22
  */
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+
+    @Override
+    @EntityGraph(value = "User-Details")
+    Page<User> findAll(@Nullable Specification<User> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(value = "User-Details")
+    List<User> findAll(Specification<User> spec);
 
     /**
      * 根据用户名查询

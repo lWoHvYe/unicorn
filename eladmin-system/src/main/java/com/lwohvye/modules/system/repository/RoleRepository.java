@@ -17,10 +17,10 @@ package com.lwohvye.modules.system.repository;
 
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.Role;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +31,22 @@ import java.util.Set;
  * @date 2018-12-03
  */
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
+
+    /**
+     * @param spec
+     * @param pageable
+     * @return org.springframework.data.domain.Page
+     * @description 重写查询所有的方法，指定EntityGraph。查询就从多条查询变成了一条关联查询。
+     * 在多对多的关系中，若存在关联关系，但另一方已经不在了，在总查询后，还会有对不存在的那条的单查询（根据id查实体）。这时就会报错不存在。因此需要把关联表维护好，不要出现脏数据
+     * @date 2021/11/6 12:09 上午
+     */
+    @Override
+    @EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
+    Page<Role> findAll(Specification<Role> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
+    List<Role> findAll(Specification<Role> spec);
 
     /**
      * 根据名称查询

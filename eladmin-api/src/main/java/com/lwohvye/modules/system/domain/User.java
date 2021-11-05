@@ -40,6 +40,9 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-11-22
  */
+// 使用@NamedEntityGraph解决Jpa懒加载经典的 N + 1 问题
+// https://docs.oracle.com/javaee/7/tutorial/persistence-entitygraphs002.htm?utm_source=product&utm_medium=link&utm_campaign=IU&utm_content=2021.2#
+@NamedEntityGraph(name = "User-Details", attributeNodes = {@NamedAttributeNode("roles"), @NamedAttributeNode("jobs"), @NamedAttributeNode("dept")})
 @Entity
 @Getter
 @Setter

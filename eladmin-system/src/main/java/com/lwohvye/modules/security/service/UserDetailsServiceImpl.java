@@ -77,6 +77,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             if (cacheUserObj instanceof JwtUserDto jwtUser)
                 jwtUserDto = jwtUser;
             else return null;
+            // 更新权限信息
+            jwtUserDto.getAuthorities();
 
             var userInner = jwtUserDto.getUser();
             // 检查dataScope是否修改
