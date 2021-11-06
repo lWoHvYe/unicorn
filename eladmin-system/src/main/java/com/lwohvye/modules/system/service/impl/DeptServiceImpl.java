@@ -197,6 +197,8 @@ public class DeptServiceImpl implements DeptService {
     @Transactional(rollbackFor = Exception.class)
     public List<Long> getDeptChildren(List<Dept> deptList) {
         var deptIds = deptList.stream().filter(Dept::getEnabled).map(Dept::getId).toList();
+        if (deptIds.isEmpty())
+            return Collections.emptyList();
         List<Long> list = new ArrayList<>(deptIds);
         var optionalDepts = deptRepository.findByPidIn(deptIds);
         optionalDepts.ifPresent(depts -> list.addAll(getDeptChildren(depts)));

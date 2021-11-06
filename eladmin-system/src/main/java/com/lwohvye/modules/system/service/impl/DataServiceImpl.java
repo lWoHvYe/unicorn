@@ -82,7 +82,7 @@ public class DataServiceImpl implements DataService {
         for (Dept dept : depts) {
             deptIds.add(dept.getId());
             List<Dept> deptChildren = deptService.findByPid(dept.getId());
-            if (deptChildren != null && deptChildren.size() != 0) {
+            if (deptChildren != null && !deptChildren.isEmpty()) {
                 deptIds.addAll(deptService.getDeptChildren(deptChildren));
             }
         }

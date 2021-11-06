@@ -75,7 +75,7 @@
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>6.6</logstash.version>
         <logback.version>1.2.6</logback.version>
-        <redisson.version>3.16.3</redisson.version>
+        <redisson.version>3.16.4</redisson.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
@@ -173,7 +173,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.0.1-android</version>
+            <version>31.0.1-jre</version>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
