@@ -88,6 +88,8 @@ public @interface Query {
         , EQUAL_IN_MULTI
         // why 原连接查询都是单条件的。针对业务，多条件连接查询，QueryCriteria中使用一个实体来承载属性
         , EQUAL_IN_MULTI_JOIN
+        // from_base64函数。当前函数只能对属性使用，不能对值使用
+        , FUNCTION_FROM_BASE64
     }
 
     /**

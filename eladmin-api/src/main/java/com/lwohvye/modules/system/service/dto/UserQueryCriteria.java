@@ -60,6 +60,10 @@ public class UserQueryCriteria implements Serializable {
     @Query(propName = "role", type = Query.Type.EQUAL_IN_MULTI_JOIN, joinName = "roles")
     private Role role;
 
+    // 库中使用Base64存储，做模糊查询（业务不建议。因为无法使用索引，效率很低，这里只是提供一种调用库函数的方式）
+    @Query(type = Query.Type.FUNCTION_FROM_BASE64)
+    private String description;
+
     /**
      * @param usernameStr
      * @description 重写set方法。将前端传的逗号分割的username，转成字符集合，并设置到另一个字段中

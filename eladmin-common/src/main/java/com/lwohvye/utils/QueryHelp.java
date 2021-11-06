@@ -269,11 +269,11 @@ public class QueryHelp {
 //                            like val
                 predicates[0] = cb.like(getExpression(attributeName, join, root).as(String.class), val.toString());
 //                            like val,%
-                predicates[1] = cb.like(getExpression(attributeName, join, root).as(String.class), val.toString() + ",%");
+                predicates[1] = cb.like(getExpression(attributeName, join, root).as(String.class), val + ",%");
 //                            like %,val,%
-                predicates[2] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val.toString() + ",%");
+                predicates[2] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val + ",%");
 //                            like %,val
-                predicates[3] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val.toString());
+                predicates[3] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val);
 //                            设置查询
                 list.add(cb.or(predicates));
                 break;
@@ -314,11 +314,11 @@ public class QueryHelp {
                         } else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L) && ObjectUtil.isNotNull(idAnnotation)) {
                             predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
                             list.add(predicate);
-//                                        安全起见。清空一下
+//                                    安全起见。清空一下
                             arrayList.clear();
                             break;
                         } else {
-//                                        其他的走等于
+//                                    其他的走等于
                             predicate = cb.equal(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
                         }
                         if (ObjectUtil.isNotNull(predicate))
@@ -327,6 +327,12 @@ public class QueryHelp {
                 }
                 if (CollUtil.isNotEmpty(arrayList))
                     list.add(cb.and(arrayList.toArray(new Predicate[0])));
+                break;
+            case FUNCTION_FROM_BASE64:
+                // where (from_base64(user0_.description) like to_base64(user0_.description))。如何设置to_base64的参数为 fieldValue，是接下来的事情
+//                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)), cb.function("to_base64", fieldType, getExpression(attributeName, join, root))));
+                // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
+                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%"));
                 break;
             default:
                 break;
