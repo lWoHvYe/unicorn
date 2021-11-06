@@ -19,6 +19,7 @@ import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
 
@@ -40,13 +41,18 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
      * 在多对多的关系中，若存在关联关系，但另一方已经不在了，在总查询后，还会有对不存在的那条的单查询（根据id查实体）。这时就会报错不存在。因此需要把关联表维护好，不要出现脏数据
      * @date 2021/11/6 12:09 上午
      */
+    // An entity graph can be used as a fetch or a load graph.
+    // If a fetch graph is used, only the attributes specified by the entity graph will be treated as FetchType.EAGER. All other attributes will be lazy.
+    // If a load graph is used, all attributes that are not specified by the entity graph will keep their default fetch type.
     @Override
+    // FETCH和LOAD这这里没有区别好像
     @EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
     Page<Role> findAll(Specification<Role> spec, Pageable pageable);
 
+    // https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#jpa.entity-graph
     @Override
-    @EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
-    List<Role> findAll(Specification<Role> spec);
+    @EntityGraph(attributePaths = {"menus", "depts"})
+    List<Role> findAll(Sort sort);
 
     /**
      * 根据名称查询

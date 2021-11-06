@@ -42,6 +42,8 @@ import java.util.Set;
  */
 // 使用@NamedEntityGraph解决Jpa懒加载经典的 N + 1 问题
 // https://docs.oracle.com/javaee/7/tutorial/persistence-entitygraphs002.htm?utm_source=product&utm_medium=link&utm_campaign=IU&utm_content=2021.2#
+// A sub graph is basically an entity graph that is embedded into another entity graph or entity sub graph. The definition of a sub graph is similar to the definition of an entity graph.
+// 还可以配置subgraphs，用于在本实体中，配置视图中属性，如roles中属性的视图。当前未用到这部分
 @NamedEntityGraph(name = "User-Details", attributeNodes = {@NamedAttributeNode("roles"), @NamedAttributeNode("jobs"), @NamedAttributeNode("dept")})
 @Entity
 @Getter

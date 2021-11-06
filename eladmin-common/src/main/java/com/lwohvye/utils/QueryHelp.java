@@ -40,6 +40,7 @@ import java.util.List;
 //@SuppressWarnings({"unchecked", "all"})
 public class QueryHelp {
 
+    // TODO: 2021/11/6 使用JPA 2.1 引入的 CriteriaUpdate 和 CriteriaDelete 进行批量更新/删除
     /**
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象

@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.FileProperties;
 import com.lwohvye.exception.BadRequestException;
@@ -24,6 +25,7 @@ import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.User;
+import com.lwohvye.modules.system.domain.projection.UserProj;
 import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.*;
@@ -34,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
-        Page<User> page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
+        var page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(userMapper::toDto));
     }
 
@@ -180,6 +181,10 @@ public class UserServiceImpl implements UserService {
     @Cacheable(key = " #root.target.getSysName() + 'userInfo:' + #p0")
     public UserDto findByName(String userName) {
         User user = userRepository.findByUsername(userName);
+        // 这里只做标记用，当前业务暂不需要Projection
+        if (RandomUtil.randomBoolean()) {
+            var upj = userRepository.findByUsername(userName, UserProj.class);
+        }
         if (user == null) {
             throw new EntityNotFoundException(User.class, "name", userName);
         } else {

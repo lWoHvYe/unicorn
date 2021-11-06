@@ -44,6 +44,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @EntityGraph(value = "User-Details")
     List<User> findAll(Specification<User> spec);
 
+    // https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#projections.interfaces.open.bean-reference
+    @EntityGraph(value = "User-Details")
+    <T> T findByUsername(String username, Class<T> clazz);
+
     /**
      * 根据用户名查询
      *
