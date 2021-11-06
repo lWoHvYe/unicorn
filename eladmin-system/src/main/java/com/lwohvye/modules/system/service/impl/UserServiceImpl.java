@@ -36,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +80,15 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
         List<User> users = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return userMapper.toDto(users);
+    }
+
+    @Override
+    public Object queryAll(User expUser, Pageable pageable) {
+        var matcher = ExampleMatcher.matching()
+                .withMatcher("username", match -> match.contains())
+                .withMatcher("nickName", match -> match.startsWith().ignoreCase());
+        var example = Example.of(expUser, matcher);
+        return userRepository.findAll(example);
     }
 
     @Override

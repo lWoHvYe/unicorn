@@ -19,6 +19,7 @@ import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.Job;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.domain.User;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -47,6 +48,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     // https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#projections.interfaces.open.bean-reference
     @EntityGraph(value = "User-Details")
     <T> T findByUsername(String username, Class<T> clazz);
+
+    @Override
+    @EntityGraph(attributePaths = {"roles", "jobs", "dept"})
+    <S extends User> Page<S> findAll(Example<S> example, Pageable pageable);
 
     /**
      * 根据用户名查询

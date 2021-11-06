@@ -111,6 +111,7 @@ public interface UserService extends BaseService {
      */
     List<UserDto> queryAll(UserQueryCriteria criteria);
 
+    Object queryAll(User expUser, Pageable pageable);
     /**
      * 导出数据
      * @param queryAll 待导出的数据
