@@ -61,7 +61,7 @@ public class UserQueryCriteria implements Serializable {
     private Role role;
 
     // 库中使用Base64存储，做模糊查询（业务不建议。因为无法使用索引，效率很低，这里只是提供一种调用库函数的方式）
-    @Query(type = Query.Type.FUNCTION_FROM_BASE64)
+    @Query(type = Query.Type.FUNCTION_4_EQUAL, functionName = "from_base64")
     private String description;
 
     /**

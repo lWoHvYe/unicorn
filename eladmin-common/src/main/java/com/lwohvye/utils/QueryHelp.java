@@ -328,11 +328,14 @@ public class QueryHelp {
                 if (CollUtil.isNotEmpty(arrayList))
                     list.add(cb.and(arrayList.toArray(new Predicate[0])));
                 break;
-            case FUNCTION_FROM_BASE64:
-                // where (from_base64(user0_.description) like to_base64(user0_.description))。如何设置to_base64的参数为 fieldValue，是接下来的事情
+//            case FUNCTION_FROM_BASE64:
+            // where (from_base64(user0_.description) like to_base64(user0_.description))。如何设置to_base64的参数为 fieldValue，是接下来的事情
 //                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)), cb.function("to_base64", fieldType, getExpression(attributeName, join, root))));
-                // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
-                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%"));
+            // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
+//                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%"));
+//                break;
+            case FUNCTION_4_EQUAL:
+                list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), val));
                 break;
             default:
                 break;

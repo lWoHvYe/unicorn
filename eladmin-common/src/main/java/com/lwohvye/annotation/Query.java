@@ -49,6 +49,9 @@ public @interface Query {
      */
     String blurry() default "";
 
+    // 库函数名
+    String functionName() default "";
+
     enum Type {
         // jie 2019/6/4 相等
         EQUAL
@@ -88,8 +91,10 @@ public @interface Query {
         , EQUAL_IN_MULTI
         // why 原连接查询都是单条件的。针对业务，多条件连接查询，QueryCriteria中使用一个实体来承载属性
         , EQUAL_IN_MULTI_JOIN
-        // from_base64函数。当前函数只能对属性使用，不能对值使用
-        , FUNCTION_FROM_BASE64
+        // why 2021/11/07 from_base64函数。当前函数只能对属性使用，不能对值使用
+        // , FUNCTION_FROM_BASE64
+        // why 2021/11/07 库函数，做相等查询
+        , FUNCTION_4_EQUAL
     }
 
     /**
