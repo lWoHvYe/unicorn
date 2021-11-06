@@ -26,10 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import javax.persistence.Id;
 import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -41,6 +39,7 @@ import java.util.List;
 public class QueryHelp {
 
     // TODO: 2021/11/6 使用JPA 2.1 引入的 CriteriaUpdate 和 CriteriaDelete 进行批量更新/删除
+
     /**
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象
@@ -129,28 +128,41 @@ public class QueryHelp {
      */
     private static <R> Join analyzeJoinType(Root<R> root, Query q, String joinName, Object val, Join join) {
         if (ObjectUtil.isNotEmpty(joinName)) {
+            // 首先获取已经设置的join
+            var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2));
+            // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
             var joinNames = joinName.split(">");
-            for (var name : joinNames) {
+
+            for (var entity : joinNames) {
+                // 若join已经有值了，就不走下面这段逻辑了
+                if (Objects.isNull(join)) {
+                    var rJoin = existJoinNames.get(entity);
+                    // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
+                    if (!Objects.isNull(rJoin)) {
+                        join = rJoin;
+                        continue;
+                    }
+                }
                 switch (q.join()) {
                     case LEFT:
                         if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
-                            join = join.join(name, JoinType.LEFT);
+                            join = join.join(entity, JoinType.LEFT);
                         } else {
-                            join = root.join(name, JoinType.LEFT);
+                            join = root.join(entity, JoinType.LEFT);
                         }
                         break;
                     case RIGHT:
                         if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
-                            join = join.join(name, JoinType.RIGHT);
+                            join = join.join(entity, JoinType.RIGHT);
                         } else {
-                            join = root.join(name, JoinType.RIGHT);
+                            join = root.join(entity, JoinType.RIGHT);
                         }
                         break;
                     case INNER:
                         if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
-                            join = join.join(name, JoinType.INNER);
+                            join = join.join(entity, JoinType.INNER);
                         } else {
-                            join = root.join(name, JoinType.INNER);
+                            join = root.join(entity, JoinType.INNER);
                         }
                         break;
                     default:
