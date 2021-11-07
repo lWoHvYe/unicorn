@@ -88,7 +88,7 @@ public class RabbitMQDelayMsgConsumerService {
             mailUtils.sendMail(mailVo);
         } finally {
             log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, amqpMsgEntityStr);
-            // TODO: 2021/4/27 处理完成，根据结果记录相关表。若处理报错，需邮件通知
+            // 处理完成，根据结果记录相关表（看业务需求）。若处理报错，需邮件通知
         }
     }
 

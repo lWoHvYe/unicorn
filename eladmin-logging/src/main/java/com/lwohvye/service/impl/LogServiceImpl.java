@@ -59,7 +59,7 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(LogQueryCriteria criteria, Pageable pageable) {
-        Page<Log> page = logRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
+        Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         String status = "ERROR";
         if (status.equals(criteria.getLogType())) {
             return PageUtil.toPage(page.map(logErrorMapper::toDto));
@@ -70,13 +70,13 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<Log> queryAll(LogQueryCriteria criteria) {
-        return logRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)));
+        return logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
-        Page<Log> page = logRepository.findAll(((root, criteriaQuery, cb) -> QueryHelp.getPredicate(root, criteria, cb)), pageable);
+        Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         return PageUtil.toPage(page.map(logSmallMapper::toDto));
     }
 

@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 //@SuppressWarnings({"unchecked", "all"})
 public class QueryHelp {
 
-    // TODO: 2021/11/6 使用JPA 2.1 引入的 CriteriaUpdate 和 CriteriaDelete 进行批量更新/删除
-
     /**
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象
@@ -55,19 +53,7 @@ public class QueryHelp {
             return cb.and(list.toArray(new Predicate[0]));
         }
         // 数据权限验证
-        DataPermission permission = query.getClass().getAnnotation(DataPermission.class);
-        if (permission != null) {
-            // 获取数据权限
-            var dataScopes = SecurityUtils.getCurrentUserDataScope();
-            if (CollectionUtil.isNotEmpty(dataScopes)) {
-                if (StringUtils.isNotBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
-                    var join = root.join(permission.joinName(), JoinType.LEFT);
-                    list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
-                } else if (StringUtils.isBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
-                    list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
-                }
-            }
-        }
+        analyzeDataPermission(root, query, list);
         try {
             var fields = getAllFields(query.getClass(), new ArrayList<>());
             for (var field : fields) {
@@ -114,6 +100,30 @@ public class QueryHelp {
         }
         int size = list.size();
         return cb.and(list.toArray(new Predicate[size]));
+    }
+
+    /**
+     * @param root
+     * @param query
+     * @param list
+     * @description 数据权限验证
+     * @date 2021/11/7 4:36 下午
+     */
+    private static <R, Q> void analyzeDataPermission(Root<R> root, Q query, ArrayList<Predicate> list) {
+        DataPermission permission = query.getClass().getAnnotation(DataPermission.class);
+        if (permission != null) {
+            // 获取数据权限
+            var dataScopes = SecurityUtils.getCurrentUserDataScope();
+            if (CollectionUtil.isNotEmpty(dataScopes)) {
+                if (StringUtils.isNotBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
+                    // 因为首先处理这部分，不必担心join重复
+                    var join = root.join(permission.joinName(), JoinType.LEFT);
+                    list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
+                } else if (StringUtils.isBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
+                    list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
+                }
+            }
+        }
     }
 
     /**
@@ -292,7 +302,6 @@ public class QueryHelp {
 //                                    In查询通过Query注解的propName指定映射的属性
                         var queryAnnotation = fieldInVal.getAnnotation(Query.class);
 //                                    如果在实体属性上配置了Query注解，需解析Query注解，确定查询方式
-                        // TODO: 2021/6/24 当前只完成部分查询。
                         if (ObjectUtil.isNotNull(queryAnnotation)) {
                             var queryType = queryAnnotation.type();
                             var queryAttrName = isBlank(queryAnnotation.propName()) ? fieldInVal.getName() : queryAnnotation.propName();
@@ -310,7 +319,8 @@ public class QueryHelp {
 //                                    传-1L时。做is null查询。额外限制为当对应属性上有id注解的时候。
                             // 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效。
                             // 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
-                            // TODO: 2021/4/6 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
+                            // 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
+                            // 2021/11/07 解决了多join问题后，该注解的功能可由原配置多个join来实现。不再进行扩展
                         } else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L) && ObjectUtil.isNotNull(idAnnotation)) {
                             predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
                             list.add(predicate);
@@ -344,9 +354,11 @@ public class QueryHelp {
 
     @SuppressWarnings("unchecked")
     private static <T, R> Expression<T> getExpression(String attributeName, Join join, Root<R> root) {
+        // 处理的维度是field维度的，每个field初始化一个join，若join有值，证明该field是join的实体中的，所以要从join中取，即join.get()。
         if (ObjectUtil.isNotEmpty(join)) {
             return join.get(attributeName);
         } else {
+            // 非join的，从root中取，root.get()。
             return root.get(attributeName);
         }
     }
@@ -370,5 +382,21 @@ public class QueryHelp {
             getAllFields(clazz.getSuperclass(), fields);
         }
         return fields;
+    }
+
+    // 2021/11/6 使用JPA 2.1 引入的 CriteriaUpdate 和 CriteriaDelete 进行批量更新/删除。不是很实用，期待后续的使用场景
+    public static <R, Q> void criteria4Update(Root<R> root, Q query, CriteriaBuilder cb) {
+//        var em = new EntityManager();
+        var criteriaUpdate = cb.createCriteriaUpdate(root.getJavaType());
+        criteriaUpdate.set("fieldName", "newFieldValue");
+        criteriaUpdate.where(getPredicate(root, query, cb));
+//        em.createQuery(criteriaUpdate).executeUpdate();
+    }
+
+    public static <R, Q> void criteriaDelete(Root<R> root, Q query, CriteriaBuilder cb) {
+//        var em = new EntityManager();
+        var criteriaDelete = cb.createCriteriaDelete(root.getJavaType());
+        criteriaDelete.where(getPredicate(root, query, cb));
+//        em.createQuery(criteriaDelete).executeUpdate();
     }
 }

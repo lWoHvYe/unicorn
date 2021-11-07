@@ -52,15 +52,15 @@ public class DictServiceImpl implements DictService {
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> queryAll(DictQueryCriteria dict, Pageable pageable) {
-        Page<Dict> page = dictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb), pageable);
+    public Map<String, Object> queryAll(DictQueryCriteria criteria, Pageable pageable) {
+        Page<Dict> page = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(dictMapper::toDto));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<DictDto> queryAll(DictQueryCriteria dict) {
-        List<Dict> list = dictRepository.findAll((root, query, cb) -> QueryHelp.getPredicate(root, dict, cb));
+    public List<DictDto> queryAll(DictQueryCriteria criteria) {
+        List<Dict> list = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
         return dictMapper.toDto(list);
     }
 
