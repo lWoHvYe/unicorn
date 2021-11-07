@@ -27,7 +27,7 @@ public class LocalCoreConfig {
 
     @Value("${local.sys.name:}")
     public void setSysName(String sysName) {
-        SYS_NAME = StrUtil.isNotEmpty(sysName) ? "[-" + sysName + "-]::" : "";
+        SYS_NAME = StrUtil.isNotEmpty(sysName) ? "-n_n-" + sysName + "-n_n-::" : "";
     }
 
     public static String getSysName() {

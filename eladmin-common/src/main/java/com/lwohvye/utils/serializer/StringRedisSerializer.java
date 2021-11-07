@@ -49,7 +49,13 @@ public class StringRedisSerializer implements RedisSerializer<Object> {
 
     @Override
     public byte[] serialize(Object object) {
-        String string = JSON.toJSONString(object);
+        var string = "";
+        // 本来就是String类型的话，就不转json了。
+        if (object instanceof String str)
+            string = str;
+        else
+            // 非String类型的key比较少。
+            string = JSON.toJSONString(object);
         if (StringUtils.isBlank(string))
             return new byte[0];
 //        string = string.replace("\"", "");

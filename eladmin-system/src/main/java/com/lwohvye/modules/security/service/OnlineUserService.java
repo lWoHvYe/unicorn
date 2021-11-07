@@ -90,7 +90,8 @@ public class OnlineUserService {
      * @return /
      */
     public List<OnlineUserDto> getAll(String filter) {
-        // TODO: 2021/10/24 String类型的key被加上了双引号，导致此处无法模糊查询，待解决
+        // String类型的key被加上了双引号，导致此处无法模糊查询，
+        // 双引号问题已解决，无法模糊是因为定义系统名称时加上了[]，这在正则里有特殊含义，所以不要用特殊字符
         List<String> keys = redisUtils.scan(SecuritySysUtil.getAuthToken(properties, "*"));
         Collections.reverse(keys);
         List<OnlineUserDto> onlineUserDtos = new ArrayList<>();
