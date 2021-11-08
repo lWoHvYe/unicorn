@@ -305,6 +305,8 @@ file:
 local:
   sys:
     name: X0X
+    # 一个开关，标识是否加载相关但类
+    load-os: true
 
 # oss配置
 alibaba:
