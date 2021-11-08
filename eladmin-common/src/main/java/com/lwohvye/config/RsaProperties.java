@@ -22,17 +22,26 @@ import org.springframework.stereotype.Component;
 /**
  * @author Zheng Jie
  * @website https://el-admin.vip
- * @description
+ * @description 公钥加密、私钥解密。  私钥加签、公钥验签。
  * @date 2020-05-18
  **/
 @Data
 @Component
 public class RsaProperties {
 
+    // 私钥
     public static String privateKey;
+
+    // 公钥
+    public static String publicKey;
 
     @Value("${rsa.private_key}")
     public void setPrivateKey(String privateKey) {
         RsaProperties.privateKey = privateKey;
+    }
+
+    @Value("${rsa.public_key}")
+    public void setPublicKey(String publicKey) {
+        RsaProperties.publicKey = publicKey;
     }
 }

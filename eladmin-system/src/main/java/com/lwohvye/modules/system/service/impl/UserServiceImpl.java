@@ -57,7 +57,6 @@ import java.util.*;
 @RequiredArgsConstructor
 //配置该类缓存的公共前缀
 @CacheConfig(cacheNames = "user")
-// TODO: 2021/2/25 Redis的使用方式需较大的调整
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;

@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.security.service;
 
+import cn.hutool.core.util.StrUtil;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
@@ -98,7 +99,7 @@ public class OnlineUserService {
         for (String key : keys) {
             OnlineUserDto onlineUserDto = (OnlineUserDto) redisUtils.get(key);
             if (StringUtils.isNotBlank(filter)) {
-                if (onlineUserDto.toString().contains(filter)) {
+                if (StrUtil.equals(onlineUserDto.getUserName(), filter)) {
                     onlineUserDtos.add(onlineUserDto);
                 }
             } else {

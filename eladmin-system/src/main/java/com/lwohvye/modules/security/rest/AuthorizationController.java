@@ -90,17 +90,14 @@ public class AuthorizationController {
 
     @ApiOperation("登录授权")
     @AnonymousPostMapping(value = "/login")
-    // TODO: 2021/4/21 登陆失败限制、ip限制、手机验证码
     public ResponseEntity<Object> login(@Validated @RequestBody AuthUserDto authUser, HttpServletRequest request) throws Exception {
 
         var username = authUser.getUsername();
-        String lockUserKey = username + "||authLocked||";
-//        var lockUser = redisUtils.get(lockUserKey);
-//        if (ObjectUtil.isNotNull(lockUser) && lockUser instanceof Collection col ? CollUtil.isNotEmpty(col) : ObjectUtil.isNotEmpty(lockUser)) {
-//        if (ObjectUtil.isNotEmpty(lockUser)) {
-        // 改用延时消息队列来做。错误一定次数后，修改用户状态为锁定，然后延时消息。一小时后解除
-//        if (redisUtils.hasKey(lockUserKey))
-//            throw new BadRequestException("用户已被锁定，请稍后再试");
+        var ip = StringUtils.getIp(request);
+        var lockedIp = ip + "||authLocked||";
+        // 当某ip多次登录失败导致用户锁定时，会同时锁定ip 15分钟
+        if (redisUtils.hasKey(lockedIp))
+            throw new BadRequestException("频繁访问，请稍后再试");
 
         // 密码解密
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, authUser.getPassword());
@@ -114,18 +111,17 @@ public class AuthorizationController {
         if (StringUtils.isBlank(authUser.getCode()) || !authUser.getCode().equalsIgnoreCase(code)) {
             throw new BadRequestException("验证码错误");
         }
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(username, password);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
 
         Authentication authentication;
         try {
             authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            // catch的异常是密码错误的，别的异常不会catch及发消息
         } catch (BadCredentialsException e) {
-            String ip = StringUtils.getIp(request);
             var infoMap = new JSONObject();
             infoMap.put("ip", ip);
-            infoMap.put("lockUserKey", lockUserKey);
             infoMap.put("username", username);
+            infoMap.put("lockedIp", lockedIp);
             var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(infoMap.toJSONString()).setExtraData("solveAuthFailed");
 //            发送消息
             rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);

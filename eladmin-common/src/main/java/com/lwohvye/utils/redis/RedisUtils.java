@@ -858,6 +858,8 @@ public class RedisUtils {
         return redisTemplate.opsForHash().hasKey(key, item);
     }
 
+    // 因为配置了value的序列化为fastjson。所以自增类操作将无法进行
+
     /**
      * 为哈希表 key 中的指定字段的整数值加上增量 increment
      * 传负值时减去增量

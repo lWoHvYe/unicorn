@@ -19,6 +19,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.lwohvye.annotation.DataPermission;
 import com.lwohvye.annotation.Query;
 import lombok.extern.slf4j.Slf4j;
@@ -138,45 +139,50 @@ public class QueryHelp {
      */
     private static <R> Join analyzeJoinType(Root<R> root, Query q, String joinName, Object val, Join join) {
         if (ObjectUtil.isNotEmpty(joinName)) {
-            // 首先获取已经设置的join
-            var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2));
+            // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
+//            var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2));
             // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
             var joinNames = joinName.split(">");
 
             for (var entity : joinNames) {
-                // 若join已经有值了，就不走下面这段逻辑了
-                if (Objects.isNull(join)) {
-                    var rJoin = existJoinNames.get(entity);
-                    // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
-                    if (!Objects.isNull(rJoin)) {
-                        join = rJoin;
-                        continue;
+                // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
+                checkJoin:
+                {
+                    if (Objects.isNull(join)) {
+//                    var rJoin = existJoinNames.get(entity);
+                        for (var rJoin : root.getJoins()) {
+                            // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
+                            if (StrUtil.equals(rJoin.getAttribute().getName(), entity)) {
+                                join = rJoin;
+                                break checkJoin;
+                            }
+                        }
                     }
-                }
-                switch (q.join()) {
-                    case LEFT:
-                        if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
-                            join = join.join(entity, JoinType.LEFT);
-                        } else {
-                            join = root.join(entity, JoinType.LEFT);
-                        }
-                        break;
-                    case RIGHT:
-                        if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
-                            join = join.join(entity, JoinType.RIGHT);
-                        } else {
-                            join = root.join(entity, JoinType.RIGHT);
-                        }
-                        break;
-                    case INNER:
-                        if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
-                            join = join.join(entity, JoinType.INNER);
-                        } else {
-                            join = root.join(entity, JoinType.INNER);
-                        }
-                        break;
-                    default:
-                        break;
+                    switch (q.join()) {
+                        case LEFT:
+                            if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
+                                join = join.join(entity, JoinType.LEFT);
+                            } else {
+                                join = root.join(entity, JoinType.LEFT);
+                            }
+                            break;
+                        case RIGHT:
+                            if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
+                                join = join.join(entity, JoinType.RIGHT);
+                            } else {
+                                join = root.join(entity, JoinType.RIGHT);
+                            }
+                            break;
+                        case INNER:
+                            if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
+                                join = join.join(entity, JoinType.INNER);
+                            } else {
+                                join = root.join(entity, JoinType.INNER);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -316,15 +322,16 @@ public class QueryHelp {
 //                                    String类型使用Inner like
                         } else if (fieldValue instanceof String str) {
                             predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + str + "%");
-//                                    传-1L时。做is null查询。额外限制为当对应属性上有id注解的时候。
+                            // 传-1L时。做is null查询。额外限制为当对应属性上有id注解的时候。
                             // 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效。
                             // 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
                             // 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
                             // 2021/11/07 解决了多join问题后，该注解的功能可由原配置多个join来实现。不再进行扩展
                         } else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L) && ObjectUtil.isNotNull(idAnnotation)) {
                             predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
+                            // 下面这三行，主体是因为，若使用了isNull，则不能再设置该join实体的其他查询，所以跳出
                             list.add(predicate);
-//                                    安全起见。清空一下
+//                              安全起见。清空一下。避免在循环结束的list.add()那里，再被加进去
                             arrayList.clear();
                             break;
                         } else {

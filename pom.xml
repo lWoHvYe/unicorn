@@ -536,7 +536,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <!--todo 针对异常
+        <!-- 针对异常
         java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.lang.String java.lang.NamedPackage.name accessible: module java.base does not "opens java.lang" to unnamed module @7bfcd12c
         需要在jvm 中添加启动参数
         ——add-opens java.base/java.lang=ALL-UNNAMED

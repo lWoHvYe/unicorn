@@ -80,10 +80,9 @@ public class AuthMQService {
         var countKey = "failed-count";
         var byKey = redisUtils.hGet(authFailedKey, countKey);
         var failCount = ObjectUtil.isNotEmpty(byKey) ? (Integer) byKey : 0;
-        log.info("fail-count" + failCount);
-        // TODO: 2021/7/5 需要加锁。但消息是顺序消费的，也许不加也行，但消费者可以有多个，最好加上
+        log.info(" {} fail-count is {} ", authFailedKey, failCount);
         if (failCount < 5) {
-            failCount += 1;
+            ++failCount;
             if (ObjectUtil.equal(failCount, 1)) {
 //                        新建时设置过期时间5分钟
                 redisUtils.hPut(authFailedKey, countKey, failCount, 5 * 60L);
@@ -92,11 +91,15 @@ public class AuthMQService {
                 redisUtils.hPut(authFailedKey, countKey, failCount);
             }
         } else {
-//                  修改状态为锁定
+            var lockedIp = infoJson.getString("lockedIp");
+            // 限制Ip登录 15分钟
+            redisUtils.set(lockedIp, authFailedKey, 15L, TimeUnit.MINUTES);
+
+//                  修改用户状态为锁定
             userService.updateEnabled(username, false);
 //                  删除缓存中的用户信息
             userCacheClean.cleanUserCache(username);
-//                  超过5次锁定一小时
+//                  超过5次锁定一小时。创建延迟解锁消息
             var wait4Unlock = new AmqpMsgEntity().setMsgType("auth").setMsgData(username).setExtraData("unlockUser")
                     .setExpire(1L).setTimeUnit(TimeUnit.HOURS);
 //                    延时消息发给RabbitMQ
