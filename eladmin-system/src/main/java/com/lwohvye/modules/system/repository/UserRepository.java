@@ -39,15 +39,23 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Override
     @EntityGraph(value = "User-Details")
-    Page<User> findAll(@Nullable Specification<User> spec, Pageable pageable);
-
-    @Override
-    @EntityGraph(value = "User-Details")
     List<User> findAll(Specification<User> spec);
 
     // https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#projections.interfaces.open.bean-reference
     @EntityGraph(value = "User-Details")
     <T> T findByUsername(String username, Class<T> clazz);
+
+    /**
+     * @param spec
+     * @param pageable
+     * @return org.springframework.data.domain.Page
+     * @description 若配置了Graph图，则查询会变成查满足条件的所有。然后内存分页。故分页类查询不建议使用。下面两个只作为存档。
+     * 但一些根据特定条件只过滤出很少记录的，可以考虑使用，比如这里的根据id、name等的查询
+     * @date 2021/11/9 10:05 下午
+     */
+    @Override
+    @EntityGraph(value = "User-Details")
+    Page<User> findAll(@Nullable Specification<User> spec, Pageable pageable);
 
     @Override
     @EntityGraph(attributePaths = {"roles", "jobs", "dept"})

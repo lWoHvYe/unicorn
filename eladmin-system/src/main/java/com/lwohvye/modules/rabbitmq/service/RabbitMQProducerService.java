@@ -80,8 +80,8 @@ public class RabbitMQProducerService {
      * @date 2021/7/26 1:17 下午
      */
     public void sendDelayMsg(AmqpMsgEntity commonEntity) {
-        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_EXCHANGE,
-                RabbitMqConfig.DATA_SYNC_ROUTE_KEY, JSON.toJSONString(commonEntity),
+        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_DELAY_EXCHANGE,
+                RabbitMqConfig.DATA_COMMON_DELAY_ROUTE_KEY, JSON.toJSONString(commonEntity),
                 message -> {
                     var expire = commonEntity.getExpire();
                     var timeUnit = commonEntity.getTimeUnit();

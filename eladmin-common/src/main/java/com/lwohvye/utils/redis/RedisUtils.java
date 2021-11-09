@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
  * @description Redis相关工具类。
  * 因为兼容多数据源。当前需配合system模块中的相关配置类一起使用，需注意
  */
-// TODO: 2021/7/11 与system模块解耦使用。部分配置的方式待调整
 @Component
 //@SuppressWarnings({"unchecked", "all"})
 public class RedisUtils {
