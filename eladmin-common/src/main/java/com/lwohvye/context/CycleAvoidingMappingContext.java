@@ -5,6 +5,7 @@
  */
 package com.lwohvye.context;
 
+import com.alibaba.fastjson.JSON;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Context;
 import org.mapstruct.MappingTarget;
@@ -28,11 +29,18 @@ import java.util.Map;
  * @author Andreas Gudian
  */
 public class CycleAvoidingMappingContext {
-    private Map<Object, Object> knownInstances = new IdentityHashMap<>();
+    private final Map<Object, Object> knownInstances = new IdentityHashMap<>();
 
     @BeforeMapping
     public <T> T getMappedInstance(Object source, @TargetType Class<T> targetType) {
-        return (T) knownInstances.get(source);
+        var obj = knownInstances.get(source);
+        // 判断类型
+        if (targetType.isInstance(obj))
+            // 是该类型进行转换
+            return targetType.cast(obj);
+        else
+            // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时
+            return JSON.parseObject(JSON.toJSONString(obj), targetType);
     }
 
     @BeforeMapping
