@@ -5,14 +5,16 @@
  */
 package com.lwohvye.context;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.core.util.ReflectUtil;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Context;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.TargetType;
 
+import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A type to be used as {@link Context} parameter to track cycles in graphs.
@@ -29,6 +31,7 @@ import java.util.Map;
  * @author Andreas Gudian
  */
 public class CycleAvoidingMappingContext {
+    // 用Map缓存处理的中间结果，也是一种空间换时间的手段
     private final Map<Object, Object> knownInstances = new IdentityHashMap<>();
 
     @BeforeMapping
@@ -39,8 +42,31 @@ public class CycleAvoidingMappingContext {
             // 是该类型进行转换
             return targetType.cast(obj);
         else
-            // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时
-            return JSON.parseObject(JSON.toJSONString(obj), targetType);
+            // 不是该类型时，一般是small类型，需要做source -> T的显示转换(非强转)
+            return genT(targetType, obj);
+    }
+
+    /**
+     * @param targetType Class for smallDto
+     * @param obj        原始侧Dto
+     * @return T         smallDto的实例
+     * @description smallDto中的属性，必须为原始侧的子集
+     * @date 2021/11/10 12:38 上午
+     */
+    private <T> T genT(Class<T> targetType, Object obj) {
+        // obj为null时，直接返回
+        if (Objects.isNull(obj))
+            return null;
+
+        var t = ReflectUtil.newInstance(targetType);
+        // targetType.getFields()只能获取到非私有的属性。所以还是需要反射来获取
+        for (Field field : ReflectUtil.getFields(targetType)) {
+            // 获取不到属性会报错哦。并且需注意，从obj取时，要使用fieldName，因为field是t中的属性
+            ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
+        }
+        // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时
+//        return JSON.parseObject(JSON.toJSONString(obj), targetType);
+        return t;
     }
 
     @BeforeMapping
