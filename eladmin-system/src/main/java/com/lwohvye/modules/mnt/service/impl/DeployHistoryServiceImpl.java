@@ -16,6 +16,7 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.repository.DeployHistoryRepository;
 import com.lwohvye.modules.mnt.service.DeployHistoryService;
@@ -51,13 +52,13 @@ public class DeployHistoryServiceImpl implements DeployHistoryService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         Page<DeployHistory> page = deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(deployHistoryMapper::toDto));
+        return PageUtil.toPage(page.map(deployHistory -> deployHistoryMapper.toDto(deployHistory, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DeployHistoryDto> queryAll(DeployHistoryQueryCriteria criteria) {
-        return deployHistoryMapper.toDto(deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return deployHistoryMapper.toDto(deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -65,7 +66,7 @@ public class DeployHistoryServiceImpl implements DeployHistoryService {
     public DeployHistoryDto findById(String id) {
         DeployHistory deployhistory = deployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
         ValidationUtil.isNull(deployhistory.getId(), "DeployHistory", "id", id);
-        return deployHistoryMapper.toDto(deployhistory);
+        return deployHistoryMapper.toDto(deployhistory, new CycleAvoidingMappingContext());
     }
 
     @Override

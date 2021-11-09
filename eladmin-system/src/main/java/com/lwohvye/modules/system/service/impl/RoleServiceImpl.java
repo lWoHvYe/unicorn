@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.security.service.UserCacheClean;
@@ -73,13 +74,13 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
-        return roleMapper.toDto(roleRepository.findAll(sort));
+        return roleMapper.toDto(roleRepository.findAll(sort), new CycleAvoidingMappingContext());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll(RoleQueryCriteria criteria) {
-        return roleMapper.toDto(roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return roleMapper.toDto(roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -87,7 +88,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(RoleQueryCriteria criteria, Pageable pageable) {
         Page<Role> page = roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(roleMapper::toDto));
+        return PageUtil.toPage(page.map(role -> roleMapper.toDto(role, new CycleAvoidingMappingContext())));
     }
 
     @Override
@@ -96,7 +97,7 @@ public class RoleServiceImpl implements RoleService {
     public RoleDto findById(long id) {
         Role role = roleRepository.findById(id).orElseGet(Role::new);
         ValidationUtil.isNull(role.getId(), "Role", "id", id);
-        return roleMapper.toDto(role);
+        return roleMapper.toDto(role, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -135,7 +136,7 @@ public class RoleServiceImpl implements RoleService {
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void updateMenu(Role resources, RoleDto roleDTO) {
-        Role role = roleMapper.toEntity(roleDTO);
+        Role role = roleMapper.toEntity(roleDTO, new CycleAvoidingMappingContext());
         List<User> users = userRepository.findByRoleId(role.getId());
         // 更新菜单
         role.setMenus(resources.getMenus());
@@ -166,7 +167,7 @@ public class RoleServiceImpl implements RoleService {
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public List<RoleSmallDto> findByUsersId(Long id) {
-        return roleSmallMapper.toDto(new ArrayList<>(roleRepository.findByUserId(id)));
+        return roleSmallMapper.toDto(new ArrayList<>(roleRepository.findByUserId(id)), new CycleAvoidingMappingContext());
     }
 
     @Override

@@ -17,6 +17,7 @@ package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
@@ -89,7 +90,7 @@ public class DeptServiceImpl implements DeptService {
                 }
             }
         }
-        List<DeptDto> list = deptMapper.toDto(deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort));
+        List<DeptDto> list = deptMapper.toDto(deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort), new CycleAvoidingMappingContext());
         // 如果为空，就代表为自定义权限或者本级权限，就需要去重，不理解可以注释掉，看查询结果
         if (StringUtils.isBlank(dataScopeType)) {
             return deduplication(list);
@@ -103,7 +104,7 @@ public class DeptServiceImpl implements DeptService {
     public DeptDto findById(Long id) {
         Dept dept = deptRepository.findById(id).orElseGet(Dept::new);
         ValidationUtil.isNull(dept.getId(), "Dept", "id", id);
-        return deptMapper.toDto(dept);
+        return deptMapper.toDto(dept, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -184,7 +185,7 @@ public class DeptServiceImpl implements DeptService {
     @Transactional(rollbackFor = Exception.class)
     public Set<DeptDto> getDeleteDepts(List<Dept> menuList, Set<DeptDto> deptDtos) {
         for (Dept dept : menuList) {
-            deptDtos.add(deptMapper.toDto(dept));
+            deptDtos.add(deptMapper.toDto(dept, new CycleAvoidingMappingContext()));
             List<Dept> depts = deptRepository.findByPid(dept.getId());
             if (depts != null && !depts.isEmpty()) {
                 getDeleteDepts(depts, deptDtos);
@@ -210,7 +211,7 @@ public class DeptServiceImpl implements DeptService {
     public List<DeptDto> getSuperior(DeptDto deptDto, List<Dept> depts) {
         if (deptDto.getPid() == null) {
             depts.addAll(deptRepository.findByPidIsNull());
-            return deptMapper.toDto(depts);
+            return deptMapper.toDto(depts, new CycleAvoidingMappingContext());
         }
         depts.addAll(deptRepository.findByPid(deptDto.getPid()));
         return getSuperior(findById(deptDto.getPid()), depts);
@@ -255,7 +256,7 @@ public class DeptServiceImpl implements DeptService {
     @Override
     public void verification(Set<DeptDto> deptDtos) {
 //        dto 2 entity
-        var deptList = deptMapper.toEntity(new ArrayList<>(deptDtos));
+        var deptList = deptMapper.toEntity(new ArrayList<>(deptDtos), new CycleAvoidingMappingContext());
         if (Boolean.TRUE.equals(userRepository.existsByDeptIn(deptList)))
             throw new BadRequestException("所选部门存在用户关联，请解除后再试！");
         if (Boolean.TRUE.equals(roleRepository.existsByDeptsIn(deptList)))

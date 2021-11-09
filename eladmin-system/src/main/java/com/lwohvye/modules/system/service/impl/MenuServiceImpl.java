@@ -18,6 +18,7 @@ package com.lwohvye.modules.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.system.domain.Menu;
@@ -85,7 +86,7 @@ public class MenuServiceImpl implements MenuService {
                 }
             }
         }
-        return menuMapper.toDto(menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort));
+        return menuMapper.toDto(menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -94,7 +95,7 @@ public class MenuServiceImpl implements MenuService {
     public MenuDto findById(long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
-        return menuMapper.toDto(menu);
+        return menuMapper.toDto(menu, new CycleAvoidingMappingContext());
     }
 
     /**
@@ -110,7 +111,7 @@ public class MenuServiceImpl implements MenuService {
         List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
         LinkedHashSet<Menu> menus = menuRepository.findByRoleIdsAndTypeNot(roleIds, 2);
-        return menus.stream().map(menuMapper::toDto).toList();
+        return menus.stream().map(menu -> menuMapper.toDto(menu, new CycleAvoidingMappingContext())).toList();
     }
 
     @Override
@@ -233,7 +234,7 @@ public class MenuServiceImpl implements MenuService {
         } else {
             menus = menuRepository.findByPidIsNull();
         }
-        return menuMapper.toDto(menus);
+        return menuMapper.toDto(menus, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -241,7 +242,7 @@ public class MenuServiceImpl implements MenuService {
     public List<MenuDto> getSuperior(MenuDto menuDto, List<Menu> menus) {
         if (menuDto.getPid() == null) {
             menus.addAll(menuRepository.findByPidIsNull());
-            return menuMapper.toDto(menus);
+            return menuMapper.toDto(menus, new CycleAvoidingMappingContext());
         }
         menus.addAll(menuRepository.findByPid(menuDto.getPid()));
         return getSuperior(findById(menuDto.getPid()), menus);
@@ -318,7 +319,7 @@ public class MenuServiceImpl implements MenuService {
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
         return menuRepository.findByRoleIdsAndPidIsNullAndTypeNot(roleIds, 2).orElseGet(LinkedHashSet::new)
                 .parallelStream().map(menu -> {
-                    var dto = menuMapper.toDto(menu);
+                    var dto = menuMapper.toDto(menu, new CycleAvoidingMappingContext());
                     var id = dto.getId();
                     dto.setChildren(getChild4CurUser(id, roleIds));
                     return dto;
@@ -329,7 +330,7 @@ public class MenuServiceImpl implements MenuService {
     private List<MenuDto> getChild4CurUser(Long pid, Set<Long> roleIds) {
         return menuRepository.findByRoleIdsAndPidAndTypeNot(roleIds, pid, 2).orElseGet(LinkedHashSet::new)
                 .parallelStream().map(menu -> {
-                    var dto = menuMapper.toDto(menu);
+                    var dto = menuMapper.toDto(menu, new CycleAvoidingMappingContext());
                     var id = dto.getId();
                     dto.setChildren(getChild4CurUser(id, roleIds));
                     return dto;

@@ -17,6 +17,7 @@ package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.domain.Deploy;
@@ -73,13 +74,13 @@ public class DeployServiceImpl implements DeployService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployQueryCriteria criteria, Pageable pageable) {
         Page<Deploy> page = deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(deployMapper::toDto));
+        return PageUtil.toPage(page.map(deploy -> deployMapper.toDto(deploy, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DeployDto> queryAll(DeployQueryCriteria criteria) {
-        return deployMapper.toDto(deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return deployMapper.toDto(deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -87,7 +88,7 @@ public class DeployServiceImpl implements DeployService {
     public DeployDto findById(Long id) {
         Deploy deploy = deployRepository.findById(id).orElseGet(Deploy::new);
         ValidationUtil.isNull(deploy.getId(), "Deploy", "id", id);
-        return deployMapper.toDto(deploy);
+        return deployMapper.toDto(deploy, new CycleAvoidingMappingContext());
     }
 
     @Override

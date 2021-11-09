@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.system.domain.Dict;
 import com.lwohvye.modules.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.DictService;
@@ -54,14 +55,14 @@ public class DictServiceImpl implements DictService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictQueryCriteria criteria, Pageable pageable) {
         Page<Dict> page = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(dictMapper::toDto));
+        return PageUtil.toPage(page.map(dict -> dictMapper.toDto(dict, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DictDto> queryAll(DictQueryCriteria criteria) {
         List<Dict> list = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return dictMapper.toDto(list);
+        return dictMapper.toDto(list, new CycleAvoidingMappingContext());
     }
 
     @Override

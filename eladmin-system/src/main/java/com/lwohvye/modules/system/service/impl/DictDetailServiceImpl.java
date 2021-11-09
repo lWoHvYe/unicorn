@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.system.domain.DictDetail;
 import com.lwohvye.modules.system.repository.DictDetailRepository;
 import com.lwohvye.modules.system.repository.DictRepository;
@@ -56,7 +57,7 @@ public class DictDetailServiceImpl implements DictDetailService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictDetailQueryCriteria criteria, Pageable pageable) {
         Page<DictDetail> page = dictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(dictDetailMapper::toDto));
+        return PageUtil.toPage(page.map(dictDetail -> dictDetailMapper.toDto(dictDetail, new CycleAvoidingMappingContext())));
     }
 
     @Override
@@ -80,7 +81,7 @@ public class DictDetailServiceImpl implements DictDetailService {
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = " #root.target.getSysName() + 'name:' + #p0")
     public List<DictDetailDto> getDictByName(String name) {
-        return dictDetailMapper.toDto(dictDetailRepository.findByDictName(name));
+        return dictDetailMapper.toDto(dictDetailRepository.findByDictName(name), new CycleAvoidingMappingContext());
     }
 
     @Override

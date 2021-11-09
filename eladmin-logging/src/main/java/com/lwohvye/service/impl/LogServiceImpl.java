@@ -18,6 +18,7 @@ package com.lwohvye.service.impl;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.domain.Log;
 import com.lwohvye.repository.LogRepository;
 import com.lwohvye.service.LogService;
@@ -62,7 +63,7 @@ public class LogServiceImpl implements LogService {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         String status = "ERROR";
         if (status.equals(criteria.getLogType())) {
-            return PageUtil.toPage(page.map(logErrorMapper::toDto));
+            return PageUtil.toPage(page.map(errInfo -> logErrorMapper.toDto(errInfo, new CycleAvoidingMappingContext())));
         }
         return page;
     }
@@ -77,7 +78,7 @@ public class LogServiceImpl implements LogService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
-        return PageUtil.toPage(page.map(logSmallMapper::toDto));
+        return PageUtil.toPage(page.map(logInfo -> logSmallMapper.toDto(logInfo, new CycleAvoidingMappingContext())));
     }
 
     /**

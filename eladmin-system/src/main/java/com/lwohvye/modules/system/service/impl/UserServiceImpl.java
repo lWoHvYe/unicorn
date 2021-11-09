@@ -19,6 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.FileProperties;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
@@ -71,14 +72,14 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
         var page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(userMapper::toDto));
+        return PageUtil.toPage(page.map(user -> userMapper.toDto(user, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
         List<User> users = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return userMapper.toDto(users);
+        return userMapper.toDto(users, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -96,7 +97,7 @@ public class UserServiceImpl implements UserService {
     public UserDto findById(long id) {
         User user = userRepository.findById(id).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", id);
-        return userMapper.toDto(user);
+        return userMapper.toDto(user, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -198,7 +199,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new EntityNotFoundException(User.class, "name", userName);
         } else {
-            return userMapper.toDto(user);
+            return userMapper.toDto(user, new CycleAvoidingMappingContext());
         }
     }
 

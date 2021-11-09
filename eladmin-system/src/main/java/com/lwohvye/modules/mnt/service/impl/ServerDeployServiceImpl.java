@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.mnt.service.impl;
 
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.mnt.domain.ServerDeploy;
 import com.lwohvye.modules.mnt.repository.ServerDeployRepository;
 import com.lwohvye.modules.mnt.service.ServerDeployService;
@@ -51,13 +52,13 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
         Page<ServerDeploy> page = serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(serverDeployMapper::toDto));
+        return PageUtil.toPage(page.map(serverDeploy -> serverDeployMapper.toDto(serverDeploy, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria) {
-        return serverDeployMapper.toDto(serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return serverDeployMapper.toDto(serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -65,14 +66,14 @@ public class ServerDeployServiceImpl implements ServerDeployService {
     public ServerDeployDto findById(Long id) {
         ServerDeploy server = serverDeployRepository.findById(id).orElseGet(ServerDeploy::new);
         ValidationUtil.isNull(server.getId(), "ServerDeploy", "id", id);
-        return serverDeployMapper.toDto(server);
+        return serverDeployMapper.toDto(server, new CycleAvoidingMappingContext());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerDeployDto findByIp(String ip) {
         ServerDeploy deploy = serverDeployRepository.findByIp(ip);
-        return serverDeployMapper.toDto(deploy);
+        return serverDeployMapper.toDto(deploy, new CycleAvoidingMappingContext());
     }
 
     @Override

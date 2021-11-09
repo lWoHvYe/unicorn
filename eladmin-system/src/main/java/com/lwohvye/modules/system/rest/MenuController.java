@@ -17,6 +17,7 @@ package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.base.BaseEntity.Update;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.service.MenuService;
@@ -85,7 +86,7 @@ public class MenuController {
         Set<Menu> menuSet = new HashSet<>();
         List<MenuDto> menuList = menuService.getMenus(id);
         menuSet.add(menuService.findOne(id));
-        menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList), menuSet);
+        menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList, new CycleAvoidingMappingContext()), menuSet);
         Set<Long> ids = menuSet.stream().map(Menu::getId).collect(Collectors.toSet());
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
@@ -143,7 +144,7 @@ public class MenuController {
         for (Long id : ids) {
             List<MenuDto> menuList = menuService.getMenus(id);
             menuSet.add(menuService.findOne(id));
-            menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList), menuSet);
+            menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList, new CycleAvoidingMappingContext()), menuSet);
         }
         menuService.delete(menuSet);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);

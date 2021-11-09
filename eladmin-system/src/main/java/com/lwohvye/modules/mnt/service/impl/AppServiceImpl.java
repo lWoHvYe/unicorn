@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.mnt.service.impl;
 
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.repository.AppRepository;
@@ -51,13 +52,13 @@ public class AppServiceImpl implements AppService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(AppQueryCriteria criteria, Pageable pageable) {
         Page<App> page = appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(appMapper::toDto));
+        return PageUtil.toPage(page.map(app -> appMapper.toDto(app, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<AppDto> queryAll(AppQueryCriteria criteria) {
-        return appMapper.toDto(appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return appMapper.toDto(appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -65,7 +66,7 @@ public class AppServiceImpl implements AppService {
     public AppDto findById(Long id) {
         App app = appRepository.findById(id).orElseGet(App::new);
         ValidationUtil.isNull(app.getId(), "App", "id", id);
-        return appMapper.toDto(app);
+        return appMapper.toDto(app, new CycleAvoidingMappingContext());
     }
 
     @Override

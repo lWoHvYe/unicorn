@@ -16,6 +16,7 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.mnt.domain.Database;
 import com.lwohvye.modules.mnt.repository.DatabaseRepository;
 import com.lwohvye.modules.mnt.service.DatabaseService;
@@ -54,13 +55,13 @@ public class DatabaseServiceImpl implements DatabaseService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable) {
         Page<Database> page = databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(databaseMapper::toDto));
+        return PageUtil.toPage(page.map(database -> databaseMapper.toDto(database, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria) {
-        return databaseMapper.toDto(databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return databaseMapper.toDto(databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -68,7 +69,7 @@ public class DatabaseServiceImpl implements DatabaseService {
     public DatabaseDto findById(String id) {
         Database database = databaseRepository.findById(id).orElseGet(Database::new);
         ValidationUtil.isNull(database.getId(), "Database", "id", id);
-        return databaseMapper.toDto(database);
+        return databaseMapper.toDto(database, new CycleAvoidingMappingContext());
     }
 
     @Override

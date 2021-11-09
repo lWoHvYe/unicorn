@@ -17,6 +17,7 @@ package com.lwohvye.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.config.FileProperties;
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.repository.LocalStorageRepository;
@@ -56,13 +57,13 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable) {
         Page<LocalStorage> page = localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(localStorageMapper::toDto));
+        return PageUtil.toPage(page.map(localStorage -> localStorageMapper.toDto(localStorage, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria) {
-        return localStorageMapper.toDto(localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+        return localStorageMapper.toDto(localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -70,7 +71,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
     public LocalStorageDto findById(Long id) {
         LocalStorage localStorage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);
         ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", id);
-        return localStorageMapper.toDto(localStorage);
+        return localStorageMapper.toDto(localStorage, new CycleAvoidingMappingContext());
     }
 
     @Override

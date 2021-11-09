@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.system.domain.Job;
@@ -56,14 +57,14 @@ public class JobServiceImpl implements JobService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
         Page<Job> page = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(jobMapper::toDto).getContent(), page.getTotalElements());
+        return PageUtil.toPage(page.map(job -> jobMapper.toDto(job, new CycleAvoidingMappingContext())));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<JobDto> queryAll(JobQueryCriteria criteria) {
         List<Job> list = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return jobMapper.toDto(list);
+        return jobMapper.toDto(list, new CycleAvoidingMappingContext());
     }
 
     @Override
@@ -72,7 +73,7 @@ public class JobServiceImpl implements JobService {
     public JobDto findById(Long id) {
         Job job = jobRepository.findById(id).orElseGet(Job::new);
         ValidationUtil.isNull(job.getId(), "Job", "id", id);
-        return jobMapper.toDto(job);
+        return jobMapper.toDto(job, new CycleAvoidingMappingContext());
     }
 
     @Override
