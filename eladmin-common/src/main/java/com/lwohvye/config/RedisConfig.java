@@ -15,7 +15,7 @@
  */
 package com.lwohvye.config;
 
-import com.alibaba.fastjson.JSON;
+import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.serializer.FastJsonRedisSerializer;
 import com.lwohvye.utils.serializer.StringRedisSerializer;
 import lombok.extern.slf4j.Slf4j;
@@ -140,7 +140,7 @@ public class RedisConfig extends CachingConfigurerSupport {
                 container.put(String.valueOf(i), params[i]);
             }
             // 转为JSON字符串
-            String jsonString = JSON.toJSONString(container);
+            String jsonString = JsonUtils.toJSONString(container);
             // 做SHA256 Hash计算，得到一个SHA256摘要作为Key
             var sha256Hex = DigestUtils.sha256Hex(jsonString);
             var classSimpleName = targetClassClass.getSimpleName();

@@ -15,16 +15,13 @@
  */
 package com.lwohvye.base;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.context.CycleAvoidingMappingContext;
+import com.lwohvye.utils.JsonUtils;
 import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Zheng Jie
@@ -75,16 +72,20 @@ public interface BaseMapper<D, E> {
      */
     List<D> toDto(List<E> entityList, @Context CycleAvoidingMappingContext context);
 
-    //    通用的JSONObject/JSONArray与String互转的方法。当入是A出是B时，会自动调用相关的规则，这里配置会作为默认的转换规则。欲使用其他的，可使用@Mapping(target="",expression="java(method...)")
-    default JSONObject convertString2JSONObject(String in) {
-        return StrUtil.isNotBlank(in) ? JSONObject.parseObject(in) : new JSONObject();
+    //    通用的Map/List与Json-String互转的方法。当入是A出是B时，会自动调用相关的规则，这里配置会作为默认的转换规则。欲使用其他的，可使用@Mapping(target="",expression="java(method...)")
+    default Map convertString2JsonMap(String in) {
+        return JsonUtils.toMap(in);
     }
 
-    default JSONArray convertString2JSONArray(String in) {
-        return StrUtil.isNotBlank(in) ? JSONArray.parseArray(in) : new JSONArray();
+    default List convertString2JsonList(String in) {
+        return JsonUtils.toList(in);
     }
 
-    default String convertJSON2String(JSON in) {
-        return ObjectUtil.isNotNull(in) ? in.toJSONString() : "";
+    default String convertMap2String(Map in) {
+        return JsonUtils.toJSONString(in);
+    }
+
+    default String convertList2String(List in) {
+        return JsonUtils.toJSONString(in);
     }
 }

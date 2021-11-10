@@ -67,11 +67,11 @@ public class JsonUtils {
     // region   toJSONString
 
     public static String toJSONString(Object obj) {
-        return Objects.isNull(obj) ? toJSONString(obj, () -> "", false) : "";
+        return toJSONString(obj, () -> "", false);
     }
 
     public static String toFormatJSONString(Object obj) {
-        return Objects.isNull(obj) ? toJSONString(obj, () -> "", true) : "";
+        return toJSONString(obj, () -> "", true);
     }
 
     /**

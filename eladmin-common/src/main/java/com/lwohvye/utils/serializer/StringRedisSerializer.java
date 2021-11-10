@@ -16,7 +16,7 @@
 package com.lwohvye.utils.serializer;
 
 import cn.hutool.core.lang.Assert;
-import com.alibaba.fastjson.JSON;
+import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -55,7 +55,7 @@ public class StringRedisSerializer implements RedisSerializer<Object> {
             string = str;
         else
             // 非String类型的key比较少。
-            string = JSON.toJSONString(object);
+            string = JsonUtils.toJSONString(object);
         if (StringUtils.isBlank(string))
             return new byte[0];
 //        string = string.replace("\"", "");

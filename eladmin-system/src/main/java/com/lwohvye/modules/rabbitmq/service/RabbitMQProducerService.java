@@ -16,10 +16,9 @@
 package com.lwohvye.modules.rabbitmq.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.utils.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +40,12 @@ public class RabbitMQProducerService {
      * @date 2021/4/27 2:49 下午
      */
     public void sendMsg(AmqpMsgEntity amqpMsgEntity) {
-        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.DATA_SYNC_ROUTE_KEY, JSONObject.toJSONString(amqpMsgEntity));
+        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.DATA_SYNC_ROUTE_KEY, JsonUtils.toJSONString(amqpMsgEntity));
 
     }
 
     public void sendMsg(String exchangeName, String routeKey, AmqpMsgEntity amqpMsgEntity) {
-        amqpTemplate.convertAndSend(exchangeName, routeKey, JSONObject.toJSONString(amqpMsgEntity));
+        amqpTemplate.convertAndSend(exchangeName, routeKey, JsonUtils.toJSONString(amqpMsgEntity));
     }
 
     /**
@@ -60,7 +59,7 @@ public class RabbitMQProducerService {
      */
     public void sendTTLMsg(AmqpMsgEntity amqpMsgEntity) {
         //给延迟队列发送消息
-        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_TTL_EXCHANGE, RabbitMqConfig.DATA_SYNC_TTL_ROUTE_KEY, JSONObject.toJSONString(amqpMsgEntity),
+        amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_TTL_EXCHANGE, RabbitMqConfig.DATA_SYNC_TTL_ROUTE_KEY, JsonUtils.toJSONString(amqpMsgEntity),
                 message -> {
 //                    将延时转为毫秒值
                     var expire = amqpMsgEntity.getExpire();
@@ -81,7 +80,7 @@ public class RabbitMQProducerService {
      */
     public void sendDelayMsg(AmqpMsgEntity commonEntity) {
         amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_DELAY_EXCHANGE,
-                RabbitMqConfig.DATA_COMMON_DELAY_ROUTE_KEY, JSON.toJSONString(commonEntity),
+                RabbitMqConfig.DATA_COMMON_DELAY_ROUTE_KEY, JsonUtils.toJSONString(commonEntity),
                 message -> {
                     var expire = commonEntity.getExpire();
                     var timeUnit = commonEntity.getTimeUnit();
@@ -95,7 +94,7 @@ public class RabbitMQProducerService {
     }
 
     public void sendDelayMsg(String exchangeName, String routeKey, AmqpMsgEntity commonEntity) {
-        amqpTemplate.convertAndSend(exchangeName, routeKey, JSON.toJSONString(commonEntity),
+        amqpTemplate.convertAndSend(exchangeName, routeKey, JsonUtils.toJSONString(commonEntity),
                 message -> {
                     var expire = commonEntity.getExpire();
                     var timeUnit = commonEntity.getTimeUnit();
@@ -115,7 +114,7 @@ public class RabbitMQProducerService {
      */
     public void sendSyncDelayMsg(AmqpMsgEntity commonEntity) {
         amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_SYNC_DELAY_EXCHANGE, "xxx.xxx",
-                JSON.toJSONString(commonEntity),
+                JsonUtils.toJSONString(commonEntity),
                 message -> {
                     // 延迟 500ms
                     message.getMessageProperties().setHeader("x-delay", 500L);

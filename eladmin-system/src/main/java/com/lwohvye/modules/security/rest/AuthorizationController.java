@@ -16,7 +16,6 @@
 package com.lwohvye.modules.security.rest;
 
 import cn.hutool.core.util.IdUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
@@ -32,6 +31,7 @@ import com.lwohvye.modules.security.security.TokenProvider;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.dto.AuthUserDto;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
+import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.StringUtils;
@@ -118,11 +118,11 @@ public class AuthorizationController {
             authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
             // catch的异常是密码错误的，别的异常不会catch及发消息
         } catch (BadCredentialsException e) {
-            var infoMap = new JSONObject();
+            var infoMap = new HashMap<String, Object>();
             infoMap.put("ip", ip);
             infoMap.put("username", username);
             infoMap.put("lockedIp", lockedIp);
-            var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(infoMap.toJSONString()).setExtraData("solveAuthFailed");
+            var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(JsonUtils.toJSONString(infoMap)).setExtraData("solveAuthFailed");
 //            发送消息
             rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
             throw e;

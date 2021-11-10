@@ -17,13 +17,13 @@ package com.lwohvye.modules.system.service.local;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.domain.Log;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.repository.LogRepository;
+import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,9 +72,9 @@ public class AuthMQService {
     public void solveAuthFailed(String record) {
         if (StrUtil.isBlank(record))
             return;
-        var infoJson = JSONObject.parseObject(record);
-        var ip = infoJson.getString("ip");
-        var username = infoJson.getString("username");
+        var infoMap = JsonUtils.toMap(record);
+        var ip = JsonUtils.getString(infoMap, "ip");
+        var username = JsonUtils.getString(infoMap, "username");
         //          使用 用户名 + ip 作为key
         String authFailedKey = username + "||authFailed||" + ip;
         var countKey = "failed-count";
@@ -91,7 +91,7 @@ public class AuthMQService {
                 redisUtils.hPut(authFailedKey, countKey, failCount);
             }
         } else {
-            var lockedIp = infoJson.getString("lockedIp");
+            var lockedIp = JsonUtils.getString(infoMap, "lockedIp");
             // 限制Ip登录 15分钟
             redisUtils.set(lockedIp, authFailedKey, 15L, TimeUnit.MINUTES);
 

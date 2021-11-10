@@ -23,11 +23,11 @@ import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.domain.vo.MailVo;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.system.service.local.AuthMQService;
+import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.MailUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -63,7 +63,7 @@ public class RabbitMQDelayMsgConsumerService {
 
     @RabbitHandler
     public void handle(String amqpMsgEntityStr) {
-        var amqpMsgEntity = JSONObject.parseObject(amqpMsgEntityStr, AmqpMsgEntity.class);
+        var amqpMsgEntity = JsonUtils.toJavaObject(amqpMsgEntityStr, AmqpMsgEntity.class);
         var msgType = amqpMsgEntity.getMsgType();
         var msgData = amqpMsgEntity.getMsgData();
         try {
