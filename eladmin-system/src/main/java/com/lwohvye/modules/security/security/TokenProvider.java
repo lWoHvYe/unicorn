@@ -68,6 +68,7 @@ public class TokenProvider implements InitializingBean {
      * @return /
      */
     public String createToken(Authentication authentication) {
+        // TODO: 2021/11/10 这个Token具体包含了什么，以及更深层的逻辑
         return jwtBuilder
                 // 加入ID确保生成的 Token 都不一致
                 .setId(IdUtil.simpleUUID())

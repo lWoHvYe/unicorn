@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
  * AOP方案也只是做异常处理。可以使用全局异常处理的方式替换。参照这个https://www.lwohvye.com/2021/01/07/736/
  * 这个可以借鉴的是，通过以某个类型为切点，可以在方法执行前后做些事情。不同于日志
  * @date 2020/1/14 13:45
+ * @see com.lwohvye.exception.handler.ApiGlobalExceptionHandler 新的统一异常处理
+ * @see com.lwohvye.utils.result.ResultInfo 统一结果返回
  */
-// TODO: 2021/1/9 ControllerAopAspect和ResultModel可能需要重做。使用统一异常处理+ResultInfo的形式。更加通用。该方法已不使用
+// ControllerAopAspect和ResultModel可能需要重做。使用统一异常处理+ResultInfo的形式。更加通用。该方法已不使用
 @Order(2)
 @Component
 @Aspect

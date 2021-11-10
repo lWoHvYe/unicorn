@@ -33,10 +33,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import org.springframework.web.util.WebUtils;
-import org.xnio.Result;
 
 import java.lang.annotation.Annotation;
 
+/**
+ * @description 这也是一种统一数据返回的方式。可视情况整合。与{@link ResponseResultBody}配合使用
+ * @date 2021/11/10 12:42 下午
+ */
 @Slf4j
 @RestControllerAdvice
 public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {

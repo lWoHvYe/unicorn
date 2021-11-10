@@ -25,7 +25,7 @@ import java.io.Serializable;
 /**
  * @packageName com.lwohvye.util
  * @className ResultBean
- * @description 通用的数据返回，及数据获取异常处理，优化返回逻辑
+ * @description 通用的数据返回，及数据获取异常处理，优化返回逻辑。与{@link com.lwohvye.aop.ControllerAopAspect} 配合使用
  * 这个方式建议和日志的合起来。放到一个切面里处理。但无法处理返回是void的。
  * 可考虑使用MallService2B中的ResultInfo相关，配合统一的异常处理来替换
  * @date 2020/1/14 8:41

@@ -25,8 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.data.domain.Pageable;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.*;
 import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.schema.AlternateTypeRule;
 import springfox.documentation.schema.AlternateTypeRuleConvention;
@@ -64,27 +63,44 @@ public class SwaggerConfig {
     @Bean
     @SuppressWarnings("all")
     public Docket createRestApi() {
+        // 可以通过RequestParameter定义些公共的请求参数，以下只是实例
+        var ticketPar = new RequestParameterBuilder();
+        var pars = new ArrayList<RequestParameter>();
+        ticketPar.name("platform")
+                .description("平台信息（标识）")
+                // 这里设置放到请求头里
+                .in(ParameterType.HEADER)
+                .required(false)
+                .build();
+        pars.add(ticketPar.build());
+        // ------------------------公共参数定义结束-------------------------------
         return new Docket(DocumentationType.SWAGGER_2)
                 .enable(enabled)
                 .pathMapping("/")
+//                .groupName("核心Api文档")
                 .apiInfo(apiInfo())
                 .select()
+//                api可以分组。下面指定了该组对应的package路径
+//                .apis(RequestHandlerSelectors.basePackage("com.lwohvye.modules"))
 //                .paths(Predicates.not(PathSelectors.regex("/error.*")))
                 .paths(PathSelectors.any())
                 .build()
                 //添加登陆认证
                 .securitySchemes(securitySchemes())
-                .securityContexts(securityContexts());
+                .securityContexts(securityContexts())
+                // 设置公共参数
+                .globalRequestParameters(pars);
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .description("1101100_1010111_1101111_1001000_1110110_1011001_1100101")
-                .title("lWoHvYe")
-                .version("2.6.4")
+                .title("王红岩- -lWoHvYe")
+                .version("2.6.16")
                 .build();
     }
 
+    // 授权信息
     private List<SecurityScheme> securitySchemes() {
         //设置请求头信息
         var securitySchemes = new ArrayList<SecurityScheme>();
@@ -93,6 +109,7 @@ public class SwaggerConfig {
         return securitySchemes;
     }
 
+    // 授权信息应用到上下文
     private List<SecurityContext> securityContexts() {
         //设置需要登录认证的路径
         List<SecurityContext> securityContexts = new ArrayList<>();

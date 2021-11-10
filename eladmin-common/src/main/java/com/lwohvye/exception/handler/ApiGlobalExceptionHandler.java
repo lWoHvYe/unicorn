@@ -37,11 +37,11 @@ import java.util.Objects;
 
 
 /**
- * 全局异常处理
+ * 全局异常处理，替代原异常处理类{@link GlobalExceptionHandler}
  * Created by cy on 2021/01/08.
  */
 @RestControllerAdvice
-// 使用Order使其先于GlobalExceptionHandler执行。原统一异常处理可移除
+// 使用Order使其先于GlobalExceptionHandler执行，这里把优先级设置为了最高。原统一异常处理可移除
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
 public class ApiGlobalExceptionHandler {

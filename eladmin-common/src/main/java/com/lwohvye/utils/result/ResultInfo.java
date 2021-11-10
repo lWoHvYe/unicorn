@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * 通用返回对象
+ * 通用返回对象。与统一异常处理。配套的统一异常处理{@link com.lwohvye.exception.handler.ApiGlobalExceptionHandler}类
  * Created by cy on 2021/01/08.
  */
 @Getter

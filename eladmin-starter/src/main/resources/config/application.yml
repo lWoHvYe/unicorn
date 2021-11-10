@@ -63,6 +63,10 @@ task:
     keep-alive-seconds: 60
     # 队列容量
     queue-capacity: 50
+    # 关闭时，等待所有任务完成再销毁
+    wait-for-tasks-to-complete: true
+    # 最大等待时间
+    await-termination-seconds: 60
 
   #七牛云
   #qiniu:

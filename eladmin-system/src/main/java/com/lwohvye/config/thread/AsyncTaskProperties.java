@@ -36,4 +36,8 @@ public class AsyncTaskProperties {
     private int keepAliveSeconds;
 
     private int queueCapacity;
+
+    private boolean waitForTasksToComplete = true;
+
+    private int awaitTerminationSeconds = 60;
 }

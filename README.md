@@ -17,11 +17,13 @@
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.16.jar >nohup.out 2>&1 &
 
 若外置依赖启动参数需添加。外置依赖可以大大减少jar包的体积。方便后续更新部署
+
 ```shell
 -Dloader.path=lib 
 #启动示例
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.16.jar >nohup.out 2>&1 &
 ```
+
 | key                | 目的                                                         |
 | ------------------ | ------------------------------------------------------------ |
 | loader.path        | lib包加载路径                                                |
@@ -48,6 +50,7 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 --add-opens java.desktop/java.awt.font=ALL-UNNAMED
 
 #### 项目简介
+
 一个基于 Spring Boot 2.5.6 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
 
 **开发文档：**  [https://el-admin.vip](https://el-admin.vip)
@@ -65,6 +68,7 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 |  github   |   https://github.com/lWoHvYe/eladmin | |
 
 #### 主要特性
+
 - 使用最新技术栈，社区资源丰富。
 - 高效率开发，代码生成器可一键生成前后端代码
 - 支持数据字典，可方便地对一些状态进行管理
@@ -80,7 +84,8 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
 - 基于最新的Java-17。
 
-####  系统功能
+#### 系统功能
+
 - 用户管理：提供用户的相关配置，新增用户后，默认密码为123456
 - 角色管理：对权限与菜单进行分配，可根据部门设置角色的数据权限
 - 菜单管理：已实现菜单动态路由，后端可配置化，支持多级菜单
@@ -99,6 +104,7 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 - 运维管理：一键部署你的应用
 
 #### 项目结构
+
 项目采用按功能分模块的开发方式，结构如下
 
 - `eladmin-common` 为系统的公共模块，各种工具类，公共配置存在该模块
@@ -159,12 +165,15 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 - 感谢 [d15801543974](https://github.com/d15801543974) 大佬提供的基于注解的通用查询方式
 
 #### 项目捐赠
+
 项目的发展离不开你的支持，请作者喝杯咖啡吧☕  [Donate](https://el-admin.vip/donation/)
 
 #### 反馈交流
+
 - QQ交流群：一群：<strike>891137268</strike> 已满、二群：947578238
 
 #### 启动类示例
+
 ```java
 
 /*
@@ -234,7 +243,9 @@ public class AppRun {
     }
 }
 ```
+
 #### MapStruct介绍
+
 | Option                                           | Purpose                                                      | Default   |
 | :----------------------------------------------- | :----------------------------------------------------------- | :-------- |
 | `mapstruct. suppressGeneratorTimestamp`          | If set to `true`, the creation of a time stamp in the `@Generated` annotation in the generated mapper classes is suppressed. | `false`   |
@@ -244,7 +255,6 @@ public class AppRun {
 | `mapstruct.defaultInjectionStrategy`             | The type of the injection in mapper via parameter `uses`. This is only used on annotated based component models such as CDI, Spring and JSR 330.<br>Supported values are:<br>`field`: dependencies will be injected in fields<br>`constructor`: will be generated constructor. Dependencies will be injected via constructor.<br>When CDI `componentModel` a default constructor will also be generated. If a injection strategy is given for a specific mapper via `@Mapper#injectionStrategy()`, the value from the annotation takes precedence over the option. | `field`   |
 | `mapstruct.unmappedTargetPolicy`                 | The default reporting policy to be applied in case an attribute of the target object of a mapping method is not populated with a source value.<br>Supported values are:<br>`ERROR`: any unmapped target property will cause the mapping code generation to fail<br>`WARN`: any unmapped target property will cause a warning at build time<br>`IGNORE`: unmapped target properties are ignored<br>If a policy is given for a specific mapper via `@Mapper#unmappedTargetPolicy()`, the value from the annotation takes precedence. | `WARN`    |
 
-
 MapStruct 提供的重要注解 :
 
 @Mapper : 标记这个接口作为一个映射接口，并且是编译时 MapStruct 处理器的入口
@@ -252,17 +262,40 @@ MapStruct 提供的重要注解 :
 @Mapping : 解决源对象和目标对象中，属性名字不同的情况
 
 部署脚本
+
 ```shell
 mv -f /opt/upload/eladmin-system-2.6.16.jar /opt/app
 cd /opt/app
 nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.16.jar >nohup.out 2>&1 &
 ```
+
 启动脚本
+
 ```shell
+#!/bin/bash
 cd /opt/app
+echo "执行...."
 nohup /usr/java/jdk-17/bin/java -jar eladmin-system-2.6.16.jar >nohup.out 2>&1 &
+echo "启动成功"
 ```
+
+停止脚本
+
+```shell
+#!/bin/bash
+echo "stop SpringBoot BAppApiServerApplication"
+# shellcheck disable=SC2009
+pid=$(ps -ef | grep eladmin-system-2.6.16.jar | grep -v grep | awk '{print $2}')
+echo "旧应用进程id：$pid"
+if [ -n "$pid" ]
+then
+# 通过使用-15 而不是-9 来停止线程
+kill -15 "$pid"
+fi
+```
+
 #### TODO
+
 - 整合Redisson（当前无法配置过期通知，待解决）
 - 邮件通知相关验证
 - 阿里云OSS进一步整合
