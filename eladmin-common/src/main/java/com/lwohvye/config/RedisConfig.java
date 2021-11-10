@@ -54,22 +54,32 @@ public class RedisConfig extends CachingConfigurerSupport {
 
     /**
      * 设置 redis 数据默认过期时间，默认2小时
-     * 设置@cacheable 序列化方式
+     * 设置@Cacheable 序列化方式
      */
     @Bean
     public RedisCacheConfiguration redisCacheConfiguration() {
+        // @Cacheable类的缓存也使用FastJsonRedisSerializer
         FastJsonRedisSerializer<Object> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
         RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig();
-        configuration = configuration.serializeValuesWith(RedisSerializationContext.
-                SerializationPair.fromSerializer(fastJsonRedisSerializer)).entryTtl(Duration.ofHours(2));
+        configuration = configuration
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(fastJsonRedisSerializer))
+                .entryTtl(Duration.ofHours(2));
         return configuration;
     }
 
+    /**
+     * @param redisConnectionFactory
+     * @return org.springframework.data.redis.core.RedisTemplate
+     * @description 与RedisUtil一起使用
+     * @date 2021/11/11 1:25 上午
+     */
     @Bean(name = "redisTemplate")
     @ConditionalOnMissingBean(name = "redisTemplate")
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         var template = new RedisTemplate<>();
         //序列化
+        // 2021/11/11 使用Jackson2JsonRedisSerializer时，序列化的结果，在反序列化时会变为Object，丢失类型信息且无法强转成目标的实体。
+        // 在使用Redis缓存信息时，对于此类问题不是很好处理（除非每次都缓存前转成Json，缓存后再取出来，J2B转回原实体），故此处继续使用FastJson。
         var fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
         // value值的序列化采用fastJsonRedisSerializer
         template.setValueSerializer(fastJsonRedisSerializer);
@@ -86,6 +96,15 @@ public class RedisConfig extends CachingConfigurerSupport {
 //        ParserConfig.getGlobalInstance().setSafeMode(true);
         // 示例-autoTypeCheckHandler的添加。非safeMode模式下，不要开启下面的配置
 //        ParserConfig.getGlobalInstance().addAutoTypeCheckHandler(new GrantedAuthorityAutoTypeCheckHandler());
+        // 亦可使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
+//        var jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+//        var objectMapper = new ObjectMapper();
+//        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+//        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+//
+//        template.setValueSerializer(jackson2JsonRedisSerializer);
+//        template.setHashValueSerializer(jackson2JsonRedisSerializer);
 
         // key的序列化采用StringRedisSerializer
         template.setKeySerializer(new StringRedisSerializer());

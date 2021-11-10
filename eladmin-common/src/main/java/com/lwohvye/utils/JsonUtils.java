@@ -187,60 +187,35 @@ public class JsonUtils {
         return obj != null ? toJavaObject(obj, tClass) : null;
     }
 
-    // region   toMap
+    // region   toCollection
 
     public static Map<String, Object> toMap(Object obj) {
-        return toMap(obj, Collections::emptyMap);
+        return toT(obj, Map.class, Collections::emptyMap);
     }
-
-    /**
-     * @param obj
-     * @param defaultSupplier
-     * @return java.util.Map
-     * @description 将obj转成map，方便根据key取值
-     * @date 2021/11/10 9:53 下午
-     */
-    public static Map<String, Object> toMap(Object obj, Supplier<Map> defaultSupplier) {
-        try {
-            if (Objects.isNull(obj))
-                return defaultSupplier.get();
-
-            if (obj instanceof Map map)
-                return (Map<String, Object>) map;
-
-            return toJavaObject(obj, Map.class, defaultSupplier);
-        } catch (Exception e) {
-            log.error(String.format("toMap exception%n%s", obj), e);
-        }
-        return defaultSupplier.get();
-    }
-
-    // endregion
-
-    // region   toList
 
     public static List toList(Object obj) {
-        return toList(obj, Collections::emptyList);
+        return toT(obj, List.class, Collections::emptyList);
     }
 
     /**
      * @param obj
+     * @param tClass
      * @param defaultSuppler
-     * @return java.util.List
-     * @description 将对象转成常规的List
-     * @date 2021/11/10 9:54 下午
+     * @return T
+     * @description
+     * @date 2021/11/11 12:30 上午
      */
-    public static List toList(Object obj, Supplier<List> defaultSuppler) {
+    public static <T> T toT(Object obj, Class<T> tClass, Supplier<T> defaultSuppler) {
         try {
             if (Objects.isNull(obj))
                 return defaultSuppler.get();
 
-            if (obj instanceof List list)
-                return list;
+            if (tClass.isInstance(obj))
+                return tClass.cast(obj);
 
-            return toJavaObject(obj, List.class, defaultSuppler);
+            return toJavaObject(obj, tClass, defaultSuppler);
         } catch (Exception e) {
-            log.error("toList exception%n" + obj, e);
+            log.error(String.format("toEntity-T exception %n%s %n%s", tClass.getSimpleName(), obj), e);
         }
         return defaultSuppler.get();
     }
