@@ -36,7 +36,7 @@ public class LoginProperties {
     /**
      * 账号单用户 登录
      */
-    private boolean singleLogin = false;
+    private boolean singleLogin = true;
 
     private LoginCode loginCode;
 

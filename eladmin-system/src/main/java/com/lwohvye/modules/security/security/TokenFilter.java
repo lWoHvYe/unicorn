@@ -15,13 +15,13 @@
  */
 package com.lwohvye.modules.security.security;
 
-import cn.hutool.core.util.StrUtil;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.security.service.dto.OnlineUserDto;
 import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -40,27 +40,16 @@ import java.util.Objects;
 /**
  * @author /
  */
+@RequiredArgsConstructor
 public class TokenFilter extends GenericFilterBean {
     private static final Logger log = LoggerFactory.getLogger(TokenFilter.class);
 
 
-    private final TokenProvider tokenProvider;
-    private final SecurityProperties properties;
-    private final OnlineUserService onlineUserService;
-    private final UserCacheClean userCacheClean;
+    private final TokenProvider tokenProvider; // Token
+    private final SecurityProperties properties; // Jwt
+    private final OnlineUserService onlineUserService; // 在线用户
+    private final UserCacheClean userCacheClean; // 用户缓存清理
 
-    /**
-     * @param tokenProvider     Token
-     * @param properties        JWT
-     * @param onlineUserService 用户在线
-     * @param userCacheClean    用户缓存清理工具
-     */
-    public TokenFilter(TokenProvider tokenProvider, SecurityProperties properties, OnlineUserService onlineUserService, UserCacheClean userCacheClean) {
-        this.properties = properties;
-        this.onlineUserService = onlineUserService;
-        this.tokenProvider = tokenProvider;
-        this.userCacheClean = userCacheClean;
-    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
@@ -68,11 +57,17 @@ public class TokenFilter extends GenericFilterBean {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String token = resolveToken(httpServletRequest);
         // 对于 Token 为空的不需要去查 Redis
-        if (StrUtil.isNotBlank(token)) {
+        if (StringUtils.hasText(token)) {
             OnlineUserDto onlineUserDto = null;
             boolean cleanUserCache = false;
             try {
-                onlineUserDto = onlineUserService.getOne(SecuritySysUtil.getAuthToken(properties, token));
+                onlineUserDto = onlineUserService.getUserByToken(SecuritySysUtil.getAuthToken(properties, token));
+                if (!Objects.isNull(onlineUserDto)) {
+                    Authentication authentication = tokenProvider.getAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // Token 续期
+                    tokenProvider.checkRenewal(token);
+                }
             } catch (ExpiredJwtException e) {
                 log.error(e.getMessage());
                 cleanUserCache = true;
@@ -80,12 +75,6 @@ public class TokenFilter extends GenericFilterBean {
                 if (cleanUserCache || Objects.isNull(onlineUserDto)) {
                     userCacheClean.cleanUserCache(String.valueOf(tokenProvider.getClaims(token).get(TokenProvider.AUTHORITIES_KEY)));
                 }
-            }
-            if (onlineUserDto != null && StringUtils.hasText(token)) {
-                Authentication authentication = tokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                // Token 续期
-                tokenProvider.checkRenewal(token);
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);

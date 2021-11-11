@@ -153,14 +153,14 @@ public class OnlineUserService {
     }
 
     /**
-     * 查询用户
+     * 根据token从缓存中获取用户
      *
-     * @param key /
+     * @param authToken /
      * @return /
      */
-    public OnlineUserDto getOne(String key) {
+    public OnlineUserDto getUserByToken(String authToken) {
         // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
-        var userObj = redisUtils.get(key);
+        var userObj = redisUtils.get(authToken);
         if (Objects.isNull(userObj))
             return null;
         // 先转成JSONObject，再转成onlineUser
@@ -182,14 +182,12 @@ public class OnlineUserService {
             return;
         }
         for (OnlineUserDto onlineUserDto : onlineUserDtos) {
-            if (onlineUserDto.getUserName().equals(userName)) {
-                try {
-                    String token = EncryptUtils.aesDecrypt(onlineUserDto.getKey());
-                    if (StringUtils.isBlank(ignoreToken) || !ignoreToken.equals(token))
-                        this.kickOut(token);
-                } catch (Exception e) {
-                    log.error("checkUser is error", e);
-                }
+            try {
+                String token = EncryptUtils.aesDecrypt(onlineUserDto.getKey());
+                if (StringUtils.isBlank(ignoreToken) || !ignoreToken.equals(token))
+                    this.kickOut(token);
+            } catch (Exception e) {
+                log.error("checkUser is error", e);
             }
         }
     }
@@ -200,7 +198,7 @@ public class OnlineUserService {
      * @param username /
      */
     @Async
-    public void kickOutForUsername(String username) throws Exception {
+    public void kickOutForUsername(String username) {
         List<OnlineUserDto> onlineUsers = getAll(username);
         for (OnlineUserDto onlineUser : onlineUsers) {
             if (onlineUser.getUserName().equals(username)) {
