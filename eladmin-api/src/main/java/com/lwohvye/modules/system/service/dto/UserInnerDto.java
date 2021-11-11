@@ -17,6 +17,7 @@ package com.lwohvye.modules.system.service.dto;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lwohvye.base.BaseDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -33,7 +34,7 @@ import java.util.Set;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class UserInnerDto implements Serializable {
+public class UserInnerDto extends BaseDTO implements Serializable {
 
     private Long id;
 

@@ -136,6 +136,7 @@ public interface RoleService extends BaseService {
      */
     List<GrantedAuthority> mapToGrantedAuthorities(UserDto user);
 
+    @Deprecated(since = "2.6.16")
     List<GrantedAuthority> mapToGrantedAuthorities(Long userId, Boolean isAdmin);
 
     List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin);

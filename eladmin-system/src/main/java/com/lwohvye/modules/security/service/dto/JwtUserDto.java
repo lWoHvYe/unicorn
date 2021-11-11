@@ -21,7 +21,6 @@ import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -33,13 +32,12 @@ import java.util.List;
  * @date 2018-11-23
  */
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class JwtUserDto implements UserDetails {
 
-    private UserInnerDto user;
+    private final UserInnerDto user;
 
-    private List<Long> dataScopes;
+    private final List<Long> dataScopes;
 
     // 不做序列化，使用时进行转换
     @JsonIgnore

@@ -211,9 +211,6 @@ public class JsonUtils {
         return toJavaObject(obj, List.class, Collections::emptyList);
     }
 
-    public static <T> List<T> toList(Object obj, Class<T> tClass) {
-        return toJavaObject(obj, List.class, Collections::emptyList);
-    }
     // endregion
 
     // region 从map中获取指定类型的数据
