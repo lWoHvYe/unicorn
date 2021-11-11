@@ -15,11 +15,12 @@
  */
 package com.lwohvye.utils;
 
-import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -47,21 +48,30 @@ public class JsonUtils {
      * 设置一些通用的属性
      */
     static {
-        objectMapper = new ObjectMapper();
-        // 如果json中有新增的字段并且是实体类类中不存在的，不报错
-        // mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-        // 如果存在未知属性，则忽略不报错，允许pojo中有在json串中不存在的字段
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // 允许key没有双引号
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-        // 允许key有单引号
-        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        // 允许整数以0开头
-//        objectMapper.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS, true);
-        // 允许字符串中存在回车换行控制符
-//        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-        // 允许有注释
-        objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        /*
+        // Option 1, modifying when constructing JsonFactory
+        JsonFactory f = JsonFactory.builder().enable(JsonReadFeature.ALLOW_JAVA_COMMENTS).build();
+        // Option 2, modifying when constructing JsonMapper or base type ObjectMapper
+        JsonMapper m = JsonMapper.builder().enable(JsonReadFeature.ALLOW_JAVA_COMMENTS).build();
+        ObjectMapper m = JsonMapper.builder().enable(JsonReadFeature.ALLOW_JAVA_COMMENTS).build();
+        // Option 3: defining when creating ObjectReader instance
+        ObjectReader r = mapper.readerFor(MyType.class).with(JsonReadFeature.ALLOW_JAVA_COMMENTS);
+         */
+        objectMapper = JsonMapper.builder()
+                // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
+                // ones that do not map to a property, and there is no "any setter" or handler that can handle it
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                // 允许key没有双引号
+                .enable(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES)
+                // 允许key有单引号
+                .enable(JsonReadFeature.ALLOW_SINGLE_QUOTES)
+                // 允许整数以0开头
+                .enable(JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS)
+                // 允许字符串中存在回车换行控制符
+                .enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
+                // 允许有Java注释
+                .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+                .build();
     }
 
     // region   toJSONString
