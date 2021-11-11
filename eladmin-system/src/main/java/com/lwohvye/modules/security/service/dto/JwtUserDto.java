@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.security.service.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.SpringContextHolder;
@@ -42,7 +42,7 @@ public class JwtUserDto implements UserDetails {
     private final List<Long> dataScopes;
 
     // 不做序列化，使用时进行转换
-    @JSONField(serialize = false)
+    @JsonIgnore
     private final List<GrantedAuthority> authorities = new ArrayList<>();
 
     public Set<String> getRoles() {
@@ -50,13 +50,13 @@ public class JwtUserDto implements UserDetails {
     }
 
     @Override
-    @JSONField(serialize = false)
+    @JsonIgnore
     public String getPassword() {
         return user.getPassword();
     }
 
     @Override
-    @JSONField(serialize = false)
+    @JsonIgnore
     public String getUsername() {
         return user.getUsername();
     }
@@ -68,26 +68,26 @@ public class JwtUserDto implements UserDetails {
         return authorities;
     }
 
-    @JSONField(serialize = false)
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @JSONField(serialize = false)
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @JSONField(serialize = false)
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
-    @JSONField(serialize = false)
+    @JsonIgnore
     public boolean isEnabled() {
         return user.getEnabled();
     }

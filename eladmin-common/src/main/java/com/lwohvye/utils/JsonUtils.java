@@ -42,7 +42,7 @@ import java.util.function.Supplier;
 public class JsonUtils {
     // 加载速度太慢了，放在静态代码块中
     // private static final ObjectMapper mapper = new ObjectMapper();
-    private static ObjectMapper objectMapper;
+    private static final ObjectMapper objectMapper;
 
     /**
      * 设置一些通用的属性

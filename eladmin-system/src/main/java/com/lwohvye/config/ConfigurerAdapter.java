@@ -15,13 +15,15 @@
  */
 package com.lwohvye.config;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fastjson.support.config.FastJsonConfig;
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -30,6 +32,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,9 +92,8 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        // 使用 fastjson 序列化，会导致 @JsonIgnore 失效，可以使用 @JSONField(serialize = false) 替换
-        FastJsonHttpMessageConverter converter = new FastJsonHttpMessageConverter();
-        List<MediaType> supportMediaTypeList = new ArrayList<>();
+        var jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        var supportedMediaTypes = new ArrayList<MediaType>();
         /**
          * Public constant media type for {@code application/json;charset=UTF-8}.
          * @deprecated as of 5.2 in favor of {@link #APPLICATION_JSON}
@@ -100,13 +102,16 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
          * now comply with the specification</a> and interpret correctly UTF-8 special
          * characters without requiring a {@code charset=UTF-8} parameter.
          */
-        supportMediaTypeList.add(MediaType.APPLICATION_JSON);
-        FastJsonConfig config = new FastJsonConfig();
-        config.setDateFormat("yyyy-MM-dd HH:mm:ss");
-        config.setSerializerFeatures(SerializerFeature.DisableCircularReferenceDetect);
-        converter.setFastJsonConfig(config);
-        converter.setSupportedMediaTypes(supportMediaTypeList);
-        converter.setDefaultCharset(StandardCharsets.UTF_8);
-        converters.add(converter);
+        supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+        jackson2HttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
+        var jsonMapper = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+                .serializationInclusion(JsonInclude.Include.NON_NULL)
+                .build();
+        jsonMapper.registerModule(new JavaTimeModule());
+        jackson2HttpMessageConverter.setObjectMapper(jsonMapper);
+        jackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
+        converters.add(jackson2HttpMessageConverter);
     }
 }

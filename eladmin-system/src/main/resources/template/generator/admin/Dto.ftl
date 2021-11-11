@@ -24,8 +24,8 @@ import java.math.BigDecimal;
 </#if>
 import java.io.Serializable;
 <#if !auto && pkColumnType = 'Long'>
-import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.serializer.ToStringSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 </#if>
 
 /**
@@ -45,7 +45,7 @@ public class ${className}Dto implements Serializable {
     <#if column.columnKey = 'PRI'>
     <#if !auto && pkColumnType = 'Long'>
     /** 防止精度丢失 */
-    @JSONField(serializeUsing = ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     </#if>
     </#if>
     private ${column.columnType} ${column.changeColumnName};

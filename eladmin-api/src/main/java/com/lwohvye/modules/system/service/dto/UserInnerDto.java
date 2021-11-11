@@ -36,12 +36,10 @@ public class UserInnerDto extends UserDto implements Serializable {
 
     private String username;
 
-    //    @JSONField(serialize = false)
     private String password;
 
     private Boolean enabled;
 
-    //    @JSONField(serialize = false)
     private Boolean isAdmin = false;
 
     public UserInnerDto(UserDto userDto) {

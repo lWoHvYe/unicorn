@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.base.BaseEntity;
-import com.alibaba.fastjson.annotation.JSONField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,7 +46,7 @@ public class Menu extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     @ManyToMany(mappedBy = "menus")
     @ApiModelProperty(value = "菜单角色")
     private Set<Role> roles;
