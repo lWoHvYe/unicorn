@@ -32,5 +32,5 @@ public interface DataService extends BaseService {
      * @param user /
      * @return /
      */
-    List<Long> getDeptIds(UserDto user);
+    List<Long> getDeptIds(Long userId, Long deptId);
 }

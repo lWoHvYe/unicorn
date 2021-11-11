@@ -84,7 +84,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             // 检查dataScope是否修改
             List<Long> dataScopes = jwtUserDto.getDataScopes();
             dataScopes.clear();
-            dataScopes.addAll(dataService.getDeptIds(userInner));
+            dataScopes.addAll(dataService.getDeptIds(userInner.getId(), userInner.getDept().getId()));
             searchDb = false;
         }
         if (searchDb) {
@@ -104,7 +104,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 // 2021/9/15 这里到authorities 序列化后，反序列化时，会有误。已初步解决
                 jwtUserDto = new JwtUserDto(
                         user,
-                        dataService.getDeptIds(user)
+                        dataService.getDeptIds(user.getId(), user.getDept().getId())
                 );
 //                userDtoCache.put(username, jwtUserDto);
                 redisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto);

@@ -26,6 +26,7 @@ import com.lwohvye.utils.enums.DataScopeEnum;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
 
 /**
@@ -44,22 +45,24 @@ public class DataServiceImpl implements DataService {
 
     /**
      * 用户角色改变时需清理缓存
-     * @param user /
+     *
+     * @param userId /
+     * @param deptId /
      * @return /
      */
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'user:' + #p0.id")
-    public List<Long> getDeptIds(UserDto user) {
+    @Cacheable(key = " #root.target.getSysName() + 'user:' + #p0")
+    public List<Long> getDeptIds(Long userId, Long deptId) {
         // 用于存储部门id
         Set<Long> deptIds = new HashSet<>();
         // 查询用户角色
-        List<RoleSmallDto> roleSet = roleService.findByUsersId(user.getId());
+        List<RoleSmallDto> roleSet = roleService.findByUsersId(userId);
         // 获取对应的部门ID
         for (RoleSmallDto role : roleSet) {
             DataScopeEnum dataScopeEnum = DataScopeEnum.find(role.getDataScope());
             switch (Objects.requireNonNull(dataScopeEnum)) {
                 case THIS_LEVEL:
-                    deptIds.add(user.getDept().getId());
+                    deptIds.add(deptId);
                     break;
                 case CUSTOMIZE:
                     deptIds.addAll(getCustomize(deptIds, role));
@@ -73,11 +76,12 @@ public class DataServiceImpl implements DataService {
 
     /**
      * 获取自定义的数据权限
+     *
      * @param deptIds 部门ID
-     * @param role 角色
+     * @param role    角色
      * @return 数据权限ID
      */
-    public Set<Long> getCustomize(Set<Long> deptIds, RoleSmallDto role){
+    public Set<Long> getCustomize(Set<Long> deptIds, RoleSmallDto role) {
         Set<Dept> depts = deptService.findByRoleId(role.getId());
         for (Dept dept : depts) {
             deptIds.add(dept.getId());

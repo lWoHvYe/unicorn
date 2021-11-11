@@ -16,12 +16,15 @@
 package com.lwohvye.modules.system.service.dto;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * @author Zheng Jie
@@ -30,11 +33,29 @@ import java.util.Arrays;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class UserInnerDto extends UserDto implements Serializable {
+public class UserInnerDto implements Serializable {
 
     private Long id;
 
+    private Set<RoleSmallDto> roles;
+
+    private Set<JobSmallDto> jobs;
+
+    private DeptSmallDto dept;
+
     private String username;
+
+    private String nickName;
+
+    private String email;
+
+    private String phone;
+
+    private String gender;
+
+    private String avatarName;
+
+    private String avatarPath;
 
     private String password;
 
@@ -42,17 +63,15 @@ public class UserInnerDto extends UserDto implements Serializable {
 
     private Boolean isAdmin = false;
 
-    public UserInnerDto(UserDto userDto) {
-        // 本类中这部分与父类重复的属性，在反射时，会被设置到父类.属性 上，所以需要单独设置
-        this.id = userDto.getId();
-        this.username = userDto.getUsername();
-        this.password = userDto.getPassword();
-        this.enabled = userDto.getEnabled();
-        this.isAdmin = userDto.getIsAdmin();
+    private String description;
 
+    private Date pwdResetTime;
+
+    public UserInnerDto(UserDto userDto) {
         // 设置其他属性
         Arrays.stream(ReflectUtil.getFields(UserDto.class))
-                .iterator().forEachRemaining(field -> ReflectUtil.setFieldValue(this, field, ReflectUtil.getFieldValue(userDto, field)));
+                // field时Dto的，因为Inner和她已经没有关系了，所以要用fieldName来设置属性
+                .iterator().forEachRemaining(field -> ReflectUtil.setFieldValue(this, field.getName(), ReflectUtil.getFieldValue(userDto, field)));
     }
 
 }

@@ -40,8 +40,6 @@ public class UserDto extends BaseDTO implements Serializable {
 
     private DeptSmallDto dept;
 
-    private Long deptId;
-
     private String username;
 
     private String nickName;

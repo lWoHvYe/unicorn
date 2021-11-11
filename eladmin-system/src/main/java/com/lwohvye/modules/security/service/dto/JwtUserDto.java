@@ -21,33 +21,33 @@ import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
  * @date 2018-11-23
  */
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class JwtUserDto implements UserDetails {
 
-    private final UserInnerDto user;
+    private UserInnerDto user;
 
-    private final List<Long> dataScopes;
+    private List<Long> dataScopes;
 
     // 不做序列化，使用时进行转换
     @JsonIgnore
     private final List<GrantedAuthority> authorities = new ArrayList<>();
 
-    public Set<String> getRoles() {
-        return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
-    }
+//    public Set<String> getRoles() {
+//        return authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
+//    }
 
     @Override
     @JsonIgnore

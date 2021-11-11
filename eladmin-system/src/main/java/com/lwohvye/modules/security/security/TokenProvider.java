@@ -42,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+// InitializingBean的用法基本上与@PostConstruct一致，只不过相应的Bean需要实现afterPropertiesSet方法。用于在bean初始化之后执行一些操作
 public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;

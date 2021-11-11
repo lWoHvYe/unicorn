@@ -28,7 +28,6 @@ import com.lwohvye.modules.system.service.DeptService;
 import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
-import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.service.VerifyService;
 import com.lwohvye.utils.PageUtil;
@@ -91,7 +90,8 @@ public class UserController {
             criteria.getDeptIds().addAll(deptService.getDeptChildren(data));
         }
         // 数据权限
-        List<Long> dataScopes = dataService.getDeptIds(userService.findByName(SecurityUtils.getCurrentUsername()));
+        var curUser = userService.findByName(SecurityUtils.getCurrentUsername());
+        List<Long> dataScopes = dataService.getDeptIds(curUser.getId(), curUser.getDept().getId());
         // criteria.getDeptIds() 不为空并且数据权限不为空则取交集
         if (!CollectionUtils.isEmpty(criteria.getDeptIds()) && !CollectionUtils.isEmpty(dataScopes)) {
             // 取交集
@@ -161,7 +161,7 @@ public class UserController {
     public ResponseEntity<Object> updatePass(@RequestBody UserPassVo passVo) throws Exception {
         String oldPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getOldPass());
         String newPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getNewPass());
-        UserDto user = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
+        var user = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
         if (!passwordEncoder.matches(oldPass, user.getPassword())) {
             throw new BadRequestException("修改失败，旧密码错误");
         }
@@ -183,7 +183,7 @@ public class UserController {
     @PostMapping(value = "/updateEmail/{code}")
     public ResponseEntity<Object> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, user.getPassword());
-        UserDto userDto = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
+        var userDto = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
         if (!passwordEncoder.matches(password, userDto.getPassword())) {
             throw new BadRequestException("密码错误");
         }

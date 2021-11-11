@@ -152,6 +152,10 @@ public class JsonUtils {
             if (Objects.isNull(obj))
                 return defaultSupplier.get();
 
+//            如果obj本身就是type<T>，就没必要转了
+            if (tClass.isInstance(obj))
+                return tClass.cast(obj);
+
             var str = toJSONString(obj);
             return objectMapper.readValue(str, tClass);
         } catch (Exception e) {
@@ -200,36 +204,16 @@ public class JsonUtils {
     // region   toCollection
 
     public static Map<String, Object> toMap(Object obj) {
-        return toT(obj, Map.class, Collections::emptyMap);
+        return toJavaObject(obj, Map.class, Collections::emptyMap);
     }
 
     public static List toList(Object obj) {
-        return toT(obj, List.class, Collections::emptyList);
+        return toJavaObject(obj, List.class, Collections::emptyList);
     }
 
-    /**
-     * @param obj
-     * @param tClass
-     * @param defaultSuppler
-     * @return T
-     * @description
-     * @date 2021/11/11 12:30 上午
-     */
-    public static <T> T toT(Object obj, Class<T> tClass, Supplier<T> defaultSuppler) {
-        try {
-            if (Objects.isNull(obj))
-                return defaultSuppler.get();
-
-            if (tClass.isInstance(obj))
-                return tClass.cast(obj);
-
-            return toJavaObject(obj, tClass, defaultSuppler);
-        } catch (Exception e) {
-            log.error(String.format("toEntity-T exception %n%s %n%s", tClass.getSimpleName(), obj), e);
-        }
-        return defaultSuppler.get();
+    public static <T> List<T> toList(Object obj, Class<T> tClass) {
+        return toJavaObject(obj, List.class, Collections::emptyList);
     }
-
     // endregion
 
     // region 从map中获取指定类型的数据

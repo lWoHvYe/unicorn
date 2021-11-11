@@ -38,7 +38,7 @@ public class WebSocketServer {
     /**
      * concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
      */
-    private static CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<WebSocketServer>();
+    private static final CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<>();
 
     /**
      * 与某个客户端的连接会话，需要通过它来给客户端发送数据
@@ -57,11 +57,7 @@ public class WebSocketServer {
     public void onOpen(Session session, @PathParam("sid") String sid) {
         this.session = session;
         //如果存在就先删除一个，防止重复推送消息
-        for (WebSocketServer webSocket : webSocketSet) {
-            if (webSocket.sid.equals(sid)) {
-                webSocketSet.remove(webSocket);
-            }
-        }
+        webSocketSet.removeIf(webSocket -> webSocket.sid.equals(sid));
         webSocketSet.add(this);
         this.sid = sid;
     }
