@@ -164,7 +164,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @CacheEvict(allEntries = true)
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<RoleSmallDto> findByUsersId(Long id) {
         return roleSmallMapper.toDto(new ArrayList<>(roleRepository.findByUserId(id)), new CycleAvoidingMappingContext());

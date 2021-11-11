@@ -78,7 +78,8 @@ public class RedisConfig extends CachingConfigurerSupport {
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         var template = new RedisTemplate<>();
         //序列化
-        // 2021/11/11 使用Jackson2JsonRedisSerializer时，序列化的结果，在反序列化时会变为Object，丢失类型信息且无法强转成目标的实体。
+        // 2021/11/11 使用Jackson2JsonRedisSerializer时，序列化的结果，在反序列化时会变为Object，丢失类型信息且无法强转成目标的实体。(通过util放置的有包含类型信息可以转回来，但通过注解放置但不行)
+        // 具体表现为：Entity序列化后，反序列化时变成Map。无法通过一般方式转回；Map、List丢失范型信息，且List<Entity>变成来List<Map>。🀄️📄就是无法转回来。
         // 在使用Redis缓存信息时，对于此类问题不是很好处理（除非每次都缓存前转成Json，缓存后再取出来，J2B转回原实体），故此处继续使用FastJson。
         var fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
         // value值的序列化采用fastJsonRedisSerializer
