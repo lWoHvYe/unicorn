@@ -21,8 +21,6 @@ import com.lwohvye.modules.security.security.JwtAccessDeniedHandler;
 import com.lwohvye.modules.security.security.JwtAuthenticationEntryPoint;
 import com.lwohvye.modules.security.security.TokenConfigurer;
 import com.lwohvye.modules.security.security.TokenProvider;
-import com.lwohvye.modules.security.service.OnlineUserService;
-import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.utils.enums.RequestMethodEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -35,6 +33,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -62,8 +61,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ApplicationContext applicationContext;
     private final SecurityProperties properties;
-    private final OnlineUserService onlineUserService;
-    private final UserCacheClean userCacheClean;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     GrantedAuthorityDefaults grantedAuthorityDefaults() {
@@ -143,7 +141,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private TokenConfigurer securityConfigurerAdapter() {
-        return new TokenConfigurer(tokenProvider, properties, onlineUserService, userCacheClean);
+        return new TokenConfigurer(tokenProvider, properties, userDetailsService);
     }
 
     private Map<String, Set<String>> getAnonymousUrl(Map<RequestMappingInfo, HandlerMethod> handlerMethodMap) {
