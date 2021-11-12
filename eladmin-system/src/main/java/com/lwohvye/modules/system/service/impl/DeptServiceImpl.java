@@ -63,32 +63,35 @@ public class DeptServiceImpl implements DeptService {
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
-    public List<DeptDto> queryAll(DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
+    public List<DeptDto> queryAll(Long currentUserId, DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "deptSort");
         String dataScopeType = SecurityUtils.getDataScopeType();
-        if (isQuery) {
-            if (dataScopeType.equals(DataScopeEnum.ALL.getValue())) {
-                criteria.setPidIsNull(true);
-            }
-            List<Field> fields = QueryHelp.getAllFields(criteria.getClass(), new ArrayList<>());
-            List<String> fieldNames = new ArrayList<>() {
-                {
-                    add("pidIsNull");
-                    add("enabled");
-                }
-            };
-            for (Field field : fields) {
-                //设置对象的访问权限，保证对private的属性的访问
-                field.setAccessible(true);
-                Object val = field.get(criteria);
-                if (fieldNames.contains(field.getName())) {
-                    continue;
-                }
-                if (ObjectUtil.isNotNull(val)) {
-                    criteria.setPidIsNull(null);
-                    break;
-                }
-            }
+        // 下面这块的大致逻辑是，数据权限是全部的，先默认查一级节点。若除了pidIsNull和enabled外其他属性有值，就移除查一级的限制。已改为重写set方法
+//        if (isQuery) {
+        if (Boolean.TRUE.equals(isQuery) && !Objects.equals(dataScopeType, DataScopeEnum.ALL.getValue())) {
+            // 非全部数据权限，移除只查一级节点，与DeptQueryCriteria中的默认值，和重写的set配合
+            criteria.setPidIsNull(null);
+//            }
+//            List<Field> fields = QueryHelp.getAllFields(criteria.getClass(), new ArrayList<>());
+//            List<String> fieldNames = new ArrayList<>() {
+//                {
+//                    add("pidIsNull");
+//                    add("enabled");
+//                }
+//            };
+//            for (Field field : fields) {
+//                //设置对象的访问权限，保证对private的属性的访问
+//                field.setAccessible(true);
+//                Object val = field.get(criteria);
+//                if (fieldNames.contains(field.getName())) {
+//                    continue;
+//                }
+//                // 数据权限为全部
+//                if (ObjectUtil.isNotNull(val)) {
+//                    criteria.setPidIsNull(null);
+//                    break;
+//                }
+//            }
         }
         List<DeptDto> list = deptMapper.toDto(deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort), new CycleAvoidingMappingContext());
         // 如果为空，就代表为自定义权限或者本级权限，就需要去重，不理解可以注释掉，看查询结果

@@ -32,12 +32,14 @@ public interface DeptService extends BaseService {
 
     /**
      * 查询所有数据
+     *
+     * @param currentUserId
      * @param criteria 条件
      * @param isQuery /
      * @throws Exception /
      * @return /
      */
-    List<DeptDto> queryAll(DeptQueryCriteria criteria, Boolean isQuery) throws Exception;
+    List<DeptDto> queryAll(Long currentUserId, DeptQueryCriteria criteria, Boolean isQuery) throws Exception;
 
     /**
      * 根据ID查询

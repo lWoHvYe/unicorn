@@ -39,9 +39,26 @@ public class DeptQueryCriteria{
     @Query
     private Long pid;
 
+    // 默认true，非全部数据权限时，移除掉
     @Query(type = Query.Type.IS_NULL, propName = "pid")
-    private Boolean pidIsNull;
+    private Boolean pidIsNull = true;
 
     @Query(type = Query.Type.BETWEEN)
     private List<Timestamp> createTime;
+
+    // 重写set，当其他属性有值是，不只查一级节点
+    public void setName(String name) {
+        this.name = name;
+        this.pidIsNull = null;
+    }
+
+    public void setPid(Long pid) {
+        this.pid = pid;
+        this.pidIsNull = null;
+    }
+
+    public void setCreateTime(List<Timestamp> createTime) {
+        this.createTime = createTime;
+        this.pidIsNull = null;
+    }
 }

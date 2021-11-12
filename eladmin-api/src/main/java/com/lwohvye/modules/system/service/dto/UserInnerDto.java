@@ -16,8 +16,6 @@
 package com.lwohvye.modules.system.service.dto;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lwohvye.base.BaseDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -34,7 +32,7 @@ import java.util.Set;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class UserInnerDto extends BaseDTO implements Serializable {
+public class UserInnerDto implements Serializable {
 
     private Long id;
 
@@ -70,9 +68,9 @@ public class UserInnerDto extends BaseDTO implements Serializable {
 
     public UserInnerDto(UserDto userDto) {
         // 设置其他属性
-        Arrays.stream(ReflectUtil.getFields(UserDto.class))
+        Arrays.stream(ReflectUtil.getFields(UserInnerDto.class))
                 // field时Dto的，因为Inner和她已经没有关系了，所以要用fieldName来设置属性
-                .iterator().forEachRemaining(field -> ReflectUtil.setFieldValue(this, field.getName(), ReflectUtil.getFieldValue(userDto, field)));
+                .iterator().forEachRemaining(field -> ReflectUtil.setFieldValue(this, field, ReflectUtil.getFieldValue(userDto, field.getName())));
     }
 
 }

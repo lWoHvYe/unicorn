@@ -23,6 +23,7 @@ import com.lwohvye.modules.system.service.DeptService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.utils.PageUtil;
+import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,14 +55,14 @@ public class DeptController {
     @GetMapping(value = "/download")
     @PreAuthorize("@el.check('dept:list')")
     public void download(HttpServletResponse response, DeptQueryCriteria criteria) throws Exception {
-        deptService.download(deptService.queryAll(criteria, false), response);
+        deptService.download(deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, false), response);
     }
 
     @ApiOperation("查询部门")
     @GetMapping
     @PreAuthorize("@el.check('user:list','dept:list')")
     public ResponseEntity<Object> query(DeptQueryCriteria criteria) throws Exception {
-        List<DeptDto> deptDtos = deptService.queryAll(criteria, true);
+        List<DeptDto> deptDtos = deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, true);
         return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(deptDtos, deptDtos.size())), HttpStatus.OK);
     }
 
