@@ -96,7 +96,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .description("1101100_1010111_1101111_1001000_1110110_1011001_1100101")
                 .title("王红岩- -lWoHvYe")
-                .version("2.6.16")
+                .version("2.6.17")
                 .build();
     }
 
