@@ -49,6 +49,20 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 --add-opens java.base/java.text=ALL-UNNAMED
 --add-opens java.desktop/java.awt.font=ALL-UNNAMED
 
+#### Maven引用方式 🎵 
+最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
+
+```xml
+<!-- https://mvnrepository.com/artifact/com.lwohvye/eladmin -->
+<dependency>
+    <groupId>com.lwohvye</groupId>
+    <artifactId>eladmin</artifactId>
+    <version>2.6.16</version>
+    <type>pom</type>
+</dependency>
+
+```
+
 #### 项目简介
 
 一个基于 Spring Boot 2.5.6 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
