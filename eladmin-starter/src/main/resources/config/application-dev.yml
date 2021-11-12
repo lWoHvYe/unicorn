@@ -25,11 +25,11 @@ spring:
         # 连接在池中最大生存的时间
         max-evictable-idle-time-millis: 900000
         # 是否自动回收超时连接
-        remove-abandoned: true
+#        remove-abandoned: true
         # 超时时间(以秒数为单位)
-        remove-abandoned-timeout: 180
+#        remove-abandoned-timeout: 180
         test-while-idle: true
-        test-on-borrow: true
+        test-on-borrow: false
         test-on-return: false
         # 检测连接是否有效
         validation-query: select 1
@@ -73,13 +73,13 @@ spring:
         # 连接在池中最大生存的时间
         max-evictable-idle-time-millis: 900000
         # 是否自动回收超时连接
-        remove-abandoned: true
+#        remove-abandoned: true
         # 超时时间(以秒数为单位)
-        remove-abandoned-timeout: 180
+#        remove-abandoned-timeout: 180
         # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
         test-while-idle: true
         # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
-        test-on-borrow: true
+        test-on-borrow: false
         # 是否在归还到池中前进行检验
         test-on-return: false
         # 检测连接是否有效
@@ -124,13 +124,13 @@ spring:
         # 连接在池中最大生存的时间
         max-evictable-idle-time-millis: 900000
         # 是否自动回收超时连接
-        remove-abandoned: true
+#        remove-abandoned: true
         # 超时时间(以秒数为单位)
-        remove-abandoned-timeout: 180
+#        remove-abandoned-timeout: 180
         # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
         test-while-idle: true
         # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
-        test-on-borrow: true
+        test-on-borrow: false
         # 是否在归还到池中前进行检验
         test-on-return: false
         # 检测连接是否有效

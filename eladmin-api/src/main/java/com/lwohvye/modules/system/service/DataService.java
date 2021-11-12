@@ -29,7 +29,7 @@ public interface DataService extends BaseService {
 
     /**
      * 获取数据权限
-     * @param user /
+     * @param userId /
      * @return /
      */
     List<Long> getDeptIds(Long userId, Long deptId);

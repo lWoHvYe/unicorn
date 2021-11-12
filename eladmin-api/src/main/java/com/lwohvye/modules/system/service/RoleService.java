@@ -134,6 +134,7 @@ public interface RoleService extends BaseService {
      * @param user 用户信息
      * @return 权限信息
      */
+    @Deprecated(since = "2.6.18")
     List<GrantedAuthority> mapToGrantedAuthorities(UserDto user);
 
     @Deprecated(since = "2.6.16")
