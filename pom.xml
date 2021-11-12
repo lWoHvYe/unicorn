@@ -23,7 +23,7 @@
     <developers>
         <developer>
             <id>lWoHvYe</id>
-            <name>王红岩</name>
+            <name>王红岩 (lWoHvYe)</name>
             <email>lWoHvYe@outlook.com</email>
             <url>https://www.lwohvye.com</url>
         </developer>
@@ -65,7 +65,7 @@
         <io.swagger.version>1.6.3</io.swagger.version>
         <fastjson.version>1.2.78</fastjson.version>
         <druid.version>1.2.8</druid.version>
-        <hutool.version>5.7.15</hutool.version>
+        <hutool.version>5.7.16</hutool.version>
         <fastutil.version>8.5.6</fastutil.version>
         <lombok.version>1.18.22</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
@@ -305,7 +305,7 @@
         <dependency>
             <groupId>nl.basjes.parse.useragent</groupId>
             <artifactId>yauaa</artifactId>
-            <version>6.1</version>
+            <version>6.3</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-collections4</artifactId>
