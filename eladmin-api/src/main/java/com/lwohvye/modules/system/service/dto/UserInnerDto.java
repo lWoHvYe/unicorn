@@ -73,4 +73,13 @@ public class UserInnerDto implements Serializable {
                 .iterator().forEachRemaining(field -> ReflectUtil.setFieldValue(this, field, ReflectUtil.getFieldValue(userDto, field.getName())));
     }
 
+    @Override
+    public String toString() {
+        return "UserInnerDto{" +
+               "id=" + id +
+               ", username='" + username + '\'' +
+               ", enabled=" + enabled +
+               ", isAdmin=" + isAdmin +
+               '}';
+    }
 }
