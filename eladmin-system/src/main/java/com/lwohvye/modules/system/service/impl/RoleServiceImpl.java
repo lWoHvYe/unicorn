@@ -36,6 +36,7 @@ import com.lwohvye.modules.system.service.mapstruct.RoleSmallMapper;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -56,6 +57,7 @@ import java.util.stream.Collectors;
  * @author Zheng Jie
  * @date 2018-12-03
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "role")
@@ -207,6 +209,7 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = " target.getSysName() + 'auth:' + #p0")
     public List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin) {
+        log.warn(" van：boy next door,do you like van游戏 ");
         // admin对应1，非admin对应0
         var instance = authHandlerContext.getInstance(Boolean.TRUE.equals(isAdmin) ? 1 : 0);
         return instance.handler(userId);

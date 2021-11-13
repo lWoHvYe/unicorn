@@ -33,6 +33,7 @@ import java.util.Set;
 
 /**
  * @author Zheng Jie
+ * @deprecated JWT无状态，移除在线用户相关
  */
 @Deprecated(since = "2.6.18")
 @RestController

@@ -39,6 +39,7 @@ import java.util.*;
 /**
  * @author Zheng Jie
  * @date 2019年10月26日21:56:27
+ * @deprecated JWT无状态，移除在线用户相关
  */
 @Deprecated(since = "2.6.18")
 @Service

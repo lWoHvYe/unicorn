@@ -38,7 +38,7 @@ import java.util.Objects;
 
 /**
  * 全局异常处理，替代原异常处理类{@link GlobalExceptionHandler}
- * 统一异常处理，无法处理 401、403异常，需⚠️
+ * 统一异常处理，因为已在SpringSecurityConfig里配置了401和403的handler，所以鉴权中的，401和403异常无法处理，需⚠️。但@el.check中但403可以被处理
  * Created by cy on 2021/01/08.
  */
 @RestControllerAdvice

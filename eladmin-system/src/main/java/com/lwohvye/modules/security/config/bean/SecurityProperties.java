@@ -44,7 +44,7 @@ public class SecurityProperties {
     /**
      * 令牌过期时间 此处单位/毫秒。默认2小时
      */
-    private Long tokenValidityInSeconds = 14400000L;
+    private Long tokenValidityInSeconds = 7200000L;
 
     /**
      * 在线用户 key，根据 key 查询 redis 中在线用户的数据

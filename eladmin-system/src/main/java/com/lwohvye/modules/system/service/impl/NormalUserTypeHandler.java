@@ -8,6 +8,7 @@ import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.modules.system.service.AUserTypeHandler;
 import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * @author Hongyan Wang
  * @date 2021年11月02日 19:24
  */
+@Slf4j
 @Component
 // 不能用下面这个注解，因为这个的使用方式，决定了要使用空参构造初始化。对于需要注入的对象，需特殊处理
 //@RequiredArgsConstructor
@@ -35,6 +37,7 @@ public class NormalUserTypeHandler extends AUserTypeHandler {
 
     @Override
     public List<GrantedAuthority> handler(Long userId) {
+        log.warn(" banana：自由的气息，蕉迟但到。");
         Set<Role> roles = roleRepository.findByUserId(userId);
         var permissions = roles.stream().flatMap(role -> role.getMenus().stream())
                 .map(Menu::getPermission)
