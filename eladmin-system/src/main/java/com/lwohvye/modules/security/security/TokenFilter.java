@@ -16,16 +16,15 @@
 package com.lwohvye.modules.security.security;
 
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
-import com.lwohvye.modules.security.service.OnlineUserService;
-import com.lwohvye.modules.security.service.UserCacheClean;
-import com.lwohvye.modules.security.service.dto.OnlineUserDto;
-import com.lwohvye.modules.security.utils.SecuritySysUtil;
+import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -35,7 +34,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * @author /
@@ -47,8 +45,7 @@ public class TokenFilter extends GenericFilterBean {
 
     private final TokenProvider tokenProvider; // Token
     private final SecurityProperties properties; // Jwt
-    private final OnlineUserService onlineUserService; // 在线用户
-    private final UserCacheClean userCacheClean; // 用户缓存清理
+    private final UserDetailsService userDetailsService;
 
 
     @Override
@@ -58,23 +55,21 @@ public class TokenFilter extends GenericFilterBean {
         String token = resolveToken(httpServletRequest);
         // 对于 Token 为空的不需要去查 Redis
         if (StringUtils.hasText(token)) {
-            OnlineUserDto onlineUserDto = null;
-            boolean cleanUserCache = false;
             try {
-                onlineUserDto = onlineUserService.getUserByToken(SecuritySysUtil.getAuthToken(properties, token));
-                if (!Objects.isNull(onlineUserDto)) {
-                    Authentication authentication = tokenProvider.getAuthentication(token);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                    // Token 续期
-                    tokenProvider.checkRenewal(token);
+                // 获取用户基础信息(从token中)
+                Authentication authentication = tokenProvider.getAuthentication(token);
+                if (authentication.getPrincipal() instanceof UserDetails userDetails) {
+                    // 根据用户名，从服务侧获取用户详细信息
+                    var jwtUserDto = (JwtUserDto) userDetailsService.loadUserByUsername(userDetails.getUsername());
+                    // 校验
+                    if (Boolean.TRUE.equals(tokenProvider.validateToken(token, jwtUserDto))) {
+                        // 剩余时常不足时，进行通知（只通知一次）
+                        tokenProvider.noticeExpire5Token(token);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             } catch (ExpiredJwtException e) {
                 log.error(e.getMessage());
-                cleanUserCache = true;
-            } finally {
-                if (cleanUserCache || Objects.isNull(onlineUserDto)) {
-                    userCacheClean.cleanUserCache(String.valueOf(tokenProvider.getClaims(token).get(TokenProvider.AUTHORITIES_KEY)));
-                }
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);

@@ -72,7 +72,7 @@ public class WebSocketServer {
 
     /**
      * 收到客户端消息后调用的方法
-     *
+     * 之后将该消息群发
      * @param message 客户端发送过来的消息
      */
     @OnMessage
@@ -111,11 +111,8 @@ public class WebSocketServer {
         for (WebSocketServer item : webSocketSet) {
             try {
                 //这里可以设定只推送给这个sid的，为null则全部推送
-                if (sid == null) {
+                if (sid == null || item.sid.equals(sid))
                     item.sendMessage(message);
-                } else if (item.sid.equals(sid)) {
-                    item.sendMessage(message);
-                }
             } catch (IOException ignored) {
             }
         }

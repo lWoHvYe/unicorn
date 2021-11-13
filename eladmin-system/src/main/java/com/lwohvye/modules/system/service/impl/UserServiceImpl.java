@@ -23,7 +23,6 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
-import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.projection.UserProj;
@@ -65,7 +64,6 @@ public class UserServiceImpl implements UserService {
     private final FileProperties properties;
     private final RedisUtils redisUtils;
     private final UserCacheClean userCacheClean;
-    private final OnlineUserService onlineUserService;
 
     @Override
     @Cacheable
@@ -85,7 +83,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object queryAll(User expUser, Pageable pageable) {
         var matcher = ExampleMatcher.matching()
-                .withMatcher("username", match -> match.contains())
+                .withMatcher("username", ExampleMatcher.GenericPropertyMatcher::contains)
                 .withMatcher("nickName", match -> match.startsWith().ignoreCase());
         var example = Example.of(expUser, matcher);
         return userRepository.findAll(example);
@@ -140,10 +138,6 @@ public class UserServiceImpl implements UserService {
             redisUtils.delete(CacheKey.DATA_USER + resources.getId());
             redisUtils.delete(CacheKey.MENU_USER + resources.getId());
             redisUtils.delete(CacheKey.ROLE_AUTH + resources.getId());
-        }
-        // 如果用户被禁用，则清除用户登录信息
-        if (Boolean.FALSE.equals(resources.getEnabled())) {
-            onlineUserService.kickOutForUsername(resources.getUsername());
         }
 
 //        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
@@ -262,11 +256,6 @@ public class UserServiceImpl implements UserService {
     public void updateEnabled(String username, Boolean enabled) {
         userRepository.updateEnabled(username, enabled);
 //        状态更新后，需清除相关信息
-        try {
-            onlineUserService.kickOutForUsername(username);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         flushCache(username);
     }
 

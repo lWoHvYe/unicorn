@@ -28,7 +28,6 @@ import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.security.TokenProvider;
-import com.lwohvye.modules.security.service.OnlineUserService;
 import com.lwohvye.modules.security.service.dto.AuthUserDto;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.utils.JsonUtils;
@@ -78,7 +77,6 @@ public class AuthorizationController {
     private final RedisUtils redisUtils;
     //    Redisson使用
     private final RedissonClient redissonClient;
-    private final OnlineUserService onlineUserService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     //    队列生产者
@@ -135,8 +133,6 @@ public class AuthorizationController {
         // SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.createToken(authentication);
         final JwtUserDto jwtUserDto = (JwtUserDto) authentication.getPrincipal();
-        // 保存在线信息
-        onlineUserService.save(jwtUserDto, token, request);
         // 返回 token 与 用户信息
         Map<String, Object> authInfo = new HashMap<>(2) {
             {
@@ -144,10 +140,6 @@ public class AuthorizationController {
                 put("user", jwtUserDto);
             }
         };
-        if (loginProperties.isSingleLogin()) {
-            //踢掉之前已经登录的token
-            onlineUserService.checkLoginOnUser(username, token);
-        }
 //        用户登录成功后，写一条消息
         var authSuccessMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
         rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
@@ -186,7 +178,6 @@ public class AuthorizationController {
     @ApiOperation("退出登录")
     @AnonymousDeleteMapping(value = "/logout")
     public ResponseEntity<Object> logout(HttpServletRequest request) {
-        onlineUserService.logout(tokenProvider.getToken(request));
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 

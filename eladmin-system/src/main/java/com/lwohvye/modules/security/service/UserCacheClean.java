@@ -41,7 +41,6 @@ public class UserCacheClean {
     public void cleanUserCache(String userName) {
         if (StringUtils.isNotEmpty(userName)) {
             redisUtils.hDelete(UserDetailsServiceImpl.USER_CACHE_KEY, userName);
-//            UserDetailsServiceImpl.userDtoCache.remove(userName);
         }
     }
 
@@ -51,6 +50,5 @@ public class UserCacheClean {
      */
     public void cleanAll() {
         redisUtils.delete(UserDetailsServiceImpl.USER_CACHE_KEY);
-//        UserDetailsServiceImpl.userDtoCache.clear();
     }
 }

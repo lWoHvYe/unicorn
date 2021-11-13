@@ -42,13 +42,14 @@ public class SecurityProperties {
     private String base64Secret;
 
     /**
-     * 令牌过期时间 此处单位/毫秒
+     * 令牌过期时间 此处单位/毫秒。默认2小时
      */
     private Long tokenValidityInSeconds = 14400000L;
 
     /**
      * 在线用户 key，根据 key 查询 redis 中在线用户的数据
      */
+    @Deprecated(since = "2.6.18")
     private String onlineKey = "online-token-";
 
     /**
@@ -57,14 +58,12 @@ public class SecurityProperties {
     private String codeKey = "code-key-";
 
     /**
-     * token 续期检查
+     * token 失效前通知检查，单位/毫秒。默认15分钟
      */
-    private Long detect = 1800000L;
+    private Long detect = 900000L;
 
-    /**
-     * 续期时间
-     */
-    private Long renew = 3600000L;
+    // 登录即将过期通知，单系统只通知一次
+    private String expireNoticeKey = "expire-notice-token-";
 
     /**
      * 前缀后面要加个空格，这个无法在文件中配置，所以重写下get方法

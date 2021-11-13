@@ -38,6 +38,7 @@ import java.util.Objects;
 
 /**
  * 全局异常处理，替代原异常处理类{@link GlobalExceptionHandler}
+ * 统一异常处理，无法处理 401、403异常，需⚠️
  * Created by cy on 2021/01/08.
  */
 @RestControllerAdvice
@@ -119,7 +120,7 @@ public class ApiGlobalExceptionHandler {
     }
 
     /**
-     * 处理无权限访问异常 AccessDeniedException
+     * 处理无权限访问异常 AccessDeniedException 403
      *
      * @param e
      * @return ResponseEntity

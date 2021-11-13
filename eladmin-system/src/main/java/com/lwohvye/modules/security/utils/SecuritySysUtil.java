@@ -23,4 +23,16 @@ public class SecuritySysUtil {
         Assert.notNull(token, "token不可为空");
         return properties.getOnlineKey() + LocalCoreConfig.SYS_NAME + token;
     }
+
+    /**
+     * @param properties
+     * @return java.lang.String
+     * @description 存储已⏰了过期的token
+     * @date 2021/11/13 10:42 上午
+     */
+    public static String getExpireNoticeKey(SecurityProperties properties) {
+        Assert.notNull(properties, "系统错误。请联系研发处理");
+        return properties.getExpireNoticeKey() + LocalCoreConfig.SYS_NAME;
+    }
+
 }

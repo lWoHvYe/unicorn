@@ -40,6 +40,7 @@ import java.util.*;
  * @author Zheng Jie
  * @date 2019年10月26日21:56:27
  */
+@Deprecated(since = "2.6.18")
 @Service
 @Slf4j
 @RequiredArgsConstructor

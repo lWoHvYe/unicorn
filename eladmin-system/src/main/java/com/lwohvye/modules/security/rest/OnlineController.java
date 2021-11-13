@@ -34,6 +34,7 @@ import java.util.Set;
 /**
  * @author Zheng Jie
  */
+@Deprecated(since = "2.6.18")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth/online")
