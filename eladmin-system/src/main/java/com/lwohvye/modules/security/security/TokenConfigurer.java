@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.security.security;
 
-import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,12 +29,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class TokenConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     private final TokenProvider tokenProvider;
-    private final SecurityProperties properties;
     private final UserDetailsService userDetailsService;
 
     @Override
     public void configure(HttpSecurity http) {
-        TokenFilter customFilter = new TokenFilter(tokenProvider, properties, userDetailsService);
+        TokenFilter customFilter = new TokenFilter(tokenProvider, userDetailsService);
         http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

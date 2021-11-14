@@ -138,7 +138,9 @@ public class TokenProvider implements InitializingBean {
     Authentication getAuthentication(String token) {
         // 上面createToken()中jwtBuilder中设置的属性，都在token中，解密后，得到Claims。这里用到了其subject属性，在当前业务里存的用户名
         Claims claims = getClaims(token);
+        //  第三个参数是 <? extends GrantedAuthority> authorities ,即为用户的权限。这里未在此处设置。在鉴权时单独获取
         User principal = new User(claims.getSubject(), "******", new ArrayList<>());
+        //  同上，这里第三个参数也是用户的权限。
         return new UsernamePasswordAuthenticationToken(principal, token, new ArrayList<>());
     }
 

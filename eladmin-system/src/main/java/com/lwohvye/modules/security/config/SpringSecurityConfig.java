@@ -16,7 +16,6 @@
 package com.lwohvye.modules.security.config;
 
 import com.lwohvye.annotation.AnonymousAccess;
-import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.security.JwtAccessDeniedHandler;
 import com.lwohvye.modules.security.security.JwtAuthenticationEntryPoint;
 import com.lwohvye.modules.security.security.TokenConfigurer;
@@ -60,7 +59,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationEntryPoint authenticationErrorHandler;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ApplicationContext applicationContext;
-    private final SecurityProperties properties;
     private final UserDetailsService userDetailsService;
 
     @Bean
@@ -141,7 +139,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private TokenConfigurer securityConfigurerAdapter() {
-        return new TokenConfigurer(tokenProvider, properties, userDetailsService);
+        return new TokenConfigurer(tokenProvider, userDetailsService);
     }
 
     private Map<String, Set<String>> getAnonymousUrl(Map<RequestMappingInfo, HandlerMethod> handlerMethodMap) {

@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.security.security;
 
-import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +43,7 @@ public class TokenFilter extends GenericFilterBean {
 
 
     private final TokenProvider tokenProvider; // Token
-    private final SecurityProperties properties; // Jwt
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService; // UserDetails
 
 
     @Override
