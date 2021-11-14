@@ -7,19 +7,21 @@
 
 </div>
 
-## 首先感谢eladmin的作者以及项目的其他贡献者。
+本项目在原eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
-本项目在原eladmin项目的基础上，进行了部分扩展及尝试。
+启动类及配置文件，参照 eladmin-starter模块
 
-启动类及配置，参照 eladmin-starter模块
+**Java16**之后，针对JDK相关包的访问添加了较多的限制，需在启动时添加相关参数。较简单的是添加 
+``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围
 
-后台运行jar
+后台运行jar（开启远程调试端口5005）
+```shell
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.17.jar >nohup.out 2>&1 &
+```
 
-若外置依赖启动参数需添加。外置依赖可以大大减少jar包的体积。方便后续更新部署
+若外置依赖启动参数需添加，``-Dloader.path=lib``引入依赖。外置依赖可以大大减少jar包的体积。方便后续更新部署
 
 ```shell
--Dloader.path=lib 
 #启动示例
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.17.jar >nohup.out 2>&1 &
 ```
@@ -42,12 +44,14 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
 ```
 
-Java 17，发布中央仓库，需要在maven的vm中配置 
+**Java 17**，发布中央仓库，需要在maven的vm中配置。若不需要deploy，无需添加
+```
 --add-opens java.base/java.lang=ALL-UNNAMED
 --add-opens java.base/java.lang.reflect=ALL-UNNAMED
 --add-opens java.base/java.util=ALL-UNNAMED
 --add-opens java.base/java.text=ALL-UNNAMED
 --add-opens java.desktop/java.awt.font=ALL-UNNAMED
+```
 
 #### Maven引用方式 🎵 
 最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
@@ -79,7 +83,7 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 |---  |--- | --- |
 |  原项目-github   |  https://github.com/elunez/eladmin   |  https://github.com/elunez/eladmin-web   |
 |  原项目-码云   |  https://gitee.com/elunez/eladmin   |  https://gitee.com/elunez/eladmin-web   |
-|  github   |   https://github.com/lWoHvYe/eladmin | |
+|  github   |   https://github.com/lWoHvYe/eladmin |    https://github.com/lWoHvYe/eladmin-web |
 
 #### 主要特性
 
@@ -177,6 +181,8 @@ Java 17，发布中央仓库，需要在maven的vm中配置
 - 感谢 [j.yao.SUSE](https://github.com/everhopingandwaiting) 大佬提供的匿名接口与Redis限流等功能
 
 - 感谢 [d15801543974](https://github.com/d15801543974) 大佬提供的基于注解的通用查询方式
+
+- 感谢 [elunez](https://github.com/elunez) 大佬提供的eladmin项目
 
 #### 项目捐赠
 
@@ -311,5 +317,4 @@ fi
 #### TODO
 
 - 整合Redisson（当前无法配置过期通知，待解决）
-- 邮件通知相关验证
-- 阿里云OSS进一步整合
+- JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）
