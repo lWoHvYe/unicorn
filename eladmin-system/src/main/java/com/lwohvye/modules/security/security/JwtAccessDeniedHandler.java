@@ -16,6 +16,7 @@
 package com.lwohvye.modules.security.security;
 
 import com.lwohvye.utils.StringUtils;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -35,7 +36,11 @@ import java.util.Objects;
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
+    @SneakyThrows
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) {
+        if (response.isCommitted())
+            return;
+
         //当用户在没有授权的情况下访问受保护的REST资源时，将调用此方法发送403 Forbidden响应
         if (!Objects.isNull(accessDeniedException))
             log.error(" accessDeniedException {} || ip: {} ", accessDeniedException.getMessage(), StringUtils.getIp(request));

@@ -16,25 +16,38 @@
 package com.lwohvye.modules.security.config;
 
 import com.lwohvye.annotation.AnonymousAccess;
+import com.lwohvye.config.rabbitmq.RabbitMqConfig;
+import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
+import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.security.JwtAccessDeniedHandler;
+import com.lwohvye.modules.security.security.JwtAuthTokenConfigurer;
 import com.lwohvye.modules.security.security.JwtAuthenticationEntryPoint;
 import com.lwohvye.modules.security.security.TokenProvider;
-import com.lwohvye.modules.security.security.JwtAuthTokenConfigurer;
+import com.lwohvye.modules.security.security.filter.CustomAuthenticationFilter;
+import com.lwohvye.modules.security.service.dto.JwtUserDto;
+import com.lwohvye.utils.JsonUtils;
+import com.lwohvye.utils.ResultUtil;
+import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.enums.RequestMethodEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,6 +56,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -54,12 +68,14 @@ import java.util.*;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final SecurityProperties properties;
     private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint authenticationErrorHandler;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ApplicationContext applicationContext;
     private final UserDetailsService userDetailsService;
+    private final RabbitMQProducerService rabbitMQProducerService;
 
     @Bean
     GrantedAuthorityDefaults grantedAuthorityDefaults() {
@@ -83,6 +99,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity
                 // 禁用 CSRF
                 .csrf().disable()
+                //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter（这里实际上是放到了前面，security自带的Filter在轮到自己执行的时候，会判断当前登录状态，如果已经被之前的Filter验证过了，自己这关就直接放行）
+                .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 // 授权异常
                 .exceptionHandling()
@@ -177,4 +195,85 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         anonymousUrls.put(RequestMethodEnum.ALL.getType(), all);
         return anonymousUrls;
     }
+
+    //注册自定义的UsernamePasswordAuthenticationFilter
+    @Bean
+    CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
+        CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
+        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
+        filter.setAuthenticationFailureHandler(authenticationFailureHandler());
+        filter.setFilterProcessesUrl("/auth/login");
+
+        //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
+        filter.setAuthenticationManager(authenticationManagerBean());
+        return filter;
+    }
+
+    /**
+     * 处理登录成功后返回 JWT Token 对.
+     *
+     * @return the authentication success handler
+     */
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return (request, response, authentication) -> {
+            if (response.isCommitted()) {
+                return;
+            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 生成令牌与第三方系统获取令牌方式
+            // UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
+            // Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            // SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = tokenProvider.createToken(authentication);
+            final JwtUserDto jwtUserDto = (JwtUserDto) authentication.getPrincipal();
+            // 用户登录成功后，写一条消息
+            var authSuccessMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
+            rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
+
+            // 返回 token 与 用户信息
+            Map<String, Object> authInfo = new HashMap<>(2) {
+                {
+                    put("token", properties.getTokenStartWith() + token);
+                    put("user", jwtUserDto);
+                }
+            };
+            // 这里需要进行响应
+            ResultUtil.resultJson(response, HttpServletResponse.SC_OK, JsonUtils.toJSONString(authInfo));
+        };
+    }
+
+    /**
+     * 失败登录处理器 处理登录失败后的逻辑 登录失败返回信息 以此为依据跳转
+     *
+     * @return the authentication failure handler
+     */
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return (request, response, authenticationException) -> {
+            if (response.isCommitted()) {
+                return;
+            }
+            // 针对于密码错误行为，需进行记录
+            if (authenticationException instanceof BadCredentialsException) {
+                var username = request.getAttribute("username");
+                if (!Objects.isNull(username)) {
+                    var ip = StringUtils.getIp(request);
+                    var lockedIp = ip + "||authLocked||";
+
+                    var infoMap = new HashMap<String, Object>();
+                    infoMap.put("ip", ip);
+                    infoMap.put("username", username);
+                    infoMap.put("lockedIp", lockedIp);
+                    var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(JsonUtils.toJSONString(infoMap)).setExtraData("solveAuthFailed");
+                    //  发送消息
+                    rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
+                }
+            }
+            // 返回错误信息。用下面的sendError会被EntryPoint拦截并覆盖。
+//            response.sendError(HttpServletResponse.SC_BAD_REQUEST, authenticationException.getMessage());
+            ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, authenticationException.getMessage());
+        };
+    }
+
 }

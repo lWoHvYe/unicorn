@@ -16,6 +16,7 @@
 package com.lwohvye.modules.security.security;
 
 import com.lwohvye.utils.StringUtils;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -35,9 +36,11 @@ import java.util.Objects;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
+    @SneakyThrows
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) {
+        if (response.isCommitted())
+            return;
+
         // 当用户尝试访问安全的REST资源而不提供任何凭据时，将调用此方法发送401 响应
         if (!Objects.isNull(authException))
             log.error(" authException {} || ip: {} ", authException.getMessage(), StringUtils.getIp(request));

@@ -18,22 +18,10 @@ package com.lwohvye.modules.security.rest;
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.annotation.rest.AnonymousDeleteMapping;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
-import com.lwohvye.annotation.rest.AnonymousPostMapping;
-import com.lwohvye.config.RsaProperties;
-import com.lwohvye.config.rabbitmq.RabbitMqConfig;
-import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
-import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
-import com.lwohvye.modules.security.security.TokenProvider;
-import com.lwohvye.modules.security.service.dto.AuthUserDto;
-import com.lwohvye.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.utils.JsonUtils;
-import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;
-import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.result.ResultInfo;
 import com.wf.captcha.base.Captcha;
@@ -44,14 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,75 +58,71 @@ public class AuthorizationController {
     private final RedisUtils redisUtils;
     //    Redisson使用
     private final RedissonClient redissonClient;
-    private final TokenProvider tokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    //    队列生产者
-    private final RabbitMQProducerService rabbitMQProducerService;
 
     @Resource
     private LoginProperties loginProperties;
 
 
-    @ApiOperation("登录授权")
-    @AnonymousPostMapping(value = "/login")
-    public ResponseEntity<Object> login(@Validated @RequestBody AuthUserDto authUser, HttpServletRequest request) throws Exception {
-
-        var username = authUser.getUsername();
-        var ip = StringUtils.getIp(request);
-        var lockedIp = ip + "||authLocked||";
-        // 当某ip多次登录失败导致用户锁定时，会同时锁定ip 15分钟
-        if (redisUtils.hasKey(lockedIp))
-            throw new BadRequestException("频繁访问，请稍后再试");
-
-        // 密码解密
-        String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, authUser.getPassword());
-        // 查询验证码
-        String code = (String) redisUtils.get(authUser.getUuid());
-        // 清除验证码
-        redisUtils.delete(authUser.getUuid());
-        if (StringUtils.isBlank(code)) {
-            throw new BadRequestException("验证码不存在或已过期");
-        }
-        if (StringUtils.isBlank(authUser.getCode()) || !authUser.getCode().equalsIgnoreCase(code)) {
-            throw new BadRequestException("验证码错误");
-        }
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-
-        Authentication authentication;
-        try {
-            authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            // catch的异常是密码错误的，别的异常不会catch及发消息
-        } catch (BadCredentialsException e) {
-            var infoMap = new HashMap<String, Object>();
-            infoMap.put("ip", ip);
-            infoMap.put("username", username);
-            infoMap.put("lockedIp", lockedIp);
-            var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(JsonUtils.toJSONString(infoMap)).setExtraData("solveAuthFailed");
-//            发送消息
-            rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
-            throw e;
-        }
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        // 生成令牌与第三方系统获取令牌方式
-        // UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
-        // Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        // SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = tokenProvider.createToken(authentication);
-        final JwtUserDto jwtUserDto = (JwtUserDto) authentication.getPrincipal();
-        // 返回 token 与 用户信息
-        Map<String, Object> authInfo = new HashMap<>(2) {
-            {
-                put("token", properties.getTokenStartWith() + token);
-                put("user", jwtUserDto);
-            }
-        };
-//        用户登录成功后，写一条消息
-        var authSuccessMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
-        rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
-        return ResponseEntity.ok(authInfo);
-    }
-
+//    @ApiOperation("登录授权")
+//    @AnonymousPostMapping(value = "/login")
+//    public ResponseEntity<Object> login(@Validated @RequestBody AuthUserDto authUser, HttpServletRequest request) throws Exception {
+//
+//        var username = authUser.getUsername();
+//        var ip = StringUtils.getIp(request);
+//        var lockedIp = ip + "||authLocked||";
+//        // 当某ip多次登录失败导致用户锁定时，会同时锁定ip 15分钟
+//        if (redisUtils.hasKey(lockedIp))
+//            throw new BadRequestException("频繁访问，请稍后再试");
+//
+//        // 密码解密
+//        String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, authUser.getPassword());
+//        // 查询验证码
+//        String code = (String) redisUtils.get(authUser.getUuid());
+//        // 清除验证码
+//        redisUtils.delete(authUser.getUuid());
+//        if (StringUtils.isBlank(code)) {
+//            throw new BadRequestException("验证码不存在或已过期");
+//        }
+//        if (StringUtils.isBlank(authUser.getCode()) || !authUser.getCode().equalsIgnoreCase(code)) {
+//            throw new BadRequestException("验证码错误");
+//        }
+//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+//
+//        Authentication authentication;
+//        try {
+//            authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+//            // catch的异常是密码错误的，别的异常不会catch及发消息
+//        } catch (BadCredentialsException e) {
+//            var infoMap = new HashMap<String, Object>();
+//            infoMap.put("ip", ip);
+//            infoMap.put("username", username);
+//            infoMap.put("lockedIp", lockedIp);
+//            var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(JsonUtils.toJSONString(infoMap)).setExtraData("solveAuthFailed");
+////            发送消息
+//            rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
+//            throw e;
+//        }
+//
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        // 生成令牌与第三方系统获取令牌方式
+//        // UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
+//        // Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+//        // SecurityContextHolder.getContext().setAuthentication(authentication);
+//        String token = tokenProvider.createToken(authentication);
+//        final JwtUserDto jwtUserDto = (JwtUserDto) authentication.getPrincipal();
+//        // 返回 token 与 用户信息
+//        Map<String, Object> authInfo = new HashMap<>(2) {
+//            {
+//                put("token", properties.getTokenStartWith() + token);
+//                put("user", jwtUserDto);
+//            }
+//        };
+////        用户登录成功后，写一条消息
+//        var authSuccessMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
+//        rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
+//        return ResponseEntity.ok(authInfo);
+//    }
+//
     @ApiOperation("获取用户信息")
     @GetMapping(value = "/info")
     public ResponseEntity<Object> getUserInfo() {
