@@ -315,6 +315,9 @@ fi
 ```
 
 #### TODO
-
+- Spring Security相关
+  - 登录认证，结果使用handler处理(AuthenticationSuccessHandler、AuthenticationFailureHandler)
+  - 更改登录接口形式，支持多种验证方式
+  - 访问鉴权，结果使用handler中间处理（成功、失败。与登录认证类似，看能否分开配置） 
 - 整合Redisson（当前无法配置过期通知，待解决）
 - JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）

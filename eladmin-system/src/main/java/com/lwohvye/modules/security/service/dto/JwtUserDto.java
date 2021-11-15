@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
+ * @description Spring Security鉴权使用的UserDetails，
  * @date 2018-11-23
  */
 @Getter
@@ -76,6 +77,8 @@ public class JwtUserDto implements UserDetails {
         return authorities;
     }
 
+    // region 在校验用户状态时，校验了下面四个属性，可根据需要设置
+
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {
@@ -99,4 +102,6 @@ public class JwtUserDto implements UserDetails {
     public boolean isEnabled() {
         return user.getEnabled();
     }
+
+    // endregion
 }

@@ -18,8 +18,8 @@ package com.lwohvye.modules.security.config;
 import com.lwohvye.annotation.AnonymousAccess;
 import com.lwohvye.modules.security.security.JwtAccessDeniedHandler;
 import com.lwohvye.modules.security.security.JwtAuthenticationEntryPoint;
-import com.lwohvye.modules.security.security.TokenConfigurer;
 import com.lwohvye.modules.security.security.TokenProvider;
+import com.lwohvye.modules.security.security.JwtAuthTokenConfigurer;
 import com.lwohvye.utils.enums.RequestMethodEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
@@ -138,8 +138,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().apply(securityConfigurerAdapter());
     }
 
-    private TokenConfigurer securityConfigurerAdapter() {
-        return new TokenConfigurer(tokenProvider, userDetailsService);
+    private JwtAuthTokenConfigurer securityConfigurerAdapter() {
+        return new JwtAuthTokenConfigurer(tokenProvider, userDetailsService);
     }
 
     private Map<String, Set<String>> getAnonymousUrl(Map<RequestMappingInfo, HandlerMethod> handlerMethodMap) {

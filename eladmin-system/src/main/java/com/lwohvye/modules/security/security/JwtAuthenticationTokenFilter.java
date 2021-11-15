@@ -38,8 +38,8 @@ import java.io.IOException;
  * @author /
  */
 @RequiredArgsConstructor
-public class TokenFilter extends GenericFilterBean {
-    private static final Logger log = LoggerFactory.getLogger(TokenFilter.class);
+public class JwtAuthenticationTokenFilter extends GenericFilterBean {
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationTokenFilter.class);
 
 
     private final TokenProvider tokenProvider; // Token

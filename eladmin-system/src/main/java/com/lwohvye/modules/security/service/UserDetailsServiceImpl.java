@@ -37,6 +37,7 @@ import java.util.Objects;
  * @author Zheng Jie
  * @date 2018-11-22
  */
+// 这里声明了UserDetailsService的实现使用这一个。因为该接口有多个实现
 @Service("userDetailsService")
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
