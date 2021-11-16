@@ -16,12 +16,12 @@
 package com.lwohvye.modules.security.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.system.service.DataService;
-import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -58,8 +58,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     //  这种缓存的方式，也许解决了些问题，但导致无法做集群的扩展，故调整为分布式缓存redis
 //    static Map<String, JwtUserDto> userDtoCache = new ConcurrentHashMap<>();
 
-    // 用户缓存的redis key
-    public static final String USER_CACHE_KEY = "Sys-User-JwtInfo-Cache";
+    // 用户缓存的redis key。考虑多系统，这里也要加标识
+    public static final String USER_CACHE_KEY = LocalCoreConfig.SYS_NAME + "Sys-User-JwtInfo-Cache";
 
     @Override
     public JwtUserDto loadUserByUsername(String username) {
@@ -108,7 +108,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         dataService.getDeptIds(user.getId(), user.getDept().getId())
                 );
 //                userDtoCache.put(username, jwtUserDto);
-                redisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto);
+                // 设置用户信息有效期，6小时。理论上不设置也可以
+                redisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto, 6 * 60 * 60);
             }
         }
         return jwtUserDto;

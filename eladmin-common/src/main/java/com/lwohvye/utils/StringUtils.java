@@ -31,6 +31,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -250,9 +251,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * 根据ip获取详细地址
      */
     public static String getLocalCityInfo(String ip) {
+        DbSearcher dbSearcher = null;
         try {
-            DataBlock dataBlock = new DbSearcher(config, file.getPath())
-                    .binarySearch(ip);
+            dbSearcher = new DbSearcher(config, file.getPath());
+            DataBlock dataBlock = dbSearcher.binarySearch(ip);
             String region = dataBlock.getRegion();
             String address = region.replace("0|", "");
             char symbol = '|';
@@ -262,6 +264,13 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             return address.equals(ElAdminConstant.REGION) ? "内网IP" : address;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+        } finally {
+            if (dbSearcher != null)
+                try {
+                    dbSearcher.close();
+                } catch (IOException e) {
+                    log.error("关闭资源失败；{}", e.getMessage());
+                }
         }
         return "";
     }

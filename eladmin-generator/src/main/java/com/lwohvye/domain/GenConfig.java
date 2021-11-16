@@ -19,6 +19,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -31,6 +33,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Entity
+@Accessors(chain = true)
 @NoArgsConstructor
 @Table(name = "code_gen_config")
 public class GenConfig implements Serializable {

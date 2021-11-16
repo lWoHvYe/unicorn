@@ -50,7 +50,7 @@ public class GenUtil {
     public static final String EXTRA = "auto_increment";
 
     /**
-     * 获取后端代码模板名称
+     * 获取后端代码模板名称。根据需要调整要生成的类
      *
      * @return List
      */
@@ -166,21 +166,23 @@ public class GenUtil {
             genFile(file, template, genMap);
         }
 
-        // 生成前端代码
-        templates = getFrontTemplateNames();
-        for (String templateName : templates) {
-            Template template = engine.getTemplate("generator/front/" + templateName + ".ftl");
-            String filePath = getFrontFilePath(templateName, genConfig.getApiPath(), genConfig.getPath(), genMap.get("changeClassName").toString());
+        // 生成前端代码。前端路径无值时不生成
+        if (StrUtil.isNotBlank(genConfig.getPath())) {
+            templates = getFrontTemplateNames();
+            for (String templateName : templates) {
+                Template template = engine.getTemplate("generator/front/" + templateName + ".ftl");
+                String filePath = getFrontFilePath(templateName, genConfig.getApiPath(), genConfig.getPath(), genMap.get("changeClassName").toString());
 
-            assert filePath != null;
-            File file = new File(filePath);
+                assert filePath != null;
+                File file = new File(filePath);
 
-            // 如果非覆盖生成
-            if (!genConfig.getCover() && FileUtil.exist(file)) {
-                continue;
+                // 如果非覆盖生成
+                if (!genConfig.getCover() && FileUtil.exist(file)) {
+                    continue;
+                }
+                // 生成代码
+                genFile(file, template, genMap);
             }
-            // 生成代码
-            genFile(file, template, genMap);
         }
     }
 
@@ -347,7 +349,9 @@ public class GenUtil {
      * 定义后端文件路径以及名称
      */
     private static String getAdminFilePath(String templateName, GenConfig genConfig, String className, String rootPath) {
-        String projectPath = rootPath + File.separator + genConfig.getModuleName();
+        // 若不设置模块名称，则不生成在模块内
+        String moduleName = genConfig.getModuleName();
+        String projectPath = StringUtils.isNotBlank(moduleName) ? rootPath + File.separator + moduleName : rootPath;
         String packagePath = projectPath + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator;
         if (!ObjectUtils.isEmpty(genConfig.getPack())) {
             packagePath += genConfig.getPack().replace(".", File.separator) + File.separator;

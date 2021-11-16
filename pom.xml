@@ -73,7 +73,7 @@
         <mapstruct.version>1.4.2.Final</mapstruct.version>
 
         <!--logstash有所依赖，需要使用management统一管理依赖-->
-        <logstash.version>6.6</logstash.version>
+        <logstash.version>7.0</logstash.version>
         <logback.version>1.2.7</logback.version>
         <redisson.version>3.16.4</redisson.version>
         <argLine>
