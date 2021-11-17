@@ -2,9 +2,9 @@
 spring:
   shardingsphere:
     datasource:
-      names: primary-ds,replica-ds-0,replica-ds-1
+      names: write-ds,read-ds-0,read-ds-1
       #     主数据源
-      primary-ds:
+      write-ds:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
         url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
@@ -51,7 +51,7 @@ spring:
             config:
               multi-statement-allow: true
       #     分数据源
-      replica-ds-0:
+      read-ds-0:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
         url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
@@ -102,7 +102,7 @@ spring:
             config:
               multi-statement-allow: true
       #     分数据源
-      replica-ds-1:
+      read-ds-1:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
         url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
@@ -153,34 +153,32 @@ spring:
             config:
               multi-statement-allow: true
     #    主从配置
-    masterslave:
-      load-balance-algorithm-type: round_robin
-      name: ms
-      master-data-source-name: primary-ds
-      slave-data-source-names: replica-ds-0,replica-ds-1
+    # 读写分离参考：https://github.com/apache/shardingsphere/blob/master/examples/shardingsphere-jdbc-example/single-feature-example/readwrite-splitting-example/readwrite-splitting-spring-boot-jpa-example
+    # https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB
+    rules:
+      # 这里指定了规则，读写分离
+      readwrite-splitting:
+        data-sources:
+          # 这个pr_ds不要漏了。
+          # <data-source-name> (+): # 读写分离逻辑数据源名称
+          pr_ds:
+            write-data-source-name: write-ds #主库数据源名称
+            read-data-source-names:
+              # - <replica-data_source-name> (+) # 从库数据源名称
+              - read-ds-0
+              - read-ds-1
+            load-balancer-name: round_robin # 负载均衡算法名称
+        # 负载均衡算法配置
+        load-balancers:
+          # <load-balancer-name> (+): # 负载均衡算法名称
+          round_robin:
+            type: ROUND_ROBIN # 负载均衡算法类型
+          #  props: # 负载均衡算法属性配置
 
     props:
       sql:
         show：true
-
-#    分库
-#    sharding:
-#      ####默认数据库策略
-#      #https://shardingsphere.apache.org/document/current/cn/user-manual/shardingsphere-jdbc/configuration/built-in-algorithm/sharding/
-#      default-database-strategy:
-#        inline:
-#          # 基于 id，需保证所有表都有这个字段才行
-#          sharding-column: id
-#          algorithm-expression: ds$->{id % 2}
-#
-#      ####主从规则
-#      master-slave-rules:
-#        ds0:
-#          master-data-source-name: primary-ds
-#          slave-data-source-names: replica-ds-0,replica-ds-1
-#        ds1:
-#          master-data-source-name: primary-ds-2
-#          slave-data-source-names: replica-ds-2-0,replica-ds-2-1
+# 分库分表参考：https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87
 
   # cache配置
   cache:

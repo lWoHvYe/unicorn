@@ -27,6 +27,7 @@ public interface CacheKey {
     /**
      * 用户
      */
+    // 接口中可以定义属性，默认（指不用加，但也不能改）是 public static final 的
     String USER_ID = "user::" + LocalCoreConfig.SYS_NAME + "id:";
     /**
      * 数据
