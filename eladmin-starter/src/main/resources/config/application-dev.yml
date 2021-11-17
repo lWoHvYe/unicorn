@@ -153,6 +153,7 @@ spring:
             config:
               multi-statement-allow: true
     #    主从配置
+    # shardingsphere 主从模型中，事务中的数据读写均用主库
     # 读写分离参考：https://github.com/apache/shardingsphere/blob/master/examples/shardingsphere-jdbc-example/single-feature-example/readwrite-splitting-example/readwrite-splitting-spring-boot-jpa-example
     # https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB
     rules:

@@ -16,11 +16,11 @@
 package com.lwohvye.modules.security.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
+import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import com.lwohvye.modules.system.service.DataService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
@@ -50,25 +50,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.loginProperties.setCacheEnable(enableCache);
     }
 
-    /**
-     * 用户信息缓存
-     *
-     * @see {@link UserCacheClean}
-     */
-    //  这种缓存的方式，也许解决了些问题，但导致无法做集群的扩展，故调整为分布式缓存redis
-//    static Map<String, JwtUserDto> userDtoCache = new ConcurrentHashMap<>();
-
-    // 用户缓存的redis key。考虑多系统，这里也要加标识
-    public static final String USER_CACHE_KEY = LocalCoreConfig.SYS_NAME + "Sys-User-JwtInfo-Cache";
 
     @Override
     public JwtUserDto loadUserByUsername(String username) {
         boolean searchDb = true;
         JwtUserDto jwtUserDto = null;
-        if (loginProperties.isCacheEnable() && redisUtils.hHasKey(USER_CACHE_KEY, username)) {
+        if (loginProperties.isCacheEnable() && redisUtils.hHasKey(SecuritySysUtil.getUserCacheKey(), username)) {
 //            jwtUserDto = userDtoCache.get(username);
             // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
-            var cacheUserObj = redisUtils.hGet(USER_CACHE_KEY, username);
+            var cacheUserObj = redisUtils.hGet(SecuritySysUtil.getUserCacheKey(), username);
             if (Objects.isNull(cacheUserObj))
                 return null;
 //            if (cacheUserObj instanceof JSONObject userJon)
@@ -109,7 +99,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 );
 //                userDtoCache.put(username, jwtUserDto);
                 // 设置用户信息有效期，6小时。理论上不设置也可以
-                redisUtils.hPut(USER_CACHE_KEY, username, jwtUserDto, 6 * 60 * 60);
+                redisUtils.hPut(SecuritySysUtil.getUserCacheKey(), username, jwtUserDto, 6 * 60 * 60);
             }
         }
         return jwtUserDto;

@@ -2,11 +2,12 @@ package com.lwohvye.modules.security.utils;
 
 import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
+import com.lwohvye.modules.security.service.UserCacheClean;
 import org.springframework.util.Assert;
 
 /**
  * @author Hongyan Wang
- * @description system模块Security部分工具类
+ * @description system模块Security部分工具类/属性定义
  * @date 2021/6/12 3:36 下午
  */
 public class SecuritySysUtil {
@@ -35,4 +36,15 @@ public class SecuritySysUtil {
         return properties.getExpireNoticeKey() + LocalCoreConfig.SYS_NAME;
     }
 
+    /**
+     * 用户信息缓存
+     *
+     * @see {@link UserCacheClean}
+     */
+    //  这种缓存的方式，也许解决了些问题，但导致无法做集群的扩展，故调整为分布式缓存redis
+//    static Map<String, JwtUserDto> userDtoCache = new ConcurrentHashMap<>();
+    public static String getUserCacheKey() {
+        // 用户缓存的redis key。考虑多系统，这里也要加标识
+        return LocalCoreConfig.SYS_NAME + "Sys-User-JwtInfo-Cache";
+    }
 }

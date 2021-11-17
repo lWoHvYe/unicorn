@@ -16,6 +16,7 @@
 
 package com.lwohvye.modules.security.service;
 
+import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class UserCacheClean {
      */
     public void cleanUserCache(String userName) {
         if (StringUtils.isNotEmpty(userName)) {
-            redisUtils.hDelete(UserDetailsServiceImpl.USER_CACHE_KEY, userName);
+            redisUtils.hDelete(SecuritySysUtil.getUserCacheKey(), userName);
         }
     }
 
@@ -49,6 +50,6 @@ public class UserCacheClean {
      * ,如发生角色授权信息变化，可以简便的全部失效缓存
      */
     public void cleanAll() {
-        redisUtils.delete(UserDetailsServiceImpl.USER_CACHE_KEY);
+        redisUtils.delete(SecuritySysUtil.getUserCacheKey());
     }
 }
