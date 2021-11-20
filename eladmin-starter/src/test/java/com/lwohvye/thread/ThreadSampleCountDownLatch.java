@@ -18,9 +18,9 @@ import java.util.concurrent.*;
  * 使用多线程时，有时需关注其他线程的完成情况
  * 采用线程的方式  Thread
  */
-//TODO 该方式数据进行实时的共享，容易出现线程安全问题，但应用更广泛
-//TODO 但实际上只在最后交互了数据，无法达到预期的交互效果
-//TODO 这里使用了线程安全的ConcurrentHashMap替代HashTable，用于实时的交互，较HashTable效率高一些，但确保了线程的安全
+// 该方式数据进行实时的共享，容易出现线程安全问题，但应用更广泛
+// 但实际上只在最后交互了数据，无法达到预期的交互效果
+// 这里使用了线程安全的ConcurrentHashMap替代HashTable，用于实时的交互，较HashTable效率高一些，但确保了线程的安全
 //@SpringBootTest
 public class ThreadSampleCountDownLatch {
 

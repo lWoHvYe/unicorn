@@ -17,6 +17,7 @@
         <qiniu.version>7.8.0</qiniu.version>
         <alipay.version>4.18.0.ALL</alipay.version>
         <aliyun.oss.version>3.12.0</aliyun.oss.version>
+        <aliyun.dysmsapi.version>2.0.7</aliyun.dysmsapi.version>
     </properties>
 
     <!--  无人维护。其中依赖版本过老，考虑其他方式  -->
@@ -92,7 +93,7 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dysmsapi20170525</artifactId>
-            <version>2.0.6</version>
+            <version>${aliyun.dysmsapi.version}</version>
         </dependency>
 
         <dependency>

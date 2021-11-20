@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 需尤其注意变量的作用范围问题
  * @date 2020/01/07 20:54
  */
-//TODO 使用CompletableFuture,子线程实时共享数据，使用Atomic原之类，资源占用更低，且不会再出现资源丢失的情况
+// 使用CompletableFuture,子线程实时共享数据，使用Atomic原之类，资源占用更低，且不会再出现资源丢失的情况
 //@SpringBootTest
 public class FutureSampleAtomic {
 
@@ -158,7 +158,6 @@ public class FutureSampleAtomic {
                 for (int j = 0; j < simCount; j++) {
 //                开始模拟
                     int count = simulateWork(random, lists, ranArray);
-                    //TODO 后续需对统计进行优化
 //                将模拟结果放入集合中
                     if (count <= 50) {
                         s50.getAndIncrement();
@@ -245,7 +244,6 @@ public class FutureSampleAtomic {
                     numList.addAll(singleList);
                     multiList.add(singleList);
                 }
-                //TODO 模拟部分是花费时间最多的地方，是主要的优化部分
 //            当目标值不为空时进行抽卡
                 while (!numList.isEmpty()) {
 //            开始抽卡

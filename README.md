@@ -11,7 +11,7 @@
 
 启动类及配置文件，参照 eladmin-starter模块
 
-**Java16**之后，针对JDK相关包的访问添加了较多的限制，需在启动时添加相关参数。较简单的是添加 
+**Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数。较简单的是添加 
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围
 
 后台运行jar（开启远程调试端口5005）
@@ -38,7 +38,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 参考：https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching
 
 ```
-当前在Spring Boot 2.5版本存在报错：（使用Idea时正常，jar运行时报错）
+在Spring Boot 2.5版本存在报错(在2.5.1已修复)：（使用Idea时正常，jar运行时报错）
 java.lang.IllegalStateException: No subdirectories found for mandatory directory location 'file:./config/*/'
 解决方式为添加启动参数    --spring.config.location=optional:classpath:/,optional:classpath:/config/,optional:file:./,optional:file:./config/
 参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
@@ -165,6 +165,14 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 - eladmin-tools 系统第三方工具模块
 - eladmin-generator 系统代码生成模块
 ```
+
+#### 运行环境
+
+- Java 17 基础运行环境
+- Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
+- Redis 6.0 缓存
+- RabbitMQ 鉴权结果记录、用户多次验证失败锁定一段时间后自动解锁
+- ELK 日志系统，若不需要可调整logback-spring.xml中的配置
 
 #### 特别鸣谢
 

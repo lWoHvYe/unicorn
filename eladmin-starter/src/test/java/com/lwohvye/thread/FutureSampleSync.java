@@ -147,7 +147,6 @@ public class FutureSampleSync {
                 for (int j = 0; j < simCount; j++) {
 //                开始模拟
                     int count = simulateWork(random, lists, ranArray);
-                    //TODO 后续需对统计进行优化
 //                将模拟结果放入集合中
                     if (count <= 50) synchronized (s50) {
                         s50++;
@@ -244,7 +243,6 @@ public class FutureSampleSync {
                     numList.addAll(singleList);
                     multiList.add(singleList);
                 }
-                //TODO 模拟部分是花费时间最多的地方，是主要的优化部分
 //            当目标值不为空时进行抽卡
                 while (!numList.isEmpty()) {
 //            开始抽卡
