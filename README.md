@@ -9,6 +9,7 @@
 
 本项目在原eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
+---
 启动类及配置文件，参照 eladmin-starter模块
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数。较简单的是添加 
@@ -37,6 +38,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 
 参考：https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching
 
+---
 ```
 在Spring Boot 2.5版本存在报错(在2.5.1已修复)：（使用Idea时正常，jar运行时报错）
 java.lang.IllegalStateException: No subdirectories found for mandatory directory location 'file:./config/*/'
@@ -44,9 +46,58 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
 ```
 
-
+---
 在Spring Boot 2.6.0版本，启动报错PatternsRequestCondition.getPatterns()空指针，原因详见springfox的[issues](https://github.com/springfox/springfox/issues/3462) ，扩展 [URL Matching with PathPattern in Spring MVC](https://spring.io/blog/2020/06/30/url-matching-with-pathpattern-in-spring-mvc) 。该版本Spring boot的 [ Release-Notes ](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
 
+⌚️马上🕑了。天亮再继续。考虑从springfox迁移到springdoc了
+
+  https://github.com/spring-projects/spring-boot/issues/24645
+
+  https://github.com/spring-projects/spring-boot/issues/24805
+
+  https://github.com/spring-projects/spring-boot/issues/21694
+
+  https://github.com/spring-projects/spring-framework/issues/24952
+
+  https://stackoverflow.com/questions/69108273/spring-boot-swagger-documentation-doesnt-work/69814964
+
+If one insists on continuing to use Springfox with Spring Boot >= 2.6, one can try to force use of Ant Path Matching by setting
+```yaml
+spring.mvc.pathmatch.matching-strategy=ant_path_matcher
+```
+
+Forcing Ant Path Matching on the actuators is a separate problem. It works by injecting the WebMvcEndpointHandlerMapping that was auto-configured before the change by WebMvcEndpointManagementContextConfiguration:
+```java
+@Bean
+public WebMvcEndpointHandlerMapping webEndpointServletHandlerMapping(
+    WebEndpointsSupplier webEndpointsSupplier,
+    ServletEndpointsSupplier servletEndpointsSupplier, ControllerEndpointsSupplier controllerEndpointsSupplier,
+    EndpointMediaTypes endpointMediaTypes, CorsEndpointProperties corsProperties,
+    WebEndpointProperties webEndpointProperties, Environment environment) {
+  List<ExposableEndpoint<?>> allEndpoints = new ArrayList<>();
+  Collection<ExposableWebEndpoint> webEndpoints = webEndpointsSupplier.getEndpoints();
+  allEndpoints.addAll(webEndpoints);
+  allEndpoints.addAll(servletEndpointsSupplier.getEndpoints());
+  allEndpoints.addAll(controllerEndpointsSupplier.getEndpoints());
+  String basePath = webEndpointProperties.getBasePath();
+  EndpointMapping endpointMapping = new EndpointMapping(basePath);
+  boolean shouldRegisterLinksMapping = shouldRegisterLinksMapping(webEndpointProperties, environment, basePath);
+  return new WebMvcEndpointHandlerMapping(endpointMapping, webEndpoints, endpointMediaTypes,
+      corsProperties.toCorsConfiguration(), new EndpointLinksResolver(allEndpoints, basePath),
+      shouldRegisterLinksMapping);
+}
+
+private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment,
+    String basePath) {
+  return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.hasText(basePath)
+      || ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
+}
+```
+There may be a cleverer way by excluding the actuators from being analyzed by Springfox in the first place.
+
+You're mileage may vary. Switching to springdoc is probably the more worthwhile approach.
+
+---
 
 **Java 17**，发布中央仓库，需要在maven的vm中配置。若不需要deploy，无需添加
 ```
@@ -56,7 +107,7 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 --add-opens java.base/java.text=ALL-UNNAMED
 --add-opens java.desktop/java.awt.font=ALL-UNNAMED
 ```
-
+---
 #### Maven引用方式 🎵 
 最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
 
@@ -70,7 +121,7 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 </dependency>
 
 ```
-
+---
 #### 项目简介
 
 一个基于 Spring Boot 2.5.6 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
@@ -204,6 +255,7 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 
 - QQ交流群：一群：<strike>891137268</strike> 已满、二群：947578238
 
+---
 #### 启动类示例
 
 ```java
@@ -275,7 +327,7 @@ public class AppRun {
     }
 }
 ```
-
+---
 #### MapStruct介绍
 
 | Option                                           | Purpose                                                      | Default   |
@@ -293,6 +345,7 @@ MapStruct 提供的重要注解 :
 
 @Mapping : 解决源对象和目标对象中，属性名字不同的情况
 
+---
 部署脚本
 
 ```shell
@@ -326,6 +379,7 @@ kill -15 "$pid"
 fi
 ```
 
+---
 #### TODO
 - 整合Redisson（当前无法配置过期通知，待解决）
 - JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）
