@@ -44,6 +44,10 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
 ```
 
+
+在Spring Boot 2.6.0版本，启动报错PatternsRequestCondition.getPatterns()空指针，原因详见[issues](https://github.com/springfox/springfox/issues/3462) 。该版本Spring boot的 [ Release-Notes ](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
+
+
 **Java 17**，发布中央仓库，需要在maven的vm中配置。若不需要deploy，无需添加
 ```
 --add-opens java.base/java.lang=ALL-UNNAMED
