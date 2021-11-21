@@ -44,7 +44,7 @@ import java.util.*;
  */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "系统：部门管理")
+@Tag(name = "DeptController", description = "系统：部门管理")
 @RequestMapping("/api/dept")
 public class DeptController {
 

@@ -29,35 +29,36 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 发送邮件
+ *
  * @author 郑杰
  * @date 2018/09/28 6:55:53
  */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/email")
-@Tag(name = "工具：邮件管理")
+@Tag(name = "EmailController", description = "工具：邮件管理")
 public class EmailController {
 
     private final EmailService emailService;
 
     @GetMapping
-    public ResponseEntity<Object> queryConfig(){
-        return new ResponseEntity<>(emailService.find(),HttpStatus.OK);
+    public ResponseEntity<Object> queryConfig() {
+        return new ResponseEntity<>(emailService.find(), HttpStatus.OK);
     }
 
     @Log("配置邮件")
     @PutMapping
     @Operation(summary = "配置邮件")
     public ResponseEntity<Object> updateConfig(@Validated @RequestBody EmailConfig emailConfig) throws Exception {
-        emailService.config(emailConfig,emailService.find());
+        emailService.config(emailConfig, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Log("发送邮件")
     @PostMapping
     @Operation(summary = "发送邮件")
-    public ResponseEntity<Object> sendEmail(@Validated @RequestBody EmailVo emailVo){
-        emailService.send(emailVo,emailService.find());
+    public ResponseEntity<Object> sendEmail(@Validated @RequestBody EmailVo emailVo) {
+        emailService.send(emailVo, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

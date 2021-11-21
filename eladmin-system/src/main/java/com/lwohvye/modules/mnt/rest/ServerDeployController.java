@@ -39,7 +39,7 @@ import java.util.Set;
  * @date 2019-08-24
  */
 @RestController
-@Tag(name = "运维：服务器管理")
+@Tag(name = "ServerDeployController", description = "运维：服务器管理")
 @RequiredArgsConstructor
 @RequestMapping("/api/serverDeploy")
 public class ServerDeployController {
@@ -53,7 +53,7 @@ public class ServerDeployController {
         serverDeployService.download(serverDeployService.queryAll(criteria), response);
     }
 
-    @Operation(summary ="查询服务器")
+    @Operation(summary = "查询服务器")
     @GetMapping
     @PreAuthorize("@el.check('serverDeploy:list')")
     public ResponseEntity<Object> query(ServerDeployQueryCriteria criteria, Pageable pageable) {
@@ -61,7 +61,7 @@ public class ServerDeployController {
     }
 
     @Log("新增服务器")
-    @Operation(summary ="新增服务器")
+    @Operation(summary = "新增服务器")
     @PostMapping
     @PreAuthorize("@el.check('serverDeploy:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody ServerDeploy resources) {
@@ -70,7 +70,7 @@ public class ServerDeployController {
     }
 
     @Log("修改服务器")
-    @Operation(summary ="修改服务器")
+    @Operation(summary = "修改服务器")
     @PutMapping
     @PreAuthorize("@el.check('serverDeploy:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody ServerDeploy resources) {
@@ -79,7 +79,7 @@ public class ServerDeployController {
     }
 
     @Log("删除服务器")
-    @Operation(summary ="删除Server")
+    @Operation(summary = "删除Server")
     @DeleteMapping
     @PreAuthorize("@el.check('serverDeploy:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
@@ -88,7 +88,7 @@ public class ServerDeployController {
     }
 
     @Log("测试连接服务器")
-    @Operation(summary ="测试连接服务器")
+    @Operation(summary = "测试连接服务器")
     @PostMapping("/testConnect")
     @PreAuthorize("@el.check('serverDeploy:add')")
     public ResponseEntity<Object> testConnect(@Validated @RequestBody ServerDeploy resources) {

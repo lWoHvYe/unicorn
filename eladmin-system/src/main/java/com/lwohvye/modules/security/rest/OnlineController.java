@@ -39,7 +39,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth/online")
-@Tag(name = "系统：在线用户管理")
+@Tag(name = "OnlineController", description = "系统：在线用户管理")
 public class OnlineController {
 
     private final OnlineUserService onlineUserService;

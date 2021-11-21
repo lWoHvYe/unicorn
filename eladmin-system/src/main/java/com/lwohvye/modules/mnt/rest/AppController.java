@@ -40,7 +40,7 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "运维：应用管理")
+@Tag(name = "AppController", description = "运维：应用管理")
 @RequestMapping("/api/app")
 public class AppController {
 
@@ -53,7 +53,7 @@ public class AppController {
         appService.download(appService.queryAll(criteria), response);
     }
 
-    @Operation(summary ="查询应用")
+    @Operation(summary = "查询应用")
     @GetMapping
     @PreAuthorize("@el.check('app:list')")
     public ResponseEntity<Object> query(AppQueryCriteria criteria, Pageable pageable) {
@@ -61,7 +61,7 @@ public class AppController {
     }
 
     @Log("新增应用")
-    @Operation(summary ="新增应用")
+    @Operation(summary = "新增应用")
     @PostMapping
     @PreAuthorize("@el.check('app:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody App resources) {
@@ -70,7 +70,7 @@ public class AppController {
     }
 
     @Log("修改应用")
-    @Operation(summary ="修改应用")
+    @Operation(summary = "修改应用")
     @PutMapping
     @PreAuthorize("@el.check('app:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody App resources) {
@@ -79,7 +79,7 @@ public class AppController {
     }
 
     @Log("删除应用")
-    @Operation(summary ="删除应用")
+    @Operation(summary = "删除应用")
     @DeleteMapping
     @PreAuthorize("@el.check('app:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {

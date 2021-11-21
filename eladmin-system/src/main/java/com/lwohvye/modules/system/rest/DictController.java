@@ -42,7 +42,7 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "系统：字典管理")
+@Tag(name = "DictController", description = "系统：字典管理")
 @RequestMapping("/api/dict")
 public class DictController {
 

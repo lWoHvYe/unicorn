@@ -42,7 +42,7 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "系统：岗位管理")
+@Tag(name = "JobController", description = "系统：岗位管理")
 @RequestMapping("/api/job")
 public class JobController {
 

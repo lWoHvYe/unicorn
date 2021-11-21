@@ -36,12 +36,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
-* @author Zheng Jie
-* @date 2019-09-05
-*/
+ * @author Zheng Jie
+ * @date 2019-09-05
+ */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "工具：本地存储管理")
+@Tag(name = "LocalStorageController", description = "工具：本地存储管理")
 @RequestMapping("/api/localStorage")
 public class LocalStorageController {
 
@@ -50,8 +50,8 @@ public class LocalStorageController {
     @Operation(summary = "查询文件")
     @GetMapping
     @PreAuthorize("@el.check('storage:list')")
-    public ResponseEntity<Object> query(LocalStorageQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(localStorageService.queryAll(criteria,pageable),HttpStatus.OK);
+    public ResponseEntity<Object> query(LocalStorageQueryCriteria criteria, Pageable pageable) {
+        return new ResponseEntity<>(localStorageService.queryAll(criteria, pageable), HttpStatus.OK);
     }
 
     @Operation(summary = "导出数据")
@@ -64,17 +64,17 @@ public class LocalStorageController {
     @Operation(summary = "上传文件")
     @PostMapping
     @PreAuthorize("@el.check('storage:add')")
-    public ResponseEntity<Object> create(@RequestParam String name, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<Object> create(@RequestParam String name, @RequestParam("file") MultipartFile file) {
         localStorageService.create(name, file);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/pictures")
     @Operation(summary = "上传图片")
-    public ResponseEntity<Object> upload(@RequestParam MultipartFile file){
+    public ResponseEntity<Object> upload(@RequestParam MultipartFile file) {
         // 判断文件是否为图片
         String suffix = FileUtil.getExtensionName(file.getOriginalFilename());
-        if(!FileUtil.IMAGE.equals(FileUtil.getFileType(suffix))){
+        if (!FileUtil.IMAGE.equals(FileUtil.getFileType(suffix))) {
             throw new BadRequestException("只能上传图片");
         }
         LocalStorage localStorage = localStorageService.create(null, file);
@@ -85,7 +85,7 @@ public class LocalStorageController {
     @Operation(summary = "修改文件")
     @PutMapping
     @PreAuthorize("@el.check('storage:edit')")
-    public ResponseEntity<Object> update(@Validated @RequestBody LocalStorage resources){
+    public ResponseEntity<Object> update(@Validated @RequestBody LocalStorage resources) {
         localStorageService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

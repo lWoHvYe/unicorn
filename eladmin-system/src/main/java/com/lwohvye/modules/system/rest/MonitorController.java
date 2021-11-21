@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "系统：服务监控管理")
+@Tag(name = "MonitorController", description = "系统：服务监控管理")
 @RequestMapping("/api/monitor")
 public class MonitorController {
 

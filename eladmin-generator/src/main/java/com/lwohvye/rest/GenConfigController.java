@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/genConfig")
-@Tag(name = "系统：代码生成器配置管理")
+@Tag(name = "GenConfigController", description = "系统：代码生成器配置管理")
 public class GenConfigController {
 
     private final GenConfigService genConfigService;

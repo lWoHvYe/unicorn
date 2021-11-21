@@ -58,7 +58,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-11-23
  */
-@Tag(name = "系统：用户管理")
+@Tag(name = "UserController", description = "系统：用户管理")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor

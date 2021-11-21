@@ -277,7 +277,7 @@ jwt:
 springdoc:
   swagger-ui:
     # 自定义的文档界面访问路径。默认访问路径是/swagger-ui.html
-    path: /springdoc/docs.html
+    path: /swagger-ui.html
 
     # 字符串类型，一共三个值来控制操作和标记的默认展开设置。它可以是“list”（仅展开标记）、“full”（展开标记和操作）或“none”（不展开任何内容）。
     docExpansion: none
@@ -299,7 +299,7 @@ springdoc:
     enabled: true
 
     # 自定义的文档api元数据访问路径。默认访问路径是/v3/api-docs
-    path: /springdoc/api-docs
+    path: /v3/api-docs
 
     # 布尔值。在@Schema（名称name、标题title和说明description，三个属性）上启用属性解析程序。
     resolve-schema-properties: true
@@ -347,6 +347,10 @@ local:
     name: X0X
     # 一个开关，标识是否加载相关但类
     load-os: true
+    # 表名映射
+    table-name:
+      user: sys_user
+
 
 # oss配置
 alibaba:

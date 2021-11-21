@@ -39,7 +39,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/logs")
-@Tag(name = "系统：日志管理")
+@Tag(name = "LogController", description = "系统：日志管理")
 public class LogController {
 
     private final LogService logService;

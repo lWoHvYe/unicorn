@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/aliyunOSS")
-@Tag(name = "工具：对象存储OSS")
+@Tag(name = "AliyunOSSController", description = "工具：对象存储OSS")
 public class AliyunOSSController {
 
     private final AliyunOSSService aliyunOSSService;

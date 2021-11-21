@@ -40,7 +40,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/generator")
-@Tag(name = "系统：代码生成管理")
+@Tag(name = "GeneratorController", description = "系统：代码生成管理")
 public class GeneratorController {
 
     private final GeneratorService generatorService;

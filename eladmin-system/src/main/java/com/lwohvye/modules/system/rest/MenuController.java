@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "系统：菜单管理")
+@Tag(name = "MenuController", description = "系统：菜单管理")
 @RequestMapping("/api/menus")
 public class MenuController {
 

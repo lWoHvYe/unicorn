@@ -127,10 +127,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/webSocket/**"
                 ).permitAll()
                 // swagger 文档
-                .antMatchers("/swagger-ui.html").permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/*/api-docs").permitAll()
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // 文件
                 .antMatchers("/avatar/**").permitAll()
                 .antMatchers("/file/**").permitAll()

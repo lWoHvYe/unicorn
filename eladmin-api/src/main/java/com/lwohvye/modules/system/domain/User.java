@@ -53,7 +53,7 @@ import java.util.Set;
 @DynamicInsert
 //@DynamicUpdate属性:默认为true,表示update对象的时候,生成动态的update语句,如果这个字段的值是null就不会被加入到update语句中。这个也许不太常用
 //@DynamicUpdate
-@Table(name = "sys_user")
+@Table(name = "#{local.sys.table-name.user:sys_user}")
 public class User extends BaseEntity implements Serializable {
 
     @Id

@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @RestController
 @RequestMapping("/api/limit")
-@Tag(name = "系统：限流测试管理")
+@Tag(name = "LimitController", description = "系统：限流测试管理")
 public class LimitController {
 
     private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger();

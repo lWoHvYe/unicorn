@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "系统：角色管理")
+@Tag(name = "RoleController", description = "系统：角色管理")
 @RequestMapping("/api/roles")
 public class RoleController {
 

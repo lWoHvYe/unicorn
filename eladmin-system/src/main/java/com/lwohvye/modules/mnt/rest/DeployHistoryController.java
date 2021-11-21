@@ -33,12 +33,12 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author zhanghouying
+ * @date 2019-08-24
+ */
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "运维：部署历史管理")
+@Tag(name = "DeployHistoryController", description = "运维：部署历史管理")
 @RequestMapping("/api/deployHistory")
 public class DeployHistoryController {
 
@@ -51,19 +51,19 @@ public class DeployHistoryController {
         deployhistoryService.download(deployhistoryService.queryAll(criteria), response);
     }
 
-    @Operation(summary ="查询部署历史")
+    @Operation(summary = "查询部署历史")
     @GetMapping
-	@PreAuthorize("@el.check('deployHistory:list')")
-    public ResponseEntity<Object> query(DeployHistoryQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(ResultInfo.success(deployhistoryService.queryAll(criteria,pageable)),HttpStatus.OK);
+    @PreAuthorize("@el.check('deployHistory:list')")
+    public ResponseEntity<Object> query(DeployHistoryQueryCriteria criteria, Pageable pageable) {
+        return new ResponseEntity<>(ResultInfo.success(deployhistoryService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("删除DeployHistory")
-    @Operation(summary ="删除部署历史")
-	@DeleteMapping
+    @Operation(summary = "删除部署历史")
+    @DeleteMapping
     @PreAuthorize("@el.check('deployHistory:del')")
-    public ResponseEntity<Object> delete(@RequestBody Set<String> ids){
+    public ResponseEntity<Object> delete(@RequestBody Set<String> ids) {
         deployhistoryService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(),HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 }
