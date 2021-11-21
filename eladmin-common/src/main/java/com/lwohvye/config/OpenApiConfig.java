@@ -12,16 +12,11 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootVersion;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +44,7 @@ import java.util.List;
 // @io.swagger.v3.oas.annotations.security.SecurityScheme(type = SecuritySchemeType.HTTP, name = "Authorization", scheme = "Bearer", in = SecuritySchemeIn.HEADER)
 @Configuration
 @RequiredArgsConstructor
-public class OpenApiConfig implements WebMvcConfigurer {
+public class OpenApiConfig {
 
     private final SwaggerProperties swaggerProperties;
 
@@ -66,7 +61,7 @@ public class OpenApiConfig implements WebMvcConfigurer {
         // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#securitySchemeObject
         // 接口调试路径
         var tryServer = new Server().url(swaggerProperties.getTryHost());
-        var contact = new Contact().name("王红岩-_-lWoHvYe").email("lWoHvYe@outlook.com");
+        var contact = new Contact().name("王红岩-_-lWoHvYe").url("https://www.lwohvye.com").email("lWoHvYe@outlook.com");
         var license = new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.html");
         return new OpenAPI()
                 .components(components())
@@ -89,7 +84,7 @@ public class OpenApiConfig implements WebMvcConfigurer {
     private Components components() {
         // 在这里定义的SecurityScheme，对应需放到header中的，需要在SecurityRequirement中配置使用的地方，在接口文档处，请求才会带上
         return new Components()
-                .addSecuritySchemes(tokenHeader, new SecurityScheme().type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.HEADER).name(tokenHeader).description("token令牌").bearerFormat("JWT"))
+                .addSecuritySchemes(tokenHeader, new SecurityScheme().type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.HEADER).name(tokenHeader).description("token令牌"))
                 .addSecuritySchemes("bearerAuth", new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT"))
                 .addSecuritySchemes("basicScheme", new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic"))
                 // 这个在下面配置了全局请求头，所以都会带上
@@ -114,28 +109,7 @@ public class OpenApiConfig implements WebMvcConfigurer {
     @Bean
     public OpenApiCustomiser customerGlobalHeaderOpenApiCustomiser() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
-                .forEach(operation -> {
-                    operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/SpInfo"));
-                });
-    }
-
-    /**
-     * 通用拦截器排除设置，所有拦截器都会自动加springdoc-opapi相关的资源排除信息，不用在应用程序自身拦截器定义的地方去添加，算是良心解耦实现。
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        try {
-            var registrationsField = FieldUtils.getField(InterceptorRegistry.class, "registrations", true);
-            var registrations = (List<InterceptorRegistration>) ReflectionUtils.getField(registrationsField, registry);
-            if (registrations != null) {
-                for (InterceptorRegistration interceptorRegistration : registrations) {
-                    interceptorRegistration.excludePathPatterns("/v3/api-docs/**", "/swagger-ui/**");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                .forEach(operation -> operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/SpInfo")));
     }
 
 }

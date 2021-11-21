@@ -19,17 +19,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -46,7 +46,8 @@ import java.util.List;
 // 在WebMvcAutoConfiguration类上标了一个如下注解：
 // @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 // 以上这行代码的意思就是当前IOC容器中没有WebMvcConfigurationSupport这个类的实例时自动配置类才会生效，这也就是在配置类上标注@EnableWebMvc会导致自动配置类WebMvcAutoConfiguration失效的原因。
-@EnableWebMvc
+// 配置后导致openApi的/v3/api-docs接口返回数据被转义，swagger-ui无法使用。移除遇到的问题已解决
+// @EnableWebMvc
 public class ConfigurerAdapter implements WebMvcConfigurer {
 
     /**
@@ -83,6 +84,26 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         return new CorsFilter(source);
     }
 
+
+    /**
+     * 通用拦截器排除设置，所有拦截器都会自动加springdoc-opapi相关的资源排除信息，不用在应用程序自身拦截器定义的地方去添加，算是良心解耦实现。
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        try {
+            var registrationsField = FieldUtils.getField(InterceptorRegistry.class, "registrations", true);
+            var registrations = (List<InterceptorRegistration>) ReflectionUtils.getField(registrationsField, registry);
+            if (registrations != null) {
+                for (InterceptorRegistration interceptorRegistration : registrations) {
+                    interceptorRegistration.excludePathPatterns("/v3/api-docs/**", "/swagger-ui/**");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         FileProperties.ElPath path = properties.getOSPath();
@@ -93,28 +114,28 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/").setCachePeriod(0);
     }
 
-    // @Override
-    // public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    //     var jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-    //     var supportedMediaTypes = new ArrayList<MediaType>();
-    //     /**
-    //      * Public constant media type for {@code application/json;charset=UTF-8}.
-    //      * @deprecated as of 5.2 in favor of {@link #APPLICATION_JSON}
-    //      * since major browsers like Chrome
-    //      * <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=438464">
-    //      * now comply with the specification</a> and interpret correctly UTF-8 special
-    //      * characters without requiring a {@code charset=UTF-8} parameter.
-    //      */
-    //     supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-    //     jackson2HttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-    //     var jsonMapper = JsonMapper.builder()
-    //             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    //             .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
-    //             .serializationInclusion(JsonInclude.Include.NON_NULL)
-    //             .build();
-    //     jsonMapper.registerModule(new JavaTimeModule());
-    //     jackson2HttpMessageConverter.setObjectMapper(jsonMapper);
-    //     jackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
-    //     converters.add(jackson2HttpMessageConverter);
-    // }
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        var jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        var supportedMediaTypes = new ArrayList<MediaType>();
+        /**
+         * Public constant media type for {@code application/json;charset=UTF-8}.
+         * @deprecated as of 5.2 in favor of {@link #APPLICATION_JSON}
+         * since major browsers like Chrome
+         * <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=438464">
+         * now comply with the specification</a> and interpret correctly UTF-8 special
+         * characters without requiring a {@code charset=UTF-8} parameter.
+         */
+        supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+        jackson2HttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
+        var jsonMapper = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+                .serializationInclusion(JsonInclude.Include.NON_NULL)
+                .build();
+        jsonMapper.registerModule(new JavaTimeModule());
+        jackson2HttpMessageConverter.setObjectMapper(jsonMapper);
+        jackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
+        converters.add(jackson2HttpMessageConverter);
+    }
 }
