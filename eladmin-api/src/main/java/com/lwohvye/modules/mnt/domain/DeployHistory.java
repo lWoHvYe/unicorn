@@ -15,13 +15,17 @@
  */
 package com.lwohvye.modules.mnt.domain;
 
-import io.swagger.annotations.ApiModelProperty;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -37,23 +41,23 @@ public class DeployHistory implements Serializable {
 
     @Id
     @Column(name = "history_id")
-	@ApiModelProperty(value = "ID", hidden = true)
+	@Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
     private String id;
 
-    @ApiModelProperty(value = "应用名称")
+    @Schema(description = "应用名称" )
     private String appName;
 
-	@ApiModelProperty(value = "IP")
+	@Schema(description = "IP" )
     private String ip;
 
 	@CreationTimestamp
-	@ApiModelProperty(value = "部署时间")
+	@Schema(description = "部署时间" )
     private Timestamp deployDate;
 
-	@ApiModelProperty(value = "部署者")
+	@Schema(description = "部署者" )
     private String deployUser;
 
-	@ApiModelProperty(value = "部署ID")
+	@Schema(description = "部署ID" )
 	private Long deployId;
 
     public void copy(DeployHistory source){

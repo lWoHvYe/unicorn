@@ -25,8 +25,9 @@ import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.result.ResultInfo;
 import com.wf.captcha.base.Captcha;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -51,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Api(tags = "系统：系统授权接口")
+@Tag(name = "系统：系统授权接口")
 public class AuthorizationController {
     private final SecurityProperties properties;
     //    缓存
@@ -63,7 +64,7 @@ public class AuthorizationController {
     private LoginProperties loginProperties;
 
 
-//    @ApiOperation("登录授权")
+    //    @Operation(summary = "登录授权")
 //    @AnonymousPostMapping(value = "/login")
 //    public ResponseEntity<Object> login(@Validated @RequestBody AuthUserDto authUser, HttpServletRequest request) throws Exception {
 //
@@ -123,13 +124,13 @@ public class AuthorizationController {
 //        return ResponseEntity.ok(authInfo);
 //    }
 //
-    @ApiOperation("获取用户信息")
+    @Operation(summary = "获取用户信息")
     @GetMapping(value = "/info")
     public ResponseEntity<Object> getUserInfo() {
         return ResponseEntity.ok(SecurityUtils.getCurrentUser());
     }
 
-    @ApiOperation("获取验证码")
+    @Operation(summary = "获取验证码")
     @AnonymousGetMapping(value = "/code")
     public ResponseEntity<Object> getCode() {
         // 获取运算的结果
@@ -152,7 +153,7 @@ public class AuthorizationController {
         return ResponseEntity.ok(imgResult);
     }
 
-    @ApiOperation("退出登录")
+    @Operation(summary = "退出登录")
     @AnonymousDeleteMapping(value = "/logout")
     public ResponseEntity<Object> logout(HttpServletRequest request) {
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
@@ -164,6 +165,8 @@ public class AuthorizationController {
      * @description Redisson中lock的使用
      * @date 2021/10/27 13:35
      */
+    @Hidden
+    @GetMapping(value = "/doBusiness5Lock")
     public ResponseEntity<Object> doBusiness5Lock(HttpServletRequest request) {
 
         // ---------------------------------Session相关---------------------------------------

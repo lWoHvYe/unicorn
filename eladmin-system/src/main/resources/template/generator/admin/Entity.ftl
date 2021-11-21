@@ -17,7 +17,7 @@ package ${package}.domain;
 
 import lombok.Data;
 import cn.hutool.core.bean.BeanUtil;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import cn.hutool.core.bean.copier.CopyOptions;
 import javax.persistence.*;
 <#if isNotNullColumns??>
@@ -71,9 +71,9 @@ public class ${className} implements Serializable {
     </#if>
     </#if>
     <#if column.remark != ''>
-    @ApiModelProperty(value = "${column.remark}")
+    @Schema(description ="${column.remark}")
     <#else>
-    @ApiModelProperty(value = "${column.changeColumnName}")
+    @Schema(description ="${column.changeColumnName}")
     </#if>
     private ${column.columnType} ${column.changeColumnName};
     </#list>

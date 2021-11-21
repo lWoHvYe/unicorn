@@ -15,16 +15,16 @@
  */
 package com.lwohvye.modules.system.rest;
 
+import com.lwohvye.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Job;
 import com.lwohvye.modules.system.service.JobService;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.annotation.Log;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,21 +42,21 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "系统：岗位管理")
+@Tag(name = "系统：岗位管理")
 @RequestMapping("/api/job")
 public class JobController {
 
     private final JobService jobService;
     private static final String ENTITY_NAME = "job";
 
-    @ApiOperation("导出岗位数据")
+    @Operation(summary = "导出岗位数据")
     @GetMapping(value = "/download")
     @PreAuthorize("@el.check('job:list')")
     public void download(HttpServletResponse response, JobQueryCriteria criteria) throws IOException {
         jobService.download(jobService.queryAll(criteria), response);
     }
 
-    @ApiOperation("查询岗位")
+    @Operation(summary = "查询岗位")
     @GetMapping
     @PreAuthorize("@el.check('job:list','user:list')")
     public ResponseEntity<Object> query(JobQueryCriteria criteria, Pageable pageable) {
@@ -64,7 +64,7 @@ public class JobController {
     }
 
     @Log("新增岗位")
-    @ApiOperation("新增岗位")
+    @Operation(summary = "新增岗位")
     @PostMapping
     @PreAuthorize("@el.check('job:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody Job resources) {
@@ -76,7 +76,7 @@ public class JobController {
     }
 
     @Log("修改岗位")
-    @ApiOperation("修改岗位")
+    @Operation(summary = "修改岗位")
     @PutMapping
     @PreAuthorize("@el.check('job:edit')")
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Job resources) {
@@ -85,7 +85,7 @@ public class JobController {
     }
 
     @Log("删除岗位")
-    @ApiOperation("删除岗位")
+    @Operation(summary = "删除岗位")
     @DeleteMapping
     @PreAuthorize("@el.check('job:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {

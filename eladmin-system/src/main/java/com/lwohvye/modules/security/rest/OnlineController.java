@@ -16,11 +16,11 @@
 package com.lwohvye.modules.security.rest;
 
 import com.lwohvye.modules.security.service.OnlineUserService;
-import com.lwohvye.utils.result.ResultInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
 import com.lwohvye.utils.EncryptUtils;
+import com.lwohvye.utils.result.ResultInfo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,26 +39,26 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth/online")
-@Api(tags = "系统：在线用户管理")
+@Tag(name = "系统：在线用户管理")
 public class OnlineController {
 
     private final OnlineUserService onlineUserService;
 
-    @ApiOperation("查询在线用户")
+    @Operation(summary = "查询在线用户")
     @GetMapping
     @PreAuthorize("@el.check()")
     public ResponseEntity<Object> query(String filter, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(onlineUserService.getAll(filter, pageable)), HttpStatus.OK);
     }
 
-    @ApiOperation("导出数据")
+    @Operation(summary = "导出数据")
     @GetMapping(value = "/download")
     @PreAuthorize("@el.check()")
     public void download(HttpServletResponse response, String filter) throws IOException {
         onlineUserService.download(onlineUserService.getAll(filter), response);
     }
 
-    @ApiOperation("踢出用户")
+    @Operation(summary = "踢出用户")
     @DeleteMapping
     @PreAuthorize("@el.check()")
     public ResponseEntity<Object> delete(@RequestBody Set<String> keys) {

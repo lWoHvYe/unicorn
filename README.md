@@ -17,14 +17,14 @@
 
 后台运行jar（开启远程调试端口5005）
 ```shell
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.17.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-3.0.0.jar >nohup.out 2>&1 &
 ```
 
 若外置依赖启动参数需添加，``-Dloader.path=lib``引入依赖。外置依赖可以大大减少jar包的体积。方便后续更新部署
 
 ```shell
 #启动示例
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.17.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.0.jar >nohup.out 2>&1 &
 ```
 
 | key                | 目的                                                         |
@@ -349,9 +349,9 @@ MapStruct 提供的重要注解 :
 部署脚本
 
 ```shell
-mv -f /opt/upload/eladmin-system-2.6.17.jar /opt/app
+mv -f /opt/upload/eladmin-system-3.0.0.jar /opt/app
 cd /opt/app
-nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.17.jar >nohup.out 2>&1 &
+nohup /usr/java/jdk-14/bin/java -jar eladmin-system-3.0.0.jar >nohup.out 2>&1 &
 ```
 
 启动脚本
@@ -360,7 +360,7 @@ nohup /usr/java/jdk-14/bin/java -jar eladmin-system-2.6.17.jar >nohup.out 2>&1 &
 #!/bin/bash
 cd /opt/app
 echo "执行...."
-nohup /usr/java/jdk-17/bin/java -jar eladmin-system-2.6.17.jar >nohup.out 2>&1 &
+nohup /usr/java/jdk-17/bin/java -jar eladmin-system-3.0.0.jar >nohup.out 2>&1 &
 echo "启动成功"
 ```
 
@@ -370,7 +370,7 @@ echo "启动成功"
 #!/bin/bash
 echo "stop SpringBoot BAppApiServerApplication"
 # shellcheck disable=SC2009
-pid=$(ps -ef | grep eladmin-system-2.6.17.jar | grep -v grep | awk '{print $2}')
+pid=$(ps -ef | grep eladmin-system-3.0.0.jar | grep -v grep | awk '{print $2}')
 echo "旧应用进程id：$pid"
 if [ -n "$pid" ]
 then

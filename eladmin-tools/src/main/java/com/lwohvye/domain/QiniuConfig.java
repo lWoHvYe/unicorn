@@ -15,9 +15,13 @@
  */
 package com.lwohvye.domain;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
@@ -33,19 +37,19 @@ public class QiniuConfig implements Serializable {
 
     @Id
     @Column(name = "config_id")
-    @ApiModelProperty(value = "ID")
+    @Schema(description = "ID" )
     private Long id;
 
     @NotBlank
-    @ApiModelProperty(value = "accessKey")
+    @Schema(description = "accessKey" )
     private String accessKey;
 
     @NotBlank
-    @ApiModelProperty(value = "secretKey")
+    @Schema(description = "secretKey" )
     private String secretKey;
 
     @NotBlank
-    @ApiModelProperty(value = "存储空间名称作为唯一的 Bucket 识别符")
+    @Schema(description ="存储空间名称作为唯一的 Bucket 识别符")
     private String bucket;
 
     /**
@@ -57,13 +61,13 @@ public class QiniuConfig implements Serializable {
      * 东南亚	Zone.zoneAs0()
      */
     @NotBlank
-    @ApiModelProperty(value = "Zone表示与机房的对应关系")
+    @Schema(description = "Zone表示与机房的对应关系" )
     private String zone;
 
     @NotBlank
-    @ApiModelProperty(value = "外链域名，可自定义，需在七牛云绑定")
+    @Schema(description ="外链域名，可自定义，需在七牛云绑定")
     private String host;
 
-    @ApiModelProperty(value = "空间类型：公开/私有")
+    @Schema(description ="空间类型：公开/私有")
     private String type = "公开";
 }

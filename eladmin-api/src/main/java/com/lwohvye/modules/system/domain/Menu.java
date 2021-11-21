@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.base.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -42,55 +42,55 @@ public class Menu extends BaseEntity implements Serializable {
     @Id
     @Column(name = "menu_id")
     @NotNull(groups = {Update.class})
-    @ApiModelProperty(value = "ID", hidden = true)
+    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "menus")
-    @ApiModelProperty(value = "菜单角色")
+    @Schema(description = "菜单角色" )
     private Set<Role> roles;
 
-    @ApiModelProperty(value = "菜单标题")
+    @Schema(description = "菜单标题" )
     private String title;
 
     @Column(name = "name")
-    @ApiModelProperty(value = "菜单组件名称")
+    @Schema(description = "菜单组件名称" )
     private String componentName;
 
-    @ApiModelProperty(value = "排序")
+    @Schema(description = "排序" )
     private Integer menuSort = 999;
 
-    @ApiModelProperty(value = "组件路径")
+    @Schema(description = "组件路径" )
     private String component;
 
-    @ApiModelProperty(value = "路由地址")
+    @Schema(description = "路由地址" )
     private String path;
 
-    @ApiModelProperty(value = "菜单类型，目录、菜单、按钮")
+    @Schema(description ="菜单类型，目录、菜单、按钮")
     private Integer type;
 
-    @ApiModelProperty(value = "权限标识")
+    @Schema(description = "权限标识" )
     private String permission;
 
-    @ApiModelProperty(value = "菜单图标")
+    @Schema(description = "菜单图标" )
     private String icon;
 
     @Column(columnDefinition = "bit(1) default 0")
-    @ApiModelProperty(value = "缓存")
+    @Schema(description = "缓存" )
     private Boolean cache;
 
     @Column(columnDefinition = "bit(1) default 0")
-    @ApiModelProperty(value = "是否隐藏")
+    @Schema(description = "是否隐藏" )
     private Boolean hidden;
 
-    @ApiModelProperty(value = "上级菜单")
+    @Schema(description = "上级菜单" )
     private Long pid;
 
-    @ApiModelProperty(value = "子节点数目", hidden = true)
+    @Schema(description = "子节点数目" , accessMode = Schema.AccessMode.READ_ONLY)
     private Integer subCount = 0;
 
-    @ApiModelProperty(value = "外链菜单")
+    @Schema(description = "外链菜单" )
     private Boolean iFrame;
 
     @Override

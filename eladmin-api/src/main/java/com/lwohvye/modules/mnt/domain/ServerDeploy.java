@@ -15,12 +15,13 @@
  */
 package com.lwohvye.modules.mnt.domain;
 
-import io.swagger.annotations.ApiModelProperty;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import com.lwohvye.base.BaseEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import com.lwohvye.base.BaseEntity;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -37,23 +38,23 @@ public class ServerDeploy extends BaseEntity implements Serializable {
 
     @Id
     @Column(name = "server_id")
-    @ApiModelProperty(value = "ID", hidden = true)
+    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ApiModelProperty(value = "服务器名称")
+    @Schema(description = "服务器名称" )
     private String name;
 
-    @ApiModelProperty(value = "IP")
+    @Schema(description = "IP" )
     private String ip;
 
-    @ApiModelProperty(value = "端口")
+    @Schema(description = "端口" )
     private Integer port;
 
-    @ApiModelProperty(value = "账号")
+    @Schema(description = "账号" )
     private String account;
 
-    @ApiModelProperty(value = "密码")
+    @Schema(description = "密码" )
     private String password;
 
     public void copy(ServerDeploy source){

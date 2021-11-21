@@ -19,12 +19,11 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lwohvye.annotation.String4Blob;
 import com.lwohvye.base.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -64,18 +63,18 @@ public class User extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "lid")
     @GenericGenerator(name = "lid", strategy = "com.lwohvye.config.LocalInsertGenerator")
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(value = "ID", hidden = true)
+    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     @ManyToMany
-    @ApiModelProperty(value = "用户角色")
+    @Schema(description = "用户角色" )
     @JoinTable(name = "sys_users_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
     private Set<Role> roles;
 
     @ManyToMany
-    @ApiModelProperty(value = "用户岗位")
+    @Schema(description = "用户岗位" )
     @JoinTable(name = "sys_users_jobs",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "job_id", referencedColumnName = "job_id")})
@@ -83,20 +82,20 @@ public class User extends BaseEntity implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "dept_id")
-    @ApiModelProperty(value = "用户部门")
+    @Schema(description = "用户部门" )
     private Dept dept;
 
     // @JsonAlias注解需要依赖于setter、getter，而@JsonProperty注解不需要
     @NotBlank
     @Column(unique = true)
-    @ApiModelProperty(value = "用户名称")
+    @Schema(description = "用户名称" )
     // @JsonAlias注解，实现:json转模型时，使json中的特定key能转化为特定的模型属性
     // 但是模型转json时，对应的转换后的key仍然与属性名一致
     @JsonAlias(value = {"userName", "uName"})
     private String username;
 
     @NotBlank
-    @ApiModelProperty(value = "用户昵称")
+    @Schema(description = "用户昵称" )
     // @JsonProperty注解，实现：json转模型时，使json中的特定key能转化为指定的模型属性；
     // 同样的，模型转json时，对应的转换后的key为指定的key
     @JsonProperty(value = "nickName")
@@ -104,30 +103,30 @@ public class User extends BaseEntity implements Serializable {
 
     @Email
     @NotBlank
-    @ApiModelProperty(value = "邮箱")
+    @Schema(description = "邮箱" )
     private String email;
 
     @NotBlank
-    @ApiModelProperty(value = "电话号码")
+    @Schema(description = "电话号码" )
     private String phone;
 
-    @ApiModelProperty(value = "用户性别")
+    @Schema(description = "用户性别" )
     private String gender;
 
-    @ApiModelProperty(value = "头像真实名称", hidden = true)
+    @Schema(description = "头像真实名称" , accessMode = Schema.AccessMode.READ_ONLY)
     private String avatarName;
 
-    @ApiModelProperty(value = "头像存储的路径", hidden = true)
+    @Schema(description = "头像存储的路径" , accessMode = Schema.AccessMode.READ_ONLY)
     private String avatarPath;
 
-    @ApiModelProperty(value = "密码")
+    @Schema(description = "密码" )
     private String password;
 
     @NotNull
-    @ApiModelProperty(value = "是否启用")
+    @Schema(description = "是否启用" )
     private Boolean enabled;
 
-    @ApiModelProperty(value = "是否为admin账号", hidden = true)
+    @Schema(description = "是否为admin账号" , accessMode = Schema.AccessMode.READ_ONLY)
     private Boolean isAdmin = false;
 
     // 描述信息。数据库中为blob类型。java侧使用String存取，存在乱码问题。在Mysql8的版本已无该问题。
@@ -137,7 +136,7 @@ public class User extends BaseEntity implements Serializable {
     private String description;
 
     @Column(name = "pwd_reset_time")
-    @ApiModelProperty(value = "最后修改密码的时间", hidden = true)
+    @Schema(description = "最后修改密码的时间" , accessMode = Schema.AccessMode.READ_ONLY)
     private Date pwdResetTime;
 
     @Override

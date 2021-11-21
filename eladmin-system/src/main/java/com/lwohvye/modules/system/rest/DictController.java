@@ -22,8 +22,8 @@ import com.lwohvye.modules.system.domain.Dict;
 import com.lwohvye.modules.system.service.DictService;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -42,28 +42,28 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "系统：字典管理")
+@Tag(name = "系统：字典管理")
 @RequestMapping("/api/dict")
 public class DictController {
 
     private final DictService dictService;
     private static final String ENTITY_NAME = "dict";
 
-    @ApiOperation("导出字典数据")
+    @Operation(summary = "导出字典数据")
     @GetMapping(value = "/download")
     @PreAuthorize("@el.check('dict:list')")
     public void download(HttpServletResponse response, DictQueryCriteria criteria) throws IOException {
         dictService.download(dictService.queryAll(criteria), response);
     }
 
-    @ApiOperation("查询字典")
+    @Operation(summary = "查询字典")
     @GetMapping(value = "/all")
     @PreAuthorize("@el.check('dict:list')")
     public ResponseEntity<Object> queryAll() {
         return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(new DictQueryCriteria())), HttpStatus.OK);
     }
 
-    @ApiOperation("查询字典")
+    @Operation(summary = "查询字典")
     @GetMapping
     @PreAuthorize("@el.check('dict:list')")
     public ResponseEntity<Object> query(DictQueryCriteria resources, Pageable pageable) {
@@ -71,7 +71,7 @@ public class DictController {
     }
 
     @Log("新增字典")
-    @ApiOperation("新增字典")
+    @Operation(summary = "新增字典")
     @PostMapping
     @PreAuthorize("@el.check('dict:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody Dict resources) {
@@ -83,7 +83,7 @@ public class DictController {
     }
 
     @Log("修改字典")
-    @ApiOperation("修改字典")
+    @Operation(summary = "修改字典")
     @PutMapping
     @PreAuthorize("@el.check('dict:edit')")
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dict resources) {
@@ -92,7 +92,7 @@ public class DictController {
     }
 
     @Log("删除字典")
-    @ApiOperation("删除字典")
+    @Operation(summary = "删除字典")
     @DeleteMapping
     @PreAuthorize("@el.check('dict:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {

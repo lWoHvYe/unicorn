@@ -16,7 +16,7 @@
 package com.lwohvye.modules.quartz.domain;
 
 import com.lwohvye.base.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,43 +44,43 @@ public class QuartzJob extends BaseEntity implements Serializable {
     private Long id;
 
     @Transient
-    @ApiModelProperty(value = "用于子任务唯一标识", hidden = true)
+    @Schema(description = "用于子任务唯一标识" , accessMode = Schema.AccessMode.READ_ONLY)
     private String uuid;
 
-    @ApiModelProperty(value = "定时器名称")
+    @Schema(description = "定时器名称" )
     private String jobName;
 
     @NotBlank
-    @ApiModelProperty(value = "Bean名称")
+    @Schema(description = "Bean名称" )
     private String beanName;
 
     @NotBlank
-    @ApiModelProperty(value = "方法名称")
+    @Schema(description = "方法名称" )
     private String methodName;
 
-    @ApiModelProperty(value = "参数")
+    @Schema(description = "参数" )
     private String params;
 
     @NotBlank
-    @ApiModelProperty(value = "cron表达式")
+    @Schema(description = "cron表达式" )
     private String cronExpression;
 
-    @ApiModelProperty(value = "状态，暂时或启动")
+    @Schema(description ="状态，暂时或启动")
     private Boolean isPause = false;
 
-    @ApiModelProperty(value = "负责人")
+    @Schema(description = "负责人" )
     private String personInCharge;
 
-    @ApiModelProperty(value = "报警邮箱")
+    @Schema(description = "报警邮箱" )
     private String email;
 
-    @ApiModelProperty(value = "子任务")
+    @Schema(description = "子任务" )
     private String subTask;
 
-    @ApiModelProperty(value = "失败后暂停")
+    @Schema(description = "失败后暂停" )
     private Boolean pauseAfterFailure;
 
     @NotBlank
-    @ApiModelProperty(value = "备注")
+    @Schema(description = "备注" )
     private String description;
 }

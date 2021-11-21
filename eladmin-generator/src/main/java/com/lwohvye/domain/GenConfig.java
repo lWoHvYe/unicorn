@@ -15,7 +15,7 @@
  */
 package com.lwohvye.domain;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -44,38 +44,38 @@ public class GenConfig implements Serializable {
 
     @Id
     @Column(name = "config_id")
-    @ApiModelProperty(value = "ID", hidden = true)
+    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
-    @ApiModelProperty(value = "表名")
+    @Schema(description = "表名" )
     private String tableName;
 
-    @ApiModelProperty(value = "接口名称")
+    @Schema(description = "接口名称" )
     private String apiAlias;
 
     @NotBlank
-    @ApiModelProperty(value = "包路径")
+    @Schema(description = "包路径" )
     private String pack;
 
     @NotBlank
-    @ApiModelProperty(value = "模块名")
+    @Schema(description = "模块名" )
     private String moduleName;
 
     @NotBlank
-    @ApiModelProperty(value = "前端文件路径")
+    @Schema(description = "前端文件路径" )
     private String path;
 
-    @ApiModelProperty(value = "前端文件路径")
+    @Schema(description = "前端文件路径" )
     private String apiPath;
 
-    @ApiModelProperty(value = "作者")
+    @Schema(description = "作者" )
     private String author;
 
-    @ApiModelProperty(value = "表前缀")
+    @Schema(description = "表前缀" )
     private String prefix;
 
-    @ApiModelProperty(value = "是否覆盖")
+    @Schema(description = "是否覆盖" )
     private Boolean cover = false;
 }

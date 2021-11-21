@@ -15,9 +15,13 @@
  */
 package com.lwohvye.domain;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
@@ -33,44 +37,44 @@ public class AlipayConfig implements Serializable {
 
     @Id
     @Column(name = "config_id")
-    @ApiModelProperty(value = "ID", hidden = true)
+    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     @NotBlank
-    @ApiModelProperty(value = "应用ID")
+    @Schema(description = "应用ID" )
     private String appId;
 
     @NotBlank
-    @ApiModelProperty(value = "商户私钥")
+    @Schema(description = "商户私钥" )
     private String privateKey;
 
     @NotBlank
-    @ApiModelProperty(value = "支付宝公钥")
+    @Schema(description = "支付宝公钥" )
     private String publicKey;
 
-    @ApiModelProperty(value = "签名方式")
+    @Schema(description = "签名方式" )
     private String signType="RSA2";
 
     @Column(name = "gateway_url")
-    @ApiModelProperty(value = "支付宝开放安全地址", hidden = true)
+    @Schema(description = "支付宝开放安全地址" , accessMode = Schema.AccessMode.READ_ONLY)
     private String gatewayUrl = "https://openapi.alipaydev.com/gateway.do";
 
-    @ApiModelProperty(value = "编码", hidden = true)
+    @Schema(description = "编码" , accessMode = Schema.AccessMode.READ_ONLY)
     private String charset= "utf-8";
 
     @NotBlank
-    @ApiModelProperty(value = "异步通知地址")
+    @Schema(description = "异步通知地址" )
     private String notifyUrl;
 
     @NotBlank
-    @ApiModelProperty(value = "订单完成后返回的页面")
+    @Schema(description = "订单完成后返回的页面" )
     private String returnUrl;
 
-    @ApiModelProperty(value = "类型")
+    @Schema(description = "类型" )
     private String format="JSON";
 
     @NotBlank
-    @ApiModelProperty(value = "商户号")
+    @Schema(description = "商户号" )
     private String sysServiceProviderId;
 
 }

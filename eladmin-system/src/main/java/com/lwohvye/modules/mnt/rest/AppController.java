@@ -15,14 +15,14 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
+import com.lwohvye.annotation.Log;
 import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.service.AppService;
-import com.lwohvye.utils.result.ResultInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
-import com.lwohvye.annotation.Log;
 import com.lwohvye.modules.mnt.service.dto.AppQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,20 +40,20 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "运维：应用管理")
+@Tag(name = "运维：应用管理")
 @RequestMapping("/api/app")
 public class AppController {
 
     private final AppService appService;
 
-    @ApiOperation("导出应用数据")
+    @Operation(summary = "导出应用数据")
     @GetMapping(value = "/download")
     @PreAuthorize("@el.check('app:list')")
     public void download(HttpServletResponse response, AppQueryCriteria criteria) throws IOException {
         appService.download(appService.queryAll(criteria), response);
     }
 
-    @ApiOperation(value = "查询应用")
+    @Operation(summary ="查询应用")
     @GetMapping
     @PreAuthorize("@el.check('app:list')")
     public ResponseEntity<Object> query(AppQueryCriteria criteria, Pageable pageable) {
@@ -61,7 +61,7 @@ public class AppController {
     }
 
     @Log("新增应用")
-    @ApiOperation(value = "新增应用")
+    @Operation(summary ="新增应用")
     @PostMapping
     @PreAuthorize("@el.check('app:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody App resources) {
@@ -70,7 +70,7 @@ public class AppController {
     }
 
     @Log("修改应用")
-    @ApiOperation(value = "修改应用")
+    @Operation(summary ="修改应用")
     @PutMapping
     @PreAuthorize("@el.check('app:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody App resources) {
@@ -79,7 +79,7 @@ public class AppController {
     }
 
     @Log("删除应用")
-    @ApiOperation(value = "删除应用")
+    @Operation(summary ="删除应用")
     @DeleteMapping
     @PreAuthorize("@el.check('app:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
