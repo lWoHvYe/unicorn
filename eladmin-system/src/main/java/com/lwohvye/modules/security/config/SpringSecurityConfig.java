@@ -160,10 +160,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     var requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
                     var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
                     // 获取pathPatternsCondition
+                    // infoEntry.getKey().getActivePatternsCondition();
                     var patternsCondition = infoEntry.getKey().getPatternsCondition();
-                    Assert.notNull(patternsCondition, "系统错误，请联系相关人员排查");
+                    var pathPatternsCondition = infoEntry.getKey().getPathPatternsCondition();
+                    Assert.state(!Objects.isNull(patternsCondition) || !Objects.isNull(pathPatternsCondition), "系统错误，请联系相关人员排查");
+                    var patterns = Objects.isNull(pathPatternsCondition) ? patternsCondition.getPatterns() : pathPatternsCondition.getDirectPaths();
                     // 返回一个Stream流，由flatMap进行合并
-                    return patternsCondition.getPatterns().stream().map(pattern ->
+                    return patterns.stream().map(pattern ->
                             // 二元组。first为methodType，second为pattern
                             Pair.of(request.getType(), pattern)
                     );
