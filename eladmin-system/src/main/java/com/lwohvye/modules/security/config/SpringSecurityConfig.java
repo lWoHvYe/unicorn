@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -50,7 +51,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -58,6 +58,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -118,39 +119,28 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 // 静态资源等等
-                .antMatchers(
-                        HttpMethod.GET,
-                        "/*.html",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/webSocket/**"
-                ).permitAll()
+                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/webSocket/**").permitAll()
                 // swagger 文档
-                .antMatchers("/swagger-ui.html").permitAll()
-                .antMatchers("/swagger-resources/**").permitAll()
-                .antMatchers("/webjars/**").permitAll()
-                .antMatchers("/*/api-docs").permitAll()
+                .antMatchers("/*/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
                 // 文件
-                .antMatchers("/avatar/**").permitAll()
-                .antMatchers("/file/**").permitAll()
+                .antMatchers("/avatar/**", "/file/**").permitAll()
                 // 阿里巴巴 druid
                 .antMatchers("/druid/**").permitAll()
                 // 放行OPTIONS请求
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 自定义匿名访问所有url放行：允许匿名和带Token访问，细腻化到每个 Request 类型
                 // GET
-                .antMatchers(HttpMethod.GET, anonymousUrls.get(RequestMethodEnum.GET.getType()).toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.GET, anonymousUrls.getOrDefault(RequestMethodEnum.GET.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // POST
-                .antMatchers(HttpMethod.POST, anonymousUrls.get(RequestMethodEnum.POST.getType()).toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.POST, anonymousUrls.getOrDefault(RequestMethodEnum.POST.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // PUT
-                .antMatchers(HttpMethod.PUT, anonymousUrls.get(RequestMethodEnum.PUT.getType()).toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.PUT, anonymousUrls.getOrDefault(RequestMethodEnum.PUT.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // PATCH
-                .antMatchers(HttpMethod.PATCH, anonymousUrls.get(RequestMethodEnum.PATCH.getType()).toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.PATCH, anonymousUrls.getOrDefault(RequestMethodEnum.PATCH.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // DELETE
-                .antMatchers(HttpMethod.DELETE, anonymousUrls.get(RequestMethodEnum.DELETE.getType()).toArray(new String[0])).permitAll()
+                .antMatchers(HttpMethod.DELETE, anonymousUrls.getOrDefault(RequestMethodEnum.DELETE.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // 所有类型的接口都放行
-                .antMatchers(anonymousUrls.get(RequestMethodEnum.ALL.getType()).toArray(new String[0])).permitAll()
+                .antMatchers(anonymousUrls.getOrDefault(RequestMethodEnum.ALL.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // 所有请求都需要认证
                 .anyRequest().authenticated()
                 .and().apply(securityConfigurerAdapter());
@@ -161,39 +151,24 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private Map<String, Set<String>> getAnonymousUrl(Map<RequestMappingInfo, HandlerMethod> handlerMethodMap) {
-        Map<String, Set<String>> anonymousUrls = new HashMap<>(6);
-        Set<String> get = new HashSet<>();
-        Set<String> post = new HashSet<>();
-        Set<String> put = new HashSet<>();
-        Set<String> patch = new HashSet<>();
-        Set<String> delete = new HashSet<>();
-        Set<String> all = new HashSet<>();
-        for (Map.Entry<RequestMappingInfo, HandlerMethod> infoEntry : handlerMethodMap.entrySet()) {
-            HandlerMethod handlerMethod = infoEntry.getValue();
-            AnonymousAccess anonymousAccess = handlerMethod.getMethodAnnotation(AnonymousAccess.class);
-            if (null != anonymousAccess) {
-                List<RequestMethod> requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
-                RequestMethodEnum request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
-                var patternsCondition = infoEntry.getKey().getPatternsCondition();
-                Assert.notNull(patternsCondition, "系统错误，请联系相关人员排查");
-                var patterns = patternsCondition.getPatterns();
-                switch (Objects.requireNonNull(request)) {
-                    case GET -> get.addAll(patterns);
-                    case POST -> post.addAll(patterns);
-                    case PUT -> put.addAll(patterns);
-                    case PATCH -> patch.addAll(patterns);
-                    case DELETE -> delete.addAll(patterns);
-                    default -> all.addAll(patterns);
-                }
-            }
-        }
-        anonymousUrls.put(RequestMethodEnum.GET.getType(), get);
-        anonymousUrls.put(RequestMethodEnum.POST.getType(), post);
-        anonymousUrls.put(RequestMethodEnum.PUT.getType(), put);
-        anonymousUrls.put(RequestMethodEnum.PATCH.getType(), patch);
-        anonymousUrls.put(RequestMethodEnum.DELETE.getType(), delete);
-        anonymousUrls.put(RequestMethodEnum.ALL.getType(), all);
-        return anonymousUrls;
+        // 根据方法类型分组。值为pattern的集合
+        return handlerMethodMap.entrySet().parallelStream()
+                // 有匿名访问注解
+                .filter(infoEntry -> !Objects.isNull(infoEntry.getValue().getMethodAnnotation(AnonymousAccess.class)))
+                .flatMap(infoEntry -> {
+                    // 先拿到方法类型
+                    var requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
+                    var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
+                    // 获取pathPatternsCondition
+                    var patternsCondition = infoEntry.getKey().getPatternsCondition();
+                    Assert.notNull(patternsCondition, "系统错误，请联系相关人员排查");
+                    // 返回一个Stream流，由flatMap进行合并
+                    return patternsCondition.getPatterns().stream().map(pattern ->
+                            // 二元组。first为methodType，second为pattern
+                            Pair.of(request.getType(), pattern)
+                    );
+                })
+                .collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toSet())));
     }
 
     //注册自定义的UsernamePasswordAuthenticationFilter
