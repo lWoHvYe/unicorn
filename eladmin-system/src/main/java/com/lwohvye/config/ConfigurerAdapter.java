@@ -93,28 +93,28 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/").setCachePeriod(0);
     }
 
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        var jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        var supportedMediaTypes = new ArrayList<MediaType>();
-        /**
-         * Public constant media type for {@code application/json;charset=UTF-8}.
-         * @deprecated as of 5.2 in favor of {@link #APPLICATION_JSON}
-         * since major browsers like Chrome
-         * <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=438464">
-         * now comply with the specification</a> and interpret correctly UTF-8 special
-         * characters without requiring a {@code charset=UTF-8} parameter.
-         */
-        supportedMediaTypes.add(MediaType.APPLICATION_JSON);
-        jackson2HttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
-        var jsonMapper = JsonMapper.builder()
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
-                .serializationInclusion(JsonInclude.Include.NON_NULL)
-                .build();
-        jsonMapper.registerModule(new JavaTimeModule());
-        jackson2HttpMessageConverter.setObjectMapper(jsonMapper);
-        jackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
-        converters.add(jackson2HttpMessageConverter);
-    }
+    // @Override
+    // public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    //     var jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+    //     var supportedMediaTypes = new ArrayList<MediaType>();
+    //     /**
+    //      * Public constant media type for {@code application/json;charset=UTF-8}.
+    //      * @deprecated as of 5.2 in favor of {@link #APPLICATION_JSON}
+    //      * since major browsers like Chrome
+    //      * <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=438464">
+    //      * now comply with the specification</a> and interpret correctly UTF-8 special
+    //      * characters without requiring a {@code charset=UTF-8} parameter.
+    //      */
+    //     supportedMediaTypes.add(MediaType.APPLICATION_JSON);
+    //     jackson2HttpMessageConverter.setSupportedMediaTypes(supportedMediaTypes);
+    //     var jsonMapper = JsonMapper.builder()
+    //             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+    //             .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+    //             .serializationInclusion(JsonInclude.Include.NON_NULL)
+    //             .build();
+    //     jsonMapper.registerModule(new JavaTimeModule());
+    //     jackson2HttpMessageConverter.setObjectMapper(jsonMapper);
+    //     jackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
+    //     converters.add(jackson2HttpMessageConverter);
+    // }
 }

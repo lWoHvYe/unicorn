@@ -306,6 +306,11 @@ springdoc:
 
   # 布尔值。实现OpenApi规范的打印。
   writer-with-default-pretty-printer: true
+#  https://springdoc.org/faq.html#how-can-i-map-pageable-spring-date-commons-object-to-correct-url-parameter-in-swagger-ui
+#  当前未生效
+  model-converters:
+    pageable-converter:
+      enabled: true
 
 # ===== 自定义swagger配置 ===== #
 swagger:
@@ -316,10 +321,6 @@ swagger:
 
 #是否允许生成代码，生产环境设置为false
 #generator:
-#  enabled: true
-
-#是否开启 swagger-ui
-#swagger:
 #  enabled: true
 
 # IP 本地解析
