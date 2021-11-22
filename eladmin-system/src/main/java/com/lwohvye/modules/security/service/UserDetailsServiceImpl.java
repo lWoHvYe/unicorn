@@ -99,7 +99,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 );
 //                userDtoCache.put(username, jwtUserDto);
                 // 设置用户信息有效期，6小时。理论上不设置也可以
-                redisUtils.hPut(SecuritySysUtil.getUserCacheKey(), username, jwtUserDto, 6 * 60 * 60);
+                redisUtils.hPut(SecuritySysUtil.getUserCacheKey(), username, jwtUserDto, 6 * 60 * 60L);
             }
         }
         return jwtUserDto;

@@ -49,6 +49,12 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 ---
 在Spring Boot 2.6.0版本，启动报错PatternsRequestCondition.getPatterns()空指针，原因详见springfox的[issues](https://github.com/springfox/springfox/issues/3462) ，扩展 [URL Matching with PathPattern in Spring MVC](https://spring.io/blog/2020/06/30/url-matching-with-pathpattern-in-spring-mvc) 。该版本Spring boot的 [ Release-Notes ](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
 
+导致报错的原因是：
+- 在SpringMVC的5.3.x系列版本（Spring Boot 2.6.x），引入新的URL Matching方式PathPattern。之前已有的是AntPathMatcher。
+- 在Spring Boot 2.6.0版本，将默认的调整为PathPattern。并提供配置 `spring.mvc.pathmatch.matching-strategy=ant_path_matcher` 可以切换回AntPathMatcher，但是`The actuator endpoints now also use PathPattern based URL matching. Note that the path matching strategy for actuator endpoints is not configurable via a configuration property.`
+- 导致报错的就是webEndpointServletHandlerMapping方法的`/actuator/health/**、/actuator/health、/actuator`这几个方法。所以在找到让springfox忽略（不处理）这几个方法的方案前。还未找到好的解决方案 
+- 暂通过改源码解决，期待后续方案。https://github.com/lWoHvYe/springfox/commit/9cb5e727a48e815b73461793ad37eae73c4af0e7
+
 ⌚️马上🕑了。天亮再继续。考虑从springfox迁移到springdoc了
 
   https://github.com/spring-projects/spring-boot/issues/24645
@@ -381,5 +387,5 @@ fi
 
 ---
 #### TODO
-- 整合Redisson（当前无法配置过期通知，待解决）
+- Springdoc相关、Springfox相关
 - JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）

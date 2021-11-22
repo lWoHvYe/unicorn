@@ -33,4 +33,12 @@ public class LocalCoreConfig {
     public static String getSysName() {
         return SYS_NAME;
     }
+
+    public static Boolean IP_LOCAL;
+
+    @Value("${ip.local-parsing}")
+    public void setIpLocal(Boolean ipLocal) {
+        IP_LOCAL = ipLocal;
+    }
+
 }

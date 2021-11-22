@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author Hongyan Wang
- * @description Jpa在映射实体和表的关系时，提供了一个入口，用于对绑定做一些操作。SpringPhysicalNamingStategy标记了过期，
+ * @description Jpa在映射实体和表的关系时，提供了一个入口，用于对绑定做一些操作。SpringPhysicalNamingStrategy标记了过期，
  * 可考虑继承hibernate侧的相关实现 {@link org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy}，未验证
  */
 @Slf4j
