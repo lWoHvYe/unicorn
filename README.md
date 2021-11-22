@@ -12,10 +12,11 @@
 ---
 启动类及配置文件，参照 eladmin-starter模块
 
-**Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数。较简单的是添加 
-``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围
+**Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数。较简单的是添加
+``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围。 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
 后台运行jar（开启远程调试端口5005）
+
 ```shell
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.17.jar >nohup.out 2>&1 &
 ```
@@ -39,82 +40,17 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 参考：https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching
 
 ---
-```
-在Spring Boot 2.5版本存在报错(在2.5.1已修复)：（使用Idea时正常，jar运行时报错）
-java.lang.IllegalStateException: No subdirectories found for mandatory directory location 'file:./config/*/'
-解决方式为添加启动参数    --spring.config.location=optional:classpath:/,optional:classpath:/config/,optional:file:./,optional:file:./config/
-参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
-```
+在 **Spring Boot 2.6.0 +** 版本，需在配置文件中添加。解决springfox启动报错问题
 
----
-在Spring Boot 2.6.0版本，启动报错PatternsRequestCondition.getPatterns()空指针，原因详见springfox的[issues](https://github.com/springfox/springfox/issues/3462) ，扩展 [URL Matching with PathPattern in Spring MVC](https://spring.io/blog/2020/06/30/url-matching-with-pathpattern-in-spring-mvc) 。该版本Spring boot的 [ Release-Notes ](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
-
-导致报错的原因是：
-- 在SpringMVC的5.3.x系列版本（Spring Boot 2.6.x），引入新的URL Matching方式PathPattern。之前已有的是AntPathMatcher。
-- 在Spring Boot 2.6.0版本，将默认的调整为PathPattern。并提供配置 `spring.mvc.pathmatch.matching-strategy=ant_path_matcher` 可以切换回AntPathMatcher，但是`The actuator endpoints now also use PathPattern based URL matching. Note that the path matching strategy for actuator endpoints is not configurable via a configuration property.`
-- 导致报错的就是webEndpointServletHandlerMapping方法的`/actuator/health/**、/actuator/health、/actuator`这几个方法。所以在找到让springfox忽略（不处理）这几个方法的方案前。还未找到好的解决方案 
-- 暂通过改源码解决，期待后续方案。https://github.com/lWoHvYe/springfox/commit/9cb5e727a48e815b73461793ad37eae73c4af0e7
-
-⌚️马上🕑了。天亮再继续。考虑从springfox迁移到springdoc了
-
-  https://github.com/spring-projects/spring-boot/issues/24645
-
-  https://github.com/spring-projects/spring-boot/issues/24805
-
-  https://github.com/spring-projects/spring-boot/issues/21694
-
-  https://github.com/spring-projects/spring-framework/issues/24952
-
-  https://stackoverflow.com/questions/69108273/spring-boot-swagger-documentation-doesnt-work/69814964
-
-If one insists on continuing to use Springfox with Spring Boot >= 2.6, one can try to force use of Ant Path Matching by setting
 ```yaml
 spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 ```
-
-Forcing Ant Path Matching on the actuators is a separate problem. It works by injecting the WebMvcEndpointHandlerMapping that was auto-configured before the change by WebMvcEndpointManagementContextConfiguration:
-```java
-@Bean
-public WebMvcEndpointHandlerMapping webEndpointServletHandlerMapping(
-    WebEndpointsSupplier webEndpointsSupplier,
-    ServletEndpointsSupplier servletEndpointsSupplier, ControllerEndpointsSupplier controllerEndpointsSupplier,
-    EndpointMediaTypes endpointMediaTypes, CorsEndpointProperties corsProperties,
-    WebEndpointProperties webEndpointProperties, Environment environment) {
-  List<ExposableEndpoint<?>> allEndpoints = new ArrayList<>();
-  Collection<ExposableWebEndpoint> webEndpoints = webEndpointsSupplier.getEndpoints();
-  allEndpoints.addAll(webEndpoints);
-  allEndpoints.addAll(servletEndpointsSupplier.getEndpoints());
-  allEndpoints.addAll(controllerEndpointsSupplier.getEndpoints());
-  String basePath = webEndpointProperties.getBasePath();
-  EndpointMapping endpointMapping = new EndpointMapping(basePath);
-  boolean shouldRegisterLinksMapping = shouldRegisterLinksMapping(webEndpointProperties, environment, basePath);
-  return new WebMvcEndpointHandlerMapping(endpointMapping, webEndpoints, endpointMediaTypes,
-      corsProperties.toCorsConfiguration(), new EndpointLinksResolver(allEndpoints, basePath),
-      shouldRegisterLinksMapping);
-}
-
-private boolean shouldRegisterLinksMapping(WebEndpointProperties webEndpointProperties, Environment environment,
-    String basePath) {
-  return webEndpointProperties.getDiscovery().isEnabled() && (StringUtils.hasText(basePath)
-      || ManagementPortType.get(environment).equals(ManagementPortType.DIFFERENT));
-}
-```
-There may be a cleverer way by excluding the actuators from being analyzed by Springfox in the first place.
-
-You're mileage may vary. Switching to springdoc is probably the more worthwhile approach.
+注意不要使用actuator系列依赖，否则可能需要改springfox源码来解决。详见：[SpringBoot-2.6.0.md](document/springboot/SpringBoot-2.6.0.md)
 
 ---
 
-**Java 17**，发布中央仓库，需要在maven的vm中配置。若不需要deploy，无需添加
-```
---add-opens java.base/java.lang=ALL-UNNAMED
---add-opens java.base/java.lang.reflect=ALL-UNNAMED
---add-opens java.base/java.util=ALL-UNNAMED
---add-opens java.base/java.text=ALL-UNNAMED
---add-opens java.desktop/java.awt.font=ALL-UNNAMED
-```
----
-#### Maven引用方式 🎵 
+#### Maven引用方式 🎵
+
 最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
 
 ```xml
@@ -127,7 +63,9 @@ You're mileage may vary. Switching to springdoc is probably the more worthwhile 
 </dependency>
 
 ```
+
 ---
+
 #### 项目简介
 
 一个基于 Spring Boot 2.5.6 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
@@ -158,7 +96,8 @@ You're mileage may vary. Switching to springdoc is probably the more worthwhile 
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 支持在线用户管理与服务器性能监控，支持限制单用户登录
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
-- 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。若需要分库分表，可参考[jpa-分库分表](https://github.com/lWoHvYe/spring-boot-jpa-cascade)
+-
+使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。若需要分库分表，可参考[jpa-分库分表](https://github.com/lWoHvYe/spring-boot-jpa-cascade)
 - Redis多数据源支持（已改回单节点并整合Redisson拓展Redis的功能），集群中，可将Token存入特定的Redis中，其他缓存到各自的Redis。即实现了集群间的Session共享，有减少集群各节点间的影响
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
 - 基于最新的Java-17。
@@ -262,25 +201,11 @@ You're mileage may vary. Switching to springdoc is probably the more worthwhile 
 - QQ交流群：一群：<strike>891137268</strike> 已满、二群：947578238
 
 ---
+
 #### 启动类示例
 
 ```java
 
-/*
- *  Copyright 2019-2020 Zheng Jie
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
 package com.lwohvye;
 
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
@@ -333,23 +258,6 @@ public class AppRun {
     }
 }
 ```
----
-#### MapStruct介绍
-
-| Option                                           | Purpose                                                      | Default   |
-| :----------------------------------------------- | :----------------------------------------------------------- | :-------- |
-| `mapstruct. suppressGeneratorTimestamp`          | If set to `true`, the creation of a time stamp in the `@Generated` annotation in the generated mapper classes is suppressed. | `false`   |
-| `mapstruct.verbose`                              | If set to `true`, MapStruct in which MapStruct logs its major decisions. Note, at the moment of writing in Maven, also `showWarnings` needs to be added due to a problem in the maven-compiler-plugin configuration. | `false`   |
-| `mapstruct. suppressGeneratorVersionInfoComment` | If set to `true`, the creation of the `comment` attribute in the `@Generated` annotation in the generated mapper classes is suppressed. The comment contains information about the version of MapStruct and about the compiler used for the annotation processing. | `false`   |
-| `mapstruct.defaultComponentModel`                | The name of the component model (see [Retrieving a mapper](https://mapstruct.org/documentation/stable/reference/html/#retrieving-mapper)) based on which mappers should be generated.<br>Supported values are:<br>`default`: the mapper uses no component model, instances are typically retrieved via `Mappers#getMapper(Class)`<br>`cdi`: the generated mapper is an application-scoped CDI bean and can be retrieved via `@Inject`<br>`spring`: the generated mapper is a singleton-scoped Spring bean and can be retrieved via `@Autowired`<br>`jsr330`: the generated mapper is annotated with {@code @Named} and can be retrieved via `@Inject`, e.g. using Spring <br> If a component model is given for a specific mapper via `@Mapper#componentModel()`, the value from the annotation takes precedence. | `default` |
-| `mapstruct.defaultInjectionStrategy`             | The type of the injection in mapper via parameter `uses`. This is only used on annotated based component models such as CDI, Spring and JSR 330.<br>Supported values are:<br>`field`: dependencies will be injected in fields<br>`constructor`: will be generated constructor. Dependencies will be injected via constructor.<br>When CDI `componentModel` a default constructor will also be generated. If a injection strategy is given for a specific mapper via `@Mapper#injectionStrategy()`, the value from the annotation takes precedence over the option. | `field`   |
-| `mapstruct.unmappedTargetPolicy`                 | The default reporting policy to be applied in case an attribute of the target object of a mapping method is not populated with a source value.<br>Supported values are:<br>`ERROR`: any unmapped target property will cause the mapping code generation to fail<br>`WARN`: any unmapped target property will cause a warning at build time<br>`IGNORE`: unmapped target properties are ignored<br>If a policy is given for a specific mapper via `@Mapper#unmappedTargetPolicy()`, the value from the annotation takes precedence. | `WARN`    |
-
-MapStruct 提供的重要注解 :
-
-@Mapper : 标记这个接口作为一个映射接口，并且是编译时 MapStruct 处理器的入口
-
-@Mapping : 解决源对象和目标对象中，属性名字不同的情况
 
 ---
 部署脚本
@@ -386,6 +294,8 @@ fi
 ```
 
 ---
+
 #### TODO
+
 - Springdoc相关、Springfox相关
 - JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）

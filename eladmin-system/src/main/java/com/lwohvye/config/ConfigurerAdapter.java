@@ -46,7 +46,7 @@ import java.util.List;
 // 在WebMvcAutoConfiguration类上标了一个如下注解：
 // @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 // 以上这行代码的意思就是当前IOC容器中没有WebMvcConfigurationSupport这个类的实例时自动配置类才会生效，这也就是在配置类上标注@EnableWebMvc会导致自动配置类WebMvcAutoConfiguration失效的原因。
-// @EnableWebMvc
+@EnableWebMvc
 public class ConfigurerAdapter implements WebMvcConfigurer {
 
     /**
