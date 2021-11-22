@@ -50,9 +50,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.util.Assert;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -151,6 +152,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private Map<String, Set<String>> getAnonymousUrl(Map<RequestMappingInfo, HandlerMethod> handlerMethodMap) {
+        // 不能用instanceof，只能用isInstance()和cast()了
+        var pathPatternsClass = PathPatternsRequestCondition.class;
+        var patternsClass = PatternsRequestCondition.class;
         // 根据方法类型分组。值为pattern的集合
         return handlerMethodMap.entrySet().parallelStream()
                 // 有匿名访问注解
@@ -160,11 +164,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     var requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
                     var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
                     // 获取pathPatternsCondition
-                    // infoEntry.getKey().getActivePatternsCondition();
-                    var patternsCondition = infoEntry.getKey().getPatternsCondition();
-                    var pathPatternsCondition = infoEntry.getKey().getPathPatternsCondition();
-                    Assert.state(!Objects.isNull(patternsCondition) || !Objects.isNull(pathPatternsCondition), "系统错误，请联系相关人员排查");
-                    var patterns = Objects.isNull(pathPatternsCondition) ? patternsCondition.getPatterns() : pathPatternsCondition.getDirectPaths();
+                    var activePatternsCondition = infoEntry.getKey().getActivePatternsCondition();
+                    Set<String> patterns;
+                    if (pathPatternsClass.isInstance(activePatternsCondition))
+                        patterns = pathPatternsClass.cast(activePatternsCondition).getDirectPaths();
+                    else if (patternsClass.isInstance(activePatternsCondition))
+                        patterns = patternsClass.cast(activePatternsCondition).getPatterns();
+                    else
+                        throw new IllegalStateException("系统错误，请联系相关人员排查");
                     // 返回一个Stream流，由flatMap进行合并
                     return patterns.stream().map(pattern ->
                             // 二元组。first为methodType，second为pattern
