@@ -1,4 +1,3 @@
----
 #### MapStruct介绍
 
 | Option                                           | Purpose                                                      | Default   |
@@ -16,6 +15,5 @@ MapStruct 提供的重要注解 :
 
 @Mapping : 解决源对象和目标对象中，属性名字不同的情况
 
----
 #### 循环依赖
 解决办法：[Jpa实体间关系及MapStruct循环依赖相关](https://www.lwohvye.com/2020/12/01/manytomany%e6%88%96onetomany-manytoone%e5%af%bc%e8%87%b4%e5%be%aa%e7%8e%af%e4%be%9d%e8%b5%96%e7%9a%84%e9%97%ae%e9%a2%98-java-lang-stackoverflowerror-jpa/)
