@@ -24,15 +24,14 @@ import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import com.lwohvye.modules.system.service.DataService;
 import com.lwohvye.modules.system.service.UserService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RMapCache;
-import org.redisson.api.RedissonClient;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 
 /**
  * @author Zheng Jie
@@ -44,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserService userService;
     private final DataService dataService;
-    private final RedissonClient redisson;
+    private final RedisUtils redisUtils;
     private final LoginProperties loginProperties;
 
     public void setEnableCache(boolean enableCache) {
@@ -56,9 +55,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public JwtUserDto loadUserByUsername(String username) {
         boolean searchDb = true;
         JwtUserDto jwtUserDto = null;
-        RMapCache<String, JwtUserDto> rMapCache = redisson.getMapCache(SecuritySysUtil.getUserCacheKey());
-        if (loginProperties.isCacheEnable() && rMapCache.containsKey(username)) {
-            jwtUserDto = rMapCache.get(username);
+        if (loginProperties.isCacheEnable() && redisUtils.hHasKey(SecuritySysUtil.getUserCacheKey(), username)) {
+//            jwtUserDto = userDtoCache.get(username);
+            // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
+            var cacheUserObj = redisUtils.hGet(SecuritySysUtil.getUserCacheKey(), username);
+            if (Objects.isNull(cacheUserObj))
+                return null;
+//            if (cacheUserObj instanceof JSONObject userJon)
+            // 2021/10/23 直接转会报错 java.lang.IllegalArgumentException: argument type mismatch 。暂使用其他方式
+//                jwtUserDto = userJon.toJavaObject(JwtUserDto.class);
+//                jwtUserDto = JSONObject.parseObject(userJon.toJSONString(), JwtUserDto.class);
+            if (cacheUserObj instanceof JwtUserDto jwtUser)
+                jwtUserDto = jwtUser;
+            else return null;
             // 更新权限信息
             jwtUserDto.getAuthorities();
 
@@ -88,8 +97,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         user,
                         dataService.getDeptIds(user.getId(), user.getDept().getId())
                 );
-                // 设置用户信息有效期，2小时。理论上不设置也可以
-                rMapCache.fastPut(username, jwtUserDto, 2L, TimeUnit.HOURS);
+//                userDtoCache.put(username, jwtUserDto);
+                // 设置用户信息有效期，6小时。理论上不设置也可以
+                redisUtils.hPut(SecuritySysUtil.getUserCacheKey(), username, jwtUserDto, 6 * 60 * 60L);
             }
         }
         return jwtUserDto;

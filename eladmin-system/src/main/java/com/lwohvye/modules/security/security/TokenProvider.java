@@ -23,13 +23,13 @@ import com.lwohvye.modules.mnt.websocket.WebSocketServer;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.utils.SecuritySysUtil;
+import com.lwohvye.utils.redis.RedisUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClock;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
-    private final RedissonClient redisson;
+    private final RedisUtils redisUtils;
     public static final String AUTHORITIES_KEY = "user";
     private static final Clock clock = DefaultClock.INSTANCE;
     private JwtParser jwtParser;
@@ -194,19 +194,18 @@ public class TokenProvider implements InitializingBean {
         var expiration = claims.getExpiration();
         if (expiration.getTime() - curDate.getTime() < properties.getDetect()) {
             // 已通知过，跳过
-            var rMapCache = redisson.getMapCache(SecuritySysUtil.getExpireNoticeKey(properties));
-            // RMapCache，可以对单key设置过期时间
-            // 使用fastPutIfAbsent。当key不存在时，设置值
-            var putResult = rMapCache.fastPutIfAbsent(token, DateUtil.now(), properties.getDetect(), TimeUnit.MILLISECONDS);
-            if (Boolean.FALSE.equals(putResult)) {
+            var expireNoticeKey = SecuritySysUtil.getExpireNoticeKey(properties) + token;
+            // 使用setInfAbsent。当key不存在时，设置值并返回true
+            var needNotice = redisUtils.setIfAbsent(expireNoticeKey, DateUtil.now(), properties.getDetect(), TimeUnit.MILLISECONDS);
+            if (Boolean.TRUE.equals(needNotice))
                 try {
                     // 提醒
                     WebSocketServer.sendInfo(new SocketMsg("您的余额已不足，请及时充值", MsgType.INFO), "sysMember");
                 } catch (IOException e) {
                     log.error("系统通知失败：{} ", e.getMessage());
                 }
-            }
         }
     }
+
     // endregion
 }

@@ -381,5 +381,5 @@ fi
 
 ---
 #### TODO
-- Springdoc相关、Springfox相关
+- 整合Redisson（当前无法配置过期通知，待解决）
 - JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）
