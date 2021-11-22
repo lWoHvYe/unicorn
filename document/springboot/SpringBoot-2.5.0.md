@@ -1,4 +1,3 @@
----
 在Spring Boot 2.5版本存在报错(在2.5.1已修复)：（使用Idea时正常，jar运行时报错）
 
 java.lang.IllegalStateException: No subdirectories found for mandatory directory location 'file:./config/*/'
@@ -7,4 +6,3 @@ java.lang.IllegalStateException: No subdirectories found for mandatory directory
 
 参考：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config.files
 
----

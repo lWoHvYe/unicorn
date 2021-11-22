@@ -1,4 +1,3 @@
----
 在Spring Boot 2.6.0版本，启动报错PatternsRequestCondition.getPatterns()空指针，原因详见springfox的[issues](https://github.com/springfox/springfox/issues/3462) ，扩展 [URL Matching with PathPattern in Spring MVC](https://spring.io/blog/2020/06/30/url-matching-with-pathpattern-in-spring-mvc) 。该版本Spring boot的 [ Release-Notes ](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes)
 
 导致报错的原因是：
@@ -57,4 +56,3 @@ There may be a cleverer way by excluding the actuators from being analyzed by Sp
 
 You're mileage may vary. Switching to springdoc is probably the more worthwhile approach.
 
----
