@@ -113,7 +113,7 @@ public class QuartzJobServiceImpl implements QuartzJobService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateIsPause(QuartzJob quartzJob) {
-        if (quartzJob.getIsPause()) {
+        if (Boolean.TRUE.equals(quartzJob.getIsPause())) {
             quartzManage.resumeJob(quartzJob);
             quartzJob.setIsPause(false);
         } else {

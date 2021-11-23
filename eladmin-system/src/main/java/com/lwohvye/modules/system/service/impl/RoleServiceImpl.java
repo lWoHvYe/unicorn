@@ -20,7 +20,6 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.security.service.UserCacheClean;
-import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.handler.AuthHandlerContext;
@@ -30,7 +29,6 @@ import com.lwohvye.modules.system.service.RoleService;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
-import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.modules.system.service.mapstruct.RoleMapper;
 import com.lwohvye.modules.system.service.mapstruct.RoleSmallMapper;
 import com.lwohvye.utils.*;
@@ -44,7 +42,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -189,46 +186,11 @@ public class RoleServiceImpl implements RoleService {
     @Transactional(rollbackFor = Exception.class)
 //    当使用root对象的属性作为key时，可以将“#root”省略，因为Spring默认使用的就是root对象的属性。
 //    需注意是 target.xxx 不带前面的 #
-    @Cacheable(key = " #root.target.getSysName() + 'auth:' + #p0.id")
-    public List<GrantedAuthority> mapToGrantedAuthorities(UserDto user) {
-        var userId = user.getId();
-        var isAdmin = user.getIsAdmin();
-
-        return genAuthorities(userId, isAdmin);
-    }
-
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = " target.getSysName() + 'auth:' + #p0")
-    public List<GrantedAuthority> mapToGrantedAuthorities(Long userId, Boolean isAdmin) {
-        return genAuthorities(userId, isAdmin);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = " target.getSysName() + 'auth:' + #p0")
+    @Cacheable(key = " #root.target.getSysName() + 'auth:' + #p0")
     public List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin) {
-        log.warn(" van：boy next door,do you like van游戏 ");
         // admin对应1，非admin对应0
         var instance = authHandlerContext.getInstance(Boolean.TRUE.equals(isAdmin) ? 1 : 0);
         return instance.handler(userId);
-    }
-
-    private List<GrantedAuthority> genAuthorities(Long userId, Boolean isAdmin) {
-        Set<String> permissions = new HashSet<>();
-        // 如果是管理员直接返回
-        if (Boolean.TRUE.equals(isAdmin)) {
-            permissions.add("admin");
-            return permissions.stream().map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-        }
-        Set<Role> roles = roleRepository.findByUserId(userId);
-        permissions = roles.stream().flatMap(role -> role.getMenus().stream())
-                .map(Menu::getPermission)
-                .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
-        return permissions.stream().map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
     }
 
     @Override

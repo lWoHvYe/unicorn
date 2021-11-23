@@ -16,11 +16,10 @@
 package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
+import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
-import com.lwohvye.modules.system.service.dto.UserDto;
-import com.lwohvye.modules.system.domain.Role;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -131,15 +130,9 @@ public interface RoleService extends BaseService {
     /**
      * 获取用户权限信息
      *
-     * @param user 用户信息
+     * @param userId 用户Id
      * @return 权限信息
      */
-    @Deprecated(since = "2.6.18")
-    List<GrantedAuthority> mapToGrantedAuthorities(UserDto user);
-
-    @Deprecated(since = "2.6.16")
-    List<GrantedAuthority> mapToGrantedAuthorities(Long userId, Boolean isAdmin);
-
     List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin);
 
     /**

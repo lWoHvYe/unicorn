@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.handler;
 
 import com.lwohvye.modules.system.service.AUserTypeHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.util.Map;
@@ -26,15 +27,19 @@ import java.util.Map;
  * @date 2021年11月02日 16:33
  * @see AuthHandlerProcessor
  */
+@Slf4j
 public record AuthHandlerContext(Map<Integer, AUserTypeHandler> handlerMap) {
 
     /**
-     * @param userType
+     * @param userType /
      * @return com.lwohvye.modules.system.service.AUserTypeHandler
      * @description 获取实例。handlerMap由另一个类来初始化
      * @date 2021/11/2 17:10
      */
     public AUserTypeHandler getInstance(Integer userType) {
+
+        log.warn(" van：boy next door,do you like van游戏 ");
+
         Assert.notNull(userType, "用户类型不可为空");
 
         var clazz = handlerMap.get(userType);
