@@ -5,7 +5,7 @@ import com.lwohvye.modules.mongodb.repository.MongoDBUserRepository;
 import com.lwohvye.modules.mongodb.service.MongoDBUserService;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.repository.UserRepository;
-import com.lwohvye.utils.SpringContextUtil;
+import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,8 +33,8 @@ public class MongoDBUserServiceIOCImpl implements MongoDBUserService {
     public void doInit() {
         // 不能使用@PostConstruct，因为在执行该注解注释的方法时，ApplicationContext还未能获取到
         log.warn("进入  +++ {}", this.getClass().getSimpleName());
-        this.userRepository = SpringContextUtil.getBean(UserRepository.class);
-        this.mongoDBUserRepository = SpringContextUtil.getBean(MongoDBUserRepository.class);
+        this.userRepository = SpringContextHolder.getBean(UserRepository.class);
+        this.mongoDBUserRepository = SpringContextHolder.getBean(MongoDBUserRepository.class);
     }
 
 

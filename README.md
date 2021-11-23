@@ -10,9 +10,9 @@
 本项目在原eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
 ---
-启动类及配置文件，参照 eladmin-starter模块
+启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources) 详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)
 
-**Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数。较简单的是添加
+**Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围。 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
 后台运行jar（开启远程调试端口5005）
@@ -37,7 +37,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 | loader.config.name | 属性文件的路径（例如，classpath：loader.properties）。 默认为loader.properties。 |
 | loader.system      | 布尔值标志，指示应将所有属性添加到系统属性。 默认为false。   |
 
-参考：https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching
+参考：[executable-jar.launching](https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching)
 
 ---
 在 **Spring Boot 2.6.0 +** 版本，需在配置文件中添加。解决springfox启动报错问题
@@ -45,6 +45,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 ```yaml
 spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 ```
+
 注意不要使用actuator系列依赖，否则可能需要改springfox源码来解决。详见：[SpringBoot-2.6.0.md](document/springboot/SpringBoot-2.6.0.md)
 
 ---
@@ -68,7 +69,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### 项目简介
 
-一个基于 Spring Boot 2.5.6 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
+一个基于最新的Java 17版本、 Spring Boot 2.6.0 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
 
 **开发文档：**  [https://el-admin.vip](https://el-admin.vip)
 
@@ -96,11 +97,10 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 支持在线用户管理与服务器性能监控，支持限制单用户登录
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
--
-使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。若需要分库分表，可参考[jpa-分库分表](https://github.com/lWoHvYe/spring-boot-jpa-cascade)
-- Redis多数据源支持（已改回单节点并整合Redisson拓展Redis的功能），集群中，可将Token存入特定的Redis中，其他缓存到各自的Redis。即实现了集群间的Session共享，有减少集群各节点间的影响
+- 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。若需要分库分表，可参考[jpa-分库分表](https://github.com/lWoHvYe/spring-boot-jpa-cascade)
+- 整合Redisson拓展Redis的功能
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
-- 基于最新的Java-17。
+- 基于最新的Java-17、Spring Boot 2.6.0
 
 #### 系统功能
 
@@ -202,100 +202,10 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 ---
 
-#### 启动类示例
-
-```java
-
-package com.lwohvye;
-
-import com.lwohvye.annotation.rest.AnonymousGetMapping;
-import com.lwohvye.utils.SpringContextHolder;
-import io.swagger.annotations.Api;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.bind.annotation.RestController;
-
-/**
- * 开启审计功能 -> @EnableJpaAuditing
- *
- * @author Zheng Jie
- * @date 2018/11/15 9:20:19
- */
-@EnableAsync
-@RestController
-@Api(hidden = true)
-@SpringBootApplication
-@EnableTransactionManagement
-@EnableJpaAuditing(auditorAwareRef = "auditorAware")
-@EnableRetry //开启重试机制
-//开启 @ConfigurationProperties 注解
-@EnableConfigurationProperties
-public class AppRun {
-
-    public static void main(String[] args) {
-        SpringApplication.run(AppRun.class, args);
-    }
-
-    @Bean
-    public SpringContextHolder springContextHolder() {
-        return new SpringContextHolder();
-    }
-
-    /**
-     * 访问首页提示
-     *
-     * @return /
-     */
-    @AnonymousGetMapping("/")
-    public String index() {
-        return "Backend service started successfully";
-    }
-}
-```
-
----
-部署脚本
-
-```shell
-mv -f /opt/upload/eladmin-system-3.0.0.jar /opt/app
-cd /opt/app
-nohup /usr/java/jdk-14/bin/java -jar eladmin-system-3.0.0.jar >nohup.out 2>&1 &
-```
-
-启动脚本
-
-```shell
-#!/bin/bash
-cd /opt/app
-echo "执行...."
-nohup /usr/java/jdk-17/bin/java -jar eladmin-system-3.0.0.jar >nohup.out 2>&1 &
-echo "启动成功"
-```
-
-停止脚本
-
-```shell
-#!/bin/bash
-echo "stop SpringBoot BAppApiServerApplication"
-# shellcheck disable=SC2009
-pid=$(ps -ef | grep eladmin-system-3.0.0.jar | grep -v grep | awk '{print $2}')
-echo "旧应用进程id：$pid"
-if [ -n "$pid" ]
-then
-# 通过使用-15 而不是-9 来停止线程
-kill -15 "$pid"
-fi
-```
-
----
-
-#### TODO
+#### Feature list
 
 - Springdoc相关、Springfox相关
 - JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）
+- 反序列化部分无法做的一个原因，就是在Controller中存在业务逻辑。进行优化
+- 另外就是权限用户对象JwtUserDTO的结构特殊性。考虑别的方式
+- Redisson部分功能应用：多数据源(Redis)、分布式扩展、锁

@@ -29,35 +29,46 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 开启审计功能 -> @EnableJpaAuditing
- *
  * @author Zheng Jie
+ * @description App启动入口
  * @date 2018/11/15 9:20:19
  */
-@EnableAsync
+@EnableAsync // 开启异步
 @RestController
 @Hidden
-@SpringBootApplication
-@EnableTransactionManagement
-@EnableJpaAuditing(auditorAwareRef = "auditorAware")
+@SpringBootApplication // 核心配置类
+@EnableTransactionManagement // 开启事务
+@EnableJpaAuditing(auditorAwareRef = "auditorAware") // 开启Jpa审计
 @EnableRetry //开启重试机制
-//开启 @ConfigurationProperties 注解
-@EnableConfigurationProperties
+@EnableConfigurationProperties //开启 @ConfigurationProperties 注解
+// 以下注解在其他类上有配置
+// @EnableCaching
+// @EnableOpenApi
+// @EnableWebMvc
 public class AppRun {
 
+    /**
+     * @param args /
+     * @description Spring Boot入口
+     * @date 2021/11/23 9:43 上午
+     */
     public static void main(String[] args) {
         SpringApplication.run(AppRun.class, args);
     }
 
+    /**
+     * @return com.lwohvye.utils.SpringContextHolder
+     * @description 注入Bean对象。用于从ApplicationContext中获取bean实例等
+     * @date 2021/11/23 9:42 上午
+     */
     @Bean
     public SpringContextHolder springContextHolder() {
         return new SpringContextHolder();
     }
 
     /**
-     * 访问首页提示
-     *
      * @return /
+     * @description 访问首页提示
      */
     @AnonymousGetMapping("/")
     public String index() {
