@@ -17,10 +17,12 @@ package com.lwohvye.modules.config;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.modules.mongodb.rest.MongoDBUserController;
-import com.lwohvye.utils.SpringContextUtil;
+import com.lwohvye.utils.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
+
+import java.util.Objects;
 
 /**
  * @author Hongyan Wang
@@ -32,9 +34,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 public class InstantiationTracingBeanPostProcessor4Search implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (event.getApplicationContext().getParent() == null) {//root application context 没有parent，再执行这个.
+        if (Objects.isNull(event.getApplicationContext().getParent())) {//root application context 没有parent，再执行这个.
             //需要执行的逻辑代码，当spring容器初始化完成后就会执行该方法。
-            var controller = SpringContextUtil.getBean(MongoDBUserController.class);
+            var controller = SpringContextHolder.getBean(MongoDBUserController.class);
             ReflectUtil.invoke(controller, "doInit");
         }
     }

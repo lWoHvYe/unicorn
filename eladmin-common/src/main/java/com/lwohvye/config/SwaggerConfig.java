@@ -16,7 +16,6 @@
 package com.lwohvye.config;
 
 import com.fasterxml.classmate.TypeResolver;
-import com.google.common.base.Predicates;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -25,7 +24,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.data.domain.Pageable;
-import springfox.documentation.builders.*;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.schema.AlternateTypeRule;
 import springfox.documentation.schema.AlternateTypeRuleConvention;
@@ -41,13 +42,11 @@ import static com.google.common.collect.Lists.newArrayList;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 /**
- * api页面 /doc.html
- *
  * @author Zheng Jie
+ * @description api页面 /doc.html /swagger-ui/index.html
  * @date 2018-11-23
  */
 @Configuration
-//@EnableSwagger2
 @EnableOpenApi
 public class SwaggerConfig {
 

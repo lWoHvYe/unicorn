@@ -68,7 +68,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     /**
-     * @param redisConnectionFactory
+     * @param redisConnectionFactory /
      * @return org.springframework.data.redis.core.RedisTemplate
      * @description 与RedisUtil一起使用
      * @date 2021/11/11 1:25 上午
@@ -101,6 +101,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 //        var jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
 //        var objectMapper = new ObjectMapper();
 //        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//      // 必须设置，否则无法将JSON转化为对象，会转化成Map类型
 //        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 //        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
 //
