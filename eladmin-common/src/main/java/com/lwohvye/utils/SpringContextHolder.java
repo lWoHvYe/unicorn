@@ -26,6 +26,7 @@ import org.springframework.core.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -114,6 +115,16 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     public static Object getBean(String beanName, String className) throws ClassNotFoundException {
         Class<?> clz = Class.forName(className);
         return applicationContext.getBean(beanName, clz);
+    }
+
+    /**
+     * @param clazz 类型
+     * @return java.util.Map key为beanName，value为beanInstance
+     * @description 根据Class获取所有该类型的Bean，可用于获取类的所有子类、接口的所有实现类
+     * @date 2021/11/23 11:48 上午
+     */
+    public static <T> Map<String, T> getBeansOfType(Class<T> clazz) {
+        return applicationContext.getBeansOfType(clazz);
     }
 
     /**

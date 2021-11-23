@@ -54,7 +54,7 @@ public class ExecutionJob extends QuartzJobBean {
     /**
      * 该处仅供参考
      */
-    private final static ThreadPoolExecutor EXECUTOR = ThreadPoolExecutorUtil.getPoll();
+    private static final ThreadPoolExecutor EXECUTOR = ThreadPoolExecutorUtil.getPoll();
 
     @Override
     public void executeInternal(JobExecutionContext context) {
@@ -75,10 +75,7 @@ public class ExecutionJob extends QuartzJobBean {
         log.setCronExpression(quartzJob.getCronExpression());
         try {
             // 执行任务
-//            System.out.println("--------------------------------------------------------------");
-//            System.out.println("任务开始执行，任务名称：" + quartzJob.getJobName());
-            QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(),
-                    quartzJob.getParams());
+            QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
             Future<?> future = EXECUTOR.submit(task);
             future.get();
             long times = System.currentTimeMillis() - startTime;
@@ -88,8 +85,6 @@ public class ExecutionJob extends QuartzJobBean {
             }
             // 任务状态
             log.setIsSuccess(true);
-//            System.out.println("任务执行完毕，任务名称：" + quartzJob.getJobName() + ", 执行时间：" + times + "毫秒");
-//            System.out.println("--------------------------------------------------------------");
             // 判断是否存在子任务
             if (StrUtil.isNotBlank(quartzJob.getSubTask())) {
                 String[] tasks = quartzJob.getSubTask().split("[,，]");
@@ -100,8 +95,6 @@ public class ExecutionJob extends QuartzJobBean {
             if (StringUtils.isNotBlank(uuid)) {
                 redisUtils.set(uuid, false);
             }
-//            System.out.println("任务执行失败，任务名称：" + quartzJob.getJobName());
-//            System.out.println("--------------------------------------------------------------");
             long times = System.currentTimeMillis() - startTime;
             log.setTime(times);
             // 任务状态 0：成功 1：失败

@@ -45,6 +45,8 @@ import org.springframework.web.bind.annotation.RestController;
 // @EnableCaching
 // @EnableOpenApi
 // @EnableWebMvc
+// @EnableWebSecurity
+// @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class AppRun {
 
     /**
@@ -57,7 +59,6 @@ public class AppRun {
     }
 
     /**
-     * @return com.lwohvye.utils.SpringContextHolder
      * @description 注入Bean对象。用于从ApplicationContext中获取bean实例等
      * @date 2021/11/23 9:42 上午
      */

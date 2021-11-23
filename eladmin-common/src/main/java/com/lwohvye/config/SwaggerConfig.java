@@ -53,9 +53,6 @@ public class SwaggerConfig {
     @Value("${jwt.header:Authorization}")
     private String tokenHeader;
 
-    @Value("${jwt.token-start-with:Bearer }")
-    private String tokenStartWith;
-
     @Value("${swagger.enabled:true}")
     private Boolean enabled;
 
@@ -81,7 +78,6 @@ public class SwaggerConfig {
                 .select()
 //                api可以分组。下面指定了该组对应的package路径
 //                .apis(RequestHandlerSelectors.basePackage("com.lwohvye.modules"))
-//                .paths(Predicates.not(PathSelectors.regex("/error.*")))
                 .paths(PathSelectors.any())
                 .build()
                 //添加登陆认证

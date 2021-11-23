@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author https://juejin.im/entry/5abb8f6951882555677e9da2
- * @description 异步任务线程池装配类
+ * @description 异步任务线程池装配类。当前用于@Async。异步执行
  * 自定义线程池有如下模式：
  * 重新实现接口AsyncConfigurer
  * 继承AsyncConfigurerSupport
@@ -59,7 +59,7 @@ public class AsyncTaskExecutePool implements AsyncConfigurer {
         //活跃时间
         executor.setKeepAliveSeconds(config.getKeepAliveSeconds());
         //线程名字前缀
-        executor.setThreadNamePrefix("lwohvye-async-");
+        executor.setThreadNamePrefix("lWoHvYe-async-");
         // setRejectedExecutionHandler：当pool已经达到max size的时候，如何处理新任务
         // CallerRunsPolicy：不在新线程中执行任务，而是由调用者所在的线程来执行
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
