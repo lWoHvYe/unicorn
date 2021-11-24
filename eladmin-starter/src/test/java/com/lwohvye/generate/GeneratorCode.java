@@ -23,7 +23,7 @@ import java.util.Arrays;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GeneratorCode {
     @Autowired
-    private IGeneratorService IGeneratorService;
+    private IGeneratorService generatorService;
 
     @Test
     @Rollback(value = false)
@@ -33,7 +33,7 @@ public class GeneratorCode {
         var tableNames = Arrays.asList("");
         tableNames.forEach(tableName -> {
 //              拿参数
-            var columns = IGeneratorService.getColumns(tableName);
+            var columns = generatorService.getColumns(tableName);
             //  只生成后端的话，只需要配置下包名和是否覆盖，
             var genConfig = new GenConfig()
 //                  未设置id无法生成
@@ -50,7 +50,7 @@ public class GeneratorCode {
                     .setCover(false);
 
 //          生成代码
-            IGeneratorService.generator(genConfig, columns);
+            generatorService.generator(genConfig, columns);
         });
     }
 }
