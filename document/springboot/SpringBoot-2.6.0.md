@@ -20,6 +20,8 @@ https://github.com/spring-projects/spring-framework/issues/24952
 
 https://stackoverflow.com/questions/69108273/spring-boot-swagger-documentation-doesnt-work/69814964
 
+https://github.com/springfox/springfox/issues/3462
+
 If one insists on continuing to use Springfox with Spring Boot >= 2.6, one can try to force use of Ant Path Matching by setting
 ```yaml
 spring.mvc.pathmatch.matching-strategy=ant_path_matcher
