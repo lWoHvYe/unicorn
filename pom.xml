@@ -63,7 +63,6 @@
         <springfox.version>3.0.0</springfox.version>
         <springdoc.openapi.version>1.5.12</springdoc.openapi.version>
         <io.swagger.version>1.6.3</io.swagger.version>
-        <fastjson.version>1.2.78</fastjson.version>
         <druid.version>1.2.8</druid.version>
         <hutool.version>5.7.16</hutool.version>
         <fastutil.version>8.5.6</fastutil.version>
@@ -244,13 +243,6 @@
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
             <version>2.12.1</version>
-        </dependency>
-
-        <!-- fastjson -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
         </dependency>
 
         <!--mapStruct依赖-->

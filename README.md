@@ -205,7 +205,4 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 #### Feature list
 
 - Springdoc相关、Springfox相关
-- JSON相关调整，使用Jackson替换Fastjson（主体剩余redis序列化/反序列化部分）
-- 反序列化部分无法做的一个原因，就是在Controller中存在业务逻辑。进行优化
-- 另外就是权限用户对象JwtUserDTO的结构特殊性。考虑别的方式
 - Redisson部分功能应用：多数据源(Redis)、分布式扩展、锁

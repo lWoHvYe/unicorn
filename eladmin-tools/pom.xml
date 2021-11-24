@@ -81,12 +81,6 @@
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
             <version>${alipay.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>fastjson</artifactId>
-                    <groupId>com.alibaba</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!--   阿里短信通道SMS     -->
         <!-- https://mvnrepository.com/artifact/com.aliyun/dysmsapi20170525 -->

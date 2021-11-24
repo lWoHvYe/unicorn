@@ -44,12 +44,6 @@
             <groupId>com.lwohvye</groupId>
             <artifactId>eladmin-tools</artifactId>
             <version>${project.core.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>fastjson</artifactId>
-                    <groupId>com.alibaba</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Spring boot websocket -->
