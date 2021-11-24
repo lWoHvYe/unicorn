@@ -17,6 +17,8 @@ package com.lwohvye.modules.system.domain.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -24,6 +26,7 @@ import java.io.Serializable;
  * @date 2018-12-20
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class MenuMetaVo implements Serializable {
 

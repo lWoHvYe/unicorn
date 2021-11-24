@@ -86,37 +86,17 @@ public class RedisConfig extends CachingConfigurerSupport {
     @ConditionalOnMissingBean(name = "redisTemplate")
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         var template = new RedisTemplate<>();
-        //序列化
-        // 2021/11/11 使用Jackson2JsonRedisSerializer时，序列化的结果，在反序列化时会变为Object，丢失类型信息且无法强转成目标的实体。(通过util放置的有包含类型信息,在反序列化时，会自动转回来；通过@Cacheable放置的不行)
-        // 具体表现为：Entity序列化后，反序列化时变成Map。无法通过一般方式转回；Map、List丢失范型信息，且List<Entity>变成来List<Map>。🀄️📄就是无法自动转回来。这类可以通过 JsonUtils.toJavaObjectList()转回来，但要转的Entity要有空参构造方法
-        // 在使用Redis缓存信息时，对于此类问题不是很好处理（除非每次都缓存前转成Json，缓存后再取出来，J2B转回原实体），故此处继续使用FastJson。
-        // var fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
-        //当一个类中包含了一个接口（或抽象类）的时候，在使用fastjson进行序列化的时候，会将子类型抹去，只保留接口（抽象类）的类型，使得反序列化时无法拿到原始类型。
-        //为了解决这个问题呢，fastjson引入了AutoType，即在序列化的时候，把原始类型记录下来。
-        // 全局开启AutoType，这里方便开发，使用全局的方式 https://github.com/alibaba/fastjson/wiki/enable_autotype
-//        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
-        // 建议使用这种方式，小范围指定白名单
-//        var parserConfig = ParserConfig.getGlobalInstance();
-//        parserConfig.addAccept("com.lwohvye.domain");
-//        parserConfig.addAccept("com.lwohvye.modules.");
-        // 开启safeMode https://github.com/alibaba/fastjson/wiki/fastjson_safemode
-//        ParserConfig.getGlobalInstance().setSafeMode(true);
-        // 示例-autoTypeCheckHandler的添加。非safeMode模式下，不要开启下面的配置
-//        ParserConfig.getGlobalInstance().addAutoTypeCheckHandler(new GrantedAuthorityAutoTypeCheckHandler());
+        // 序列化
         var stringRedisSerializer = new StringRedisSerializer();
-        // 亦可使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
+        // 使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
-//
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
-
-        // fastJsonRedisSerializer.setObjectMapper(objectMapper);
         // key的序列化采用StringRedisSerializer
         template.setKeySerializer(stringRedisSerializer);
         template.setHashKeySerializer(stringRedisSerializer);
-        // value值的序列化采用fastJsonRedisSerializer
-        // template.setValueSerializer(fastJsonRedisSerializer);
-        // template.setHashValueSerializer(fastJsonRedisSerializer);
+        // value值的序列化采用jackson2JsonRedisSerializer
+        template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+
         template.setConnectionFactory(redisConnectionFactory);
         //执行afterPropertiesSet方法，完成属性的设置
         template.afterPropertiesSet();
@@ -125,13 +105,13 @@ public class RedisConfig extends CachingConfigurerSupport {
 
 
     private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
-        // 亦可使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
         var jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         var objectMapper = new ObjectMapper();
         // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-//      // 必须设置，否则无法将JSON转化为对象，会转化成Map类型
+        // 必须设置，否则无法将JSON转化为对象，会转化成Map类型。指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会抛出异常
         objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
         return jackson2JsonRedisSerializer;
@@ -200,16 +180,3 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
 }
-// https://github.com/alibaba/fastjson/wiki/fastjson_safemode
-// 这部分未用到，仅作为示例使用
-//public class GrantedAuthorityAutoTypeCheckHandler implements ParserConfig.AutoTypeCheckHandler {
-//
-//    public Class<?> handler(String typeName, Class<?> expectClass, int features) {
-//        return switch (typeName) {
-//            case "JaasGrantedAuthority" -> JaasGrantedAuthority.class;
-//            case "SimpleGrantedAuthority" -> SimpleGrantedAuthority.class;
-//            case "SwitchUserGrantedAuthority" -> SwitchUserGrantedAuthority.class;
-//            default -> GrantedAuthority.class;
-//        };
-//    }
-//}

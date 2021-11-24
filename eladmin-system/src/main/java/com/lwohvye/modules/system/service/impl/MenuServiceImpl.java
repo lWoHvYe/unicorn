@@ -37,6 +37,7 @@ import com.lwohvye.modules.system.service.mapstruct.MenuMapper;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -48,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -106,7 +108,6 @@ public class MenuServiceImpl implements IMenuService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @Cacheable(key = " #root.target.getSysName() + 'user:' + #p0")
     public List<MenuDto> findByUser(Long currentUserId) {
         List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
@@ -225,7 +226,7 @@ public class MenuServiceImpl implements IMenuService {
     }
 
     @Override
-    @CacheEvict(allEntries = true)
+    @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> getMenus(Long pid) {
         List<Menu> menus;
@@ -388,6 +389,18 @@ public class MenuServiceImpl implements IMenuService {
                 }
         );
         return list;
+    }
+
+    @SneakyThrows
+    @Override
+    @Cacheable(key = " #root.target.getSysName() + 'menu4user:' + #p0")
+    @Transactional(rollbackFor = Exception.class)
+    public Object buildWebMenus(Long uid) {
+        CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
+                .thenApply(this::buildTree)
+                .thenApply(this::buildMenus);
+        cf.join();
+        return cf.get();
     }
 
     @Override

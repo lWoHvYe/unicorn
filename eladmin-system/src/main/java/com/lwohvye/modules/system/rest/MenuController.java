@@ -66,14 +66,8 @@ public class MenuController {
     @GetMapping(value = "/build")
     @Operation(summary = "获取前端所需菜单")
     public ResponseEntity<Object> buildMenus() {
-        // TODO: 2021/11/24 反序列化报错
-        // org.springframework.data.redis.serializer.SerializationException: Could not read JSON: Unexpected token (START_OBJECT), expected VALUE_STRING: need JSON String that contains type id (for subtype of java.lang.Object)
-        //  at [Source: (byte[])"[{"@class":"com.lwohvye.modules.system.service.dto.MenuDto","createBy":null,"updateBy":null,"createTime":["java.sql.Timestamp",1545117089000],"updateTime":null,"id":1,"children":null,"type":0,"permission":null,"title":"系统管理","menuSort":1,"path":"system","component":null,"pid":null,"subCount":7,"iFrame":false,"cache":false,"hidden":false,"componentName":null,"icon":"system","iframe":false,"label":"系统管理","hasChildren":true,"leaf":false},{"@class":"com.lwohvye.modules.system.service"[truncated 18149 bytes]; line: 1, column: 2]; nested exception is com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected VALUE_STRING: need JSON String that contains type id (for subtype of java.lang.Object)
-        //  at [Source: (byte[])"[{"@class":"com.lwohvye.modules.system.service.dto.MenuDto","createBy":null,"updateBy":null,"createTime":["java.sql.Timestamp",1545117089000],"updateTime":null,"id":1,"children":null,"type":0,"permission":null,"title":"系统管理","menuSort":1,"path":"system","component":null,"pid":null,"subCount":7,"iFrame":false,"cache":false,"hidden":false,"componentName":null,"icon":"system","iframe":false,"label":"系统管理","hasChildren":true,"leaf":false},{"@class":"com.lwohvye.modules.system.service"[truncated 18149 bytes]; line: 1, column: 2]
-        List<MenuDto> menuDtoList = menuService.findByUser(SecurityUtils.getCurrentUserId());
-        List<MenuDto> menuDtos = menuService.buildTree(menuDtoList);
-//        List<MenuDto> menuDtos = menuService.buildTree2(menuDtoList);
-        return new ResponseEntity<>(menuService.buildMenus(menuDtos), HttpStatus.OK);
+        // 在方法参数里用SecurityUtils.getCurrentUserId()在一些情况下会不走缓存
+        return new ResponseEntity<>(menuService.buildWebMenus(SecurityUtils.getCurrentUserId()), HttpStatus.OK);
     }
 
     @Operation(summary = "返回全部的菜单")
