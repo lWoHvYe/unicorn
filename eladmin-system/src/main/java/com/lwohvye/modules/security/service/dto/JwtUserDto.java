@@ -16,15 +16,12 @@
 package com.lwohvye.modules.security.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.utils.SpringContextHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,7 +48,7 @@ public class JwtUserDto implements UserDetails {
         无论何时将任何final字段/引用计算为“常量表达式”，JVM都会对其进行序列化，忽略transient关键字的存在。比如 private final transient String = "abc"，就还会被序列化
         HashMap类是java中transient关键字的一个很好的用例
      */
-    private final transient List<GrantedAuthority> authorities = new ArrayList<>();
+    private final transient List<GrantedAuthority> authorities;
 
     // 可能名称易被误解，这里的roles是用户的权限信息，类似与permission，通过该属性，前端判断🔘的显示等，没有该属性就不会在登录后跳转首页。所以不能注释掉
     public Set<String> getRoles() {
@@ -69,15 +66,6 @@ public class JwtUserDto implements UserDetails {
     public String getUsername() {
         return user.getUsername();
     }
-
-    public List<GrantedAuthority> getAuthorities() {
-        authorities.clear();
-        authorities.addAll(SpringContextHolder.getBean(IRoleService.class)
-                .grantedAuthorityGenHandler(user.getId(), user.getIsAdmin()));
-        return authorities;
-    }
-
-    // region 在校验用户状态时，校验了下面四个属性，可根据需要设置
 
     @Override
     @JsonIgnore

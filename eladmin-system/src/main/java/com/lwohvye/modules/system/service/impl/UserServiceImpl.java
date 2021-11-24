@@ -29,6 +29,7 @@ import com.lwohvye.modules.system.domain.projection.UserProj;
 import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.*;
+import com.lwohvye.modules.system.service.mapstruct.UserInnerMapper;
 import com.lwohvye.modules.system.service.mapstruct.UserMapper;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -61,6 +62,7 @@ public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserInnerMapper userInnerMapper;
     private final FileProperties properties;
     private final RedisUtils redisUtils;
     private final UserCacheClean userCacheClean;
@@ -201,7 +203,8 @@ public class UserServiceImpl implements IUserService {
     @Transactional(rollbackFor = Exception.class)
     public UserInnerDto findInnerUserByName(String userName) {
         // 方法内调用，Spring aop不会生效，所以下面的查询不会走缓存
-        return new UserInnerDto(findByName(userName));
+        var user = userRepository.findByUsername(userName);
+        return userInnerMapper.toDto(user, new CycleAvoidingMappingContext());
     }
 
     @Override

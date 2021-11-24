@@ -20,18 +20,18 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.modules.security.utils.SecuritySysUtil;
 import com.lwohvye.modules.system.service.IDataService;
+import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Zheng Jie
@@ -41,41 +41,36 @@ import java.util.Objects;
 @Service("userDetailsService")
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
+
     private final IUserService userService;
+    private final IRoleService roleService;
     private final IDataService dataService;
-    private final RedisUtils redisUtils;
     private final LoginProperties loginProperties;
 
     public void setEnableCache(boolean enableCache) {
         this.loginProperties.setCacheEnable(enableCache);
     }
 
+    /**
+     * 用户信息缓存
+     *
+     * @see UserCacheClean
+     */
+    //  这种缓存的方式，也许解决了些问题，但导致无法做集群的扩展，后续解决。用户权限数据建议序列化
+    static Map<String, JwtUserDto> userDtoCache = new ConcurrentHashMap<>();
 
     @Override
     public JwtUserDto loadUserByUsername(String username) {
         boolean searchDb = true;
         JwtUserDto jwtUserDto = null;
-        if (loginProperties.isCacheEnable() && redisUtils.hHasKey(SecuritySysUtil.getUserCacheKey(), username)) {
-//            jwtUserDto = userDtoCache.get(username);
-            // 使用fastjson自带的FastJsonRedisSerializer时，从redis中取出的是JSON（JSONObject、JSONArray）对象
-            var cacheUserObj = redisUtils.hGet(SecuritySysUtil.getUserCacheKey(), username);
-            if (Objects.isNull(cacheUserObj))
-                return null;
-//            if (cacheUserObj instanceof JSONObject userJon)
-            // 2021/10/23 直接转会报错 java.lang.IllegalArgumentException: argument type mismatch 。暂使用其他方式
-//                jwtUserDto = userJon.toJavaObject(JwtUserDto.class);
-//                jwtUserDto = JSONObject.parseObject(userJon.toJSONString(), JwtUserDto.class);
-            if (cacheUserObj instanceof JwtUserDto jwtUser)
-                jwtUserDto = jwtUser;
-            else return null;
-            // 更新权限信息
-            jwtUserDto.getAuthorities();
+        if (loginProperties.isCacheEnable() && userDtoCache.containsKey(username)) {
+            jwtUserDto = userDtoCache.get(username);
 
             var userInner = jwtUserDto.getUser();
             // 检查dataScope是否修改
             List<Long> dataScopes = jwtUserDto.getDataScopes();
             dataScopes.clear();
-            dataScopes.addAll(dataService.getDeptIds(userInner.getId(), userInner.getDept().getId()));
+            dataScopes.addAll(dataService.getDeptIds(userInner.getId(), userInner.getDeptId()));
             searchDb = false;
         }
         if (searchDb) {
@@ -92,14 +87,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 if (Boolean.FALSE.equals(user.getEnabled())) {
                     throw new BadRequestException("账号未激活！");
                 }
-                // 2021/9/15 这里到authorities 序列化后，反序列化时，会有误。已初步解决
                 jwtUserDto = new JwtUserDto(
                         user,
-                        dataService.getDeptIds(user.getId(), user.getDept().getId())
+                        dataService.getDeptIds(user.getId(), user.getDeptId()),
+                        roleService.grantedAuthorityGenHandler(user.getId(), user.getIsAdmin())
                 );
-//                userDtoCache.put(username, jwtUserDto);
-                // 设置用户信息有效期，6小时。理论上不设置也可以
-                redisUtils.hPut(SecuritySysUtil.getUserCacheKey(), username, jwtUserDto, 6 * 60 * 60L);
+                userDtoCache.put(username, jwtUserDto);
             }
         }
         return jwtUserDto;

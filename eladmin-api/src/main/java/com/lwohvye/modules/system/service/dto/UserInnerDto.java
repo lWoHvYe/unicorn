@@ -15,15 +15,15 @@
  */
 package com.lwohvye.modules.system.service.dto;
 
-import cn.hutool.core.util.ReflectUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Zheng Jie
@@ -31,55 +31,30 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@ToString
 @RequiredArgsConstructor
 public class UserInnerDto implements Serializable {
 
     private Long id;
 
-    private Set<RoleSmallDto> roles;
+    private List<Long> roleIds;
 
-    private Set<JobSmallDto> jobs;
+    private List<Long> jobIds;
 
-    private DeptSmallDto dept;
+    private Long deptId;
 
     private String username;
 
-    private String nickName;
-
-    private String email;
-
-    private String phone;
-
-    private String gender;
-
-    private String avatarName;
-
-    private String avatarPath;
-
+    @JsonIgnore
     private String password;
 
     private Boolean enabled;
 
+    @JsonIgnore
     private Boolean isAdmin = false;
 
     private String description;
 
     private Date pwdResetTime;
 
-    public UserInnerDto(UserDto userDto) {
-        // 设置其他属性
-        Arrays.stream(ReflectUtil.getFields(UserInnerDto.class))
-                // field时Dto的，因为Inner和她已经没有关系了，所以要用fieldName来设置属性
-                .iterator().forEachRemaining(field -> ReflectUtil.setFieldValue(this, field, ReflectUtil.getFieldValue(userDto, field.getName())));
-    }
-
-    @Override
-    public String toString() {
-        return "UserInnerDto{" +
-               "id=" + id +
-               ", username='" + username + '\'' +
-               ", enabled=" + enabled +
-               ", isAdmin=" + isAdmin +
-               '}';
-    }
 }

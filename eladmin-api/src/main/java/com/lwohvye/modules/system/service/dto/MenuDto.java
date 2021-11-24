@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import com.lwohvye.base.BaseDTO;
@@ -32,6 +33,7 @@ public class MenuDto extends BaseDTO implements Serializable {
 
     private Long id;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MenuDto> children;
 
     private Integer type;
