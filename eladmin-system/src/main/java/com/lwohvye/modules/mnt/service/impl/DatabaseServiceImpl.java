@@ -19,7 +19,7 @@ import cn.hutool.core.util.IdUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.mnt.domain.Database;
 import com.lwohvye.modules.mnt.repository.DatabaseRepository;
-import com.lwohvye.modules.mnt.service.DatabaseService;
+import com.lwohvye.modules.mnt.service.IDatabaseService;
 import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
 import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.DatabaseMapper;
@@ -46,7 +46,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DatabaseServiceImpl implements DatabaseService {
+public class DatabaseServiceImpl implements IDatabaseService {
 
     private final DatabaseRepository databaseRepository;
     private final DatabaseMapper databaseMapper;

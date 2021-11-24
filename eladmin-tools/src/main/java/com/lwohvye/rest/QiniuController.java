@@ -18,12 +18,13 @@ package com.lwohvye.rest;
 import com.lwohvye.annotation.Log;
 import com.lwohvye.domain.QiniuConfig;
 import com.lwohvye.domain.QiniuContent;
-import com.lwohvye.service.QiNiuService;
 import com.lwohvye.service.dto.QiniuQueryCriteria;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.lwohvye.service.dto.QiniuQueryCriteria;
+import com.lwohvye.service.IQiNiuService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ import java.util.Map;
 @Tag(name = "QiniuController", description = "工具：七牛云存储管理")
 public class QiniuController {
 
-    private final QiNiuService qiNiuService;
+    private final IQiNiuService qiNiuService;
 
     @GetMapping(value = "/config")
     public ResponseEntity<Object> queryConfig() {

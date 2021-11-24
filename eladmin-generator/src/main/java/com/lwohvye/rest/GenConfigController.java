@@ -16,11 +16,11 @@
 package com.lwohvye.rest;
 
 import com.lwohvye.domain.GenConfig;
-import com.lwohvye.service.GenConfigService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import com.lwohvye.service.IGenConfigService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "GenConfigController", description = "系统：代码生成器配置管理")
 public class GenConfigController {
 
-    private final GenConfigService genConfigService;
+    private final IGenConfigService genConfigService;
 
     @Operation(summary = "查询")
     @GetMapping(value = "/{tableName}")

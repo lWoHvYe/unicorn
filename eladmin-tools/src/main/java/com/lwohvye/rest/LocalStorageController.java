@@ -18,7 +18,7 @@ package com.lwohvye.rest;
 import com.lwohvye.annotation.Log;
 import com.lwohvye.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.service.LocalStorageService;
+import com.lwohvye.service.ILocalStorageService;
 import com.lwohvye.service.dto.LocalStorageQueryCriteria;
 import com.lwohvye.utils.FileUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ import java.io.IOException;
 @RequestMapping("/api/localStorage")
 public class LocalStorageController {
 
-    private final LocalStorageService localStorageService;
+    private final ILocalStorageService localStorageService;
 
     @Operation(summary = "查询文件")
     @GetMapping

@@ -29,7 +29,7 @@ import java.util.List;
  * @author Zheng Jie
  * @date 2018-11-24
  */
-public interface LogService {
+public interface ILogService {
 
     /**
      * 分页查询

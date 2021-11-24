@@ -18,7 +18,7 @@ package com.lwohvye.modules.mnt.rest;
 import com.lwohvye.annotation.Log;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.mnt.domain.Database;
-import com.lwohvye.modules.mnt.service.DatabaseService;
+import com.lwohvye.modules.mnt.service.IDatabaseService;
 import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
 import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
 import com.lwohvye.modules.mnt.util.SqlUtils;
@@ -52,7 +52,7 @@ import java.util.Set;
 public class DatabaseController {
 
     private final String fileSavePath = FileUtil.getTmpDirPath() + "/";
-    private final DatabaseService databaseService;
+    private final IDatabaseService databaseService;
 
     @Operation(summary = "导出数据库数据")
     @GetMapping(value = "/download")

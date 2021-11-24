@@ -28,8 +28,8 @@ import com.lwohvye.modules.system.domain.vo.MenuMetaVo;
 import com.lwohvye.modules.system.domain.vo.MenuVo;
 import com.lwohvye.modules.system.repository.MenuRepository;
 import com.lwohvye.modules.system.repository.UserRepository;
-import com.lwohvye.modules.system.service.MenuService;
-import com.lwohvye.modules.system.service.RoleService;
+import com.lwohvye.modules.system.service.IMenuService;
+import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.MenuDto;
 import com.lwohvye.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
@@ -57,12 +57,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "menu")
-public class MenuServiceImpl implements MenuService {
+public class MenuServiceImpl implements IMenuService {
 
     private final MenuRepository menuRepository;
     private final UserRepository userRepository;
     private final MenuMapper menuMapper;
-    private final RoleService roleService;
+    private final IRoleService roleService;
     private final RedisUtils redisUtils;
 
     @Override

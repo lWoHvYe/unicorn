@@ -20,7 +20,7 @@ import com.lwohvye.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Dept;
-import com.lwohvye.modules.system.service.DeptService;
+import com.lwohvye.modules.system.service.IDeptService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.utils.PageUtil;
@@ -48,7 +48,7 @@ import java.util.*;
 @RequestMapping("/api/dept")
 public class DeptController {
 
-    private final DeptService deptService;
+    private final IDeptService deptService;
     private static final String ENTITY_NAME = "dept";
 
     @Operation(summary = "导出部门数据")

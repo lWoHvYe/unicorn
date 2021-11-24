@@ -16,7 +16,7 @@
 package com.lwohvye.rest;
 
 import com.lwohvye.annotation.Log;
-import com.lwohvye.service.LogService;
+import com.lwohvye.service.ILogService;
 import com.lwohvye.service.dto.LogQueryCriteria;
 import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.result.ResultInfo;
@@ -42,7 +42,7 @@ import java.io.IOException;
 @Tag(name = "LogController", description = "系统：日志管理")
 public class LogController {
 
-    private final LogService logService;
+    private final ILogService logService;
 
     @Log("导出数据")
     @Operation(summary = "导出数据")

@@ -19,7 +19,7 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.system.domain.DictDetail;
 import com.lwohvye.modules.system.repository.DictDetailRepository;
 import com.lwohvye.modules.system.repository.DictRepository;
-import com.lwohvye.modules.system.service.DictDetailService;
+import com.lwohvye.modules.system.service.IDictDetailService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.DictDetailMapper;
@@ -46,7 +46,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 // 这里使用dict做域名，而非dictName，需注意
 @CacheConfig(cacheNames = "dict")
-public class DictDetailServiceImpl implements DictDetailService {
+public class DictDetailServiceImpl implements IDictDetailService {
 
     private final DictRepository dictRepository;
     private final DictDetailRepository dictDetailRepository;

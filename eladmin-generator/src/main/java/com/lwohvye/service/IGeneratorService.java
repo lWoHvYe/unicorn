@@ -27,7 +27,7 @@ import java.util.List;
  * @author Zheng Jie
  * @date 2019-01-02
  */
-public interface GeneratorService {
+public interface IGeneratorService {
 
     /**
      * 查询数据库元数据

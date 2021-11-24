@@ -24,7 +24,7 @@ import cn.hutool.extra.template.TemplateUtil;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.service.VerifyService;
+import com.lwohvye.service.IVerifyService;
 import com.lwohvye.utils.redis.RedisUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ import java.util.Collections;
  */
 @Service
 @RequiredArgsConstructor
-public class VerifyServiceImpl implements VerifyService {
+public class VerifyServiceImpl implements IVerifyService {
 
     @Value("${code.expiration:250}")
     private Long expiration;

@@ -13,22 +13,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.system.service;
+package com.lwohvye.service;
 
-import com.lwohvye.base.BaseService;
-
-import java.util.Map;
+import com.lwohvye.domain.GenConfig;
 
 /**
  * @author Zheng Jie
- * @date 2020-05-02
+ * @date 2019-01-14
  */
-public interface MonitorService extends BaseService {
+public interface IGenConfigService {
 
     /**
-     * 查询数据分页
-     *
-     * @return Map
+     * 查询表配置
+     * @param tableName 表名
+     * @return 表配置
      */
-    Map<String, Object> getServers();
+    GenConfig find(String tableName);
+
+    /**
+     * 更新表配置
+     * @param tableName 表名
+     * @param genConfig 表配置
+     * @return 表配置
+     */
+    GenConfig update(String tableName, GenConfig genConfig);
 }

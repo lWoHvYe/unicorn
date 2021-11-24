@@ -21,7 +21,7 @@ import com.lwohvye.domain.EmailConfig;
 import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.repository.EmailRepository;
-import com.lwohvye.service.EmailService;
+import com.lwohvye.service.IEmailService;
 import com.lwohvye.utils.EncryptUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
@@ -39,7 +39,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "email")
-public class EmailServiceImpl implements EmailService {
+public class EmailServiceImpl implements IEmailService {
 
     private final EmailRepository emailRepository;
 

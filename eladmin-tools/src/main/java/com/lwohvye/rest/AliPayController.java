@@ -20,7 +20,6 @@ import com.lwohvye.annotation.Log;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.domain.AlipayConfig;
 import com.lwohvye.domain.vo.TradeVo;
-import com.lwohvye.service.AliPayService;
 import com.lwohvye.utils.AliPayStatusEnum;
 import com.lwohvye.utils.AlipayUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +27,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.lwohvye.service.IAliPayService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +50,7 @@ import java.util.Map;
 public class AliPayController {
 
     private final AlipayUtils alipayUtils;
-    private final AliPayService alipayService;
+    private final IAliPayService alipayService;
 
     @GetMapping
     public ResponseEntity<AlipayConfig> queryConfig() {

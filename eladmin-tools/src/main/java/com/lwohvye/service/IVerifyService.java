@@ -22,7 +22,7 @@ import com.lwohvye.domain.vo.EmailVo;
  * @author Zheng Jie
  * @date 2018-12-26
  */
-public interface VerifyService extends BaseService {
+public interface IVerifyService extends BaseService {
 
     /**
      * 发送验证码

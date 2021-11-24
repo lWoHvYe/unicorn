@@ -2,7 +2,7 @@ package com.lwohvye.service.impl;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
-import com.lwohvye.service.AliyunOSSService;
+import com.lwohvye.service.IAliyunOSSService;
 import com.lwohvye.utils.FileUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- 
+
  * @date 2021年09月05日 16:22
  */
 @Slf4j
 @Service
-public class AliyunOSSServiceImpl implements AliyunOSSService {
+public class AliyunOSSServiceImpl implements IAliyunOSSService {
 
     // 引入starter后，可直接注入
     @Autowired

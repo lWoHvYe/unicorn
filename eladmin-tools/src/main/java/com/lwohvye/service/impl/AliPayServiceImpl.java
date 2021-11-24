@@ -23,7 +23,7 @@ import com.lwohvye.domain.AlipayConfig;
 import com.lwohvye.domain.vo.TradeVo;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.repository.AliPayRepository;
-import com.lwohvye.service.AliPayService;
+import com.lwohvye.service.IAliPayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
@@ -40,7 +40,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "aliPay")
-public class AliPayServiceImpl implements AliPayService {
+public class AliPayServiceImpl implements IAliPayService {
 
     private final AliPayRepository aliPayRepository;
 

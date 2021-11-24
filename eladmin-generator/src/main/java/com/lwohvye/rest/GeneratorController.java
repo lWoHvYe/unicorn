@@ -17,8 +17,8 @@ package com.lwohvye.rest;
 
 import com.lwohvye.domain.ColumnInfo;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.service.GenConfigService;
-import com.lwohvye.service.GeneratorService;
+import com.lwohvye.service.IGenConfigService;
+import com.lwohvye.service.IGeneratorService;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,8 +43,8 @@ import java.util.List;
 @Tag(name = "GeneratorController", description = "系统：代码生成管理")
 public class GeneratorController {
 
-    private final GeneratorService generatorService;
-    private final GenConfigService genConfigService;
+    private final IGeneratorService generatorService;
+    private final IGenConfigService genConfigService;
 
     @Value("${generator.enabled:true}")
     private Boolean generatorEnabled;

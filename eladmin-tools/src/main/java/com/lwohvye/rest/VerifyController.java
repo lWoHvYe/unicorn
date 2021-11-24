@@ -16,14 +16,15 @@
 package com.lwohvye.rest;
 
 import com.lwohvye.domain.vo.EmailVo;
-import com.lwohvye.service.EmailService;
-import com.lwohvye.service.VerifyService;
+import com.lwohvye.service.IVerifyService;
 import com.lwohvye.utils.enums.CodeBiEnum;
 import com.lwohvye.utils.enums.CodeEnum;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import com.lwohvye.domain.vo.EmailVo;
+import com.lwohvye.service.IEmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +41,8 @@ import java.util.Objects;
 @Tag(name = "VerifyController", description = "工具：验证码管理")
 public class VerifyController {
 
-    private final VerifyService verificationCodeService;
-    private final EmailService emailService;
+    private final IVerifyService verificationCodeService;
+    private final IEmailService emailService;
 
     @PostMapping(value = "/resetEmail")
     @Operation(summary = "重置邮箱，发送验证码")

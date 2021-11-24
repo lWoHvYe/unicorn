@@ -20,7 +20,7 @@ import com.lwohvye.domain.QiniuContent;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.repository.QiNiuConfigRepository;
 import com.lwohvye.repository.QiniuContentRepository;
-import com.lwohvye.service.QiNiuService;
+import com.lwohvye.service.IQiNiuService;
 import com.lwohvye.service.dto.QiniuQueryCriteria;
 import com.lwohvye.utils.*;
 import com.qiniu.common.QiniuException;
@@ -52,7 +52,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "qiNiu")
-public class QiNiuServiceImpl implements QiNiuService {
+public class QiNiuServiceImpl implements IQiNiuService {
 
     private final QiNiuConfigRepository qiNiuConfigRepository;
     private final QiniuContentRepository qiniuContentRepository;

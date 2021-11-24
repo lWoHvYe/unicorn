@@ -31,7 +31,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2019-03-29
  */
-public interface JobService extends BaseService {
+public interface IJobService extends BaseService {
 
     /**
      * 根据ID查询

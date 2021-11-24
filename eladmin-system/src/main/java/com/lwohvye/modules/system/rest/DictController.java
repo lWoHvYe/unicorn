@@ -19,7 +19,7 @@ import com.lwohvye.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Dict;
-import com.lwohvye.modules.system.service.DictService;
+import com.lwohvye.modules.system.service.IDictService;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,7 +46,7 @@ import java.util.Set;
 @RequestMapping("/api/dict")
 public class DictController {
 
-    private final DictService dictService;
+    private final IDictService dictService;
     private static final String ENTITY_NAME = "dict";
 
     @Operation(summary = "导出字典数据")

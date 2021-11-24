@@ -25,7 +25,7 @@ import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.handler.AuthHandlerContext;
 import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.modules.system.repository.UserRepository;
-import com.lwohvye.modules.system.service.RoleService;
+import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "role")
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl implements IRoleService {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;

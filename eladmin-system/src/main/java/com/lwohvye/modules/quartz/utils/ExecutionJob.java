@@ -25,8 +25,8 @@ import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.quartz.repository.QuartzLogRepository;
-import com.lwohvye.modules.quartz.service.QuartzJobService;
-import com.lwohvye.service.EmailService;
+import com.lwohvye.modules.quartz.service.IQuartzJobService;
+import com.lwohvye.service.IEmailService;
 import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.StringUtils;
@@ -61,7 +61,7 @@ public class ExecutionJob extends QuartzJobBean {
         QuartzJob quartzJob = (QuartzJob) context.getMergedJobDataMap().get(QuartzJob.JOB_KEY);
         // 获取spring bean
         QuartzLogRepository quartzLogRepository = SpringContextHolder.getBean(QuartzLogRepository.class);
-        QuartzJobService quartzJobService = SpringContextHolder.getBean(QuartzJobService.class);
+        IQuartzJobService quartzJobService = SpringContextHolder.getBean(IQuartzJobService.class);
         RedisUtils redisUtils = SpringContextHolder.getBean(RedisUtils.class);
 
         String uuid = quartzJob.getUuid();
@@ -107,7 +107,7 @@ public class ExecutionJob extends QuartzJobBean {
                 quartzJobService.updateIsPause(quartzJob);
             }
             if (quartzJob.getEmail() != null) {
-                EmailService emailService = SpringContextHolder.getBean(EmailService.class);
+                IEmailService emailService = SpringContextHolder.getBean(IEmailService.class);
                 // 邮箱报警
                 if (StrUtil.isNotBlank(quartzJob.getEmail())) {
                     EmailVo emailVo = taskAlarm(quartzJob, ThrowableUtil.getStackTrace(e));

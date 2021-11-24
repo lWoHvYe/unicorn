@@ -17,7 +17,7 @@ package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.annotation.Log;
 import com.lwohvye.modules.mnt.domain.ServerDeploy;
-import com.lwohvye.modules.mnt.service.ServerDeployService;
+import com.lwohvye.modules.mnt.service.IServerDeployService;
 import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +44,7 @@ import java.util.Set;
 @RequestMapping("/api/serverDeploy")
 public class ServerDeployController {
 
-    private final ServerDeployService serverDeployService;
+    private final IServerDeployService serverDeployService;
 
     @Operation(summary = "导出服务器数据")
     @GetMapping(value = "/download")

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.system.rest;
 
-import com.lwohvye.modules.system.service.MonitorService;
+import com.lwohvye.modules.system.service.IMonitorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/monitor")
 public class MonitorController {
 
-    private final MonitorService serverService;
+    private final IMonitorService serverService;
 
     @GetMapping
     @Operation(summary = "查询服务监控")

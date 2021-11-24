@@ -13,22 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.service;
+package com.lwohvye.modules.mnt.service;
 
-import com.lwohvye.service.dto.LocalStorageDto;
-import com.lwohvye.service.dto.LocalStorageQueryCriteria;
-import com.lwohvye.domain.LocalStorage;
+import com.lwohvye.modules.mnt.domain.DeployHistory;
+import com.lwohvye.modules.mnt.service.dto.DeployHistoryDto;
+import com.lwohvye.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
-* @author Zheng Jie
-* @date 2019-09-05
-*/
-public interface LocalStorageService {
+ * @author zhanghouying
+ */
+public interface IDeployHistoryService {
 
     /**
      * 分页查询
@@ -36,47 +36,39 @@ public interface LocalStorageService {
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable);
+    Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable);
 
     /**
-     * 查询全部数据
+     * 查询全部
      * @param criteria 条件
      * @return /
      */
-    List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria);
+    List<DeployHistoryDto> queryAll(DeployHistoryQueryCriteria criteria);
 
     /**
      * 根据ID查询
      * @param id /
      * @return /
      */
-    LocalStorageDto findById(Long id);
+    DeployHistoryDto findById(String id);
 
     /**
-     * 上传
-     * @param name 文件名称
-     * @param file 文件
-     * @return
+     * 创建
+     * @param resources /
      */
-    LocalStorage create(String name, MultipartFile file);
+    void create(DeployHistory resources);
 
     /**
-     * 编辑
-     * @param resources 文件信息
-     */
-    void update(LocalStorage resources);
-
-    /**
-     * 多选删除
+     * 删除
      * @param ids /
      */
-    void deleteAll(Long[] ids);
+    void delete(Set<String> ids);
 
     /**
      * 导出数据
-     * @param localStorageDtos 待导出的数据
+     * @param queryAll /
      * @param response /
      * @throws IOException /
      */
-    void download(List<LocalStorageDto> localStorageDtos, HttpServletResponse response) throws IOException;
+    void download(List<DeployHistoryDto> queryAll, HttpServletResponse response) throws IOException;
 }

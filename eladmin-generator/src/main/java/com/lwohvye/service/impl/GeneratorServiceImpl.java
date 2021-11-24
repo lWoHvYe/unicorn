@@ -22,7 +22,7 @@ import com.lwohvye.domain.ColumnInfo;
 import com.lwohvye.domain.GenConfig;
 import com.lwohvye.domain.vo.TableInfo;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.service.GeneratorService;
+import com.lwohvye.service.IGeneratorService;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.GenUtil;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
-public class GeneratorServiceImpl implements GeneratorService {
+public class GeneratorServiceImpl implements IGeneratorService {
     private static final Logger log = LoggerFactory.getLogger(GeneratorServiceImpl.class);
     @PersistenceContext
     private EntityManager em;

@@ -18,7 +18,7 @@ package com.lwohvye.service.impl;
 import com.lwohvye.domain.GenConfig;
 import com.lwohvye.repository.GenConfigRepository;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.service.GenConfigService;
+import com.lwohvye.service.IGenConfigService;
 import org.springframework.stereotype.Service;
 import java.io.File;
 
@@ -28,7 +28,7 @@ import java.io.File;
  */
 @Service
 @RequiredArgsConstructor
-public class GenConfigServiceImpl implements GenConfigService {
+public class GenConfigServiceImpl implements IGenConfigService {
 
     private final GenConfigRepository genConfigRepository;
 

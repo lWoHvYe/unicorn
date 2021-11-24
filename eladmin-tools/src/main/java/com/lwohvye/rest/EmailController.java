@@ -18,10 +18,10 @@ package com.lwohvye.rest;
 import com.lwohvye.annotation.Log;
 import com.lwohvye.domain.EmailConfig;
 import com.lwohvye.domain.vo.EmailVo;
-import com.lwohvye.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import com.lwohvye.service.IEmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "EmailController", description = "工具：邮件管理")
 public class EmailController {
 
-    private final EmailService emailService;
+    private final IEmailService emailService;
 
     @GetMapping
     public ResponseEntity<Object> queryConfig() {

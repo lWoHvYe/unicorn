@@ -6,7 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
-import com.lwohvye.modules.mongodb.service.MongoDBUserService;
+import com.lwohvye.modules.mongodb.service.IMongoDBUserService;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.support.SpringFactoriesLoader;
@@ -26,7 +26,7 @@ import java.util.ServiceLoader;
 @RequestMapping("/api/mongodb/user")
 public class MongoDBUserController {
 
-    private MongoDBUserService mongoDBUserService;
+    private IMongoDBUserService mongoDBUserService;
 
     /**
      * @description 启动成功后调用，执行部分初始化
@@ -38,14 +38,14 @@ public class MongoDBUserController {
         if (ObjectUtil.isNull(mongoDBUserService)) {
 //            SPI的两种方式：Java ServiceLoader和Spring SpringFactoriesLoader。当前都无法注入属性。待解决
             if (RandomUtil.randomBoolean()) {
-                var mongoDBUserServices = ServiceLoader.load(MongoDBUserService.class);
+                var mongoDBUserServices = ServiceLoader.load(IMongoDBUserService.class);
 //        有值，且大小唯一
                 if (ObjectUtil.isNotNull(mongoDBUserServices) && CollUtil.isNotEmpty(mongoDBUserServices) && ObjectUtil.equal(mongoDBUserServices.stream().count(), 1L)) {
                     var optionalMongoDBUserService = mongoDBUserServices.findFirst();
                     optionalMongoDBUserService.ifPresent(dbUserService -> this.mongoDBUserService = dbUserService);
                 }
             } else {
-                var mongoDBUserServices = SpringFactoriesLoader.loadFactories(MongoDBUserService.class, null);
+                var mongoDBUserServices = SpringFactoriesLoader.loadFactories(IMongoDBUserService.class, null);
 //        有值，且大小唯一
                 if (ObjectUtil.isNotNull(mongoDBUserServices) && CollUtil.isNotEmpty(mongoDBUserServices) && ObjectUtil.equal(mongoDBUserServices.size(), 1)) {
                     this.mongoDBUserService = mongoDBUserServices.get(0);

@@ -3,7 +3,7 @@ package com.lwohvye.config;
 import com.lwohvye.config.condition.LinuxCondition;
 import com.lwohvye.config.condition.MacOSCondition;
 import com.lwohvye.config.condition.WindowsCondition;
-import com.lwohvye.modules.system.service.TerminalService;
+import com.lwohvye.modules.system.service.ITerminalService;
 import com.lwohvye.modules.system.service.local.LinuxTerminalServiceImpl;
 import com.lwohvye.modules.system.service.local.MacOSTerminalServiceImpl;
 import com.lwohvye.modules.system.service.local.WindowsTerminalServiceImpl;
@@ -31,7 +31,7 @@ public class TerminalServiceConditionConfig {
      */
     @Bean("terminalService")
     @Conditional({MacOSCondition.class})
-    public TerminalService macOSTerminalService() {
+    public ITerminalService macOSTerminalService() {
         return new MacOSTerminalServiceImpl();
     }
 
@@ -41,7 +41,7 @@ public class TerminalServiceConditionConfig {
      */
     @Bean("terminalService")
     @Conditional({WindowsCondition.class})
-    public TerminalService windowTerminalService() {
+    public ITerminalService windowTerminalService() {
         return new WindowsTerminalServiceImpl();
     }
 
@@ -52,7 +52,7 @@ public class TerminalServiceConditionConfig {
      */
     @Bean("terminalService")
     @Conditional({LinuxCondition.class})
-    public TerminalService linuxTerminalService() {
+    public ITerminalService linuxTerminalService() {
         return new LinuxTerminalServiceImpl();
     }
 }

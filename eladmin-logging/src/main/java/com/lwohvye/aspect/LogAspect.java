@@ -15,7 +15,7 @@
  */
 package com.lwohvye.aspect;
 
-import com.lwohvye.service.LogService;
+import com.lwohvye.service.ILogService;
 import lombok.extern.slf4j.Slf4j;
 import com.lwohvye.domain.Log;
 import com.lwohvye.utils.RequestHolder;
@@ -40,11 +40,11 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class LogAspect {
 
-    private final LogService logService;
+    private final ILogService logService;
 
     ThreadLocal<Long> currentTime = new ThreadLocal<>();
 
-    public LogAspect(LogService logService) {
+    public LogAspect(ILogService logService) {
         this.logService = logService;
     }
 

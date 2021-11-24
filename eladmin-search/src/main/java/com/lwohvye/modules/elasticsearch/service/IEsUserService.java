@@ -2,7 +2,7 @@ package com.lwohvye.modules.elasticsearch.service;
 
 import com.lwohvye.base.BaseService;
 
-public interface EsUserService extends BaseService {
+public interface IEsUserService extends BaseService {
 
     Object queryAll();
 

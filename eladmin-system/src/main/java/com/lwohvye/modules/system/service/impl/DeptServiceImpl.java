@@ -16,7 +16,6 @@
 package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Dept;
@@ -24,7 +23,7 @@ import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.repository.DeptRepository;
 import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.modules.system.repository.UserRepository;
-import com.lwohvye.modules.system.service.DeptService;
+import com.lwohvye.modules.system.service.IDeptService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.DeptMapper;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +50,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "dept")
-public class DeptServiceImpl implements DeptService {
+public class DeptServiceImpl implements IDeptService {
 
     private final DeptRepository deptRepository;
     private final DeptMapper deptMapper;

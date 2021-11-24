@@ -17,11 +17,10 @@ package com.lwohvye.modules.system.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.modules.system.domain.Dept;
-import com.lwohvye.modules.system.service.DataService;
-import com.lwohvye.modules.system.service.DeptService;
-import com.lwohvye.modules.system.service.RoleService;
+import com.lwohvye.modules.system.service.IDataService;
+import com.lwohvye.modules.system.service.IDeptService;
+import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
-import com.lwohvye.modules.system.service.dto.UserDto;
 import com.lwohvye.utils.enums.DataScopeEnum;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,10 +37,10 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "data")
-public class DataServiceImpl implements DataService {
+public class DataServiceImpl implements IDataService {
 
-    private final RoleService roleService;
-    private final DeptService deptService;
+    private final IRoleService roleService;
+    private final IDeptService deptService;
 
     /**
      * 用户角色改变时需清理缓存

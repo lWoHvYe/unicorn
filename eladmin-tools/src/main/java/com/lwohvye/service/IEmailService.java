@@ -22,7 +22,7 @@ import com.lwohvye.domain.EmailConfig;
  * @author Zheng Jie
  * @date 2018-12-26
  */
-public interface EmailService {
+public interface IEmailService {
 
     /**
      * 更新邮件配置

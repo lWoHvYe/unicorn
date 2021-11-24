@@ -27,7 +27,7 @@ import java.util.Map;
 * @author Zheng Jie
 * @date 2019-04-10
 */
-public interface DictDetailService extends BaseService {
+public interface IDictDetailService extends BaseService {
 
     /**
      * 创建

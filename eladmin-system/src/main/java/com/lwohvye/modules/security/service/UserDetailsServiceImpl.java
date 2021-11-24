@@ -21,8 +21,8 @@ import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.security.utils.SecuritySysUtil;
-import com.lwohvye.modules.system.service.DataService;
-import com.lwohvye.modules.system.service.UserService;
+import com.lwohvye.modules.system.service.IDataService;
+import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +41,8 @@ import java.util.Objects;
 @Service("userDetailsService")
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserService userService;
-    private final DataService dataService;
+    private final IUserService userService;
+    private final IDataService dataService;
     private final RedisUtils redisUtils;
     private final LoginProperties loginProperties;
 

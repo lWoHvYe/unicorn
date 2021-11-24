@@ -27,7 +27,7 @@ import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.projection.UserProj;
 import com.lwohvye.modules.system.repository.UserRepository;
-import com.lwohvye.modules.system.service.UserService;
+import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.*;
 import com.lwohvye.modules.system.service.mapstruct.UserMapper;
 import com.lwohvye.utils.*;
@@ -57,7 +57,7 @@ import java.util.*;
 @RequiredArgsConstructor
 //配置该类缓存的公共前缀
 @CacheConfig(cacheNames = "user")
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;

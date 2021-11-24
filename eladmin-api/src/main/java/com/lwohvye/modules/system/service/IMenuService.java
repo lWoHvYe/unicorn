@@ -29,7 +29,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-12-17
  */
-public interface MenuService extends BaseService {
+public interface IMenuService extends BaseService {
 
     /**
      * 查询全部数据

@@ -2,7 +2,7 @@ package com.lwohvye.rest;
 
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.annotation.rest.AnonymousPostMapping;
-import com.lwohvye.service.AliyunOSSService;
+import com.lwohvye.service.IAliyunOSSService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "AliyunOSSController", description = "工具：对象存储OSS")
 public class AliyunOSSController {
 
-    private final AliyunOSSService aliyunOSSService;
+    private final IAliyunOSSService aliyunOSSService;
 
     @AnonymousPostMapping
     @Operation(summary = "分片上传")
