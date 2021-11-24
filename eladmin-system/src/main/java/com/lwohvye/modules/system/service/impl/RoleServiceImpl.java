@@ -92,6 +92,8 @@ public class RoleServiceImpl implements IRoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+//    当使用root对象的属性作为key时，可以将“#root”省略，因为Spring默认使用的就是root对象的属性。
+//    需注意是 target.xxx 不带前面的 #
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     public RoleDto findById(long id) {
         Role role = roleRepository.findById(id).orElseGet(Role::new);
@@ -184,9 +186,6 @@ public class RoleServiceImpl implements IRoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-//    当使用root对象的属性作为key时，可以将“#root”省略，因为Spring默认使用的就是root对象的属性。
-//    需注意是 target.xxx 不带前面的 #
-    @Cacheable(key = " #root.target.getSysName() + 'auth:' + #p0")
     public List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin) {
         // admin对应1，非admin对应0
         var instance = authHandlerContext.getInstance(Boolean.TRUE.equals(isAdmin) ? 1 : 0);
