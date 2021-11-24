@@ -56,7 +56,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      *
      * @see UserCacheClean
      */
-    //  这种缓存的方式，也许解决了些问题，但导致无法做集群的扩展，后续解决。用户权限数据建议序列化
+    //  这种缓存的方式，也许解决了些问题，但导致无法做集群的扩展，后续解决。
+    //  不能存redis中，使用fastjson时没什么问题。但使用jackson反序列化需要实体有空参构造。而SimpleGrantedAuthority无空参构造。
     static Map<String, JwtUserDto> userDtoCache = new ConcurrentHashMap<>();
 
     @Override

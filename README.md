@@ -46,7 +46,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 ```
 
-注意不要使用actuator系列依赖，否则可能需要改springfox源码来解决。详见：[SpringBoot-2.6.0.md](document/springboot/SpringBoot-2.6.0.md)
+注意不要使用actuator系列依赖，否则可能需要改springfox源码来解决。详见：[SpringBoot-2.6.0](document/springboot/SpringBoot-2.6.0.md)
 
 ---
 
@@ -95,9 +95,9 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 自定义权限注解与匿名接口注解，可快速对接口拦截与放行
 - 对一些常用地前端组件封装：表格数据请求、数据字典等
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
-- 支持在线用户管理与服务器性能监控，支持限制单用户登录
+- 提供服务器性能监控功能
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
-- 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。若需要分库分表，可参考[jpa-分库分表](https://github.com/lWoHvYe/spring-boot-jpa-cascade)
+- 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
 - 基于最新的Java-17、Spring Boot 2.6.0

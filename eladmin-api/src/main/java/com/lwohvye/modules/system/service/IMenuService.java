@@ -85,6 +85,7 @@ public interface IMenuService extends BaseService {
      */
     Object buildMenus(List<MenuDto> menuDtos);
 
+    Object buildWebMenus(Long uid);
     /**
      * 根据ID查询
      * @param id /
