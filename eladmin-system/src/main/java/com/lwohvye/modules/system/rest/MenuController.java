@@ -67,7 +67,8 @@ public class MenuController {
     @Operation(summary = "获取前端所需菜单")
     public ResponseEntity<Object> buildMenus() {
         // 在方法参数里用SecurityUtils.getCurrentUserId()在一些情况下会不走缓存
-        return new ResponseEntity<>(menuService.buildWebMenus(SecurityUtils.getCurrentUserId()), HttpStatus.OK);
+        var cuid = SecurityUtils.getCurrentUserId();
+        return new ResponseEntity<>(menuService.buildWebMenus(cuid), HttpStatus.OK);
     }
 
     @Operation(summary = "返回全部的菜单")
