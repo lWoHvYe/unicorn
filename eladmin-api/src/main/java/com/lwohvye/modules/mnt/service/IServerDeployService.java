@@ -13,68 +13,83 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.system.service;
+package com.lwohvye.modules.mnt.service;
 
-import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.service.dto.DictDto;
-import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
-import com.lwohvye.modules.system.domain.Dict;
+import com.lwohvye.modules.mnt.domain.ServerDeploy;
+import com.lwohvye.modules.mnt.service.dto.ServerDeployDto;
+import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Zheng Jie
- * @date 2019-04-10
- */
-public interface DictService extends BaseService {
+* @author zhanghouying
+* @date 2019-08-24
+*/
+public interface IServerDeployService {
 
     /**
      * 分页查询
-     *
      * @param criteria 条件
      * @param pageable 分页参数
+     * @return /
      */
-    Map<String, Object> queryAll(DictQueryCriteria criteria, Pageable pageable);
+    Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部数据
-     *
-     * @param dict
+     * @param criteria 条件
+     * @return /
      */
-    List<DictDto> queryAll(DictQueryCriteria dict);
+    List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria);
+
+    /**
+     * 根据ID查询
+     * @param id /
+     * @return /
+     */
+    ServerDeployDto findById(Long id);
 
     /**
      * 创建
-     *
-     * @param resources
+     * @param resources /
      */
-    void create(Dict resources);
+    void create(ServerDeploy resources);
 
     /**
      * 编辑
-     *
      * @param resources /
      */
-    void update(Dict resources);
+    void update(ServerDeploy resources);
 
     /**
      * 删除
-     *
      * @param ids /
      */
     void delete(Set<Long> ids);
 
     /**
+     * 根据IP查询
+     * @param ip /
+     * @return /
+     */
+    ServerDeployDto findByIp(String ip);
+
+	/**
+	 * 测试登录服务器
+	 * @param resources /
+	 * @return /
+	 */
+	Boolean testConnect(ServerDeploy resources);
+
+    /**
      * 导出数据
-     *
-     * @param queryAll 待导出的数据
+     * @param queryAll /
      * @param response /
      * @throws IOException /
      */
-    void download(List<DictDto> queryAll, HttpServletResponse response) throws IOException;
+    void download(List<ServerDeployDto> queryAll, HttpServletResponse response) throws IOException;
 }

@@ -21,7 +21,7 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.repository.LocalStorageRepository;
-import com.lwohvye.service.LocalStorageService;
+import com.lwohvye.service.ILocalStorageService;
 import com.lwohvye.service.dto.LocalStorageDto;
 import com.lwohvye.service.dto.LocalStorageQueryCriteria;
 import com.lwohvye.service.mapstruct.LocalStorageMapper;
@@ -47,7 +47,7 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-public class LocalStorageServiceImpl implements LocalStorageService {
+public class LocalStorageServiceImpl implements ILocalStorageService {
 
     private final LocalStorageRepository localStorageRepository;
     private final LocalStorageMapper localStorageMapper;

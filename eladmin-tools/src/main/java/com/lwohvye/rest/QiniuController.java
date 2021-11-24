@@ -23,7 +23,7 @@ import com.lwohvye.annotation.Log;
 import com.lwohvye.domain.QiniuConfig;
 import com.lwohvye.domain.QiniuContent;
 import com.lwohvye.service.dto.QiniuQueryCriteria;
-import com.lwohvye.service.QiNiuService;
+import com.lwohvye.service.IQiNiuService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +47,7 @@ import java.util.Map;
 @Api(tags = "工具：七牛云存储管理")
 public class QiniuController {
 
-    private final QiNiuService qiNiuService;
+    private final IQiNiuService qiNiuService;
 
     @GetMapping(value = "/config")
     public ResponseEntity<Object> queryConfig(){
@@ -79,7 +79,7 @@ public class QiniuController {
     @ApiOperation("上传文件")
     @PostMapping
     public ResponseEntity<Object> upload(@RequestParam MultipartFile file){
-        QiniuContent qiniuContent = qiNiuService.upload(file,qiNiuService.find());
+        QiniuContent qiniuContent = qiNiuService.upload(file, qiNiuService.find());
         Map<String,Object> map = new HashMap<>(3);
         map.put("id",qiniuContent.getId());
         map.put("errno",0);
@@ -100,7 +100,7 @@ public class QiniuController {
     @GetMapping(value = "/download/{id}")
     public ResponseEntity<Object> download(@PathVariable Long id){
         Map<String,Object> map = new HashMap<>(1);
-        map.put("url", qiNiuService.download(qiNiuService.findByContentId(id),qiNiuService.find()));
+        map.put("url", qiNiuService.download(qiNiuService.findByContentId(id), qiNiuService.find()));
         return new ResponseEntity<>(map,HttpStatus.OK);
     }
 
@@ -108,7 +108,7 @@ public class QiniuController {
     @ApiOperation("删除文件")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Object> delete(@PathVariable Long id){
-        qiNiuService.delete(qiNiuService.findByContentId(id),qiNiuService.find());
+        qiNiuService.delete(qiNiuService.findByContentId(id), qiNiuService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

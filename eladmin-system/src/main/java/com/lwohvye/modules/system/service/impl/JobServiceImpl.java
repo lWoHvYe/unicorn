@@ -21,7 +21,7 @@ import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.system.domain.Job;
 import com.lwohvye.modules.system.repository.JobRepository;
 import com.lwohvye.modules.system.repository.UserRepository;
-import com.lwohvye.modules.system.service.JobService;
+import com.lwohvye.modules.system.service.IJobService;
 import com.lwohvye.modules.system.service.dto.JobDto;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.JobMapper;
@@ -46,7 +46,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "job")
-public class JobServiceImpl implements JobService {
+public class JobServiceImpl implements IJobService {
 
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;

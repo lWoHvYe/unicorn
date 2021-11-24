@@ -21,7 +21,7 @@ import com.lwohvye.domain.Log;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.UserCacheClean;
-import com.lwohvye.modules.system.service.UserService;
+import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.repository.LogRepository;
 import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -56,7 +56,7 @@ public class AuthMQService {
     private RedisUtils redisUtils;
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @Autowired
     private UserCacheClean userCacheClean;

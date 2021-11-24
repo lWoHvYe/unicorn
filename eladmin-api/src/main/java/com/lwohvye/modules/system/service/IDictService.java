@@ -13,76 +13,68 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.mnt.service;
+package com.lwohvye.modules.system.service;
 
-import com.lwohvye.modules.mnt.domain.Database;
-import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
-import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
+import com.lwohvye.base.BaseService;
+import com.lwohvye.modules.system.service.dto.DictDto;
+import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
+import com.lwohvye.modules.system.domain.Dict;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * @author ZhangHouYing
- * @date 2019-08-24
+ * @author Zheng Jie
+ * @date 2019-04-10
  */
-public interface DatabaseService {
+public interface IDictService extends BaseService {
 
     /**
      * 分页查询
+     *
      * @param criteria 条件
      * @param pageable 分页参数
-     * @return /
      */
-    Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(DictQueryCriteria criteria, Pageable pageable);
 
     /**
-     * 查询全部
-     * @param criteria 条件
-     * @return /
+     * 查询全部数据
+     *
+     * @param dict
      */
-    List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria);
-
-    /**
-     * 根据ID查询
-     * @param id /
-     * @return /
-     */
-    DatabaseDto findById(String id);
+    List<DictDto> queryAll(DictQueryCriteria dict);
 
     /**
      * 创建
-     * @param resources /
+     *
+     * @param resources
      */
-    void create(Database resources);
+    void create(Dict resources);
 
     /**
      * 编辑
+     *
      * @param resources /
      */
-    void update(Database resources);
+    void update(Dict resources);
 
     /**
      * 删除
+     *
      * @param ids /
      */
-    void delete(Set<String> ids);
-
-	/**
-	 * 测试连接数据库
-	 * @param resources /
-	 * @return /
-	 */
-	boolean testConnection(Database resources);
+    void delete(Set<Long> ids);
 
     /**
      * 导出数据
-     * @param queryAll /
+     *
+     * @param queryAll 待导出的数据
      * @param response /
-     * @throws IOException e
+     * @throws IOException /
      */
-    void download(List<DatabaseDto> queryAll, HttpServletResponse response) throws IOException;
+    void download(List<DictDto> queryAll, HttpServletResponse response) throws IOException;
 }

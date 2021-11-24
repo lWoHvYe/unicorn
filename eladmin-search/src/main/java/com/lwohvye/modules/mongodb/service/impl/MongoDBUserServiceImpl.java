@@ -2,7 +2,7 @@ package com.lwohvye.modules.mongodb.service.impl;
 
 import com.lwohvye.modules.mongodb.domain.MongoDBUser;
 import com.lwohvye.modules.mongodb.repository.MongoDBUserRepository;
-import com.lwohvye.modules.mongodb.service.MongoDBUserService;
+import com.lwohvye.modules.mongodb.service.IMongoDBUserService;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @date 2021年04月17日 13:53
  */
 @Service
-public class MongoDBUserServiceImpl implements MongoDBUserService {
+public class MongoDBUserServiceImpl implements IMongoDBUserService {
 
     @Autowired
     private UserRepository userRepository;

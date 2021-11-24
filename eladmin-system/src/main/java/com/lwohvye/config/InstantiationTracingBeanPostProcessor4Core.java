@@ -16,7 +16,7 @@
 package com.lwohvye.config;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.modules.system.service.TerminalService;
+import com.lwohvye.modules.system.service.ITerminalService;
 import com.lwohvye.modules.system.service.impl.NormalUserTypeHandler;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class InstantiationTracingBeanPostProcessor4Core implements ApplicationLi
             var userTypeHandler = SpringContextHolder.getBean(NormalUserTypeHandler.class);
             ReflectUtil.invoke(userTypeHandler, "doInit");
 
-            var terminalClazz = TerminalService.class;
+            var terminalClazz = ITerminalService.class;
             try {
                 var terminalService = SpringContextHolder.getBean(terminalClazz);
                 terminalService.prSysName();

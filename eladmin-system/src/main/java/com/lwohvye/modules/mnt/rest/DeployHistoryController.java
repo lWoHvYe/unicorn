@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.modules.mnt.service.DeployHistoryService;
+import com.lwohvye.modules.mnt.service.IDeployHistoryService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,20 +41,20 @@ import java.util.Set;
 @RequestMapping("/api/deployHistory")
 public class DeployHistoryController {
 
-    private final DeployHistoryService deployhistoryService;
+    private final IDeployHistoryService deployHistoryService;
 
     @ApiOperation("导出部署历史数据")
     @GetMapping(value = "/download")
     @PreAuthorize("@el.check('deployHistory:list')")
     public void download(HttpServletResponse response, DeployHistoryQueryCriteria criteria) throws IOException {
-        deployhistoryService.download(deployhistoryService.queryAll(criteria), response);
+        deployHistoryService.download(deployHistoryService.queryAll(criteria), response);
     }
 
     @ApiOperation(value = "查询部署历史")
     @GetMapping
 	@PreAuthorize("@el.check('deployHistory:list')")
     public ResponseEntity<Object> query(DeployHistoryQueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(ResultInfo.success(deployhistoryService.queryAll(criteria,pageable)),HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(deployHistoryService.queryAll(criteria,pageable)),HttpStatus.OK);
     }
 
     @Log("删除DeployHistory")
@@ -62,7 +62,7 @@ public class DeployHistoryController {
 	@DeleteMapping
     @PreAuthorize("@el.check('deployHistory:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<String> ids){
-        deployhistoryService.delete(ids);
+        deployHistoryService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(),HttpStatus.OK);
     }
 }

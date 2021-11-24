@@ -20,7 +20,7 @@ import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Menu;
-import com.lwohvye.modules.system.service.MenuService;
+import com.lwohvye.modules.system.service.IMenuService;
 import com.lwohvye.modules.system.service.dto.MenuDto;
 import com.lwohvye.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.MenuMapper;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/menus")
 public class MenuController {
 
-    private final MenuService menuService;
+    private final IMenuService menuService;
     private final MenuMapper menuMapper;
     private static final String ENTITY_NAME = "menu";
 

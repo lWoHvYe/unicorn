@@ -1,7 +1,7 @@
 package com.lwohvye.modules.elasticsearch.rest;
 
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
-import com.lwohvye.modules.elasticsearch.service.EsUserService;
+import com.lwohvye.modules.elasticsearch.service.IEsUserService;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class EsUserController {
 
-    private final EsUserService esUserService;
+    private final IEsUserService esUserService;
 
     @AnonymousGetMapping
     public ResponseEntity getAllEsUser() {

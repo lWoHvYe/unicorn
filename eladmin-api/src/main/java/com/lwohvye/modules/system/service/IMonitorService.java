@@ -16,21 +16,19 @@
 package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.service.dto.UserDto;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * 数据权限服务类
  * @author Zheng Jie
- * @date 2020-05-07
+ * @date 2020-05-02
  */
-public interface DataService extends BaseService {
+public interface IMonitorService extends BaseService {
 
     /**
-     * 获取数据权限
-     * @param userId /
-     * @return /
+     * 查询数据分页
+     *
+     * @return Map
      */
-    List<Long> getDeptIds(Long userId, Long deptId);
+    Map<String, Object> getServers();
 }

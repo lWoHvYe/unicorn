@@ -13,23 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.mnt.service;
+package com.lwohvye.service;
 
-import com.lwohvye.modules.mnt.domain.App;
-import com.lwohvye.modules.mnt.service.dto.AppDto;
-import com.lwohvye.modules.mnt.service.dto.AppQueryCriteria;
+import com.lwohvye.service.dto.LocalStorageDto;
+import com.lwohvye.service.dto.LocalStorageQueryCriteria;
+import com.lwohvye.domain.LocalStorage;
 import org.springframework.data.domain.Pageable;
-
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
+* @author Zheng Jie
+* @date 2019-09-05
 */
-public interface AppService {
+public interface ILocalStorageService {
 
     /**
      * 分页查询
@@ -37,45 +36,47 @@ public interface AppService {
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(AppQueryCriteria criteria, Pageable pageable);
+    Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部数据
      * @param criteria 条件
      * @return /
      */
-    List<AppDto> queryAll(AppQueryCriteria criteria);
+    List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria);
 
     /**
      * 根据ID查询
      * @param id /
      * @return /
      */
-    AppDto findById(Long id);
+    LocalStorageDto findById(Long id);
 
     /**
-     * 创建
-     * @param resources /
+     * 上传
+     * @param name 文件名称
+     * @param file 文件
+     * @return
      */
-    void create(App resources);
+    LocalStorage create(String name, MultipartFile file);
 
     /**
      * 编辑
-     * @param resources /
+     * @param resources 文件信息
      */
-    void update(App resources);
+    void update(LocalStorage resources);
 
     /**
-     * 删除
+     * 多选删除
      * @param ids /
      */
-    void delete(Set<Long> ids);
+    void deleteAll(Long[] ids);
 
     /**
      * 导出数据
-     * @param queryAll /
+     * @param localStorageDtos 待导出的数据
      * @param response /
      * @throws IOException /
      */
-    void download(List<AppDto> queryAll, HttpServletResponse response) throws IOException;
+    void download(List<LocalStorageDto> localStorageDtos, HttpServletResponse response) throws IOException;
 }

@@ -24,9 +24,9 @@ import com.lwohvye.modules.mnt.domain.Deploy;
 import com.lwohvye.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.domain.ServerDeploy;
 import com.lwohvye.modules.mnt.repository.DeployRepository;
-import com.lwohvye.modules.mnt.service.DeployHistoryService;
-import com.lwohvye.modules.mnt.service.DeployService;
-import com.lwohvye.modules.mnt.service.ServerDeployService;
+import com.lwohvye.modules.mnt.service.IDeployHistoryService;
+import com.lwohvye.modules.mnt.service.IDeployService;
+import com.lwohvye.modules.mnt.service.IServerDeployService;
 import com.lwohvye.modules.mnt.service.dto.AppDto;
 import com.lwohvye.modules.mnt.service.dto.DeployDto;
 import com.lwohvye.modules.mnt.service.dto.DeployQueryCriteria;
@@ -56,13 +56,13 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DeployServiceImpl implements DeployService {
+public class DeployServiceImpl implements IDeployService {
 
     private final String FILE_SEPARATOR = "/";
     private final DeployRepository deployRepository;
     private final DeployMapper deployMapper;
-    private final ServerDeployService serverDeployService;
-    private final DeployHistoryService deployHistoryService;
+    private final IServerDeployService serverDeployService;
+    private final IDeployHistoryService deployHistoryService;
 
     /**
      * 循环次数

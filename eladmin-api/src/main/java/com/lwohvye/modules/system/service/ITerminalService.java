@@ -1,5 +1,5 @@
 package com.lwohvye.modules.system.service;
 
-public interface TerminalService {
+public interface ITerminalService {
     void prSysName();
 }

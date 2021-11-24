@@ -1,10 +1,10 @@
 package com.lwohvye.modules.system.service.local;
 
-import com.lwohvye.modules.system.service.TerminalService;
+import com.lwohvye.modules.system.service.ITerminalService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LinuxTerminalServiceImpl implements TerminalService {
+public class LinuxTerminalServiceImpl implements ITerminalService {
     @Override
     public void prSysName() {
         log.warn(" This is GUN/Linux CentOS ");

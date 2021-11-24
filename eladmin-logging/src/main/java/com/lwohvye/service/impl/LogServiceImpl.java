@@ -21,7 +21,7 @@ import cn.hutool.json.JSONUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.domain.Log;
 import com.lwohvye.repository.LogRepository;
-import com.lwohvye.service.LogService;
+import com.lwohvye.service.ILogService;
 import com.lwohvye.service.dto.LogQueryCriteria;
 import com.lwohvye.service.mapstruct.LogErrorMapper;
 import com.lwohvye.service.mapstruct.LogSmallMapper;
@@ -33,6 +33,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -49,7 +50,7 @@ import java.util.*;
 @Service
 //有参构造
 @RequiredArgsConstructor
-public class LogServiceImpl implements LogService {
+public class LogServiceImpl implements ILogService {
     private final LogRepository logRepository;
     private final LogErrorMapper logErrorMapper;
     private final LogSmallMapper logSmallMapper;
@@ -98,7 +99,7 @@ public class LogServiceImpl implements LogService {
         if (log != null) {
             log.setDescription(aopLog.value());
         }
-        assert log != null;
+        Assert.notNull(log, "信息有误，不可为空");
         log.setRequestIp(ip);
 
         log.setAddress(StringUtils.getCityInfo(log.getRequestIp()));

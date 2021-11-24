@@ -3,7 +3,7 @@ package com.lwohvye.modules.elasticsearch.service.impl;
 import cn.hutool.core.util.RandomUtil;
 import com.lwohvye.modules.elasticsearch.domain.EsUser;
 import com.lwohvye.modules.elasticsearch.repository.EsUserRepository;
-import com.lwohvye.modules.elasticsearch.service.EsUserService;
+import com.lwohvye.modules.elasticsearch.service.IEsUserService;
 import com.lwohvye.modules.mongodb.repository.MongoDBUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class EsUserServiceImpl implements EsUserService {
+public class EsUserServiceImpl implements IEsUserService {
 
     @Autowired
     private EsUserRepository esUserRepository;

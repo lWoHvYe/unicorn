@@ -22,7 +22,7 @@ import com.lwohvye.domain.AlipayConfig;
  * @author Zheng Jie
  * @date 2018-12-31
  */
-public interface AliPayService {
+public interface IAliPayService {
 
     /**
      * 查询配置

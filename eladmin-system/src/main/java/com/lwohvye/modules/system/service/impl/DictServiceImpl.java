@@ -19,7 +19,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.system.domain.Dict;
 import com.lwohvye.modules.system.repository.DictRepository;
-import com.lwohvye.modules.system.service.DictService;
+import com.lwohvye.modules.system.service.IDictService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.modules.system.service.dto.DictDto;
 import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
@@ -45,7 +45,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "dict")
-public class DictServiceImpl implements DictService {
+public class DictServiceImpl implements IDictService {
 
     private final DictRepository dictRepository;
     private final DictMapper dictMapper;

@@ -28,7 +28,7 @@ import java.util.Set;
 * @author Zheng Jie
 * @date 2019-03-25
 */
-public interface DeptService extends BaseService {
+public interface IDeptService extends BaseService {
 
     /**
      * 查询所有数据

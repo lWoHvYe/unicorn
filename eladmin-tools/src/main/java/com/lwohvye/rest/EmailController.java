@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 import com.lwohvye.annotation.Log;
 import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.domain.EmailConfig;
-import com.lwohvye.service.EmailService;
+import com.lwohvye.service.IEmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "工具：邮件管理")
 public class EmailController {
 
-    private final EmailService emailService;
+    private final IEmailService emailService;
 
     @GetMapping
     public ResponseEntity<Object> queryConfig(){
@@ -49,7 +49,7 @@ public class EmailController {
     @PutMapping
     @ApiOperation("配置邮件")
     public ResponseEntity<Object> updateConfig(@Validated @RequestBody EmailConfig emailConfig) throws Exception {
-        emailService.config(emailConfig,emailService.find());
+        emailService.config(emailConfig, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -57,7 +57,7 @@ public class EmailController {
     @PostMapping
     @ApiOperation("发送邮件")
     public ResponseEntity<Object> sendEmail(@Validated @RequestBody EmailVo emailVo){
-        emailService.send(emailVo,emailService.find());
+        emailService.send(emailVo, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

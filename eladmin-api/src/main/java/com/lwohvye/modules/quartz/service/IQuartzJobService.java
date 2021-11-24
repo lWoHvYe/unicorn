@@ -28,7 +28,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2019-01-07
  */
-public interface QuartzJobService {
+public interface IQuartzJobService {
 
     /**
      * 分页查询

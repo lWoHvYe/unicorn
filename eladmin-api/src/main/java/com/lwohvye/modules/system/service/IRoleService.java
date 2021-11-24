@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-12-03
  */
-public interface RoleService extends BaseService {
+public interface IRoleService extends BaseService {
 
     /**
      * 查询全部数据

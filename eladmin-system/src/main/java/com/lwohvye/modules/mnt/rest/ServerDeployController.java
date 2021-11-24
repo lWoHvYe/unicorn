@@ -21,7 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.annotation.Log;
-import com.lwohvye.modules.mnt.service.ServerDeployService;
+import com.lwohvye.modules.mnt.service.IServerDeployService;
 import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -44,7 +44,7 @@ import java.util.Set;
 @RequestMapping("/api/serverDeploy")
 public class ServerDeployController {
 
-    private final ServerDeployService serverDeployService;
+    private final IServerDeployService serverDeployService;
 
     @ApiOperation("导出服务器数据")
     @GetMapping(value = "/download")

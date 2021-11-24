@@ -16,7 +16,7 @@
 package com.lwohvye.modules.security.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lwohvye.modules.system.service.RoleService;
+import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.AllArgsConstructor;
@@ -72,7 +72,7 @@ public class JwtUserDto implements UserDetails {
 
     public List<GrantedAuthority> getAuthorities() {
         authorities.clear();
-        authorities.addAll(SpringContextHolder.getBean(RoleService.class)
+        authorities.addAll(SpringContextHolder.getBean(IRoleService.class)
                 .grantedAuthorityGenHandler(user.getId(), user.getIsAdmin()));
         return authorities;
     }

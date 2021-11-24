@@ -16,7 +16,7 @@
 package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.modules.mnt.domain.App;
-import com.lwohvye.modules.mnt.service.AppService;
+import com.lwohvye.modules.mnt.service.IAppService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,7 +44,7 @@ import java.util.Set;
 @RequestMapping("/api/app")
 public class AppController {
 
-    private final AppService appService;
+    private final IAppService appService;
 
     @ApiOperation("导出应用数据")
     @GetMapping(value = "/download")

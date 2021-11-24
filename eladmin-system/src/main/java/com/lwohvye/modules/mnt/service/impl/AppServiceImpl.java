@@ -19,7 +19,7 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.repository.AppRepository;
-import com.lwohvye.modules.mnt.service.AppService;
+import com.lwohvye.modules.mnt.service.IAppService;
 import com.lwohvye.modules.mnt.service.dto.AppDto;
 import com.lwohvye.modules.mnt.service.dto.AppQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.AppMapper;
@@ -43,7 +43,7 @@ import java.util.*;
  */
 @Service
 @RequiredArgsConstructor
-public class AppServiceImpl implements AppService {
+public class AppServiceImpl implements IAppService {
 
     private final AppRepository appRepository;
     private final AppMapper appMapper;

@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateUtil;
-import com.lwohvye.modules.system.service.MonitorService;
+import com.lwohvye.modules.system.service.IMonitorService;
 import com.lwohvye.utils.ElAdminConstant;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.StringUtils;
@@ -39,7 +39,7 @@ import java.util.*;
  * @date 2020-05-02
  */
 @Service
-public class MonitorServiceImpl implements MonitorService {
+public class MonitorServiceImpl implements IMonitorService {
 
     private final DecimalFormat df = new DecimalFormat("0.00");
 

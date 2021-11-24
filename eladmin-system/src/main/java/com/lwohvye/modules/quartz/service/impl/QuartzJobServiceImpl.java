@@ -23,7 +23,7 @@ import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.quartz.repository.QuartzJobRepository;
 import com.lwohvye.modules.quartz.repository.QuartzLogRepository;
-import com.lwohvye.modules.quartz.service.QuartzJobService;
+import com.lwohvye.modules.quartz.service.IQuartzJobService;
 import com.lwohvye.modules.quartz.service.dto.JobQueryCriteria;
 import com.lwohvye.modules.quartz.utils.QuartzManage;
 import com.lwohvye.utils.*;
@@ -45,7 +45,7 @@ import java.util.*;
  */
 @RequiredArgsConstructor
 @Service(value = "quartzJobService")
-public class QuartzJobServiceImpl implements QuartzJobService {
+public class QuartzJobServiceImpl implements IQuartzJobService {
 
     private final QuartzJobRepository quartzJobRepository;
     private final QuartzLogRepository quartzLogRepository;

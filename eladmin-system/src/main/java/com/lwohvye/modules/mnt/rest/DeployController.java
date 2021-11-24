@@ -17,7 +17,7 @@ package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.modules.mnt.domain.Deploy;
 import com.lwohvye.modules.mnt.domain.DeployHistory;
-import com.lwohvye.modules.mnt.service.DeployService;
+import com.lwohvye.modules.mnt.service.IDeployService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,7 +53,7 @@ import java.util.Set;
 public class DeployController {
 
     private final String fileSavePath = FileUtil.getTmpDirPath() + "/";
-    private final DeployService deployService;
+    private final IDeployService deployService;
 
 
     @ApiOperation("导出部署数据")

@@ -18,7 +18,7 @@ package com.lwohvye.modules.system.rest;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.DictDetail;
-import com.lwohvye.modules.system.service.DictDetailService;
+import com.lwohvye.modules.system.service.IDictDetailService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;
@@ -49,7 +49,7 @@ import java.util.Map;
 @RequestMapping("/api/dictDetail")
 public class DictDetailController {
 
-    private final DictDetailService dictDetailService;
+    private final IDictDetailService dictDetailService;
     private static final String ENTITY_NAME = "dictDetail";
 
     @ApiOperation("查询字典详情")

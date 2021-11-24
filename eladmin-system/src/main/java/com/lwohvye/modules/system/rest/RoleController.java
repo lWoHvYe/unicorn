@@ -19,7 +19,7 @@ import cn.hutool.core.lang.Dict;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.service.RoleService;
+import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/roles")
 public class RoleController {
 
-    private final RoleService roleService;
+    private final IRoleService roleService;
 
     private static final String ENTITY_NAME = "role";
 

@@ -23,13 +23,13 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;
-import com.lwohvye.modules.system.service.DataService;
-import com.lwohvye.modules.system.service.DeptService;
-import com.lwohvye.modules.system.service.RoleService;
-import com.lwohvye.modules.system.service.UserService;
+import com.lwohvye.modules.system.service.IDataService;
+import com.lwohvye.modules.system.service.IDeptService;
+import com.lwohvye.modules.system.service.IRoleService;
+import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
-import com.lwohvye.service.VerifyService;
+import com.lwohvye.service.IVerifyService;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;
@@ -65,11 +65,11 @@ import java.util.Set;
 public class UserController {
 
     private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
-    private final DataService dataService;
-    private final DeptService deptService;
-    private final RoleService roleService;
-    private final VerifyService verificationCodeService;
+    private final IUserService userService;
+    private final IDataService dataService;
+    private final IDeptService deptService;
+    private final IRoleService roleService;
+    private final IVerifyService verifyService;
 
     @ApiOperation("导出用户数据")
     @GetMapping(value = "/download")
@@ -187,7 +187,7 @@ public class UserController {
         if (!passwordEncoder.matches(password, userDto.getPassword())) {
             throw new BadRequestException("密码错误");
         }
-        verificationCodeService.validated(CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
+        verifyService.validated(CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
         userService.updateEmail(userDto.getUsername(), user.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }

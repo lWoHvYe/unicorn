@@ -26,7 +26,7 @@ import com.lwohvye.domain.vo.TradeVo;
 import com.lwohvye.domain.AlipayConfig;
 import com.lwohvye.utils.AliPayStatusEnum;
 import com.lwohvye.utils.AlipayUtils;
-import com.lwohvye.service.AliPayService;
+import com.lwohvye.service.IAliPayService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +50,7 @@ import java.util.Map;
 public class AliPayController {
 
     private final AlipayUtils alipayUtils;
-    private final AliPayService alipayService;
+    private final IAliPayService alipayService;
 
     @GetMapping
     public ResponseEntity<AlipayConfig> queryConfig() {

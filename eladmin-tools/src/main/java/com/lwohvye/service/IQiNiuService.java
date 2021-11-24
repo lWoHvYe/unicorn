@@ -29,7 +29,7 @@ import java.util.List;
  * @author Zheng Jie
  * @date 2018-12-31
  */
-public interface QiNiuService {
+public interface IQiNiuService {
 
     /**
      * 查配置

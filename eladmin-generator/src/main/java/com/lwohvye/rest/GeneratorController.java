@@ -21,8 +21,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.service.GenConfigService;
-import com.lwohvye.service.GeneratorService;
+import com.lwohvye.service.IGenConfigService;
+import com.lwohvye.service.IGeneratorService;
 import com.lwohvye.utils.PageUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -43,8 +43,8 @@ import java.util.List;
 @Api(tags = "系统：代码生成管理")
 public class GeneratorController {
 
-    private final GeneratorService generatorService;
-    private final GenConfigService genConfigService;
+    private final IGeneratorService generatorService;
+    private final IGenConfigService genConfigService;
 
     @Value("${generator.enabled:true}")
     private Boolean generatorEnabled;

@@ -18,7 +18,7 @@ package com.lwohvye.modules.mnt.service.impl;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.mnt.domain.ServerDeploy;
 import com.lwohvye.modules.mnt.repository.ServerDeployRepository;
-import com.lwohvye.modules.mnt.service.ServerDeployService;
+import com.lwohvye.modules.mnt.service.IServerDeployService;
 import com.lwohvye.modules.mnt.service.dto.ServerDeployDto;
 import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.ServerDeployMapper;
@@ -43,7 +43,7 @@ import java.util.*;
  */
 @Service
 @RequiredArgsConstructor
-public class ServerDeployServiceImpl implements ServerDeployService {
+public class ServerDeployServiceImpl implements IServerDeployService {
 
     private final ServerDeployRepository serverDeployRepository;
     private final ServerDeployMapper serverDeployMapper;

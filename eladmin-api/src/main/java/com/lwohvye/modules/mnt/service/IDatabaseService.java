@@ -15,9 +15,9 @@
  */
 package com.lwohvye.modules.mnt.service;
 
-import com.lwohvye.modules.mnt.domain.ServerDeploy;
-import com.lwohvye.modules.mnt.service.dto.ServerDeployDto;
-import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
+import com.lwohvye.modules.mnt.domain.Database;
+import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
+import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;
@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
-public interface ServerDeployService {
+ * @author ZhangHouYing
+ * @date 2019-08-24
+ */
+public interface IDatabaseService {
 
     /**
      * 分页查询
@@ -37,59 +37,52 @@ public interface ServerDeployService {
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable);
+    Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable);
 
     /**
-     * 查询全部数据
+     * 查询全部
      * @param criteria 条件
      * @return /
      */
-    List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria);
+    List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria);
 
     /**
      * 根据ID查询
      * @param id /
      * @return /
      */
-    ServerDeployDto findById(Long id);
+    DatabaseDto findById(String id);
 
     /**
      * 创建
      * @param resources /
      */
-    void create(ServerDeploy resources);
+    void create(Database resources);
 
     /**
      * 编辑
      * @param resources /
      */
-    void update(ServerDeploy resources);
+    void update(Database resources);
 
     /**
      * 删除
      * @param ids /
      */
-    void delete(Set<Long> ids);
-
-    /**
-     * 根据IP查询
-     * @param ip /
-     * @return /
-     */
-    ServerDeployDto findByIp(String ip);
+    void delete(Set<String> ids);
 
 	/**
-	 * 测试登录服务器
+	 * 测试连接数据库
 	 * @param resources /
 	 * @return /
 	 */
-	Boolean testConnect(ServerDeploy resources);
+	boolean testConnection(Database resources);
 
     /**
      * 导出数据
      * @param queryAll /
      * @param response /
-     * @throws IOException /
+     * @throws IOException e
      */
-    void download(List<ServerDeployDto> queryAll, HttpServletResponse response) throws IOException;
+    void download(List<DatabaseDto> queryAll, HttpServletResponse response) throws IOException;
 }

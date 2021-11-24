@@ -19,7 +19,7 @@ import cn.hutool.core.util.IdUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.repository.DeployHistoryRepository;
-import com.lwohvye.modules.mnt.service.DeployHistoryService;
+import com.lwohvye.modules.mnt.service.IDeployHistoryService;
 import com.lwohvye.modules.mnt.service.dto.DeployHistoryDto;
 import com.lwohvye.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.DeployHistoryMapper;
@@ -43,7 +43,7 @@ import java.util.*;
  */
 @Service
 @RequiredArgsConstructor
-public class DeployHistoryServiceImpl implements DeployHistoryService {
+public class DeployHistoryServiceImpl implements IDeployHistoryService {
 
     private final DeployHistoryRepository deployHistoryRepository;
     private final DeployHistoryMapper deployHistoryMapper;
