@@ -10,7 +10,8 @@
 本项目在原eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
 ---
-启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources) 详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)
+启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
+详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围。 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
@@ -87,7 +88,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富。
+- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.6.0。
 - 高效率开发，代码生成器可一键生成前后端代码
 - 支持数据字典，可方便地对一些状态进行管理
 - 支持接口限流，避免恶意请求导致服务层压力过大
@@ -100,7 +101,6 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
-- 基于最新的Java-17、Spring Boot 2.6.0
 
 #### 系统功能
 
@@ -115,9 +115,8 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 定时任务：整合Quartz做定时任务，加入任务日志，任务运行情况一目了然
 - 代码生成：高灵活度生成前后端代码，减少大量重复的工作任务
 - 邮件工具：配合富文本，发送html格式的邮件
-- 七牛云存储：可同步七牛云存储的数据到系统，无需登录七牛云直接操作云数据
 - 阿里云OSS：可实现基础的上传及下载功能
-- 支付宝支付：整合了支付宝支付并且提供了测试账号，可自行测试
+- 阿里短信通道SMS：可实现基础的发送短信功能
 - 服务监控：监控服务器的负载情况
 - 运维管理：一键部署你的应用
 
@@ -133,7 +132,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 - `eladmin-logging` 为系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
-- `eladmin-tools` 为第三方工具模块，包含：图床、邮件、云存储、本地存储、支付宝
+- `eladmin-tools` 为第三方工具模块，包含：邮件、OSS、SMS、本地存储
 
 - `eladmin-generator` 为系统的代码生成模块，代码生成的模板在 system 模块中
 
@@ -147,8 +146,8 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - eladmin-common 公共模块
     - annotation 为系统自定义注解
     - aspect 自定义注解的切面
-    - base 提供了Entity、DTO基类和mapstruct的通用mapper
-    - config 自定义权限实现、redis配置、swagger配置、Rsa配置等
+    - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper
+    - config 自定义权限实现、redis配置、openApi配置、Rsa配置等
     - exception 项目统一异常的处理
     - utils 系统通用工具类
 - eladmin-api 基础实体及接口模块
@@ -156,7 +155,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
     - modules 基础实体及接口定义
     - utils 通用工具类扩展
 - eladmin-system 系统核心模块
-	- config 配置跨域与静态资源，与数据权限
+	- config 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
 	    - thread 线程池相关
 	    - rabbitmq 消息队列相关
 	- modules 系统相关模块(登录授权、消息队列、系统监控、定时任务、运维管理等)
@@ -177,8 +176,6 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 #### 特别鸣谢
 
 - 感谢 [JetBrains](https://www.jetbrains.com/) 提供的非商业开源软件开发授权
-
-- 感谢 [七牛云](https://www.qiniu.com/) 提供的免费云存储与CDN加速支持
 
 - 感谢 [PanJiaChen](https://github.com/PanJiaChen/vue-element-admin) 大佬提供的前端模板
 

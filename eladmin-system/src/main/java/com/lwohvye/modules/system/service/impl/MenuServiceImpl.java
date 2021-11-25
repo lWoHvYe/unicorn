@@ -79,13 +79,12 @@ public class MenuServiceImpl implements IMenuService {
                 //设置对象的访问权限，保证对private的属性的访问
                 field.setAccessible(true);
                 Object val = field.get(criteria);
-                if ("pidIsNull".equals(field.getName())) {
+                if ("pidIsNull".equals(field.getName()))
                     continue;
-                }
-                if (ObjectUtil.isNotNull(val)) {
+
+                if (ObjectUtil.isNotNull(val))
                     criteria.setPidIsNull(null);
-                    break;
-                }
+                break;
             }
         }
         return menuMapper.toDto(menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort), new CycleAvoidingMappingContext());
@@ -119,22 +118,20 @@ public class MenuServiceImpl implements IMenuService {
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(Menu resources) {
-        if (menuRepository.findByTitle(resources.getTitle()) != null) {
+        if (menuRepository.findByTitle(resources.getTitle()) != null)
             throw new EntityExistException(Menu.class, "title", resources.getTitle());
-        }
-        if (StringUtils.isNotBlank(resources.getComponentName())) {
-            if (menuRepository.findByComponentName(resources.getComponentName()) != null) {
+
+        if (StringUtils.isNotBlank(resources.getComponentName()))
+            if (menuRepository.findByComponentName(resources.getComponentName()) != null)
                 throw new EntityExistException(Menu.class, "componentName", resources.getComponentName());
-            }
-        }
-        if (resources.getPid().equals(0L)) {
+
+        if (resources.getPid().equals(0L))
             resources.setPid(null);
-        }
-        if (resources.getIFrame()) {
+
+        if (Boolean.TRUE.equals(resources.getIFrame())) {
             String http = "http://", https = "https://";
-            if (!(resources.getPath().toLowerCase().startsWith(http) || resources.getPath().toLowerCase().startsWith(https))) {
+            if (!(resources.getPath().toLowerCase().startsWith(http) || resources.getPath().toLowerCase().startsWith(https)))
                 throw new BadRequestException("外链必须以http://或者https://开头");
-            }
         }
         menuRepository.save(resources);
         // 计算子节点数目
@@ -147,27 +144,23 @@ public class MenuServiceImpl implements IMenuService {
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void update(Menu resources) {
-        if (resources.getId().equals(resources.getPid())) {
+        if (resources.getId().equals(resources.getPid()))
             throw new BadRequestException("上级不能为自己");
-        }
         Menu menu = menuRepository.findById(resources.getId()).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Permission", "id", resources.getId());
 
-        if (resources.getIFrame()) {
+        if (Boolean.TRUE.equals(resources.getIFrame())) {
             String http = "http://", https = "https://";
-            if (!(resources.getPath().toLowerCase().startsWith(http) || resources.getPath().toLowerCase().startsWith(https))) {
+            if (!(resources.getPath().toLowerCase().startsWith(http) || resources.getPath().toLowerCase().startsWith(https)))
                 throw new BadRequestException("外链必须以http://或者https://开头");
-            }
         }
         Menu menu1 = menuRepository.findByTitle(resources.getTitle());
 
-        if (menu1 != null && !menu1.getId().equals(menu.getId())) {
+        if (menu1 != null && !menu1.getId().equals(menu.getId()))
             throw new EntityExistException(Menu.class, "title", resources.getTitle());
-        }
 
-        if (resources.getPid().equals(0L)) {
+        if (resources.getPid().equals(0L))
             resources.setPid(null);
-        }
 
         // 记录的父节点ID
         Long oldPid = menu.getPid();
@@ -175,23 +168,14 @@ public class MenuServiceImpl implements IMenuService {
 
         if (StringUtils.isNotBlank(resources.getComponentName())) {
             menu1 = menuRepository.findByComponentName(resources.getComponentName());
-            if (menu1 != null && !menu1.getId().equals(menu.getId())) {
+            if (menu1 != null && !menu1.getId().equals(menu.getId()))
                 throw new EntityExistException(Menu.class, "componentName", resources.getComponentName());
-            }
         }
-        menu.setTitle(resources.getTitle());
-        menu.setComponent(resources.getComponent());
-        menu.setPath(resources.getPath());
-        menu.setIcon(resources.getIcon());
-        menu.setIFrame(resources.getIFrame());
-        menu.setPid(resources.getPid());
-        menu.setMenuSort(resources.getMenuSort());
-        menu.setCache(resources.getCache());
-        menu.setHidden(resources.getHidden());
-        menu.setComponentName(resources.getComponentName());
-        menu.setPermission(resources.getPermission());
-        menu.setType(resources.getType());
+        menu.setTitle(resources.getTitle()).setComponent(resources.getComponent()).setPath(resources.getPath()).setIcon(resources.getIcon())
+                .setIFrame(resources.getIFrame()).setPid(resources.getPid()).setMenuSort(resources.getMenuSort()).setCache(resources.getCache())
+                .setHidden(resources.getHidden()).setComponentName(resources.getComponentName()).setPermission(resources.getPermission()).setType(resources.getType());
         menuRepository.save(menu);
+
         // 计算父级菜单节点数目
         updateSubCnt(oldPid);
         updateSubCnt(newPid);
@@ -230,11 +214,11 @@ public class MenuServiceImpl implements IMenuService {
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> getMenus(Long pid) {
         List<Menu> menus;
-        if (pid != null && !pid.equals(0L)) {
+        if (pid != null && !pid.equals(0L))
             menus = menuRepository.findByPid(pid);
-        } else {
+        else
             menus = menuRepository.findByPidIsNull();
-        }
+
         return menuMapper.toDto(menus, new CycleAvoidingMappingContext());
     }
 
@@ -358,14 +342,14 @@ public class MenuServiceImpl implements IMenuService {
         menuVo.setHidden(menuDTO.getHidden());
         // 如果不是外链
         if (Boolean.FALSE.equals(menuDTO.getIFrame())) {
-            if (menuDTO.getPid() == null) {
+            if (menuDTO.getPid() == null)
                 menuVo.setComponent(StringUtils.isEmpty(menuDTO.getComponent()) ? "Layout" : menuDTO.getComponent());
                 // 如果不是一级菜单，并且菜单类型为目录，则代表是多级菜单
-            } else if (menuDTO.getType() == 0) {
+            else if (menuDTO.getType() == 0)
                 menuVo.setComponent(StringUtils.isEmpty(menuDTO.getComponent()) ? "ParentView" : menuDTO.getComponent());
-            } else if (StringUtils.isNoneBlank(menuDTO.getComponent())) {
+            else if (StringUtils.isNoneBlank(menuDTO.getComponent()))
                 menuVo.setComponent(menuDTO.getComponent());
-            }
+
         }
         menuVo.setMeta(new MenuMetaVo(menuDTO.getTitle(), menuDTO.getIcon(), !menuDTO.getCache()));
         return menuVo;
@@ -401,7 +385,8 @@ public class MenuServiceImpl implements IMenuService {
 
     @SneakyThrows
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'menu4user:' + #p0")
+    // TODO: 2021/11/25 反序列化时报错。暂移除缓存
+    // @Cacheable(key = " target.getSysName() + 'menu4user:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public Object buildWebMenus(Long uid) {
         CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
@@ -454,11 +439,7 @@ public class MenuServiceImpl implements IMenuService {
         redisUtils.delete(CacheKey.MENU_ID + id);
         redisUtils.delByKeys4Business(CacheKey.MENU_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
         // 清除 Role 缓存
-        List<Role> roles = roleService.findInMenuId(new ArrayList<>() {
-            {
-                add(id);
-            }
-        });
+        List<Role> roles = roleService.findInMenuId(Collections.singletonList(id));
         redisUtils.delByKeys4Business(CacheKey.ROLE_ID, roles.stream().map(Role::getId).collect(Collectors.toSet()));
     }
 }

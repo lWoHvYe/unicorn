@@ -114,6 +114,11 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/").setCachePeriod(0);
     }
 
+    /**
+     * @param converters /
+     * @description 对向前端返回的数据，日期格式化。
+     * @date 2021/11/25 10:04 上午
+     */
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         var jackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();

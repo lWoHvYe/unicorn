@@ -52,13 +52,6 @@
             <version>${mail.version}</version>
         </dependency>
 
-        <!--七牛云存储-->
-        <dependency>
-            <groupId>com.qiniu</groupId>
-            <artifactId>qiniu-java-sdk</artifactId>
-            <version>${qiniu.version}</version>
-        </dependency>
-
         <!--    对象存储计划改为阿里云OSS  版本问题  -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -76,12 +69,6 @@
             <version>${aliyun.oss.version}</version>
         </dependency>
 
-        <!--支付宝依赖-->
-        <dependency>
-            <groupId>com.alipay.sdk</groupId>
-            <artifactId>alipay-sdk-java</artifactId>
-            <version>${alipay.version}</version>
-        </dependency>
         <!--   阿里短信通道SMS     -->
         <!-- https://mvnrepository.com/artifact/com.aliyun/dysmsapi20170525 -->
         <dependency>
