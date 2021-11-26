@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.system.service;
+package com.lwohvye.modules.system.handler;
 
 import com.lwohvye.base.BaseService;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,11 +22,11 @@ import java.util.List;
 
 /**
  * @author Hongyan Wang
- * @description 业务处理基类，这里使用抽象类，是为了保证子类的单继承
+ * @description 业务处理基类，密封类sealed。需通过permits指定子类。子类可以是final标记的实现类、sealed标记的密封类、non-sealed标记的非密封类
  * @date 2021年11月02日 16:42
  */
-public abstract class AUserTypeHandler implements BaseService {
+public sealed interface AUserTypeHandler extends BaseService permits AdminUserTypeHandler, NormalUserTypeHandler, DevUserTypeHandler {
 
-    public abstract List<GrantedAuthority> handler(Long userId);
+    List<GrantedAuthority> handler(Long userId);
 
 }

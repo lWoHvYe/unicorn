@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.system.handler;
 
-import com.lwohvye.modules.system.service.AUserTypeHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
@@ -32,7 +31,7 @@ public record AuthHandlerContext(Map<Integer, AUserTypeHandler> handlerMap) {
 
     /**
      * @param userType /
-     * @return com.lwohvye.modules.system.service.AUserTypeHandler
+     * @return com.lwohvye.modules.system.handler.AUserTypeHandler
      * @description 获取实例。handlerMap由另一个类来初始化
      * @date 2021/11/2 17:10
      */
