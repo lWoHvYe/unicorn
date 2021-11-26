@@ -21,13 +21,14 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 /**
  * @author ZhangHouYing
+ * @description 这个 bean 会自动注册声明 @ServerEndpoint 注解声明的 websocket endpoint，使用springboot自带tomcat启动需要该配置，使用独立 tomcat 则不需要该配置。
  * @date 2019-08-24 15:44
  */
 @Configuration
 public class WebSocketConfig {
 
-	@Bean
-	public ServerEndpointExporter serverEndpointExporter() {
-		return new ServerEndpointExporter();
-	}
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter() {
+        return new ServerEndpointExporter();
+    }
 }

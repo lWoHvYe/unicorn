@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.security.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
@@ -31,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -82,7 +82,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 // SpringSecurity会自动转换UsernameNotFoundException为BadCredentialsException
                 throw new UsernameNotFoundException("", e);
             }
-            if (ObjectUtil.isNull(user.getId())) {
+            if (Objects.isNull(user.getId())) {
                 throw new UsernameNotFoundException("");
             } else {
                 if (Boolean.FALSE.equals(user.getEnabled())) {

@@ -192,11 +192,10 @@ public class UserServiceImpl implements IUserService {
         if (RandomUtil.randomBoolean()) {
             var upj = userRepository.findByUsername(userName, UserProj.class);
         }
-        if (user == null) {
+        if (Objects.isNull(user))
             throw new EntityNotFoundException(User.class, "name", userName);
-        } else {
+        else
             return userMapper.toDto(user, new CycleAvoidingMappingContext());
-        }
     }
 
     @Override
@@ -204,7 +203,10 @@ public class UserServiceImpl implements IUserService {
     public UserInnerDto findInnerUserByName(String userName) {
         // 方法内调用，Spring aop不会生效，所以下面的查询不会走缓存
         var user = userRepository.findByUsername(userName);
-        return userInnerMapper.toDto(user, new CycleAvoidingMappingContext());
+        if (Objects.isNull(user))
+            throw new EntityNotFoundException(User.class, "name", userName);
+        else
+            return userInnerMapper.toDto(user, new CycleAvoidingMappingContext());
     }
 
     @Override
