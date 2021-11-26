@@ -392,7 +392,9 @@ public class MenuServiceImpl implements IMenuService {
                 .thenApply(this::buildTree)
                 .thenApply(this::buildMenus);
         cf.join();
-        return cf.get();
+        // 直接cf.get()返回。序列化是一个数组，无法反序列化
+        // 所以需要new 一个List对象返回
+        return new ArrayList<>(cf.get());
     }
 
     @Override
