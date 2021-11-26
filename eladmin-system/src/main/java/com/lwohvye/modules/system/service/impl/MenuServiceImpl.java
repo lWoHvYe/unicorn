@@ -385,15 +385,17 @@ public class MenuServiceImpl implements IMenuService {
 
     @SneakyThrows
     @Override
-    // TODO: 2021/11/25 反序列化时报错。暂移除缓存
-    // @Cacheable(key = " target.getSysName() + 'menu4user:' + #p0")
+    @Cacheable(key = " target.getSysName() + 'menu4user:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public Object buildWebMenus(Long uid) {
         CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
                 .thenApply(this::buildTree)
                 .thenApply(this::buildMenus);
         cf.join();
-        return cf.get();
+        // 直接cf.get()返回。序列化是一个数组，无法反序列化。序列化结果为：[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]
+        // 所以需要new 一个List对象返回。此时序列化的结果为：[“java.util.ArrayList”,[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]]
+        // 另外把方法返回值的类型改成List<MenuVo>也是**不行**的。
+        return new ArrayList<>(cf.get());
     }
 
     @Override
