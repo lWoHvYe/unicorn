@@ -31,7 +31,7 @@ import java.util.Objects;
  * @author Andreas Gudian
  */
 public class CycleAvoidingMappingContext {
-    // 用Map缓存处理的中间结果，也是一种空间换时间的手段
+    // 因为是私有的，似乎是没太大用途
     private final Map<Object, Object> knownInstances = new IdentityHashMap<>();
 
     @BeforeMapping
