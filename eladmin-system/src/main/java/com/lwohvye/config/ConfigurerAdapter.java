@@ -62,7 +62,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     // 处理全局跨域
 
     /**
-     * 方法类	             方法名称	               必填	        请求头字段	                     说明
+     * 方法类	            方法名称	               必填	        请求头字段	                     说明
      * CorsRegistry	    addMapping	                是	无, 非Cors属性,属于SpringBoot配置	    配置支持跨域的路径
      * CorsRegistration	allowedOrigins	            是	Access-Control-Allow-Origin	        配置允许的源
      * CorsRegistration	addAllowedOriginPattern	    是	Access-Control-Allow-Origin	        配置允许的源。Spring Boot 2.4.0之后，allowedOrigins不允许使用*，改用这个

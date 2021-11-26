@@ -17,7 +17,6 @@ package com.lwohvye.modules.system.handler;
 
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.modules.system.enums.UserTypeEnum;
-import com.lwohvye.modules.system.service.AUserTypeHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;

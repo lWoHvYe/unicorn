@@ -1,11 +1,10 @@
-package com.lwohvye.modules.system.service.impl;
+package com.lwohvye.modules.system.handler;
 
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.enums.UserTypeEnum;
 import com.lwohvye.modules.system.repository.RoleRepository;
-import com.lwohvye.modules.system.service.AUserTypeHandler;
 import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 // 不能用下面这个注解，因为这个的使用方式，决定了要使用空参构造初始化。对于需要注入的对象，需特殊处理
 //@RequiredArgsConstructor
 @UserTypeHandlerAnno(UserTypeEnum.NORMAL)
-public class NormalUserTypeHandler extends AUserTypeHandler {
+public final class NormalUserTypeHandler implements AUserTypeHandler {
 
     private RoleRepository roleRepository;
 
