@@ -1,8 +1,8 @@
 package com.lwohvye.modules.security.security.filter;
 
+import com.lwohvye.constant.SecurityConstant;
 import com.lwohvye.modules.system.service.IResourceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
@@ -38,15 +38,15 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
         var filterInvocation = (FilterInvocation) object;
         var requestUrl = filterInvocation.getRequestUrl(); // 获取当前请求的Url
         var reqMethod = filterInvocation.getRequest().getMethod(); // 请求方法GET、POST、PUT、DELETE
-        var roleNames = resourceService.queryAllRes().stream() //获取数据库中的所有资源信息，即本案例中的resource以及对应的role
+        var roles = resourceService.queryAllRes().stream() //获取数据库中的所有资源信息，即本案例中的resource以及对应的role
                 .filter(resource -> antPathMatcher.match(resource.getPattern(), requestUrl) // URI匹配
                                     && StringUtils.hasText(resource.getRestName()) // 有关联角色（需要特定角色权限）
                                     && Objects.equals(resource.getReqMethod(), reqMethod)) // 请求方法类型匹配
-                .flatMap(resource -> Arrays.stream(resource.getRestName().split(","))) // 将字符状态的角色名用逗号切开
+                .flatMap(resource -> Arrays.stream(resource.getRoleCodes().split(","))) // 将字符状态的角色名用逗号切开
                 .distinct() // 排重
-                .map(roleName -> "ROLE_" + roleName).toList();
-        return !roleNames.isEmpty() ? SecurityConfig.createList(roleNames.toArray(String[]::new)) // 构建返回
-                : SecurityConfig.createList("ROLE_LOGIN"); //如果请求Url在资源表中不存在相应的模式，则该请求登陆后即可访问
+                .map(role -> "ROLE_" + role).toList();
+        return !roles.isEmpty() ? SecurityConfig.createList(roles.toArray(String[]::new)) // 构建返回
+                : SecurityConfig.createList(SecurityConstant.ROLE_LOGIN); //如果请求Url在资源表中不存在相应的模式，则该请求登陆后即可访问
     }
 
     /**

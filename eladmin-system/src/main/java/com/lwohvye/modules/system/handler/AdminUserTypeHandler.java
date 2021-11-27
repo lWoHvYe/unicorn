@@ -1,5 +1,6 @@
 package com.lwohvye.modules.system.handler;
 
+import com.lwohvye.constant.SecurityConstant;
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.modules.system.enums.UserTypeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public final class AdminUserTypeHandler implements AUserTypeHandler {
     public List<GrantedAuthority> handler(Long userId) {
         log.warn(" billy：吾乃新日暮里的王，三界哲学的主宰。");
         Set<String> permissions = new HashSet<>();
-        permissions.add("ROLE_ADMIN");
+        permissions.add(SecurityConstant.ROLE_ADMIN);
         return permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 }

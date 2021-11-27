@@ -1,5 +1,6 @@
 package com.lwohvye.modules.security.security;
 
+import com.lwohvye.constant.SecurityConstant;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -28,14 +29,15 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication auth, Object object, Collection<ConfigAttribute> ca) throws AccessDeniedException, InsufficientAuthenticationException {
         for (ConfigAttribute configAttribute : ca) {
-            if ("ROLE_LOGIN".equals(configAttribute.getAttribute()) && auth instanceof UsernamePasswordAuthenticationToken) { //如果请求Url需要的角色是ROLE_LOGIN，说明当前的Url用户登录后即可访问
+            if (SecurityConstant.ROLE_LOGIN.equals(configAttribute.getAttribute()) && auth instanceof UsernamePasswordAuthenticationToken) { //如果请求Url需要的角色是ROLE_LOGIN，说明当前的Url用户登录后即可访问
                 return;
             }
             var auths = auth.getAuthorities(); //获取登录用户具有的角色
             // var auths = SecurityUtils.getCurrentUser().getAuthorities();
             for (GrantedAuthority grantedAuthority : auths) {
-                // TODO: 2021/11/27 对admin放行
-                if (configAttribute.getAttribute().equals(grantedAuthority.getAuthority())) {
+                if (configAttribute.getAttribute().equals(grantedAuthority.getAuthority())
+                    // 对admin放行
+                    || SecurityConstant.ROLE_ADMIN.equals(grantedAuthority.getAuthority())) {
                     return;
                 }
             }

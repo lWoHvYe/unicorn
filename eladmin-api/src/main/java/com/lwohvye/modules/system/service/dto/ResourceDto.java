@@ -57,7 +57,7 @@ public class ResourceDto implements Serializable {
      */
     private Integer status;
 
-    private String roleNames;
+    private String roleCodes;
 
     /**
      * 所在类名

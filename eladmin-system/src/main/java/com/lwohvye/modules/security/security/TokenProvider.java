@@ -106,7 +106,7 @@ public class TokenProvider implements InitializingBean {
                 .setId(IdUtil.simpleUUID())
                 // 签发者
                 .setIssuer("lWoHvYe")
-                // 私有声明
+                // 私有声明。权限作为偏动态的，不放入token中
                 .claim(AUTHORITIES_KEY, authentication.getName())
                 // 这里放入了username。然后在 getAuthentication()中，解密并取出来，构建了Authentication。
                 // 在doFilter()中，将Authentication存入上下文。SecurityContextHolder.getContext().setAuthentication(authentication);

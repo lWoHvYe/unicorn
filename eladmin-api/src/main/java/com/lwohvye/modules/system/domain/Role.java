@@ -81,6 +81,10 @@ public class Role extends BaseEntity implements Serializable {
     @Schema(description = "名称", accessMode = Schema.AccessMode.READ_ONLY)
     private String name;
 
+    @NotBlank
+    @Schema(description = "标识", accessMode = Schema.AccessMode.READ_ONLY)
+    private String code;
+
     @Schema(description = "数据权限，全部 、 本级 、 自定义")
     private String dataScope = DataScopeEnum.THIS_LEVEL.getValue();
 

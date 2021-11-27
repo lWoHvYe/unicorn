@@ -32,8 +32,8 @@ import org.mapstruct.ReportingPolicy;
 public interface ResourceMapper extends BaseMapper<ResourceDto, Resource> {
 
     @Override
-    @Mapping(target = "roleNames", expression = "java(entity.getRoles().stream()" +
-                                                ".map(com.lwohvye.modules.system.domain.Role::getName)" +
+    @Mapping(target = "roleCodes", expression = "java(entity.getRoles().stream()" +
+                                                ".map(com.lwohvye.modules.system.domain.Role::getCode)" +
                                                 ".collect(java.util.stream.Collectors.joining(\",\")))")
     ResourceDto toDto(Resource entity, CycleAvoidingMappingContext context);
 
