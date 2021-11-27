@@ -71,6 +71,24 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 request.setAttribute("username", username);
                 setDetails(request, authRequest);
             }
+            // 在Spring Security中对用户进行认证的是AuthenticationManager，其只有一个方法，尝试对封装了认证信息的Authentication进行身份验证，如果成功，则返回完全填充的Authentication（包括授予的权限）
+            // AuthenticationManager 只关注认证成功与否而并不关心具体的认证方式。对于这些具体认证方式是交给了AuthenticationProvider来负责。Manager将请求转发给具体的Provider实现类来做
+            // UserDetailService, 用户认证通过Provider来做，所以Provider需要拿到系统已经保存的认证信息，获取用户信息的接口spring-security抽象成UserDetailService。
+            // AuthenticationToken, 所有提交给AuthenticationManager的认证请求都会被封装成一个Token的实现
+            // SecurityContext，当用户通过认证之后，就会为这个用户生成一个唯一的SecurityContext，里面包含用户的认证信息Authentication。
+            // 通过SecurityContext我们可以获取到用户的标识Principle和授权信息GrantedAuthrity。在系统的任何地方只要通过SecurityHolder.getSecruityContext()就可以获取到SecurityContext。
+            /*
+             * 尝试对通过Authentication实例对象封装的身份信息进行验证。
+             * 如果验证成功，则返回完全填充的Authentication对象（包括授予的权限）。
+             *
+             * AuthenticationManager 建议遵循以下的约定
+             * 1，如果帐户被禁用并且AuthenticationManager可以测试此状态，则必须引发 DisabledException
+             * 2，如果帐户被锁定并且并且AuthenticationManager可以测试帐户锁定，则必须抛出LockedException
+             * 3，如果凭据不正确，则必须抛出BadCredentialsException
+             * 虽然上述选项是可选的，但是 AuthenticationManager 必须始终测试凭据。
+             * 我们应该上述顺序捕获这些异常，同时实现者也应按上述顺序抛出异常（即，如果帐户被禁用或锁定，
+             * 则立即拒绝身份验证请求，并且不执行凭据测试过程），这可以防止根据禁用或锁定的帐户测试凭据。
+             */
             return this.getAuthenticationManager().authenticate(authRequest);
         }
         //transmit it to UsernamePasswordAuthenticationFilter

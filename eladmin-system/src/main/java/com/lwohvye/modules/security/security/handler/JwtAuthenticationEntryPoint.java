@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.modules.security.security;
+package com.lwohvye.modules.security.security.handler;
 
 import com.lwohvye.utils.StringUtils;
 import lombok.SneakyThrows;
