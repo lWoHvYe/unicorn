@@ -36,5 +36,8 @@ public class JwtAuthTokenConfigurer extends SecurityConfigurerAdapter<DefaultSec
     public void configure(HttpSecurity http) {
         JwtAuthenticationTokenFilter customFilter = new JwtAuthenticationTokenFilter(tokenProvider, userDetailsService);
         http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+        // 根据过滤器的执行顺序。LogoutFilter在UsernamePasswordAuthenticationFilter之前执行。若要在logout时，获取到用户信息，则需要把我们自定义的获取信息的filter放在logout之前
+        // TODO: 2021/11/27 以下配置不可行，且Filter似乎构成了环。后续有空优化
+        // http.addFilterBefore(customFilter, LogoutFilter.class);
     }
 }

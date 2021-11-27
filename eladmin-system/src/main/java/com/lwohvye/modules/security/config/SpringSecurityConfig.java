@@ -118,7 +118,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/auth/logout")
-                .addLogoutHandler(new CustomLogoutHandler())
+                .addLogoutHandler(new CustomLogoutHandler(tokenProvider))
                 .logoutSuccessHandler(new CustomLogoutSuccessHandler())
                 // 防止iframe 造成跨域
                 .and()

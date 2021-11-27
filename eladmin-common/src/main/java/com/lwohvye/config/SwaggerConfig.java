@@ -110,6 +110,7 @@ public class SwaggerConfig {
         List<SecurityContext> securityContexts = new ArrayList<>();
         // ^(?!auth).*$ 表示所有包含auth的接口不需要使用securitySchemes即不需要带token
         // ^标识开始  ()里是一子表达式  ?!/auth表示匹配不是/auth的位置，匹配上则添加请求头，注意路径已/开头  .表示任意字符  *表示前面的字符匹配多次 $标识结束
+        // Ant URI相关参考：https://www.lwohvye.com/2021/11/27/spring-mvc-%e8%b7%af%e5%be%84uri%e4%b8%ad%e7%9a%84-ant-%e9%a3%8e%e6%a0%bc/
         securityContexts.add(getContextByPath());
         return securityContexts;
     }
