@@ -20,9 +20,11 @@ import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
-import com.lwohvye.modules.security.security.JwtAccessDeniedHandler;
+import com.lwohvye.modules.security.security.handler.CustomLogoutHandler;
+import com.lwohvye.modules.security.security.handler.CustomLogoutSuccessHandler;
+import com.lwohvye.modules.security.security.handler.JwtAccessDeniedHandler;
 import com.lwohvye.modules.security.security.JwtAuthTokenConfigurer;
-import com.lwohvye.modules.security.security.JwtAuthenticationEntryPoint;
+import com.lwohvye.modules.security.security.handler.JwtAuthenticationEntryPoint;
 import com.lwohvye.modules.security.security.TokenProvider;
 import com.lwohvye.modules.security.security.filter.CustomAuthenticationFilter;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
@@ -100,14 +102,23 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         Map<String, Set<String>> anonymousUrls = getAnonymousUrl(handlerMethodMap);
         httpSecurity
                 // 禁用 CSRF
+                // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
+                // 一般来讲，为了防御CSRF攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。
                 .csrf().disable()
-                //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter（这里实际上是放到了前面，security自带的Filter在轮到自己执行的时候，会判断当前登录状态，如果已经被之前的Filter验证过了，自己这关就直接放行）
+                //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter
+                // （这里实际上是放到了前面，security自带的Filter在轮到自己执行的时候，会判断当前登录状态，如果已经被之前的Filter验证过了，自己这关就直接放行）
                 .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 // 授权异常
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationErrorHandler)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
+                // 定义退出逻辑处理
+                .and()
+                .logout()
+                .logoutUrl("/auth/logout")
+                .addLogoutHandler(new CustomLogoutHandler())
+                .logoutSuccessHandler(new CustomLogoutSuccessHandler())
                 // 防止iframe 造成跨域
                 .and()
                 .headers()
@@ -116,6 +127,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 不创建会话
                 .and()
                 .sessionManagement()
+                // SessionManagementConfigurer
+                // session的创建策略，总是创建【ALWAYS】、需要时创建【IF_REQUIRED】、永不创建【STATELESS】 、永不创建但如有则使用【NEVER】
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
@@ -180,6 +193,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 })
                 .collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toSet())));
     }
+
+    // region loginFilter、handler
 
     //注册自定义的UsernamePasswordAuthenticationFilter
     @Bean
@@ -260,5 +275,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, authenticationException.getMessage());
         };
     }
+
+    // endregion
 
 }
