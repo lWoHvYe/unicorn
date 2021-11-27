@@ -30,7 +30,7 @@ public class GeneratorCode {
     @Transactional(rollbackFor = Exception.class)
     public void generator() {
 //        表名称，支持多表
-        var tableNames = Arrays.asList("");
+        var tableNames = Arrays.asList("sys_resource");
         tableNames.forEach(tableName -> {
 //              拿参数
             var columns = generatorService.getColumns(tableName);
@@ -38,14 +38,17 @@ public class GeneratorCode {
             var genConfig = new GenConfig()
 //                  未设置id无法生成
                     .setId(1L)
+                    .setTableName(tableName)
+                    .setApiAlias("资源")
+                    .setModuleName("eladmin-system")
 //                  根据需求更改包路径
-                    .setPack("com.lwohvye")
+                    .setPack("com.lwohvye.modules.system")
 //                  前端路径。不生成前端可置空
                     .setPath("")
 //                  作者
                     .setAuthor("Super idol lv")
 //                  表前缀。生成实体时，会移除该前缀
-                    .setPrefix("")
+                    .setPrefix("sys_")
 //                  若文件存在，是否进行覆盖
                     .setCover(false);
 

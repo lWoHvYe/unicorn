@@ -13,12 +13,12 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-package ${package}.service;
+package com.lwohvye.modules.system.service;
 
-import ${package}.domain.${className};
+import com.lwohvye.modules.system.domain.Resource;
 import com.lwohvye.base.BaseService;
-import ${package}.service.dto.${className}Dto;
-import ${package}.service.dto.${className}QueryCriteria;
+import com.lwohvye.modules.system.service.dto.ResourceDto;
+import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
 import org.springframework.data.domain.Pageable;
 import java.util.Map;
 import java.util.List;
@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 /**
 * @website https://el-admin.vip
 * @description 服务接口
-* @author ${author}
-* @date ${date}
+* @author Super idol lv
+* @date 2021-11-27
 **/
-public interface ${className}Service extends BaseService {
+public interface IResourceService extends BaseService {
 
     /**
     * 查询数据分页
@@ -39,40 +39,40 @@ public interface ${className}Service extends BaseService {
     * @param pageable 分页参数
     * @return Map<String,Object>
     */
-    Map<String,Object> queryAll(${className}QueryCriteria criteria, Pageable pageable);
+    Map<String,Object> queryAll(ResourceQueryCriteria criteria, Pageable pageable);
 
     /**
     * 查询所有数据不分页
     * @param criteria 条件参数
-    * @return List<${className}Dto>
+    * @return List<ResourceDto>
     */
-    List<${className}Dto> queryAll(${className}QueryCriteria criteria);
+    List<ResourceDto> queryAll(ResourceQueryCriteria criteria);
 
     /**
      * 根据ID查询
-     * @param ${pkChangeColName} ID
-     * @return ${className}Dto
+     * @param resourceId ID
+     * @return ResourceDto
      */
-    ${className}Dto findById(${pkColumnType} ${pkChangeColName});
+    ResourceDto findById(Long resourceId);
 
     /**
     * 创建
     * @param resources /
-    * @return ${className}Dto
+    * @return ResourceDto
     */
-    ${className}Dto create(${className} resources);
+    ResourceDto create(Resource resources);
 
     /**
     * 编辑
     * @param resources /
     */
-    void update(${className} resources);
+    void update(Resource resources);
 
     /**
     * 多选删除
     * @param ids /
     */
-    void deleteAll(${pkColumnType}[] ids);
+    void deleteAll(Long[] ids);
 
     /**
     * 导出数据
@@ -80,5 +80,5 @@ public interface ${className}Service extends BaseService {
     * @param response /
     * @throws IOException /
     */
-    void download(List<${className}Dto> all, HttpServletResponse response) throws IOException;
+    void download(List<ResourceDto> all, HttpServletResponse response) throws IOException;
 }
