@@ -173,7 +173,7 @@ public class MenuServiceImpl implements IMenuService {
         }
         menu.setTitle(resources.getTitle()).setComponent(resources.getComponent()).setPath(resources.getPath()).setIcon(resources.getIcon())
                 .setIFrame(resources.getIFrame()).setPid(resources.getPid()).setMenuSort(resources.getMenuSort()).setCache(resources.getCache())
-                .setHidden(resources.getHidden()).setComponentName(resources.getComponentName()).setPermission(resources.getPermission()).setType(resources.getType());
+                .setHidden(resources.getHidden()).setComponentName(resources.getComponentName()).setType(resources.getType());
         menuRepository.save(menu);
 
         // 计算父级菜单节点数目
@@ -414,7 +414,6 @@ public class MenuServiceImpl implements IMenuService {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("菜单标题", menuDTO.getTitle());
             map.put("菜单类型", menuDTO.getType() == null ? "目录" : menuDTO.getType() == 1 ? "菜单" : "按钮");
-            map.put("权限标识", menuDTO.getPermission());
             map.put("外链菜单", menuDTO.getIFrame() ? "是" : "否");
             map.put("菜单可见", menuDTO.getHidden() ? "否" : "是");
             map.put("是否缓存", menuDTO.getCache() ? "是" : "否");

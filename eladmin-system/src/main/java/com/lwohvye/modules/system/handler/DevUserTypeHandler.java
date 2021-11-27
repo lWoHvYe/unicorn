@@ -25,7 +25,7 @@ public final class DevUserTypeHandler implements AUserTypeHandler {
         log.warn(" salted fish：reverse。");
         Set<String> permissions = new HashSet<>();
         // 这里只是随便写一下，正常是走不到这个handler的
-        permissions.add("admin-dev");
+        permissions.add("ROLE_DEV");
         return permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 }

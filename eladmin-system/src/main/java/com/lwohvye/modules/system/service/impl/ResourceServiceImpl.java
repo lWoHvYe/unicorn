@@ -66,8 +66,15 @@ public class ResourceServiceImpl implements IResourceService {
 
     @Override
     public List<ResourceDto> queryAll(ResourceQueryCriteria criteria) {
-        return resourceMapper.toDto(resourceRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)),
-                new CycleAvoidingMappingContext());
+        var list = resourceRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
+        return resourceMapper.toDto(list, new CycleAvoidingMappingContext());
+    }
+
+    @Override
+    @Cacheable
+    @Transactional(rollbackFor = Exception.class)
+    public List<ResourceDto> queryAllRes() {
+        return resourceMapper.toDto(resourceRepository.findAll(), new CycleAvoidingMappingContext());
     }
 
     @Override

@@ -34,13 +34,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.Key;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -55,6 +55,7 @@ public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
     private final RedissonClient redisson;
+    private final UserDetailsService userDetailsService;
     public static final String AUTHORITIES_KEY = "user";
     private static final Clock clock = DefaultClock.INSTANCE;
     private JwtParser jwtParser;
@@ -138,10 +139,11 @@ public class TokenProvider implements InitializingBean {
     public Authentication getAuthentication(String token) {
         // 上面createToken()中jwtBuilder中设置的属性，都在token中，解密后，得到Claims。这里用到了其subject属性，在当前业务里存的用户名
         Claims claims = getClaims(token);
-        //  第三个参数是 <? extends GrantedAuthority> authorities ,即为用户的权限。这里未在此处设置。在鉴权时单独获取
-        User principal = new User(claims.getSubject(), "******", new ArrayList<>());
+        //  第三个参数是 <? extends GrantedAuthority> authorities ,即为用户的权限。当前改为角色级别
+        var authorities = userDetailsService.loadUserByUsername(claims.getSubject()).getAuthorities();
+        User principal = new User(claims.getSubject(), "******", authorities);
         //  同上，这里第三个参数也是用户的权限。
-        return new UsernamePasswordAuthenticationToken(principal, token, new ArrayList<>());
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     public Claims getClaims(String token) {

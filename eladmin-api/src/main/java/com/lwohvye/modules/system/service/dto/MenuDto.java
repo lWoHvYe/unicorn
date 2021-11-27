@@ -38,8 +38,6 @@ public class MenuDto extends BaseDTO implements Serializable {
 
     private Integer type;
 
-    private String permission;
-
     private String title;
 
     private Integer menuSort;

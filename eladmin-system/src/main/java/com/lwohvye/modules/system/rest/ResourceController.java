@@ -19,17 +19,15 @@ import com.lwohvye.annotation.Log;
 import com.lwohvye.modules.system.domain.Resource;
 import com.lwohvye.modules.system.service.IResourceService;
 import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
-import org.springframework.data.domain.Pageable;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
 
 /**
 * @website https://el-admin.vip
@@ -43,14 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 public class ResourceController {
 
     private final IResourceService resourceService;
-
-    @Log("导出数据")
-    @Operation(summary = "导出数据")
-    @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('resource:list')")
-    public void download(HttpServletResponse response, ResourceQueryCriteria criteria) throws IOException {
-        resourceService.download(resourceService.queryAll(criteria), response);
-    }
 
     @GetMapping
     @Log("查询资源")

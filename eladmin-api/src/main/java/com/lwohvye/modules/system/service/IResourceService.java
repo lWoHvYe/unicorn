@@ -48,6 +48,8 @@ public interface IResourceService extends BaseService {
     */
     List<ResourceDto> queryAll(ResourceQueryCriteria criteria);
 
+    List<ResourceDto> queryAllRes();
+
     /**
      * 根据ID查询
      * @param resourceId ID
@@ -81,4 +83,5 @@ public interface IResourceService extends BaseService {
     * @throws IOException /
     */
     void download(List<ResourceDto> all, HttpServletResponse response) throws IOException;
+
 }

@@ -20,14 +20,17 @@ import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
+import com.lwohvye.modules.security.security.CustomAccessDecisionManager;
+import com.lwohvye.modules.security.security.JwtAuthTokenConfigurer;
+import com.lwohvye.modules.security.security.TokenProvider;
+import com.lwohvye.modules.security.security.filter.CustomAuthenticationFilter;
+import com.lwohvye.modules.security.security.filter.CustomFilterInvocationSecurityMetadataSource;
 import com.lwohvye.modules.security.security.handler.CustomLogoutHandler;
 import com.lwohvye.modules.security.security.handler.CustomLogoutSuccessHandler;
 import com.lwohvye.modules.security.security.handler.JwtAccessDeniedHandler;
-import com.lwohvye.modules.security.security.JwtAuthTokenConfigurer;
 import com.lwohvye.modules.security.security.handler.JwtAuthenticationEntryPoint;
-import com.lwohvye.modules.security.security.TokenProvider;
-import com.lwohvye.modules.security.security.filter.CustomAuthenticationFilter;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
+import com.lwohvye.modules.system.service.IResourceService;
 import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.ResultUtil;
 import com.lwohvye.utils.StringUtils;
@@ -38,7 +41,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -49,6 +54,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -69,6 +76,10 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+// 使用 @EnableGlobalMethodSecurity 注解来启用全局方法安全注解功能。该注解提供了三种不同的机制来实现同一种功能
+// 包括prePostEnabled 、securedEnabled 和 jsr250Enabled 三种方式
+// 设置 prePostEnabled 为 true ，则开启了基于表达式的方法安全控制。通过表达式运算结果的布尔值来决定是否可以访问（true 开放， false 拒绝 ）
+// 设置 securedEnabled 为 true ，就开启了角色注解 @Secured ，该注解功能要简单的多，默认情况下只能基于角色（默认需要带前缀 ROLE_）集合来进行访问控制决策。
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -79,6 +90,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ApplicationContext applicationContext;
     private final UserDetailsService userDetailsService;
+    private final IResourceService resourceService;
     private final RabbitMQProducerService rabbitMQProducerService;
 
     @Bean
@@ -156,7 +168,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 // 所有类型的接口都放行
                 .antMatchers(anonymousUrls.getOrDefault(RequestMethodEnum.ALL.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // 所有请求都需要认证
-                .anyRequest().authenticated()
+                .anyRequest().authenticated().withObjectPostProcessor(filterSecurityInterceptorObjectPostProcessor())
                 .and().apply(securityConfigurerAdapter());
     }
 
@@ -193,6 +205,46 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 })
                 .collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toSet())));
     }
+
+    // region   权限认证
+
+    /**
+     * 自定义 FilterSecurityInterceptor  ObjectPostProcessor 以替换默认配置达到动态权限的目的
+     *
+     * @return ObjectPostProcessor
+     */
+    private ObjectPostProcessor<FilterSecurityInterceptor> filterSecurityInterceptorObjectPostProcessor() {
+        return new ObjectPostProcessor<>() {
+            @Override
+            public <O extends FilterSecurityInterceptor> O postProcess(O object) {
+                object.setAccessDecisionManager(customAccessDecisionManager());
+                object.setSecurityMetadataSource(customFilterInvocationSecurityMetadataSource());
+                return object;
+            }
+        };
+    }
+
+    /**
+     * 元数据加载器
+     *
+     * @return CustomFilterInvocationSecurityMetadataSource
+     */
+    @Bean
+    public FilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource() {
+        return new CustomFilterInvocationSecurityMetadataSource(resourceService);
+    }
+
+    /**
+     * 访问决策器
+     *
+     * @return affirmativeBased
+     */
+    @Bean
+    public AccessDecisionManager customAccessDecisionManager() {
+        return new CustomAccessDecisionManager();
+    }
+
+    // endregion
 
     // region loginFilter、handler
 

@@ -70,8 +70,8 @@ public class Menu extends BaseEntity implements Serializable {
     @Schema(description ="菜单类型，目录、菜单、按钮")
     private Integer type;
 
-    @Schema(description = "权限标识" )
-    private String permission;
+    // @Schema(description = "权限标识" )
+    // private String permission;
 
     @Schema(description = "菜单图标" )
     private String icon;
