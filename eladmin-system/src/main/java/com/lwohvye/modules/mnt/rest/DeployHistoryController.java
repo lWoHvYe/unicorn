@@ -46,14 +46,12 @@ public class DeployHistoryController {
 
     @Operation(summary = "导出部署历史数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('deployHistory:list')")
     public void download(HttpServletResponse response, DeployHistoryQueryCriteria criteria) throws IOException {
         deployHistoryService.download(deployHistoryService.queryAll(criteria), response);
     }
 
     @Operation(summary = "查询部署历史")
     @GetMapping
-    @PreAuthorize("@el.check('deployHistory:list')")
     public ResponseEntity<Object> query(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(deployHistoryService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
@@ -61,7 +59,6 @@ public class DeployHistoryController {
     @Log("删除DeployHistory")
     @Operation(summary = "删除部署历史")
     @DeleteMapping
-    @PreAuthorize("@el.check('deployHistory:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<String> ids) {
         deployHistoryService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);

@@ -40,7 +40,6 @@ public class MonitorController {
 
     @GetMapping
     @Operation(summary = "查询服务监控")
-    @PreAuthorize("@el.check('monitor:list')")
     public ResponseEntity<Object> query() {
         return new ResponseEntity<>(serverService.getServers(), HttpStatus.OK);
     }

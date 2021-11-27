@@ -48,14 +48,12 @@ public class ServerDeployController {
 
     @Operation(summary = "导出服务器数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('serverDeploy:list')")
     public void download(HttpServletResponse response, ServerDeployQueryCriteria criteria) throws IOException {
         serverDeployService.download(serverDeployService.queryAll(criteria), response);
     }
 
     @Operation(summary = "查询服务器")
     @GetMapping
-    @PreAuthorize("@el.check('serverDeploy:list')")
     public ResponseEntity<Object> query(ServerDeployQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(serverDeployService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
@@ -63,7 +61,6 @@ public class ServerDeployController {
     @Log("新增服务器")
     @Operation(summary = "新增服务器")
     @PostMapping
-    @PreAuthorize("@el.check('serverDeploy:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.create(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
@@ -72,7 +69,6 @@ public class ServerDeployController {
     @Log("修改服务器")
     @Operation(summary = "修改服务器")
     @PutMapping
-    @PreAuthorize("@el.check('serverDeploy:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -81,7 +77,6 @@ public class ServerDeployController {
     @Log("删除服务器")
     @Operation(summary = "删除Server")
     @DeleteMapping
-    @PreAuthorize("@el.check('serverDeploy:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         serverDeployService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
@@ -90,7 +85,6 @@ public class ServerDeployController {
     @Log("测试连接服务器")
     @Operation(summary = "测试连接服务器")
     @PostMapping("/testConnect")
-    @PreAuthorize("@el.check('serverDeploy:add')")
     public ResponseEntity<Object> testConnect(@Validated @RequestBody ServerDeploy resources) {
         return new ResponseEntity<>(ResultInfo.success(serverDeployService.testConnect(resources)), HttpStatus.CREATED);
     }

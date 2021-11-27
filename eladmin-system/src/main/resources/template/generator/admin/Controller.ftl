@@ -47,7 +47,6 @@ public class ${className}Controller {
     @Log("导出数据")
     @Operation(summary = "导出数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('${changeClassName}:list')")
     public void download(HttpServletResponse response, ${className}QueryCriteria criteria) throws IOException {
         ${changeClassName}Service.download(${changeClassName}Service.queryAll(criteria), response);
     }
@@ -55,7 +54,6 @@ public class ${className}Controller {
     @GetMapping
     @Log("查询${apiAlias}")
     @Operation(summary = "查询${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:list')")
     public ResponseEntity<Object> query(${className}QueryCriteria criteria, Pageable pageable){
         return new ResponseEntity<>(${changeClassName}Service.queryAll(criteria,pageable),HttpStatus.OK);
     }
@@ -63,7 +61,6 @@ public class ${className}Controller {
     @PostMapping
     @Log("新增${apiAlias}")
     @Operation(summary = "新增${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody ${className} resources){
         return new ResponseEntity<>(${changeClassName}Service.create(resources),HttpStatus.CREATED);
     }
@@ -71,7 +68,6 @@ public class ${className}Controller {
     @PutMapping
     @Log("修改${apiAlias}")
     @Operation(summary = "修改${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody ${className} resources){
         ${changeClassName}Service.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -79,7 +75,6 @@ public class ${className}Controller {
 
     @Log("删除${apiAlias}")
     @Operation(summary = "删除${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:del')")
     @DeleteMapping
     public ResponseEntity<Object> delete(@RequestBody ${pkColumnType}[] ids) {
         ${changeClassName}Service.deleteAll(ids);

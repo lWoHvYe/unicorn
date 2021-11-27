@@ -49,21 +49,18 @@ public class LocalStorageController {
 
     @Operation(summary = "查询文件")
     @GetMapping
-    @PreAuthorize("@el.check('storage:list')")
     public ResponseEntity<Object> query(LocalStorageQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(localStorageService.queryAll(criteria, pageable), HttpStatus.OK);
     }
 
     @Operation(summary = "导出数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('storage:list')")
     public void download(HttpServletResponse response, LocalStorageQueryCriteria criteria) throws IOException {
         localStorageService.download(localStorageService.queryAll(criteria), response);
     }
 
     @Operation(summary = "上传文件")
     @PostMapping
-    @PreAuthorize("@el.check('storage:add')")
     public ResponseEntity<Object> create(@RequestParam String name, @RequestParam("file") MultipartFile file) {
         localStorageService.create(name, file);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -84,7 +81,6 @@ public class LocalStorageController {
     @Log("修改文件")
     @Operation(summary = "修改文件")
     @PutMapping
-    @PreAuthorize("@el.check('storage:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody LocalStorage resources) {
         localStorageService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

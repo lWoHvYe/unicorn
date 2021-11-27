@@ -58,14 +58,12 @@ public class DeployController {
 
     @Operation(summary = "导出部署数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('database:list')")
     public void download(HttpServletResponse response, DeployQueryCriteria criteria) throws IOException {
         deployService.download(deployService.queryAll(criteria), response);
     }
 
     @Operation(summary = "查询部署")
     @GetMapping
-    @PreAuthorize("@el.check('deploy:list')")
     public ResponseEntity<Object> query(DeployQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(deployService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
@@ -73,7 +71,6 @@ public class DeployController {
     @Log("新增部署")
     @Operation(summary = "新增部署")
     @PostMapping
-    @PreAuthorize("@el.check('deploy:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody Deploy resources) {
         deployService.create(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
@@ -82,7 +79,6 @@ public class DeployController {
     @Log("修改部署")
     @Operation(summary = "修改部署")
     @PutMapping
-    @PreAuthorize("@el.check('deploy:edit')")
     public ResponseEntity<Object> update(@Validated @RequestBody Deploy resources) {
         deployService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -91,7 +87,6 @@ public class DeployController {
     @Log("删除部署")
     @Operation(summary = "删除部署")
     @DeleteMapping
-    @PreAuthorize("@el.check('deploy:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         deployService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
@@ -100,7 +95,6 @@ public class DeployController {
     @Log("上传文件部署")
     @Operation(summary = "上传文件部署")
     @PostMapping(value = "/upload")
-    @PreAuthorize("@el.check('deploy:edit')")
     public ResponseEntity<Object> upload(@RequestBody MultipartFile file, HttpServletRequest request) throws Exception {
         Long id = Long.valueOf(request.getParameter("id"));
         String fileName = "";
@@ -124,7 +118,6 @@ public class DeployController {
     @Log("系统还原")
     @Operation(summary = "系统还原")
     @PostMapping(value = "/serverReduction")
-    @PreAuthorize("@el.check('deploy:edit')")
     public ResponseEntity<Object> serverReduction(@Validated @RequestBody DeployHistory resources) {
         String result = deployService.serverReduction(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -133,7 +126,6 @@ public class DeployController {
     @Log("服务运行状态")
     @Operation(summary = "服务运行状态")
     @PostMapping(value = "/serverStatus")
-    @PreAuthorize("@el.check('deploy:edit')")
     public ResponseEntity<Object> serverStatus(@Validated @RequestBody Deploy resources) {
         String result = deployService.serverStatus(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -142,7 +134,6 @@ public class DeployController {
     @Log("启动服务")
     @Operation(summary = "启动服务")
     @PostMapping(value = "/startServer")
-    @PreAuthorize("@el.check('deploy:edit')")
     public ResponseEntity<Object> startServer(@Validated @RequestBody Deploy resources) {
         String result = deployService.startServer(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -151,7 +142,6 @@ public class DeployController {
     @Log("停止服务")
     @Operation(summary = "停止服务")
     @PostMapping(value = "/stopServer")
-    @PreAuthorize("@el.check('deploy:edit')")
     public ResponseEntity<Object> stopServer(@Validated @RequestBody Deploy resources) {
         String result = deployService.stopServer(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);

@@ -51,21 +51,18 @@ public class DictController {
 
     @Operation(summary = "导出字典数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('dict:list')")
     public void download(HttpServletResponse response, DictQueryCriteria criteria) throws IOException {
         dictService.download(dictService.queryAll(criteria), response);
     }
 
     @Operation(summary = "查询字典")
     @GetMapping(value = "/all")
-    @PreAuthorize("@el.check('dict:list')")
     public ResponseEntity<Object> queryAll() {
         return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(new DictQueryCriteria())), HttpStatus.OK);
     }
 
     @Operation(summary = "查询字典")
     @GetMapping
-    @PreAuthorize("@el.check('dict:list')")
     public ResponseEntity<Object> query(DictQueryCriteria resources, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(resources, pageable)), HttpStatus.OK);
     }
@@ -73,7 +70,6 @@ public class DictController {
     @Log("新增字典")
     @Operation(summary = "新增字典")
     @PostMapping
-    @PreAuthorize("@el.check('dict:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody Dict resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
@@ -85,7 +81,6 @@ public class DictController {
     @Log("修改字典")
     @Operation(summary = "修改字典")
     @PutMapping
-    @PreAuthorize("@el.check('dict:edit')")
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dict resources) {
         dictService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -94,7 +89,6 @@ public class DictController {
     @Log("删除字典")
     @Operation(summary = "删除字典")
     @DeleteMapping
-    @PreAuthorize("@el.check('dict:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         dictService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
