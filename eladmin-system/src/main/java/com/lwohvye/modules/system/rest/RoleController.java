@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +49,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "RoleController", description = "系统：角色管理")
-@RequestMapping("/api/roles")
+@RequestMapping("/api/sys/roles")
 public class RoleController {
 
     private final IRoleService roleService;

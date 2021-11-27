@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +36,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "ResourceController", description = "资源管理")
-@RequestMapping("/api/resource")
+@RequestMapping("/api/sys/resources")
 public class ResourceController {
 
     private final IResourceService resourceService;

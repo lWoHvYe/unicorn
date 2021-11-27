@@ -49,7 +49,7 @@ public class ResourceDto implements Serializable {
      */
     private String pattern;
 
-    // 请求方法
+    // 请求方法。空表示全部
     private String reqMethod;
 
     /**
@@ -57,7 +57,7 @@ public class ResourceDto implements Serializable {
      */
     private Integer status;
 
-    private String roleCodes;
+    private List<String> roleCodes;
 
     /**
      * 所在类名

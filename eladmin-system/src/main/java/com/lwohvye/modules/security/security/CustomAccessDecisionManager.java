@@ -4,6 +4,7 @@ import com.lwohvye.constant.SecurityConstant;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,15 +30,17 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication auth, Object object, Collection<ConfigAttribute> ca) throws AccessDeniedException, InsufficientAuthenticationException {
         for (ConfigAttribute configAttribute : ca) {
-            if (SecurityConstant.ROLE_LOGIN.equals(configAttribute.getAttribute()) && auth instanceof UsernamePasswordAuthenticationToken) { //如果请求Url需要的角色是ROLE_LOGIN，说明当前的Url用户登录后即可访问
+            if (SecurityConstant.ROLE_LOGIN.equals(configAttribute.getAttribute()) && auth instanceof UsernamePasswordAuthenticationToken)  //如果请求Url需要的角色是ROLE_LOGIN，说明当前的Url用户登录后即可访问
                 return;
-            }
+
+            // TODO: 2021/11/28 匿名访问问题。用户使用过期的凭证访问，似乎是有问题的。白天验证
+            if (SecurityConstant.ROLE_LOGIN.equals(configAttribute.getAttribute()) && auth instanceof AnonymousAuthenticationToken) // 匿名访问，放行
+                return;
+
             var auths = auth.getAuthorities(); //获取登录用户具有的角色
             // var auths = SecurityUtils.getCurrentUser().getAuthorities();
             for (GrantedAuthority grantedAuthority : auths) {
-                if (configAttribute.getAttribute().equals(grantedAuthority.getAuthority())
-                    // 对admin放行
-                    || SecurityConstant.ROLE_ADMIN.equals(grantedAuthority.getAuthority())) {
+                if (configAttribute.getAttribute().equals(grantedAuthority.getAuthority())) {
                     return;
                 }
             }

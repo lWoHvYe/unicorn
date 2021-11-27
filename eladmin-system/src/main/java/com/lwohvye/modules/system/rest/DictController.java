@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +42,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "DictController", description = "系统：字典管理")
-@RequestMapping("/api/dict")
+@RequestMapping("/api/sys/dict")
 public class DictController {
 
     private final IDictService dictService;

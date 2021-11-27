@@ -40,9 +40,9 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
         var reqMethod = filterInvocation.getRequest().getMethod(); // 请求方法GET、POST、PUT、DELETE
         var roles = resourceService.queryAllRes().stream() //获取数据库中的所有资源信息，即本案例中的resource以及对应的role
                 .filter(resource -> antPathMatcher.match(resource.getPattern(), requestUrl) // URI匹配
-                                    && StringUtils.hasText(resource.getRestName()) // 有关联角色（需要特定角色权限）
-                                    && Objects.equals(resource.getReqMethod(), reqMethod)) // 请求方法类型匹配
-                .flatMap(resource -> Arrays.stream(resource.getRoleCodes().split(","))) // 将字符状态的角色名用逗号切开
+                                    && !resource.getRoleCodes().isEmpty() // 有关联角色（需要特定角色权限）
+                                    && (Objects.isNull(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), reqMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
+                .flatMap(resource -> resource.getRoleCodes().stream()) // 将字符状态的角色名用逗号切开
                 .distinct() // 排重
                 .map(role -> "ROLE_" + role).toList();
         return !roles.isEmpty() ? SecurityConfig.createList(roles.toArray(String[]::new)) // 构建返回

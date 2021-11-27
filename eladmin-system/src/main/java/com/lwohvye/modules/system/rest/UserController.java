@@ -41,7 +41,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -60,7 +59,7 @@ import java.util.Set;
  */
 @Tag(name = "UserController", description = "系统：用户管理")
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/sys/users")
 @RequiredArgsConstructor
 public class UserController {
 

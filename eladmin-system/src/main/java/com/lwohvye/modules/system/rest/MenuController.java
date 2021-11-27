@@ -33,7 +33,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +48,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "MenuController", description = "系统：菜单管理")
-@RequestMapping("/api/menus")
+@RequestMapping("/api/sys/menus")
 public class MenuController {
 
     private final IMenuService menuService;

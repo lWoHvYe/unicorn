@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +42,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "JobController", description = "系统：岗位管理")
-@RequestMapping("/api/job")
+@RequestMapping("/api/sys/job")
 public class JobController {
 
     private final IJobService jobService;

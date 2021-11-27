@@ -71,7 +71,7 @@ public class ResourceServiceImpl implements IResourceService {
     }
 
     @Override
-    @Cacheable
+    @Cacheable(key = " #root.target.getSysName() + 'allResources' ")
     @Transactional(rollbackFor = Exception.class)
     public List<ResourceDto> queryAllRes() {
         return resourceMapper.toDto(resourceRepository.findAll(), new CycleAvoidingMappingContext());

@@ -18,10 +18,17 @@ package com.lwohvye.modules.system.service.mapstruct;
 import com.lwohvye.base.BaseMapper;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.system.domain.Resource;
+import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.service.dto.ResourceDto;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Super idol lv
@@ -32,9 +39,13 @@ import org.mapstruct.ReportingPolicy;
 public interface ResourceMapper extends BaseMapper<ResourceDto, Resource> {
 
     @Override
-    @Mapping(target = "roleCodes", expression = "java(entity.getRoles().stream()" +
-                                                ".map(com.lwohvye.modules.system.domain.Role::getCode)" +
-                                                ".collect(java.util.stream.Collectors.joining(\",\")))")
-    ResourceDto toDto(Resource entity, CycleAvoidingMappingContext context);
+    @Mapping(target = "roleCodes", expression = "java(genSimpleRole(entity.getRoles()))")
+        // ⚠️ 若不加@Context，则toDto(List<T> list) 不会用 toDto(T t)。
+    ResourceDto toDto(Resource entity, @Context CycleAvoidingMappingContext context);
 
+    default List<String> genSimpleRole(Collection<Role> roles) {
+        if (Objects.isNull(roles))
+            return Collections.emptyList();
+        return roles.stream().map(role -> role.getCode().toUpperCase()).toList();
+    }
 }
