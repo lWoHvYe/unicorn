@@ -61,7 +61,7 @@ public class GenUtil {
         templateNames.add("Mapper");
         templateNames.add("Controller");
         templateNames.add("QueryCriteria");
-        templateNames.add("Service");
+        templateNames.add("IService");
         templateNames.add("ServiceImpl");
         templateNames.add("Repository");
         return templateNames;
@@ -365,8 +365,8 @@ public class GenUtil {
             return packagePath + "rest" + File.separator + className + "Controller.java";
         }
 
-        if ("Service".equals(templateName)) {
-            return packagePath + "service" + File.separator + className + "Service.java";
+        if ("IService".equals(templateName)) {
+            return packagePath + "service" + File.separator + "I" + className + "Service.java";
         }
 
         if ("ServiceImpl".equals(templateName)) {

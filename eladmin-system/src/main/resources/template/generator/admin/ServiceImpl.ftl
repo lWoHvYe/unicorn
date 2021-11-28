@@ -29,7 +29,7 @@ import com.lwohvye.utils.ValidationUtil;
 import com.lwohvye.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import ${package}.repository.${className}Repository;
-import ${package}.service.${className}Service;
+import ${package}.service.I${className}Service;
 import ${package}.service.dto.${className}Dto;
 import ${package}.service.dto.${className}QueryCriteria;
 import ${package}.service.mapstruct.${className}Mapper;
@@ -47,8 +47,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import PageUtil;
-import QueryHelp;
+import com.lwohvye.utils.PageUtil;
+import com.lwohvye.utils.QueryHelp;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
@@ -65,7 +65,7 @@ import java.util.LinkedHashMap;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "${changeClassName}")
-public class ${className}ServiceImpl implements ${className}Service {
+public class ${className}ServiceImpl implements I${className}Service {
 
     private final ${className}Repository ${changeClassName}Repository;
     private final ${className}Mapper ${changeClassName}Mapper;

@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/api/${changeClassName}")
 public class ${className}Controller {
 
-    private final ${className}Service ${changeClassName}Service;
+    private final I${className}Service ${changeClassName}Service;
 
     @Log("导出数据")
     @ApiOperation("导出数据")

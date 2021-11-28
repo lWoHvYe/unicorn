@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 * @author ${author}
 * @date ${date}
 **/
-public interface ${className}Service extends BaseService {
+public interface I${className}Service extends BaseService {
 
     /**
     * 查询数据分页
