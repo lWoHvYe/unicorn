@@ -678,7 +678,6 @@ CREATE TABLE `sys_role`
     UNIQUE KEY `uniq_name` (`name`),
     KEY `role_name_index` (`name`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 3
   DEFAULT CHARSET = utf8
   ROW_FORMAT = COMPACT COMMENT ='角色表';
 
@@ -687,9 +686,35 @@ CREATE TABLE `sys_role`
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_role`
-VALUES (1, '超级管理员', 'admin', 1, '-', '全部', NULL, 'admin', '2018-11-23 11:04:37', '2020-08-06 16:10:24');
+VALUES (1, '超级管理员', 'admin', 1, '- 看起来比较菜', '全部', NULL, 'admin', '2018-11-23 11:04:37', '2021-11-12 18:42:58');
 INSERT INTO `sys_role`
-VALUES (2, '普通用户', 2, 'common', '-', '本级', NULL, 'admin', '2018-11-23 13:09:06', '2020-09-05 10:45:12');
+VALUES (2, '普通用户', 'commin', 2, '普普通通', '本级', NULL, 'test', '2018-11-23 13:09:06', '2021-11-15 20:23:49');
+INSERT INTO `sys_role`
+VALUES (3, '产品运营', 'product', 2, '产品运营及输出', '本级', 'admin', 'admin', '2021-11-05 22:40:03', '2021-11-05 23:00:37');
+INSERT INTO `sys_role`
+VALUES (4, '大佬', 'dalao', 4, NULL, '自定义', 'admin', 'admin', '2021-11-06 19:57:46', '2021-11-09 21:03:27');
+INSERT INTO `sys_role`
+VALUES (5, 'Java 从精通到陌生', 'java', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:25:28', '2021-11-24 18:49:45');
+INSERT INTO `sys_role`
+VALUES (6, 'C语言 从看懂到看开', 'c', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:25:58', '2021-11-24 18:55:05');
+INSERT INTO `sys_role`
+VALUES (7, 'Python', 'python', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:26:08', '2021-11-08 12:26:08');
+INSERT INTO `sys_role`
+VALUES (8, 'IOS', 'ios', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:26:31', '2021-11-08 12:26:31');
+INSERT INTO `sys_role`
+VALUES (9, 'Android 从入门到改行', 'android', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:26:49', '2021-11-24 18:50:08');
+INSERT INTO `sys_role`
+VALUES (10, 'C++', 'c++', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:27:02', '2021-11-08 12:27:02');
+INSERT INTO `sys_role`
+VALUES (11, 'JavaScript全栈开发 从入门到单身狗', 'js', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:27:28', '2021-11-24 18:53:11');
+INSERT INTO `sys_role`
+VALUES (12, 'Go', 'go', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:28:04', '2021-11-08 12:28:04');
+INSERT INTO `sys_role`
+VALUES (13, 'PHP 从放弃到坚持放弃', 'php', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:28:13', '2021-11-24 18:51:15');
+INSERT INTO `sys_role`
+VALUES (14, 'C# 从入门到放弃', 'c#', 3, NULL, '全部', 'admin', 'admin', '2021-11-24 18:50:45', '2021-11-24 18:50:45');
+INSERT INTO `sys_role`
+VALUES (15, 'SQL Server 没入门就放弃', 'sql_server', 3, NULL, '全部', 'admin', 'admin', '2021-11-24 18:53:44', '2021-11-24 18:53:44');
 COMMIT;
 
 -- ----------------------------
@@ -1024,6 +1049,9 @@ INSERT INTO `sys_users_roles`
 VALUES (2, 2);
 COMMIT;
 
+-- ----------------------------
+-- Table structure for sys_resource
+-- ----------------------------
 CREATE TABLE `sys_resource`
 (
     `resource_id` bigint       NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -1034,12 +1062,34 @@ CREATE TABLE `sys_resource`
     `rest_name`   varchar(255) COMMENT '所在类名',
     `remark`      varchar(255) COMMENT '备注',
     PRIMARY KEY (`resource_id`),
-    KEY `pattern` (`pattern`),
-    KEY `rest_name` (`rest_name`)
+    KEY `pattern` (`pattern`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='资源（API）';
 
+-- ----------------------------
+-- Records of sys_resource
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_resource`
+VALUES (1, '查询', '/api/**', 'GET', 1, '', '所有查询权限');
+INSERT INTO `sys_resource`
+VALUES (2, '修改', '/api/**', 'PUT', 1, '', '所有修改权限');
+INSERT INTO `sys_resource`
+VALUES (3, '新增', '/api/**', 'POST', 1, '', '所有新增权限');
+INSERT INTO `sys_resource`
+VALUES (4, '删除', '/api/**', 'DELETE', 1, '', '所有删除权限');
+INSERT INTO `sys_resource`
+VALUES (5, '角色模块', '/api/sys/roles**', NULL, 1, 'RoleRest', '角色模块所有权限');
+INSERT INTO `sys_resource`
+VALUES (6, '资源查询', '/api/sys/resources*', 'GET', 1, 'ResourceRest', '资源查询权限');
+INSERT INTO `sys_resource`
+VALUES (7, '系统管理', '/api/sys/**', NULL, 1, NULL, '系统管理模块权限');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for sys_roles_resources
+-- ----------------------------
 CREATE TABLE `sys_roles_resources`
 (
     `role_id`     bigint,
@@ -1049,6 +1099,28 @@ CREATE TABLE `sys_roles_resources`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+-- ----------------------------
+-- Records of sys_roles_resources
+-- ----------------------------
+BEGIN;
+INSERT INTO `sys_roles_resources`
+VALUES (1, 1);
+INSERT INTO `sys_roles_resources`
+VALUES (1, 2);
+INSERT INTO `sys_roles_resources`
+VALUES (1, 3);
+INSERT INTO `sys_roles_resources`
+VALUES (1, 4);
+INSERT INTO `sys_roles_resources`
+VALUES (2, 1);
+INSERT INTO `sys_roles_resources`
+VALUES (2, 5);
+INSERT INTO `sys_roles_resources`
+VALUES (3, 6);
+INSERT INTO `sys_roles_resources`
+VALUES (6, 7);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for tool_alipay_config
