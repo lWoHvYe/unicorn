@@ -36,6 +36,7 @@ import com.lwohvye.utils.ResultUtil;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.enums.RequestMethodEnum;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -71,8 +72,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author Zheng Jie
+ * @author Zheng Jie,Hongyan Wang
+ * @description SpringSecurity配置类。若需要不同接口不同的安全策略，可参考{@link CustomSpringBootWebSecurityConfiguration}中的配置方式
  */
+@ConditionalOnExpression("!${local.sys.multi-security:false}") // 这里用了取反。非multi时开启。默认开启
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

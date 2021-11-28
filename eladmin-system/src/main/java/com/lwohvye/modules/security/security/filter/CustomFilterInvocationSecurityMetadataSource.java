@@ -8,15 +8,13 @@ import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Hongyan Wang
  * @description 要实现动态配置权限，首先自定义一个类实现FilterInvocationSecurityMetadataSource接口，Spring Security通过接口中的getAttributes方法来确定请求需要哪些角色
+ * <a href="https://docs.spring.io/spring-security/site/docs/4.2.4.RELEASE/reference/htmlsingle/#appendix-faq-dynamic-url-metadata">The first thing you should ask yourself is if you really need to do this.</a>
  * @date 2021/11/27 2:45 下午
  */
 @RequiredArgsConstructor
@@ -35,18 +33,24 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
      */
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
-        var filterInvocation = (FilterInvocation) object;
-        var requestUrl = filterInvocation.getRequestUrl(); // 获取当前请求的Url
-        var reqMethod = filterInvocation.getRequest().getMethod(); // 请求方法GET、POST、PUT、DELETE
-        var roles = resourceService.queryAllRes().stream() //获取数据库中的所有资源信息，即本案例中的resource以及对应的role
-                .filter(resource -> antPathMatcher.match(resource.getPattern(), requestUrl) // URI匹配
+
+        var fi = (FilterInvocation) object;
+        var url = fi.getRequestUrl(); // 获取当前请求的Url
+        var httpMethod = fi.getRequest().getMethod(); // 请求方法GET、POST、PUT、DELETE
+        List<ConfigAttribute> attributes;
+        // Lookup your database (or other source) using this information and populate the
+        // list of attributes
+        var securityConfigs = resourceService.queryAllRes().stream() //获取数据库中的所有资源信息，即本案例中的resource以及对应的role
+                .filter(resource -> antPathMatcher.match(resource.getPattern(), url) // URI匹配
                                     && !resource.getRoleCodes().isEmpty() // 有关联角色（需要特定角色权限）
-                                    && (Objects.isNull(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), reqMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
+                                    && (Objects.isNull(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), httpMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
                 .flatMap(resource -> resource.getRoleCodes().stream()) // 将字符状态的角色名用逗号切开
                 .distinct() // 排重
-                .map(role -> "ROLE_" + role).toList();
-        return !roles.isEmpty() ? SecurityConfig.createList(roles.toArray(String[]::new)) // 构建返回
-                : SecurityConfig.createList(SecurityConstant.ROLE_LOGIN); //如果请求Url在资源表中不存在相应的模式，则该请求登陆后即可访问
+                .map(role -> new SecurityConfig("ROLE_" + role.trim())).toList();
+        if (!securityConfigs.isEmpty())
+            attributes = new ArrayList<>(securityConfigs); // 构建返回
+        else attributes = Collections.singletonList(new SecurityConfig(SecurityConstant.ROLE_LOGIN)); //如果请求Url在资源表中不存在相应的模式，则该请求登陆后即可访问
+        return attributes;
     }
 
     /**
@@ -60,11 +64,11 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
     /**
      * 返回类对象是否支持校验
      *
-     * @param aClass
+     * @param clazz
      * @return
      */
     @Override
-    public boolean supports(Class<?> aClass) {
-        return true;
+    public boolean supports(Class<?> clazz) {
+        return FilterInvocation.class.isAssignableFrom(clazz);
     }
 }
