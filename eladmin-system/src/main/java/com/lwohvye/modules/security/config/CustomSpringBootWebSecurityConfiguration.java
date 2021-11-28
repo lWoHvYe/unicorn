@@ -1,20 +1,21 @@
 package com.lwohvye.modules.security.config;
 
-import lombok.SneakyThrows;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * @author Hongyan Wang
@@ -28,80 +29,89 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 @ConditionalOnClass(WebSecurityConfigurerAdapter.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+// Spring Security 5.4开始，新的定义方式 https://github.com/spring-projects/spring-security/issues/8804
 public class CustomSpringBootWebSecurityConfiguration {
 
-    /**
-     * 后台接口安全策略. 默认配置
-     */
-    @Configuration
-    @Order(2) // 1似乎被用了，称为100。所以用的2
-    @ConditionalOnExpression("${local.sys.multi-security:false}")
-    static class AdminConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) {
-            var daoAuthenticationProvider = new DaoAuthenticationProvider();
-            //用户详情服务个性化
-            daoAuthenticationProvider.setUserDetailsService(username -> {
-                // 自行实现获取UserDetails逻辑
-                return null;
-            });
-            // 也可以设计特定的密码策略
-            var bCryptPasswordEncoder = new BCryptPasswordEncoder();
-            daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
-            auth.authenticationProvider(daoAuthenticationProvider);
-        }
+    // @Bean
+    // SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    //     return http
+    //             .antMatcher("/**")
+    //             .authorizeRequests(authorize -> authorize
+    //                     .anyRequest().authenticated()
+    //             )
+    //             .build();
+    // }
 
-        @SneakyThrows
-        @Override
-        public void configure(WebSecurity web) {
-            super.configure(web);
-        }
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            // 根据需求自行定制。首个antMatcher指定了该配置生效的范围
-            http.antMatcher("/admin/v2")
-                    .sessionManagement(Customizer.withDefaults())
-                    .formLogin(Customizer.withDefaults());
-
-
-        }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // 密码加密方式
+        return new BCryptPasswordEncoder();
     }
 
-    /**
-     * app接口安全策略. 没有{@link Order}注解优先级比上面低
-     */
-    @Configuration
-    @ConditionalOnExpression("${local.sys.multi-security:false}")
-    static class AppConfigurerAdapter extends WebSecurityConfigurerAdapter {
+    // region 后台接口安全策略
 
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) {
-            var daoAuthenticationProvider = new DaoAuthenticationProvider();
-            //用户详情服务个性化
-            daoAuthenticationProvider.setUserDetailsService(username -> {
-                // 自行实现获取UserDetails逻辑
-                return null;
-            });
-            // 也可以设计特定的密码策略
-            var bCryptPasswordEncoder = new BCryptPasswordEncoder();
-            daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
-            auth.authenticationProvider(daoAuthenticationProvider);
-        }
-
-        @SneakyThrows
-        @Override
-        public void configure(WebSecurity web) {
-            super.configure(web);
-        }
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            // 根据需求自行定制。首个antMatcher指定了该配置生效的范围
-            http.antMatcher("/app/v2")
-                    .sessionManagement(Customizer.withDefaults())
-                    .formLogin(Customizer.withDefaults());
-        }
+    // 如果 Spring IoC 容器中存在了多个UserDetailsService，那么这些UserDetailsService就不会生效，影响DaoAuthenticationProvider的注入。
+    // 解决方式为在configure(HttpSecurity http)中，通过
+    // SharedObject是Spring Security提供的一个非常好用的功能，如果需要在不同的地方需要对一个对象重复使用就可以将它注册为SharedObject，甚至直接注入Spring IoC像下面这样获取就可以了。
+    // 这个特性能够简化配置，提高代码的可读性，也为Spring Security的DSL特性打下了基础
+    //   var context = http.getSharedObject(ApplicationContext.class);
+    //   var xxxAuthenticationProvider = context.getBean("xxxAuthenticationProvider", xxxAuthenticationProvider.class);
+    //   http.authenticationProvider(xxxAuthenticationProvider) 注入
+    @Bean("daoAuthenticationProvider4Admin")
+    DaoAuthenticationProvider daoAuthenticationProvider4Admin() {
+        var daoAuthenticationProvider = new DaoAuthenticationProvider();
+        //用户详情服务个性化
+        daoAuthenticationProvider.setUserDetailsService(username -> {
+            // 自行实现获取UserDetails逻辑
+            return null;
+        });
+        // 也可以设计特定的密码策略
+        var bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
+        return daoAuthenticationProvider;
     }
+
+    @Bean
+    SecurityFilterChain filterChain4Admin(HttpSecurity http) throws Exception {
+        var context = http.getSharedObject(ApplicationContext.class);
+        var daoAuthenticationProvider4Admin = context.getBean("daoAuthenticationProvider4Admin", AuthenticationProvider.class);
+        // 根据需求自行定制。首个antMatcher指定了该配置生效的范围
+        return http.antMatcher("/admin/v2")
+                .authenticationProvider(daoAuthenticationProvider4Admin)
+                .sessionManagement(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults())
+                .build();
+    }
+
+    // endregion
+
+    // region app接口安全策略
+
+    @Bean("daoAuthenticationProvider4App")
+    DaoAuthenticationProvider daoAuthenticationProvider4App() {
+        var daoAuthenticationProvider = new DaoAuthenticationProvider();
+        //用户详情服务个性化
+        daoAuthenticationProvider.setUserDetailsService(username -> {
+            // 自行实现获取UserDetails逻辑
+            return null;
+        });
+        // 也可以设计特定的密码策略
+        var bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
+        return daoAuthenticationProvider;
+    }
+
+    @Bean
+    SecurityFilterChain filterChain4App(HttpSecurity http) throws Exception {
+        var context = http.getSharedObject(ApplicationContext.class);
+        var daoAuthenticationProvider4App = context.getBean("daoAuthenticationProvider4App", AuthenticationProvider.class);
+        // 根据需求自行定制。首个antMatcher指定了该配置生效的范围
+        return http.antMatcher("/app/v2")
+                .authenticationProvider(daoAuthenticationProvider4App)
+                .sessionManagement(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults())
+                .build();
+    }
+    // endregion
 }
