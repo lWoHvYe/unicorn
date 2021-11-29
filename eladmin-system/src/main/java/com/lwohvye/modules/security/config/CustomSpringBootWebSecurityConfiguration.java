@@ -1,5 +1,6 @@
 package com.lwohvye.modules.security.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -24,6 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * @see org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration
  */
 @ConditionalOnExpression("${local.sys.multi-security:false}")
+@Slf4j
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
 @EnableWebSecurity
@@ -63,7 +65,8 @@ public class CustomSpringBootWebSecurityConfiguration {
         var daoAuthenticationProvider = new DaoAuthenticationProvider();
         //用户详情服务个性化
         daoAuthenticationProvider.setUserDetailsService(username -> {
-            // 自行实现获取UserDetails逻辑
+            // 自行实现获取UserDetails逻辑。若在其他处实现，这里注入一下
+            log.warn("Admin-Api is in use");
             return null;
         });
         // 也可以设计特定的密码策略
@@ -72,6 +75,9 @@ public class CustomSpringBootWebSecurityConfiguration {
         return daoAuthenticationProvider;
     }
 
+    // 在HttpSecurityConfiguration中
+    // HttpSecurity被@Scope("prototype")标记。也就是这个HttpSecurity Bean不是单例的，每一次请求都会构造一个新的实例。
+    // 这个设定非常方便构建多个互相没有太多关联的SecurityFilterChain，进而能在一个安全体系中构建相互隔离的安全策略。
     @Bean
     SecurityFilterChain filterChain4Admin(HttpSecurity http) throws Exception {
         var context = http.getSharedObject(ApplicationContext.class);
@@ -94,6 +100,7 @@ public class CustomSpringBootWebSecurityConfiguration {
         //用户详情服务个性化
         daoAuthenticationProvider.setUserDetailsService(username -> {
             // 自行实现获取UserDetails逻辑
+            log.warn("App-Api is in use");
             return null;
         });
         // 也可以设计特定的密码策略

@@ -44,8 +44,8 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
                 .filter(resource -> antPathMatcher.match(resource.getPattern(), url) // URI匹配
                                     && !resource.getRoleCodes().isEmpty() // 有关联角色（需要特定角色权限）
                                     && (Objects.isNull(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), httpMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
-                .flatMap(resource -> resource.getRoleCodes().stream()) // 将字符状态的角色名用逗号切开
-                .distinct() // 排重
+                .flatMap(resource -> resource.getRoleCodes().stream()) // 用flatMap合并流
+                .distinct() // 排重。到这里，因为是角色级别的，理论上不会太多，排重与否影响不大
                 .map(role -> new SecurityConfig("ROLE_" + role.trim())).toList();
         if (!securityConfigs.isEmpty())
             attributes = new ArrayList<>(securityConfigs); // 构建返回
