@@ -715,6 +715,8 @@ INSERT INTO `sys_role`
 VALUES (14, 'C# 从入门到放弃', 'c#', 3, NULL, '全部', 'admin', 'admin', '2021-11-24 18:50:45', '2021-11-24 18:50:45');
 INSERT INTO `sys_role`
 VALUES (15, 'SQL Server 没入门就放弃', 'sql_server', 3, NULL, '全部', 'admin', 'admin', '2021-11-24 18:53:44', '2021-11-24 18:53:44');
+INSERT INTO `sys_role`
+VALUES (16, '匿名', 'anonymous', 4, '', '本级', 'admin', NULL, '2021-11-30 10:10:20', '2021-11-30 10:10:22');
 COMMIT;
 
 -- ----------------------------
@@ -1085,6 +1087,28 @@ INSERT INTO `sys_resource`
 VALUES (6, '资源查询', '/api/sys/resources*', 'GET', 1, 'ResourceRest', '资源查询权限');
 INSERT INTO `sys_resource`
 VALUES (7, '系统管理', '/api/sys/**', NULL, 1, NULL, '系统管理模块权限');
+INSERT INTO `sys_resource`
+VALUES (8, '验证码', '/auth/code', NULL, 1, NULL, '获取验证码');
+INSERT INTO `sys_resource`
+VALUES (9, 'html资源', '/**/*.html', 'GET', 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (10, 'css资源', '/**/*.css', 'GET', 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (11, 'js资源', '/**/*.js', 'GET', 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (12, 'api-docs', '/v3/api-docs/**', NULL, 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (13, 'swagger-ui', '/swagger-ui/**', NULL, 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (14, 'avatar', '/avatar/**', NULL, 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (15, 'file', '/file/**', NULL, 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (16, 'druid', '/druid/**', NULL, 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (17, 'options', '/**', 'OPTIONS', 1, NULL, NULL);
+INSERT INTO `sys_resource`
+VALUES (18, 'webSocket', '/webSocket/**', NULL, 1, NULL, 'WebSocket相关');
 COMMIT;
 
 -- ----------------------------
@@ -1120,6 +1144,28 @@ INSERT INTO `sys_roles_resources`
 VALUES (3, 6);
 INSERT INTO `sys_roles_resources`
 VALUES (6, 7);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 8);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 9);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 10);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 11);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 12);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 13);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 14);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 15);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 16);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 17);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 18);
 COMMIT;
 
 -- ----------------------------

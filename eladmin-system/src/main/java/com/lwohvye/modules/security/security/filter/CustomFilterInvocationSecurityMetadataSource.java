@@ -1,26 +1,30 @@
 package com.lwohvye.modules.security.security.filter;
 
 import com.lwohvye.constant.SecurityConstant;
+import com.lwohvye.modules.security.config.SpringSecurityConfig;
 import com.lwohvye.modules.system.service.IResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
+import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 
 import java.util.*;
 
 /**
  * @author Hongyan Wang
- * @description 要实现动态配置权限，首先自定义一个类实现FilterInvocationSecurityMetadataSource接口，Spring Security通过接口中的getAttributes方法来确定请求需要哪些角色
+ * @description 要实现动态配置权限，首先自定义一个类实现FilterInvocationSecurityMetadataSource接口，Spring Security通过接口中的getAttributes方法来确定请求需要哪些角色。
+ * 在{@link DefaultFilterInvocationSecurityMetadataSource} 中，可获取到配置的requestMap（在{@link SpringSecurityConfig} 中配置的authorizeRequests部分），后续看如何获取这部分信息，
  * <a href="https://docs.spring.io/spring-security/site/docs/4.2.4.RELEASE/reference/htmlsingle/#appendix-faq-dynamic-url-metadata">The first thing you should ask yourself is if you really need to do this.</a>
  * @date 2021/11/27 2:45 下午
  */
 @RequiredArgsConstructor
 public class CustomFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
-    AntPathMatcher antPathMatcher = new AntPathMatcher();  //用来实现ant风格的Url匹配
+    PathMatcher antPathMatcher = new AntPathMatcher();  //用来实现ant风格的Url匹配
 
     private final IResourceService resourceService;
 

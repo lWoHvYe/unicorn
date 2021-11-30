@@ -4,14 +4,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.annotation.rest.AnonymousGetMapping;
-import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.modules.mongodb.service.IMongoDBUserService;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,12 +56,12 @@ public class MongoDBUserController {
         }
     }
 
-    @AnonymousGetMapping
+    @GetMapping
     public ResponseEntity getAllUser() {
         return new ResponseEntity<>(ResultInfo.success(mongoDBUserService.queryAll()), HttpStatus.OK);
     }
 
-    @AnonymousPostMapping
+    @PostMapping
     public ResponseEntity updateUsers() {
         mongoDBUserService.updateUsers();
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);

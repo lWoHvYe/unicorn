@@ -146,30 +146,30 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 // session的创建策略，总是创建【ALWAYS】、需要时创建【IF_REQUIRED】、永不创建【STATELESS】 、永不创建但如有则使用【NEVER】
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
+                .authorizeRequests() // TODO: 2021/11/30 启动动态权限后，关于此的配置未生效。转由在resource表中配置
                 // 静态资源等等
-                .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/webSocket/**").permitAll()
+                // .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/webSocket/**").permitAll()
                 // swagger 文档
-                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                // .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // 文件
-                .antMatchers("/avatar/**", "/file/**").permitAll()
+                // .antMatchers("/avatar/**", "/file/**").permitAll()
                 // 阿里巴巴 druid
-                .antMatchers("/druid/**").permitAll()
+                // .antMatchers("/druid/**").permitAll()
                 // 放行OPTIONS请求
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 自定义匿名访问所有url放行：允许匿名和带Token访问，细腻化到每个 Request 类型
                 // GET
-                .antMatchers(HttpMethod.GET, anonymousUrls.getOrDefault(RequestMethodEnum.GET.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
+                // .antMatchers(HttpMethod.GET, anonymousUrls.getOrDefault(RequestMethodEnum.GET.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // POST
-                .antMatchers(HttpMethod.POST, anonymousUrls.getOrDefault(RequestMethodEnum.POST.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
+                // .antMatchers(HttpMethod.POST, anonymousUrls.getOrDefault(RequestMethodEnum.POST.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // PUT
-                .antMatchers(HttpMethod.PUT, anonymousUrls.getOrDefault(RequestMethodEnum.PUT.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
+                // .antMatchers(HttpMethod.PUT, anonymousUrls.getOrDefault(RequestMethodEnum.PUT.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // PATCH
-                .antMatchers(HttpMethod.PATCH, anonymousUrls.getOrDefault(RequestMethodEnum.PATCH.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
+                // .antMatchers(HttpMethod.PATCH, anonymousUrls.getOrDefault(RequestMethodEnum.PATCH.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // DELETE
-                .antMatchers(HttpMethod.DELETE, anonymousUrls.getOrDefault(RequestMethodEnum.DELETE.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
+                // .antMatchers(HttpMethod.DELETE, anonymousUrls.getOrDefault(RequestMethodEnum.DELETE.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // 所有类型的接口都放行
-                .antMatchers(anonymousUrls.getOrDefault(RequestMethodEnum.ALL.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
+                // .antMatchers(anonymousUrls.getOrDefault(RequestMethodEnum.ALL.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
                 // 所有请求都需要认证
                 .anyRequest().authenticated().withObjectPostProcessor(filterSecurityInterceptorObjectPostProcessor())
                 .and().apply(securityConfigurerAdapter());

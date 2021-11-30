@@ -30,13 +30,13 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
     @Override
     public void decide(Authentication auth, Object object, Collection<ConfigAttribute> ca) throws AccessDeniedException, InsufficientAuthenticationException {
         for (ConfigAttribute configAttribute : ca) {
+            // 使用凭证。访问登录即可访问的资源
             if (SecurityConstant.ROLE_LOGIN.equals(configAttribute.getAttribute()) && auth instanceof UsernamePasswordAuthenticationToken)  //如果请求Url需要的角色是ROLE_LOGIN，说明当前的Url用户登录后即可访问
                 return;
-
-            // TODO: 2021/11/28 匿名访问问题。用户使用过期的凭证访问，似乎是有问题的。白天验证
-            if (SecurityConstant.ROLE_LOGIN.equals(configAttribute.getAttribute()) && auth instanceof AnonymousAuthenticationToken) // 匿名访问，放行
+            // 未使用凭证。访问可匿名访问的资源
+            if (SecurityConstant.ROLE_ANONYMOUS.equals(configAttribute.getAttribute()) && auth instanceof AnonymousAuthenticationToken) // 匿名访问，放行
                 return;
-
+            // 访问受保护的资源。需校验权限
             var auths = auth.getAuthorities(); //获取登录用户具有的角色
             // var auths = SecurityUtils.getCurrentUser().getAuthorities();
             for (GrantedAuthority grantedAuthority : auths) {
