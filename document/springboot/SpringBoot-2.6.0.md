@@ -7,10 +7,11 @@ boot的 [ Release-Notes ](https://github.com/spring-projects/spring-boot/wiki/Sp
 - 在SpringMVC的5.3.x系列版本（Spring Boot 2.6.x），引入新的URL Matching方式PathPattern。之前已有的是AntPathMatcher。
 - 在Spring Boot 2.6.0版本，将默认的调整为PathPattern。并提供配置 `spring.mvc.pathmatch.matching-strategy=ant_path_matcher`
   可以切换回AntPathMatcher，但是`The actuator endpoints now also use PathPattern based URL matching. Note that the path matching strategy for actuator endpoints is not configurable via a configuration property.`
-- 导致报错的就是webEndpointServletHandlerMapping方法的`/actuator/health/**、/actuator/health、/actuator`这几个方法。所以在找到让springfox忽略（不处理）这几个方法的方案前。还未找到好的解决方案
+- 导致报错的就是webEndpointServletHandlerMapping方法的`/actuator/health/**、/actuator/health、/actuator`这几个方法。所以在找到让springfox忽略（不处理）这几个方法的方案前。~~还未找到好的解决方案~~，过滤方式详见方法三
 - ~~暂通过改源码解决，期待后续方案。📦后的jar详见ex-lib目录~~。[git commit](https://github.com/lWoHvYe/springfox/commit/9cb5e727a48e815b73461793ad37eae73c4af0e7)
 - 调整源码修改方式，ex-lib中jar为该方式。详见：[git commit](https://github.com/lWoHvYe/springfox/commit/1dfca11330435e1c8965c93d1fd3943016c63062)
 - 生活总是充满惊喜。上面说了，导致问题的原因是/actuator/**，这些是actuator模块的，项目并未显式的引用，所以为神马会有这几个path？ 🤪答案就是redisson。排除掉就可以了，至少只要不需要这些功能，不用改源码
+- 第三种修复方式更为推荐。具体为将springfox中springfox.documentation.spring.web.plugins包下的WebMvcRequestHandlerProvider.java拷贝到项目下(包路径不要变)，进行修改，主体为过滤掉PatternsRequestCondition为null的handlerMappings。详见：[git commit](https://github.com/lWoHvYe/eladmin/commit/e4c94d2c6e18d474a6b2b620cd78e4e5464419b4)
 
 ⌚️马上🕑了。天亮再继续。考虑从springfox迁移到springdoc了
 
