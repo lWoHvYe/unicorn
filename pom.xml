@@ -333,6 +333,12 @@
             <scope>runtime</scope>
             -->
         </dependency>
+        <!--    tracking unsafe strings    -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-util</artifactId>
+            <version>3.19.0</version>
+        </dependency>
         <!--   fixed dependencies of plugins with threat    -->
         <!--   4pdfbox     -->
         <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
