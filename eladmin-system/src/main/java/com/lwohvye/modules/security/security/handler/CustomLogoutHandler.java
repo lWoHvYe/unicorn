@@ -1,7 +1,21 @@
+/*
+ *  Copyright 2020-2022 lWoHvYe
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package com.lwohvye.modules.security.security.handler;
 
 import com.lwohvye.modules.security.security.TokenProvider;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,10 +30,7 @@ import java.util.Objects;
  * @date 2021/11/27 9:42 上午
  */
 @Slf4j
-@RequiredArgsConstructor
-public class CustomLogoutHandler implements LogoutHandler {
-
-    private final TokenProvider tokenProvider; // Token
+public record CustomLogoutHandler(TokenProvider tokenProvider) implements LogoutHandler {
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {

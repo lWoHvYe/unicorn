@@ -34,40 +34,51 @@ import java.sql.Timestamp;
 
 /**
  * 通用字段， is_del 根据需求自行添加
+ *
  * @author Zheng Jie
  * @Date 2019年10月24日20:46:32
  */
 @Getter
 @Setter
-@MappedSuperclass
+@MappedSuperclass // @MappedSuperclass 用在父类上面。当这个类肯定是父类时，加此标注。如果改成@Entity，则继承后，多个类继承，只会生成一个表，而不是多个继承，生成多个表
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity implements Serializable {
 
     @CreatedBy
     @Column(name = "create_by", updatable = false)
-    @Schema(description = "创建人" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "创建人", accessMode = Schema.AccessMode.READ_ONLY)
     private String createBy;
 
     @LastModifiedBy
     @Column(name = "update_by")
-    @Schema(description = "更新人" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "更新人", accessMode = Schema.AccessMode.READ_ONLY)
     private String updateBy;
 
     @CreationTimestamp
     @Column(name = "create_time", updatable = false)
-    @Schema(description = "创建时间" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "创建时间", accessMode = Schema.AccessMode.READ_ONLY)
     private Timestamp createTime;
 
     @UpdateTimestamp
     @Column(name = "update_time")
-    @Schema(description = "更新时间" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "更新时间", accessMode = Schema.AccessMode.READ_ONLY)
     private Timestamp updateTime;
 
-    /* 分组校验 */
-    public @interface Create {}
+/*
+    // 乐观锁Version
+    private Integer version;
+
+    // 逻辑删除 deleted=0 ==>deleted =1(失效)
+    private Integer deleted;
+*/
 
     /* 分组校验 */
-    public @interface Update {}
+    public @interface Create {
+    }
+
+    /* 分组校验 */
+    public @interface Update {
+    }
 
     @Override
     public String toString() {
