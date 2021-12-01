@@ -1225,17 +1225,6 @@ public class RedisUtils {
 //    region set相关操作
 
     /**
-     * set添加元素
-     *
-     * @param key
-     * @param values
-     * @return
-     */
-    public Long sAdd(String key, String... values) {
-        return redisTemplate.opsForSet().add(key, values);
-    }
-
-    /**
      * 将数据放入set缓存
      *
      * @param key    键

@@ -19,11 +19,17 @@ import com.fasterxml.classmate.TypeResolver;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
+import org.springframework.web.util.pattern.PathPatternParser;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
@@ -34,11 +40,17 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
+import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 /**
@@ -46,6 +58,7 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
  * @description api页面 /doc.html /swagger-ui/index.html
  * @date 2018-11-23
  */
+@Slf4j
 @Configuration
 @EnableOpenApi
 public class SwaggerConfig {
@@ -130,6 +143,66 @@ public class SwaggerConfig {
         securityReferences.add(new SecurityReference(tokenHeader, authorizationScopes));
         return securityReferences;
     }
+
+    /**
+     * @return org.springframework.beans.factory.config.BeanPostProcessor
+     * @description 针对springfox在Spring Boot 2.6系列版本不兼容，一个解决方案。在bean初始化前后调用该方法，后续还可以做些别的事情
+     * <a href="https://github.com/springfox/springfox/issues/3462#issuecomment-983144080">解决方案</a>
+     * @date 2021/12/1 9:07 上午
+     */
+    @Bean
+    public static BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
+        return new BeanPostProcessor() {
+
+            // 该方法在bean初始化之后调用。还有一个Before在初始化之前调用
+            @Override
+            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+                // 只针对这两类处理
+                if (bean instanceof WebMvcRequestHandlerProvider || bean instanceof WebFluxRequestHandlerProvider)
+                    customizeSpringfoxHandlerMappings(getHandlerMappings(bean));
+                return bean;
+            }
+
+            private <T extends RequestMappingInfoHandlerMapping> void customizeSpringfoxHandlerMappings(List<T> mappings) {
+                var warring = """    
+                          The actual matchingStrategy of the bean [{}] is [PathPatternParser], which is not support by springfox, ignored.
+                            It contains the following patterns [{}].
+                            Notice that you have to set `spring.mvc.pathmatch.matching-strategy=ant-path-matcher` in the configuration.
+                          see: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes
+                        """;
+                List<T> copy = mappings.stream()
+                        .filter(mapping -> {
+                            // mapping.getPatternParser() Return the configured PathPatternParser, or null。把无PatternsRequestCondition的过滤掉了。
+                            PathPatternParser patternParser = mapping.getPatternParser();
+                            if (!Objects.isNull(patternParser)) {
+                                String beanName = mapping.getClass().getSimpleName();
+                                String patterns = mapping.getHandlerMethods().keySet().stream()
+                                        .flatMap(requestMappingInfo -> requestMappingInfo.getPathPatternsCondition() != null ?
+                                                requestMappingInfo.getPathPatternsCondition().getDirectPaths().stream() : Stream.empty())
+                                        .collect(joining(","));
+                                log.warn(warring, beanName, patterns);
+                            }
+                            return Objects.isNull(patternParser);
+                        }).toList();
+                mappings.clear();
+                mappings.addAll(copy);
+            }
+
+            @SuppressWarnings("unchecked")
+            private List<RequestMappingInfoHandlerMapping> getHandlerMappings(Object bean) {
+                try {
+                    // 获取属性
+                    Field field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
+                    // 改变属性的访问状态
+                    ReflectionUtils.makeAccessible(field);
+                    return (List<RequestMappingInfoHandlerMapping>) field.get(bean);
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        };
+    }
+
 }
 
 /**
