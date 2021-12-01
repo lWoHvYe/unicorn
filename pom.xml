@@ -150,7 +150,7 @@
             <!--
             The actuator endpoints now also use PathPattern based URL matching.
             Note that the path matching strategy for actuator endpoints is not configurable via a configuration property.
-            故，在业务中不需要监控系列的前提下，移除。若需要使用该功能，当前需要用ex-lib中的springfox-spring-webmvc-3.0.0.jar替代原jar。方可启动成功
+            故，在业务中不需要监控系列的前提下，可考虑移除
             -->
             <!--<exclusions>-->
             <!--    <exclusion>-->
