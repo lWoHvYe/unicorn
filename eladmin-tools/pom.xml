@@ -13,10 +13,10 @@
     <name>工具模块</name>
 
     <properties>
-        <mail.version>1.4.7</mail.version>
+        <mail.version>1.6.2</mail.version>
         <qiniu.version>7.8.0</qiniu.version>
         <alipay.version>4.18.0.ALL</alipay.version>
-        <aliyun.oss.version>3.12.0</aliyun.oss.version>
+        <aliyun.oss.version>3.13.2</aliyun.oss.version>
         <aliyun.dysmsapi.version>2.0.8</aliyun.dysmsapi.version>
         <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     </properties>
@@ -49,11 +49,11 @@
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <artifactId>javax.mail-api</artifactId>
             <version>${mail.version}</version>
         </dependency>
 
-        <!--    对象存储计划改为阿里云OSS  版本问题  -->
+        <!--    对象存储计划改为阿里云OSS  -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>aliyun-oss-spring-boot-starter</artifactId>

@@ -88,9 +88,9 @@
         <mapstruct.version>1.4.2.Final</mapstruct.version>
 
         <!--logstash有所依赖，需要使用management统一管理依赖-->
-        <logstash.version>7.0</logstash.version>
+        <logstash.version>7.0.1</logstash.version>
         <logback.version>1.2.7</logback.version>
-        <redisson.version>3.16.4</redisson.version>
+        <redisson.version>3.16.5</redisson.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
@@ -233,7 +233,7 @@
         <dependency>
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-ip2region</artifactId>
-            <version>2.5.6</version>
+            <version>2.5.7</version>
         </dependency>
 
         <!--lombok插件-->
