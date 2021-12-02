@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.security.config;
 
-import com.lwohvye.annotation.AnonymousAccess;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
@@ -34,14 +33,11 @@ import com.lwohvye.modules.system.service.IResourceService;
 import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.ResultUtil;
 import com.lwohvye.utils.StringUtils;
-import com.lwohvye.utils.enums.RequestMethodEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.util.Pair;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
@@ -61,15 +57,11 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Zheng Jie,Hongyan Wang
@@ -110,11 +102,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        // 搜寻匿名标记 url： @AnonymousAccess
-        RequestMappingHandlerMapping requestMappingHandlerMapping = (RequestMappingHandlerMapping) applicationContext.getBean("requestMappingHandlerMapping");
-        Map<RequestMappingInfo, HandlerMethod> handlerMethodMap = requestMappingHandlerMapping.getHandlerMethods();
-        // 获取匿名标记
-        Map<String, Set<String>> anonymousUrls = getAnonymousUrl(handlerMethodMap);
         httpSecurity
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
@@ -146,30 +133,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 // session的创建策略，总是创建【ALWAYS】、需要时创建【IF_REQUIRED】、永不创建【STATELESS】 、永不创建但如有则使用【NEVER】
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests() // TODO: 2021/11/30 启动动态权限后，关于此的配置未生效。转由在resource表中配置
-                // 静态资源等等
-                // .antMatchers(HttpMethod.GET, "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/webSocket/**").permitAll()
-                // swagger 文档
-                // .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                // 文件
-                // .antMatchers("/avatar/**", "/file/**").permitAll()
-                // 阿里巴巴 druid
-                // .antMatchers("/druid/**").permitAll()
-                // 放行OPTIONS请求
-                // .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // 自定义匿名访问所有url放行：允许匿名和带Token访问，细腻化到每个 Request 类型
-                // GET
-                // .antMatchers(HttpMethod.GET, anonymousUrls.getOrDefault(RequestMethodEnum.GET.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
-                // POST
-                // .antMatchers(HttpMethod.POST, anonymousUrls.getOrDefault(RequestMethodEnum.POST.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
-                // PUT
-                // .antMatchers(HttpMethod.PUT, anonymousUrls.getOrDefault(RequestMethodEnum.PUT.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
-                // PATCH
-                // .antMatchers(HttpMethod.PATCH, anonymousUrls.getOrDefault(RequestMethodEnum.PATCH.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
-                // DELETE
-                // .antMatchers(HttpMethod.DELETE, anonymousUrls.getOrDefault(RequestMethodEnum.DELETE.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
-                // 所有类型的接口都放行
-                // .antMatchers(anonymousUrls.getOrDefault(RequestMethodEnum.ALL.getType(), Collections.emptySet()).toArray(new String[0])).permitAll()
+                .authorizeRequests()
                 // 所有请求都需要认证
                 .anyRequest().authenticated().withObjectPostProcessor(filterSecurityInterceptorObjectPostProcessor())
                 .and().apply(securityConfigurerAdapter());
@@ -177,36 +141,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private JwtAuthTokenConfigurer securityConfigurerAdapter() {
         return new JwtAuthTokenConfigurer(tokenProvider, userDetailsService);
-    }
-
-    private Map<String, Set<String>> getAnonymousUrl(Map<RequestMappingInfo, HandlerMethod> handlerMethodMap) {
-        // 不能用instanceof，只能用isInstance()和cast()了
-        var pathPatternsClass = PathPatternsRequestCondition.class;
-        var patternsClass = PatternsRequestCondition.class;
-        // 根据方法类型分组。值为pattern的集合
-        return handlerMethodMap.entrySet().parallelStream()
-                // 有匿名访问注解
-                .filter(infoEntry -> !Objects.isNull(infoEntry.getValue().getMethodAnnotation(AnonymousAccess.class)))
-                .flatMap(infoEntry -> {
-                    // 先拿到方法类型
-                    var requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
-                    var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
-                    // 获取pathPatternsCondition
-                    var activePatternsCondition = infoEntry.getKey().getActivePatternsCondition();
-                    Set<String> patterns;
-                    if (pathPatternsClass.isInstance(activePatternsCondition))
-                        patterns = pathPatternsClass.cast(activePatternsCondition).getDirectPaths();
-                    else if (patternsClass.isInstance(activePatternsCondition))
-                        patterns = patternsClass.cast(activePatternsCondition).getPatterns();
-                    else
-                        throw new IllegalStateException("系统错误，请联系相关人员排查");
-                    // 返回一个Stream流，由flatMap进行合并
-                    return patterns.stream().map(pattern ->
-                            // 二元组。first为methodType，second为pattern
-                            Pair.of(request.getType(), pattern)
-                    );
-                })
-                .collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toSet())));
     }
 
     // region   权限认证
@@ -234,7 +168,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     public FilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource() {
-        return new CustomFilterInvocationSecurityMetadataSource(resourceService);
+        return new CustomFilterInvocationSecurityMetadataSource(applicationContext, resourceService);
     }
 
     /**
@@ -287,12 +221,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
 
             // 返回 token 与 用户信息
-            Map<String, Object> authInfo = new HashMap<>(2) {
-                {
-                    put("token", properties.getTokenStartWith() + token);
-                    put("user", jwtUserDto);
-                }
-            };
+            var authInfo = Map.of("token", properties.getTokenStartWith() + token, "user", jwtUserDto);
             // 这里需要进行响应
             ResultUtil.resultJson(response, HttpServletResponse.SC_OK, JsonUtils.toJSONString(authInfo));
         };

@@ -60,7 +60,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 <dependency>
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
-    <version>2.6.16</version>
+    <version>2.6.17</version>
     <type>pom</type>
 </dependency>
 
@@ -70,7 +70,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### 项目简介
 
-一个基于最新的Java 17版本、 Spring Boot 2.6.0 、 Spring Boot Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
+一个基于最新的Java 17版本、 Spring Boot 2.6、 Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
 
 **开发文档：**  [https://el-admin.vip](https://el-admin.vip)
 
@@ -88,7 +88,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.6.0。
+- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.6。
 - 高效率开发，代码生成器可一键生成前后端代码
 - 支持数据字典，可方便地对一些状态进行管理
 - 支持接口限流，避免恶意请求导致服务层压力过大

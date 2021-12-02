@@ -19,7 +19,6 @@ import com.lwohvye.constant.SecurityConstant;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,12 +47,11 @@ public class CustomAccessDecisionManager implements AccessDecisionManager {
             // 使用凭证。访问登录即可访问的资源
             if (SecurityConstant.ROLE_LOGIN.equals(configAttribute.getAttribute()) && auth instanceof UsernamePasswordAuthenticationToken)  //如果请求Url需要的角色是ROLE_LOGIN，说明当前的Url用户登录后即可访问
                 return;
-            // 未使用凭证。访问可匿名访问的资源
-            if (SecurityConstant.ROLE_ANONYMOUS.equals(configAttribute.getAttribute()) && auth instanceof AnonymousAuthenticationToken) // 匿名访问，放行
+            // 访问可匿名访问的资源
+            if (SecurityConstant.ROLE_ANONYMOUS.equals(configAttribute.getAttribute())) // 访问匿名资源，放行
                 return;
             // 访问受保护的资源。需校验权限
             var auths = auth.getAuthorities(); //获取登录用户具有的角色
-            // var auths = SecurityUtils.getCurrentUser().getAuthorities();
             for (GrantedAuthority grantedAuthority : auths) {
                 if (configAttribute.getAttribute().equals(grantedAuthority.getAuthority())) {
                     return;
