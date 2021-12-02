@@ -18,7 +18,7 @@
         <alipay.version>4.18.0.ALL</alipay.version>
         <aliyun.oss.version>3.12.0</aliyun.oss.version>
         <aliyun.dysmsapi.version>2.0.8</aliyun.dysmsapi.version>
-        <bcprov.jdk15on.version>1.69</bcprov.jdk15on.version>
+        <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     </properties>
 
     <!--  无人维护。其中依赖版本过老，考虑其他方式  -->
