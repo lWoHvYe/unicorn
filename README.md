@@ -19,14 +19,14 @@
 后台运行jar（开启远程调试端口5005）
 
 ```shell
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.17.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
 ```
 
 若外置依赖启动参数需添加，``-Dloader.path=lib``引入依赖。外置依赖可以大大减少jar包的体积。方便后续更新部署
 
 ```shell
 #启动示例
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.17.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
 ```
 
 | key                | 目的                                                         |
@@ -193,13 +193,14 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 项目的发展离不开你的支持，请作者喝杯咖啡吧☕  [Donate](https://el-admin.vip/donation/)
 
-#### 反馈交流
-
-- QQ交流群：一群：<strike>891137268</strike> 已满、二群：947578238
 
 ---
 
 #### Feature list
 
-- Springdoc相关、Springfox相关
+- dev_3.0 Springdoc相关，部分bug（动态权限功能后，api异常）
 - Redisson部分功能应用：多数据源(Redis)、分布式扩展、锁
+- dev_3.0 动态权限，前端功能开发调整
+- ASM字节码增强
+- 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）
+- 网关(Gateway)模块-鉴权
