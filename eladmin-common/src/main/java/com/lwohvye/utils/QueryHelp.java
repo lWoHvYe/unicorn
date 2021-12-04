@@ -89,7 +89,7 @@ public class QueryHelp {
 //                    解析join类型
                     join = analyzeJoinType(root, q, joinName, val, join);
 //                    解析查询类型
-                    analyzeQueryType(root, cb, list, q, attributeName, fieldType, val, join);
+                    analyzeQueryType(root, cb, list, q, attributeName, fieldType, val instanceof Comparable<?> cec ? cec.getClass() : null, val, join);
                 }
                 field.setAccessible(accessible);
             }
@@ -137,7 +137,7 @@ public class QueryHelp {
     private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, String joinName, Object val, Join<R, ?> join) {
         if (StringUtils.isNotBlank(joinName)) {
             // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
-//            var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2));
+            // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
             // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
             var joinNames = joinName.split(">");
 
@@ -146,7 +146,7 @@ public class QueryHelp {
                 checkJoin:
                 {
                     if (Objects.isNull(join)) {
-//                    var rJoin = existJoinNames.get(entity);
+//                    var rJoin = existJoinNames.get(entity); 同上
                         for (var rJoin : root.getJoins()) {
                             // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
                             if (Objects.equals(rJoin.getAttribute().getName(), entity)) {
@@ -193,12 +193,20 @@ public class QueryHelp {
      * @param q             /
      * @param attributeName /
      * @param fieldType     /
+     * @param cecType       这个参数只是为了解决几个警告，因为fieldType不一定extends Comparable，所以加了这个。实际环境下可移除该属性
      * @param val           /
      * @param join          /
      * @description 解析query.type()。抽取主要为了方便调用
      * @date 2021/6/24 10:52 上午
      */
-    private static <R, T> void analyzeQueryType(Root<R> root, CriteriaBuilder cb, ArrayList<Predicate> list, Query q, String attributeName, Class<T> fieldType, Object val, Join<R, ?> join) {
+    // ? extends E:接收E类型或者E的子类型。
+    // ? super E:接收E类型或者E的父类型 https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
+    private static <R, T, C extends Comparable<? super C>> void analyzeQueryType(Root<R> root,
+                                                                                 CriteriaBuilder cb,
+                                                                                 ArrayList<Predicate> list,
+                                                                                 Query q, String attributeName,
+                                                                                 Class<T> fieldType, Class<C> cecType, Object val,
+                                                                                 Join<R, ?> join) {
         switch (q.type()) {
             case EQUAL:
                 list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
@@ -207,23 +215,24 @@ public class QueryHelp {
                 // TODO: 2021/12/4 范型相关，有精力了研究研究怎么改
                 // 虽然会⚠️，但这里是不能这么写的 val instanceof Comparable<?> ele。报错与pt3一致
                 if (val instanceof Comparable ele) {
-                    var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了
+                    // var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
+                    // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
                     //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
                     //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
-                    //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 这样也是不得行的
-                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), ele));
+                    //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
+                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele)));
                 }
                 break;
             case LESS_THAN:
                 if (val instanceof Comparable ele) {
-                    var cecType = (Class<? extends Comparable>) fieldType;
-                    list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), ele));
+                    // var cecType = (Class<? extends Comparable>) fieldType; 同上
+                    list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele)));
                 }
                 break;
             case LESS_THAN_NQ:
                 if (val instanceof Comparable ele) {
-                    var cecType = (Class<? extends Comparable>) fieldType;
-                    list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), ele));
+                    // var cecType = (Class<? extends Comparable>) fieldType; 同上
+                    list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele)));
                 }
                 break;
             case INNER_LIKE:
@@ -316,7 +325,7 @@ public class QueryHelp {
                 for (Field fieldInVal : ReflectUtil.getFields(val.getClass())) {
                     var fieldValue = ReflectUtil.getFieldValue(val, fieldInVal);
                     if (ObjectUtils.isNotEmpty(fieldValue)) {
-                        Predicate predicate = null;
+                        Predicate predicate;
 //                                    Id注解，只会出现在主键上
                         var idAnnotation = fieldInVal.getAnnotation(Id.class);
 //                                    In查询通过Query注解的propName指定映射的属性
@@ -362,10 +371,10 @@ public class QueryHelp {
                 break;
 //            case FUNCTION_FROM_BASE64:
             // where (from_base64(user0_.description) like to_base64(user0_.description))。如何设置to_base64的参数为 fieldValue，是接下来的事情
-//                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)), cb.function("to_base64", fieldType, getExpression(attributeName, join, root))));
+            //    list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)), cb.function("to_base64", fieldType, getExpression(attributeName, join, root)))); // 多个是支持的
             // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
-//                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%"));
-//                break;
+//                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%")); // 这种把调用函数硬编码了
+//                break; 后续移除
             case FUNCTION_4_EQUAL:
                 list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), val));
                 break;
@@ -407,17 +416,17 @@ public class QueryHelp {
 
     // 2021/11/6 使用JPA 2.1 引入的 CriteriaUpdate 和 CriteriaDelete 进行批量更新/删除。不是很实用，期待后续的使用场景
     public static <R, Q> void criteria4Update(Root<R> root, Q query, CriteriaBuilder cb) {
-//        var em = new EntityManager();
+//        var em = new EntityManager(); //获取em
         var criteriaUpdate = cb.createCriteriaUpdate(root.getJavaType());
         criteriaUpdate.set("fieldName", "newFieldValue");
         criteriaUpdate.where(getPredicate(root, query, cb));
-//        em.createQuery(criteriaUpdate).executeUpdate();
+//        em.createQuery(criteriaUpdate).executeUpdate(); // 执行
     }
 
     public static <R, Q> void criteriaDelete(Root<R> root, Q query, CriteriaBuilder cb) {
-//        var em = new EntityManager();
+//        var em = new EntityManager(); // 获取em
         var criteriaDelete = cb.createCriteriaDelete(root.getJavaType());
         criteriaDelete.where(getPredicate(root, query, cb));
-//        em.createQuery(criteriaDelete).executeUpdate();
+//        em.createQuery(criteriaDelete).executeUpdate(); // 执行
     }
 }
