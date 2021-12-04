@@ -20,6 +20,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.annotation.DataPermission;
 import com.lwohvye.annotation.Query;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
 import javax.persistence.Id;
 import javax.persistence.criteria.*;
@@ -88,7 +89,7 @@ public class QueryHelp {
 //                    解析join类型
                     join = analyzeJoinType(root, q, joinName, val, join);
 //                    解析查询类型
-                    analyzeQueryType(root, cb, list, q, attributeName, (Class<? extends Comparable>) fieldType, val, join);
+                    analyzeQueryType(root, cb, list, q, attributeName, fieldType, val, join);
                 }
                 field.setAccessible(accessible);
             }
@@ -197,32 +198,47 @@ public class QueryHelp {
      * @description 解析query.type()。抽取主要为了方便调用
      * @date 2021/6/24 10:52 上午
      */
-    private static <R> void analyzeQueryType(Root<R> root, CriteriaBuilder cb, ArrayList<Predicate> list, Query q, String attributeName, Class<? extends Comparable> fieldType, Object val, Join<R, ?> join) {
+    private static <R, T> void analyzeQueryType(Root<R> root, CriteriaBuilder cb, ArrayList<Predicate> list, Query q, String attributeName, Class<T> fieldType, Object val, Join<R, ?> join) {
         switch (q.type()) {
             case EQUAL:
                 list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
                 break;
             case GREATER_THAN:
-                list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), (Comparable) val));
+                // TODO: 2021/12/4 范型相关，有精力了研究研究怎么改
+                // 虽然会⚠️，但这里是不能这么写的 val instanceof Comparable<?> ele。报错与pt3一致
+                if (val instanceof Comparable ele) {
+                    var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了
+                    //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
+                    //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
+                    //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 这样也是不得行的
+                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), ele));
+                }
                 break;
             case LESS_THAN:
-                list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), (Comparable) val));
+                if (val instanceof Comparable ele) {
+                    var cecType = (Class<? extends Comparable>) fieldType;
+                    list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), ele));
+                }
                 break;
             case LESS_THAN_NQ:
-                list.add(cb.lessThan(getExpression(attributeName, join, root).as(fieldType), (Comparable) val));
+                if (val instanceof Comparable ele) {
+                    var cecType = (Class<? extends Comparable>) fieldType;
+                    list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), ele));
+                }
                 break;
             case INNER_LIKE:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val.toString() + "%"));
+                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
                 break;
             case LEFT_LIKE:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val.toString()));
+                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val));
                 break;
             case RIGHT_LIKE:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString() + "%"));
+                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
                 break;
             case IN:
-                if (CollUtil.isNotEmpty((Collection<? extends Comparable>) val)) {
-                    list.add(getExpression(attributeName, join, root).in((Collection<? extends Comparable>) val));
+                if (val instanceof Collection<?> col && !col.isEmpty()) {
+                    // 这里不能用fieldType.cast(val)。因为in()方法的重载，会走进in(Object... var1)中，正常要进in(Collection<?> var1)
+                    list.add(getExpression(attributeName, join, root).in(col));
                 }
                 break;
             case NOT_EQUAL:
@@ -235,22 +251,24 @@ public class QueryHelp {
                 list.add(cb.isNull(getExpression(attributeName, join, root)));
                 break;
             case BETWEEN:
-                var between = new ArrayList<>((List<Object>) val);
-                list.add(cb.between(getExpression(attributeName, join, root).as((Class<? extends Comparable>) between.get(0).getClass()), (Comparable) between.get(0), (Comparable) between.get(1)));
+                if (val instanceof List col && col.size() == 2 && col.get(0) instanceof Comparable start && col.get(1) instanceof Comparable end) {
+                    var eleType = (Class<? extends Comparable>) col.get(0).getClass();
+                    list.add(cb.between(getExpression(attributeName, join, root).as(eleType), start, end));
+                }
                 break;
             case NOT_IN:
-                if (CollUtil.isNotEmpty((Collection<? extends Comparable>) val)) {
-                    list.add(cb.not(getExpression(attributeName, join, root).in((Collection<? extends Comparable>) val)));
+                if (val instanceof Collection<?> col && !col.isEmpty()) {
+                    list.add(cb.not(getExpression(attributeName, join, root).in(col)));
                 }
                 break;
             case LIKE_STR:
                 list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
                 break;
             case IN_OR_ISNULL:
-                if (CollUtil.isNotEmpty((Collection<? extends Comparable>) val)) {
+                if (val instanceof Collection<?> col && !col.isEmpty()) {
                     list.add(
 //                                        在集合中
-                            cb.or(getExpression(attributeName, join, root).in((Collection<? extends Comparable>) val)
+                            cb.or(getExpression(attributeName, join, root).in(col)
 //                                                或值为null
                                     , cb.isNull(getExpression(attributeName, join, root))
 //                                                或值为空字符串
@@ -297,22 +315,23 @@ public class QueryHelp {
 //                            val是一个实体。里面有多个属性。将其中非空的属性配置进去
                 for (Field fieldInVal : ReflectUtil.getFields(val.getClass())) {
                     var fieldValue = ReflectUtil.getFieldValue(val, fieldInVal);
-                    if (Objects.nonNull(fieldValue)) {
+                    if (ObjectUtils.isNotEmpty(fieldValue)) {
                         Predicate predicate = null;
 //                                    Id注解，只会出现在主键上
                         var idAnnotation = fieldInVal.getAnnotation(Id.class);
 //                                    In查询通过Query注解的propName指定映射的属性
                         var queryAnnotation = fieldInVal.getAnnotation(Query.class);
 //                                    如果在实体属性上配置了Query注解，需解析Query注解，确定查询方式
+                        var fieldInValType = fieldInVal.getType();
                         if (Objects.nonNull(queryAnnotation)) {
                             var queryType = queryAnnotation.type();
                             var queryAttrName = isBlank(queryAnnotation.propName()) ? fieldInVal.getName() : queryAnnotation.propName();
                             predicate = switch (queryType) {
-                                case EQUAL -> cb.equal(getExpression(queryAttrName, join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
+                                case EQUAL -> cb.equal(getExpression(queryAttrName, join, root).as(fieldInValType), fieldValue);
                                 case NOT_EQUAL -> cb.notEqual(getExpression(queryAttrName, join, root), fieldValue);
-                                case INNER_LIKE -> cb.like(getExpression(queryAttrName, join, root).as(String.class), "%" + fieldValue.toString() + "%");
-                                case IN -> getExpression(queryAttrName, join, root).in((Collection<? extends Comparable>) fieldValue);
-                                case NOT_IN -> cb.not(getExpression(queryAttrName, join, root).in((Collection<? extends Comparable>) fieldValue));
+                                case INNER_LIKE -> cb.like(getExpression(queryAttrName, join, root).as(String.class), "%" + fieldValue + "%");
+                                case IN -> getExpression(queryAttrName, join, root).in((Collection<?>) fieldValue);
+                                case NOT_IN -> cb.not(getExpression(queryAttrName, join, root).in((Collection<?>) fieldValue));
                                 default -> throw new RuntimeException("暂不支持该类型，请期待后续支持：" + queryType);
                             };
 //                                    String类型使用Inner like
@@ -324,7 +343,7 @@ public class QueryHelp {
                             // 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
                             // 2021/11/07 解决了多join问题后，该注解的功能可由原配置多个join来实现。不再进行扩展
                         } else if (fieldValue instanceof Long && Objects.equals(fieldValue, -1L) && Objects.nonNull(idAnnotation)) {
-                            predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
+                            predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as(fieldInValType));
                             // 下面这三行，主体是因为，若使用了isNull，则不能再设置该join实体的其他查询，所以跳出
                             list.add(predicate);
 //                              安全起见。清空一下。避免在循环结束的list.add()那里，再被加进去
@@ -332,7 +351,7 @@ public class QueryHelp {
                             break;
                         } else {
 //                                    其他的走等于
-                            predicate = cb.equal(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
+                            predicate = cb.equal(getExpression(fieldInVal.getName(), join, root).as(fieldInValType), fieldValue);
                         }
                         if (Objects.nonNull(predicate))
                             arrayList.add(predicate);
