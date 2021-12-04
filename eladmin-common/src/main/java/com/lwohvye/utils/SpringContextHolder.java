@@ -30,8 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author Jie
- * @author Super Idol lv
+ * @author Jie, Super Idol lv, Super Idol peng
  * @description 可用来获取IOC注册的Bean
  * 使用 Class.forName(String s)时，传的是类的全路径（包含包）
  * 上面几种获取bean的。传的是bean的名称（首字母小写）
