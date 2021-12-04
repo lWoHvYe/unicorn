@@ -12,6 +12,10 @@
     <artifactId>eladmin-starter</artifactId>
     <name>启动模块-基础</name>
 
+    <properties>
+        <javassist.version>3.28.0-GA</javassist.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.lwohvye</groupId>
@@ -33,6 +37,12 @@
                     <groupId>com.google.errorprone</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
         </dependency>
     </dependencies>
 
