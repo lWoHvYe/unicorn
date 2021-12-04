@@ -16,10 +16,7 @@
 package com.lwohvye.utils;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.lwohvye.annotation.DataPermission;
 import com.lwohvye.annotation.Query;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +25,9 @@ import javax.persistence.Id;
 import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
- * @author Zheng Jie
+ * @author Zheng Jie, lWoHvYe
  * @date 2019-6-4 14:59:48
  */
 @Slf4j
@@ -73,17 +69,17 @@ public class QueryHelp {
                     var attributeName = isBlank(propName) ? field.getName() : propName;
                     var fieldType = field.getType();
                     var val = field.get(query);
-                    if (ObjectUtil.isNull(val) || "".equals(val)) {
+                    if (Objects.isNull(val) || Objects.equals("", val)) {
                         continue;
                     }
-                    Join join = null;
+                    Join<R, ?> join = null;
                     // 模糊多字段
-                    if (ObjectUtil.isNotEmpty(blurry)) {
+                    if (StringUtils.isNotBlank(blurry)) {
                         var blurrys = blurry.split(",");
                         var orPredicate = new ArrayList<Predicate>();
                         for (String s : blurrys) {
                             orPredicate.add(cb.like(root.get(s)
-                                    .as(String.class), "%" + val.toString() + "%"));
+                                    .as(String.class), "%" + val + "%"));
                         }
                         var p = new Predicate[orPredicate.size()];
                         list.add(cb.or(orPredicate.toArray(p)));
@@ -104,9 +100,9 @@ public class QueryHelp {
     }
 
     /**
-     * @param root
-     * @param query
-     * @param list
+     * @param root  /
+     * @param query /
+     * @param list  /
      * @description 数据权限验证
      * @date 2021/11/7 4:36 下午
      */
@@ -115,10 +111,10 @@ public class QueryHelp {
         if (permission != null) {
             // 获取数据权限
             var dataScopes = SecurityUtils.getCurrentUserDataScope();
-            if (CollectionUtil.isNotEmpty(dataScopes)) {
+            if (CollUtil.isNotEmpty(dataScopes)) {
                 if (StringUtils.isNotBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
-                    // 因为首先处理这部分，不必担心join重复
-                    var join = root.join(permission.joinName(), JoinType.LEFT);
+                    // 因为首先处理这部分，不必担心join重复。这里用var的化，join的类型会是Join<Object, Object>
+                    Join<R, ?> join = root.join(permission.joinName(), JoinType.LEFT);
                     list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
                 } else if (StringUtils.isBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
                     list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
@@ -128,17 +124,17 @@ public class QueryHelp {
     }
 
     /**
-     * @param root
-     * @param q
-     * @param joinName
-     * @param val
-     * @param join
+     * @param root     /
+     * @param q        /
+     * @param joinName /
+     * @param val      /
+     * @param join     /
      * @return javax.persistence.criteria.Join
      * @description 解析joinType
      * @date 2021/6/24 10:52 上午
      */
-    private static <R> Join analyzeJoinType(Root<R> root, Query q, String joinName, Object val, Join join) {
-        if (ObjectUtil.isNotEmpty(joinName)) {
+    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, String joinName, Object val, Join<R, ?> join) {
+        if (StringUtils.isNotBlank(joinName)) {
             // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
 //            var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2));
             // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
@@ -152,7 +148,7 @@ public class QueryHelp {
 //                    var rJoin = existJoinNames.get(entity);
                         for (var rJoin : root.getJoins()) {
                             // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
-                            if (StrUtil.equals(rJoin.getAttribute().getName(), entity)) {
+                            if (Objects.equals(rJoin.getAttribute().getName(), entity)) {
                                 join = rJoin;
                                 break checkJoin;
                             }
@@ -160,21 +156,21 @@ public class QueryHelp {
                     }
                     switch (q.join()) {
                         case LEFT:
-                            if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
+                            if (Objects.nonNull(join) && Objects.nonNull(val)) {
                                 join = join.join(entity, JoinType.LEFT);
                             } else {
                                 join = root.join(entity, JoinType.LEFT);
                             }
                             break;
                         case RIGHT:
-                            if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
+                            if (Objects.nonNull(join) && Objects.nonNull(val)) {
                                 join = join.join(entity, JoinType.RIGHT);
                             } else {
                                 join = root.join(entity, JoinType.RIGHT);
                             }
                             break;
                         case INNER:
-                            if (ObjectUtil.isNotNull(join) && ObjectUtil.isNotNull(val)) {
+                            if (Objects.nonNull(join) && Objects.nonNull(val)) {
                                 join = join.join(entity, JoinType.INNER);
                             } else {
                                 join = root.join(entity, JoinType.INNER);
@@ -190,18 +186,18 @@ public class QueryHelp {
     }
 
     /**
-     * @param root
-     * @param cb
-     * @param list
-     * @param q
-     * @param attributeName
-     * @param fieldType
-     * @param val
-     * @param join
+     * @param root          /
+     * @param cb            /
+     * @param list          /
+     * @param q             /
+     * @param attributeName /
+     * @param fieldType     /
+     * @param val           /
+     * @param join          /
      * @description 解析query.type()。抽取主要为了方便调用
      * @date 2021/6/24 10:52 上午
      */
-    private static <R> void analyzeQueryType(Root<R> root, CriteriaBuilder cb, ArrayList<Predicate> list, Query q, String attributeName, Class<? extends Comparable> fieldType, Object val, Join join) {
+    private static <R> void analyzeQueryType(Root<R> root, CriteriaBuilder cb, ArrayList<Predicate> list, Query q, String attributeName, Class<? extends Comparable> fieldType, Object val, Join<R, ?> join) {
         switch (q.type()) {
             case EQUAL:
                 list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
@@ -239,7 +235,7 @@ public class QueryHelp {
                 list.add(cb.isNull(getExpression(attributeName, join, root)));
                 break;
             case BETWEEN:
-                var between = new ArrayList<Object>((List<Object>) val);
+                var between = new ArrayList<>((List<Object>) val);
                 list.add(cb.between(getExpression(attributeName, join, root).as((Class<? extends Comparable>) between.get(0).getClass()), (Comparable) between.get(0), (Comparable) between.get(1)));
                 break;
             case NOT_IN:
@@ -295,20 +291,20 @@ public class QueryHelp {
                 break;
             case EQUAL_IN_MULTI_JOIN:
 //                            该注解只针对Join查询。非join不处理
-                if (ObjectUtil.isNull(join))
+                if (Objects.isNull(join))
                     break;
                 var arrayList = new ArrayList<Predicate>();
 //                            val是一个实体。里面有多个属性。将其中非空的属性配置进去
                 for (Field fieldInVal : ReflectUtil.getFields(val.getClass())) {
                     var fieldValue = ReflectUtil.getFieldValue(val, fieldInVal);
-                    if (ObjectUtil.isNotNull(fieldValue)) {
+                    if (Objects.nonNull(fieldValue)) {
                         Predicate predicate = null;
 //                                    Id注解，只会出现在主键上
                         var idAnnotation = fieldInVal.getAnnotation(Id.class);
 //                                    In查询通过Query注解的propName指定映射的属性
                         var queryAnnotation = fieldInVal.getAnnotation(Query.class);
 //                                    如果在实体属性上配置了Query注解，需解析Query注解，确定查询方式
-                        if (ObjectUtil.isNotNull(queryAnnotation)) {
+                        if (Objects.nonNull(queryAnnotation)) {
                             var queryType = queryAnnotation.type();
                             var queryAttrName = isBlank(queryAnnotation.propName()) ? fieldInVal.getName() : queryAnnotation.propName();
                             predicate = switch (queryType) {
@@ -327,7 +323,7 @@ public class QueryHelp {
                             // 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
                             // 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
                             // 2021/11/07 解决了多join问题后，该注解的功能可由原配置多个join来实现。不再进行扩展
-                        } else if (fieldValue instanceof Long && ObjectUtil.equals(fieldValue, -1L) && ObjectUtil.isNotNull(idAnnotation)) {
+                        } else if (fieldValue instanceof Long && Objects.equals(fieldValue, -1L) && Objects.nonNull(idAnnotation)) {
                             predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()));
                             // 下面这三行，主体是因为，若使用了isNull，则不能再设置该join实体的其他查询，所以跳出
                             list.add(predicate);
@@ -338,7 +334,7 @@ public class QueryHelp {
 //                                    其他的走等于
                             predicate = cb.equal(getExpression(fieldInVal.getName(), join, root).as((Class<? extends Comparable>) fieldInVal.getType()), fieldValue);
                         }
-                        if (ObjectUtil.isNotNull(predicate))
+                        if (Objects.nonNull(predicate))
                             arrayList.add(predicate);
                     }
                 }
@@ -359,10 +355,9 @@ public class QueryHelp {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T, R> Expression<T> getExpression(String attributeName, Join join, Root<R> root) {
+    private static <T, R> Expression<T> getExpression(String attributeName, Join<R, ?> join, Root<R> root) {
         // 处理的维度是field维度的，每个field初始化一个join，若join有值，证明该field是join的实体中的，所以要从join中取，即join.get()。
-        if (ObjectUtil.isNotEmpty(join)) {
+        if (Objects.nonNull(join)) {
             return join.get(attributeName);
         } else {
             // 非join的，从root中取，root.get()。
@@ -383,7 +378,7 @@ public class QueryHelp {
         return true;
     }
 
-    public static List<Field> getAllFields(Class clazz, List<Field> fields) {
+    public static <T> List<Field> getAllFields(Class<T> clazz, List<Field> fields) {
         if (clazz != null) {
             fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
             getAllFields(clazz.getSuperclass(), fields);
