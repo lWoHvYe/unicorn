@@ -86,9 +86,10 @@ public class QueryHelp {
                         list.add(cb.or(orPredicate.toArray(p)));
                         continue;
                     }
-//                    解析join类型
+                    // 解析join类型
                     join = analyzeJoinType(root, q, joinName, val, join);
-//                    解析查询类型
+                    // 解析查询类型
+                    // 当下根据val获取cec，后续看看有没有办法从fieldType出发，即如何获取父类，或判断是不是某个类的子类
                     analyzeQueryType(root, cb, list, q, attributeName, fieldType, val instanceof Comparable<?> cec ? cec.getClass() : null, val, join);
                 }
                 field.setAccessible(accessible);
@@ -212,28 +213,21 @@ public class QueryHelp {
                 list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
                 break;
             case GREATER_THAN:
-                // TODO: 2021/12/4 范型相关，有精力了研究研究怎么改
                 // 虽然会⚠️，但这里是不能这么写的 val instanceof Comparable<?> ele。报错与pt3一致
-                if (val instanceof Comparable ele) {
-                    // var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
-                    // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
-                    //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
-                    //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
-                    //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
-                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele)));
-                }
+                // if (val instanceof Comparable ele) { 这个没什么必要
+                // var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
+                // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
+                //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
+                //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
+                //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
+                list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
+                // } 跟上面的后续一起移除
                 break;
             case LESS_THAN:
-                if (val instanceof Comparable ele) {
-                    // var cecType = (Class<? extends Comparable>) fieldType; 同上
-                    list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele)));
-                }
+                list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
                 break;
             case LESS_THAN_NQ:
-                if (val instanceof Comparable ele) {
-                    // var cecType = (Class<? extends Comparable>) fieldType; 同上
-                    list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele)));
-                }
+                list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
                 break;
             case INNER_LIKE:
                 list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
