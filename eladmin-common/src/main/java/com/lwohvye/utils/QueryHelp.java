@@ -32,8 +32,8 @@ import java.util.*;
  * @date 2019-6-4 14:59:48
  */
 @Slf4j
-// @SuppressWarnings 抑制警告
-//@SuppressWarnings({"unchecked", "all"})
+// @SuppressWarnings 抑制警告 https://www.lwohvye.com/2021/12/05/suppresswarnings%e6%b3%a8%e8%a7%a3%e7%94%a8%e6%b3%95/
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class QueryHelp {
 
     /**
@@ -89,7 +89,6 @@ public class QueryHelp {
                     // 解析join类型
                     join = analyzeJoinType(root, q, joinName, val, join);
                     // 解析查询类型
-                    // 当下根据val获取cec，后续看看有没有办法从fieldType出发，即如何获取父类，或判断是不是某个类的子类
                     analyzeQueryType(root, cb, list, q, attributeName, fieldType, val instanceof Comparable<?> cec ? cec.getClass() : null, val, join);
                 }
                 field.setAccessible(accessible);
