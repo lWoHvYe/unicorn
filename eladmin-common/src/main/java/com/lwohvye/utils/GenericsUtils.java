@@ -15,9 +15,9 @@
  */
 package com.lwohvye.utils;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -59,6 +59,70 @@ public class GenericsUtils {
             }
         }
         return Object.class;
+    }
+
+    public static void printClass(Class<?> cl) {
+        System.out.print(cl);
+        // getTypeParameters获取泛型类型变量
+        printTypes(cl.getTypeParameters(), "<", ", ", ">", true);
+        Type sc = cl.getGenericSuperclass();
+        if (sc != null) {
+            System.out.print(" extends ");
+            printType(sc, false);
+        }
+        printTypes(cl.getGenericInterfaces(), " implements ", ", ", "", false);
+        System.out.println();
+    }
+
+    public static void printMethod(Method m) {
+        String name = m.getName();
+        System.out.print(Modifier.toString(m.getModifiers()));
+        System.out.print(" ");
+        printTypes(m.getTypeParameters(), "<", ", ", ">", true);
+
+        printType(m.getGenericReturnType(), false);
+        System.out.print(" ");
+        System.out.print(name);
+        System.out.print(" (");
+        //getGenericParameterTypes  获得这个方法被声明的泛型参数类型
+        printTypes(m.getGenericParameterTypes(), "", ", ", "", false);
+        System.out.println(")");
+    }
+
+    public static void printTypes(Type[] types, String pre, String sep, String suf, boolean isDefinition) {
+        if (pre.equals(" extends ") && Arrays.equals(types, new Type[]{Object.class})) return;
+        if (types.length > 0) System.out.print(pre);
+        for (int i = 0; i < types.length; i++) {
+            if (i > 0) System.out.print(sep);
+            printType(types[i], isDefinition);
+        }
+        if (types.length > 0) System.out.print(suf);
+    }
+
+    public static void printType(Type type, boolean isDefinition) {
+        if (type instanceof Class t) { // 描述具体类型
+            System.out.print(t.getName());
+        } else if (type instanceof TypeVariable t) { // 描述类型变量(如 T extends Comparable<? super T> )
+            System.out.print(t.getName());
+            if (isDefinition)
+                printTypes(t.getBounds(), " extends ", " & ", "", false);
+        } else if (type instanceof WildcardType t) { // 描述通配符 (如?super T )
+            System.out.print("?");
+            printTypes(t.getUpperBounds(), " extends ", " & ", "", false);
+            printTypes(t.getLowerBounds(), " super ", " & ", "", false);
+        } else if (type instanceof ParameterizedType t) { // 描述泛型类或接口类型(如 Comparable<? super T> 。)
+            Type owner = t.getOwnerType();
+            if (owner != null) {
+                printType(owner, false);
+                System.out.print(".");
+            }
+            printType(t.getRawType(), false);
+            printTypes(t.getActualTypeArguments(), "<", ", ", ">", false);
+        } else if (type instanceof GenericArrayType t) { // 描述泛型数组(如 T[ ]。)
+            System.out.print("");
+            printType(t.getGenericComponentType(), isDefinition);
+            System.out.print("[]");
+        }
     }
 
     // 只能获取超类上的泛型信息，使用场景十分的有限
