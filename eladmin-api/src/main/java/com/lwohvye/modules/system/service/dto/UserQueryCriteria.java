@@ -65,8 +65,9 @@ public class UserQueryCriteria implements Serializable {
     private String description;
 
     /**
+     * 重写set方法。将前端传的逗号分割的username，转成字符集合，并设置到另一个字段中
+     *
      * @param usernameStr
-     * @description 重写set方法。将前端传的逗号分割的username，转成字符集合，并设置到另一个字段中
      * @date 2021/3/10 22:12
      */
     public void setUsernameStr(String usernameStr) {

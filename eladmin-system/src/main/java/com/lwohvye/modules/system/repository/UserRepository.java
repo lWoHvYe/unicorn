@@ -46,11 +46,12 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     <T> T findByUsername(String username, Class<T> clazz);
 
     /**
+     * 若配置了Graph图，则查询会变成查满足条件的所有。然后内存分页。故分页类查询不建议使用。下面两个只作为存档。
+     * 但一些根据特定条件只过滤出很少记录的，可以考虑使用，比如这里的根据id、name等的查询
+     *
      * @param spec
      * @param pageable
      * @return org.springframework.data.domain.Page
-     * @description 若配置了Graph图，则查询会变成查满足条件的所有。然后内存分页。故分页类查询不建议使用。下面两个只作为存档。
-     * 但一些根据特定条件只过滤出很少记录的，可以考虑使用，比如这里的根据id、name等的查询
      * @date 2021/11/9 10:05 下午
      */
     @Override
@@ -168,9 +169,10 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     int countByDepts(Set<Long> deptIds);
 
     /**
-     * @param deptIds
+     * 优化：使用exists判断是否存在
+     *
+     * @param deptIds /
      * @return java.lang.Boolean
-     * @description 优化：使用exists判断是否存在
      * @date 2021/6/15 1:27 下午
      */
     // 这种有连接查询。但除了id还支持别的 select user0_.user_id as col_0_0_ from sys_user user0_ left outer join sys_dept dept1_ on user0_.dept_id=dept1_.dept_id where dept1_.dept_id in (17 , 2) limit 1

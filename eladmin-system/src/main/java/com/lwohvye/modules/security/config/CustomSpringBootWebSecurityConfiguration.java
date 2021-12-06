@@ -34,9 +34,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
+ * 多个策略配置。欲使用，可在配置文件中开启
+ *
  * @author Hongyan Wang
  * @date 2021/11/28 10:24 上午
- * @description 多个策略配置。欲使用，可在配置文件中开启
  * @see org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration
  */
 @ConditionalOnExpression("${local.sys.multi-security:false}")

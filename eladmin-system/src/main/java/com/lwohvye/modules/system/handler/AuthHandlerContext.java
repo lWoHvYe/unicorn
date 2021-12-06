@@ -21,8 +21,9 @@ import org.springframework.util.Assert;
 import java.util.Map;
 
 /**
+ * 策略模式上下文，该类的注入由相关的HandlerProcessor实现
+ *
  * @author Hongyan Wang
- * @description 策略模式上下文，该类的注入由相关的HandlerProcessor实现
  * @date 2021年11月02日 16:33
  * @see AuthHandlerProcessor
  */
@@ -30,9 +31,10 @@ import java.util.Map;
 public record AuthHandlerContext(Map<Integer, AUserTypeHandler> handlerMap) {
 
     /**
+     * 获取实例。handlerMap由另一个类来初始化
+     *
      * @param userType /
      * @return com.lwohvye.modules.system.handler.AUserTypeHandler
-     * @description 获取实例。handlerMap由另一个类来初始化
      * @date 2021/11/2 17:10
      */
     public AUserTypeHandler getInstance(Integer userType) {

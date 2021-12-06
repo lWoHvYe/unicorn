@@ -24,7 +24,8 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @description 主动返回数据
+ * 主动返回数据
+ *
  * @date 2021/11/15 7:19 下午
  */
 public class ResultUtil {

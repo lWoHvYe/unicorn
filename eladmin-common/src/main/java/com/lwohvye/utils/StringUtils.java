@@ -148,9 +148,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
+     * 只把首字母转小写。
+     *
      * @param s
      * @return java.lang.String
-     * @description 只把首字母转小写。
      * @date 2021/7/13 11:53 上午
      */
     public static String lowerFirstChar(String s) {
@@ -163,9 +164,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
+     * 只把首字母转大写。
+     *
      * @param s
      * @return java.lang.String
-     * @description 只把首字母转大写。
      * @date 2021/7/13 11:54 上午
      */
     public static String upperFirstChar(String s) {
@@ -312,9 +314,10 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
-     * @return java.lang.String
-     * @description 将使用ISO-8859-1编码导致乱码的中文，使用UTF-8重新编码
+     * 将使用ISO-8859-1编码导致乱码的中文，使用UTF-8重新编码
      * 当前用于使用String存储数据库中blob类型属性时，解决返回数据乱码问题
+     *
+     * @return java.lang.String
      * @params [str]
      * @date 2020/11/13 9:40
      */

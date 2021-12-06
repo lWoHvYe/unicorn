@@ -39,8 +39,9 @@ public class TheadFactoryName implements ThreadFactory {
     }
 
     /**
+     * SecurityManager相关参考：https://www.lwohvye.com/2021/11/23/java%e5%ae%89%e5%85%a8%ef%bc%9asecuritymanager%e4%b8%8eaccesscontroller/
+     *
      * @param name /
-     * @description SecurityManager相关参考：https://www.lwohvye.com/2021/11/23/java%e5%ae%89%e5%85%a8%ef%bc%9asecuritymanager%e4%b8%8eaccesscontroller/
      * @date 2021/11/23 3:32 下午
      */
     private TheadFactoryName(String name) {

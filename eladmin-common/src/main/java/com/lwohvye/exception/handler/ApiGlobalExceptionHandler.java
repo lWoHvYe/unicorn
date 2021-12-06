@@ -50,7 +50,7 @@ public class ApiGlobalExceptionHandler {
     /**
      * 处理所有未知异常 Throwable
      *
-     * @param e
+     * @param e /
      * @return ResponseEntity
      */
     @ResponseBody
@@ -63,7 +63,7 @@ public class ApiGlobalExceptionHandler {
     /**
      * 处理实体已存在异常 EntityExistException
      *
-     * @param e
+     * @param e /
      * @return ResponseEntity
      */
     @ResponseBody
@@ -76,7 +76,7 @@ public class ApiGlobalExceptionHandler {
     /**
      * 处理实体不存在异常 EntityNotFoundException
      *
-     * @param e
+     * @param e /
      * @return ResponseEntity
      */
     @ResponseBody
@@ -89,7 +89,7 @@ public class ApiGlobalExceptionHandler {
     /**
      * 处理自定义异常 BadRequestException
      *
-     * @param e
+     * @param e /
      * @return ResponseEntity
      */
     @ResponseBody
@@ -100,9 +100,10 @@ public class ApiGlobalExceptionHandler {
     }
 
     /**
-     * @param e
+     * 使用Assert可能抛出的异常
+     *
+     * @param e /
      * @return org.springframework.http.ResponseEntity
-     * @description 使用Assert可能抛出的异常
      * @date 2021/6/1 1:14 下午
      */
     @ResponseBody
@@ -122,7 +123,7 @@ public class ApiGlobalExceptionHandler {
     /**
      * 处理无权限访问异常 AccessDeniedException 403
      *
-     * @param e
+     * @param e /
      * @return ResponseEntity
      */
     @ResponseBody
@@ -135,7 +136,7 @@ public class ApiGlobalExceptionHandler {
     /**
      * 处理请求方法不支持的异常 HttpRequestMethodNotSupportedException
      *
-     * @param e
+     * @param e /
      * @return ResponseEntity
      */
     @ResponseBody
@@ -148,7 +149,7 @@ public class ApiGlobalExceptionHandler {
     /**
      * 处理请求参数不正确的异常 HttpRequestMethodNotSupportedException
      *
-     * @param e
+     * @param e /
      * @return ResponseEntity
      */
     @ResponseBody
@@ -164,9 +165,10 @@ public class ApiGlobalExceptionHandler {
     }
 
     /**
+     * 添加或更新的数据中有非空字段设置为null。或者未使用级联删除外键，均会出此异常
+     *
      * @return org.springframework.http.ResponseEntity
-     * @description 添加或更新的数据中有非空字段设置为null。或者未使用级联删除外键，均会出此异常
-     * @params [e]
+     * @params e /
      * @date 2021/1/9 21:42
      */
     @ResponseBody

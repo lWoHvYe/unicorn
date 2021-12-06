@@ -34,11 +34,12 @@ import java.util.Set;
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
 
     /**
+     * 重写查询所有的方法，指定EntityGraph。查询就从多条查询变成了一条关联查询。但分页会变成内存分页。实际业务中，数据量大时不建议使用
+     * 在多对多的关系中，若存在关联关系，但另一方已经不在了，在总查询后，还会有对不存在的那条的单查询（根据id查实体）。这时就会报错不存在。因此需要把关联表维护好，不要出现脏数据
+     *
      * @param spec
      * @param pageable
      * @return org.springframework.data.domain.Page
-     * @description 重写查询所有的方法，指定EntityGraph。查询就从多条查询变成了一条关联查询。但分页会变成内存分页。实际业务中，数据量大时不建议使用
-     * 在多对多的关系中，若存在关联关系，但另一方已经不在了，在总查询后，还会有对不存在的那条的单查询（根据id查实体）。这时就会报错不存在。因此需要把关联表维护好，不要出现脏数据
      * @date 2021/11/6 12:09 上午
      */
     // An entity graph can be used as a fetch or a load graph.
@@ -99,9 +100,10 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
     int countByDepts(Set<Long> deptIds);
 
     /**
+     * 这里会多连一张表。虽然也只是通过dept.id筛选。这里主要验证in一个entity类型的变量
+     *
      * @param depts
      * @return java.lang.Boolean
-     * @description 这里会多连一张表。虽然也只是通过dept.id筛选。这里主要验证in一个entity类型的变量
      * @date 2021/6/15 2:14 下午
      */
 //    select role0_.role_id as col_0_0_ from sys_role role0_ left outer join sys_roles_depts depts1_

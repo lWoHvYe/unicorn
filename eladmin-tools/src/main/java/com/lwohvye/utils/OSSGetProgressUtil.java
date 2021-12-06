@@ -27,8 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 
 /**
+ * 上传/下载进度条，适用于一般的上传下载，不适用断点和分片
+ *
  * @author Hongyan Wang
- * @description 上传/下载进度条，适用于一般的上传下载，不适用断点和分片
  * @date 2021/9/5 17:37
  */
 @Slf4j

@@ -41,7 +41,8 @@ public class ResultInfo<T> implements IResultInfo<T> {
     private LocalDateTime currentTime;
 
     /**
-     * @description 普通实体，用result字段返回
+     * 普通实体，用result字段返回
+     *
      * @params [businessCode, t, description]
      * @date 2021/2/6 8:33
      */
@@ -53,7 +54,8 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @description list类依旧参照分页。包含content和totalElements
+     * list类依旧参照分页。包含content和totalElements
+     *
      * @params [businessCode, resultSet, description]
      * @date 2021/2/6 8:36
      */
@@ -66,7 +68,8 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @description map根据是否是page，如果是page类。返回content和totalElements；如果是普通map，返回resultMap
+     * map根据是否是page，如果是page类。返回content和totalElements；如果是普通map，返回resultMap
+     *
      * @params [businessCode, objectMap, description]
      * @date 2021/2/6 8:37
      */
@@ -95,7 +98,8 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @description page类返回content和totalElements
+     * page类返回content和totalElements
+     *
      * @params [businessCode, page, description]
      * @date 2021/2/6 8:38
      */
@@ -108,8 +112,9 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
+     * 只是返回成功状态。无其他结果集
+     *
      * @return com.lwohvye.utils.result.ResultInfo<T>
-     * @description 只是返回成功状态。无其他结果集
      * @params []
      * @date 2021/1/9 9:39
      */

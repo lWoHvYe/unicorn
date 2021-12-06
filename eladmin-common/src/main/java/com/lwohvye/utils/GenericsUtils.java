@@ -21,26 +21,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @description 具体较复杂，这里只做留档，标识可以通过一些方法获取到T.class
+ * 具体较复杂，这里只做留档，标识可以通过一些方法获取到T.class
  * <a href="https://www.lwohvye.com/2021/12/05/java%e4%b8%ad%e7%9a%84class%e7%b1%bb/">Class.java</a>
+ *
  * @date 2021/11/13 5:49 下午
  */
 public class GenericsUtils {
     /**
+     * 通过反射, 获得定义Class时声明的父类的范型参数的类型.
+     * 如public BookManager extends GenricManager<Book>
+     *
      * @param clazz The class to introspect
      * @return the first generic declaration, or <code>Object.class</code> if cannot be determined
-     * @description 通过反射, 获得定义Class时声明的父类的范型参数的类型.
-     * 如public BookManager extends GenricManager<Book>
      */
     public static Class getSuperClassGenricType(Class clazz) {
         return getSuperClassGenricType(clazz, 0);
     }
 
     /**
+     * 通过反射, 获得定义Class时声明的父类的范型参数的类型.需注意拿的是父类的
+     * 如public BookManager extends GenricManager<Book>
+     *
      * @param clazz clazz The class to introspect
      * @param index the Index of the generic declaration,start from 0.
-     * @description 通过反射, 获得定义Class时声明的父类的范型参数的类型.需注意拿的是父类的
-     * 如public BookManager extends GenricManager<Book>
      */
     public static Class getSuperClassGenricType(Class clazz, int index) throws IndexOutOfBoundsException {
         // 返回表示此 Class 所表示的实体（类、接口、基本类型或 void）的直接超类的 Type。

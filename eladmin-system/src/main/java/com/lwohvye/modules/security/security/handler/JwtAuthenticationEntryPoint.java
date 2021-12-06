@@ -24,12 +24,12 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Objects;
 
 /**
+ * AuthenticationEntryPoint 用来解决匿名（未登陆）用户访问无权限资源时的异常
+ *
  * @author Zheng Jie
- * @description AuthenticationEntryPoint 用来解决匿名（未登陆）用户访问无权限资源时的异常
  */
 @Slf4j
 @Component

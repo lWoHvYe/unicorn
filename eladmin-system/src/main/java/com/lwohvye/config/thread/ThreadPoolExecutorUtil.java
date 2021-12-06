@@ -22,8 +22,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 用于获取自定义线程池。当前用于定时任务的执行
+ *
  * @author Zheng Jie
- * @description 用于获取自定义线程池。当前用于定时任务的执行
  * @date 2019年10月31日18:16:47
  */
 public class ThreadPoolExecutorUtil {

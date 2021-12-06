@@ -43,12 +43,13 @@ public class DySMSUtil {
     }
 
     /**
+     * 发送短信
+     *
      * @param phoneNumbers
      * @param signName
      * @param templateCode
      * @param templateParam
      * @return java.lang.String
-     * @description 发送短信
      * @date 2021/11/7 12:53 下午
      */
     @SneakyThrows
@@ -71,9 +72,10 @@ public class DySMSUtil {
     }
 
     /**
+     * 查询结果
+     *
      * @param phoneNumbers
      * @param bizId
-     * @description 查询结果
      * @date 2021/11/7 12:52 下午
      */
     @SneakyThrows

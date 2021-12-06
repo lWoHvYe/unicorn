@@ -80,7 +80,8 @@ public class LogServiceImpl implements ILogService {
     }
 
     /**
-     * @description 日志为异步写的。不影响相关的业务
+     * 日志为异步写的。不影响相关的业务
+     *
      * @params [username, browser, ip, joinPoint, log]
      * @date 2021/3/25 23:39
      */

@@ -22,8 +22,9 @@ import com.lwohvye.annotation.String4Blob;
 import java.util.Arrays;
 
 /**
+ * 将实体中乱码的String正常转码
+ *
  * @author Hongyan Wang
- * @description 将实体中乱码的String正常转码
  * @date 2021年04月01日 0:13
  */
 public class ConvertString4BlobUtil<T> {

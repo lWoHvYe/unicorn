@@ -29,8 +29,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * App启动入口
+ *
  * @author Zheng Jie
- * @description App启动入口
  * @date 2018/11/15 9:20:19
  */
 @EnableAsync // 开启异步
@@ -50,8 +51,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AppRun {
 
     /**
+     * Spring Boot入口
+     *
      * @param args /
-     * @description Spring Boot入口
      * @date 2021/11/23 9:43 上午
      */
     public static void main(String[] args) {
@@ -59,7 +61,8 @@ public class AppRun {
     }
 
     /**
-     * @description 注入Bean对象。用于从ApplicationContext中获取bean实例等
+     * 注入Bean对象。用于从ApplicationContext中获取bean实例等
+     *
      * @date 2021/11/23 9:42 上午
      */
     @Bean
@@ -68,8 +71,9 @@ public class AppRun {
     }
 
     /**
+     * 访问首页提示
+     *
      * @return /
-     * @description 访问首页提示
      */
     @AnonymousGetMapping("/")
     public String index() {

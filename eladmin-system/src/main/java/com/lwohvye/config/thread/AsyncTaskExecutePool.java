@@ -25,12 +25,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * @author https://juejin.im/entry/5abb8f6951882555677e9da2
- * @description 异步任务线程池装配类。当前用于@Async。异步执行
+ * 异步任务线程池装配类。当前用于@Async。异步执行
  * 自定义线程池有如下模式：
  * 重新实现接口AsyncConfigurer
  * 继承AsyncConfigurerSupport
  * 配置由自定义的TaskExecutor替代内置的任务执行器
+ *
+ * @author https://juejin.im/entry/5abb8f6951882555677e9da2
  * @date 2019年10月31日15:06:18
  */
 @Slf4j

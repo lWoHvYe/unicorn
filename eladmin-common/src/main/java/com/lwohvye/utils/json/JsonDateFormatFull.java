@@ -24,9 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @author liangming.deng
- * @description jackson日期转换工具类
+ * jackson日期转换工具类
  * 这里似乎影响了json的时间格式化，包括http返回的
+ *
+ * @author liangming.deng
  */
 public class JsonDateFormatFull extends JsonSerializer<Date> {
 

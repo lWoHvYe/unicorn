@@ -23,8 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 时间轮
+ *
  * @author Hongyan Wang
- * @description 时间轮
  * @date 2021年10月26日 12:33
  */
 @Slf4j

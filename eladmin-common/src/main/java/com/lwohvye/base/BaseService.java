@@ -19,8 +19,9 @@ import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.exception.NeedImplementException;
 
 /**
+ * Service层部分公共方法
+ *
  * @author Hongyan Wang
- * @description Service层部分公共方法
  * @date 2021/6/17 5:07 下午
  */
 public interface BaseService {
@@ -31,8 +32,9 @@ public interface BaseService {
     }
 
     /**
-     * @description 部分场景下，在类初始化完成后，执行部分额外操作
+     * 部分场景下，在类初始化完成后，执行部分额外操作
      * 通过抛异常的方式，限制必须手动实现
+     *
      * @date 2021/7/18 19:06
      */
     default void doInit() {

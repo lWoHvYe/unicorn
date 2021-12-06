@@ -17,7 +17,8 @@
 package com.lwohvye.modules.mnt.domain;
 
 /**
- * @description 树
+ * 树
+ *
  * @date 2021/11/6 10:11 上午
  */
 public class TreeNode {

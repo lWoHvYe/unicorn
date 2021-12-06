@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 </#if>
 
 /**
-* @website https://el-admin.vip
-* @description /
+*
+* @website https://lwohvye.com
 * @author ${author}
 * @date ${date}
 **/

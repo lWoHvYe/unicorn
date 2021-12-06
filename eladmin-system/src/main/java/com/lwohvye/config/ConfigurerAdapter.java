@@ -115,8 +115,9 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     }
 
     /**
+     * 对向前端返回的数据，日期格式化。
+     *
      * @param converters /
-     * @description 对向前端返回的数据，日期格式化。
      * @date 2021/11/25 10:04 上午
      */
     @Override

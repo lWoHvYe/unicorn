@@ -28,12 +28,13 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Component;
 
 /**
+ * 用于捕获Controller层异常，转化为失败信息，与{@link ResultModel}配合使用
+ * AOP方案也只是做异常处理。可以使用全局异常处理的方式替换。参照这个https://www.lwohvye.com/2021/01/07/736/
+ * 这个可以借鉴的是，通过以某个类型为切点，可以在方法执行前后做些事情。不同于日志
+ *
  * @author Hongyan Wang
  * @packageName com.lwohvye.aop
  * @className ControllerAopAspect
- * @description 用于捕获Controller层异常，转化为失败信息，与{@link ResultModel}配合使用
- * AOP方案也只是做异常处理。可以使用全局异常处理的方式替换。参照这个https://www.lwohvye.com/2021/01/07/736/
- * 这个可以借鉴的是，通过以某个类型为切点，可以在方法执行前后做些事情。不同于日志
  * @date 2020/1/14 13:45
  * @see com.lwohvye.exception.handler.ApiGlobalExceptionHandler 新的统一异常处理
  * @see com.lwohvye.utils.result.ResultInfo 统一结果返回
@@ -46,7 +47,8 @@ import org.springframework.stereotype.Component;
 public class ControllerAopAspect {
 
     /**
-     * @description 定义切点，使用指定实体类ResultModel为返回值的public方法作为切点
+     * 定义切点，使用指定实体类ResultModel为返回值的public方法作为切点
+     *
      * @date 2020/1/14 14:24
      */
     @Pointcut("execution(public com.lwohvye.*.ResultModel *(..))")

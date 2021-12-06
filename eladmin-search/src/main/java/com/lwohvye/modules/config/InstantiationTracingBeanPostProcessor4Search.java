@@ -25,10 +25,11 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import java.util.Objects;
 
 /**
+ * 当Spring将所有的Bean都初始化完成后，会留有一个入口，通过实现如下接口，可在此阶段进行部分业务
+ * 与  @PostConstruct 的区别在于，此时ApplicationContext已可以获取到
+ *
  * @author Hongyan Wang
  * @date 2021年07月18日 18:15
- * @description 当Spring将所有的Bean都初始化完成后，会留有一个入口，通过实现如下接口，可在此阶段进行部分业务
- * 与  @PostConstruct 的区别在于，此时ApplicationContext已可以获取到
  */
 @Configuration
 public class InstantiationTracingBeanPostProcessor4Search implements ApplicationListener<ContextRefreshedEvent> {

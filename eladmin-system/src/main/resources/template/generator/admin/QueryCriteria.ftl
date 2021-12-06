@@ -30,7 +30,7 @@ import com.lwohvye.annotation.Query;
 </#if>
 
 /**
-* @website https://el-admin.vip
+* @website https://lwohvye.com
 * @author ${author}
 * @date ${date}
 **/

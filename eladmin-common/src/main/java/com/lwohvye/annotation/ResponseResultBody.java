@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.lang.annotation.*;
 
 /**
+ * 通用返回注解
+ *
  * @author Hongyan Wang
- * @description 通用返回注解
  * @date 2021/1/15 19:44
  */
 @Retention(RetentionPolicy.RUNTIME)

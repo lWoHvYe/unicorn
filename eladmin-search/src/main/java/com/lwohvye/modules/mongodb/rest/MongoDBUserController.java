@@ -45,7 +45,8 @@ public class MongoDBUserController {
     private IMongoDBUserService mongoDBUserService;
 
     /**
-     * @description 启动成功后调用，执行部分初始化
+     * 启动成功后调用，执行部分初始化
+     *
      * @date 2021/7/18 18:48
      */
     //    @PostConstruct

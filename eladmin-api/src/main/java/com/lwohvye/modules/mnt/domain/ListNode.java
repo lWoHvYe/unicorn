@@ -17,8 +17,9 @@
 package com.lwohvye.modules.mnt.domain;
 
 /**
+ * 链表实体类
+ *
  * @author Hongyan Wang
- * @description 链表实体类
  * @date 2020/12/13 11:18
  */
 public class ListNode {

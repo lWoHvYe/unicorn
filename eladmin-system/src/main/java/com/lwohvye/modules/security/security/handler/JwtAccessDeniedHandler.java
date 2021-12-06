@@ -24,12 +24,12 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Objects;
 
 /**
+ * AccessDeniedHandler 用来解决认证过的用户访问无权限资源时的异常
+ *
  * @author Zheng Jie
- * @description AccessDeniedHandler 用来解决认证过的用户访问无权限资源时的异常
  */
 @Slf4j
 @Component

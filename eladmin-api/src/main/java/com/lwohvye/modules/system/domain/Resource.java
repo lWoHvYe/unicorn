@@ -34,7 +34,6 @@ import java.util.Set;
 /**
  * @author Super idol lv
  * @website https://el-admin.vip
- * @description /
  * @date 2021-11-27
  **/
 @Entity

@@ -66,7 +66,8 @@ public class AuthRetryService {
     }
 
     /**
-     * @description -----------------------------------------------------------------------------------------
+     * -----------------------------------------------------------------------------------------
+     *
      * @EnableRetry – 表示开启重试机制
      * 对于@EnableRetry中的proxyTargetClass参数，是控制是否使用Cglib动态代理，默认的情况下为false，表示使用Jdk动态代理。
      * ------------------------------------------------------------------------------------------------------
@@ -120,11 +121,9 @@ public class AuthRetryService {
     }
 
     /**
-     * @param e
-     * @description 在@Retryable多次重试失败后，调用该方法。
+     * 在@Retryable多次重试失败后，调用该方法。
      * 要触发@Recover标记的方法，@Retryable标记的方法不能有返回值，只能是void才能触发。
-     * @Recover标记的方法的第一入参要与发生的异常一至，才会被调用
-     * @date 2021/10/19 16:03
+     * 被@Recover标记的方法的第一入参要与发生的异常一至，才会被调用
      */
     @Recover
     public void recover(IllegalAccessException e) {

@@ -29,6 +29,7 @@ import java.util.Objects;
  * 收尾：https://www.lwohvye.com/2020/12/01/manytomany%e6%88%96onetomany-manytoone%e5%af%bc%e8%87%b4%e5%be%aa%e7%8e%af%e4%be%9d%e8%b5%96%e7%9a%84%e9%97%ae%e9%a2%98-java-lang-stackoverflowerror-jpa/
  *
  * @author Andreas Gudian
+ * @since 2.6.16
  */
 public class CycleAvoidingMappingContext {
     // 因为是私有的，似乎是没太大用途
@@ -47,10 +48,11 @@ public class CycleAvoidingMappingContext {
     }
 
     /**
+     * smallDto中的属性，必须为原始侧的子集
+     *
      * @param targetType Class for smallDto
      * @param obj        原始侧Dto
      * @return T         smallDto的实例
-     * @description smallDto中的属性，必须为原始侧的子集
      * @date 2021/11/10 12:38 上午
      */
     private <T> T genT(Class<T> targetType, Object obj) {
@@ -67,11 +69,18 @@ public class CycleAvoidingMappingContext {
             // 下面的反射，底层还是 field.get()获取属性、field.set()设置属性
             ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
         }
-        // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时
-//        return JSON.parseObject(JSON.toJSONString(obj), targetType);
+        // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时。这是不使用反射时，另一种处理方式
+        // return JsonUtils.toJavaObject(obj, targetType);
         return t;
     }
 
+    /**
+     * 存储进map中
+     *
+     * @param source key
+     * @param target val
+     * @date 2021/12/6 2:32 PM
+     */
     @BeforeMapping
     public void storeMappedInstance(Object source, @MappingTarget Object target) {
         knownInstances.put(source, target);

@@ -41,7 +41,8 @@ public class MongoDBUserServiceIOCImpl implements IMongoDBUserService {
     private MongoDBUserRepository mongoDBUserRepository;
 
     /**
-     * @description SPI只能调用无参构造，所以要用这种方式来为属性赋值
+     * SPI只能调用无参构造，所以要用这种方式来为属性赋值
+     *
      * @date 2021/7/18 15:50
      */
 //    @PostConstruct

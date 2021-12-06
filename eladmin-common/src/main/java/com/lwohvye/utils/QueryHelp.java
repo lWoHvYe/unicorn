@@ -37,12 +37,13 @@ import java.util.*;
 public class QueryHelp {
 
     /**
+     * 解析属性上的查询注解。贫瘠相应的查询
+     *
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象
      * @param cb    CriteriaBuilder工厂类，用于创建查询的criteriaQuery对象
      *              Predicate查询条件的拼接对应于where后面的添加表达式
      * @return javax.persistence.criteria.Predicate
-     * @description 解析属性上的查询注解。贫瘠相应的查询
      * @date 2021/3/31 11:57
      */
     public static <R, Q> Predicate getPredicate(Root<R> root, Q query, CriteriaBuilder cb) {
@@ -98,10 +99,11 @@ public class QueryHelp {
     }
 
     /**
+     * 数据权限验证
+     *
      * @param root  /
      * @param query /
      * @param list  /
-     * @description 数据权限验证
      * @date 2021/11/7 4:36 下午
      */
     private static <R, Q> void analyzeDataPermission(Root<R> root, Q query, ArrayList<Predicate> list) {
@@ -122,12 +124,13 @@ public class QueryHelp {
     }
 
     /**
+     * 解析joinType
+     *
      * @param root     /
      * @param q        /
      * @param joinName /
      * @param val      /
      * @return javax.persistence.criteria.Join
-     * @description 解析joinType
      * @date 2021/6/24 10:52 上午
      */
     private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, String joinName, Object val) {
@@ -184,6 +187,8 @@ public class QueryHelp {
     }
 
     /**
+     * 解析query.type()。抽取主要为了方便调用
+     *
      * @param root          /
      * @param cb            /
      * @param list          /
@@ -193,7 +198,6 @@ public class QueryHelp {
      * @param cecType       这个参数只是为了解决几个警告，因为fieldType不一定extends Comparable，所以加了这个。实际环境下可移除该属性
      * @param val           /
      * @param join          /
-     * @description 解析query.type()。抽取主要为了方便调用
      * @date 2021/6/24 10:52 上午
      */
     // ? extends E:接收E类型或者E的子类型。

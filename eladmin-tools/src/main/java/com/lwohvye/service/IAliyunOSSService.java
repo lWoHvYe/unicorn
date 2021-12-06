@@ -23,16 +23,18 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IAliyunOSSService {
 
     /**
+     * 分片上传
+     *
      * @param file
-     * @description 分片上传
      * @date 2021/9/5 17:12
      */
     void multipartUploadFile(MultipartFile file);
 
     /**
+     * 断点续传下载
+     *
      * @param ossUri       oss地址（无前缀）
      * @param downloadPath (下载路径)
-     * @description 断点续传下载
      * @date 2021/9/5 17:12
      */
     void downloadFile(String ossUri, String downloadPath);

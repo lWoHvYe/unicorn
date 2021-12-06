@@ -86,9 +86,10 @@ public class AuthorizationController {
     }
 
     /**
+     * Redisson中lock的使用
+     *
      * @param request
      * @return org.springframework.http.ResponseEntity
-     * @description Redisson中lock的使用
      * @date 2021/10/27 13:35
      */
     @Hidden

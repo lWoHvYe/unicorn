@@ -121,9 +121,10 @@ public class TokenProvider implements InitializingBean {
     }
 
     /**
-     * @param createdDate
+     * 计算过期时间
+     *
+     * @param createdDate /
      * @return java.util.Date
-     * @description 计算过期时间
      * @date 2021/11/13 11:10 上午
      */
     private Date calculateExpirationDate(Date createdDate) {

@@ -28,8 +28,9 @@ import java.util.HashMap;
 import java.util.Objects;
 
 /**
+ * 策略模式，处理type与实现类的映射关系
+ *
  * @author Hongyan Wang
- * @description 策略模式，处理type与实现类的映射关系
  * @date 2021年11月02日 16:34
  */
 @Slf4j

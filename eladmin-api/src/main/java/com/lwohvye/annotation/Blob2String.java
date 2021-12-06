@@ -23,8 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 针对String取blob类型乱码问题
+ *
  * @author Hongyan Wang
- * @description 针对String取blob类型乱码问题
  * @date 2021/3/15 8:16 下午
  */
 @Qualifier
