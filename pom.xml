@@ -90,7 +90,7 @@
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.0.1</logstash.version>
         <logback.version>1.2.7</logback.version>
-        <redisson.version>3.16.5</redisson.version>
+        <redisson.version>3.16.6</redisson.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
