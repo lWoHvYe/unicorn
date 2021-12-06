@@ -38,6 +38,7 @@ import java.util.Objects;
  * @date 2019-01-07
  */
 @Slf4j
+@SuppressWarnings("unused")
 public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
 
     //    Spring应用上下文环境
@@ -204,7 +205,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      */
     private static void assertContextInjected() {
         if (Objects.isNull(applicationContext))
-            throw new IllegalStateException("applicaitonContext属性未注入, 请在applicationContext.xml中定义SpringContextHolder或在SpringBoot启动类中注册SpringContextHolder.");
+            throw new IllegalStateException("applicationContext属性未注入, 请在applicationContext.xml中定义SpringContextHolder或在SpringBoot启动类中注册SpringContextHolder.");
     }
 
     /**

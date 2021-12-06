@@ -1957,7 +1957,7 @@ public class RedisUtils {
                         // 如果锁已经过期
                         byte[] oldValue = redisConnection.getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + lockExpire + 1).getBytes());
                         // 防止死锁
-                        assert oldValue != null;
+                        Assert.notNull(oldValue, "入参有误，原值不可为空");
                         return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
                     }
                 }

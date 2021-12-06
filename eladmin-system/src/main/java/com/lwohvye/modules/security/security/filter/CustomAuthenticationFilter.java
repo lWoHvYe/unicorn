@@ -25,6 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +50,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             try (InputStream is = request.getInputStream()) {
                 var authUser = JsonUtils.toJavaObject(is, AuthUserDto.class);
 
-                assert authUser != null;
+                // assert authUser != null; // 在jvm中，通过-ea开启断言，该方式只适合与测试环节，正式参数校验建议用Assert系列，底层为抛出异常
+                Assert.notNull(authUser, "用户信息不可为空");
                 var username = authUser.getUsername();
                 username = StringUtils.isNotBlank(username) ? username : "";
 
