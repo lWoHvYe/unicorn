@@ -24,6 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
@@ -80,9 +81,9 @@ public class BaseEntity implements Serializable {
     }
 
     @Override
-    public String toString() {
+    public String toString() { // 通用的ToString方法
         ToStringBuilder builder = new ToStringBuilder(this);
-        Field[] fields = this.getClass().getDeclaredFields();
+        Field[] fields = this.getClass().getDeclaredFields(); // 这里只获取本类的全部域
         try {
             for (Field f : fields) {
                 f.setAccessible(true);
