@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * 因为兼容多数据源。当前需配合system模块中的相关配置类一起使用，需注意
  */
 @Component
-//@SuppressWarnings({"unchecked", "all"})
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class RedisUtils {
     private static final Logger log = LoggerFactory.getLogger(RedisUtils.class);
     //    允许同一包下，及子类访问

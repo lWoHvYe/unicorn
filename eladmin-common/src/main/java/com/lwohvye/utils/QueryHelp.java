@@ -33,7 +33,7 @@ import java.util.*;
  */
 @Slf4j
 // @SuppressWarnings 抑制警告 https://www.lwohvye.com/2021/12/05/suppresswarnings%e6%b3%a8%e8%a7%a3%e7%94%a8%e6%b3%95/
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class QueryHelp {
 
     /**
@@ -57,9 +57,7 @@ public class QueryHelp {
             for (var field : fields) {
 //                field.canAccess(filed对应的查询器实例)
                 var accessible = field.canAccess(query);
-//                boolean accessible = field.isAccessible();
-//                if (ObjectUtil.notEqual(accessible, field.isAccessible()))
-//                    throw new RuntimeException("编码有误" + field.toString() + accessible);
+                // boolean accessible = field.isAccessible(); // 方法已过期，改用canAccess
                 // 设置对象的访问权限，保证对private的属性的访
                 field.setAccessible(true);
                 Query q = field.getAnnotation(Query.class);
@@ -73,7 +71,6 @@ public class QueryHelp {
                     if (Objects.isNull(val) || Objects.equals("", val)) {
                         continue;
                     }
-                    Join<R, ?> join = null;
                     // 模糊多字段
                     if (StringUtils.isNotBlank(blurry)) {
                         var blurrys = blurry.split(",");
@@ -87,7 +84,7 @@ public class QueryHelp {
                         continue;
                     }
                     // 解析join类型
-                    join = analyzeJoinType(root, q, joinName, val, join);
+                    var join = analyzeJoinType(root, q, joinName, val);
                     // 解析查询类型
                     analyzeQueryType(root, cb, list, q, attributeName, fieldType, val instanceof Comparable<?> cec ? cec.getClass() : null, val, join);
                 }
@@ -112,12 +109,12 @@ public class QueryHelp {
         if (permission != null) {
             // 获取数据权限
             var dataScopes = SecurityUtils.getCurrentUserDataScope();
-            if (CollUtil.isNotEmpty(dataScopes)) {
-                if (StringUtils.isNotBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
+            if (CollUtil.isNotEmpty(dataScopes) && StringUtils.isNotBlank(permission.fieldName())) {
+                if (StringUtils.isNotBlank(permission.joinName())) {
                     // 因为首先处理这部分，不必担心join重复。这里用var的化，join的类型会是Join<Object, Object>
                     Join<R, ?> join = root.join(permission.joinName(), JoinType.LEFT);
                     list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
-                } else if (StringUtils.isBlank(permission.joinName()) && StringUtils.isNotBlank(permission.fieldName())) {
+                } else {
                     list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
                 }
             }
@@ -129,12 +126,12 @@ public class QueryHelp {
      * @param q        /
      * @param joinName /
      * @param val      /
-     * @param join     /
      * @return javax.persistence.criteria.Join
      * @description 解析joinType
      * @date 2021/6/24 10:52 上午
      */
-    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, String joinName, Object val, Join<R, ?> join) {
+    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, String joinName, Object val) {
+        Join<R, ?> join = null;
         if (StringUtils.isNotBlank(joinName)) {
             // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
             // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
@@ -212,15 +209,12 @@ public class QueryHelp {
                 list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
                 break;
             case GREATER_THAN:
-                // 虽然会⚠️，但这里是不能这么写的 val instanceof Comparable<?> ele。报错与pt3一致
-                // if (val instanceof Comparable ele) { 这个没什么必要
                 // var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
                 // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
                 //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
                 //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
                 //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
                 list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
-                // } 跟上面的后续一起移除
                 break;
             case LESS_THAN:
                 list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
@@ -401,6 +395,7 @@ public class QueryHelp {
 
     public static <T> List<Field> getAllFields(Class<T> clazz, List<Field> fields) {
         if (clazz != null) {
+            // getDeclaredFields返回该类的全部域，包括私有域，但不包括超类的域，所以要递归调用
             fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
             getAllFields(clazz.getSuperclass(), fields);
         }
