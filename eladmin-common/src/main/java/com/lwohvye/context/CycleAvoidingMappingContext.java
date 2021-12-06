@@ -60,8 +60,11 @@ public class CycleAvoidingMappingContext {
 
         var t = ReflectUtil.newInstance(targetType);
         // targetType.getFields()只能获取到非私有的属性。所以还是需要反射来获取
+        // targetType.getDeclaredFields() 可以获取本类中的所有域，不包括从超类继承的
+        // 所以还是使用ReflectUtil.getFields(targetType)，获取全部的域，包括从超类继承的
         for (Field field : ReflectUtil.getFields(targetType)) {
             // 获取不到属性会报错哦。并且需注意，从obj取时，要使用fieldName，因为field是t中的属性
+            // 下面的反射，底层还是 field.get()获取属性、field.set()设置属性
             ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
         }
         // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时

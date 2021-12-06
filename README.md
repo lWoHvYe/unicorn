@@ -16,7 +16,7 @@
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围。 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
-后台运行jar（开启远程调试端口5005）
+后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和 System.out。
 
 ```shell
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-3.0.0.jar >nohup.out 2>&1 &
