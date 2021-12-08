@@ -16,6 +16,7 @@
 package com.lwohvye.modules.security.rest;
 
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.modules.security.config.bean.LoginProperties;
@@ -36,9 +37,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Zheng Jie
@@ -109,6 +111,41 @@ public class AuthorizationController {
         var sysName = session.getAttribute("sysName");
 
         // ---------------------------------锁相关---------------------------------------------
+
+        // region Java 锁
+        var reentrantLock = new ReentrantLock();
+        var condition = reentrantLock.newCondition(); // 条件对象
+        reentrantLock.lock();
+        try {
+            while (!RandomUtil.randomBoolean()) // 条件不满足时，保持await()。这样写避免虚假唤醒
+                condition.await();
+            // doSomething
+            condition.signalAll(); // 在其中线程中唤醒。被唤醒的线程要重新获取锁
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt(); // 异常后，中断线程。这里只是标记中断，具体中断事宜由线程自己处理
+        } finally {
+            reentrantLock.unlock();
+        }
+
+        //---------------------------------------------------------------
+
+        var readWriteLock = new ReentrantReadWriteLock();
+        readWriteLock.readLock().lock(); // 读锁不阻塞。Idea快捷键 RL
+        try {
+            // doSomething
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+
+        readWriteLock.writeLock().lock(); // 写阻塞写和读。Idea快捷键 WL
+        try {
+            // doSomething
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+
+        // endregion
 
         // region   可重入锁
         // 获取分布式锁。只要锁名称一样，就是同一把锁
