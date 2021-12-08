@@ -21,6 +21,7 @@ import com.lwohvye.exception.BadRequestException;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -29,19 +30,22 @@ import java.util.*;
  * Created by cy on 2021/01/08.
  */
 @Getter
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class ResultInfo<T> implements IResultInfo<T> {
-    private static final long serialVersionUID = -7313465544799377989L;
-    private long businessCode;
+    @Serial
+    private static final long serialVersionUID = -2022L;
+    private final long businessCode;
     private List<T> content;
     private T result;
     private Map resultMap;
-    private String description;
+    private final String description;
     private long totalElements;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime currentTime;
+    private final LocalDateTime currentTime;
 
     /**
-     * @description 普通实体，用result字段返回
+     * 普通实体，用result字段返回
+     *
      * @params [businessCode, t, description]
      * @date 2021/2/6 8:33
      */
@@ -53,7 +57,8 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @description list类依旧参照分页。包含content和totalElements
+     * list类依旧参照分页。包含content和totalElements
+     *
      * @params [businessCode, resultSet, description]
      * @date 2021/2/6 8:36
      */
@@ -66,36 +71,38 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @description map根据是否是page，如果是page类。返回content和totalElements；如果是普通map，返回resultMap
+     * map根据是否是page，如果是page类。返回content和totalElements；如果是普通map，返回resultMap
+     *
      * @params [businessCode, objectMap, description]
      * @date 2021/2/6 8:37
      */
     public ResultInfo(long businessCode, Map<String, Object> objectMap, String description) {
         this.businessCode = businessCode;
 //        考虑map可以不是page的情况
-        var content = objectMap.get("content");
+        var ctt = objectMap.get("content"); // 内容主体
 //        content可能是List。也可能是Set
-        if (ObjectUtil.isNotNull(content)) {
-            if (content instanceof List list)
+        if (ObjectUtil.isNotNull(ctt)) {
+            if (ctt instanceof List list)
                 this.content = list;
-            else if (content instanceof Set set)
+            else if (ctt instanceof Set set)
 //                Set类型转成List
                 this.content = new ArrayList(set);
             else
-                throw new BadRequestException("content类型有误，请求兼容新类型" + content.getClass());
+                throw new BadRequestException("content类型有误，请求兼容新类型" + ctt.getClass());
         } else {
 //            不是page用resultMap字段返回
             this.resultMap = objectMap;
         }
-        var totalElements = objectMap.get("totalElements");
-        if (ObjectUtil.isNotNull(totalElements) && totalElements instanceof Long total)
+        var tes = objectMap.get("totalElements"); // 总记录数
+        if (ObjectUtil.isNotNull(tes) && tes instanceof Long total)
             this.totalElements = total;
         this.description = description;
         currentTime = LocalDateTime.now();
     }
 
     /**
-     * @description page类返回content和totalElements
+     * page类返回content和totalElements
+     *
      * @params [businessCode, page, description]
      * @date 2021/2/6 8:38
      */
@@ -108,9 +115,9 @@ public class ResultInfo<T> implements IResultInfo<T> {
     }
 
     /**
-     * @return com.lwohvye.utils.result.ResultInfo<T>
-     * @description 只是返回成功状态。无其他结果集
-     * @params []
+     * 只是返回成功状态。无其他结果集
+     *
+     * @return com.lwohvye.utils.result.ResultInfo
      * @date 2021/1/9 9:39
      */
     public static <T> ResultInfo<T> success() {
@@ -120,9 +127,9 @@ public class ResultInfo<T> implements IResultInfo<T> {
     /**
      * 通用成功返回方式。支持map、list、page和单一实体，但都会套个壳，针对不需要壳的场景不适用
      *
-     * @param t
-     * @param <T>
-     * @return
+     * @param t   /
+     * @param <T> /
+     * @return /
      */
     public static <T> ResultInfo<T> success(T t) {
         return ResultInfo.success(t, "");
@@ -145,9 +152,9 @@ public class ResultInfo<T> implements IResultInfo<T> {
     /**
      * 成功返回不分页结果集
      *
-     * @param resultSet
-     * @param <T>
-     * @return
+     * @param resultSet /
+     * @param <T>       /
+     * @return /
      */
     public static <T> ResultInfo<T> success(List<T> resultSet) {
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), resultSet, "");
@@ -156,10 +163,10 @@ public class ResultInfo<T> implements IResultInfo<T> {
     /**
      * 成功返回带描述的不分页结果集
      *
-     * @param resultSet
-     * @param description
-     * @param <T>
-     * @return
+     * @param resultSet   /
+     * @param description /
+     * @param <T>         /
+     * @return /
      */
     public static <T> ResultInfo<T> success(List<T> resultSet, String description) {
         return new ResultInfo<>(ResultCode.SUCCESS.getCode(), resultSet, description);
@@ -168,64 +175,64 @@ public class ResultInfo<T> implements IResultInfo<T> {
     /**
      * 带描述的服务端处理失败返回
      *
-     * @param description
-     * @param <T>
-     * @return
+     * @param description /
+     * @param <T>         /
+     * @return /
      */
     public static <T> ResultInfo<T> failed(String description) {
-        return new ResultInfo<>(ResultCode.FAILED.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.FAILED.getCode(), Collections.emptyList(), description);
     }
 
     /**
      * 未登录或token过期的失败返回
      *
-     * @param <T>
-     * @return
+     * @param <T> /
+     * @return /
      */
     public static <T> ResultInfo<T> unauthorized() {
-        return new ResultInfo<>(ResultCode.UNAUTHORIZED.getCode(), new ArrayList<>(), ResultCode.UNAUTHORIZED.getDescription());
+        return new ResultInfo<>(ResultCode.UNAUTHORIZED.getCode(), Collections.emptyList(), ResultCode.UNAUTHORIZED.getDescription());
     }
 
     /**
      * 未授权的失败返回
      *
-     * @param description
-     * @param <T>
-     * @return
+     * @param description /
+     * @param <T>         /
+     * @return /
      */
     public static <T> ResultInfo<T> forbidden(String description) {
-        return new ResultInfo<>(ResultCode.FORBIDDEN.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.FORBIDDEN.getCode(), Collections.emptyList(), description);
     }
 
     /**
      * 参数验证失败的返回
      *
-     * @param <T>
-     * @return
+     * @param <T> /
+     * @return /
      */
     public static <T> ResultInfo<T> validateFailed() {
-        return new ResultInfo<>(ResultCode.VALIDATE_FAILED.getCode(), new ArrayList<>(), ResultCode.VALIDATE_FAILED.getDescription());
+        return new ResultInfo<>(ResultCode.VALIDATE_FAILED.getCode(), Collections.emptyList(), ResultCode.VALIDATE_FAILED.getDescription());
     }
 
     /**
      * 带描述的参数验证失败返回
      *
-     * @param description
-     * @param <T>
-     * @return
+     * @param description /
+     * @param <T>         /
+     * @return /
      */
     public static <T> ResultInfo<T> validateFailed(String description) {
-        return new ResultInfo<>(ResultCode.VALIDATE_FAILED.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.VALIDATE_FAILED.getCode(), Collections.emptyList(), description);
     }
 
     /**
      * 请求方法错误的返回
      *
-     * @param description
-     * @param <T>
-     * @return
+     * @param description /
+     * @param <T>         /
+     * @return /
      */
     public static <T> ResultInfo<T> methodNotAllowed(String description) {
-        return new ResultInfo<>(ResultCode.METHOD_NOT_ALLOWED.getCode(), new ArrayList<>(), description);
+        return new ResultInfo<>(ResultCode.METHOD_NOT_ALLOWED.getCode(), Collections.emptyList(), description);
     }
 }

@@ -361,16 +361,6 @@ public class RedisUtils {
         }
     }
 
-    /**
-     * 设置指定 key 的值
-     *
-     * @param key
-     * @param value
-     */
-    public void set(String key, String value) {
-        redisTemplate.opsForValue().set(key, value);
-    }
-
 //    private static String luaCpMoreScript =
 //            """
 //                    if redis.call('exists',KEYS[1]) == 0 or redis.call('get',KEYS[1]) < ARGV[1] then
@@ -469,7 +459,7 @@ public class RedisUtils {
      * @param value
      * @return
      */
-    public Object getAndSet(String key, String value) {
+    public Object getAndSet(String key, Object value) {
         return redisTemplate.opsForValue().getAndSet(key, value);
     }
 
@@ -528,7 +518,7 @@ public class RedisUtils {
      * @param unit    时间单位, 天:TimeUnit.DAYS 小时:TimeUnit.HOURS 分钟:TimeUnit.MINUTES
      *                秒:TimeUnit.SECONDS 毫秒:TimeUnit.MILLISECONDS
      */
-    public void setEx(String key, String value, long timeout, TimeUnit unit) {
+    public void setEx(String key, Object value, long timeout, TimeUnit unit) {
         redisTemplate.opsForValue().set(key, value, timeout, unit);
     }
 
@@ -619,7 +609,7 @@ public class RedisUtils {
      * @param value
      * @param offset 从指定位置开始覆写
      */
-    public void setRange(String key, String value, long offset) {
+    public void setRange(String key, Object value, long offset) {
         redisTemplate.opsForValue().set(key, value, offset);
     }
 
@@ -769,10 +759,6 @@ public class RedisUtils {
             return false;
         }
     }
-//
-//    public void hPut(String key, String hashKey, String value) {
-//        redisTemplate.opsForHash().put(key, hashKey, value);
-//    }
 
     /**
      * HashSet
@@ -820,7 +806,7 @@ public class RedisUtils {
      * @param value
      * @return
      */
-    public Boolean hPutIfAbsent(String key, String hashKey, String value) {
+    public Boolean hPutIfAbsent(String key, String hashKey, Object value) {
         return redisTemplate.opsForHash().putIfAbsent(key, hashKey, value);
     }
 
@@ -1231,6 +1217,7 @@ public class RedisUtils {
      * @param values 值 可以是多个
      * @return 成功个数
      */
+    // @SafeVarargs 读取的时候可以用这个限制警告，当前无用。作用等同于SuppressWamings("unchecked"。)
     public Long sSet(String key, Object... values) {
         try {
             return redisTemplate.opsForSet().add(key, values);
@@ -2014,7 +2001,7 @@ public class RedisUtils {
 
                 // 视业务调整sleep时间
                 Thread.sleep(50);
-                log.error(lockKey + ":等待获取锁中...");
+                log.error("{}:等待获取锁中...", lockKey);
             } catch (InterruptedException e) {
                 log.error("等待锁出错，锁名称:{}，原因:{}", lockKey, e.getMessage());
             }

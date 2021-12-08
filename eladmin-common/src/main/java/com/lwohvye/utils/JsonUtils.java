@@ -39,6 +39,7 @@ import java.util.function.Supplier;
  * @date 2021/11/10 11:42 下午
  */
 @Slf4j
+@SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class JsonUtils {
     // 加载速度太慢了，放在静态代码块中
     // private static final ObjectMapper mapper = new ObjectMapper();
