@@ -60,7 +60,9 @@ public class QueryHelp {
                 var accessible = field.canAccess(query);
                 // boolean accessible = field.isAccessible(); // 方法已过期，改用canAccess
                 // 设置对象的访问权限，保证对private的属性的访
-                field.setAccessible(true);
+                // field.setAccessible(true); // 用下面这种方式
+                if (!field.trySetAccessible()) // 设置成功/或本就是true。会返回true
+                    continue; // 若设置失败，则跳过
                 Query q = field.getAnnotation(Query.class);
                 if (q != null) {
                     var propName = q.propName();
@@ -89,7 +91,7 @@ public class QueryHelp {
                     // 解析查询类型
                     analyzeQueryType(root, cb, list, q, attributeName, fieldType, val instanceof Comparable<?> cec ? cec.getClass() : null, val, join);
                 }
-                field.setAccessible(accessible);
+                field.setAccessible(accessible); // 该回原来的属性
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
