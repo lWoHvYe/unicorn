@@ -233,12 +233,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
 
             // 返回 token 与 用户信息
-            Map<String, Object> authInfo = new HashMap<>(2) {
-                {
-                    put("token", properties.getTokenStartWith() + token);
-                    put("user", jwtUserDto);
-                }
-            };
+            Map<String, Object> authInfo = Map.of("token", properties.getTokenStartWith() + token, "user", jwtUserDto);
             // 这里需要进行响应
             ResultUtil.resultJson(response, HttpServletResponse.SC_OK, JsonUtils.toJSONString(authInfo));
         };
