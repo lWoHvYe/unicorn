@@ -79,7 +79,7 @@
         <springfox.version>3.0.0</springfox.version>
         <io.swagger.version>1.6.3</io.swagger.version>
         <druid.version>1.2.8</druid.version>
-        <hutool.version>5.7.16</hutool.version>
+        <hutool.version>5.7.17</hutool.version>
         <fastutil.version>8.5.6</fastutil.version>
         <lombok.version>1.18.22</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
