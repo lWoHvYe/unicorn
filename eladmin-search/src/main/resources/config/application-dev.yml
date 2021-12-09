@@ -61,14 +61,6 @@ spring:
       # username: test_user
       # password: pass@123
       database: eladmin
-    elasticsearch:
-#      client:
-#        reactive:
-#          endpoints: 10.211.55.140:9200
-      # 在es8，将移除tcp的方式：https://docs.spring.io/spring-data/elasticsearch/docs/4.3.0/reference/html/#reference
-      cluster-name: elasticsearch
-      # 还是连不上
-      cluster-nodes: 10.211.55.140:9200
 
   # redis配置
   redis:
@@ -94,6 +86,14 @@ spring:
     virtual-host: /eladmin # rabbitmq的虚拟host
     username: admin # rabbitmq的用户名
     password: admin # rabbitmq的密码
+
+  mail:
+    host: xxx.com #SMTP server host
+    username: xxx #login user
+    password: xxx #login password
+    properties:
+      from: xxx@xxx.com #发件人（邮箱）
+      to-dev: xxx@oo.com #信息默认接收人（邮箱）
 
 # 登录相关配置
 #login:
@@ -162,3 +162,15 @@ file:
   # 文件大小 /M
 #  maxSize: 100
 #  avatarMaxSize: 5
+
+# oss配置
+alibaba:
+  cloud:
+    access-key: xx
+    secret-key: xx
+    oss:
+      endpoint: xxx
+      # 自定义属性 bucketName
+      bucket-name: xxx
+      # 自定义属性 filePath
+      file-path: xxx/xxx/
