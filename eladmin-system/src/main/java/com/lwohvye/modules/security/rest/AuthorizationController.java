@@ -119,6 +119,7 @@ public class AuthorizationController {
         var reentrantLock = new ReentrantLock();
         var condition = reentrantLock.newCondition(); // 条件对象
         reentrantLock.lock();
+        // var lockRes = reentrantLock.tryLock(); 加锁成功返回true，否则返回false，这样不会阻塞，也可以设置超时
         try {
             while (!RandomUtil.randomBoolean()) // 条件不满足时，保持await()。这样写避免虚假唤醒
                 condition.await();
@@ -134,14 +135,14 @@ public class AuthorizationController {
         //---------------------------------------------------------------
 
         var readWriteLock = new ReentrantReadWriteLock();
-        readWriteLock.readLock().lock(); // 读锁不阻塞。Idea快捷键 RL
+        readWriteLock.readLock().lock(); // 读锁不阻塞读，但阻塞写。Idea快捷键 RL
         try {
             // doSomething
         } finally {
             readWriteLock.readLock().unlock();
         }
 
-        readWriteLock.writeLock().lock(); // 写阻塞写和读。Idea快捷键 WL
+        readWriteLock.writeLock().lock(); // 写锁阻塞写和读。Idea快捷键 WL
         try {
             // doSomething
         } finally {

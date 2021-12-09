@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TheadFactoryName implements ThreadFactory {
 
     private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
-    private final ThreadGroup group;
+    private final ThreadGroup group; // 建议不要在自己的程序中使用线程组。
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String namePrefix;
 
@@ -39,8 +39,9 @@ public class TheadFactoryName implements ThreadFactory {
     }
 
     /**
+     * SecurityManager相关参考：https://www.lwohvye.com/2021/11/23/java%e5%ae%89%e5%85%a8%ef%bc%9asecuritymanager%e4%b8%8eaccesscontroller/
+     *
      * @param name /
-     * @description SecurityManager相关参考：https://www.lwohvye.com/2021/11/23/java%e5%ae%89%e5%85%a8%ef%bc%9asecuritymanager%e4%b8%8eaccesscontroller/
      * @date 2021/11/23 3:32 下午
      */
     private TheadFactoryName(String name) {
@@ -61,12 +62,12 @@ public class TheadFactoryName implements ThreadFactory {
     public Thread newThread(Runnable r) {
         //此时线程的名字 就是 namePrefix + -thread- + 这个线程池中第几个执行的线程
         Thread t = new Thread(group, r, namePrefix + "-thread-" + threadNumber.getAndIncrement(), 0);
-        if (t.isDaemon()) {
+        // 所谓后台/守护(daemon)线程，是指在程序运行的时候在后台提供一种通用服务的线程，并且这个线程并不属于程序中不可或缺的部分。
+        // 必须在线程启动之前调用setDaemon()方法，才能把它设置为后台线程。注意：后台进程在不执行finally子句的情况下就会终止其run()方法。
+        if (t.isDaemon()) // 这里将其设置为非守护线程
             t.setDaemon(false);
-        }
-        if (t.getPriority() != Thread.NORM_PRIORITY) {
+        if (t.getPriority() != Thread.NORM_PRIORITY)
             t.setPriority(Thread.NORM_PRIORITY);
-        }
         return t;
     }
 }

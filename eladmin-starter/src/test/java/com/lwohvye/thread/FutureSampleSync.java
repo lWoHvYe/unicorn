@@ -41,7 +41,7 @@ import java.util.concurrent.CompletableFuture;
  * 需尤其注意变量的作用范围问题
  * @date 2019/9/22 8:54
  */
-//TODO 使用CompletableFuture,子线程实时共享数据，使用synchronized同步代码块，不能使用volatile,会有极少量数据丢失，原因未知
+//TODO 使用CompletableFuture,子线程实时共享数据，使用synchronized同步代码块，不能使用volatile,因为volatile变量不能提供原子性，这样++动作线程不安全
 //@SpringBootTest
 public class FutureSampleSync {
 

@@ -134,7 +134,7 @@ public class AnotherFutureSample {
             countMap.put(key, value);
             totalCount += value;
         }
-        Arrays.asList(values).forEach(ThreadLocal::remove);
+        Arrays.asList(values).forEach(ThreadLocal::remove); // 移除，避免内存泄漏
 
 //         输出总结果
         this.printResult(countMap, simCount / 100, totalCount);
@@ -211,7 +211,8 @@ public class AnotherFutureSample {
 //          记录本线程模拟结果集
             Map<String, Integer> countHashMap = new HashMap<>();
             try {
-                Random random = SecureRandom.getInstanceStrong();
+                Random random = SecureRandom.getInstanceStrong(); // 线程安全的
+                // var ri = ThreadLocalRandom.current().nextInt(); // 也可以获取随机数。较上面这种可能更好一些
 //              生成乱序池子
                 int[] ranArray = ranArray();
                 for (int j = 0; j < simCount; j++) {
