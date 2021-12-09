@@ -14,7 +14,9 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
     针对异常
     java.lang.reflect.InaccessibleObjectException: Unable to make field private final java.lang.String java.lang.NamedPackage.name accessible: module java.base does not "opens java.lang" to unnamed module @7bfcd12c
     需要在jvm 中添加启动参数
-     --add-opens java.base/java.lang=ALL-UNNAMED
+     --add-opens java.base/java.lang=ALL-UNNAMED 
+     注：在Java 9 中引入了Java平台模块系统（JPMS），这里的ALL-UNNAMED表示所有未命名模块。整体意思为将java.base/java.lang对所有未命名模块开放
+     根据java.base模块的module-info.java文件，其已将主要的所有的类exports。在运行时需要反射获取java.base/java.lang下的类，所以要添加opens，这里应该是未把其子包open的
     如果反射代码在命名模块中，则ALL-UNNAMED可以用其名称替换。
     如果要添加的标志太多，则可以考虑使用封装终止开关 --permit-illegal-access。它将允许类路径上的所有代码反射所有已命名的模块
     针对Java 16下，无法反射java.base包下的内容的情况，在mvn的运行环境中添加如下配置
@@ -103,3 +105,31 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 
 [Support for JDK16](https://github.com/rzwitserloot/lombok/issues/2681#)
 
+#### Java平台模块系统（JPMS）、Jigsaw 项目
+这个确切的讲，是在Java 9引入的
+```
+JPMS对包可见性细化为：public to everyone、public but only to friend modules、public only within a module、protected、package、private
+模块系统的首要目的是为了封装。然后在有些时候，我们必须要打破封装来处理遗留代码或是运行测试。我们可以下面几个命令行参数来打破封装。
+需注意的是，包是没有层级关系的，也就是说java.base/java.lang配置只针对该包下的类，是不包括子包的，也就是针对java.lang.reflect要单独配置
+--add-reads module=target-module(,target-module)*：更新源模块来读取目标模块。目标模块可以是ALL-UNNAMED来读取所有未命名模块。
+--add-exports module/package=target-module(,target-module)*：更新源模块来导出包到目标模块。这会添加一个从源模块来目标模块的受限导出。目标模块可以是ALL-UNNAMED来导出到所有未命名模块。
+--add-opens module/package=target-module(,target-module)*：更新源模块来开放包到目标模块。这回添加一个从源模块到目标模块的受限开放。
+--patch-module module=file(;file)*：使用JAR文件或目录中的类和资源文件来覆盖或增加一个模块的内容。在需要临时修改一个模块的内容以方便测试时，--patch-module非常实用。
+```
+
+Java 为 module-info.java 设计了专用的语法
+```
+语法解读：(这里同样是不包括子包)
+
+[open] module <module>: 声明一个模块，模块名称应全局唯一，不可重复。加上 open 关键词表示模块内的所有包都允许通过 Java 反射访问，模块声明体内不再允许使用 opens 语句。
+
+requires [transitive | static] <module>: 声明模块依赖，一次只能声明一个依赖，如果依赖多个模块，需要多次声明。加上 transitive 关键词表示传递依赖，比如模块 A 依赖模块 B，模块 B 传递依赖模块 C，那么模块 A 就会自动依赖模块 C，类似于 Maven。加上 static 关键词表示编译时必需，运行时可选，类似于 Maven 的 <scope>runtime</scope>。
+
+exports <package> [to <module1>[, <module2>...]]: 导出模块内的包（允许直接 import 使用），一次导出一个包，如果需要导出多个包，需要多次声明。如果需要定向导出，可以使用 to关键词，后面加上模块列表（逗号分隔）。
+
+opens <package> [to <module>[, <module2>...]]: 开放模块内的包（允许通过 Java 反射访问），一次开放一个包，如果需要开放多个包，需要多次声明。如果需要定向开放，可以使用 to关键词，后面加上模块列表（逗号分隔）。
+
+provides <interface | abstract class> with <class1>[, <class2> ...]: 声明模块提供的 Java SPI 服务，一次可以声明多个服务实现类（逗号分隔）。
+
+uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加上之后模块内的代码就可以通过 ServiceLoader.load(Class) 一次性加载所声明的 SPI 服务的所有实现类。
+```
