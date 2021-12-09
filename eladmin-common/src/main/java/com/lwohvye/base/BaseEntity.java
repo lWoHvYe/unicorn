@@ -82,12 +82,13 @@ public class BaseEntity implements Serializable {
 
     @Override
     public String toString() { // 通用的ToString方法
-        ToStringBuilder builder = new ToStringBuilder(this);
-        Field[] fields = this.getClass().getDeclaredFields(); // 这里只获取本类的全部域
+        var builder = new ToStringBuilder(this);
+        var fields = this.getClass().getDeclaredFields(); // 这里只获取本类的全部域
         try {
-            for (Field f : fields) {
-                f.setAccessible(true);
-                builder.append(f.getName(), f.get(this)).append("\n");
+            for (var f : fields) {
+                // f.setAccessible(true); 用下面的方式更好一些
+                if (f.trySetAccessible())
+                    builder.append(f.getName(), f.get(this)).append("\n");
             }
         } catch (Exception e) {
             builder.append("toString builder encounter an error");

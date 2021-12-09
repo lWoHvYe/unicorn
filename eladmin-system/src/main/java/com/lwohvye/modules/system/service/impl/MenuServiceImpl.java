@@ -76,13 +76,11 @@ public class MenuServiceImpl implements IMenuService {
             criteria.setPidIsNull(true);
             List<Field> fields = QueryHelp.getAllFields(criteria.getClass(), new ArrayList<>());
             for (Field field : fields) {
-                //设置对象的访问权限，保证对private的属性的访问
-                field.setAccessible(true);
-                Object val = field.get(criteria);
                 if ("pidIsNull".equals(field.getName()))
                     continue;
-
-                if (ObjectUtil.isNotNull(val))
+                //设置对象的访问权限，保证对private的属性的访问
+                // field.setAccessible(true); 用下面的方式更好一些
+                if (field.trySetAccessible() && ObjectUtil.isNotNull(field.get(criteria)))
                     criteria.setPidIsNull(null);
                 break;
             }
