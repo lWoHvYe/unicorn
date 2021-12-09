@@ -18,10 +18,12 @@ package com.lwohvye.modules.system.domain.vo;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.modules.system.domain.Resource;
+import lombok.Getter;
 import net.minidev.json.annotate.JsonIgnore;
 
 import java.lang.reflect.Field;
 
+@Getter // 要序列化，就要把get方法放出来
 public class ResourceVo {
     /**
      * ID
@@ -43,6 +45,7 @@ public class ResourceVo {
 
     @JsonIgnore
     public static ResourceVo toVo(Resource resource) {
+        // 在这里打断点，导致发起了很多打dbSearch，造成长时间停顿。不打就没问题
         var vo = new ResourceVo();
         var fields = ResourceVo.class.getDeclaredFields();
         for (Field field : fields) {
