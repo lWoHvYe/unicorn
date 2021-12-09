@@ -14,7 +14,7 @@
 详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
-``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围。 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
+``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS。在对项目做相关改造之前，应该只能用ALL-UNNAMED表示对所有未命名模块开放）。 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
 后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和 System.out。
 
