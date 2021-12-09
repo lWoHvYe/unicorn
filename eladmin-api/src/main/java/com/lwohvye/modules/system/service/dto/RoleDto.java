@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.system.service.dto;
 
+import com.lwohvye.modules.system.domain.vo.ResourceVo;
 import lombok.Getter;
 import lombok.Setter;
 import com.lwohvye.base.BaseDTO;
@@ -35,6 +36,8 @@ public class RoleDto extends BaseDTO implements Serializable {
     private Set<MenuDto> menus;
 
     private Set<DeptDto> depts;
+
+    private Set<ResourceVo> resourcesOt;
 
     private String name;
 
