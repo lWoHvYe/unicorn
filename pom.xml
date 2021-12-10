@@ -518,7 +518,8 @@
                 <version>3.0.0-alpha-1</version>
                 <extensions>true</extensions>
             </plugin>
-            <plugin>
+            <!--     Toolchains are ignored, 'javadocExecutable' parameter is set to。这个插件是用来配置maven run的jdk的，当前是通过其他方式配置了     -->
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-toolchains-plugin</artifactId>
                 <version>3.0.0</version>
@@ -538,7 +539,7 @@
                         </jdk>
                     </toolchains>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 
