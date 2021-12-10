@@ -201,7 +201,8 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### Feature list
 
-- Springdoc相关、Springfox相关
+- Springdoc相关、Springfox相关（动态权限后，api无法显示）
 - Redisson部分功能应用：多数据源(Redis)、分布式扩展、锁
 - Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的 refreshToken 
-- 权限重构。基于resource的动态权限（API、Web）
+- 权限重构。基于resource的动态权限（API基本完成、Web未开始）
+- JPMS改造（暂缓）
