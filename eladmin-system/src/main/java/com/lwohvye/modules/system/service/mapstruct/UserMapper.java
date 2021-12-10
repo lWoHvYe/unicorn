@@ -15,14 +15,10 @@
  */
 package com.lwohvye.modules.system.service.mapstruct;
 
-import com.lwohvye.annotation.Blob2String;
 import com.lwohvye.base.BaseMapper;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.service.dto.UserDto;
-import com.lwohvye.utils.ConvertBlob2StringUtil;
-import com.lwohvye.utils.mapper.TimestampMapper;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 /**

@@ -16,7 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollUtil;
-import com.lwohvye.annotation.Log;
+import com.lwohvye.log.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
@@ -29,7 +29,7 @@ import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
-import com.lwohvye.service.IVerifyService;
+import com.lwohvye.tools.service.IVerifyService;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;

@@ -65,6 +65,7 @@ public interface ILogService {
     @Async
     void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, Log log);
 
+    void save(Log resource);
     /**
      * 查询异常详情
      * @param id 日志ID

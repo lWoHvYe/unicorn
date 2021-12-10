@@ -22,7 +22,7 @@ import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.service.IUserService;
-import com.lwohvye.repository.LogRepository;
+import com.lwohvye.service.ILogService;
 import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -45,11 +45,11 @@ import java.util.concurrent.TimeUnit;
 public class AuthMQService {
     //    -------------------记录鉴权信息-----------------------------
     @Autowired
-    private LogRepository logRepository;
+    private ILogService logService;
 
     public void saveAuthorizeLog(String record) {
         var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(record);
-        logRepository.save(log);
+        logService.save(log);
     }
     //    ----------------------登录失败-----------------------------
 

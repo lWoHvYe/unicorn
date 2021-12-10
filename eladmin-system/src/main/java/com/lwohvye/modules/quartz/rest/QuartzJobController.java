@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.quartz.rest;
 
-import com.lwohvye.annotation.Log;
+import com.lwohvye.log.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

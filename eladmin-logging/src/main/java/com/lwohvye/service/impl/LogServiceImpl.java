@@ -111,6 +111,11 @@ public class LogServiceImpl implements ILogService {
         logRepository.save(log);
     }
 
+    @Override
+    public void save(Log resource) {
+        logRepository.save(resource);
+    }
+
     /**
      * 根据方法和传入的参数获取请求参数
      */

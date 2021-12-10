@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.system.rest;
 
-import com.lwohvye.annotation.Log;
+import com.lwohvye.log.annotation.Log;
 import com.lwohvye.modules.system.domain.Resource;
 import com.lwohvye.modules.system.service.IResourceService;
 import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;

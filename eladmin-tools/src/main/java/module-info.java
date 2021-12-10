@@ -8,4 +8,6 @@ module lwohvye.eladmin.tools {
     requires spring.context.support;
 
     exports com.lwohvye.tools.utils;
+    exports com.lwohvye.tools.domain.vo;
+    exports com.lwohvye.tools.service;
 }

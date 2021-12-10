@@ -11,6 +11,8 @@ module lwohvye.eladmin.api {
     exports com.lwohvye.modules.quartz.service;
     exports com.lwohvye.modules.quartz.service.dto;
     exports com.lwohvye.modules.system.domain;
+    exports com.lwohvye.modules.system.domain.vo;
+    exports com.lwohvye.modules.system.domain.projection;
     exports com.lwohvye.modules.system.service;
     exports com.lwohvye.modules.system.service.dto;
 

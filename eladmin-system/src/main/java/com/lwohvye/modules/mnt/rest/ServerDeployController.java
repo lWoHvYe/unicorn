@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.annotation.Log;
+import com.lwohvye.log.annotation.Log;
 import com.lwohvye.modules.mnt.domain.ServerDeploy;
 import com.lwohvye.modules.mnt.service.IServerDeployService;
 import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
