@@ -19,6 +19,7 @@ module lwohvye.eladmin.system {
     requires transitive ganymed.ssh2;
     requires transitive org.apache.commons.io;
     requires transitive jakarta.websocket.api;
+    requires transitive com.fasterxml.jackson.datatype.jsr310;
     requires transitive quartz;
     requires transitive easy.captcha;
     requires transitive redisson;
@@ -26,7 +27,7 @@ module lwohvye.eladmin.system {
     requires transitive java.management;
     requires transitive jjwt.api;
     requires transitive jjwt.impl;
-    // requires transitive jsr305; 这个里有内容与java.annotation包名重复了
+    // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
     requires transitive com.github.oshi;
     requires transitive io.netty.common;
 
