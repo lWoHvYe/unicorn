@@ -71,6 +71,7 @@
     </parent>
 
     <properties>
+        <!--    Spring Boot依赖版本配置：https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#dependency-versions.properties    -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
@@ -501,6 +502,15 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
+            <!--     https://felix.apache.org/documentation/subprojects/apache-felix-maven-bundle-plugin-bnd.html
+                     https://www.lwohvye.com/2021/12/10/osgi-%e7%90%86%e8%a7%a3/
+                     暂无打bundle-package的打算。留档
+               -->
+            <!--<plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+            </plugin>-->
         </plugins>
     </build>
 
