@@ -50,6 +50,7 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.utils.json;
     exports com.lwohvye.utils.mapper;
     exports com.lwohvye.utils.redis;
+    exports com.lwohvye.utils.result;
 
     opens com.lwohvye.base;
 }
