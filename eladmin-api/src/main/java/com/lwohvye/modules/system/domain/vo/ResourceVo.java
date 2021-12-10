@@ -17,9 +17,9 @@
 package com.lwohvye.modules.system.domain.vo;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.modules.system.domain.Resource;
 import lombok.Getter;
-import net.minidev.json.annotate.JsonIgnore;
 
 import java.lang.reflect.Field;
 

@@ -13,9 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.utils;
+package com.lwohvye.api.utils;
 
-import com.lwohvye.annotation.Blob2String;
+import com.lwohvye.api.annotation.Blob2String;
+import com.lwohvye.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**

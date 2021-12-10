@@ -17,7 +17,7 @@ package com.lwohvye.modules.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lwohvye.annotation.String4Blob;
+import com.lwohvye.api.annotation.String4Blob;
 import com.lwohvye.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
