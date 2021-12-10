@@ -18,7 +18,7 @@ package com.lwohvye.config.common;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+// import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lwohvye.config.FileProperties;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.context.annotation.Bean;
@@ -140,7 +140,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
                 .defaultDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
                 .serializationInclusion(JsonInclude.Include.NON_NULL)
                 .build();
-        jsonMapper.registerModule(new JavaTimeModule());
+        // jsonMapper.registerModule(new JavaTimeModule());
         jackson2HttpMessageConverter.setObjectMapper(jsonMapper);
         jackson2HttpMessageConverter.setDefaultCharset(StandardCharsets.UTF_8);
         converters.add(jackson2HttpMessageConverter);

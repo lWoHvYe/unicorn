@@ -1,5 +1,6 @@
 // 暂作为open module。允许其他模块通过反射访问，后续缩小范围
 module lwohvye.eladmin.common {
+    requires transitive java.compiler;
     requires transitive java.servlet;
     requires transitive java.sql;
     requires transitive java.persistence;
