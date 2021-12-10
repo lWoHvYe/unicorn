@@ -46,7 +46,7 @@ spring:
         enable_lazy_no_trans: true
     #        指定表名解析。spring下可不加。会自动使用
     #        naming:
-    #          physical-strategy: com.lwohvye.config.ServerAwareNamingStrategy
+    #          physical-strategy: com.lwohvye.config.common.ServerAwareNamingStrategy
     open-in-view: true
     hibernate:
       ddl-auto: none
