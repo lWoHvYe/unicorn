@@ -14,13 +14,13 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.modules.mongodb.rest;
+package com.lwohvye.search.modules.mongodb.rest;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.modules.mongodb.service.IMongoDBUserService;
+import com.lwohvye.search.modules.mongodb.service.IMongoDBUserService;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.support.SpringFactoriesLoader;

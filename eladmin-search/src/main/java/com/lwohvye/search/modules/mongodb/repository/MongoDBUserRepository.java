@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.modules.mongodb.repository;
+package com.lwohvye.search.modules.mongodb.repository;
 
-import com.lwohvye.modules.mongodb.domain.MongoDBUser;
+import com.lwohvye.search.modules.mongodb.domain.MongoDBUser;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-@SuppressWarnings({ "requires-automatic", "requires-transitive-automatic" })
+@SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.eladmin.system {
     requires transitive lwohvye.eladmin.api;
     requires transitive lwohvye.eladmin.tools;
@@ -34,4 +34,5 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.mnt.util;
     exports com.lwohvye.modules.rabbitmq.domain;
     exports com.lwohvye.modules.rabbitmq.service;
+    exports com.lwohvye.modules.system.repository to lwohvye.eladmin.search; // 这里先这样
 }

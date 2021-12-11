@@ -14,4 +14,4 @@
 #    limitations under the License.
 #
 
-com.lwohvye.modules.mongodb.service.impl.MongoDBUserServiceIOCImpl
+com.lwohvye.search.modules.mongodb.service.impl.MongoDBUserServiceIOCImpl

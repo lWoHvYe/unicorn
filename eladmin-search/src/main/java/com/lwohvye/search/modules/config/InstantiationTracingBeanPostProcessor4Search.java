@@ -13,10 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.modules.config;
+package com.lwohvye.search.modules.config;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.modules.mongodb.rest.MongoDBUserController;
+import com.lwohvye.search.modules.mongodb.rest.MongoDBUserController;
 import com.lwohvye.utils.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;

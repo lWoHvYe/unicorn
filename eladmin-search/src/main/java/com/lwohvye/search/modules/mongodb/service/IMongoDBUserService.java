@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.modules.mongodb.service;
+package com.lwohvye.search.modules.mongodb.service;
 
 import com.lwohvye.base.BaseService;
 

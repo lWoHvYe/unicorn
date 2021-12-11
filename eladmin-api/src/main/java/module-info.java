@@ -21,6 +21,8 @@ module lwohvye.eladmin.api {
     opens com.lwohvye.modules.quartz.domain;
     opens com.lwohvye.modules.quartz.service.dto;
     opens com.lwohvye.modules.system.domain;
+    opens com.lwohvye.modules.system.domain.vo;
+    opens com.lwohvye.modules.system.domain.projection;
     opens com.lwohvye.modules.system.service.dto;
 
 }

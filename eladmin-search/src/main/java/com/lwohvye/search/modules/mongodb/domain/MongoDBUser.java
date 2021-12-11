@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.modules.mongodb.domain;
+package com.lwohvye.search.modules.mongodb.domain;
 
 import lombok.Getter;
 import lombok.Setter;
