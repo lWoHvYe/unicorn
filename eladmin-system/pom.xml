@@ -26,18 +26,6 @@
             <artifactId>eladmin-api</artifactId>
             <version>${project.core.version}</version>
         </dependency>
-        <!-- 代码生成模块 -->
-        <dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-generator</artifactId>
-            <version>${project.core.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.lwohvye</groupId>
-                    <artifactId>eladmin-common</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <!-- tools 模块包含了 common 和 logging 模块 -->
         <dependency>

@@ -54,11 +54,11 @@
 
     <modules>
         <module>eladmin-common</module>
+        <module>eladmin-api</module>
         <module>eladmin-logging</module>
         <module>eladmin-system</module>
         <module>eladmin-tools</module>
         <module>eladmin-generator</module>
-        <module>eladmin-api</module>
     </modules>
 
     <parent>

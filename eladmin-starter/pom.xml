@@ -6,8 +6,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.6.1</version>
-        <!--<relativePath/>设定一个空值将始终从仓库中获取，不从本地路径获取。
-        查找顺序：relativePath元素中的地址–本地仓库–远程仓库-->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -26,6 +24,12 @@
         <dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>eladmin-system</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>
+        <!-- 代码生成模块 -->
+        <dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-generator</artifactId>
             <version>${project.core.version}</version>
         </dependency>
         <!--分库分表中间件-->
@@ -85,7 +89,7 @@
     <!-- 打包 -->
     <build>
         <plugins>
-            <!-- Spring Boot模块jar构建 -->
+            <!-- Spring Boot模块jar构建 https://docs.spring.io/spring-boot/docs/current/maven-plugin/reference/htmlsingle/#packaging.examples.custom-classifier -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -107,9 +111,11 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
+                        <id>repackage</id>
+                        <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
+                        <!--<configuration>
+                            <classifier>exec</classifier>
+                        </configuration>-->
                     </execution>
                 </executions>
             </plugin>
