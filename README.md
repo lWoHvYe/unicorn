@@ -204,3 +204,4 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）
 - 网关(Gateway)模块-鉴权
+- JPMS改造（暂缓）
