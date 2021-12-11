@@ -3,9 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>eladmin</artifactId>
-        <groupId>com.lwohvye</groupId>
-        <version>3.0.0</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.1</version>
+        <!--<relativePath/>设定一个空值将始终从仓库中获取，不从本地路径获取。
+        查找顺序：relativePath元素中的地址–本地仓库–远程仓库-->
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,6 +16,10 @@
     <name>启动模块-基础</name>
 
     <properties>
+
+        <java.version>17</java.version>
+        <project.core.version>3.0.0</project.core.version>
+        <mapstruct.version>1.4.2.Final</mapstruct.version>
         <javassist.version>3.28.0-GA</javassist.version>
     </properties>
 
@@ -160,6 +167,46 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- 解决 Java-16下 lombok报错：
+            Fatal error compiling: java.lang.IllegalAccessError: class lombok.javac.apt.LombokProcessor (in unnamed module @0x486bcaa) cannot access class com.sun.tools.javac.processing.JavacProcessingEnvironment (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.processing to unnamed module @0x486bcaa
+            -->
+            <plugin>
+                <!-- maven-compiler-plugin应该是默认使用的。所以可以不显示的配置。 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <!--for lombok annotations to resolve-->
+                    <!--contradictory to maven, intelliJ fails with this-->
+                    <annotationProcessorPaths>
+                        <!--4lombok-->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <!-- Support for Java 16
+                            https://github.com/rzwitserloot/lombok/issues/2681#
+                            -->
+                            <version>${lombok.version}</version>
+                        </path>
+                        <!--4mapstruct-->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <!--     Maven JDK9 Jigsaw       -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jmod-plugin</artifactId>
+                <version>3.0.0-alpha-1</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
