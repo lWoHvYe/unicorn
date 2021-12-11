@@ -16,7 +16,6 @@
     <name>启动模块-基础</name>
 
     <properties>
-
         <java.version>17</java.version>
         <project.core.version>3.0.0</project.core.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>

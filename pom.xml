@@ -77,6 +77,8 @@
         <java.version>17</java.version>
         <project.core.version>3.0.0</project.core.version>
         <log4jdbc.version>1.16</log4jdbc.version>
+        <!--   待Spring Boot下版本发布后移除     -->
+        <log4j2.version>2.15.0</log4j2.version>
         <springfox.version>3.0.0</springfox.version>
         <springdoc.openapi.version>1.5.12</springdoc.openapi.version>
         <io.swagger.version>1.6.3</io.swagger.version>
