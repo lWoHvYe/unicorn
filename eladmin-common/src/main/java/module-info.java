@@ -1,9 +1,11 @@
 // 暂作为open module。允许其他模块通过反射访问，后续缩小范围
+@SuppressWarnings({ "requires-automatic", "requires-transitive-automatic" }) // 抑制compile warn: requires transitive directive for an automatic module
 module lwohvye.eladmin.common {
     requires transitive java.compiler;
     requires transitive java.servlet;
     requires transitive java.sql;
     requires transitive java.persistence;
+    requires transitive java.validation;
     requires transitive spring.core;
     requires transitive spring.beans;
     requires transitive spring.context;

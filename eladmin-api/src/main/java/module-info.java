@@ -1,6 +1,6 @@
+@SuppressWarnings({ "requires-automatic", "requires-transitive-automatic" })
 module lwohvye.eladmin.api {
     requires transitive lwohvye.eladmin.common;
-    requires transitive java.validation;
 
     exports com.lwohvye.api.annotation;
     exports com.lwohvye.api.utils;

@@ -1,9 +1,11 @@
+@SuppressWarnings({ "requires-automatic", "requires-transitive-automatic" })
 module lwohvye.eladmin.system {
     requires transitive lwohvye.eladmin.api;
-    requires transitive lwohvye.eladmin.logging;
-    requires lwohvye.eladmin.tools;
+    requires transitive lwohvye.eladmin.tools;
 
     requires transitive java.desktop;
+    requires transitive java.annotation;
+    requires transitive java.management;
     requires transitive spring.aop;
     requires transitive spring.amqp;
     requires transitive spring.context.support;
@@ -23,8 +25,6 @@ module lwohvye.eladmin.system {
     requires transitive quartz;
     requires transitive easy.captcha;
     requires transitive redisson;
-    requires transitive java.annotation;
-    requires transitive java.management;
     requires transitive jjwt.api;
     requires transitive jjwt.impl;
     // requires transitive jsr305; //这个里有内容与java.annotation包名重复了

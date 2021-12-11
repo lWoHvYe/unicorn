@@ -135,4 +135,4 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 ```
 
 - [Project Jigsaw](http://openjdk.java.net/projects/jigsaw/quick-start)
-- 
+- [warn: requires transitive directive for an automatic module](https://stackoverflow.com/questions/49600947/how-to-suppress-the-requires-transitive-directive-for-an-automatic-module-warn) 
