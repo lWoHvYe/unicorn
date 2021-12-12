@@ -133,3 +133,7 @@ provides <interface | abstract class> with <class1>[, <class2> ...]: 声明模�
 
 uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加上之后模块内的代码就可以通过 ServiceLoader.load(Class) 一次性加载所声明的 SPI 服务的所有实现类。
 ```
+
+- [Project Jigsaw](http://openjdk.java.net/projects/jigsaw/quick-start)
+- [warn: requires transitive directive for an automatic module](https://stackoverflow.com/questions/49600947/how-to-suppress-the-requires-transitive-directive-for-an-automatic-module-warn) 
+- [jmod-example](https://github.com/khmarbaise/jdk9-jlink-jmod-example)
