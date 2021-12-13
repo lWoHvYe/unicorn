@@ -22,6 +22,12 @@
             <artifactId>eladmin-system</artifactId>
             <version>${project.core.version}</version>
         </dependency>
+        <!-- 代码生成模块 -->
+        <dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-generator</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>
         <!--分库分表中间件-->
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
