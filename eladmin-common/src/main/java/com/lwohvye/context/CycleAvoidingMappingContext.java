@@ -6,10 +6,12 @@
 package com.lwohvye.context;
 
 import cn.hutool.core.util.ReflectUtil;
+import lombok.SneakyThrows;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Context;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.TargetType;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
@@ -55,19 +57,24 @@ public class CycleAvoidingMappingContext {
      * @return T         smallDto的实例
      * @date 2021/11/10 12:38 上午
      */
+    @SneakyThrows
     private <T> T genT(Class<T> targetType, Object obj) {
         // obj为null时，直接返回
         if (Objects.isNull(obj))
             return null;
 
-        var t = ReflectUtil.newInstance(targetType);
+        // var t = ReflectUtil.newInstance(targetType);
+        var t = targetType.getDeclaredConstructor().newInstance();
         // targetType.getFields()只能获取到非私有的属性。所以还是需要反射来获取
         // targetType.getDeclaredFields() 可以获取本类中的所有域，不包括从超类继承的
         // 所以还是使用ReflectUtil.getFields(targetType)，获取全部的域，包括从超类继承的
         for (Field field : ReflectUtil.getFields(targetType)) {
             // 获取不到属性会报错哦。并且需注意，从obj取时，要使用fieldName，因为field是t中的属性
+            var oField = ReflectionUtils.findField(obj.getClass(), field.getName());
+            if (Objects.nonNull(oField) && oField.trySetAccessible() && field.trySetAccessible())
+                field.set(t, oField.get(obj));
             // 下面的反射，底层还是 field.get()获取属性、field.set()设置属性
-            ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
+            // ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
         }
         // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时。这是不使用反射时，另一种处理方式
         // return JsonUtils.toJavaObject(obj, targetType);

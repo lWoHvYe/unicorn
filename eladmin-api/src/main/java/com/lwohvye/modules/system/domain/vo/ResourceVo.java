@@ -16,12 +16,14 @@
 
 package com.lwohvye.modules.system.domain.vo;
 
-import cn.hutool.core.util.ReflectUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.modules.system.domain.Resource;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 @Getter // 要序列化，就要把get方法放出来
 public class ResourceVo {
@@ -44,14 +46,16 @@ public class ResourceVo {
     private Integer status;
 
     @JsonIgnore
+    @SneakyThrows
     public static ResourceVo toVo(Resource resource) {
         // 在这里打断点，导致发起了很多打dbSearch，造成长时间停顿。不打就没问题
         var vo = new ResourceVo();
         var fields = ResourceVo.class.getDeclaredFields();
         for (Field field : fields) {
-            if (field.trySetAccessible())
-                // field.set(vo, ReflectUtil.getFieldValue(resource, field.getName())); // 似乎是有问题的样子
-                ReflectUtil.setFieldValue(vo, field, ReflectUtil.getFieldValue(resource, field.getName()));
+            var rField = ReflectionUtils.findField(resource.getClass(), field.getName());
+            if (Objects.nonNull(rField) && field.trySetAccessible() && rField.trySetAccessible())
+                field.set(vo, rField.get(resource));
+            // ReflectUtil.setFieldValue(vo, field, ReflectUtil.getFieldValue(resource, field.getName()));
         }
         return vo;
     }
