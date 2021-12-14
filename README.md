@@ -47,7 +47,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 ```
 
-注意不要使用actuator系列依赖，否则可能需要改springfox源码来解决。详见：[SpringBoot-2.6.0](document/springboot/SpringBoot-2.6.0.md)
+注意不要使用actuator系列依赖，否则需要添加配置支持。详见：[SpringBoot-2.6.0](document/springboot/SpringBoot-2.6.0.md)
 
 ---
 
