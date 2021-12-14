@@ -84,7 +84,7 @@ public class OpenApiConfig {
                 .security(securityRequirements())
                 .servers(Collections.singletonList(tryServer))
                 .info(new Info()
-                        .title(swaggerProperties.getApplicationName() + " Api Doc")
+                        .title(swaggerProperties.getApplicationName() + " API Doc") // 应用程序编程接口 Application Programming Interface
                         .contact(contact)
                         .description(swaggerProperties.getApplicationDescription())
                         .version("Application Version: " + swaggerProperties.getApplicationVersion() + "\n Spring Boot Version: " + SpringBootVersion.getVersion())

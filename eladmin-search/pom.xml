@@ -36,9 +36,23 @@
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>${druid.version}</version>
         </dependency>
+        <!--lombok插件-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!--mapStruct依赖-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!--mongodb-->
         <dependency>
@@ -169,7 +183,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <!-- maven-compiler-plugin应该是默认使用的。所以可以不显示的配置。 -->
+                <!-- 这里主要为lombok和mapstruct的配置。 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -194,6 +208,13 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <!--     Maven JDK9 Jigsaw       -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jmod-plugin</artifactId>
+                <version>3.0.0-alpha-1</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
