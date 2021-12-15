@@ -51,6 +51,8 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 ---
 
+[近期log4j相关](https://www.lwohvye.com/2021/12/11/log4j2-2021-12-09/)
+
 #### Maven引用方式 🎵
 
 最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
