@@ -332,7 +332,7 @@
         <dependency>
             <groupId>nl.basjes.parse.useragent</groupId>
             <artifactId>yauaa</artifactId>
-            <version>6.4</version>
+            <version>6.5</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-collections4</artifactId>
