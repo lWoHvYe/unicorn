@@ -29,6 +29,11 @@
         <!-- 代码生成模块 -->
         <dependency>
             <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-tools</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lwohvye</groupId>
             <artifactId>eladmin-generator</artifactId>
             <version>${project.core.version}</version>
         </dependency>

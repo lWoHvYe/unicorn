@@ -49,6 +49,12 @@ public class MailUtils {
 
     }
 
+    public void sendMail(String to, String subject, String text) {
+        var mailVo = new MailVo().setTo(StringUtils.isBlank(to) ? getMailDefaultTo() : to)
+                .setSubject(subject).setText(text);
+        sendMail(mailVo);
+    }
+
     private void checkMail(MailVo mailVo) {
         if (StringUtils.isEmpty(mailVo.getTo())) {
             throw new BadRequestException("邮件收信人不能为空");

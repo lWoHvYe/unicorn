@@ -15,7 +15,6 @@
  */
 package com.lwohvye.utils;
 
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -105,7 +104,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * 拿到ApplicationContext对象实例后就可以手动获取Bean的注入实例对象
      */
     public static <T> T getBean(String beanName, Class<T> clazz) {
-        if (StrUtil.isBlank(beanName)) {
+        if (StringUtils.isBlank(beanName)) {
             return applicationContext.getBean(clazz);
         } else {
             return applicationContext.getBean(beanName, clazz);
