@@ -116,7 +116,7 @@ public class ExecutionJob extends QuartzJobBean {
                     Template template = engine.getTemplate("email/taskAlarm.ftl");
                     var content = template.render(data);
                     List<String> emails = Arrays.asList(quartzJob.getEmail().split("[,，]"));
-                    ReflectUtil.invoke(SpringContextHolder.getBean("iEmailService"), "send", emails, subject, content);
+                    ReflectUtil.invoke(SpringContextHolder.getBean("emailServiceImpl"), "send", emails, subject, content);
                 }
             }
 //            执行失败再记录日志
