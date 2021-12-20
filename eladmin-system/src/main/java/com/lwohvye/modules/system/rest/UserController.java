@@ -16,10 +16,11 @@
 package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollUtil;
-import com.lwohvye.log.annotation.Log;
+import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.log.annotation.Log;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;
@@ -29,7 +30,6 @@ import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
-import com.lwohvye.tools.service.IVerifyService;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;
@@ -68,7 +68,6 @@ public class UserController {
     private final IDataService dataService;
     private final IDeptService deptService;
     private final IRoleService roleService;
-    private final IVerifyService verifyService;
 
     @Operation(summary = "导出用户数据")
     @GetMapping(value = "/download")
@@ -181,7 +180,7 @@ public class UserController {
         if (!passwordEncoder.matches(password, userDto.getPassword())) {
             throw new BadRequestException("密码错误");
         }
-        verifyService.validated(CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
+        ReflectUtil.invoke("verifyService", "validated", CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
         userService.updateEmail(userDto.getUsername(), user.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }

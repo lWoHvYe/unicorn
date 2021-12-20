@@ -1,7 +1,7 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.eladmin.system {
     requires transitive lwohvye.eladmin.api;
-    requires transitive lwohvye.eladmin.tools;
+    requires transitive lwohvye.eladmin.logging;
 
     requires transitive java.desktop;
     requires transitive java.management;

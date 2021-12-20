@@ -21,9 +21,16 @@
     </properties>
 
     <dependencies>
+        <!--    system模块    -->
         <dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>eladmin-system</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>
+        <!--   tools模块     -->
+        <dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-tools</artifactId>
             <version>${project.core.version}</version>
         </dependency>
         <!-- 代码生成模块 -->

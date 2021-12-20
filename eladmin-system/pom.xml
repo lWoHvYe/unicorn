@@ -27,10 +27,10 @@
             <version>${project.core.version}</version>
         </dependency>
 
-        <!-- tools 模块包含了 common 和 logging 模块 -->
+        <!-- logging 模块 -->
         <dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-tools</artifactId>
+            <artifactId>eladmin-logging</artifactId>
             <version>${project.core.version}</version>
         </dependency>
 

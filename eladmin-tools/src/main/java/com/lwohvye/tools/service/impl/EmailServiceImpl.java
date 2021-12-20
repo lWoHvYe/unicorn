@@ -17,9 +17,9 @@ package com.lwohvye.tools.service.impl;
 
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
+import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.tools.domain.EmailConfig;
 import com.lwohvye.tools.domain.vo.EmailVo;
-import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.tools.repository.EmailRepository;
 import com.lwohvye.tools.service.IEmailService;
 import com.lwohvye.utils.EncryptUtils;
@@ -30,6 +30,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -106,5 +107,11 @@ public class EmailServiceImpl implements IEmailService {
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
+    }
+
+    @Override
+    public void send(List<String> tos, String subject, String content) {
+        var emailVo = new EmailVo().setTos(tos).setSubject(subject).setContent(content);
+        send(emailVo, find());
     }
 }
