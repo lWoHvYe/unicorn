@@ -22,13 +22,10 @@ import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import com.lwohvye.config.thread.ThreadPoolExecutorUtil;
-import com.lwohvye.domain.vo.EmailVo;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.quartz.repository.QuartzLogRepository;
 import com.lwohvye.modules.quartz.service.IQuartzJobService;
-import com.lwohvye.service.IEmailService;
-import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.ThrowableUtil;
@@ -119,7 +116,7 @@ public class ExecutionJob extends QuartzJobBean {
                     Template template = engine.getTemplate("email/taskAlarm.ftl");
                     var content = template.render(data);
                     List<String> emails = Arrays.asList(quartzJob.getEmail().split("[,，]"));
-                    ReflectUtil.invoke(SpringContextHolder.getBean("iEmailService"), "send", emails, subject, content);
+                    ReflectUtil.invoke(SpringContextHolder.getBean("emailServiceImpl"), "send", emails, subject, content);
                 }
             }
 //            执行失败再记录日志
