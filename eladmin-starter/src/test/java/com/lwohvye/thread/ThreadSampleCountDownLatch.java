@@ -157,6 +157,7 @@ public class ThreadSampleCountDownLatch {
         } finally {
 //        关闭线程池
             executor.shutdown();
+            while (!executor.isTerminated()) ; // 这里可以等待一下结束。阻塞一下
         }
     }
 
