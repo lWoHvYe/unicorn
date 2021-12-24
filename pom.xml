@@ -78,7 +78,7 @@
         <project.core.version>2.6.18</project.core.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <springfox.version>3.0.0</springfox.version>
-        <io.swagger.version>1.6.3</io.swagger.version>
+        <io.swagger.version>1.6.4</io.swagger.version>
         <druid.version>1.2.8</druid.version>
         <hutool.version>5.7.17</hutool.version>
         <fastutil.version>8.5.6</fastutil.version>
@@ -90,7 +90,7 @@
         <log4j2.version>2.17.0</log4j2.version>
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.0.1</logstash.version>
-        <logback.version>1.2.9</logback.version>
+        <logback.version>1.2.10</logback.version>
         <redisson.version>3.16.7</redisson.version>
         <argLine>
             -Dfile.encoding=UTF-8
@@ -332,7 +332,7 @@
         <dependency>
             <groupId>nl.basjes.parse.useragent</groupId>
             <artifactId>yauaa</artifactId>
-            <version>6.5</version>
+            <version>6.6</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-collections4</artifactId>
