@@ -105,19 +105,18 @@ public class ExecutionJob extends QuartzJobBean {
                 //更新状态
                 quartzJobService.updateIsPause(quartzJob);
             }
-            if (quartzJob.getEmail() != null) {
-                // 邮箱报警
-                if (StrUtil.isNotBlank(quartzJob.getEmail())) {
-                    var subject = "定时任务【" + quartzJob.getJobName() + "】执行失败，请尽快处理！";
-                    Map<String, Object> data = new HashMap<>(16);
-                    data.put("task", quartzJob);
-                    data.put("msg", ThrowableUtil.getStackTrace(e));
-                    TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
-                    Template template = engine.getTemplate("email/taskAlarm.ftl");
-                    var content = template.render(data);
-                    List<String> emails = Arrays.asList(quartzJob.getEmail().split("[,，]"));
-                    ReflectUtil.invoke(SpringContextHolder.getBean("emailServiceImpl"), "send", emails, subject, content);
-                }
+            // 邮箱报警
+            if (StrUtil.isNotBlank(quartzJob.getEmail())) {
+                var subject = "定时任务【" + quartzJob.getJobName() + "】执行失败，请尽快处理！";
+                Map<String, Object> data = new HashMap<>(16);
+                data.put("task", quartzJob);
+                data.put("msg", ThrowableUtil.getStackTrace(e));
+                TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+                Template template = engine.getTemplate("email/taskAlarm.ftl");
+                var content = template.render(data);
+                List<String> emails = Arrays.asList(quartzJob.getEmail().split("[,，]"));
+                // 这里通过反射来获取
+                ReflectUtil.invoke(SpringContextHolder.getBean("emailServiceImpl"), "send", emails, subject, content);
             }
 //            执行失败再记录日志
             quartzLogRepository.save(log);

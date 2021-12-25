@@ -55,7 +55,7 @@ public class ExecuteShellUtil {
 		ChannelShell channel = null;
 		PrintWriter printWriter = null;
 		BufferedReader input = null;
-		stdout = new Vector<String>();
+		stdout = new Vector<>();
 		try {
 			channel = (ChannelShell) session.openChannel("shell");
 			channel.connect();
