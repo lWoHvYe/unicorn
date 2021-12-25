@@ -205,5 +205,5 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - dev_3.0 动态权限，前端功能开发调整
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）
-- 网关(Gateway)模块-鉴权（JWT Token无状态改造后，可以抽取出鉴权模块，做SSO。后续鉴权模块可与网关集成）
+- 网关(Gateway)模块-鉴权（JWT Token无状态改造后，可以抽取出鉴权模块，做SSO。后续鉴权模块可与网关集成，这部分待集成Spring Cloud，网关额外负责认证与鉴权，内部服务不直接暴露）
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，但未找到Spring Boot项目的启动方式，故暂缓，可能要等到Spring 6.x 及 Spring Boot 3.X对 JPMS相关支持及Java 17了）
