@@ -87,9 +87,10 @@
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <!--    指定版本，新版本Spring Boot发布后可移除    -->
-        <log4j2.version>2.17.0</log4j2.version>
+        <!--<log4j2.version>2.17.0</log4j2.version>-->
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.0.1</logstash.version>
+        <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
         <logback.version>1.2.10</logback.version>
         <redisson.version>3.16.7</redisson.version>
         <argLine>
