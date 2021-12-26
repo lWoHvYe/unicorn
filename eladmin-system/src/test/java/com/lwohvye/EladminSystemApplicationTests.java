@@ -1,14 +1,21 @@
 package com.lwohvye;
 
+import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.script.ScriptEngineManager;
+import java.io.FileReader;
+import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -18,6 +25,7 @@ public class EladminSystemApplicationTests {
     public void contextLoads() {
     }
 
+    @SneakyThrows
     public static void main(String[] args) {
         final val friend = new Friend("在一起", 8);
         val person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
@@ -63,6 +71,35 @@ public class EladminSystemApplicationTests {
 
         List<String> syncArrayList = Collections.synchronizedList(new ArrayList<>()); // 对于经常被修改的数组列表， 同步的 ArrayList 可以胜过 CopyOnWriteArrayList()；
         Map<String, Long> syncHashMap = Collections.synchronizedMap(new HashMap<>()); // 对于映射，ConcurrentHashMap较同步的HashMap要好一些。
+
+        var pMap = Stream.of(person, person, person).collect(Collectors.toMap(Person::name, Function.identity())); // 用identity比 t -> t 看着舒服
+
+        // ----------------------------------------------------------------------------------------------
+        // 获取脚本引擎
+        var manager = new ScriptEngineManager();
+        var nashornEngine = manager.getEngineByName("nashorn"); // js脚本引擎
+        var jsScript = ""; // js脚本
+        var result0 = nashornEngine.eval(jsScript); // 执行脚本-来自字符串
+        var jsFile = new FileReader("fileName");
+        var result1 = nashornEngine.eval(jsFile); // 执行脚本-来自文件
+        // 还可以设置或获取域内的属性。这里略过
+        // 可以指定结果的输出
+        // 还可以调用脚本的函数和方法。
+        // ----------------------------------------------------------------------------------------------
+        // MethodHandle为1.7引入的。Unsafe 是不建议开发者直接使用的，因为 Unsafe 所操作的并不属于Java标准，会容易带来一些安全性的问题。
+        // JDK9 之后，官方推荐使用 java.lang.invoke.Varhandle 来替代 Unsafe 大部分功能，对比 Unsafe ，Varhandle 有着相似的功能，但会更加安全，并且，在并发方面也提高了不少性能。
+        // https://www.lwohvye.com/2021/12/26/juc%e6%95%b4%e7%90%86%e7%ac%94%e8%ae%b0-varhandle/
+        var treeNode = new TreeNode(1);
+        var bgVarHandle = MethodHandles.lookup().in(TreeNode.class).findVarHandle(TreeNode.class, "val", int.class);
+        System.out.println("get：" + bgVarHandle.get(treeNode));
+        bgVarHandle.set(treeNode, 2);
+
+        var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
+        System.out.println("get：" + nameVarHandle.get(person));
+        nameVarHandle.set(person, "社会主义");
+        System.out.println(person.name());
+        nameVarHandle.setVolatile(person, "核心价值观");
+        System.out.println(person.name());
     }
 
 //    Person person;
