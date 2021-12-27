@@ -1,5 +1,7 @@
 package com.lwohvye;
 
+import com.lwohvye.hiddenclass.Customer;
+import com.lwohvye.hiddenclass.PropertyAccessorFactory;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.script.ScriptEngineManager;
 import java.io.FileReader;
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
@@ -17,8 +21,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+import static org.junit.jupiter.api.Assertions.*;
+
+// @ExtendWith(SpringExtension.class)
+// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EladminSystemApplicationTests {
 
     @Test
@@ -100,9 +106,30 @@ public class EladminSystemApplicationTests {
         System.out.println(person.name());
         nameVarHandle.setVolatile(person, "核心价值观");
         System.out.println(person.name());
+        // ------------------------------------------------------------------------------------------------
     }
 
-//    Person person;
+    //    Person person;
 
+    @Test
+    public void testHiddenClass() throws Throwable {
+        // com.lwohvye.hiddenclass.CustomerPropertyAccessor/0x0000000800ca9000 类名是这样的，最后用 /分隔，后面是Hidden Classes
+        var accessor = PropertyAccessorFactory.getPropertyAccessor(Customer.class);
+
+        var customer = new Customer("Idol", 18L, LocalDate.of(1995, Month.MAY, 23), "Main Street");
+        assertEquals("Idol", accessor.getValue(customer, "name"));
+        assertEquals(LocalDate.of(1995, Month.MAY, 23), accessor.getValue(customer, "birthday"));
+        assertEquals("Main Street", accessor.getValue(customer, "address"));
+
+        assertTrue(accessor.getClass().isHidden());
+        assertNull(accessor.getClass().getCanonicalName());
+    }
+
+    @Test
+    public void testCannotLoadHiddenClass() throws Throwable {
+        var accessor = PropertyAccessorFactory.getPropertyAccessor(Customer.class);
+        // 这里会报类找不到，因为隐藏类是不能被ClassLoader load的
+        accessor.getClass().getClassLoader().loadClass(accessor.getClass().getName());
+    }
 }
 
