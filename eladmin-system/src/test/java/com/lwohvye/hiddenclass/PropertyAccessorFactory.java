@@ -26,6 +26,7 @@ import static java.lang.invoke.MethodType.methodType;
 
 /**
  * Very basic property accessor generator; doesn't take care of primitive boxing etc.
+ * 这是一个代理工厂类，生成代理类的。
  * <a href="http://openjdk.java.net/jeps/371">Hidden Classes</a>
  * <a href="https://github.com/gunnarmorling/hidden-classes">demo</a>
  * <a href="https://www.lwohvye.com/2021/12/27/asm-%e5%ba%93%e7%9a%84%e4%bb%8b%e7%bb%8d%e5%92%8c%e4%bd%bf%e7%94%a8/">ASM相关</a>
@@ -38,7 +39,7 @@ public class PropertyAccessorFactory implements Opcodes {
         Lookup lookup;
         try {
             lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup())
-                    .defineHiddenClass(PropertyAccessorFactory.generatePropertyAccessor(clazz), false); // 通过defineHiddenClass来获取
+                    .defineHiddenClass(PropertyAccessorFactory.generatePropertyAccessor(clazz), false); // 通过defineHiddenClass来获取 Hidden Classes
             var ctor = lookup.findConstructor(lookup.lookupClass(), methodType(void.class));
             return (PropertyAccessor<T>) ctor.invoke();
         } catch (Throwable t) {
@@ -68,7 +69,7 @@ public class PropertyAccessorFactory implements Opcodes {
             methodVisitor.visitCode();
             var label0 = new Label();
             methodVisitor.visitLabel(label0);
-            methodVisitor.visitLineNumber(3, label0); // 这里通过LineNumber访问，通用性较差，也许可以移除掉。在getValue里移除了无影响
+            methodVisitor.visitLineNumber(3, label0); // 这里通过LineNumber访问。理论上可用于在指定位置添加代码。
             methodVisitor.visitVarInsn(ALOAD, 0);
             methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
             methodVisitor.visitInsn(RETURN);
@@ -92,6 +93,7 @@ public class PropertyAccessorFactory implements Opcodes {
 
             // var field = instance.getClass().getDeclaredField(property);
             methodVisitor.visitLabel(label0);
+            methodVisitor.visitLineNumber(35, label0); // 行号这里，只要顺序没问题就行
             methodVisitor.visitVarInsn(ALOAD, 1);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
             methodVisitor.visitVarInsn(ALOAD, 2);
@@ -101,6 +103,7 @@ public class PropertyAccessorFactory implements Opcodes {
             // field.trySetAccessible();
             var label3 = new Label();
             methodVisitor.visitLabel(label3);
+            methodVisitor.visitLineNumber(36, label3);
             methodVisitor.visitVarInsn(ALOAD, 3);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "trySetAccessible", "()Z", false);
             methodVisitor.visitInsn(POP);
@@ -108,6 +111,7 @@ public class PropertyAccessorFactory implements Opcodes {
             // return field.get(instance);
             var label4 = new Label();
             methodVisitor.visitLabel(label4);
+            methodVisitor.visitLineNumber(37, label4);
             methodVisitor.visitVarInsn(ALOAD, 3);
             methodVisitor.visitVarInsn(ALOAD, 1);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
@@ -115,6 +119,7 @@ public class PropertyAccessorFactory implements Opcodes {
             methodVisitor.visitInsn(ARETURN);
 
             methodVisitor.visitLabel(label2);
+            methodVisitor.visitLineNumber(27, label2);
             methodVisitor.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
             methodVisitor.visitVarInsn(ASTORE, 3);
             var label5 = new Label();

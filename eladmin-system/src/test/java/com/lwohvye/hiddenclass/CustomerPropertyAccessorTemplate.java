@@ -26,7 +26,7 @@ public class CustomerPropertyAccessorTemplate implements PropertyAccessor<Custom
 
     @SneakyThrows
     @Override
-    // 并没有走进该方法，实际访问的为ASM的代理。如注释所言，这个是一个 template for ASMifier
+    // 该类并未加载，实际访问的为ASM的代理。如注释所言，这个是一个 template for ASMifier
     // java --add-opens java.base/jdk.internal.org.objectweb.asm.util=ALL-UNNAMED jdk.internal.org.objectweb.asm.util.ASMifier CustomerPropertyAccessorTemplate.class
     public Object getValue(Customer instance, String property) {
         // var field = ReflectionUtils.findField(instance.getClass(), property);

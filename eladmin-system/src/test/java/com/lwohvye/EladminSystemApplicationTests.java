@@ -102,6 +102,7 @@ public class EladminSystemApplicationTests {
 
         var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
         System.out.println("get：" + nameVarHandle.get(person));
+        // record中是final属性，所以下面的两个set会报错的
         nameVarHandle.set(person, "社会主义");
         System.out.println(person.name());
         nameVarHandle.setVolatile(person, "核心价值观");
@@ -114,12 +115,22 @@ public class EladminSystemApplicationTests {
     @Test
     public void testHiddenClass() throws Throwable {
         // com.lwohvye.hiddenclass.CustomerPropertyAccessor/0x0000000800ca8c00 类名是这样的，最后用 /分隔，后面是Hidden Classes
-        var accessor = PropertyAccessorFactory.getPropertyAccessor(Customer.class);
+        // var accessor = PropertyAccessorFactory.getPropertyAccessor(Customer.class);
+        //
+        // var customer = new Customer("Idol", 18L, LocalDate.of(1995, Month.MAY, 23), "Main Street");
+        // assertEquals("Idol", accessor.getValue(customer, "name"));
+        // assertEquals(LocalDate.of(1995, Month.MAY, 23), accessor.getValue(customer, "birthday"));
+        // assertEquals("Main Street", accessor.getValue(customer, "address"));
 
-        var customer = new Customer("Idol", 18L, LocalDate.of(1995, Month.MAY, 23), "Main Street");
-        assertEquals("Idol", accessor.getValue(customer, "name"));
-        assertEquals(LocalDate.of(1995, Month.MAY, 23), accessor.getValue(customer, "birthday"));
-        assertEquals("Main Street", accessor.getValue(customer, "address"));
+        val friend = new Friend("在一起", 8);
+        val person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
+
+        var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
+        System.out.println("get：" + nameVarHandle.get(person));
+
+        var accessor = PropertyAccessorFactory.getPropertyAccessor(Person.class);
+        assertEquals(person.name(), accessor.getValue(person, "name"));
+        assertEquals(person.age(), accessor.getValue(person, "age"));
 
         assertTrue(accessor.getClass().isHidden());
         assertNull(accessor.getClass().getCanonicalName());
