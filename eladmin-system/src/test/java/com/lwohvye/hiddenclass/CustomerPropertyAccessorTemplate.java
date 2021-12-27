@@ -18,9 +18,6 @@ package com.lwohvye.hiddenclass;
 
 
 import lombok.SneakyThrows;
-import org.springframework.util.ReflectionUtils;
-
-import java.util.Objects;
 
 /**
  * Used as template for ASMifier.
@@ -29,10 +26,27 @@ public class CustomerPropertyAccessorTemplate implements PropertyAccessor<Custom
 
     @SneakyThrows
     @Override
-    // 并没有走进该方法，实际访问的为ASM的代理
+    // 并没有走进该方法，实际访问的为ASM的代理。如注释所言，这个是一个 template for ASMifier
+    // java --add-opens java.base/jdk.internal.org.objectweb.asm.util=ALL-UNNAMED jdk.internal.org.objectweb.asm.util.ASMifier CustomerPropertyAccessorTemplate.class
     public Object getValue(Customer instance, String property) {
-        var field = ReflectionUtils.findField(instance.getClass(), property);
-        Objects.requireNonNull(field).trySetAccessible();
+        // var field = ReflectionUtils.findField(instance.getClass(), property);
+        // Objects.requireNonNull(field).trySetAccessible();
+        // return field.get(instance);
+        var field = instance.getClass().getDeclaredField(property);
+        field.trySetAccessible();
         return field.get(instance);
+        // if (property.equals("name")) {
+        //     return instance.getName();
+        // }
+        //
+        // if (property.equals("birthday")) {
+        //     return instance.getBirthday();
+        // }
+        //
+        // if (property.equals("address")) {
+        //     return instance.getAddress();
+        // }
+        //
+        // throw new IllegalArgumentException("Unknown property: " + property);
     }
 }

@@ -23,8 +23,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// @ExtendWith(SpringExtension.class)
-// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EladminSystemApplicationTests {
 
     @Test
@@ -113,7 +113,7 @@ public class EladminSystemApplicationTests {
 
     @Test
     public void testHiddenClass() throws Throwable {
-        // com.lwohvye.hiddenclass.CustomerPropertyAccessor/0x0000000800ca9000 类名是这样的，最后用 /分隔，后面是Hidden Classes
+        // com.lwohvye.hiddenclass.CustomerPropertyAccessor/0x0000000800ca8c00 类名是这样的，最后用 /分隔，后面是Hidden Classes
         var accessor = PropertyAccessorFactory.getPropertyAccessor(Customer.class);
 
         var customer = new Customer("Idol", 18L, LocalDate.of(1995, Month.MAY, 23), "Main Street");
