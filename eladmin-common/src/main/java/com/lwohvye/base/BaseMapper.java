@@ -76,7 +76,7 @@ public interface BaseMapper<D, E> {
     // 但针对当前问题中不能使用qualifiedByName,因为这些mapper中都有这方法，又回到源点来，建议在对应但Mapper中Override一下。
     // 若在项目中不用uses相互引用mapper，可以把@Named移除掉，在有需要时会自动使用
     // https://mapstruct.org/documentation/stable/reference/html/#selection-based-on-qualifiers
-    //    通用的Map/List与Json-String互转的方法。当入是A出是B时，会自动调用相关的规则，这里配置会作为默认的转换规则。欲使用其他的，可使用@Mapping(target="",expression="java(method...)")
+    // 通用的Map/List与Json-String互转的方法。当入是A出是B时，会自动调用相关的规则，这里配置会作为默认的转换规则。欲使用其他的，可使用@Mapping(target="",expression="java(method...)")
     default Map convertString2JsonMap(String in) {
         return JsonUtils.toMap(in);
     }
