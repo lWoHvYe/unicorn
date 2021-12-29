@@ -18,6 +18,7 @@
         <project.core.version>2.6.18</project.core.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <javassist.version>3.28.0-GA</javassist.version>
+        <shardingsphere.version>5.0.0</shardingsphere.version>
     </properties>
 
     <dependencies>
@@ -43,7 +44,7 @@
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
             <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
-            <version>5.0.0</version>
+            <version>${shardingsphere.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>guava</artifactId>

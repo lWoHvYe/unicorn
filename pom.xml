@@ -79,6 +79,7 @@
         <log4jdbc.version>1.16</log4jdbc.version>
         <springfox.version>3.0.0</springfox.version>
         <io.swagger.version>1.6.4</io.swagger.version>
+        <knife4j.version>3.0.3</knife4j.version>
         <druid.version>1.2.8</druid.version>
         <hutool.version>5.7.18</hutool.version>
         <fastutil.version>8.5.6</fastutil.version>
@@ -93,6 +94,15 @@
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
         <logback.version>1.2.10</logback.version>
         <redisson.version>3.16.7</redisson.version>
+        <guava.version>31.0.1-jre</guava.version>
+        <poi.version>5.1.0</poi.version>
+        <xerces.version>2.12.1</xerces.version>
+        <yauaa.version>6.6</yauaa.version>
+        <ip2region.version>2.6.0</ip2region.version>
+        <pdfbox.version>2.0.25</pdfbox.version>
+        <xmlsec.version>2.3.0</xmlsec.version>
+        <xmlgraphics.version>2.6</xmlgraphics.version>
+        <batik.version>1.14</batik.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
@@ -201,7 +211,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.0.1-jre</version>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
@@ -221,7 +231,7 @@
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
-            <version>3.0.3</version>
+            <version>${knife4j.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>javassist</artifactId>
@@ -276,7 +286,7 @@
         <dependency>
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-ip2region</artifactId>
-            <version>2.6.0</version>
+            <version>${ip2region.version}</version>
         </dependency>
 
         <!--lombok插件-->
@@ -291,17 +301,17 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.1.0</version>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.1.0</version>
+            <version>${poi.version}</version>
         </dependency>
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
-            <version>2.12.1</version>
+            <version>${xerces.version}</version>
         </dependency>
 
         <!--mapStruct依赖-->
@@ -316,13 +326,14 @@
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!--   具体可以看看这个，https://jcp.org/en/jsr/detail?id=330     -->
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
 
-        <!-- Java图形验证码 -->
+        <!-- Java图形验证码。该项目闭源，后续找找替代方案 -->
         <dependency>
             <groupId>com.github.whvcse</groupId>
             <artifactId>easy-captcha</artifactId>
@@ -333,7 +344,7 @@
         <dependency>
             <groupId>nl.basjes.parse.useragent</groupId>
             <artifactId>yauaa</artifactId>
-            <version>6.6</version>
+            <version>${yauaa.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-collections4</artifactId>
@@ -353,30 +364,34 @@
             -->
         </dependency>
         <!--   fixed dependencies of plugins with threat    -->
+        <!--   下面几个依赖的具体用途
+        Apache XML Graphics Commons is a library that consists of several reusable components used by Apache Batik and Apache FOP.
+        Many of these components can easily be used separately outside the domains of SVG and XSL-FO.
+        You'll find components such as a PDF library, an RTF library, Graphics2D implementations that let you generate PDF and PostScript files and much more.     -->
         <!--   4pdfbox     -->
         <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>2.0.25</version>
+            <version>${pdfbox.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>fontbox</artifactId>
-            <version>2.0.25</version>
+            <version>${pdfbox.version}</version>
         </dependency>
         <!--    4xmlsec    -->
         <!-- https://mvnrepository.com/artifact/org.apache.santuario/xmlsec -->
         <dependency>
             <groupId>org.apache.santuario</groupId>
             <artifactId>xmlsec</artifactId>
-            <version>2.3.0</version>
+            <version>${xmlsec.version}</version>
         </dependency>
         <!--    4xmlgraphics-commons    -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>xmlgraphics-commons</artifactId>
-            <version>2.6</version>
+            <version>${xmlgraphics.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-io</artifactId>
@@ -388,11 +403,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--    4batik    -->
+        <!--    4batik  Batik is a Java-based toolkit for applications or applets that want to use images in the Scalable Vector Graphics (SVG) format for various purposes, such as display, generation or manipulation.  -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>batik-all</artifactId>
-            <version>1.14</version>
+            <version>${batik.version}</version>
         </dependency>
     </dependencies>
     <!--
