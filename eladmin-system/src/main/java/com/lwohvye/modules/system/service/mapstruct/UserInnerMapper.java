@@ -39,6 +39,7 @@ import java.util.List;
 //使用uses指定的转换规则，会自动使用，mapstruct会根据入和出自动使用转换规则，但使用maven的compile会报错，也就是说自动编译可以，但使用maven不行，原因未知
 //@Mapper(componentModel = "spring", uses = {ConvertBlob2StringUtil.class, RoleMapper.class, DeptMapper.class, JobMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserInnerMapper extends BaseMapper<UserInnerDto, User> {
+    // 针对于MapStruct，推荐一款插件：https://plugins.jetbrains.com/plugin/10036-mapstruct-support
     @Override
 //    @Mapping(target = "description", source = "description", qualifiedBy = Blob2String.class)
     @Mapping(target = "roleIds", expression = "java(entity.getRoles().stream().map(this::getRoleId).toList())")
