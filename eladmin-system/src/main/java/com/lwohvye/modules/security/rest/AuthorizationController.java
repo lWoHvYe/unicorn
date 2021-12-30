@@ -112,7 +112,7 @@ public class AuthorizationController {
 
         // region Java 锁
         var reentrantLock = new ReentrantLock();
-        var condition = reentrantLock.newCondition(); // 条件对象
+        var condition = reentrantLock.newCondition(); // 条件对象。基于Condition，可以更细粒度的控制等待与唤醒
         reentrantLock.lock();
         // var lockRes = reentrantLock.tryLock(); 加锁成功返回true，否则返回false，这样不会阻塞，也可以设置超时
         try {
@@ -129,7 +129,7 @@ public class AuthorizationController {
 
         //---------------------------------------------------------------
 
-        var readWriteLock = new ReentrantReadWriteLock();
+        var readWriteLock = new ReentrantReadWriteLock(); // 读写锁
         readWriteLock.readLock().lock(); // 读锁不阻塞读，但阻塞写。Idea快捷键 RL
         try {
             // doSomething
@@ -146,7 +146,11 @@ public class AuthorizationController {
 
         // endregion
 
-        // region   可重入锁
+        // 主体感觉上，Java中的锁是单系统的。下面这些Redisson都是 分布式锁。
+        // TODO: 2021/12/29 当下遗留一个问题，就是加解锁放在事务中时，解锁后事务还未提交，应如何解决这类问题。
+        //  当下的一个方案是将加解锁放到事务外/或者调整其传播行为为独立的事务(Propagation.REQUIRES_NEW)。
+        //  从系统设计的角度，会变的复杂一些：若是对资源的使用，需考虑主体业务失败后的补偿问题，也许需要把资源的使用分阶段？（未使用、已锁定、已使用、已失效）
+        // region Redisson  可重入锁
         // 获取分布式锁。只要锁名称一样，就是同一把锁
         // 可重入锁：同一线程不必重新获取锁
         var lock = redissonClient.getLock("lock-red");

@@ -93,7 +93,7 @@ public class EladminSystemApplicationTests {
         // 还可以调用脚本的函数和方法。
         // ----------------------------------------------------------------------------------------------
         // MethodHandle为1.7引入的。Unsafe 是不建议开发者直接使用的，因为 Unsafe 所操作的并不属于Java标准，会容易带来一些安全性的问题。
-        // JDK9 之后，官方推荐使用 java.lang.invoke.Varhandle 来替代 Unsafe 大部分功能，对比 Unsafe ，Varhandle 有着相似的功能，但会更加安全，并且，在并发方面也提高了不少性能。
+        // JDK9 之后，官方推荐使用 java.lang.invoke.VarHandle 来替代 Unsafe 大部分功能，对比 Unsafe ，VarHandle 有着相似的功能，但会更加安全，并且，在并发方面也提高了不少性能。
         // https://www.lwohvye.com/2021/12/26/juc%e6%95%b4%e7%90%86%e7%ac%94%e8%ae%b0-varhandle/
         var treeNode = new TreeNode(1);
         var bgVarHandle = MethodHandles.lookup().in(TreeNode.class).findVarHandle(TreeNode.class, "val", int.class);
@@ -124,7 +124,7 @@ public class EladminSystemApplicationTests {
 
         val friend = new Friend("在一起", 8);
         val person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
-
+        // MethodHandle和VarHandle
         var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
         System.out.println("get：" + nameVarHandle.get(person));
 
