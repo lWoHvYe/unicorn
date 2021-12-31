@@ -32,7 +32,7 @@ import java.util.Arrays;
  * @author Hongyan Wang
  * @packageName com.lwohvye.generate
  * @className GeneratorCode
- * @description
+ * @description 使用Shardingsphere的eladmin-starter无法运行该功能，后续排查原因
  * @date 2020/12/30 0:11
  */
 @ExtendWith(SpringExtension.class)
