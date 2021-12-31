@@ -99,6 +99,7 @@
         <xerces.version>2.12.1</xerces.version>
         <yauaa.version>6.6</yauaa.version>
         <ip2region.version>2.6.0</ip2region.version>
+        <thumbnailator.version>0.4.15</thumbnailator.version>
         <pdfbox.version>2.0.25</pdfbox.version>
         <xmlsec.version>2.3.0</xmlsec.version>
         <xmlgraphics.version>2.6</xmlgraphics.version>
@@ -362,6 +363,12 @@
                 JsonProvider, AppenderListener, JsonFactoryDecorator, JsonGeneratorDecorator, etc
             <scope>runtime</scope>
             -->
+        </dependency>
+        <!--图片处理。主要为调整图片的尺寸-->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>${thumbnailator.version}</version>
         </dependency>
         <!--   fixed dependencies of plugins with threat    -->
         <!--   下面几个依赖的具体用途
