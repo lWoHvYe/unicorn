@@ -62,7 +62,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 <dependency>
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
-    <version>2.6.17</version>
+    <version>2.6.18</version>
     <type>pom</type>
 </dependency>
 
