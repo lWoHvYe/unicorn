@@ -33,11 +33,13 @@ import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.RsaUtils;
 import com.lwohvye.utils.SecurityUtils;
+import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.enums.CodeEnum;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +61,7 @@ import java.util.Set;
  * @date 2018-11-23
  */
 @Api(tags = "系统：用户管理")
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -186,7 +189,15 @@ public class UserController {
         if (!passwordEncoder.matches(password, userDto.getPassword())) {
             throw new BadRequestException("密码错误");
         }
-        ReflectUtil.invoke("verifyService", "validated", CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
+        var beanName = "verifyServiceImpl";
+        Object verifyService = null;
+        try {
+            verifyService = SpringContextHolder.getBean(beanName);
+        } catch (Exception ex) {
+            log.error("获取 {} 异常，原因 {} ，请确认是否引入相关模块", beanName, ex.getMessage());
+            throw new BadRequestException("系统错误，请联系客服");
+        }
+        ReflectUtil.invoke(verifyService, "validated", CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
         userService.updateEmail(userDto.getUsername(), user.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -30,6 +30,7 @@ import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.ThrowableUtil;
 import com.lwohvye.utils.redis.RedisUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.quartz.QuartzJobBean;
@@ -48,6 +49,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @date 2019-01-07
  */
 @Async
+@Slf4j
 public class ExecutionJob extends QuartzJobBean {
 
     /**
@@ -65,25 +67,25 @@ public class ExecutionJob extends QuartzJobBean {
 
         String uuid = quartzJob.getUuid();
 
-        QuartzLog log = new QuartzLog();
-        log.setJobName(quartzJob.getJobName());
-        log.setBeanName(quartzJob.getBeanName());
-        log.setMethodName(quartzJob.getMethodName());
-        log.setParams(quartzJob.getParams());
+        QuartzLog quartzLog = new QuartzLog();
+        quartzLog.setJobName(quartzJob.getJobName());
+        quartzLog.setBeanName(quartzJob.getBeanName());
+        quartzLog.setMethodName(quartzJob.getMethodName());
+        quartzLog.setParams(quartzJob.getParams());
         long startTime = System.currentTimeMillis();
-        log.setCronExpression(quartzJob.getCronExpression());
+        quartzLog.setCronExpression(quartzJob.getCronExpression());
         try {
             // 执行任务
             QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
             Future<?> future = EXECUTOR.submit(task);
             future.get();
             long times = System.currentTimeMillis() - startTime;
-            log.setTime(times);
+            quartzLog.setTime(times);
             if (StringUtils.isNotBlank(uuid)) {
                 redisUtils.set(uuid, true);
             }
             // 任务状态
-            log.setIsSuccess(true);
+            quartzLog.setIsSuccess(true);
             // 判断是否存在子任务
             if (StrUtil.isNotBlank(quartzJob.getSubTask())) {
                 String[] tasks = quartzJob.getSubTask().split("[,，]");
@@ -95,10 +97,10 @@ public class ExecutionJob extends QuartzJobBean {
                 redisUtils.set(uuid, false);
             }
             long times = System.currentTimeMillis() - startTime;
-            log.setTime(times);
+            quartzLog.setTime(times);
             // 任务状态 0：成功 1：失败
-            log.setIsSuccess(false);
-            log.setExceptionDetail(ThrowableUtil.getStackTrace(e));
+            quartzLog.setIsSuccess(false);
+            quartzLog.setExceptionDetail(ThrowableUtil.getStackTrace(e));
             // 任务如果失败了则暂停
             if (quartzJob.getPauseAfterFailure() != null && quartzJob.getPauseAfterFailure()) {
                 quartzJob.setIsPause(false);
@@ -116,10 +118,18 @@ public class ExecutionJob extends QuartzJobBean {
                 var content = template.render(data);
                 List<String> emails = Arrays.asList(quartzJob.getEmail().split("[,，]"));
                 // 这里通过反射来获取
-                ReflectUtil.invoke(SpringContextHolder.getBean("emailServiceImpl"), "send", emails, subject, content);
+                var beanName = "emailServiceImpl";
+                Object emailService = null;
+                try {
+                    emailService = SpringContextHolder.getBean(beanName);
+                } catch (Exception ex) {
+                    log.error("获取 {} 异常，原因 {} ，请确认是否引入相关模块", beanName, ex.getMessage());
+                    return;
+                }
+                ReflectUtil.invoke(emailService, "send", emails, subject, content);
             }
 //            执行失败再记录日志
-            quartzLogRepository.save(log);
+            quartzLogRepository.save(quartzLog);
         }
     }
 }

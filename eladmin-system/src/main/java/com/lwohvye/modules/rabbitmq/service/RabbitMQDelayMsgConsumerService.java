@@ -81,7 +81,15 @@ public class RabbitMQDelayMsgConsumerService {
             var text = template.render(Dict.create().setIgnoreNull("errMsg", e.getMessage()));
 
             // 邮件通知
-            ReflectUtil.invoke(SpringContextHolder.getBean("mailUtils"), "sendMail", to, subject, text);
+            Object mailUtils;
+            var beanName = "mailUtils";
+            try {
+                mailUtils = SpringContextHolder.getBean(beanName);
+            } catch (Exception ex) {
+                log.error("获取 {} 异常，原因 {} ，请确认是否引入相关模块", beanName, ex.getMessage());
+                return;
+            }
+            ReflectUtil.invoke(mailUtils, "sendMail", to, subject, text);
         } finally {
             log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, amqpMsgEntityStr);
             // 处理完成，根据结果记录相关表（看业务需求）。若处理报错，需邮件通知
