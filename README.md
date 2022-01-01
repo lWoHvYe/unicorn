@@ -208,3 +208,9 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 网关(Gateway)模块-鉴权（JWT Token无状态改造后，可以抽取出鉴权模块，做SSO。后续鉴权模块可与网关集成，这部分待集成Spring Cloud，网关额外负责认证与鉴权，内部服务不直接暴露）
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，但未找到Spring Boot项目的启动方式，故暂缓，可能要等到Spring 6.x 及 Spring Boot 3.X对 JPMS相关支持及Java 17了）
 - db中时间的存储格式可以用datetime或者timestamp，datetime占用8个字节、存在时区问题但可存储的时间范围广，timestamp占用4个字节、只能存储1970～2037但无时区问题，后续确定是否需要由datetime转为timestamp
+
+#### Spring Cloud
+
+感觉着只是这样处理的话，不是很麻烦，本月试一下
+
+![](document/images/microservices.png)
