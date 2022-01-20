@@ -102,7 +102,7 @@
         <thumbnailator.version>0.4.16</thumbnailator.version>
         <pdfbox.version>2.0.25</pdfbox.version>
         <xmlsec.version>2.3.0</xmlsec.version>
-        <xmlgraphics.version>2.6</xmlgraphics.version>
+        <xmlgraphics.version>2.7</xmlgraphics.version>
         <batik.version>1.14</batik.version>
         <argLine>
             -Dfile.encoding=UTF-8
