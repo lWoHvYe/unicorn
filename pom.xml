@@ -97,7 +97,7 @@
         <guava.version>31.0.1-jre</guava.version>
         <poi.version>5.2.0</poi.version>
         <xerces.version>2.12.1</xerces.version>
-        <yauaa.version>6.7</yauaa.version>
+        <yauaa.version>6.8</yauaa.version>
         <ip2region.version>2.6.0</ip2region.version>
         <thumbnailator.version>0.4.16</thumbnailator.version>
         <pdfbox.version>2.0.25</pdfbox.version>
