@@ -30,6 +30,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -354,5 +356,28 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
 
     public static String getMd5(File file) {
         return getMd5(getByte(file));
+    }
+
+    /**
+     * NIO 拷贝文件
+     *
+     * @param source
+     * @param target
+     * @date 2022/1/26 3:57 PM
+     */
+    public static void fileCopyNIO(String source, String target) throws IOException {
+        try (var in = new FileInputStream(source)) {
+            try (var out = new FileOutputStream(target)) {
+                var inChannel = in.getChannel();
+                var outChannel = out.getChannel();
+                var buffer = ByteBuffer.allocate(4096);
+                while (inChannel.read(buffer) != -1) {
+                    buffer.flip(); // 读写模式切换
+                    outChannel.write(buffer);
+                    buffer.clear(); // 写完清空 + 为下一轮的读操作作准备
+                }
+            }
+        }
+
     }
 }
