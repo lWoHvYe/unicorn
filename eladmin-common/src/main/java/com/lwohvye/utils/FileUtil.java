@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -378,6 +380,24 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
                 }
             }
         }
+    }
 
+    /**
+     * NIO遍历目录下所有文件（包括子目录）
+     *
+     * @param source
+     * @date 2022/1/26 4:20 PM
+     */
+    public static void listFiles(String source) throws IOException {
+        var initPath = Paths.get(source);
+        // 通过重写FileVisitor中部分方法的逻辑来实现
+        Files.walkFileTree(initPath, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                System.out.println(file.getFileName().toString());
+                // return super.visitFile(file, attrs);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }
