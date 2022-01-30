@@ -6,6 +6,7 @@ module lwohvye.eladmin.system {
     requires transitive java.desktop;
     requires transitive java.management;
     requires transitive java.annotation;
+    requires transitive java.scripting;
     requires transitive spring.aop;
     requires transitive spring.amqp;
     requires transitive spring.context.support;
