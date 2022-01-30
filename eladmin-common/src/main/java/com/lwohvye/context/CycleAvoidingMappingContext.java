@@ -6,10 +6,12 @@
 package com.lwohvye.context;
 
 import cn.hutool.core.util.ReflectUtil;
+import lombok.SneakyThrows;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Context;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.TargetType;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
@@ -29,6 +31,7 @@ import java.util.Objects;
  * 收尾：https://www.lwohvye.com/2020/12/01/manytomany%e6%88%96onetomany-manytoone%e5%af%bc%e8%87%b4%e5%be%aa%e7%8e%af%e4%be%9d%e8%b5%96%e7%9a%84%e9%97%ae%e9%a2%98-java-lang-stackoverflowerror-jpa/
  *
  * @author Andreas Gudian
+ * @since 2.6.16
  */
 public class CycleAvoidingMappingContext {
     // 因为是私有的，似乎是没太大用途
@@ -47,31 +50,44 @@ public class CycleAvoidingMappingContext {
     }
 
     /**
+     * smallDto中的属性，必须为原始侧的子集
+     *
      * @param targetType Class for smallDto
      * @param obj        原始侧Dto
      * @return T         smallDto的实例
-     * @description smallDto中的属性，必须为原始侧的子集
      * @date 2021/11/10 12:38 上午
      */
+    @SneakyThrows
     private <T> T genT(Class<T> targetType, Object obj) {
         // obj为null时，直接返回
         if (Objects.isNull(obj))
             return null;
 
-        var t = ReflectUtil.newInstance(targetType);
+        // var t = ReflectUtil.newInstance(targetType);
+        var t = targetType.getDeclaredConstructor().newInstance();
         // targetType.getFields()只能获取到非私有的属性。所以还是需要反射来获取
         // targetType.getDeclaredFields() 可以获取本类中的所有域，不包括从超类继承的
         // 所以还是使用ReflectUtil.getFields(targetType)，获取全部的域，包括从超类继承的
         for (Field field : ReflectUtil.getFields(targetType)) {
             // 获取不到属性会报错哦。并且需注意，从obj取时，要使用fieldName，因为field是t中的属性
+            var oField = ReflectionUtils.findField(obj.getClass(), field.getName());
+            if (Objects.nonNull(oField) && oField.trySetAccessible() && field.trySetAccessible())
+                field.set(t, oField.get(obj));
             // 下面的反射，底层还是 field.get()获取属性、field.set()设置属性
-            ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
+            // ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
         }
-        // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时
-//        return JSON.parseObject(JSON.toJSONString(obj), targetType);
+        // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时。这是不使用反射时，另一种处理方式
+        // return JsonUtils.toJavaObject(obj, targetType);
         return t;
     }
 
+    /**
+     * 存储进map中
+     *
+     * @param source key
+     * @param target val
+     * @date 2021/12/6 2:32 PM
+     */
     @BeforeMapping
     public void storeMappedInstance(Object source, @MappingTarget Object target) {
         knownInstances.put(source, target);

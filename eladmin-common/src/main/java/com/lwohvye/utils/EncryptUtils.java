@@ -27,8 +27,9 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 /**
+ * AES加密
+ *
  * @author lWoHvYe
- * @description AES加密
  * @date 2021-11-05
  */
 

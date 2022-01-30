@@ -17,12 +17,12 @@ package com.lwohvye.modules.system.service.local;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.domain.Log;
+import com.lwohvye.log.domain.Log;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.service.IUserService;
-import com.lwohvye.repository.LogRepository;
+import com.lwohvye.log.service.ILogService;
 import com.lwohvye.utils.JsonUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +32,12 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Hongyan Wang
- * @description 这里用了consumerAwareErrorHandler在另一个类KafkaConsumerService里。不知什么原因就造成了循环依赖
+ * 这里用了consumerAwareErrorHandler在另一个类KafkaConsumerService里。不知什么原因就造成了循环依赖
  * 但在idea中运行时没有问题，打jar部署就有问题。
  * 已知的一个原因是依赖未及时更新。但这不是导致该问题的原因
  * 因为starter模块依赖system模块，但system更新后，starter打包时用的还是原来的。但用idea运行时就是新的。这是一个差异
+ *
+ * @author Hongyan Wang
  * @date 2021年04月21日 21:29
  */
 @Slf4j
@@ -44,11 +45,11 @@ import java.util.concurrent.TimeUnit;
 public class AuthMQService {
     //    -------------------记录鉴权信息-----------------------------
     @Autowired
-    private LogRepository logRepository;
+    private ILogService logService;
 
     public void saveAuthorizeLog(String record) {
         var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(record);
-        logRepository.save(log);
+        logService.save(log);
     }
     //    ----------------------登录失败-----------------------------
 
@@ -65,8 +66,9 @@ public class AuthMQService {
     private RabbitMQProducerService rabbitMQProducerService;
 
     /**
-     * @param record
-     * @description 消费登录验证不通过的消息
+     * 消费登录验证不通过的消息
+     *
+     * @param record /
      * @date 2021/10/13 10:22 下午
      */
     public void solveAuthFailed(String record) {

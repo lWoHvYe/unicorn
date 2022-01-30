@@ -30,15 +30,16 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * @author Hongyan Wang
- * @packageName com.lwohvye.springboot.otherpart.common.local
- * @className FutureSampleSync
- * @description 抽卡模拟 将抽卡简化成随机取一个1000的样本中的数，取到指定的算抽中
+ * 抽卡模拟 将抽卡简化成随机取一个1000的样本中的数，取到指定的算抽中
  * 在取到需要的时，会将与其同样的从期望中一并移除
  * 由于模拟采用了随机数的方式，所以池子可以任意配置，不影响结果
  * 由于使用了多线程，所以需关注其他线程的完成情况
  * 采用Feature的方式，使用CompletableFuture的runAsync()构建没有返回的子线程，各子线程实时共享数据，使用synchronized同步代码块
  * 需尤其注意变量的作用范围问题
+ *
+ * @author Hongyan Wang
+ * @packageName com.lwohvye.springboot.otherpart.common.local
+ * @className FutureSampleSync
  * @date 2019/9/22 8:54
  */
 // 使用CompletableFuture,子线程实时共享数据，使用synchronized同步代码块，不能使用volatile,因为volatile变量不能提供原子性，这样++动作线程不安全
@@ -61,8 +62,9 @@ public class FutureSampleSync {
 
 
     /**
+     * 方法主体，用于模拟调用，获取及输出模拟结果
+     *
      * @return void
-     * @description 方法主体，用于模拟调用，获取及输出模拟结果
      * @params []
      * @author Hongyan Wang
      * @date 2019/9/23 9:59
@@ -130,8 +132,9 @@ public class FutureSampleSync {
     }
 
     /**
+     * 模拟多线程相关类
+     *
      * @author Hongyan Wang
-     * @description 模拟多线程相关类
      * @className SimCallable
      * @date 2019/9/23 9:53
      */
@@ -147,9 +150,10 @@ public class FutureSampleSync {
         }
 
         /**
-         * @return void
-         * @description 不再使用同步变量，直接将各子线程结果返回，由主线程处理,
+         * 不再使用同步变量，直接将各子线程结果返回，由主线程处理,
          * 池子是否乱序并不影响结果，若每次模拟都重新生成乱序池子将大幅降低效率，可以一个线程只使用一个乱序池子，但实际意义不大
+         *
+         * @return void
          * @params []
          * @author Hongyan Wang
          * @date 2019/9/23 9:52
@@ -205,8 +209,9 @@ public class FutureSampleSync {
         }
 
         /**
+         * 生成乱序不重复数组，作为模拟池
+         *
          * @return int[]
-         * @description 生成乱序不重复数组，作为模拟池
          * @params []
          * @author Hongyan Wang
          * @date 2019/9/23 9:51
@@ -229,11 +234,12 @@ public class FutureSampleSync {
         }
 
         /**
-         * @return int
-         * @description 核心代码
+         * 核心代码
          * 模拟抽卡，当前为单个池子，根据要求，生成数个不重复的数值集合，
          * 当结果在某个数值集合中时，从目标集合中移除其所在的集合
          * 当前使用连续生成数值的方式
+         *
+         * @return int
          * @params [random, lists, ranArray]
          * @author Hongyan Wang
          * @date 2019/9/23 9:39

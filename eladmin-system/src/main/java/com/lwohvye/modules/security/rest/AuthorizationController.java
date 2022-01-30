@@ -24,8 +24,9 @@ import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import com.wf.captcha.base.Captcha;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -50,7 +51,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Api(tags = "系统：系统授权接口")
+@Tag(name = "AuthorizationController", description = "系统：系统授权接口")
 public class AuthorizationController {
     private final SecurityProperties properties;
     //    缓存
@@ -62,13 +63,13 @@ public class AuthorizationController {
     private LoginProperties loginProperties;
 
 
-    @ApiOperation("获取用户信息")
+    @Operation(summary = "获取用户信息")
     @GetMapping(value = "/info")
     public ResponseEntity<Object> getUserInfo() {
         return ResponseEntity.ok(SecurityUtils.getCurrentUser());
     }
 
-    @ApiOperation("获取验证码")
+    @Operation(summary = "获取验证码")
     @AnonymousGetMapping(value = "/code")
     public ResponseEntity<Object> getCode() {
         // 获取运算的结果
@@ -82,17 +83,18 @@ public class AuthorizationController {
         // 保存
         redisUtils.set(uuid, captchaValue, loginProperties.getLoginCode().getExpiration(), TimeUnit.MINUTES);
         // 验证码信息
-        Map<String, Object> imgResult = Map.of("img", captcha.toBase64(), "uuid", uuid);
+        var imgResult = Map.of("img", captcha.toBase64(), "uuid", uuid);
         return ResponseEntity.ok(imgResult);
     }
 
     /**
+     * Redisson中lock的使用
+     *
      * @param request
      * @return org.springframework.http.ResponseEntity
-     * @description Redisson中lock的使用
      * @date 2021/10/27 13:35
      */
-    @ApiOperation(value = "分布式锁", hidden = true)
+    @Hidden
     @GetMapping(value = "/doBusiness5Lock")
     public ResponseEntity<Object> doBusiness5Lock(HttpServletRequest request) {
 

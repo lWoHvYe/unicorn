@@ -31,7 +31,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <project.core.version>2.6.18</project.core.version>
+        <project.core.version>3.0.0</project.core.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <druid.version>1.2.8</druid.version>
     </properties>
@@ -63,6 +63,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
+        <!--Spring boot 测试-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -204,6 +205,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <!-- 这里主要为lombok和mapstruct的配置。 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -218,9 +220,6 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <!-- Support for Java 16
-                            https://github.com/rzwitserloot/lombok/issues/2681#
-                            -->
                             <version>${lombok.version}</version>
                         </path>
                         <!--4mapstruct-->
@@ -231,6 +230,13 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <!--     Maven JDK9 Jigsaw       -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jmod-plugin</artifactId>
+                <version>3.0.0-alpha-1</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>

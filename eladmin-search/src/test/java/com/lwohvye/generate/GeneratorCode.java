@@ -16,8 +16,8 @@
 
 package com.lwohvye.generate;
 
-import com.lwohvye.domain.GenConfig;
-import com.lwohvye.service.IGeneratorService;
+import com.lwohvye.generator.domain.GenConfig;
+import com.lwohvye.generator.service.IGeneratorService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

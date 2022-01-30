@@ -24,12 +24,14 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+// import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Objects;
 
 /**
+ * 策略模式，处理type与实现类的映射关系
+ *
  * @author Hongyan Wang
- * @description 策略模式，处理type与实现类的映射关系
  * @date 2021年11月02日 16:34
  */
 @Slf4j
@@ -58,7 +60,9 @@ public class AuthHandlerProcessor implements BeanFactoryPostProcessor {
     /*
      * 通过父类+注解找到实体类
      */
-    private <T> T getBeansWithAnnotation(ConfigurableListableBeanFactory beanFactory, Class<T> manager, Class<? extends UserTypeHandlerAnno> annotation, Integer userType) throws BeansException {
+    // @Nullable 该方法用在方法上或返回值前，用以标识方法可能返回null。也可用方法签名上的某个参数前，标识该参数可以传null，内部有做相关处理
+    // private @Nullable
+    <T> T getBeansWithAnnotation(ConfigurableListableBeanFactory beanFactory, Class<T> manager, Class<? extends UserTypeHandlerAnno> annotation, Integer userType) throws BeansException {
         if (ObjectUtils.isEmpty(userType))
             return null;
 

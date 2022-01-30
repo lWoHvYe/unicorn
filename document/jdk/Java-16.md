@@ -137,3 +137,8 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 - [Project Jigsaw](http://openjdk.java.net/projects/jigsaw/quick-start)
 - [warn: requires transitive directive for an automatic module](https://stackoverflow.com/questions/49600947/how-to-suppress-the-requires-transitive-directive-for-an-automatic-module-warn) 
 - [jmod-example](https://github.com/khmarbaise/jdk9-jlink-jmod-example)
+```shell
+# 将无法模块化的放到clib中，可模块化的放到mlib
+# 当前待解决：模块 lwohvye.eladmin.starter 不具有 ModuleMainClass 属性，请使用 -m <模块>/<主类>。针对Spring Boot项目，应该有某个地方不一样
+java -p mlib -Dloader.path=clib -m lwohvye.eladmin.starter
+```

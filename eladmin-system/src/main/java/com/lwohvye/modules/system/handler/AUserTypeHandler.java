@@ -21,8 +21,9 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.List;
 
 /**
+ * 业务处理基类，密封类sealed。需通过permits指定子类。子类可以是final标记的实现类、sealed标记的密封类、non-sealed标记的非密封类
+ *
  * @author Hongyan Wang
- * @description 业务处理基类，密封类sealed。需通过permits指定子类。子类可以是final标记的实现类、sealed标记的密封类、non-sealed标记的非密封类
  * @date 2021年11月02日 16:42
  */
 public sealed interface AUserTypeHandler extends BaseService permits AdminUserTypeHandler, NormalUserTypeHandler, DevUserTypeHandler {

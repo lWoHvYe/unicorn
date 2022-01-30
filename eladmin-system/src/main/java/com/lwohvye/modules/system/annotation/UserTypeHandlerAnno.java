@@ -20,8 +20,9 @@ import com.lwohvye.modules.system.enums.UserTypeEnum;
 import java.lang.annotation.*;
 
 /**
+ * 用户类型注解
+ *
  * @author Hongyan Wang
- * @description 用户类型注解
  * @date 2021年11月02日 16:47
  */
 @Target({ElementType.TYPE})

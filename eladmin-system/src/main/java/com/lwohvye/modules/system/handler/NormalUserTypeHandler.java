@@ -16,12 +16,10 @@
 package com.lwohvye.modules.system.handler;
 
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
-import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.enums.UserTypeEnum;
 import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.utils.SpringContextHolder;
-import com.lwohvye.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -53,9 +51,10 @@ public final class NormalUserTypeHandler implements AUserTypeHandler {
     public List<GrantedAuthority> handler(Long userId) {
         log.warn(" banana：自由的气息，蕉迟但到。");
         Set<Role> roles = roleRepository.findByUserId(userId);
-        var permissions = roles.stream().flatMap(role -> role.getMenus().stream())
-                .map(Menu::getPermission)
-                .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
+        var permissions = roles.stream().map(role -> "ROLE_" + role.getCode().toUpperCase()).collect(Collectors.toSet());
+        // .flatMap(role -> role.getResources().stream())
+        // .map(Resource::getPattern)
+        // .filter(StringUtils::isNotBlank).collect(Collectors.toSet());
         return permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 }

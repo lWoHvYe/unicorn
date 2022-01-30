@@ -22,8 +22,9 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
+ * 设置审计 https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#auditing
+ *
  * @author : Dong ZhaoYang
- * @description : 设置审计 https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#auditing
  * @date : 2019/10/28
  */
 @Component("auditorAware")

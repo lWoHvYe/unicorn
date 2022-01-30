@@ -18,9 +18,10 @@ package com.lwohvye.utils;
 import java.io.Closeable;
 
 /**
+ * 用于关闭各种连接，缺啥补啥
+ *
  * @author Zheng Jie
  * @website https://el-admin.vip
- * @description 用于关闭各种连接，缺啥补啥
  * @date 2021-03-05
  **/
 public class CloseUtil {

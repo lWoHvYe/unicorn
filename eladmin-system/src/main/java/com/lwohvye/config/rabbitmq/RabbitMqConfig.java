@@ -167,8 +167,9 @@ public class RabbitMqConfig {
     }
 
     /**
+     * topic交换机。支持路由通配符 *代表一个单词 #代表零个或多个单词
+     *
      * @return org.springframework.amqp.core.TopicExchange
-     * @description topic交换机。支持路由通配符 *代表一个单词 #代表零个或多个单词
      * @date 2021/9/30 10:25 上午
      */
     @Bean

@@ -19,7 +19,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * @description 用户类型的枚举
+ * 用户类型的枚举
+ *
  * @author Hongyan Wang
  * @date 2021年11月02日 16:51
  */

@@ -1,0 +1,4 @@
+正则表达式
+- 将ApiModelProperty替换为Schema注释，注解中的内容不变。$2表示引用第二段匹配的内容，使用()分段
+   查找： (@ApiModelProperty\(value = )(\"[\u4E00-\u9FA5A-Za-z0-9_]+\")(, hidden = true\))
+   替换： @Schema\(description = $2 , accessMode = Schema.AccessMode.READ_ONLY\)

@@ -31,8 +31,9 @@ import java.util.Objects;
 import static org.springframework.http.HttpStatus.*;
 
 /**
+ * 该统一异常处理已不再使用。可视情况移除。
+ *
  * @author Zheng Jie
- * @description 该统一异常处理已不再使用。可视情况移除。
  * @date 2018-11-23
  * @see ApiGlobalExceptionHandler 替代方案
  */

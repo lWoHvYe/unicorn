@@ -25,6 +25,8 @@ server:
   #  server.undertow.direct-buffers= true
 
 spring:
+  application:
+    name: EL-Admin-Starter
   freemarker:
     check-template-location: false
   profiles:
@@ -44,16 +46,16 @@ spring:
         enable_lazy_no_trans: true
     #        指定表名解析。spring下可不加。会自动使用
     #        naming:
-    #          physical-strategy: com.lwohvye.config.ServerAwareNamingStrategy
+    #          physical-strategy: com.lwohvye.config.common.ServerAwareNamingStrategy
     open-in-view: true
     hibernate:
       ddl-auto: none
 
   # 参考：https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes#pathpattern-based-path-matching-strategy-for-spring-mvc
   # The default strategy for matching request paths against registered Spring MVC handler mappings has changed from AntPathMatcher to PathPatternParser
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+#  mvc:
+#    pathmatch:
+#      matching-strategy: ant_path_matcher
 
 #  # 全局懒加载。
 #  main:

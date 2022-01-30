@@ -36,8 +36,9 @@ import java.util.HashMap;
 public class DruidMonitorConfig {
 
     /**
+     * 配置一个管理后台的Servlet
+     *
      * @return
-     * @description 配置一个管理后台的Servlet
      * @params
      * @date 2020/1/3 10:09
      */
@@ -57,8 +58,9 @@ public class DruidMonitorConfig {
     }
 
     /**
+     * 配置一个Web监控的filter
+     *
      * @return org.springframework.boot.web.servlet.FilterRegistrationBean
-     * @description 配置一个Web监控的filter
      * @params []
      * @date 2020/1/3 10:10
      */

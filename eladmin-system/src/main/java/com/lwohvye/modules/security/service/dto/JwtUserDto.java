@@ -27,8 +27,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * Spring Security鉴权使用的UserDetails，
+ *
  * @author Zheng Jie
- * @description Spring Security鉴权使用的UserDetails，
  * @date 2018-11-23
  */
 @Getter

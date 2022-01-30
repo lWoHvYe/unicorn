@@ -171,7 +171,7 @@ public class MenuServiceImpl implements IMenuService {
         }
         menu.setTitle(resources.getTitle()).setComponent(resources.getComponent()).setPath(resources.getPath()).setIcon(resources.getIcon())
                 .setIFrame(resources.getIFrame()).setPid(resources.getPid()).setMenuSort(resources.getMenuSort()).setCache(resources.getCache())
-                .setHidden(resources.getHidden()).setComponentName(resources.getComponentName()).setPermission(resources.getPermission()).setType(resources.getType());
+                .setHidden(resources.getHidden()).setComponentName(resources.getComponentName()).setType(resources.getType());
         menuRepository.save(menu);
 
         // 计算父级菜单节点数目
@@ -383,15 +383,16 @@ public class MenuServiceImpl implements IMenuService {
 
     @SneakyThrows
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'menu4user:' + #p0")
+    @Cacheable(key = " target.getSysName() + 'menu4user:' + #p0")
     @Transactional(rollbackFor = Exception.class)
     public Object buildWebMenus(Long uid) {
         CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
                 .thenApply(this::buildTree)
                 .thenApply(this::buildMenus);
         cf.join();
-        // 直接cf.get()返回。序列化是一个数组，无法反序列化
-        // 所以需要new 一个List对象返回
+        // 直接cf.get()返回。序列化是一个数组，无法反序列化。序列化结果为：[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]
+        // 所以需要new 一个List对象返回。此时序列化的结果为：[“java.util.ArrayList”,[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]]
+        // 另外把方法返回值的类型改成List<MenuVo>也是**不行**的。
         return new ArrayList<>(cf.get());
     }
 
@@ -411,7 +412,6 @@ public class MenuServiceImpl implements IMenuService {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("菜单标题", menuDTO.getTitle());
             map.put("菜单类型", menuDTO.getType() == null ? "目录" : menuDTO.getType() == 1 ? "菜单" : "按钮");
-            map.put("权限标识", menuDTO.getPermission());
             map.put("外链菜单", menuDTO.getIFrame() ? "是" : "否");
             map.put("菜单可见", menuDTO.getHidden() ? "否" : "是");
             map.put("是否缓存", menuDTO.getCache() ? "是" : "否");

@@ -31,7 +31,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <project.core.version>2.6.18</project.core.version>
+        <project.core.version>3.0.0</project.core.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <javassist.version>3.28.0-GA</javassist.version>
         <shardingsphere.version>5.0.0</shardingsphere.version>
@@ -220,7 +220,11 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- 解决 Java-16下 lombok报错：
+            Fatal error compiling: java.lang.IllegalAccessError: class lombok.javac.apt.LombokProcessor (in unnamed module @0x486bcaa) cannot access class com.sun.tools.javac.processing.JavacProcessingEnvironment (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.processing to unnamed module @0x486bcaa
+            -->
             <plugin>
+                <!-- 这里主要为lombok和mapstruct的配置。 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -248,6 +252,13 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <!--     Maven JDK9 Jigsaw       -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jmod-plugin</artifactId>
+                <version>3.0.0-alpha-1</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>

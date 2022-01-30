@@ -35,9 +35,10 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author lWoHvYe
- * @description Redis相关工具类。
+ * Redis相关工具类。
  * 因为兼容多数据源。当前需配合system模块中的相关配置类一起使用，需注意
+ *
+ * @author lWoHvYe
  */
 @Component
 @SuppressWarnings({"unchecked", "rawtypes", "unused"})
@@ -375,7 +376,7 @@ public class RedisUtils {
 //     * @param key
 //     * @param value
 //     * @return boolean
-//     * @description 比原值大时再更新。true表示进行了更新。但redis的比较是string维度的，所以废弃
+//     * 比原值大时再更新。true表示进行了更新。但redis的比较是string维度的，所以废弃
 //     * @date 2021/7/17 9:59
 //     */
 //    public boolean setIfLarger(String key, Long value) {
@@ -544,10 +545,11 @@ public class RedisUtils {
     }
 
     /**
+     * 只有在key存在时，才更新key的值
+     *
      * @param key
      * @param value
      * @return boolean
-     * @description 只有在key存在时，才更新key的值
      * @date 2021/7/11 0:56
      */
     public boolean setIfPresent(String key, Object value) {
@@ -555,12 +557,13 @@ public class RedisUtils {
     }
 
     /**
+     * 只有在Key不存在时，设置其值
+     *
      * @param key
      * @param value
      * @param time
      * @param timeUnit
      * @return java.lang.Boolean
-     * @description 只有在Key不存在时，设置其值
      * @date 2021/7/11 0:49
      */
     public Boolean setIfAbsent(String key, Object value, long time, TimeUnit timeUnit) {
@@ -579,12 +582,13 @@ public class RedisUtils {
     }
 
     /**
+     * 只有在key存在时，更新其属性
+     *
      * @param key
      * @param value
      * @param time
      * @param timeUnit
      * @return java.lang.Boolean
-     * @description 只有在key存在时，更新其属性
      * @date 2021/7/11 0:59
      */
     public Boolean setIfPresent(String key, Object value, long time, TimeUnit timeUnit) {
@@ -1533,11 +1537,12 @@ public class RedisUtils {
     }
 
     /**
+     * 添加元素，key不存在则添加，存在则不操作
+     *
      * @param key
      * @param value
      * @param score
      * @return java.lang.Boolean
-     * @description 添加元素，key不存在则添加，存在则不操作
      * @date 2021/7/11 0:35
      */
     public Boolean zAddIfAbsent(String key, Object value, double score) {
@@ -1553,10 +1558,11 @@ public class RedisUtils {
     }
 
     /**
+     * 添加元素，key并不存在则添加，存在则不操作
+     *
      * @param key
      * @param values
      * @return java.lang.Long
-     * @description 添加元素，key并不存在则添加，存在则不操作
      * @date 2021/7/11 0:37
      */
     public Long zAddIfAbsent(String key, Set<ZSetOperations.TypedTuple<Object>> values) {
@@ -1865,11 +1871,12 @@ public class RedisUtils {
     private final RedisScript<Long> hgScoreRedisScript = new DefaultRedisScript<>(LUA_HG_SCORE_SCRIPT, Long.class);
 
     /**
+     * 当本次分数比Redis中高时，再更新。
+     *
      * @param key
      * @param value
      * @param score
      * @return boolean
-     * @description 当本次分数比Redis中高时，再更新。
      * @date 2021/7/17 11:52
      */
     //  当value类型为String时 这里存入的value为 001，通过其他方法存入的为 "001"，是不一样的，这点需特别注意，要想保持一致，lua相关的需要手动在前后拼双引号    "\"" + value + "\""
@@ -1981,10 +1988,11 @@ public class RedisUtils {
     private final RedisScript<Long> unLockRedisScript = new DefaultRedisScript<>(LUA_UNLOCK_SCRIPT, Long.class);
 
     /**
+     * lua-加锁
+     *
      * @param lockKey
      * @param value
      * @param expireTime
-     * @description lua-加锁
      * @date 2021/7/29 1:13 下午
      */
     public boolean doLock(String lockKey, String value, Long expireTime) {

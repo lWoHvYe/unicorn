@@ -17,10 +17,10 @@ package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.log.annotation.Log;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;
@@ -36,14 +36,13 @@ import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.enums.CodeEnum;
 import com.lwohvye.utils.result.ResultInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -60,10 +59,10 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-11-23
  */
-@Api(tags = "系统：用户管理")
+@Tag(name = "UserController", description = "系统：用户管理")
 @Slf4j
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/sys/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -73,16 +72,14 @@ public class UserController {
     private final IDeptService deptService;
     private final IRoleService roleService;
 
-    @ApiOperation("导出用户数据")
+    @Operation(summary = "导出用户数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('user:list')")
     public void download(HttpServletResponse response, UserQueryCriteria criteria) throws IOException {
         userService.download(userService.queryAll(criteria), response);
     }
 
-    @ApiOperation("查询用户")
+    @Operation(summary = "查询用户")
     @GetMapping
-    @PreAuthorize("@el.check('user:list')")
     public ResponseEntity<Object> query(UserQueryCriteria criteria, Pageable pageable) {
         if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
             criteria.getDeptIds().add(criteria.getDeptId());
@@ -110,9 +107,8 @@ public class UserController {
     }
 
     @Log("新增用户")
-    @ApiOperation("新增用户")
+    @Operation(summary = "新增用户")
     @PostMapping
-    @PreAuthorize("@el.check('user:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody User resources) {
         checkLevel(resources);
         // 默认密码 123456
@@ -122,9 +118,8 @@ public class UserController {
     }
 
     @Log("修改用户")
-    @ApiOperation("修改用户")
+    @Operation(summary = "修改用户")
     @PutMapping
-    @PreAuthorize("@el.check('user:edit')")
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody User resources) throws Exception {
         checkLevel(resources);
         userService.update(resources);
@@ -132,7 +127,7 @@ public class UserController {
     }
 
     @Log("修改用户：个人中心")
-    @ApiOperation("修改用户：个人中心")
+    @Operation(summary = "修改用户：个人中心")
     @PutMapping(value = "center")
     public ResponseEntity<Object> center(@Validated(Update.class) @RequestBody User resources) {
         if (!resources.getId().equals(SecurityUtils.getCurrentUserId())) {
@@ -143,9 +138,8 @@ public class UserController {
     }
 
     @Log("删除用户")
-    @ApiOperation("删除用户")
+    @Operation(summary = "删除用户")
     @DeleteMapping
-    @PreAuthorize("@el.check('user:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         for (Long id : ids) {
             Integer currentLevel = roleService.findByUsersId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
@@ -158,7 +152,7 @@ public class UserController {
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 
-    @ApiOperation("修改密码")
+    @Operation(summary = "修改密码")
     @PostMapping(value = "/updatePass")
     public ResponseEntity<Object> updatePass(@RequestBody UserPassVo passVo) throws Exception {
         String oldPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getOldPass());
@@ -174,14 +168,14 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @ApiOperation("修改头像")
+    @Operation(summary = "修改头像")
     @PostMapping(value = "/updateAvatar")
     public ResponseEntity<Object> updateAvatar(@RequestParam MultipartFile avatar) {
         return new ResponseEntity<>(userService.updateAvatar(avatar), HttpStatus.OK);
     }
 
     @Log("修改邮箱")
-    @ApiOperation("修改邮箱")
+    @Operation(summary = "修改邮箱")
     @PostMapping(value = "/updateEmail/{code}")
     public ResponseEntity<Object> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, user.getPassword());

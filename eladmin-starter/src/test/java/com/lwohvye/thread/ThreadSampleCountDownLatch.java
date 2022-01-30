@@ -132,8 +132,9 @@ public class ThreadSampleCountDownLatch {
     }
 
     /**
+     * 启动多线程
+     *
      * @return void
-     * @description 启动多线程
      * @params [lists]
      * @author Hongyan Wang
      * @date 2019/9/24 13:19
@@ -156,6 +157,7 @@ public class ThreadSampleCountDownLatch {
         } finally {
 //        关闭线程池
             executor.shutdown();
+            while (!executor.isTerminated()) ; // 这里可以等待一下结束。阻塞一下
         }
     }
 
@@ -211,8 +213,9 @@ public class ThreadSampleCountDownLatch {
         }
 
         /**
+         * 模拟核心代码
+         *
          * @return int
-         * @description 模拟核心代码
          * @params [random, lists]
          * @author Hongyan Wang
          * @date 2019/9/24 13:31

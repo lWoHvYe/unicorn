@@ -34,8 +34,9 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
+ * Json工具类
+ *
  * @author Hongyan Wang
- * @description Json工具类
  * @date 2021/11/10 11:42 下午
  */
 @Slf4j
@@ -86,11 +87,12 @@ public class JsonUtils {
     }
 
     /**
-     * @param obj
-     * @param defaultSupplier
-     * @param format
+     * toJSONString 底层实现。简单类型直接返回
+     *
+     * @param obj             要转json的对象，若是String类型，不做处理
+     * @param defaultSupplier 回调
+     * @param format          是否格式化
      * @return java.lang.String
-     * @description toJSONString 底层实现。简单类型直接返回
      * @date 2021/11/10 9:37 下午
      */
     public static String toJSONString(Object obj, Supplier<String> defaultSupplier, boolean format) {
@@ -141,11 +143,12 @@ public class JsonUtils {
     }
 
     /**
-     * @param obj
-     * @param tClass
-     * @param defaultSupplier
+     * toJavaObject底层实现
+     *
+     * @param obj             要转的对象，不是String类型时，会先toJSONString
+     * @param tClass          要转成的类型
+     * @param defaultSupplier 回调
      * @return T
-     * @description toJavaObject底层实现
      * @date 2021/11/10 9:39 下午
      */
     public static <T> T toJavaObject(Object obj, Class<T> tClass, Supplier<T> defaultSupplier) {
@@ -174,11 +177,12 @@ public class JsonUtils {
     }
 
     /**
-     * @param obj
-     * @param tClass
-     * @param defaultSupplier
+     * toJavaObjectList底层实现
+     *
+     * @param obj             要转的对象，不是String类型时，会先toJSONString
+     * @param tClass          要转成的类型
+     * @param defaultSupplier 回调
      * @return java.util.List<T>
-     * @description toJavaObjectList底层实现
      * @date 2021/11/10 9:45 下午
      */
     public static <T> List<T> toJavaObjectList(Object obj, Class<T> tClass, Supplier<List<T>> defaultSupplier) {

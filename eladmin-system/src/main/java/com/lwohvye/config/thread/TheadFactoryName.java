@@ -15,6 +15,7 @@
  */
 package com.lwohvye.config.thread;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ThreadFactory;
@@ -59,7 +60,7 @@ public class TheadFactoryName implements ThreadFactory {
     }
 
     @Override
-    public Thread newThread(Runnable r) {
+    public Thread newThread(@NotNull Runnable r) {
         //此时线程的名字 就是 namePrefix + -thread- + 这个线程池中第几个执行的线程
         Thread t = new Thread(group, r, namePrefix + "-thread-" + threadNumber.getAndIncrement(), 0);
         // 所谓后台/守护(daemon)线程，是指在程序运行的时候在后台提供一种通用服务的线程，并且这个线程并不属于程序中不可或缺的部分。

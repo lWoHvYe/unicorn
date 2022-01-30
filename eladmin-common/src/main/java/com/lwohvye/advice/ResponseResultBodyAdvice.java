@@ -37,7 +37,8 @@ import org.springframework.web.util.WebUtils;
 import java.lang.annotation.Annotation;
 
 /**
- * @description 这也是一种统一数据返回的方式。可视情况整合。与{@link ResponseResultBody}配合使用
+ * 这也是一种统一数据返回的方式。可视情况整合。与{@link ResponseResultBody}配合使用
+ *
  * @date 2021/11/10 12:42 下午
  */
 @Slf4j

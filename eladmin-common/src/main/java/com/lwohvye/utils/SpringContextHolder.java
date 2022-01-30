@@ -29,11 +29,12 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author Jie, Super Idol lv, Super Idol peng
- * @description 可用来获取IOC注册的Bean
+ * 可用来获取IOC注册的Bean
  * 使用 Class.forName(String s)时，传的是类的全路径（包含包）
  * 上面几种获取bean的。传的是bean的名称（首字母小写）
  * 针对接口，需要获取相关的实现类，因为注解是在实现类上的
+ *
+ * @author Jie, Super Idol lv, Super Idol peng
  * @date 2019-01-07
  */
 @Slf4j
@@ -117,9 +118,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     }
 
     /**
+     * 根据Class获取所有该类型的Bean，可用于获取类的所有子类、接口的所有实现类
+     *
      * @param clazz 类型
      * @return java.util.Map key为beanName，value为beanInstance
-     * @description 根据Class获取所有该类型的Bean，可用于获取类的所有子类、接口的所有实现类
      * @date 2021/11/23 11:48 上午
      */
     public static <T> Map<String, T> getBeansOfType(Class<T> clazz) {
@@ -127,9 +129,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     }
 
     /**
+     * 检查ApplicationContext中是否包含
+     *
      * @param beanName /
      * @return boolean
-     * @description 检查ApplicationContext中是否包含
      * @date 2021/11/23 9:33 上午
      */
     public static boolean containsBean(String beanName) {
@@ -137,9 +140,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     }
 
     /**
+     * 判断bean是否为单例
+     *
      * @param name /
      * @return boolean
-     * @description 判断bean是否为单例
      * @date 2021/11/23 9:34 上午
      */
     public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
@@ -147,9 +151,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     }
 
     /**
+     * 获取bean的类型
+     *
      * @param beanName /
      * @return java.lang.Class
-     * @description 获取bean的类型
      * @date 2021/11/23 9:35 上午
      */
     public static Class<?> getType(String beanName) throws NoSuchBeanDefinitionException {

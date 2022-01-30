@@ -77,9 +77,10 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     /**
+     * 与RedisUtil一起使用
+     *
      * @param redisConnectionFactory /
      * @return org.springframework.data.redis.core.RedisTemplate
-     * @description 与RedisUtil一起使用
      * @date 2021/11/11 1:25 上午
      */
     @Bean(name = "redisTemplate")

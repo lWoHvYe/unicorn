@@ -29,16 +29,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
- * @author Hongyan Wang
- * @packageName com.lwohvye.springboot.otherpart.common.local
- * @className AnotherFutureSample
- * @description 抽卡模拟 将抽卡简化成随机取一个1000的样本中的数，取到指定的算抽中
+ * 抽卡模拟 将抽卡简化成随机取一个1000的样本中的数，取到指定的算抽中
  * 在取到需要的时，会将与其同样的从期望中一并移除
  * 由于模拟采用了随机数的方式，所以池子可以任意配置，不影响结果
  * 由于使用了多线程，所以需关注其他线程的完成情况
  * 采用Feature的方式，使用CompletableFuture的supplyAsync()构建子线程，并获取返回结果进行处理
  * 经过调整使用ThreadLocal修饰变量，简化线程内各函数的传值，但会一定程度上降低效率
  * 需尤其注意变量的作用范围问题
+ *
+ * @author Hongyan Wang
+ * @packageName com.lwohvye.springboot.otherpart.common.local
+ * @className AnotherFutureSample
  * @date 2019/9/22 8:54
  */
 // 使用CompletableFuture，开启的线程数受CPU支持的线程数影响较大，通过更改线程数，发现执行时间方差较大
@@ -68,8 +69,9 @@ public class AnotherFutureSample {
 
 
     /**
+     * 方法主体，用于模拟调用，获取及输出模拟结果
+     *
      * @return void
-     * @description 方法主体，用于模拟调用，获取及输出模拟结果
      * @params []
      * @author Hongyan Wang
      * @date 2019/9/23 9:59
@@ -145,8 +147,9 @@ public class AnotherFutureSample {
     }
 
     /**
+     * 输出模拟结果
+     *
      * @return void
-     * @description 输出模拟结果
      * @params [countMap, simCount, totalCount]
      * @author Hongyan Wang
      * @date 2019/9/24 13:56
@@ -180,8 +183,9 @@ public class AnotherFutureSample {
     }
 
     /**
+     * 模拟多线程相关类
+     *
      * @author Hongyan Wang
-     * @description 模拟多线程相关类
      * @className SimCallable
      * @date 2019/9/23 9:53
      */
@@ -197,14 +201,15 @@ public class AnotherFutureSample {
         }
 
         /**
+         * 不再使用同步变量，直接将各子线程结果返回，由主线程处理,
+         * 池子是否乱序并不影响结果，若每次模拟都重新生成乱序池子将大幅降低效率，可以一个线程只使用一个乱序池子，但实际意义不大
+         * Computes a result, or throws an exception if unable to do so.
+         *
          * @return computed result
          * @throws Exception if unable to compute a result
-         * @description 不再使用同步变量，直接将各子线程结果返回，由主线程处理,
-         * 池子是否乱序并不影响结果，若每次模拟都重新生成乱序池子将大幅降低效率，可以一个线程只使用一个乱序池子，但实际意义不大
          * @params []
          * @author Hongyan Wang
          * @date 2019/9/23 9:52
-         * Computes a result, or throws an exception if unable to do so.
          */
         @Override
         public Map<String, Integer> call() {
@@ -275,8 +280,9 @@ public class AnotherFutureSample {
         }
 
         /**
+         * 生成乱序不重复数组，作为模拟池
+         *
          * @return int[]
-         * @description 生成乱序不重复数组，作为模拟池
          * @params []
          * @author Hongyan Wang
          * @date 2019/9/23 9:51
@@ -299,11 +305,12 @@ public class AnotherFutureSample {
         }
 
         /**
-         * @return int
-         * @description 核心代码
+         * 核心代码
          * 模拟抽卡，当前为单个池子，根据要求，生成数个不重复的数值集合，
          * 当结果在某个数值集合中时，从目标集合中移除其所在的集合
          * 当前使用连续生成数值的方式
+         *
+         * @return int
          * @params [random, lists, ranArray]
          * @author Hongyan Wang
          * @date 2019/9/23 9:39

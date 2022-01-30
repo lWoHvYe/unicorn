@@ -34,13 +34,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.Key;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -55,6 +55,7 @@ public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
     private final RedissonClient redisson;
+    private final UserDetailsService userDetailsService;
     public static final String AUTHORITIES_KEY = "user";
     private static final Clock clock = DefaultClock.INSTANCE;
     private JwtParser jwtParser;
@@ -105,7 +106,7 @@ public class TokenProvider implements InitializingBean {
                 .setId(IdUtil.simpleUUID())
                 // 签发者
                 .setIssuer("lWoHvYe")
-                // 私有声明
+                // 私有声明。权限作为偏动态的，不放入token中
                 .claim(AUTHORITIES_KEY, authentication.getName())
                 // 这里放入了username。然后在 getAuthentication()中，解密并取出来，构建了Authentication。
                 // 在doFilter()中，将Authentication存入上下文。SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -120,9 +121,10 @@ public class TokenProvider implements InitializingBean {
     }
 
     /**
-     * @param createdDate
+     * 计算过期时间
+     *
+     * @param createdDate /
      * @return java.util.Date
-     * @description 计算过期时间
      * @date 2021/11/13 11:10 上午
      */
     private Date calculateExpirationDate(Date createdDate) {
@@ -138,10 +140,11 @@ public class TokenProvider implements InitializingBean {
     public Authentication getAuthentication(String token) {
         // 上面createToken()中jwtBuilder中设置的属性，都在token中，解密后，得到Claims。这里用到了其subject属性，在当前业务里存的用户名
         Claims claims = getClaims(token);
-        //  第三个参数是 <? extends GrantedAuthority> authorities ,即为用户的权限。这里未在此处设置。在鉴权时单独获取
-        User principal = new User(claims.getSubject(), "******", new ArrayList<>());
+        //  第三个参数是 <? extends GrantedAuthority> authorities ,即为用户的权限。当前改为角色级别
+        var authorities = userDetailsService.loadUserByUsername(claims.getSubject()).getAuthorities();
+        User principal = new User(claims.getSubject(), "******", authorities);
         //  同上，这里第三个参数也是用户的权限。
-        return new UsernamePasswordAuthenticationToken(principal, token, new ArrayList<>());
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     public Claims getClaims(String token) {
@@ -196,9 +199,9 @@ public class TokenProvider implements InitializingBean {
             // 已通知过，跳过
             var rMapCache = redisson.getMapCache(SecuritySysUtil.getExpireNoticeKey(properties));
             // RMapCache，可以对单key设置过期时间
-            // 使用fastPutIfAbsent。当key不存在时，设置值
+            // 使用fastPutIfAbsent。当key不存在时，设置值。成功设置时返回true
             var putResult = rMapCache.fastPutIfAbsent(token, DateUtil.now(), properties.getDetect(), TimeUnit.MILLISECONDS);
-            if (Boolean.FALSE.equals(putResult)) {
+            if (Boolean.TRUE.equals(putResult)) {
                 try {
                     // 提醒
                     WebSocketServer.sendInfo(new SocketMsg("您的余额已不足，请及时充值", MsgType.INFO), "sysMember");

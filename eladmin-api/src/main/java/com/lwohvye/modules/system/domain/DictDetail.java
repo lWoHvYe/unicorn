@@ -16,7 +16,7 @@
 package com.lwohvye.modules.system.domain;
 
 import com.lwohvye.base.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -39,21 +39,21 @@ public class DictDetail extends BaseEntity implements Serializable {
     @Id
     @Column(name = "detail_id")
     @NotNull(groups = Update.class)
-    @ApiModelProperty(value = "ID", hidden = true)
+    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JoinColumn(name = "dict_id")
     @ManyToOne(fetch=FetchType.LAZY)
-    @ApiModelProperty(value = "字典", hidden = true)
+    @Schema(description = "字典" , accessMode = Schema.AccessMode.READ_ONLY)
     private Dict dict;
 
-    @ApiModelProperty(value = "字典标签")
+    @Schema(description = "字典标签" )
     private String label;
 
-    @ApiModelProperty(value = "字典值")
+    @Schema(description = "字典值" )
     private String value;
 
-    @ApiModelProperty(value = "排序")
+    @Schema(description = "排序" )
     private Integer dictSort = 999;
 }

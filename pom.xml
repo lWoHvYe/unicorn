@@ -23,7 +23,7 @@
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
     <packaging>pom</packaging>
-    <version>2.6.18</version>
+    <version>3.0.0</version>
 
     <name>EL-ADMIN 管理系统</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
@@ -49,7 +49,7 @@
         <connection>scm:git:git://github.com/lWoHvYe/eladmin.git</connection>
         <developerConnection>scm:git:ssh://github.com/lWoHvYe/eladmin.git</developerConnection>
         <url>https://github.com/lWoHvYe/eladmin/tree/main</url>
-        <tag>eladmin-v2.6.18</tag>
+        <tag>eladmin-v3.0.0</tag>
     </scm>
 
     <modules>
@@ -75,11 +75,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
-        <project.core.version>2.6.18</project.core.version>
+        <project.core.version>3.0.0</project.core.version>
         <log4jdbc.version>1.16</log4jdbc.version>
-        <springfox.version>3.0.0</springfox.version>
+        <springdoc.openapi.version>1.6.2</springdoc.openapi.version>
         <io.swagger.version>1.6.4</io.swagger.version>
-        <knife4j.version>3.0.3</knife4j.version>
         <druid.version>1.2.8</druid.version>
         <hutool.version>5.7.20</hutool.version>
         <fastutil.version>8.5.6</fastutil.version>
@@ -88,7 +87,7 @@
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <!--    指定版本，新版本Spring Boot发布后可移除    -->
-        <!--<log4j2.version>2.17.0</log4j2.version>-->
+        <!--        <log4j2.version>2.17.0</log4j2.version>-->
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.0.1</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
@@ -161,17 +160,6 @@
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>${redisson.version}</version>
-            <!--
-            The actuator endpoints now also use PathPattern based URL matching.
-            Note that the path matching strategy for actuator endpoints is not configurable via a configuration property.
-            故，在业务中不需要监控系列的前提下，可考虑移除
-            -->
-            <!--<exclusions>-->
-            <!--    <exclusion>-->
-            <!--        <artifactId>spring-boot-starter-actuator</artifactId>-->
-            <!--        <groupId>org.springframework.boot</groupId>-->
-            <!--        </exclusion>-->
-            <!--</exclusions>-->
         </dependency>
 
         <!--spring boot 集成redis所需common-pool2-->
@@ -198,63 +186,33 @@
 
         <!-- Swagger UI 相关 -->
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-core</artifactId>
-            <version>${io.swagger.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.openapi.version}</version>
+        </dependency>
+        <!--    his dependency helps ignoring @AuthenticationPrincipal in case its used on REST Controllers    -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-security</artifactId>
+            <version>${springdoc.openapi.version}</version>
+        </dependency>
+        <!--    enable the support of spring Pageable Type    -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-data-rest</artifactId>
+            <version>${springdoc.openapi.version}</version>
+        </dependency>
+        <!--   enable javadoc support     -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-javadoc</artifactId>
+            <version>${springdoc.openapi.version}</version>
         </dependency>
         <!--    swagger-core依赖该包，部分原因，需单独升级依赖版本    -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${io.swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-models</artifactId>
-            <version>${io.swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.xiaoymin</groupId>
-            <artifactId>knife4j-spring-boot-starter</artifactId>
-            <version>${knife4j.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javassist</artifactId>
-                    <groupId>org.javassist</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>swagger-annotations</artifactId>
-                    <groupId>io.swagger</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>swagger-models</artifactId>
-                    <groupId>io.swagger</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>swagger-core</artifactId>
-                    <groupId>io.swagger</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>mapstruct</artifactId>
-                    <groupId>org.mapstruct</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!--Mysql依赖包-->
         <dependency>
@@ -486,6 +444,12 @@
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
                         </path>
+                        <!--4javadoc-->
+                        <path>
+                            <groupId>com.github.therapi</groupId>
+                            <artifactId>therapi-runtime-javadoc-scribe</artifactId>
+                            <version>0.12.0</version>
+                        </path>
                     </annotationProcessorPaths>
                     <!--https://docs.spring.io/spring-boot/docs/2.4.4/reference/html/appendix-configuration-metadata.html#configuration-metadata-annotation-processor-->
                     <!--<proc>none</proc>-->
@@ -568,6 +532,35 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
+            </plugin>-->
+            <!--     Maven JDK9 Jigsaw       -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jmod-plugin</artifactId>
+                <version>3.0.0-alpha-1</version>
+                <extensions>true</extensions>
+            </plugin>
+            <!--     Toolchains are ignored, 'javadocExecutable' parameter is set to。这个插件是用来配置maven run的jdk的，当前是通过其他方式配置了     -->
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-toolchains-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <?m2e ignore ?>
+                        <goals>
+                            <goal>toolchain</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <toolchains>
+                        <jdk>
+                            <version>17</version>
+                            <vendor>oracle</vendor>
+                        </jdk>
+                    </toolchains>
+                </configuration>
             </plugin>-->
         </plugins>
     </build>

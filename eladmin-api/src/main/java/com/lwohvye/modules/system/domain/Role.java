@@ -18,7 +18,7 @@ package com.lwohvye.modules.system.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.base.BaseEntity;
 import com.lwohvye.utils.enums.DataScopeEnum;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -36,7 +36,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-11-22
  */
-@NamedEntityGraph(name = "Role-Details", attributeNodes = {@NamedAttributeNode("menus"), @NamedAttributeNode("depts")})
+@NamedEntityGraph(name = "Role-Details", attributeNodes = {@NamedAttributeNode("menus"), @NamedAttributeNode("depts"), @NamedAttributeNode("resources")})
 @Entity
 @Getter
 @Setter
@@ -48,40 +48,51 @@ public class Role extends BaseEntity implements Serializable {
     @Column(name = "role_id")
     @NotNull(groups = {Update.class})
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(value = "ID", hidden = true)
+    @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "roles")
-    @ApiModelProperty(value = "用户", hidden = true)
+    @Schema(description = "用户", accessMode = Schema.AccessMode.READ_ONLY)
     private Set<User> users;
 
     @ManyToMany
     @JoinTable(name = "sys_roles_menus",
             joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")},
             inverseJoinColumns = {@JoinColumn(name = "menu_id", referencedColumnName = "menu_id")})
-    @ApiModelProperty(value = "菜单", hidden = true)
+    @Schema(description = "菜单", accessMode = Schema.AccessMode.READ_ONLY)
     private Set<Menu> menus;
 
     @ManyToMany
     @JoinTable(name = "sys_roles_depts",
             joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")},
             inverseJoinColumns = {@JoinColumn(name = "dept_id", referencedColumnName = "dept_id")})
-    @ApiModelProperty(value = "部门", hidden = true)
+    @Schema(description = "部门", accessMode = Schema.AccessMode.READ_ONLY)
     private Set<Dept> depts;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @JoinTable(name = "sys_roles_resources",
+            joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")},
+            inverseJoinColumns = {@JoinColumn(name = "resource_id", referencedColumnName = "resource_id")})
+    @Schema(description = "资源", accessMode = Schema.AccessMode.READ_ONLY)
+    private Set<Resource> resources;
+
     @NotBlank
-    @ApiModelProperty(value = "名称", hidden = true)
+    @Schema(description = "名称", accessMode = Schema.AccessMode.READ_ONLY)
     private String name;
 
-    @ApiModelProperty(value = "数据权限，全部 、 本级 、 自定义")
+    @NotBlank
+    @Schema(description = "标识", accessMode = Schema.AccessMode.READ_ONLY)
+    private String code;
+
+    @Schema(description = "数据权限，全部 、 本级 、 自定义")
     private String dataScope = DataScopeEnum.THIS_LEVEL.getValue();
 
     @Column(name = "level")
-    @ApiModelProperty(value = "级别，数值越小，级别越大")
+    @Schema(description = "级别，数值越小，级别越大")
     private Integer level = 3;
 
-    @ApiModelProperty(value = "描述")
+    @Schema(description = "描述")
     private String description;
 
     @Override

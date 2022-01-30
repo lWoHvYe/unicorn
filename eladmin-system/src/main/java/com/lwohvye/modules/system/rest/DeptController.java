@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.lwohvye.log.annotation.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Dept;
@@ -25,13 +26,11 @@ import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.SecurityUtils;
 import com.lwohvye.utils.result.ResultInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.annotation.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,31 +43,28 @@ import java.util.*;
  */
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "系统：部门管理")
-@RequestMapping("/api/dept")
+@Tag(name = "DeptController", description = "系统：部门管理")
+@RequestMapping("/api/sys/dept")
 public class DeptController {
 
     private final IDeptService deptService;
     private static final String ENTITY_NAME = "dept";
 
-    @ApiOperation("导出部门数据")
+    @Operation(summary = "导出部门数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('dept:list')")
     public void download(HttpServletResponse response, DeptQueryCriteria criteria) throws Exception {
         deptService.download(deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, false), response);
     }
 
-    @ApiOperation("查询部门")
+    @Operation(summary = "查询部门")
     @GetMapping
-    @PreAuthorize("@el.check('user:list','dept:list')")
     public ResponseEntity<Object> query(DeptQueryCriteria criteria) throws Exception {
         List<DeptDto> deptDtos = deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, true);
         return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(deptDtos, deptDtos.size())), HttpStatus.OK);
     }
 
-    @ApiOperation("查询部门:根据ID获取同级与上级数据")
+    @Operation(summary = "查询部门:根据ID获取同级与上级数据")
     @PostMapping("/superior")
-    @PreAuthorize("@el.check('user:list','dept:list')")
     public ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids) {
         Set<DeptDto> deptDtos = new LinkedHashSet<>();
         for (Long id : ids) {
@@ -80,9 +76,8 @@ public class DeptController {
     }
 
     @Log("新增部门")
-    @ApiOperation("新增部门")
+    @Operation(summary = "新增部门")
     @PostMapping
-    @PreAuthorize("@el.check('dept:add')")
     public ResponseEntity<Object> create(@Validated @RequestBody Dept resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
@@ -92,18 +87,16 @@ public class DeptController {
     }
 
     @Log("修改部门")
-    @ApiOperation("修改部门")
+    @Operation(summary = "修改部门")
     @PutMapping
-    @PreAuthorize("@el.check('dept:edit')")
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dept resources) {
         deptService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
 
     @Log("删除部门")
-    @ApiOperation("删除部门")
+    @Operation(summary = "删除部门")
     @DeleteMapping
-    @PreAuthorize("@el.check('dept:del')")
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         Set<DeptDto> deptDtos = new HashSet<>();
         for (Long id : ids) {

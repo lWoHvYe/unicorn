@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
 /**
- * @description 处理退出逻辑
+ * 处理退出逻辑
+ *
  * @date 2021/11/27 9:42 上午
  */
 @Slf4j

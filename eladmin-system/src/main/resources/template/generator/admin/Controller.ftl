@@ -15,7 +15,7 @@
 */
 package ${package}.rest;
 
-import com.lwohvye.annotation.Log;
+import com.lwohvye.log.annotation.Log;
 import ${package}.domain.${className};
 import ${package}.service.${className}Service;
 import ${package}.service.dto.${className}QueryCriteria;
@@ -26,59 +26,55 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 /**
-* @website https://el-admin.vip
+* @website https://lwohvye.com
 * @author ${author}
 * @date ${date}
 **/
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "${apiAlias}管理")
+@Tag(name = "${className}Controller", description = "${apiAlias}管理")
 @RequestMapping("/api/${changeClassName}")
 public class ${className}Controller {
 
     private final I${className}Service ${changeClassName}Service;
 
     @Log("导出数据")
-    @ApiOperation("导出数据")
+    @Operation(summary = "导出数据")
     @GetMapping(value = "/download")
-    @PreAuthorize("@el.check('${changeClassName}:list')")
     public void download(HttpServletResponse response, ${className}QueryCriteria criteria) throws IOException {
         ${changeClassName}Service.download(${changeClassName}Service.queryAll(criteria), response);
     }
 
     @GetMapping
     @Log("查询${apiAlias}")
-    @ApiOperation("查询${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:list')")
+    @Operation(summary = "查询${apiAlias}")
     public ResponseEntity<Object> query(${className}QueryCriteria criteria, Pageable pageable){
         return new ResponseEntity<>(${changeClassName}Service.queryAll(criteria,pageable),HttpStatus.OK);
     }
 
     @PostMapping
     @Log("新增${apiAlias}")
-    @ApiOperation("新增${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:add')")
+    @Operation(summary = "新增${apiAlias}")
     public ResponseEntity<Object> create(@Validated @RequestBody ${className} resources){
         return new ResponseEntity<>(${changeClassName}Service.create(resources),HttpStatus.CREATED);
     }
 
     @PutMapping
     @Log("修改${apiAlias}")
-    @ApiOperation("修改${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:edit')")
+    @Operation(summary = "修改${apiAlias}")
     public ResponseEntity<Object> update(@Validated @RequestBody ${className} resources){
         ${changeClassName}Service.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Log("删除${apiAlias}")
-    @ApiOperation("删除${apiAlias}")
-    @PreAuthorize("@el.check('${changeClassName}:del')")
+    @Operation(summary = "删除${apiAlias}")
     @DeleteMapping
     public ResponseEntity<Object> delete(@RequestBody ${pkColumnType}[] ids) {
         ${changeClassName}Service.deleteAll(ids);
