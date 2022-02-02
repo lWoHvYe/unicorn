@@ -165,7 +165,8 @@ public class AuthorizationController {
             // doSomething...
         } finally {
             // 解锁。
-            lock.unlock();
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) // 添加这个，目的是保证目标以及锁了，以及比较重要的锁是当前线程锁的
+                lock.unlock();
         }
         // endregion
 
