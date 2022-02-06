@@ -63,7 +63,9 @@ public class ThreadSampleCyclicBarrier {
     private static Integer threadCount = 10;
     //    用于控制主线程等待子线程结束
 //    private static final CountDownLatch latch = new CountDownLatch(threadCount);
-    private static final CyclicBarrier await = new CyclicBarrier(threadCount + 1);
+    // `CyclicBarrier` 还提供一个更高级的构造函数 `CyclicBarrier(int parties, Runnable barrierAction)`，用于在线程到达屏障时（多个线程会执行多次），优先执行 `barrierAction`，
+    // 具体为在await方法中会调用dowait，在该方法中调用了 `barrierAction` 的 `run()` 方法
+    private static final CyclicBarrier await = new CyclicBarrier(threadCount + 1, () -> System.out.println("有线程抵达屏障"));
     //        模拟次数
     private Integer simuCount = 1000000;
 
