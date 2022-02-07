@@ -20,6 +20,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.lwohvye.exception.BadRequestException;
+import lombok.SneakyThrows;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.slf4j.Logger;
@@ -31,7 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
@@ -399,5 +402,68 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    /**
+     * mmap内存映射文件，针对小文件效率还可以，也可针对大文件做部分映射
+     *
+     * @param source
+     * @date 2022/2/7 12:27 PM
+     */
+    @SneakyThrows
+    public static void mappedFile(String source) {
+        var path = Paths.get(source);
+        try (var fileChannel = FileChannel.open(path)) {
+            // try (var fileChannel = new RandomAccessFile(source, "rw").getChannel()) {
+            // var size = fileChannel.size();
+            var size = 0x8000000; //128 Mb
+            // MappedByteBuffer是 ByteBuffer 的子类，也可以使用其中的部分操作
+            var mmap = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, size); // 将文件的前size个字节映射到内存
+            // for (int i = 0; i < size; i++) {
+            //     var src = mmap.get(i); // 获取指定位置字节。随机读
+            //     mmap.put(i, (byte) (src + 1)); // 修改
+            // }
+            while (mmap.hasRemaining()) { // 顺序读
+                var src = mmap.get(); // 获取当前位置字节
+                mmap.put((byte) (src + 2)); // 修改当前位置字节
+            }
+            mmap.force(); // 强制输出改动到文件
+            mmap.clear();
+
+            // 下面是在指定位置读写的示例
+            {
+                // 写
+                var data = new byte[4];
+                var position = 8;
+                // 从当前 mmap 指针的位置写入 4b 的数据
+                mmap.put(data);
+                // 指定 position 写入 4b 的数据
+                var subBuffer = mmap.slice();
+                subBuffer.position(position);
+                subBuffer.put(data);
+            }
+            {
+                // 读
+                var data = new byte[4];
+                var position = 8;
+                // 从当前 mmap 指针的位置读取 4b 的数据
+                mmap.get(data);
+                // 指定 position 读取 4b 的数据
+                var subBuffer = mmap.slice();
+                subBuffer.position(position);
+                subBuffer.get(data);
+            }
+            {
+                // FileChannel锁相关
+                var lock = fileChannel.lock(); //调用lock，阻塞
+                lock.release(); // 释放锁
+                var lock1 = fileChannel.tryLock(); //调用tryLock，立即响应，加锁失败返回null
+                if (Objects.nonNull(lock1)) lock1.close(); // 释放锁，底层调用的release()
+
+                try (var lock2 = fileChannel.lock()) { // try-with-resources。快捷键 资源.twr
+                    // doSomething
+                }
+            }
+        }
     }
 }
