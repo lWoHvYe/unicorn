@@ -17,7 +17,7 @@
 
 echo "stop SpringBoot Application"
 # shellcheck disable=SC2009
-pid=$(ps -ef | grep eladmin-system-3.0.0.jar | grep -v grep | awk '{print $2}')
+pid=$(ps -ef | grep eladmin-system-3.0.1.jar | grep -v grep | awk '{print $2}')
 echo "旧应用进程id：$pid"
 if [ -n "$pid" ]
 then

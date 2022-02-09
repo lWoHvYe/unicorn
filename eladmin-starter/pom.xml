@@ -31,7 +31,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <project.core.version>3.0.0</project.core.version>
+        <project.core.version>3.0.1</project.core.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <javassist.version>3.28.0-GA</javassist.version>
         <shardingsphere.version>5.0.0</shardingsphere.version>

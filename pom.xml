@@ -23,7 +23,7 @@
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 
     <name>EL-ADMIN 管理系统</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
@@ -49,7 +49,7 @@
         <connection>scm:git:git://github.com/lWoHvYe/eladmin.git</connection>
         <developerConnection>scm:git:ssh://github.com/lWoHvYe/eladmin.git</developerConnection>
         <url>https://github.com/lWoHvYe/eladmin/tree/main</url>
-        <tag>eladmin-v3.0.0</tag>
+        <tag>eladmin-v3.0.1</tag>
     </scm>
 
     <modules>
@@ -75,7 +75,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
-        <project.core.version>3.0.0</project.core.version>
+        <project.core.version>3.0.1</project.core.version>
         <log4jdbc.version>1.16</log4jdbc.version>
         <springdoc.openapi.version>1.6.6</springdoc.openapi.version>
         <io.swagger.version>1.6.4</io.swagger.version>
@@ -99,10 +99,10 @@
         <yauaa.version>6.8</yauaa.version>
         <ip2region.version>2.6.3</ip2region.version>
         <thumbnailator.version>0.4.16</thumbnailator.version>
-        <pdfbox.version>2.0.25</pdfbox.version>
-        <xmlsec.version>2.3.0</xmlsec.version>
-        <xmlgraphics.version>2.7</xmlgraphics.version>
-        <batik.version>1.14</batik.version>
+        <!--        <pdfbox.version>2.0.25</pdfbox.version>-->
+        <!--        <xmlsec.version>2.3.0</xmlsec.version>-->
+        <!--        <xmlgraphics.version>2.7</xmlgraphics.version>-->
+        <!--        <batik.version>1.14</batik.version>-->
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
@@ -328,52 +328,52 @@
             <artifactId>thumbnailator</artifactId>
             <version>${thumbnailator.version}</version>
         </dependency>
-        <!--   fixed dependencies of plugins with threat    -->
-        <!--   下面几个依赖的具体用途
+        <!--   fixed dependencies of plugins with threat ，未实际使用下面的依赖，只是在发布到中央仓库时，有显示这部分依赖，且默认版本有漏洞，不确定是何处引用   -->
+        <!--   下面几个依赖的具体用途，22-02-09，暂移除无关的依赖
         Apache XML Graphics Commons is a library that consists of several reusable components used by Apache Batik and Apache FOP.
         Many of these components can easily be used separately outside the domains of SVG and XSL-FO.
         You'll find components such as a PDF library, an RTF library, Graphics2D implementations that let you generate PDF and PostScript files and much more.     -->
         <!--   4pdfbox     -->
         <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>${pdfbox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>fontbox</artifactId>
-            <version>${pdfbox.version}</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.pdfbox</groupId>-->
+        <!--            <artifactId>pdfbox</artifactId>-->
+        <!--            <version>${pdfbox.version}</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.pdfbox</groupId>-->
+        <!--            <artifactId>fontbox</artifactId>-->
+        <!--            <version>${pdfbox.version}</version>-->
+        <!--        </dependency>-->
         <!--    4xmlsec    -->
         <!-- https://mvnrepository.com/artifact/org.apache.santuario/xmlsec -->
-        <dependency>
-            <groupId>org.apache.santuario</groupId>
-            <artifactId>xmlsec</artifactId>
-            <version>${xmlsec.version}</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.santuario</groupId>-->
+        <!--            <artifactId>xmlsec</artifactId>-->
+        <!--            <version>${xmlsec.version}</version>-->
+        <!--        </dependency>-->
         <!--    4xmlgraphics-commons    -->
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>xmlgraphics-commons</artifactId>
-            <version>${xmlgraphics.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-io</artifactId>
-                    <groupId>commons-io</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.xmlgraphics</groupId>-->
+        <!--            <artifactId>xmlgraphics-commons</artifactId>-->
+        <!--            <version>${xmlgraphics.version}</version>-->
+        <!--            <exclusions>-->
+        <!--                <exclusion>-->
+        <!--                    <artifactId>commons-io</artifactId>-->
+        <!--                    <groupId>commons-io</groupId>-->
+        <!--                </exclusion>-->
+        <!--                <exclusion>-->
+        <!--                    <artifactId>commons-logging</artifactId>-->
+        <!--                    <groupId>commons-logging</groupId>-->
+        <!--                </exclusion>-->
+        <!--            </exclusions>-->
+        <!--        </dependency>-->
         <!--    4batik  Batik is a Java-based toolkit for applications or applets that want to use images in the Scalable Vector Graphics (SVG) format for various purposes, such as display, generation or manipulation.  -->
-        <dependency>
-            <groupId>org.apache.xmlgraphics</groupId>
-            <artifactId>batik-all</artifactId>
-            <version>${batik.version}</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.xmlgraphics</groupId>-->
+        <!--            <artifactId>batik-all</artifactId>-->
+        <!--            <version>${batik.version}</version>-->
+        <!--        </dependency>-->
     </dependencies>
     <!--
         If you are using logstash-logback-encoder in a project (such as spring-boot) that also declares dependencies on any of the above libraries,
