@@ -57,4 +57,5 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.utils.result;
 
     opens com.lwohvye.base;
+    opens com.lwohvye.config;
 }

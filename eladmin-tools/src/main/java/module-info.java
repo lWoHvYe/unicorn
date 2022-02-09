@@ -11,6 +11,7 @@ module lwohvye.eladmin.tools {
     exports com.lwohvye.tools.domain.vo;
     exports com.lwohvye.tools.service;
 
+    opens com.lwohvye.tools.config;
     opens com.lwohvye.tools.utils;
     opens com.lwohvye.tools.service;
 }

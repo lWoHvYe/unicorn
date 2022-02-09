@@ -36,5 +36,13 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.mnt.util;
     exports com.lwohvye.modules.rabbitmq.domain;
     exports com.lwohvye.modules.rabbitmq.service;
+    exports com.lwohvye.modules.system.handler;
     exports com.lwohvye.modules.system.repository to lwohvye.eladmin.search; // 这里先这样
+
+    opens com.lwohvye.config.common;
+    opens com.lwohvye.config.datasource;
+    opens com.lwohvye.config.rabbitmq;
+    opens com.lwohvye.config.thread;
+    opens com.lwohvye.modules.quartz.config;
+    opens com.lwohvye.modules.security.config;
 }
