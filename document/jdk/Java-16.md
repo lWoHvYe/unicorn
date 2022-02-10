@@ -136,6 +136,8 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 
 在实际使用中，需要容器创建的bean，需要exports to spring.beans, 有的还需要spring.content，暂不清楚；包含注入的属性的bean，需要opens to spring.core。opens包含了exports，controller需要exports to spring.web。还有那些需要反射的场景
 
+那些在resources中的配置等内容，也需要将相关目录open，可参考classes下的结构，否则无法被外界访问，最容易漏掉的就是config中的spring boot配置。
+
 应该是有相关插件，用于生成module-info.java文件的。
 
 - [Project Jigsaw](http://openjdk.java.net/projects/jigsaw/quick-start)
