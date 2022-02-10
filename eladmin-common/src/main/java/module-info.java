@@ -1,5 +1,6 @@
 // 暂作为open module。允许其他模块通过反射访问，后续缩小范围
-@SuppressWarnings({ "requires-automatic", "requires-transitive-automatic" }) // 抑制compile warn: requires transitive directive for an automatic module
+@SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
+        // 抑制compile warn: requires transitive directive for an automatic module
 module lwohvye.eladmin.common {
     requires transitive java.compiler;
     requires transitive java.servlet;
@@ -10,6 +11,8 @@ module lwohvye.eladmin.common {
     requires transitive spring.beans;
     requires transitive spring.context;
     requires transitive spring.tx;
+    requires transitive spring.aop;
+    requires transitive spring.aspects;
     requires transitive spring.web;
     requires transitive spring.webmvc;
     requires transitive spring.jdbc;
@@ -43,6 +46,8 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.advice;
     exports com.lwohvye.annotation;
     exports com.lwohvye.annotation.rest;
+    exports com.lwohvye.aop to spring.beans;
+    exports com.lwohvye.aspect to spring.beans;
     exports com.lwohvye.base;
     exports com.lwohvye.config;
     exports com.lwohvye.constant;
@@ -57,5 +62,8 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.utils.result;
 
     opens com.lwohvye.base;
-    opens com.lwohvye.config;
+    opens com.lwohvye.config to spring.core;
+    opens com.lwohvye.utils to spring.core;
+    opens com.lwohvye.utils.redis to spring.core;
+    opens com.lwohvye.utils.result to spring.core;
 }
