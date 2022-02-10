@@ -6,7 +6,7 @@ module lwohvye.eladmin.generator {
     exports com.lwohvye.generator.domain;
     exports com.lwohvye.generator.domain.vo;
     exports com.lwohvye.generator.repository to spring.beans;
-    exports com.lwohvye.generator.rest to spring.beans;
+    exports com.lwohvye.generator.rest to spring.beans, spring.web;
     exports com.lwohvye.generator.service;
     exports com.lwohvye.generator.service.impl to spring.beans;
 

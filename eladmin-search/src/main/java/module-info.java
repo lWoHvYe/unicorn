@@ -1,5 +1,5 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
-open module lwohvye.eladmin.search {// 将module设置为open，解决了未加载application.yml配置的问题，原因不清楚
+open module lwohvye.eladmin.search {// 将module设置为open，解决了未加载application.yml的问题，是因为没有opens config；在resources下的config中的配置也需要open才行。
     requires lwohvye.eladmin.system;
     requires lwohvye.eladmin.tools;
     requires lwohvye.eladmin.generator;

@@ -32,24 +32,26 @@ module lwohvye.eladmin.system {
     requires transitive io.netty.common;
     requires org.jetbrains.annotations;
 
+    exports com.lwohvye.config.condition to spring.beans;
     exports com.lwohvye.modules.mnt.repository to spring.beans;
-    exports com.lwohvye.modules.mnt.rest to spring.beans;
+    exports com.lwohvye.modules.mnt.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.mnt.service.mapstruct;
     exports com.lwohvye.modules.mnt.util;
     exports com.lwohvye.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
     exports com.lwohvye.modules.quartz.repository to spring.beans;
-    exports com.lwohvye.modules.quartz.rest to spring.beans;
+    exports com.lwohvye.modules.quartz.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.quartz.task to spring.beans;
     exports com.lwohvye.modules.quartz.utils to spring.beans;
     exports com.lwohvye.modules.rabbitmq.domain;
     exports com.lwohvye.modules.rabbitmq.service;
     exports com.lwohvye.modules.security.service;
+    exports com.lwohvye.modules.security.service.dto;
     exports com.lwohvye.modules.security.security;
     exports com.lwohvye.modules.security.security.filter;
     exports com.lwohvye.modules.security.security.handler;
-    exports com.lwohvye.modules.security.rest to spring.beans;
+    exports com.lwohvye.modules.security.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.system.handler;
-    exports com.lwohvye.modules.system.rest to spring.beans;
+    exports com.lwohvye.modules.system.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.system.service.impl to spring.beans;
     exports com.lwohvye.modules.system.service.local;
     exports com.lwohvye.modules.system.service.mapstruct;
@@ -79,4 +81,9 @@ module lwohvye.eladmin.system {
     opens com.lwohvye.modules.system.service.local;
     opens com.lwohvye.modules.system.service.mapstruct;
     opens com.lwohvye.modules.system.repository to spring.core;
+
+    // 理论上这几个也要opens，简单而言，未open的部分是无法被外界访问的。
+    opens template.email;
+    opens template.generator.admin;
+    opens template.generator.front;
 }

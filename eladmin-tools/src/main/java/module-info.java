@@ -11,7 +11,7 @@ module lwohvye.eladmin.tools {
     exports com.lwohvye.tools.utils;
     exports com.lwohvye.tools.domain.vo;
     exports com.lwohvye.tools.repository to spring.beans;
-    exports com.lwohvye.tools.rest to spring.beans;
+    exports com.lwohvye.tools.rest to spring.beans, spring.web;
     exports com.lwohvye.tools.service;
     exports com.lwohvye.tools.service.dto;
     exports com.lwohvye.tools.service.impl;
