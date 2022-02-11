@@ -98,7 +98,7 @@
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>6.8</yauaa.version>
         <ip2region.version>2.6.3</ip2region.version>
-        <thumbnailator.version>0.4.16</thumbnailator.version>
+        <thumbnailator.version>0.4.17</thumbnailator.version>
         <!--        <pdfbox.version>2.0.25</pdfbox.version>-->
         <!--        <xmlsec.version>2.3.0</xmlsec.version>-->
         <!--        <xmlgraphics.version>2.7</xmlgraphics.version>-->
