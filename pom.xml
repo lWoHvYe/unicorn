@@ -81,7 +81,7 @@
         <io.swagger.version>1.6.4</io.swagger.version>
         <druid.version>1.2.8</druid.version>
         <hutool.version>5.7.20</hutool.version>
-        <fastutil.version>8.5.7</fastutil.version>
+        <fastutil.version>8.5.8</fastutil.version>
         <lombok.version>1.18.22</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
