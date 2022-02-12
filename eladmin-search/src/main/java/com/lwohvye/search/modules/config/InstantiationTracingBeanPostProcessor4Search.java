@@ -19,8 +19,8 @@ import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.search.modules.mongodb.rest.MongoDBUserController;
 import com.lwohvye.utils.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
@@ -31,7 +31,7 @@ import java.util.Objects;
  * @author Hongyan Wang
  * @date 2021年07月18日 18:15
  */
-@Configuration
+@Component
 public class InstantiationTracingBeanPostProcessor4Search implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

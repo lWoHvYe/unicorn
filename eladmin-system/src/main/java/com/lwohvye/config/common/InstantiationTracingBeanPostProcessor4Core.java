@@ -16,24 +16,30 @@
 package com.lwohvye.config.common;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.modules.system.service.ITerminalService;
 import com.lwohvye.modules.system.handler.NormalUserTypeHandler;
+import com.lwohvye.modules.system.service.ITerminalService;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 /**
  * 当Spring将所有的Bean都初始化完成后，会留有一个入口，通过实现如下接口，可在此阶段进行部分业务
  * 与  @PostConstruct 的区别在于，此时ApplicationContext已可以获取到
+ * <p>
+ * Spring 中@Configuration 和 @Component 区别：
+ * `@Configuration` 注解本质上还是 `@Component`
+ * `@Configuration` 中所有带 `@Bean` 注解的方法都会被动态代理，因此调用该方法返回的都是同一个实例。
+ * `@Component` 注解并没有通过 cglib 来代理`@Bean` 方法的调用，因此调用该方法返回的是不同的实例。
+ * 或者简单一点，里面有定义Bean的，使用`@Configuration` 。
  *
  * @author Hongyan Wang
  * @date 2021年07月18日 18:15
  */
 @Slf4j
-@Configuration
+@Component
 public class InstantiationTracingBeanPostProcessor4Core implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
