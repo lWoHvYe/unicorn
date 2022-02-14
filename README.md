@@ -28,6 +28,10 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 #启动示例
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.0.jar >nohup.out 2>&1 &
 ```
+```shell
+#在未来的3.0.1版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
+nohup java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.1.jar >nohup.out 2>&1 &
+```
 
 | key                | 目的                                                         |
 | ------------------ | ------------------------------------------------------------ |
