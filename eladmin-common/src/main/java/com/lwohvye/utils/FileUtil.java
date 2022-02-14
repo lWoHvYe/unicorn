@@ -364,6 +364,27 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
     }
 
     /**
+     * 传统文件拷贝方式
+     *
+     * @param source
+     * @param target
+     * @date 2022/2/14 3:16 PM
+     */
+    public static void fileCopy(String source, String target) throws IOException {
+        // 传统方式
+        try (FileInputStream in = new FileInputStream(source)) {
+            try (FileOutputStream out = new FileOutputStream(target)) {
+                var bytes = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(bytes)) != -1)
+                    out.write(bytes, 0, bytesRead);
+            }
+        }
+        // 7开始，新的方式
+        // Files.copy(Paths.get(source), Paths.get(target));
+    }
+
+    /**
      * NIO 拷贝文件
      *
      * @param source
@@ -375,12 +396,16 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
             try (var out = new FileOutputStream(target)) {
                 var inChannel = in.getChannel();
                 var outChannel = out.getChannel();
+
+                // 带缓冲区的拷贝
                 var buffer = ByteBuffer.allocate(4096);
                 while (inChannel.read(buffer) != -1) {
                     buffer.flip(); // 读写模式切换
                     outChannel.write(buffer);
                     buffer.clear(); // 写完清空 + 为下一轮的读操作作准备
                 }
+                // 另一种方式。比上面的简洁很多
+                // outChannel.transferFrom(inChannel, 0, inChannel.size());
             }
         }
     }
