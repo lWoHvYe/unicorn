@@ -46,8 +46,8 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.advice;
     exports com.lwohvye.annotation;
     exports com.lwohvye.annotation.rest;
-    exports com.lwohvye.aop to spring.beans;
-    exports com.lwohvye.aspect to spring.beans;
+    exports com.lwohvye.aop to spring.beans, spring.aop;
+    exports com.lwohvye.aspect to spring.beans, spring.aop;
     exports com.lwohvye.base;
     exports com.lwohvye.config;
     exports com.lwohvye.constant;

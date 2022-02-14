@@ -3,7 +3,7 @@ module lwohvye.eladmin.logging {
     requires transitive lwohvye.eladmin.common;
 
     exports com.lwohvye.log.annotation;
-    exports com.lwohvye.log.aspect to spring.beans;
+    exports com.lwohvye.log.aspect to spring.beans, spring.aop;
     exports com.lwohvye.log.domain;
     exports com.lwohvye.log.repository to spring.beans;
     exports com.lwohvye.log.rest to spring.beans, spring.web;

@@ -134,7 +134,12 @@ provides <interface | abstract class> with <class1>[, <class2> ...]: 声明模�
 uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加上之后模块内的代码就可以通过 ServiceLoader.load(Class) 一次性加载所声明的 SPI 服务的所有实现类。
 ```
 
-在实际使用中，需要容器创建的bean，需要exports to spring.beans, 有的还需要spring.content，暂不清楚；包含注入的属性的bean，需要opens to spring.core。opens包含了exports，controller需要exports to spring.web。还有那些需要反射的场景
+在实际使用中，
+- 需要容器创建的bean，需要exports to spring.beans, 有的还需要spring.content，暂不清楚；
+- 包含注入的属性的bean，需要opens to spring.core。opens包含了exports，
+- controller需要exports to spring.web。
+- Aspect相关的需要 exports to aop
+- 还有那些需要反射的场景
 
 那些在resources中的配置等内容，也需要将相关目录open，可参考classes下的结构，否则无法被外界访问，最容易漏掉的就是config中的spring boot配置。
 
