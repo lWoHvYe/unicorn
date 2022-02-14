@@ -69,6 +69,7 @@ public class LogAspect {
         Log log = new Log("INFO", System.currentTimeMillis() - currentTime.get());
         currentTime.remove();
         HttpServletRequest request = RequestHolder.getHttpServletRequest();
+        // TODO: 2022/2/14 保持日志这块，有循环依赖导致的栈溢出问题，待解决
         logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request),joinPoint, log);
         return result;
     }
