@@ -21,6 +21,8 @@ import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.utils.ThrowableUtil;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -45,6 +47,8 @@ import java.util.Objects;
 // 使用Order使其先于GlobalExceptionHandler执行，这里把优先级设置为了最高。原统一异常处理可移除
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
+@ConditionalOnWebApplication // 在Spring为Web服务时生效
+@ConditionalOnMissingBean(ApiGlobalExceptionHandler.class) // 避免Bean冲突
 public class ApiGlobalExceptionHandler {
 
     /**
@@ -61,61 +65,21 @@ public class ApiGlobalExceptionHandler {
     }
 
     /**
-     * 处理实体已存在异常 EntityExistException
+     * 部分非受检异常，统一处理
      *
      * @param e /
-     * @return ResponseEntity
+     * @return ResponseEntity/
+     * @date 2022/2/24 10:59 AM
      */
     @ResponseBody
-    @ExceptionHandler(value = EntityExistException.class)
-    public ResponseEntity<ResultInfo> entityExistException(EntityExistException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
-        return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * 处理实体不存在异常 EntityNotFoundException
-     *
-     * @param e /
-     * @return ResponseEntity
-     */
-    @ResponseBody
-    @ExceptionHandler(value = EntityNotFoundException.class)
-    public ResponseEntity<ResultInfo> entityNotFoundException(EntityNotFoundException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
-        return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * 处理自定义异常 BadRequestException
-     *
-     * @param e /
-     * @return ResponseEntity
-     */
-    @ResponseBody
-    @ExceptionHandler(value = BadRequestException.class)
-    public ResponseEntity<ResultInfo> badRequestException(BadRequestException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
-        return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * 使用Assert可能抛出的异常
-     *
-     * @param e /
-     * @return org.springframework.http.ResponseEntity
-     * @date 2021/6/1 1:14 下午
-     */
-    @ResponseBody
-    @ExceptionHandler(value = IllegalStateException.class)
-    public ResponseEntity<ResultInfo> illegalStateException(IllegalStateException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
-        return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
-    @ResponseBody
-    @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<ResultInfo> illegalArgumentException(IllegalArgumentException e) {
+    @ExceptionHandler({
+            EntityExistException.class // 实体已存在
+            , EntityNotFoundException.class // 实体不存在
+            , BadRequestException.class // 自定义异常
+            , IllegalStateException.class // Assert相关
+            , IllegalArgumentException.class // Assert相关
+    })
+    public ResponseEntity<ResultInfo> handleServletException(RuntimeException e) {
         log.error(ThrowableUtil.getStackTrace(e));
         return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
     }

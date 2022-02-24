@@ -78,6 +78,8 @@ public class UserController {
         userService.download(userService.queryAll(criteria), response);
     }
 
+    // 关于@InitBinder，有时间可以试一下，@InitBinder属于Controller级别的SpringMVC属性编辑器（只对所在的Controller生效）,并不是全局级别
+
     @Operation(summary = "查询用户")
     @GetMapping
     public ResponseEntity<Object> query(UserQueryCriteria criteria, Pageable pageable) {
