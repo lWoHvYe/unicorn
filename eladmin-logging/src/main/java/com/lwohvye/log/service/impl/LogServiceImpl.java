@@ -91,7 +91,7 @@ public class LogServiceImpl implements ILogService {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        com.lwohvye.log.annotation.Log aopLog = method.getAnnotation(com.lwohvye.log.annotation.Log.class);
+        com.lwohvye.annotation.log.Log aopLog = method.getAnnotation(com.lwohvye.annotation.log.Log.class);
 
         // 方法路径
         String methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";

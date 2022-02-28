@@ -15,7 +15,7 @@
 */
 package ${package}.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import ${package}.domain.${className};
 import ${package}.service.${className}Service;
 import ${package}.service.dto.${className}QueryCriteria;

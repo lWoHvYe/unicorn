@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.log.annotation;
+package com.lwohvye.annotation.log;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

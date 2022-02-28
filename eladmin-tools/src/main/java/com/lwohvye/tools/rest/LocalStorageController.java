@@ -15,7 +15,7 @@
  */
 package com.lwohvye.tools.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.tools.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.tools.service.ILocalStorageService;

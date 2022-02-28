@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.quartz.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.quartz.domain.QuartzJob;

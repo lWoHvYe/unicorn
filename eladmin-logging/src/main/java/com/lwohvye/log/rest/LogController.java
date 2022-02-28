@@ -15,7 +15,7 @@
  */
 package com.lwohvye.log.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.log.service.ILogService;
 import com.lwohvye.log.service.dto.LogQueryCriteria;
 import com.lwohvye.utils.SecurityUtils;

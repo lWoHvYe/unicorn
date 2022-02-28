@@ -20,7 +20,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;

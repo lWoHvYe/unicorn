@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.modules.mnt.service.IDeployHistoryService;
 import com.lwohvye.utils.result.ResultInfo;

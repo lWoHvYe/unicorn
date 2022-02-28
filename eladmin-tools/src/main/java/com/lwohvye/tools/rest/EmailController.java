@@ -15,7 +15,7 @@
  */
 package com.lwohvye.tools.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.tools.domain.EmailConfig;
 import com.lwohvye.tools.domain.vo.EmailVo;
 import com.lwohvye.tools.service.IEmailService;

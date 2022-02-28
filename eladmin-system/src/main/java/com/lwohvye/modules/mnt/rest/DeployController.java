@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.modules.mnt.domain.Deploy;
 import com.lwohvye.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.service.IDeployService;

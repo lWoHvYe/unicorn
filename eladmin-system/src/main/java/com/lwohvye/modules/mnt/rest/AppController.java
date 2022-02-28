@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.rest;
 
-import com.lwohvye.log.annotation.Log;
+import com.lwohvye.annotation.log.Log;
 import com.lwohvye.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.service.dto.AppQueryCriteria;
 import com.lwohvye.modules.mnt.service.IAppService;
