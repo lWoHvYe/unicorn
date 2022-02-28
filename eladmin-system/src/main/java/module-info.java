@@ -35,11 +35,13 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.config.condition to spring.beans;
     exports com.lwohvye.modules.mnt.repository to spring.beans;
     exports com.lwohvye.modules.mnt.rest to spring.beans, spring.web;
+    exports com.lwohvye.modules.mnt.service;
     exports com.lwohvye.modules.mnt.service.mapstruct;
     exports com.lwohvye.modules.mnt.util;
     exports com.lwohvye.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
     exports com.lwohvye.modules.quartz.repository to spring.beans;
     exports com.lwohvye.modules.quartz.rest to spring.beans, spring.web;
+    exports com.lwohvye.modules.quartz.service;
     exports com.lwohvye.modules.quartz.task to spring.beans;
     exports com.lwohvye.modules.quartz.utils to spring.beans;
     exports com.lwohvye.modules.rabbitmq.domain;
@@ -52,6 +54,7 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.security.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.system.handler;
     exports com.lwohvye.modules.system.rest to spring.beans, spring.web;
+    exports com.lwohvye.modules.system.service;
     exports com.lwohvye.modules.system.service.impl to spring.beans;
     exports com.lwohvye.modules.system.service.local;
     exports com.lwohvye.modules.system.service.mapstruct;

@@ -143,7 +143,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 - `eladmin-common` 为系统的公共模块，各种工具类，公共配置存在该模块
 
-- `eladmin-api` 基础实体及接口模块，方便后续服务拆分
+- `eladmin-api` 基础实体及DTO，方便后续服务拆分
 
 - `eladmin-system` 为系统核心模块，包含管理侧权限配置等。包含api模块service层的具体实现
 
@@ -167,7 +167,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
     - config 自定义权限实现、redis配置、openApi配置、Rsa配置等
     - exception 项目统一异常的处理
     - utils 系统通用工具类
-- eladmin-api 基础实体及接口模块
+- eladmin-api 基础实体及DTO
     - annotation 为模块自定义注解
     - modules 基础实体及接口定义
     - utils 通用工具类扩展
