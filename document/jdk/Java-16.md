@@ -153,7 +153,7 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 # 当前待解决：模块 lwohvye.eladmin.starter 不具有 ModuleMainClass 属性，请使用 -m <模块>/<主类>。针对Spring Boot项目，应该有某个地方不一样
 java -p mlib -Dloader.path=clib -m lwohvye.eladmin.starter
 ```
-- 在Idea的 Run/Debug Configurations中的VM options中，部分可能需要调一下
+- ~~在Idea的 Run/Debug Configurations中的VM options中，部分可能需要调一下~~
 - 直接启动报异常，是因为部分依赖无法module化（无法得到 module description，在编译时有相关警告 can't extract module name from xxx.jar: Provider class xxx not int module），[具体原因](https://stackoverflow.com/questions/54682417/unable-to-derive-module-descriptor-provider-class-x-not-in-module)
 ```
 Error occurred during initialization of boot layer
@@ -162,3 +162,11 @@ Caused by: java.lang.module.InvalidModuleDescriptorException: Provider class xxx
 ```
 - 经简单验证，若无无法module化的依赖，是可以启动成功的
 - 另，若删除主启动类的module-info.java，以未命名模块的方式来运行，也是一种方式，这算是对Java 9之前的一个兼容
+
+IDEA中，两种启动方式的启动参数，另通过查看VM参数，module模式中有`--module-path`属性
+```shell
+# 非module
+java -classpath lib com.lwohvye.AppSearchRun
+# module
+java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
+```

@@ -29,6 +29,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -70,7 +71,8 @@ public class LogAspect {
         currentTime.remove();
         HttpServletRequest request = RequestHolder.getHttpServletRequest();
         // TODO: 2022/2/14 保持日志这块，有循环依赖导致的栈溢出问题，待解决
-        logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request),joinPoint, log);
+        // TODO: 2022/2/28 栈溢出应该有别的条件。人员状态的修改，未出现该问题
+        logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), joinPoint, log);
         return result;
     }
 
@@ -78,21 +80,21 @@ public class LogAspect {
      * 配置异常通知
      *
      * @param joinPoint join point for advice
-     * @param e exception
+     * @param e         exception
      */
     @AfterThrowing(pointcut = "logPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
-        Log log = new Log("ERROR",System.currentTimeMillis() - currentTime.get());
+        Log log = new Log("ERROR", System.currentTimeMillis() - currentTime.get());
         currentTime.remove();
         log.setExceptionDetail(ThrowableUtil.getStackTrace(e).getBytes());
         HttpServletRequest request = RequestHolder.getHttpServletRequest();
-        logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), (ProceedingJoinPoint)joinPoint, log);
+        logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), (ProceedingJoinPoint) joinPoint, log);
     }
 
     public String getUsername() {
         try {
             return SecurityUtils.getCurrentUsername();
-        }catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
