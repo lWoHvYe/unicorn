@@ -26,7 +26,7 @@ import java.util.List;
  * @date 2021/1/7 17:26
  */
 public interface IResultInfo<T> extends Serializable {
-    long getBusinessCode();
+    int getBusinessCode();
 
     List<T> getContent();
 

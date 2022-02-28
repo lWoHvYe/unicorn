@@ -15,12 +15,16 @@
  */
 package com.lwohvye.utils.result;
 
+import org.jetbrains.annotations.Contract;
+
 /**
  * 封装API的返回码
  * Created by cy on 2021/01/08.
  */
 public interface IResultCode {
-    long getCode();
 
-    String getDescription();
+    @Contract(pure = true)
+    int code();
+
+    String description();
 }

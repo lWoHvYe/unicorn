@@ -38,6 +38,7 @@ module lwohvye.eladmin.common {
     requires transitive com.fasterxml.jackson.databind;
     requires transitive org.apache.poi.poi;
     requires transitive org.apache.poi.ooxml;
+    requires transitive org.jetbrains.annotations;
     requires transitive mica.ip2region;
     requires transitive nl.basjes.parse.useragent;
     requires transitive org.hibernate.validator;

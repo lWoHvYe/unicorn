@@ -16,10 +16,12 @@
 
 package com.lwohvye.utils.result;
 
+import com.lwohvye.exception.BadRequestException;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -27,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 主动返回数据
@@ -38,7 +41,7 @@ public class ResultUtil {
 
 
     @SneakyThrows
-    public static void resultJson(HttpServletResponse response, int responseStatus, String msg) {
+    public static void resultJson(@NotNull HttpServletResponse response, int responseStatus, String msg) {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(responseStatus);
@@ -57,7 +60,7 @@ public class ResultUtil {
      */
     @Nullable // 放在参数上，表示参数可为null，放在属性上，表示属性可为null，放在方法上，表示方法可能返回null
     public static <T> T getEntityFromResp(ResponseEntity<?> responseEntity, Class<T> tClass) {
-        // TODO: 2022/2/27 需要校验下businessCode，并进行不同的处理
+        checkResp(responseEntity);
         return responseEntity.getBody() instanceof ResultInfo<?> resultInfo && tClass.isInstance(resultInfo.getResult())
                 ? tClass.cast(resultInfo.getResult()) : null;
     }
@@ -71,6 +74,7 @@ public class ResultUtil {
      * @date 2022/2/27 11:25 PM
      */
     public static <T> List<T> getListFromResp(ResponseEntity<?> responseEntity, Class<T> tClass) {
+        checkResp(responseEntity);
         return responseEntity.getBody() instanceof ResultInfo<?> resultInfo ? (List<T>) resultInfo.getContent() : Collections.emptyList();
     }
 
@@ -82,7 +86,18 @@ public class ResultUtil {
      * @date 2022/2/27 11:43 PM
      */
     public static Map getMapFromResp(ResponseEntity<?> responseEntity) {
+        checkResp(responseEntity);
         return responseEntity.getBody() instanceof ResultInfo<?> resultInfo ? resultInfo.getResultMap() : Collections.emptyMap();
     }
 
+    /**
+     * 针对通用的Restful返回，当响应不是200时，抛出运行时异常
+     *
+     * @param responseEntity /
+     * @date 2022/2/28 1:44 PM
+     */
+    private static void checkResp(@NotNull ResponseEntity<?> responseEntity) {
+        if (responseEntity.getBody() instanceof ResultInfo<?> resultInfo && !Objects.equals(resultInfo.getBusinessCode(), ResultCode.SUCCESS.code()))
+            throw new BadRequestException(resultInfo.getDescription());
+    }
 }

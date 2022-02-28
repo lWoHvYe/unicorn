@@ -30,7 +30,6 @@ module lwohvye.eladmin.system {
     // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
     requires transitive com.github.oshi;
     requires transitive io.netty.common;
-    requires org.jetbrains.annotations;
 
     exports com.lwohvye.config.condition to spring.beans;
     exports com.lwohvye.modules.mnt.repository to spring.beans;
