@@ -73,12 +73,12 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
     /**
      * 根据用户ID查询
      *
-     * @param id 用户ID
+     * @param userId 用户ID
      * @return /
      */
     @Query(value = "SELECT r.* FROM sys_role r, sys_users_roles u WHERE " +
                    "r.role_id = u.role_id AND u.user_id = ?1", nativeQuery = true)
-    Set<Role> findByUserId(Long id);
+    List<Role> findByUserId(Long userId);
 
     /**
      * 解绑角色菜单

@@ -64,6 +64,7 @@ module lwohvye.eladmin.common {
     opens com.lwohvye.base;
     opens com.lwohvye.config to spring.core;
     opens com.lwohvye.utils to spring.core;
+    opens com.lwohvye.utils.json to spring.core;
     opens com.lwohvye.utils.redis to spring.core;
     opens com.lwohvye.utils.result to spring.core;
 }

@@ -16,7 +16,7 @@
 package com.lwohvye.base;
 
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.utils.JsonUtils;
+import com.lwohvye.utils.json.JsonUtils;
 import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
 

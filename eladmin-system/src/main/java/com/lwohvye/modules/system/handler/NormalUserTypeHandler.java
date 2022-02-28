@@ -50,7 +50,7 @@ public final class NormalUserTypeHandler implements AUserTypeHandler {
     @Override
     public List<GrantedAuthority> handler(Long userId) {
         log.warn(" banana：自由的气息，蕉迟但到。");
-        Set<Role> roles = roleRepository.findByUserId(userId);
+        var roles = roleRepository.findByUserId(userId);
         var permissions = roles.stream().map(role -> "ROLE_" + role.getCode().toUpperCase()).collect(Collectors.toSet());
         // .flatMap(role -> role.getResources().stream())
         // .map(Resource::getPattern)

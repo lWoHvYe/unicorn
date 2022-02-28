@@ -167,8 +167,8 @@ public class RoleServiceImpl implements IRoleService {
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
-    public List<RoleSmallDto> findByUsersId(Long id) {
-        return roleSmallMapper.toDto(new ArrayList<>(roleRepository.findByUserId(id)), new CycleAvoidingMappingContext());
+    public List<RoleSmallDto> findByUsersId(Long userId) {
+        return roleSmallMapper.toDto(roleRepository.findByUserId(userId), new CycleAvoidingMappingContext());
     }
 
     @Override

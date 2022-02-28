@@ -29,6 +29,8 @@ public class RoleSmallDto implements Serializable {
 
     private String name;
 
+    private String code;
+
     private Integer level;
 
     private String dataScope;

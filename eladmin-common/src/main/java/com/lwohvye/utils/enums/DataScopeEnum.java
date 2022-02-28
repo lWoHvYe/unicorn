@@ -18,10 +18,13 @@ package com.lwohvye.utils.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 /**
  * <p>
  * 数据权限枚举
  * </p>
+ *
  * @author Zheng Jie
  * @date 2020-05-07
  */
@@ -42,12 +45,7 @@ public enum DataScopeEnum {
     private final String description;
 
     public static DataScopeEnum find(String val) {
-        for (DataScopeEnum dataScopeEnum : DataScopeEnum.values()) {
-            if (val.equals(dataScopeEnum.getValue())) {
-                return dataScopeEnum;
-            }
-        }
-        return null;
+        return Arrays.stream(DataScopeEnum.values()).filter(dataScopeEnum -> val.equals(dataScopeEnum.value)).findFirst().orElse(null);
     }
 
 }

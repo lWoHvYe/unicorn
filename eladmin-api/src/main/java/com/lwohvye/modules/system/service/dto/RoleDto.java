@@ -41,6 +41,8 @@ public class RoleDto extends BaseDTO implements Serializable {
 
     private String name;
 
+    private String code;
+
     private String dataScope;
 
     private Integer level;

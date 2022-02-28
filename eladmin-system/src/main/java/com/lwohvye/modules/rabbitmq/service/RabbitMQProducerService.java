@@ -18,7 +18,7 @@ package com.lwohvye.modules.rabbitmq.service;
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
-import com.lwohvye.utils.JsonUtils;
+import com.lwohvye.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -26,7 +26,7 @@ import cn.hutool.extra.template.TemplateUtil;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.system.service.local.AuthMQService;
-import com.lwohvye.utils.JsonUtils;
+import com.lwohvye.utils.json.JsonUtils;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;

@@ -23,7 +23,7 @@ import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.log.service.ILogService;
-import com.lwohvye.utils.JsonUtils;
+import com.lwohvye.utils.json.JsonUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.mnt.websocket;
 
-import com.lwohvye.utils.JsonUtils;
+import com.lwohvye.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
