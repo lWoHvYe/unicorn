@@ -129,7 +129,10 @@ public class RedisConfig extends CachingConfigurerSupport {
     @Override
     public KeyGenerator keyGenerator() {
         return (Object target, Method method, Object... params) -> {
-            var container = new HashMap<String, Object>(3);
+            // HashMap指定初始容量时，会根据给定的值，查找并设置不小于且距离给定值最近的2的幂为真正的初始容量。
+            // 因为若x为2的幂，则y%x = y&(x-1)，
+            // 默认初始容量为16，负载因子为0.75f。这里指定为8，当put的内容超过6时，将触发扩容，在当下一般一两个参数的情况下，够用了
+            var container = new HashMap<String, Object>(8);
             var targetClassClass = target.getClass();
             var methodName = method.getName();
             // 类地址。可根据需要决定是否放入摘要中
