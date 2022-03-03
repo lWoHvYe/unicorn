@@ -15,20 +15,21 @@
  */
 package com.lwohvye.modules.system.domain;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.base.BaseEntity;
-import lombok.Data;
-import cn.hutool.core.bean.BeanUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
-import cn.hutool.core.bean.copier.CopyOptions;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -83,5 +84,19 @@ public class Resource implements Serializable {
 
     public void copy(Resource source) {
         BeanUtil.copyProperties(source, this, CopyOptions.create().setIgnoreNullValue(true));
+    }
+
+    // equals和hashCode，Idea是有模版的
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Resource resource)) return false;
+        // 下面这块，用到了上面instanceof中的resource，似乎作用域有些不对，实际上这只是个语法🍬，看反编译后的情况会容易理解一些
+        return resourceId.equals(resource.resourceId) && pattern.equals(resource.pattern) && Objects.equals(reqMethod, resource.reqMethod);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(resourceId, pattern, reqMethod);
     }
 }
