@@ -19,7 +19,6 @@ package com.lwohvye;
 import com.lwohvye.hiddenclass.Customer;
 import com.lwohvye.hiddenclass.PropertyAccessorFactory;
 import lombok.SneakyThrows;
-import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,16 +46,16 @@ public class EladminSystemApplicationTests {
 
     @SneakyThrows
     public static void main(String[] args) {
-        final val friend = new Friend("在一起", 8);
-        val person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
-        final val name = person.name();
-        final val age = person.age();
+        final var friend = new Friend("在一起", 8);
+        var person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
+        final var name = person.name();
+        final var age = person.age();
 //        隐式的继承自Record类。有equals hashCode toString方法
-        final val equals = person.equals(person);
-        final val string = person.toString();
+        final var equals = person.equals(person);
+        final var string = person.toString();
 
-        final val next = person.listNode().next;
-        final val friends = Person.friends;
+        final var next = person.listNode().next;
+        final var friends = Person.friends;
 
         var m = new HashMap<String, Long>();
 
@@ -136,8 +135,8 @@ public class EladminSystemApplicationTests {
         // assertEquals(LocalDate.of(1995, Month.MAY, 23), accessor.getValue(customer, "birthday"));
         // assertEquals("Main Street", accessor.getValue(customer, "address"));
 
-        val friend = new Friend("在一起", 8);
-        val person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
+        var friend = new Friend("在一起", 8);
+        var person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
         // MethodHandle和VarHandle
         var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
         System.out.println("get：" + nameVarHandle.get(person));
