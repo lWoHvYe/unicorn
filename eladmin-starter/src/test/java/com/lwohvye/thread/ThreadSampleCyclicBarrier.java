@@ -63,11 +63,12 @@ public class ThreadSampleCyclicBarrier {
     private static Integer threadCount = 10;
     //    用于控制主线程等待子线程结束
 //    private static final CountDownLatch latch = new CountDownLatch(threadCount);
-    // `CyclicBarrier` 还提供一个更高级的构造函数 `CyclicBarrier(int parties, Runnable barrierAction)`，用于在线程到达屏障时（多个线程会执行多次），优先执行 `barrierAction`，
+    // `CyclicBarrier` 还提供一个更高级的构造函数 `CyclicBarrier(int parties, Runnable barrierAction)`，用于在最后一个线程到达屏障时（parties减到0时，执行一次，之后会将其重置，所以如果将其设置为5，然后起10个线程，就会执行两次），优先执行 `barrierAction`，
     // 具体为在await方法中会调用dowait，在该方法中调用了 `barrierAction` 的 `run()` 方法
-    private static final CyclicBarrier await = new CyclicBarrier(threadCount + 1, () -> System.out.println("有线程抵达屏障"));
+    private static final CyclicBarrier await = new CyclicBarrier(threadCount + 1,
+            () -> System.out.println("做为最后一个抵达的线程，执行barrierAction，并打开屏障开启下一轮"));
     //        模拟次数
-    private Integer simuCount = 1000000;
+    private Integer simuCount = 100000;
 
 
     public ThreadSampleCyclicBarrier() {
@@ -83,7 +84,7 @@ public class ThreadSampleCyclicBarrier {
             threadSampleCyclicBarrier.startWork();
 //            因为把结果输出放在主线程，所以需要设计主线程等待其他线程到达等待处
             await.await();
-            //为防止数据丢失，就绪后，再等待一下
+            //为防止数据丢失，就绪后，再等待一下。这里主要时抵达屏障后可能还有点别的事情。
             TimeUnit.SECONDS.sleep(2);
 //            输出结果
             threadSampleCyclicBarrier.printResult();
@@ -214,10 +215,10 @@ public class ThreadSampleCyclicBarrier {
             countMap.put("s450", countMap.get("s450") + s450);
             countMap.put("s500", countMap.get("s500") + s500);
             countMap.put("other", countMap.get("other") + other);
-            System.out.println("运行结束");
-            System.out.println(Thread.currentThread().getName());
+            System.out.println(Thread.currentThread().getName() + "抵达屏障");
             //到达等待处，开始等待
             await.await();
+            System.out.println(Thread.currentThread().getName() + "运行结束");
         }
 
         /**
