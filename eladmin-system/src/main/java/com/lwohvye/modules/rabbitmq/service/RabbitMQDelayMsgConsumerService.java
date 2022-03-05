@@ -57,6 +57,8 @@ public class RabbitMQDelayMsgConsumerService {
     @Autowired
     private AuthMQService authMQService;
 
+
+    // 消费者本身是顺序消费的，且可以避免线程安全问题，有考虑过引入异步，但就无法保证顺序性了，还要解决线程安全问题。等有合适的场景了再做尝试
     @RabbitHandler
     public void handle(String amqpMsgEntityStr) {
         var amqpMsgEntity = JsonUtils.toJavaObject(amqpMsgEntityStr, AmqpMsgEntity.class);
@@ -80,7 +82,7 @@ public class RabbitMQDelayMsgConsumerService {
             Template template = engine.getTemplate("email/noticeEmail.ftl");
             var text = template.render(Dict.create().setIgnoreNull("errMsg", e.getMessage()));
 
-            // 邮件通知
+            // 邮件通知。采用下面这种方式，主要是将system模块和tools模块解耦，并且后续也可以执行别的实现方式
             Object mailUtils;
             var beanName = "mailUtils";
             try {

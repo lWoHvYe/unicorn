@@ -57,7 +57,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
                 callBack.executor();
             CALL_BACKS.clear();
         }
-        SpringContextHolder.addCallback = false;
+        SpringContextHolder.addCallback = false; // 这个只在启动后执行一下，后面就没必要了。CALL_BACKS里存的就是预先放进去，要在初始化完成后执行的任务。
     }
 
     public static ApplicationContext getApplicationContext() {
@@ -72,6 +72,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     /**
      * 针对 某些初始化方法，在SpringContextHolder 未初始化时 提交回调方法。
      * 在SpringContextHolder 初始化后，进行回调使用
+     * 这个可以说也是在启动后，执行些逻辑，原来实现ApplicationListener做的事情，应该可以通过这个来实现。
      *
      * @param callBack 回调函数
      */
@@ -79,7 +80,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
         if (addCallback) {
             SpringContextHolder.CALL_BACKS.add(callBack);
         } else {
-            log.warn("CallBack：{} 已无法添加！立即执行", callBack.getCallBackName());
+            log.warn("CallBack：{} 容器已启动完毕，已无法添加！立即执行", callBack.getCallBackName());
             callBack.executor();
         }
     }
