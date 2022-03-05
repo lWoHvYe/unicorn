@@ -28,7 +28,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAccumulator;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * 抽卡模拟 将抽卡简化成随机取一个1000的样本中的数，取到指定的算抽中
@@ -36,7 +38,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 由于模拟采用了随机数的方式，所以池子可以任意配置，不影响结果
  * 由于使用了多线程，所以需关注其他线程的完成情况
  * 采用Feature的方式，使用CompletableFuture的runAsync()构建没有返回的子线程，各子线程实时共享数据，使用Atomic原之类代替原同步代码块
+ * 对于大量线程需访问同一同步变量时，可以用LongAdder来替代AtomicInteger，因为乐观锁的多次重试也是消耗资源的通过increment()递增，也可通过add()增加指定的值，最后通过sum()获取最终结果
+ * 而LongAccumulator则更灵活一些，可以在构造中指定操作和零元素，在线程中通过accumulate()执行，最后通过get()得到结果
+ * 另外还有Double系列
  * 需尤其注意变量的作用范围问题
+ * 这里较Atomic系列差别不大，因为冲突不明显，主要耗时在模拟阶段
  *
  * @author Hongyan Wang
  * @packageName com.lwohvye.springboot.otherpart.common.local
@@ -45,22 +51,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 // 使用CompletableFuture,子线程实时共享数据，使用Atomic原之类，资源占用更低，且不会再出现资源丢失的情况
 //@SpringBootTest
-public class FutureSampleAtomic {
+public class FutureSampleAtomicAdderAccumulator {
 
-    private Logger logger4j = LoggerFactory.getLogger(FutureSampleAtomic.class);
+    private Logger logger4j = LoggerFactory.getLogger(FutureSampleAtomicAdderAccumulator.class);
 
     //    使用原子类,较使用synchronized资源占用更少
-    private AtomicInteger s50 = new AtomicInteger(0);
-    private AtomicInteger s100 = new AtomicInteger(0);
-    private AtomicInteger s150 = new AtomicInteger(0);
-    private AtomicInteger s200 = new AtomicInteger(0);
-    private AtomicInteger s250 = new AtomicInteger(0);
-    private AtomicInteger s300 = new AtomicInteger(0);
-    private AtomicInteger s350 = new AtomicInteger(0);
-    private AtomicInteger s400 = new AtomicInteger(0);
-    private AtomicInteger s450 = new AtomicInteger(0);
-    private AtomicInteger s500 = new AtomicInteger(0);
-    private AtomicInteger other = new AtomicInteger(0);
+    private final LongAdder s50 = new LongAdder();
+    private final LongAdder s100 = new LongAdder();
+    private final LongAdder s150 = new LongAdder();
+    private final LongAdder s200 = new LongAdder();
+    private final LongAdder s250 = new LongAdder();
+    private final LongAccumulator s300 = new LongAccumulator(Long::sum, 0);
+    private final LongAccumulator s350 = new LongAccumulator(Long::sum, 0);
+    private final LongAccumulator s400 = new LongAccumulator(Long::sum, 0);
+    private final LongAccumulator s450 = new LongAccumulator(Long::sum, 0);
+    private final LongAccumulator s500 = new LongAccumulator(Long::sum, 0);
+    private final AtomicLong other = new AtomicLong(0L);
 
 
     /**
@@ -117,18 +123,18 @@ public class FutureSampleAtomic {
 //         记录结束时间
         long end = DateUtil.currentSeconds();
 //          输出结果
-        logger4j.info("50次以内：" + (double) s50.get() * 100 / simCount + "%;");
-        logger4j.info("100次以内：" + (double) s100.get() * 100 / simCount + "%;");
-        logger4j.info("150次以内：" + (double) s150.get() * 100 / simCount + "%;");
-        logger4j.info("200次以内：" + (double) s200.get() * 100 / simCount + "%;");
-        logger4j.info("250次以内：" + (double) s250.get() * 100 / simCount + "%;");
+        logger4j.info("50次以内：" + (double) s50.sum() * 100 / simCount + "%;");
+        logger4j.info("100次以内：" + (double) s100.sum() * 100 / simCount + "%;");
+        logger4j.info("150次以内：" + (double) s150.sum() * 100 / simCount + "%;");
+        logger4j.info("200次以内：" + (double) s200.sum() * 100 / simCount + "%;");
+        logger4j.info("250次以内：" + (double) s250.sum() * 100 / simCount + "%;");
         logger4j.info("300次以内：" + (double) s300.get() * 100 / simCount + "%;");
         logger4j.info("350次以内：" + (double) s350.get() * 100 / simCount + "%;");
         logger4j.info("400次以内：" + (double) s400.get() * 100 / simCount + "%;");
         logger4j.info("450次以内：" + (double) s450.get() * 100 / simCount + "%;");
         logger4j.info("500次以内：" + (double) s500.get() * 100 / simCount + "%;");
         logger4j.info("500次以上：" + (double) other.get() * 100 / simCount + "%;");
-        System.out.println("总计模拟:" + (s50.get() + s100.get() + s150.get() + s200.get() + s250.get() + s300.get()
+        System.out.println("总计模拟:" + (s50.sum() + s100.sum() + s150.sum() + s200.sum() + s250.sum() + s300.get()
                                       + s350.get() + s400.get() + s450.get() + s500.get() + other.get()) + "次");
 
         System.out.println(end - start);
@@ -180,25 +186,25 @@ public class FutureSampleAtomic {
                     int count = simulateWork(random, lists, ranArray);
 //                将模拟结果放入集合中
                     if (count <= 50) {
-                        s50.getAndIncrement();
+                        s50.increment(); // 对于xxxAdder，可通过increment()和decrement()用于递增和递减，也可以通过add(longVal)增加指定的值
                     } else if (count <= 100) {
-                        s100.getAndIncrement();
+                        s100.increment();
                     } else if (count <= 150) {
-                        s150.getAndIncrement();
+                        s150.increment();
                     } else if (count <= 200) {
-                        s200.getAndIncrement();
+                        s200.add(1L);
                     } else if (count <= 250) {
-                        s250.getAndIncrement();
+                        s250.add(1L);
                     } else if (count <= 300) {
-                        s300.getAndIncrement();
+                        s300.accumulate(1L); // 对于xxxAccumulator，可通过accumulate(longVal)增加指定的值。这个系列主要是可以指定操作
                     } else if (count <= 350) {
-                        s350.getAndIncrement();
+                        s350.accumulate(1L);
                     } else if (count <= 400) {
-                        s400.getAndIncrement();
+                        s400.accumulate(1L);
                     } else if (count <= 450) {
-                        s450.getAndIncrement();
+                        s450.accumulate(1L);
                     } else if (count <= 500) {
-                        s500.getAndIncrement();
+                        s500.accumulate(1L);
                     } else {
                         other.getAndIncrement();
                     }
