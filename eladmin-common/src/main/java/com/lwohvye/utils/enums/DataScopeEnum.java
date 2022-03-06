@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * <p>
@@ -45,7 +46,7 @@ public enum DataScopeEnum {
     private final String description;
 
     public static DataScopeEnum find(String val) {
-        return Arrays.stream(DataScopeEnum.values()).filter(dataScopeEnum -> val.equals(dataScopeEnum.value)).findFirst().orElse(null);
+        return Arrays.stream(DataScopeEnum.values()).filter(dataScopeEnum -> Objects.equals(dataScopeEnum.value, val)).findFirst().orElse(null);
     }
 
 }

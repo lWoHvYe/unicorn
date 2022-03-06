@@ -38,6 +38,7 @@ import java.lang.annotation.Annotation;
 
 /**
  * 这也是一种统一数据返回的方式。可视情况整合。与{@link ResponseResultBody}配合使用
+ * ResponseBodyAdvice 实现了这个接口的类，处理返回的值在传递给 HttpMessageConverter之前。应用场景为spring项目开发过程中，对controller层返回值进行修改增强处理（比如加密、统一返回格式等）。
  *
  * @date 2021/11/10 12:42 下午
  */

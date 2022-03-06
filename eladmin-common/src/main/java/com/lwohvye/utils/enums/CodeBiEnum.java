@@ -18,10 +18,14 @@ package com.lwohvye.utils.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * <p>
  * 验证码业务场景
  * </p>
+ *
  * @author Zheng Jie
  * @date 2020-05-02
  */
@@ -39,12 +43,7 @@ public enum CodeBiEnum {
     private final String description;
 
     public static CodeBiEnum find(Integer code) {
-        for (CodeBiEnum value : CodeBiEnum.values()) {
-            if (code.equals(value.getCode())) {
-                return value;
-            }
-        }
-        return null;
+        return Arrays.stream(CodeBiEnum.values()).filter(codeBiEnum -> Objects.equals(codeBiEnum.code, code)).findFirst().orElse(null);
     }
 
 }

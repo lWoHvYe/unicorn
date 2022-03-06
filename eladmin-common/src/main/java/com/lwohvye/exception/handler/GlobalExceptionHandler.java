@@ -37,6 +37,7 @@ import static org.springframework.http.HttpStatus.*;
  * @date 2018-11-23
  * @see ApiGlobalExceptionHandler 替代方案
  */
+@Deprecated(since = "3.0.0", forRemoval = true)
 @Slf4j
 // 该注解默认会扫描指定包中所有@RequestMapping注解
 @RestControllerAdvice

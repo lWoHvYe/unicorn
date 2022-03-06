@@ -45,7 +45,7 @@ import java.util.Objects;
  */
 @RestControllerAdvice
 // 使用Order使其先于GlobalExceptionHandler执行，这里把优先级设置为了最高。原统一异常处理可移除
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE) // 移除GlobalExceptionHandler后，可能需要调整下Order
 @Slf4j
 @ConditionalOnWebApplication // 在Spring为Web服务时生效
 @ConditionalOnMissingBean(ApiGlobalExceptionHandler.class) // 避免Bean冲突

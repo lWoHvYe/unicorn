@@ -18,10 +18,12 @@ package com.lwohvye.utils.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * @author Zheng Jie
  * @website https://el-admin.vip
- * @description
  * @date 2020-06-10
  **/
 @Getter
@@ -64,11 +66,6 @@ public enum RequestMethodEnum {
     private final String type;
 
     public static RequestMethodEnum find(String type) {
-        for (RequestMethodEnum value : RequestMethodEnum.values()) {
-            if (type.equals(value.getType())) {
-                return value;
-            }
-        }
-        return ALL;
+        return Arrays.stream(RequestMethodEnum.values()).filter(requestMethodEnum -> Objects.equals(requestMethodEnum.type, type)).findFirst().orElse(ALL);
     }
 }

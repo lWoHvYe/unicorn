@@ -18,17 +18,22 @@ package com.lwohvye.config;
 import com.lwohvye.utils.SecurityUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 指定接口访问的权限，使用方式 @PreAuthorize("@el.check('user:list','role:list')")
+ *
  * @author Zheng Jie
+ * @deprecated 3.0开始引入动态权限，提高灵活性的同时，也方便后续服务拆分，抽出权限相关功能
  */
+@Deprecated(since = "3.0.0", forRemoval = true)
 @Service(value = "el")
 public class ElPermissionConfig {
 
-    public Boolean check(String ...permissions){
+    public Boolean check(String... permissions) {
         // 获取当前用户的所有权限
         List<String> elPermissions = SecurityUtils.getCurrentUser().getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
         // 判断当前用户的所有权限是否包含接口上定义的权限
