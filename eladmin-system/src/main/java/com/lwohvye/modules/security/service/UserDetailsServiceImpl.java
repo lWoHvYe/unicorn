@@ -56,7 +56,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      *
      * @see UserCacheClean
      */
-    //  这种缓存的方式，也许解决了些问题，但导致无法做集群的扩展，后续解决。
+    //  这种本地缓存的方式，也是解决热Key的一种方案，可以减轻Redis的压力（多个Redis集群，单个Redis不再保存全量数据，分散）。针对失效、过期等，后续可接入RQ，进行相关事件通知。
     //  不能存redis中，使用fastjson时没什么问题。但使用jackson反序列化需要实体有空参构造。而SimpleGrantedAuthority无空参构造。
     static Map<String, JwtUserDto> userDtoCache = new ConcurrentHashMap<>();
 
