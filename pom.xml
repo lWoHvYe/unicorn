@@ -91,7 +91,7 @@
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.0.1</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
-        <logback.version>1.2.10</logback.version>
+        <logback.version>1.2.11</logback.version>
         <redisson.version>3.16.8</redisson.version>
         <guava.version>31.1-jre</guava.version>
         <poi.version>5.2.0</poi.version>
