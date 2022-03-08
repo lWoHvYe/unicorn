@@ -19,8 +19,7 @@ import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.repository.QuartzJobRepository;
 import com.lwohvye.modules.quartz.utils.QuartzManage;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -31,10 +30,10 @@ import java.util.List;
  * @author Zheng Jie
  * @date 2019-01-07
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JobRunner implements ApplicationRunner {
-    private static final Logger log = LoggerFactory.getLogger(JobRunner.class);
     private final QuartzJobRepository quartzJobRepository;
     private final QuartzManage quartzManage;
 

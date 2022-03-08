@@ -38,7 +38,7 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.mnt.service.mapstruct;
     exports com.lwohvye.modules.mnt.util;
     exports com.lwohvye.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
-    exports com.lwohvye.modules.quartz.repository to spring.beans;
+    exports com.lwohvye.modules.quartz.repository to spring.beans; // 若要使用JRebel，则需要exports to unnamed module
     exports com.lwohvye.modules.quartz.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.quartz.service;
     exports com.lwohvye.modules.quartz.task to spring.beans;
