@@ -98,12 +98,12 @@ public class UserController {
             // 取交集
             criteria.getDeptIds().retainAll(dataScopes);
             if (!CollUtil.isEmpty(criteria.getDeptIds())) {
-                return new ResponseEntity<>(userService.queryAll(criteria, pageable), HttpStatus.OK);
+                return new ResponseEntity<>(ResultInfo.success(userService.queryAll(criteria, pageable)), HttpStatus.OK);
             }
         } else {
             // 否则取并集
             criteria.getDeptIds().addAll(dataScopes);
-            return new ResponseEntity<>(userService.queryAll(criteria, pageable), HttpStatus.OK);
+            return new ResponseEntity<>(ResultInfo.success(userService.queryAll(criteria, pageable)), HttpStatus.OK);
         }
         return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(null, 0)), HttpStatus.OK);
     }

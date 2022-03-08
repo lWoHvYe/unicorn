@@ -159,6 +159,8 @@ public class UserServiceImpl implements IUserService {
         if (StrUtil.isNotEmpty(description))
             user.setDescription(description);
         userRepository.save(user);
+        // 清除本地缓存
+        flushCache(user.getUsername());
     }
 
     @Override
@@ -201,7 +203,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserInnerDto findInnerUserByName(String userName) {
-        // 方法内调用，Spring aop不会生效，所以下面的查询不会走缓存
+        // 方法内调用，Spring aop不会生效，所以若直接调 findByName(String username) 方法不会走缓存
         var user = userRepository.findByUsername(userName);
         if (Objects.isNull(user))
             throw new EntityNotFoundException(User.class, "name", userName);

@@ -52,7 +52,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      * 判断类或者方法是否使用了 @ResponseResultBody
      */
     @Override
-    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) { // 此时已构建了 ResponseEntity
         return AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), ANNOTATION_TYPE) || returnType.hasMethodAnnotation(ANNOTATION_TYPE);
     }
 
