@@ -16,6 +16,7 @@
 
 package com.lwohvye.modules.security.service;
 
+import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
@@ -40,7 +41,7 @@ public record UserCacheClean(RabbitMQProducerService rabbitMQProducerService) {
     public void cleanUserCache(String userName, Boolean doSync) {
         if (StringUtils.isNotEmpty(userName)) {
             if (Boolean.TRUE.equals(doSync)) { // 广播事件
-                var amqpMsg = new AmqpMsgEntity().setMsgType("sp").setMsgData(userName).setExtraData("cleanUserCache").setOrigin(RabbitMqConfig.ORIGIN);
+                var amqpMsg = new AmqpMsgEntity().setMsgType("sp").setMsgData(userName).setExtraData("cleanUserCache").setOrigin(LocalCoreConfig.ORIGIN);
                 rabbitMQProducerService.sendSyncDelayMsg(RabbitMqConfig.SP_SYNC_ROUTE_KEY, amqpMsg);
             }
             UserDetailsServiceImpl.userDtoCache.remove(userName);

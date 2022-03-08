@@ -19,7 +19,7 @@ package com.lwohvye.modules.rabbitmq.service;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.config.rabbitmq.RabbitMqConfig;
+import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.utils.json.JsonUtils;
@@ -44,14 +44,14 @@ public class RabbitMQSPMsgConsumerService {
     }
 
     @RabbitHandler
-    @RabbitListener(queues = "#{rabbitMQSPMsgConsumerService.getSPMsgQueue()}") // 可以通过SpEL从别处获取监听的队列名
+    @RabbitListener(queues = "#{localCoreConfig.SP_SYNC_DELAY_QUEUE}") // 可以通过SpEL从别处获取监听的队列名
     public void spMsgConsumer(String amqpMsgEntityStr) {
         var amqpMsgEntity = JsonUtils.toJavaObject(amqpMsgEntityStr, AmqpMsgEntity.class);
         var msgType = amqpMsgEntity.getMsgType();
         var msgData = amqpMsgEntity.getMsgData();
         var origin = amqpMsgEntity.getOrigin();
         try {
-            if (Objects.equals(origin, RabbitMqConfig.ORIGIN))
+            if (Objects.equals(origin, LocalCoreConfig.ORIGIN))
                 return; // 本实例产生的事件，忽略即可
 
             if (ObjectUtil.equals(msgType, "sp")) {
@@ -66,7 +66,4 @@ public class RabbitMQSPMsgConsumerService {
         }
     }
 
-    public String getSPMsgQueue() {
-        return RabbitMqConfig.SP_SYNC_DELAY_QUEUE;
-    }
 }

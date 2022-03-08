@@ -15,11 +15,10 @@
  */
 package com.lwohvye.config.rabbitmq;
 
+import com.lwohvye.config.LocalCoreConfig;
 import org.springframework.amqp.core.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,16 +57,6 @@ public class RabbitMqConfig {
 
     public static final String DATA_COMMON_DELAY_QUEUE = "data.common.delay.queue";
 
-    // 这里的情景就是当集群部署时，针对单个事件，多个相同的实例只要消费一次就可以了。但这里因为要通知各实例更新内部的缓存，需要每个实例都消费。当下想到的就是每个实例一个队列，通过配置
-    public static String SP_SYNC_DELAY_QUEUE;
-
-    public static String ORIGIN; // 实例标识
-
-    @Value("${local.sys.sp-sync-queue:}") // Value无法直接为静态属性注入值，需放在set方法上
-    public void setSpSyncVal(String spSyncQueue) {
-        SP_SYNC_DELAY_QUEUE = spSyncQueue;
-        ORIGIN = StringUtils.hasText(spSyncQueue) ? spSyncQueue.split("\\.")[0] : "";
-    }
 
     // endregion
 
@@ -219,7 +208,7 @@ public class RabbitMqConfig {
     @Bean
     public Queue spSyncQueue() {
         return QueueBuilder
-                .durable(SP_SYNC_DELAY_QUEUE)
+                .durable(LocalCoreConfig.SP_SYNC_DELAY_QUEUE)
                 // 满足要求后转发的死信交换机及路由键
                 .withArgument("x-dead-letter-exchange", DEAD_INFO_EXCHANGE)
                 .withArgument("x-dead-letter-routing-key", DEAD_ROUTE_KEY)
