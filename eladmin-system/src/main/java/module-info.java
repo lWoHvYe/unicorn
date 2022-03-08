@@ -77,6 +77,7 @@ module lwohvye.eladmin.system {
     opens com.lwohvye.modules.rabbitmq.service;
     opens com.lwohvye.modules.security.config;
     opens com.lwohvye.modules.security.config.bean;
+    opens com.lwohvye.modules.security.service to spring.core;
     opens com.lwohvye.modules.security.rest to spring.core;
     opens com.lwohvye.modules.system.rest to spring.core;
     opens com.lwohvye.modules.system.service.impl to spring.core;

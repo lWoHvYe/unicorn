@@ -20,8 +20,6 @@ import com.lwohvye.config.rabbitmq.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.utils.StringUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,11 +28,7 @@ import org.springframework.stereotype.Component;
  * @apiNote: 用于清理 用户登录信息缓存，为防止Spring循环依赖与安全考虑 ，单独构成工具类
  */
 @Component
-@RequiredArgsConstructor
-public class UserCacheClean {
-
-    @Autowired
-    private RabbitMQProducerService rabbitMQProducerService;
+public record UserCacheClean(RabbitMQProducerService rabbitMQProducerService) {
 
     /**
      * 清理特定用户缓存信息<br>

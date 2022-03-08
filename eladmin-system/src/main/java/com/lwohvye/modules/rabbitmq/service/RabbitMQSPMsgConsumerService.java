@@ -35,8 +35,13 @@ import java.util.Objects;
 @Slf4j
 public class RabbitMQSPMsgConsumerService {
 
-    @Autowired
     private UserCacheClean userCacheClean;
+
+    @Autowired // Spring循环依赖问题，可以通过将构造注入改为setter注入的方式解决（三个Map）。也可以使用@Lazy注解。还有些别的解决方式
+    // 这里只是做一个记录。UserCacheClean并未构成循环依赖
+    public void setUserCacheClean(UserCacheClean userCacheClean) {
+        this.userCacheClean = userCacheClean;
+    }
 
     @RabbitHandler
     @RabbitListener(queues = "#{rabbitMQSPMsgConsumerService.getSPMsgQueue()}") // 可以通过SpEL从别处获取监听的队列名
