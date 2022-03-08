@@ -41,6 +41,7 @@ public class VerifyServiceImpl implements IVerifyService {
 
     @Value("${code.expiration:250}")
     private Long expiration;
+
     private final RedisUtils redisUtils;
 
     @Override

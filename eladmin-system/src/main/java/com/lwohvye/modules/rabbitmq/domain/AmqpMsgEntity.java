@@ -43,7 +43,10 @@ public class AmqpMsgEntity {
     //    消息体
     private String msgData;
 
-    //    其他额外属性
+    //    其他额外属性，比如要执行的方法
     private String extraData;
+
+    //    标识消息的来源，用于来源方消费者忽略
+    private String origin;
 
 }

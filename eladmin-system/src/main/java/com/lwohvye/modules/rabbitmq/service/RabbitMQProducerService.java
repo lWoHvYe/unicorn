@@ -113,11 +113,12 @@ public class RabbitMQProducerService {
     /**
      * 延迟消息，topic模式
      *
-     * @param commonEntity
+     * @param routeKey     路由键
+     * @param commonEntity 消息体
      * @date 2021/9/30 1:38 下午
      */
-    public void sendSyncDelayMsg(AmqpMsgEntity commonEntity) {
-        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_SYNC_DELAY_EXCHANGE, "xxx.xxx",
+    public void sendSyncDelayMsg(String routeKey, AmqpMsgEntity commonEntity) {
+        amqpTemplate.convertAndSend(RabbitMqConfig.TOPIC_SYNC_DELAY_EXCHANGE, routeKey,
                 JsonUtils.toJSONString(commonEntity),
                 message -> {
                     // 延迟 500ms

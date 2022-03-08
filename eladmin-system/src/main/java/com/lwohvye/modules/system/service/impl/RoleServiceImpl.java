@@ -227,7 +227,7 @@ public class RoleServiceImpl implements IRoleService {
     public void delCaches(Long id, List<User> users) {
         users = CollectionUtil.isEmpty(users) ? userRepository.findByRoleId(id) : users;
         if (CollectionUtil.isNotEmpty(users)) {
-            users.forEach(item -> userCacheClean.cleanUserCache(item.getUsername()));
+            users.forEach(item -> userCacheClean.cleanUserCache(item.getUsername(), true));
             Set<Long> userIds = users.stream().map(User::getId).collect(Collectors.toSet());
             redisUtils.delByKeys4Business(CacheKey.DATA_USER, userIds);
             redisUtils.delByKeys4Business(CacheKey.MENU_USER, userIds);

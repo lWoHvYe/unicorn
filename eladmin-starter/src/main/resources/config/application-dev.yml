@@ -342,17 +342,6 @@ file:
   # 文件大小 /M
 #  maxSize: 100
 #  avatarMaxSize: 5
-#  系统名称
-local:
-  sys:
-    name: X0X
-    # 一个开关，标识是否加载相关但类
-    load-os: true
-    # 使用多个策略配置。默认false
-    multi-security: false
-    # 表名映射
-    table-name:
-      user: sys_user
 
 
 # oss配置

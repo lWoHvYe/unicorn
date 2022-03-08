@@ -16,8 +16,12 @@
 
 package com.lwohvye.modules.security.service;
 
+import com.lwohvye.config.rabbitmq.RabbitMqConfig;
+import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,14 +33,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserCacheClean {
 
+    @Autowired
+    private RabbitMQProducerService rabbitMQProducerService;
+
     /**
      * 清理特定用户缓存信息<br>
      * 用户信息变更时
      *
      * @param userName /
+     * @param doSync   是否广播事件
      */
-    public void cleanUserCache(String userName) {
+    public void cleanUserCache(String userName, Boolean doSync) {
         if (StringUtils.isNotEmpty(userName)) {
+            if (Boolean.TRUE.equals(doSync)) { // 广播事件
+                var amqpMsg = new AmqpMsgEntity().setMsgType("sp").setMsgData(userName).setExtraData("cleanUserCache").setOrigin(RabbitMqConfig.ORIGIN);
+                rabbitMQProducerService.sendSyncDelayMsg(RabbitMqConfig.SP_SYNC_ROUTE_KEY, amqpMsg);
+            }
             UserDetailsServiceImpl.userDtoCache.remove(userName);
         }
     }

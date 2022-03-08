@@ -100,7 +100,7 @@ public class AuthMQService {
 //                  修改用户状态为锁定
             userService.updateEnabled(username, false);
 //                  删除缓存中的用户信息
-            userCacheClean.cleanUserCache(username);
+            userCacheClean.cleanUserCache(username, true);
 //                  超过5次锁定一小时。创建延迟解锁消息
             var wait4Unlock = new AmqpMsgEntity().setMsgType("auth").setMsgData(username).setExtraData("unlockUser")
                     .setExpire(1L).setTimeUnit(TimeUnit.HOURS);
@@ -115,7 +115,7 @@ public class AuthMQService {
             return;
         userService.updateEnabled(record, true);
 //              删除缓存中的用户信息
-        userCacheClean.cleanUserCache(record);
+        userCacheClean.cleanUserCache(record, true);
     }
 
 }

@@ -290,6 +290,6 @@ public class UserServiceImpl implements IUserService {
      * @param username /
      */
     private void flushCache(String username) {
-        userCacheClean.cleanUserCache(username);
+        userCacheClean.cleanUserCache(username, true);
     }
 }
