@@ -220,7 +220,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - Redisson部分功能应用：多数据源(Redis)、分布式扩展、锁
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
-- dev_3.0 JPMS改造（3.0版本有做部分尝试，但未找到Spring Boot项目的启动方式，故暂缓，可能要等到Spring 6.x 及 Spring Boot 3.X对 JPMS相关支持及Java 17了）
+- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可启动，当下无法打包成功（3.0版本时明明可以打包成功的，只是启动不起来）,也未找到jar包的启动方式，故暂缓，可能要等到Spring 6.x 及 Spring Boot 3.X对 JPMS相关支持及Java 17了）
 - db中时间的存储格式可以用datetime或者timestamp，datetime占用8个字节、存在时区问题但可存储的时间范围广，timestamp占用4个字节、只能存储1970～2037但无时区问题，后续确定是否需要由datetime转为timestamp
 
 #### TODO

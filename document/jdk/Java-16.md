@@ -170,3 +170,4 @@ java -classpath lib com.lwohvye.AppSearchRun
 # module
 java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
 ```
+[SpringBoot jar包启动原理](https://www.lwohvye.com/2022/03/09/springboot-jar%e5%8c%85%e5%90%af%e5%8a%a8%e7%9a%84%e5%8e%9f%e7%90%86/)
