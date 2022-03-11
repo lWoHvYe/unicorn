@@ -87,7 +87,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         return Redisson.create(config);
     }
 
-    // 这个是替换上面的RedisCacheManager的
+    // 这个是替换原来的RedisCacheManager的。通过该CacheManager，使用Cacheable 注解，缓存数据会被放在一个RMap 中，搞清楚这点后，可以比较精准的清除一些key
     @Bean
     CacheManager redissonCacheManager(RedissonClient redissonClient) {
         return new RedissonSpringCacheManager(redissonClient, "classpath:/cache-config.yaml");
@@ -142,7 +142,6 @@ public class RedisConfig extends CachingConfigurerSupport {
      * 修改操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
      * 删除操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
      *
-     * 整合Redisson后，这个也不再使用
      */
     @Bean
     @Override

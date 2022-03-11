@@ -435,7 +435,7 @@ public class MenuServiceImpl implements IMenuService {
      */
     public void delCaches(Long id) {
         List<User> users = userRepository.findByMenuId(id);
-        redisUtils.delete(CacheKey.MENU_ID + id);
+        redisUtils.delInRC(CacheKey.MENU_ID, id);
         redisUtils.delByKeys4Business(CacheKey.MENU_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
         // 清除 Role 缓存
         List<Role> roles = roleService.findInMenuId(Collections.singletonList(id));

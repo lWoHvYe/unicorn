@@ -297,6 +297,6 @@ public class DeptServiceImpl implements IDeptService {
         List<User> users = userRepository.findByRoleDeptId(id);
         // 删除数据权限
         redisUtils.delByKeys4Business(CacheKey.DATA_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
-        redisUtils.delete(CacheKey.DEPT_ID + id);
+        redisUtils.delInRC(CacheKey.DEPT_ID, id);
     }
 }

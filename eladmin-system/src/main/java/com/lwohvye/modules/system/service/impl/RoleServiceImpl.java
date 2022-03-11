@@ -231,8 +231,6 @@ public class RoleServiceImpl implements IRoleService {
             Set<Long> userIds = users.stream().map(User::getId).collect(Collectors.toSet());
             redisUtils.delByKeys4Business(CacheKey.DATA_USER, userIds);
             redisUtils.delByKeys4Business(CacheKey.MENU_USER, userIds);
-            redisUtils.delByKeys4Business(CacheKey.ROLE_AUTH, userIds);
         }
-        redisUtils.delete(CacheKey.ROLE_ID + id);
     }
 }

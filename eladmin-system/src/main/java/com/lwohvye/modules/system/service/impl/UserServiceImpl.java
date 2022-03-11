@@ -137,9 +137,8 @@ public class UserServiceImpl implements IUserService {
         }
         // 如果用户的角色改变
         if (!resources.getRoles().equals(user.getRoles())) {
-            redisUtils.delete(CacheKey.DATA_USER + resources.getId());
-            redisUtils.delete(CacheKey.MENU_USER + resources.getId());
-            redisUtils.delete(CacheKey.ROLE_AUTH + resources.getId());
+            redisUtils.delInRC(CacheKey.DATA_USER, resources.getId());
+            redisUtils.delInRC(CacheKey.MENU_USER, resources.getId());
         }
 
 //        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();

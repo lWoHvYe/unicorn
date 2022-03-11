@@ -19,6 +19,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.lwohvye.utils.CacheKey;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +52,8 @@ public class RedisUtils {
     // Redis lua的执行出错，是因为Redis的Value的序列化使用的Json相关的。针对lua相关的操作，可以使用StringRedisTemplate
     protected StringRedisTemplate stringRedisTemplate;
 
+    protected RedissonClient redissonClient;
+
     //    分布式锁前缀
     @Value("${local.redis.lock-prefix:redis-lock-}")
     private String lockPrefix;
@@ -58,11 +62,13 @@ public class RedisUtils {
     @Value("${local.redis.lock-expire:200000}")
     private long lockExpire;
 
-    public RedisUtils(RedisTemplate<Object, Object> redisTemplate, StringRedisTemplate stringRedisTemplate) {
+    public RedisUtils(RedisTemplate<Object, Object> redisTemplate, StringRedisTemplate stringRedisTemplate, RedissonClient redissonClient) {
         this.redisTemplate = redisTemplate;
         this.stringRedisTemplate = stringRedisTemplate;
+        this.redissonClient = redissonClient;
     }
 
+    // https://github.com/redisson/redisson/wiki/11.-redis%E5%91%BD%E4%BB%A4%E5%92%8Credisson%E5%AF%B9%E8%B1%A1%E5%8C%B9%E9%85%8D%E5%88%97%E8%A1%A8      慢慢将其变成Redisson的形状
 
 //    region key相关操作
 
@@ -1913,20 +1919,29 @@ public class RedisUtils {
 //       endregion
 
     /**
-     * @param prefix 前缀
-     * @param ids    id
+     * 删除通过Redisson存入的key
+     *
+     * @param map /
+     * @param suf 标识
+     * @date 2022/3/12 12:03 AM
      */
-    public void delByKeys4Business(String prefix, Set<Long> ids) {
+    public void delInRC(Map<String, String> map, Object suf) {
+        var mapCache = redissonClient.getMapCache(map.get(CacheKey.CACHE_NAME));
+        var prefix = map.get("key");
+        mapCache.remove(prefix + suf);
+    }
+
+    /**
+     * @param map 前缀
+     * @param ids id
+     */
+    public void delByKeys4Business(Map<String, String> map, Set<Long> ids) {
         Set<Object> keys = new HashSet<>();
+        var mapCache = redissonClient.getMapCache(map.get(CacheKey.CACHE_NAME));
+        var prefix = map.get("key");
         for (Long id : ids) {
-            keys.addAll(Objects.requireNonNull(redisTemplate.keys(prefix + id)));
+            mapCache.remove(prefix + id);
         }
-        var count = redisTemplate.delete(keys);
-        // 此处提示可自行删除
-        log.debug("--------------------------------------------");
-        log.debug("成功删除缓存：{}", keys);
-        log.debug("缓存删除数量：{} 个", count);
-        log.debug("--------------------------------------------");
     }
 
     /**
