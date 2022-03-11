@@ -80,7 +80,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     //     return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration).build();
     // }
 
-    // // 原文件是redisson.yml，可能下面这配置不用也行，在主yml中配置了
+    // 默认读的json格式，yaml需要这样额外配置
     @Bean(destroyMethod = "shutdown")
     RedissonClient redisson(@Value("classpath:/redisson.yaml") Resource configFile) throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());
@@ -141,6 +141,8 @@ public class RedisConfig extends CachingConfigurerSupport {
      * 新增操作：清除列表查询缓存。暂不做加入缓存操作
      * 修改操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
      * 删除操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
+     *
+     * 整合Redisson后，这个也不再使用
      */
     @Bean
     @Override
