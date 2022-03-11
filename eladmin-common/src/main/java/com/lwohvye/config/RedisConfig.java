@@ -24,28 +24,27 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.lwohvye.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.redisson.api.RedissonClient;
+import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.HashMap;
 
 /**
@@ -63,17 +62,30 @@ public class RedisConfig extends CachingConfigurerSupport {
      * 设置 redis 数据默认过期时间，默认2小时
      * 设置@Cacheable 序列化方式
      */
+    // @Bean
+    // public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+    //     var stringRedisSerializer = new StringRedisSerializer();
+    //     Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
+    //     var configuration = RedisCacheConfiguration.defaultCacheConfig()
+    //             // key序列化
+    //             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(stringRedisSerializer))
+    //             // value序列化
+    //             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
+    //             .entryTtl(Duration.ofHours(2)).disableCachingNullValues();
+    //     return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration).build();
+    // }
+
+    // // 原文件是redisson.yml，可能下面这配置不用也行，在主yml中配置了
+    // @Bean(destroyMethod = "shutdown")
+    // RedissonClient redisson(@Value("classpath:/redisson.yaml") Resource configFile) throws IOException {
+    //     Config config = Config.fromYAML(configFile.getInputStream());
+    //     return Redisson.create(config);
+    // }
+
+    // 这个是替换上面的RedisCacheManager的
     @Bean
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        var stringRedisSerializer = new StringRedisSerializer();
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
-        var configuration = RedisCacheConfiguration.defaultCacheConfig()
-                // key序列化
-                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(stringRedisSerializer))
-                // value序列化
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
-                .entryTtl(Duration.ofHours(2)).disableCachingNullValues();
-        return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration).build();
+    CacheManager redissonCacheManager(RedissonClient redissonClient) {
+        return new RedissonSpringCacheManager(redissonClient, "classpath:/cache-config.yaml");
     }
 
     /**
