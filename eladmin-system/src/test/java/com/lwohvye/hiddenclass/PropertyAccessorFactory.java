@@ -40,7 +40,7 @@ public class PropertyAccessorFactory implements Opcodes {
         try {
             lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup())
                     // 需注意虽然这里用了ASM，但隐藏类本身与ASM不是绑定的，这点不要误解了。
-                    // 虽未细看，但隐藏类较传统代理类应该是有一定优势的，比如类的生命周期较短、且无法被发射，且用于替代不建议使用的Unsafe类相关。具体可以去理解下面的部分，摘自jeps/371
+                    // 虽未细看，但隐藏类较传统代理类应该是有一定优势的，比如类的生命周期较短、且无法被反射，且用于替代不建议使用的Unsafe类相关。具体可以去理解下面的部分，摘自jeps/371
                     // Goals
                     // - Allow frameworks to define classes as non-discoverable implementation details of the framework,so that they cannot be linked against by other classes nor discovered through reflection.
                     // - Support extending an access control nest with non-discoverable classes.

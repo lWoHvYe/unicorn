@@ -16,20 +16,19 @@ module lwohvye.eladmin.system {
     requires transitive spring.security.web;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
-    requires transitive jsch;
-    requires transitive druid;
-    requires transitive ganymed.ssh2;
-    requires transitive org.apache.commons.io;
-    requires transitive jakarta.websocket.api;
     requires transitive com.fasterxml.jackson.datatype.jsr310;
-    requires transitive quartz;
+    requires transitive com.github.oshi;
+    requires transitive druid;
     requires transitive easy.captcha;
-    requires transitive redisson;
+    requires transitive ganymed.ssh2;
+    requires transitive io.netty.common;
+    requires transitive jakarta.websocket.api;
     requires transitive jjwt.api;
     requires transitive jjwt.impl;
+    requires transitive jsch;
+    requires transitive org.apache.commons.io;
+    requires transitive quartz;
     // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
-    requires transitive com.github.oshi;
-    requires transitive io.netty.common;
 
     exports com.lwohvye.config.condition to spring.beans;
     exports com.lwohvye.modules.mnt.repository to spring.beans;
