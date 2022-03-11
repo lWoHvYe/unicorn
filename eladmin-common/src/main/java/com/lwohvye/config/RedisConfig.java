@@ -24,8 +24,11 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.lwohvye.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -38,12 +41,14 @@ import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -76,11 +81,11 @@ public class RedisConfig extends CachingConfigurerSupport {
     // }
 
     // // 原文件是redisson.yml，可能下面这配置不用也行，在主yml中配置了
-    // @Bean(destroyMethod = "shutdown")
-    // RedissonClient redisson(@Value("classpath:/redisson.yaml") Resource configFile) throws IOException {
-    //     Config config = Config.fromYAML(configFile.getInputStream());
-    //     return Redisson.create(config);
-    // }
+    @Bean(destroyMethod = "shutdown")
+    RedissonClient redisson(@Value("classpath:/redisson.yaml") Resource configFile) throws IOException {
+        Config config = Config.fromYAML(configFile.getInputStream());
+        return Redisson.create(config);
+    }
 
     // 这个是替换上面的RedisCacheManager的
     @Bean
@@ -89,7 +94,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     }
 
     /**
-     * 与RedisUtil一起使用
+     * 与RedisUtil一起使用，完全整合Redisson后，RedisUtil应该就用不到了
      *
      * @param redisConnectionFactory /
      * @return org.springframework.data.redis.core.RedisTemplate
