@@ -14,9 +14,11 @@
 详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
-``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS。在对项目完成相关改造之前（当前未找到jar启动的方式），应该只能用ALL-UNNAMED表示对所有未命名模块开放）。 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
+``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS。在对项目完成相关改造之前（当前未找到jar启动的方式），应该只能用ALL-UNNAMED表示对所有未命名模块开放）。
+详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
-后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和 System.out（有一个箭头的表示以覆盖的方式重定向，而有两个箭头的表示以追加的方式重定向。如果需要将标准输出以及标准错误输出同时重定向到一个文件，需要将某个输出转换为另一个输出，例如 2>&1 表示将标准错误输出转换为标准输出）。
+后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和 System.out（有一个箭头的表示以覆盖的方式重定向，而有两个箭头的表示以追加的方式重定向。如果需要将标准输出以及标准错误输出同时重定向到一个文件，需要将某个输出转换为另一个输出，例如 2>&1
+表示将标准错误输出转换为标准输出）。
 
 ```shell
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-3.0.0.jar >nohup.out 2>&1 &
@@ -28,6 +30,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 #启动示例
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.0.jar >nohup.out 2>&1 &
 ```
+
 ```shell
 #在未来的3.0.1版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
 nohup java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.1.jar >nohup.out 2>&1 &
@@ -62,6 +65,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
 
 **可根据需要选择版本**
+
 ```xml
 <!--2.6.18版本为springfox + 未进行动态权限改造-->
 <!-- https://mvnrepository.com/artifact/com.lwohvye/eladmin -->
@@ -72,6 +76,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
     <type>pom</type>
 </dependency>
 ```
+
 ```xml
 <!--3.x系列版本为springdoc + 动态权限改造 + JPMS部分改造-->
 <dependency>
@@ -190,6 +195,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - Redis 6.0 缓存
 - RabbitMQ 鉴权结果记录、用户多次验证失败锁定一段时间后自动解锁
 - ELK 日志系统，若不需要可调整logback-spring.xml中的配置
+- 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ记得装延迟插件，ES记得装IK
 
 #### 特别鸣谢
 
@@ -225,7 +231,10 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 #### TODO
 
 - ResourceBundle用于解决国际化和本地化问题，当前有输出相关信息，
+
 ```
 ResourceBundleMessageSource is configured to read resources with encoding 'ISO-8859-1' but ResourceBundle.Control not supported in current system environment: ResourceBundle.Control not supported in named modules - falling back to plain ResourceBundle.getBundle retrieval with the platform default encoding. Consider setting the 'defaultEncoding' property to 'null' for participating in the platform default and therefore avoiding this log message.
 ```
-根据API Note，有ResourceBundle.Control is not supported in named modules. If the ResourceBundle.getBundle method with a ResourceBundle.Control is called in a named module, the method will throw an UnsupportedOperationException. Any service providers of ResourceBundleControlProvider are ignored in named modules.
+
+根据API Note，有ResourceBundle.Control is not supported in named modules. If the ResourceBundle.getBundle method with a ResourceBundle.Control is called in a named
+module, the method will throw an UnsupportedOperationException. Any service providers of ResourceBundleControlProvider are ignored in named modules.
