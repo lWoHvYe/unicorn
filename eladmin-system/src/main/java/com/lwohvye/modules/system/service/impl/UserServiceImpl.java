@@ -72,7 +72,7 @@ public class UserServiceImpl implements IUserService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
         var page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(user -> userMapper.toDto(user, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(user -> userMapper.toDto(user, new CycleAvoidingMappingContext()))); // 这里使用toPage，在无符合条件的记录时，也有构筑结果并缓存，也算是一定程度上缓解缓存穿透
     }
 
     @Override

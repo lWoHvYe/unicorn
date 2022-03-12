@@ -80,9 +80,10 @@ public class MenuServiceImpl implements IMenuService {
                     continue;
                 //设置对象的访问权限，保证对private的属性的访问
                 // field.setAccessible(true); 用下面的方式更好一些
-                if (field.trySetAccessible() && ObjectUtil.isNotNull(field.get(criteria)))
+                if (field.trySetAccessible() && ObjectUtil.isNotNull(field.get(criteria))) {
                     criteria.setPidIsNull(null);
-                break;
+                    break;
+                }
             }
         }
         return menuMapper.toDto(menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort), new CycleAvoidingMappingContext());
