@@ -15,17 +15,13 @@
  */
 package com.lwohvye.modules.quartz.utils;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.template.Template;
-import cn.hutool.extra.template.TemplateConfig;
-import cn.hutool.extra.template.TemplateEngine;
-import cn.hutool.extra.template.TemplateUtil;
 import com.lwohvye.config.thread.ThreadPoolExecutorUtil;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.quartz.repository.QuartzLogRepository;
 import com.lwohvye.modules.quartz.service.IQuartzJobService;
+import com.lwohvye.utils.MailAdapter;
 import com.lwohvye.utils.SpringContextHolder;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.ThrowableUtil;
@@ -35,9 +31,6 @@ import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -109,24 +102,12 @@ public class ExecutionJob extends QuartzJobBean {
             }
             // 邮箱报警
             if (StrUtil.isNotBlank(quartzJob.getEmail())) {
+                var to = quartzJob.getEmail();
                 var subject = "定时任务【" + quartzJob.getJobName() + "】执行失败，请尽快处理！";
-                Map<String, Object> data = new HashMap<>(16);
-                data.put("task", quartzJob);
-                data.put("msg", ThrowableUtil.getStackTrace(e));
-                TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
-                Template template = engine.getTemplate("email/taskAlarm.ftl");
-                var content = template.render(data);
-                List<String> emails = Arrays.asList(quartzJob.getEmail().split("[,，]"));
-                // 这里通过反射来获取
-                var beanName = "emailServiceImpl";
-                Object emailService = null;
-                try {
-                    emailService = SpringContextHolder.getBean(beanName);
-                } catch (Exception ex) {
-                    log.error("获取 {} 异常，原因 {} ，请确认是否引入相关模块", beanName, ex.getMessage());
-                    return;
-                }
-                ReflectUtil.invoke(emailService, "send", emails, subject, content);
+                var templateName = "email/taskAlarm.ftl";
+                Map<String, Object> paramsMap = Map.of("task", quartzJob, "msg", ThrowableUtil.getStackTrace(e)); // 这里用var类型推断，会是Map<String, Serializable>
+                var res = MailAdapter.sendTemplatedMail(to, subject, templateName, paramsMap);
+                log.error("Task Error，Name {} || Reason {} || NoticeRes {} ", quartzJob.getJobName(), e.getMessage(), res);
             }
 //            执行失败再记录日志
             quartzLogRepository.save(quartzLog);

@@ -122,7 +122,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 提供服务器性能监控功能
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
 - 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
-- 整合Redisson拓展Redis的功能
+- 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
 
 #### 系统功能
@@ -222,7 +222,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### Feature list
 
-- dev_3.0 Springdoc相关。Web侧跟进
+- dev_3.0 Springdoc相关。Web侧跟进（无限delay）
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可启动，当下无法打包成功（3.0版本时明明可以打包成功的，只是启动不起来）,也未找到jar包的启动方式，故暂缓，可能要等到Spring 6.x 及 Spring Boot 3.X对 JPMS相关支持及Java 17了）
