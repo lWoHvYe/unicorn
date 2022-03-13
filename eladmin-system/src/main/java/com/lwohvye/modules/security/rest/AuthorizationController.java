@@ -29,6 +29,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RRateLimiter;
+import org.redisson.api.RateIntervalUnit;
+import org.redisson.api.RateType;
 import org.redisson.api.RedissonClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -98,7 +102,7 @@ public class AuthorizationController {
     @GetMapping(value = "/doBusiness5Lock")
     public ResponseEntity<Object> doBusiness5Lock(HttpServletRequest request) {
 
-        // ---------------------------------Session相关---------------------------------------
+        // --------------Session相关，可考虑接入Redisson的 Spring会话管理 (Spring Session Manager)--------------
 
         // 获取Session
         var session = request.getSession();
@@ -112,7 +116,7 @@ public class AuthorizationController {
 
         // ---------------------------------锁相关---------------------------------------------
 
-        // region Java 锁
+        // region Java 锁 Lock
         var reentrantLock = new ReentrantLock();
         var condition = reentrantLock.newCondition(); // 条件对象。基于Condition，可以更细粒度的控制等待与唤醒
         reentrantLock.lock();
@@ -152,7 +156,7 @@ public class AuthorizationController {
         // TODO: 2021/12/29 当下遗留一个问题，就是加解锁放在事务中时，解锁后事务还未提交，应如何解决这类问题。
         //  当下的一个方案是将加解锁放到事务外/或者调整其传播行为为独立的事务(Propagation.REQUIRES_NEW)。
         //  从系统设计的角度，会变的复杂一些：若是对资源的使用，需考虑主体业务失败后的补偿问题，也许需要把资源的使用分阶段？（未使用、已锁定、已使用、已失效）
-        // region Redisson  可重入锁
+        // region Redisson  可重入锁 RLock
         // 获取分布式锁。只要锁名称一样，就是同一把锁
         // 可重入锁：同一线程不必重新获取锁
         var lock = redissonClient.getLock("lock-red");
@@ -168,9 +172,11 @@ public class AuthorizationController {
             if (lock.isLocked() && lock.isHeldByCurrentThread()) // 添加这个，目的是保证目标以及锁了，以及比较重要的锁是当前线程锁的
                 lock.unlock();
         }
+
+        // Redisson还提供了联锁（MultiLock）和红锁（RedLock），用于关联多个锁对象（可能来自不同的Redisson实例），加解锁保证几个锁都成功获取或释放（联锁保证全部成功，红锁保证大部分成功）
         // endregion
 
-        // region   读写锁
+        // region   读写锁 RReadWriteLock
         //  读写锁：读读共享、读写互斥、写写互斥
         var rwLock = redissonClient.getReadWriteLock("lock-read_write");
         //  读锁
@@ -190,7 +196,7 @@ public class AuthorizationController {
         }
         // endregion
 
-        // region   信号量
+        // region   信号量 RSemaphore
         var semaphore = redissonClient.getSemaphore("semaphore-red");
         //  实际使用时，release() 和 acquire() 在不同的业务/线程中
         //  信号量 +1
@@ -204,7 +210,7 @@ public class AuthorizationController {
         }
         // endregion
 
-        // region   闭锁
+        // region   闭锁 RCountDownLatch
         var countDownLatch = redissonClient.getCountDownLatch("anyCountDownLatch-green");
         //  等待的量
         countDownLatch.trySetCount(4L);
@@ -218,6 +224,45 @@ public class AuthorizationController {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        // endregion
+
+        // region   限流器RateLimiter
+        // 基于Redis的分布式限流器（RateLimiter）可以用来在分布式环境下现在请求方的调用频率。
+        // 既适用于不同Redisson实例下的多线程限流，也适用于相同Redisson实例下的多线程限流。
+        // 该算法不保证公平性。除了同步接口外，还提供了异步（Async）、反射式（Reactive）和RxJava2标准的接口。
+        RRateLimiter rateLimiter = redissonClient.getRateLimiter("authRateLimiter");
+        // 初始化
+        // 最大流速 = 每1秒钟产生10个令牌。令牌与信号量是不同的，信号量包括获取及释放，而令牌定时产生，只需要取即可
+        // 分布式的特点就是，一个实例的动作，可以影响到其他的实例
+        rateLimiter.trySetRate(RateType.OVERALL, 10, 1, RateIntervalUnit.SECONDS);
+
+        var rPermits = rateLimiter.availablePermits(); // 可用令牌数
+        var rPermitsRFuture = rateLimiter.availablePermitsAsync(); // 异步
+        var done = rPermitsRFuture.isDone(); // 异步完成情况
+        try {
+            var res01 = rPermitsRFuture.get(); // 阻塞获取，可加超时
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        // CompletableFuture的getNow(T valueIfAbsent)，本质为Returns the result value (or throws any encountered exception) if completed, else returns the given valueIfAbsent.
+        var resNow01 = rPermitsRFuture.getNow(); // 这里应该是要么返回具体结果，要么就是null之类的，不会阻塞
+        // 异步编程，主体就是Future，而对Future的操作，主体就是那几种
+
+        // 获取令牌
+        rateLimiter.acquire(3); // 阻塞
+
+        var res = rateLimiter.tryAcquire(3);// 非阻塞，还可以带超时
+
+        var resRFuture = rateLimiter.tryAcquireAsync(3); // 异步，返回是RFuture，参照Future相关操作
+        // ...
+
+        Thread t = new Thread(() -> {
+            // 可以在子线程中，或者其他服务实例中获取令牌
+            rateLimiter.acquire(2);
+            // ...doSomething()
+        });
+
         // endregion
 
         return null;
