@@ -15,17 +15,17 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.system.domain.Resource;
+import com.lwohvye.modules.system.observer.RoleObserver;
 import com.lwohvye.modules.system.repository.ResourceRepository;
 import com.lwohvye.modules.system.service.IResourceService;
 import com.lwohvye.modules.system.service.dto.ResourceDto;
 import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.ResourceMapper;
-import com.lwohvye.utils.FileUtil;
-import com.lwohvye.utils.PageUtil;
-import com.lwohvye.utils.QueryHelp;
-import com.lwohvye.utils.ValidationUtil;
+import com.lwohvye.utils.*;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -35,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,10 +53,28 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "resource")
-public class ResourceServiceImpl implements IResourceService {
+public class ResourceServiceImpl implements IResourceService, RoleObserver {
 
     private final ResourceRepository resourceRepository;
     private final ResourceMapper resourceMapper;
+    private final RedisUtils redisUtils;
+
+    @PostConstruct
+    @Override
+    public void doInit() {
+        SpringContextHolder.addCallBacks(this::doRegister);
+    }
+
+    /**
+     * 注册观察者
+     *
+     * @date 2022/3/13 9:39 PM
+     */
+    @Override
+    public void doRegister() {
+        var roleService = SpringContextHolder.getBean("roleServiceImpl");
+        ReflectUtil.invoke(roleService, "addObserver", this);
+    }
 
     @Override
     @Cacheable
@@ -125,5 +144,10 @@ public class ResourceServiceImpl implements IResourceService {
             list.add(map);
         }
         FileUtil.downloadExcel(list, response);
+    }
+
+    @Override
+    public void roleUpdate(Object obj) {
+        redisUtils.delInRC(CacheKey.RESOURCE_ALL, null);
     }
 }

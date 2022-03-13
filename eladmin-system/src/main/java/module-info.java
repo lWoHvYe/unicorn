@@ -51,11 +51,13 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.security.security.handler;
     exports com.lwohvye.modules.security.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.system.handler;
+    exports com.lwohvye.modules.system.observer;
     exports com.lwohvye.modules.system.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.system.service;
-    exports com.lwohvye.modules.system.service.impl to spring.beans;
+    exports com.lwohvye.modules.system.service.impl to spring.beans, hutool.all;
     exports com.lwohvye.modules.system.service.local;
     exports com.lwohvye.modules.system.service.mapstruct;
+    exports com.lwohvye.modules.system.subject to spring.aop;
     exports com.lwohvye.modules.system.repository to spring.beans, lwohvye.eladmin.search; // 这里先这样
 
     opens com.lwohvye.config.common;

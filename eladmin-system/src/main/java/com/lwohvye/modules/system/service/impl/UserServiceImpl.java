@@ -17,6 +17,7 @@ package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.FileProperties;
 import com.lwohvye.context.CycleAvoidingMappingContext;
@@ -26,11 +27,15 @@ import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.projection.UserProj;
+import com.lwohvye.modules.system.observer.DeptObserver;
+import com.lwohvye.modules.system.observer.MenuObserver;
+import com.lwohvye.modules.system.observer.RoleObserver;
 import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.*;
 import com.lwohvye.modules.system.service.mapstruct.UserInnerMapper;
 import com.lwohvye.modules.system.service.mapstruct.UserMapper;
+import com.lwohvye.modules.system.subject.UserSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -44,11 +49,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -58,7 +65,7 @@ import java.util.*;
 @RequiredArgsConstructor
 //配置该类缓存的公共前缀
 @CacheConfig(cacheNames = "user")
-public class UserServiceImpl implements IUserService {
+public class UserServiceImpl extends UserSubject implements IUserService, RoleObserver, MenuObserver, DeptObserver {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -66,6 +73,30 @@ public class UserServiceImpl implements IUserService {
     private final FileProperties properties;
     private final RedisUtils redisUtils;
     private final UserCacheClean userCacheClean;
+
+    @PostConstruct
+    @Override
+    public void doInit() {
+        SpringContextHolder.addCallBacks(this::doRegister);
+    }
+
+    /**
+     * 注册观察者
+     *
+     * @date 2022/3/13 9:40 PM
+     */
+    @Override
+    public void doRegister() {
+        var roleService = SpringContextHolder.getBean("roleServiceImpl");
+        ReflectUtil.invoke(roleService, "addObserver", this);
+
+        var menuService = SpringContextHolder.getBean("menuServiceImpl");
+        ReflectUtil.invoke(menuService, "addObserver", this);
+
+        var deptService = SpringContextHolder.getBean("deptServiceImpl");
+        ReflectUtil.invoke(deptService, "addObserver", this);
+
+    }
 
     @Override
     @Cacheable
@@ -135,11 +166,6 @@ public class UserServiceImpl implements IUserService {
         if (user3 != null && !user.getId().equals(user3.getId())) {
             throw new EntityExistException(User.class, "phone", resources.getPhone());
         }
-        // 如果用户的角色改变
-        if (!resources.getRoles().equals(user.getRoles())) {
-            redisUtils.delInRC(CacheKey.DATA_USER, resources.getId());
-            redisUtils.delInRC(CacheKey.MENU_USER, resources.getId());
-        }
 
 //        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
 //        不确定是否需要进行赋值。理论上传递的是引用。更改会影响到这方
@@ -158,6 +184,9 @@ public class UserServiceImpl implements IUserService {
         if (StrUtil.isNotEmpty(description))
             user.setDescription(description);
         userRepository.save(user);
+
+        // 发布用户更新事件
+        notifyObserver(resources.getId());
         // 清除本地缓存
         flushCache(user.getUsername());
     }
@@ -292,5 +321,32 @@ public class UserServiceImpl implements IUserService {
      */
     private void flushCache(String username) {
         userCacheClean.cleanUserCache(username, true);
+    }
+
+    @Override
+    public void roleUpdate(Object obj) {
+        userRepository.findByRoleId((long) obj).forEach(user -> {
+            userCacheClean.cleanUserCache(user.getUsername(), true);
+            redisUtils.delInRC(CacheKey.USER_ID, user.getId());
+            notifyObserver(user.getId());
+        });
+    }
+
+    @Override
+    public void menuUpdate(Object obj) {
+        userRepository.findByMenuId((long) obj).forEach(user -> {
+            userCacheClean.cleanUserCache(user.getUsername(), true);
+            redisUtils.delInRC(CacheKey.USER_ID, user.getId());
+            notifyObserver(user.getId());
+        });
+    }
+
+    @Override
+    public void deptUpdate(Object obj) {
+        userRepository.findByRoleDeptId((long) obj).forEach(user -> {
+            userCacheClean.cleanUserCache(user.getUsername(), true);
+            redisUtils.delInRC(CacheKey.USER_ID, user.getId());
+            notifyObserver(user.getId());
+        });
     }
 }

@@ -51,4 +51,6 @@ public interface CacheKey {
      * 部门
      */
     Map<String, String> DEPT_ID = Map.of(CACHE_NAME, "dept", "key", LocalCoreConfig.SYS_NAME + "id:");
+
+    Map<String, String> RESOURCE_ALL = Map.of(CACHE_NAME, "resource", "key", LocalCoreConfig.SYS_NAME + "allResources");
 }

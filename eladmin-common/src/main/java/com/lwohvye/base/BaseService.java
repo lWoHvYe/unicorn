@@ -40,4 +40,8 @@ public interface BaseService {
     default void doInit() {
         throw new NeedImplementException("Can't use default method, Please Implement it by yourself !");
     }
+
+    default void doRegister() {
+        throw new NeedImplementException("Can't use default method, Please Implement it by yourself !");
+    }
 }

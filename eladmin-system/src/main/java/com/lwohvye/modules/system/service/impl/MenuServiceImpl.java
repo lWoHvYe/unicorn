@@ -18,22 +18,22 @@ package com.lwohvye.modules.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.system.domain.Menu;
-import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.MenuMetaVo;
 import com.lwohvye.modules.system.domain.vo.MenuVo;
+import com.lwohvye.modules.system.observer.UserObserver;
 import com.lwohvye.modules.system.repository.MenuRepository;
-import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.IMenuService;
 import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.MenuDto;
 import com.lwohvye.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.mapstruct.MenuMapper;
+import com.lwohvye.modules.system.subject.MenuSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +45,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -59,13 +60,29 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "menu")
-public class MenuServiceImpl implements IMenuService {
+public class MenuServiceImpl extends MenuSubject implements IMenuService, UserObserver {
 
     private final MenuRepository menuRepository;
-    private final UserRepository userRepository;
     private final MenuMapper menuMapper;
     private final IRoleService roleService;
     private final RedisUtils redisUtils;
+
+    @PostConstruct
+    @Override
+    public void doInit() {
+        SpringContextHolder.addCallBacks(this::doRegister);
+    }
+
+    /**
+     * 注册观察者
+     *
+     * @date 2022/3/13 9:38 PM
+     */
+    @Override
+    public void doRegister() {
+        var userService = SpringContextHolder.getBean("userServiceImpl");
+        ReflectUtil.invoke(userService, "addObserver", this);
+    }
 
     @Override
     @Cacheable
@@ -435,11 +452,12 @@ public class MenuServiceImpl implements IMenuService {
      * @param id 菜单ID
      */
     public void delCaches(Long id) {
-        List<User> users = userRepository.findByMenuId(id);
-        redisUtils.delInRC(CacheKey.MENU_ID, id);
-        redisUtils.delByKeys4Business(CacheKey.MENU_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
-        // 清除 Role 缓存
-        List<Role> roles = roleService.findInMenuId(Collections.singletonList(id));
-        redisUtils.delByKeys4Business(CacheKey.ROLE_ID, roles.stream().map(Role::getId).collect(Collectors.toSet()));
+        // 发布菜单更新事件
+        notifyObserver(id);
+    }
+
+    @Override
+    public void userUpdate(Object obj) {
+        redisUtils.delInRC(CacheKey.MENU_USER, obj);
     }
 }

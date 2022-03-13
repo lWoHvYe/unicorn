@@ -1928,7 +1928,7 @@ public class RedisUtils {
     public void delInRC(Map<String, String> map, Object suf) {
         var mapCache = redissonClient.getMapCache(map.get(CacheKey.CACHE_NAME));
         var prefix = map.get("key");
-        mapCache.remove(prefix + suf);
+        mapCache.remove(Objects.nonNull(suf) ? prefix + suf : prefix);
     }
 
     /**

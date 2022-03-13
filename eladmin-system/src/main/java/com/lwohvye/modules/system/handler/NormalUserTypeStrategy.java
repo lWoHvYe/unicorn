@@ -41,7 +41,7 @@ public final class NormalUserTypeStrategy implements AUserTypeStrategy {
     private RoleRepository roleRepository;
 
     /**
-     * 属性注入。这里不使用@PostConstruct后置处理，是因为之前有验证在执行后置处理的时候，SpringContextHolder还无法获取到相关的bean（似乎是applicationContext还未注入）
+     * 属性注入。这里不使用@PostConstruct后置处理，是因为之前有验证在执行后置处理的时候，SpringContextHolder还无法获取到相关的bean（因为applicationContext还未注入）
      * 另，当下@PostConstruct并未被执行，这个跟使用@Autowire未注入roleRepository这两个问题，后续研究一下
      *
      * @date 2022/3/13 6:03 PM

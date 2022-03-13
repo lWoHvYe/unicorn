@@ -15,6 +15,11 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
+import cn.hutool.core.util.ReflectUtil;
+import com.lwohvye.modules.system.observer.UserObserver;
+import com.lwohvye.utils.CacheKey;
+import com.lwohvye.utils.SpringContextHolder;
+import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.service.IDataService;
@@ -26,6 +31,7 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -38,10 +44,28 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "data")
-public class DataServiceImpl implements IDataService {
+public class DataServiceImpl implements IDataService, UserObserver {
 
     private final IRoleService roleService;
     private final IDeptService deptService;
+    private final RedisUtils redisUtils;
+
+    @PostConstruct
+    @Override
+    public void doInit() {
+        SpringContextHolder.addCallBacks(this::doRegister);
+    }
+
+    /**
+     * 注册观察者
+     *
+     * @date 2022/3/13 9:36 PM
+     */
+    @Override
+    public void doRegister() {
+        var userService = SpringContextHolder.getBean("userServiceImpl");
+        ReflectUtil.invoke(userService, "addObserver", this);
+    }
 
     /**
      * 用户角色改变时需清理缓存
@@ -91,5 +115,10 @@ public class DataServiceImpl implements IDataService {
             }
         }
         return deptIds;
+    }
+
+    @Override
+    public void userUpdate(Object obj) {
+        redisUtils.delInRC(CacheKey.DATA_USER, obj);
     }
 }

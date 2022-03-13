@@ -27,6 +27,7 @@ import com.lwohvye.modules.system.service.IDeptService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.DeptMapper;
+import com.lwohvye.modules.system.subject.DeptSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.enums.DataScopeEnum;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -50,7 +51,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "dept")
-public class DeptServiceImpl implements IDeptService {
+public class DeptServiceImpl extends DeptSubject implements IDeptService {
 
     private final DeptRepository deptRepository;
     private final DeptMapper deptMapper;
@@ -294,9 +295,7 @@ public class DeptServiceImpl implements IDeptService {
      * @param id /
      */
     public void delCaches(Long id) {
-        List<User> users = userRepository.findByRoleDeptId(id);
-        // 删除数据权限
-        redisUtils.delByKeys4Business(CacheKey.DATA_USER, users.stream().map(User::getId).collect(Collectors.toSet()));
-        redisUtils.delInRC(CacheKey.DEPT_ID, id);
+        // 发布部门更新事件
+        notifyObserver(id);
     }
 }

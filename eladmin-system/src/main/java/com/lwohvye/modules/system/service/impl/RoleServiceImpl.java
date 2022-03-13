@@ -15,14 +15,13 @@
  */
 package com.lwohvye.modules.system.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.modules.security.service.UserCacheClean;
 import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.handler.AuthHandlerContext;
+import com.lwohvye.modules.system.observer.MenuObserver;
 import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.IRoleService;
@@ -31,6 +30,7 @@ import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.modules.system.service.mapstruct.RoleMapper;
 import com.lwohvye.modules.system.service.mapstruct.RoleSmallMapper;
+import com.lwohvye.modules.system.subject.RoleSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +45,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "role")
-public class RoleServiceImpl implements IRoleService {
+public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuObserver {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
@@ -66,7 +66,23 @@ public class RoleServiceImpl implements IRoleService {
     private final RedisUtils redisUtils;
     private final UserRepository userRepository;
     private final AuthHandlerContext authHandlerContext;
-    private final UserCacheClean userCacheClean;
+
+    @PostConstruct
+    @Override
+    public void doInit() {
+        SpringContextHolder.addCallBacks(this::doRegister);
+    }
+
+    /**
+     * 注册观察者
+     *
+     * @date 2022/3/13 9:35 PM
+     */
+    @Override
+    public void doRegister() {
+        var menuService = SpringContextHolder.getBean("menuServiceImpl");
+        ReflectUtil.invoke(menuService, "addObserver", this);
+    }
 
     @Override
     @Cacheable(key = " #root.target.getSysName() + 'all-roles'")
@@ -130,7 +146,7 @@ public class RoleServiceImpl implements IRoleService {
         role.setLevel(resources.getLevel());
         roleRepository.save(role);
         // 更新相关缓存
-        delCaches(role.getId(), null);
+        delCaches(role.getId());
     }
 
     @Override
@@ -138,10 +154,10 @@ public class RoleServiceImpl implements IRoleService {
     @Transactional(rollbackFor = Exception.class)
     public void updateMenu(Role resources, RoleDto roleDTO) {
         Role role = roleMapper.toEntity(roleDTO, new CycleAvoidingMappingContext());
-        List<User> users = userRepository.findByRoleId(role.getId());
         // 更新菜单
         role.setMenus(resources.getMenus());
-        delCaches(resources.getId(), users);
+        // TODO: 2022/3/13 各处发布更新事件与保存更改的先后，需进一步考量，虽然理论上先改再发布更好，但也可能导致被通知侧拿到的数据是改后的，从而产生些许问题
+        delCaches(resources.getId());
         roleRepository.save(role);
     }
 
@@ -159,7 +175,7 @@ public class RoleServiceImpl implements IRoleService {
     public void delete(Set<Long> ids) {
         for (Long id : ids) {
             // 更新相关缓存
-            delCaches(id, null);
+            delCaches(id);
         }
         roleRepository.deleteAllByIdIn(ids);
     }
@@ -226,13 +242,16 @@ public class RoleServiceImpl implements IRoleService {
      *
      * @param id /
      */
-    public void delCaches(Long id, List<User> users) {
-        users = CollectionUtil.isEmpty(users) ? userRepository.findByRoleId(id) : users;
-        if (CollectionUtil.isNotEmpty(users)) {
-            users.forEach(item -> userCacheClean.cleanUserCache(item.getUsername(), true));
-            Set<Long> userIds = users.stream().map(User::getId).collect(Collectors.toSet());
-            redisUtils.delByKeys4Business(CacheKey.DATA_USER, userIds);
-            redisUtils.delByKeys4Business(CacheKey.MENU_USER, userIds);
-        }
+    public void delCaches(Long id) {
+        // 发布角色更新事件
+        notifyObserver(id);
+    }
+
+    @Override
+    public void menuUpdate(Object obj) {
+        roleRepository.findInMenuId(Collections.singletonList((long) obj)).forEach(role -> {
+            redisUtils.delInRC(CacheKey.ROLE_ID, role.getId());
+            notifyObserver(role.getId());
+        });
     }
 }
