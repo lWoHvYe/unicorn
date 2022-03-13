@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 /**
- * 策略模式，处理type与实现类的映射关系
+ * 策略模式，处理type与实现类的映射关系，同时使用了单例模式
  *
  * @author Hongyan Wang
  * @date 2021年11月02日 16:34
@@ -46,14 +46,14 @@ public class AuthHandlerProcessor implements BeanFactoryPostProcessor {
      */
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
-        var handlerMap = new HashMap<Integer, AUserTypeHandler>();
+        var handlerMap = new HashMap<Integer, AUserTypeStrategy>();
         for (var temp : UserTypeEnum.values()) {
-            var beanInstance = getBeansWithAnnotation(configurableListableBeanFactory, AUserTypeHandler.class, UserTypeHandlerAnno.class, temp.getType());
+            var beanInstance = getBeansWithAnnotation(configurableListableBeanFactory, AUserTypeStrategy.class, UserTypeHandlerAnno.class, temp.getType());
             if (!Objects.isNull(beanInstance))
                 handlerMap.put(temp.getType(), beanInstance);
         }
         var context = new AuthHandlerContext(handlerMap);
-        //单例注入
+        //单例注入，单例模式
         configurableListableBeanFactory.registerSingleton(AuthHandlerContext.class.getName(), context);
     }
 

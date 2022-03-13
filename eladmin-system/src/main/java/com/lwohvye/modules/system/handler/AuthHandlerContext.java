@@ -21,14 +21,14 @@ import org.springframework.util.Assert;
 import java.util.Map;
 
 /**
- * 策略模式上下文，该类的注入由相关的HandlerProcessor实现
+ * 策略模式上下文（环境类），给外部调用，该类的注入由相关的HandlerProcessor实现
  *
  * @author Hongyan Wang
  * @date 2021年11月02日 16:33
  * @see AuthHandlerProcessor
  */
 @Slf4j
-public record AuthHandlerContext(Map<Integer, AUserTypeHandler> handlerMap) {
+public record AuthHandlerContext(Map<Integer, AUserTypeStrategy> handlerMap) {
 
     /**
      * 获取实例。handlerMap由另一个类来初始化
@@ -37,7 +37,7 @@ public record AuthHandlerContext(Map<Integer, AUserTypeHandler> handlerMap) {
      * @return com.lwohvye.modules.system.handler.AUserTypeHandler
      * @date 2021/11/2 17:10
      */
-    public AUserTypeHandler getInstance(Integer userType) {
+    public AUserTypeStrategy getInstance(Integer userType) {
 
         log.warn(" van：boy next door,do you like van游戏 ");
 

@@ -16,7 +16,7 @@
 package com.lwohvye.config.common;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.modules.system.handler.NormalUserTypeHandler;
+import com.lwohvye.modules.system.handler.NormalUserTypeStrategy;
 import com.lwohvye.modules.system.service.ITerminalService;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class InstantiationTracingBeanPostProcessor4Core implements ApplicationLi
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (event.getApplicationContext().getParent() == null) {//root application context 没有parent，再执行这个.
             //需要执行的逻辑代码，当spring容器初始化完成后就会执行该方法。
-            var userTypeHandler = SpringContextHolder.getBean(NormalUserTypeHandler.class);
+            var userTypeHandler = SpringContextHolder.getBean(NormalUserTypeStrategy.class);
             ReflectUtil.invoke(userTypeHandler, "doInit");
 
             var terminalClazz = ITerminalService.class;

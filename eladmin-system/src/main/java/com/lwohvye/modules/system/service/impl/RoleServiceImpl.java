@@ -188,8 +188,10 @@ public class RoleServiceImpl implements IRoleService {
     @Transactional(rollbackFor = Exception.class)
     public List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin) {
         // admin对应1，非admin对应0
-        var instance = authHandlerContext.getInstance(Boolean.TRUE.equals(isAdmin) ? 1 : 0);
-        return instance.handler(userId);
+        var userType = Boolean.TRUE.equals(isAdmin) ? 1 : 0;
+        // 策略模式
+        var instance = authHandlerContext.getInstance(userType);
+        return instance.grantedAuth(userId);
     }
 
     @Override

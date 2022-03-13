@@ -16,7 +16,6 @@
 package com.lwohvye.modules.system.handler;
 
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
-import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.enums.UserTypeEnum;
 import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.utils.SpringContextHolder;
@@ -26,7 +25,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -38,17 +36,23 @@ import java.util.stream.Collectors;
 // 不能用下面这个注解，因为这个的使用方式，决定了要使用空参构造初始化。对于需要注入的对象，需特殊处理
 //@RequiredArgsConstructor
 @UserTypeHandlerAnno(UserTypeEnum.NORMAL)
-public final class NormalUserTypeHandler implements AUserTypeHandler {
+public final class NormalUserTypeStrategy implements AUserTypeStrategy {
 
     private RoleRepository roleRepository;
 
+    /**
+     * 属性注入。这里不使用@PostConstruct后置处理，是因为之前有验证在执行后置处理的时候，SpringContextHolder还无法获取到相关的bean（似乎是applicationContext还未注入）
+     * 另，当下@PostConstruct并未被执行，这个跟使用@Autowire未注入roleRepository这两个问题，后续研究一下
+     *
+     * @date 2022/3/13 6:03 PM
+     */
     @Override
     public void doInit() {
         this.roleRepository = SpringContextHolder.getBean(RoleRepository.class);
     }
 
     @Override
-    public List<GrantedAuthority> handler(Long userId) {
+    public List<GrantedAuthority> grantedAuth(Long userId) {
         log.warn(" banana：自由的气息，蕉迟但到。");
         var roles = roleRepository.findByUserId(userId);
         var permissions = roles.stream().map(role -> "ROLE_" + role.getCode().toUpperCase()).collect(Collectors.toSet());
