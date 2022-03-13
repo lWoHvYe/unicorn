@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,26 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.modules.system.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+package com.lwohvye.designpatterns.state;
 
-/**
- * 用户类型的枚举，这里用枚举，实际上有点不符合开闭原则，加类型至少要改这个类
- *
- * @author Hongyan Wang
- * @date 2021年11月02日 16:51
- */
-@Getter
-@AllArgsConstructor
-public enum UserTypeEnum {
-
-    ADMIN(1, "尊贵的VIP"),
-    NORMAL(0, "未来的VIP"),
-    DEV(-1, "Ctrl C + V");
-
-    private Integer type;
-
-    private String desc;
+// 任务初始状态
+class TaskInit implements State {
+    @Override
+    public void update(Task task, ActionType actionType) {
+        if  (actionType == ActionType.START) {
+            task.setState(new TaskOngoing());
+        }
+    }
 }
