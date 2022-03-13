@@ -14,21 +14,9 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.designpatterns.state;
+package com.lwohvye.designpatterns.observer;
 
-import com.lwohvye.designpatterns.observer.ActivityObserver;
-import com.lwohvye.designpatterns.observer.TaskManageObserver;
-
-// 任务初始状态
-class TaskInit implements State {
-    @Override
-    public void update(Task task, ActionType actionType) {
-        if (actionType == ActionType.START) {
-            TaskOngoing taskOngoing = new TaskOngoing();
-            // 加入观察对象
-            taskOngoing.add(new ActivityObserver());
-            taskOngoing.add(new TaskManageObserver());
-            task.setState(taskOngoing);
-        }
-    }
+// 抽象观察者
+public interface Observer {
+    void response(Long taskId); // 反应
 }

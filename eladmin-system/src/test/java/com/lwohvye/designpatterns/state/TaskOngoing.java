@@ -16,14 +16,16 @@
 
 package com.lwohvye.designpatterns.state;
 
+import com.lwohvye.designpatterns.observer.Subject;
+
 // 任务进行状态
-class TaskOngoing implements State {
+class TaskOngoing extends Subject implements State {
     @Override
     public void update(Task task, ActionType actionType) {
         if (actionType == ActionType.ACHIEVE) {
             task.setState(new TaskFinished());
             // 通知
-            // doNotice();
+            notifyObserver(task.getTaskId());
         } else if (actionType == ActionType.STOP) {
             task.setState(new TaskPaused());
         } else if (actionType == ActionType.EXPIRE) {
