@@ -4,6 +4,7 @@ open module lwohvye.eladmin.search {// 将module设置为open，解决了未加�
     requires lwohvye.eladmin.tools;
     requires lwohvye.eladmin.generator;
     requires spring.data.mongodb;
+    requires spring.data.elasticsearch;
 
     // opens com.lwohvye;
     // opens com.lwohvye.search.modules.config;

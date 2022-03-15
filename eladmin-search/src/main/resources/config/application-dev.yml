@@ -61,6 +61,14 @@ spring:
       # username: test_user
       # password: pass@123
       database: eladmin
+    elasticsearch:
+#      client:
+#        reactive:
+#          endpoints: 10.211.55.140:9200
+      # 在es8，将移除tcp的方式：https://docs.spring.io/spring-data/elasticsearch/docs/4.3.0/reference/html/#reference
+      cluster-name: elasticsearch
+      # 还是连不上
+      cluster-nodes: 10.211.55.140:9200
 
   # redis配置
   redis:

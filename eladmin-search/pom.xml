@@ -87,6 +87,11 @@
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
+<!--   整合es，在2.6.4版本，默认是4.3.x的 spring-data-elasticsearch，对应的es是7.15.2，可能需要降版本（本地是7.14系列）     -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
