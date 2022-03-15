@@ -77,3 +77,9 @@ rsa:
 #
 logging:
   config: classpath:logback-spring.xml
+
+#  系统名称。各实例存在差异的部分，放到源文件中好一些，dev/prod文件最好存各实例通用的。走配置中心时，印象中与该文件中相同的配置部分会被覆盖，所以可以把个性化的配置放到实例内
+local:
+  sys:
+    # 相同服务的各实例会有不同的配置，从而使得一些事件能被各实例都消费一次，理论上有更好地解决方案
+    sp-sync-queue: she.sp-sync.queue
