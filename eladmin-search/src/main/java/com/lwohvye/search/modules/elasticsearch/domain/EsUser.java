@@ -28,7 +28,7 @@ import java.io.Serializable;
 // https://docs.spring.io/spring-data/elasticsearch/docs/4.2.5/reference/html/
 //@Document 注解主要声明索引名、类型名、分片数量和备份数量
 //@Field 注解主要声明字段对应ES的类型
-@Document(indexName = "Y-Es-User")
+@Document(indexName = "she_es_user")
 @Getter
 @Setter
 @ToString
