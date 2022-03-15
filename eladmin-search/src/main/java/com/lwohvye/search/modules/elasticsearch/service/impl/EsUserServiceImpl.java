@@ -23,10 +23,11 @@ import com.lwohvye.search.modules.elasticsearch.service.IEsUserService;
 import com.lwohvye.search.modules.mongodb.repository.MongoDBUserRepository;
 import com.lwohvye.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
-import org.springframework.data.elasticsearch.core.query.BaseQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -45,7 +46,9 @@ public class EsUserServiceImpl implements IEsUserService {
     @Override
     public Object queryAll() {
         // 复杂查询
-        var searchHits = elasticsearchRestTemplate.search(new BaseQuery(), EsUser.class);
+        var queryBuilder = new NativeSearchQueryBuilder();
+        queryBuilder.withQuery(QueryBuilders.matchAllQuery());
+        var searchHits = elasticsearchRestTemplate.search(queryBuilder.build(), EsUser.class);
         return searchHits.getTotalHits() <= 0L ?
                 esUserRepository.findAll()
                 : PageUtil.toPage(searchHits.stream().map(SearchHit::getContent).toList(), searchHits.getTotalHits());

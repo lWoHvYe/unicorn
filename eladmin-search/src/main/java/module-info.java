@@ -5,6 +5,7 @@ open module lwohvye.eladmin.search {// 将module设置为open，解决了未加�
     requires lwohvye.eladmin.generator;
     requires spring.data.mongodb;
     requires spring.data.elasticsearch;
+    requires elasticsearch; // JPMS不声明requires，连导包提示都没有。需要明确具体需要哪些模块的依赖
 
     // opens com.lwohvye;
     // opens com.lwohvye.search.modules.config;
