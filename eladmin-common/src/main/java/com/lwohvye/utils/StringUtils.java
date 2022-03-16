@@ -27,6 +27,7 @@ import net.dreamlu.mica.ip2region.core.Ip2regionSearcher;
 import net.dreamlu.mica.ip2region.core.IpInfo;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
+import org.springframework.lang.NonNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
@@ -323,5 +324,17 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String convertToString(String str) {
         return StrUtil.isNotEmpty(str) ? new String(str.getBytes(StandardCharsets.ISO_8859_1)) : "";
+    }
+
+    /**
+     * 校验是否是合法的ip地址。针对复杂字符串的校验问题，要想到正则
+     *
+     * @param str
+     * @return boolean
+     * @date 2022/3/16 4:46 PM
+     */
+    public static boolean isIPAddress(@NonNull String str) {
+        String regx = "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
+        return str.matches(regx);
     }
 }
