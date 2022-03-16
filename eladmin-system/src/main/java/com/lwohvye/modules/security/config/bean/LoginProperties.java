@@ -78,30 +78,29 @@ public class LoginProperties {
         Captcha captcha;
         synchronized (this) {
             switch (loginCode.getCodeType()) {
-                case arithmetic:
+                case arithmetic -> {
                     // 算术类型 https://gitee.com/whvse/EasyCaptcha
                     captcha = new FixedArithmeticCaptcha(loginCode.getWidth(), loginCode.getHeight());
                     // 几位数运算，默认是两位
                     captcha.setLen(loginCode.getLength());
-                    break;
-                case chinese:
+                }
+                case chinese -> {
                     captcha = new ChineseCaptcha(loginCode.getWidth(), loginCode.getHeight());
                     captcha.setLen(loginCode.getLength());
-                    break;
-                case chinese_gif:
+                }
+                case chinese_gif -> {
                     captcha = new ChineseGifCaptcha(loginCode.getWidth(), loginCode.getHeight());
                     captcha.setLen(loginCode.getLength());
-                    break;
-                case gif:
+                }
+                case gif -> {
                     captcha = new GifCaptcha(loginCode.getWidth(), loginCode.getHeight());
                     captcha.setLen(loginCode.getLength());
-                    break;
-                case spec:
+                }
+                case spec -> {
                     captcha = new SpecCaptcha(loginCode.getWidth(), loginCode.getHeight());
                     captcha.setLen(loginCode.getLength());
-                    break;
-                default:
-                    throw new BadConfigurationException("验证码配置信息错误！正确配置查看 LoginCodeEnum ");
+                }
+                default -> throw new BadConfigurationException("验证码配置信息错误！正确配置查看 LoginCodeEnum ");
             }
         }
         if(StringUtils.isNotBlank(loginCode.getFontName())){

@@ -298,7 +298,7 @@
             <version>1</version>
         </dependency>
 
-        <!-- Java图形验证码。该项目闭源，后续找找替代方案 -->
+        <!-- Java图形验证码。该项目在gitee上有 -->
         <dependency>
             <groupId>com.github.whvcse</groupId>
             <artifactId>easy-captcha</artifactId>
