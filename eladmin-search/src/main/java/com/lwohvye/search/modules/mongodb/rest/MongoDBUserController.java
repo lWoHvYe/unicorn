@@ -19,15 +19,14 @@ package com.lwohvye.search.modules.mongodb.rest;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.ReflectUtil;
+import com.lwohvye.annotation.rest.AnonymousGetMapping;
+import com.lwohvye.annotation.rest.AnonymousPostMapping;
 import com.lwohvye.search.modules.mongodb.service.IMongoDBUserService;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -69,16 +68,17 @@ public class MongoDBUserController {
                 }
             }
             // 对SPI注入的实体做初始化，部分属性填充，也算是一种方式
-            ReflectUtil.invoke(this.mongoDBUserService, "doInit");
+            this.mongoDBUserService.doInit();
+            // ReflectUtil.invoke(this.mongoDBUserService, "doInit"); 当使用SpringFactoriesLoader，不晓得现在为啥没法访问父类中的doInit()了
         }
     }
 
-    @GetMapping
+    @AnonymousGetMapping
     public ResponseEntity getAllUser() {
         return new ResponseEntity<>(ResultInfo.success(mongoDBUserService.queryAll()), HttpStatus.OK);
     }
 
-    @PostMapping
+    @AnonymousPostMapping
     public ResponseEntity updateUsers() {
         mongoDBUserService.updateUsers();
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);

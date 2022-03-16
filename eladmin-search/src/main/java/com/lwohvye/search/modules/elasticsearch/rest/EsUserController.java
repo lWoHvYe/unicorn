@@ -17,6 +17,7 @@
 package com.lwohvye.search.modules.elasticsearch.rest;
 
 import com.lwohvye.annotation.rest.AnonymousGetMapping;
+import com.lwohvye.annotation.rest.AnonymousPatchMapping;
 import com.lwohvye.search.modules.elasticsearch.service.IEsUserService;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class EsUserController {
         return new ResponseEntity<>(ResultInfo.success(esUserService.queryAll()), HttpStatus.OK);
     }
 
+    @AnonymousPatchMapping
     public ResponseEntity updateUsers() {
         esUserService.updateUsers();
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);

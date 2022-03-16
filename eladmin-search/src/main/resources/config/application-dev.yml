@@ -137,6 +137,53 @@ jwt:
   # 续期时间范围，默认1小时，单位毫秒
 #  renew: 3600000
 
+
+# ===== SpringDoc配置 ===== #
+springdoc:
+  swagger-ui:
+    # 自定义的文档界面访问路径。默认访问路径是/swagger-ui.html
+    path: /swagger-ui.html
+
+    # 字符串类型，一共三个值来控制操作和标记的默认展开设置。它可以是“list”（仅展开标记）、“full”（展开标记和操作）或“none”（不展开任何内容）。
+    docExpansion: none
+
+    # 布尔值。控制“试用”请求的请求持续时间（毫秒）的显示。
+    displayRequestDuration: true
+
+    # 布尔值。控制供应商扩展（x-）字段和操作、参数和架构值的显示。
+    showExtensions: true
+
+    # 布尔值。控制参数的扩展名（pattern、maxLength、minLength、maximum、minminimum）字段和值的显示。
+    showCommonExtensions: true
+
+    # 布尔值。禁用swagger用户界面默认petstore url。（从v1.4.1开始提供）。
+    disable-swagger-default-url: true
+
+  api-docs:
+    # enabled the /v3/api-docs endpoint
+    enabled: true
+
+    # 自定义的文档api元数据访问路径。默认访问路径是/v3/api-docs
+    path: /v3/api-docs
+
+    # 布尔值。在@Schema（名称name、标题title和说明description，三个属性）上启用属性解析程序。
+    resolve-schema-properties: true
+
+  # 布尔值。实现OpenApi规范的打印。
+  writer-with-default-pretty-printer: true
+  #  https://springdoc.org/faq.html#how-can-i-map-pageable-spring-date-commons-object-to-correct-url-parameter-in-swagger-ui
+  #  当前未生效
+  model-converters:
+    pageable-converter:
+      enabled: true
+
+# ===== 自定义swagger配置 ===== #
+swagger:
+  application-name: ${spring.application.name}
+  application-version: 3.0.1
+  application-description: 1101100_1010111_1101111_1001000_1110110_1011001_1100101
+  try-host: http://localhost:${server.port}
+
 #是否允许生成代码，生产环境设置为false
 #generator:
 #  enabled: true

@@ -24,7 +24,11 @@ import com.lwohvye.search.modules.mongodb.repository.MongoDBUserRepository;
 import com.lwohvye.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
@@ -46,9 +50,13 @@ public class EsUserServiceImpl implements IEsUserService {
     @Override
     public Object queryAll() {
         // 复杂查询
-        var queryBuilder = new NativeSearchQueryBuilder();
-        queryBuilder.withQuery(QueryBuilders.matchAllQuery());
-        var searchHits = elasticsearchRestTemplate.search(queryBuilder.build(), EsUser.class);
+        var searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.queryStringQuery("admin").defaultField("userName")) // 查询条件
+                .withPageable(PageRequest.of(0, 5)) // 分页
+                .withSorts(SortBuilders.fieldSort("userName").order(SortOrder.DESC)) // 排序。只能对keywords的样子，id不行
+                .withHighlightFields(new HighlightBuilder.Field("adm")) // 高亮字段显示
+                .build();
+        var searchHits = elasticsearchRestTemplate.search(searchQuery, EsUser.class);
         return searchHits.getTotalHits() <= 0L ?
                 esUserRepository.findAll()
                 : PageUtil.toPage(searchHits.stream().map(SearchHit::getContent).toList(), searchHits.getTotalHits());

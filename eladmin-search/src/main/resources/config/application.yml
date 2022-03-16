@@ -25,6 +25,8 @@ server:
   #  server.undertow.direct-buffers= true
 
 spring:
+  application:
+    name: EL-Admin-Search
   freemarker:
     check-template-location: false
   profiles:
