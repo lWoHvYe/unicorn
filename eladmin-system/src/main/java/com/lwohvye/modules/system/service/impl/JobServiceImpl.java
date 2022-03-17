@@ -20,8 +20,8 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.system.domain.Job;
 import com.lwohvye.modules.system.repository.JobRepository;
-import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.IJobService;
+import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.JobDto;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.JobMapper;
@@ -50,7 +50,7 @@ public class JobServiceImpl implements IJobService {
 
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
-    private final UserRepository userRepository;
+    private final IUserService userService;
 
     @Override
     @Cacheable
@@ -124,7 +124,7 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     public void verification(Set<Long> ids) {
-        if (userRepository.countByJobs(ids) > 0) {
+        if (userService.countByJobs(ids) > 0) {
             throw new BadRequestException("所选的岗位中存在用户关联，请解除关联再试！");
         }
     }

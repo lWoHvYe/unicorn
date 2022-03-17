@@ -80,7 +80,7 @@ public class DataServiceImpl implements IDataService, UserObserver {
         // 用于存储部门id
         Set<Long> deptIds = new HashSet<>();
         // 查询用户角色
-        List<RoleSmallDto> roleSet = roleService.findByUsersId(userId);
+        List<RoleSmallDto> roleSet = roleService.findByUserId(userId);
         // 获取对应的部门ID
         for (RoleSmallDto role : roleSet) {
             DataScopeEnum dataScopeEnum = DataScopeEnum.find(role.getDataScope());

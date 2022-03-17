@@ -19,7 +19,6 @@ import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.thread.ThreadPoolExecutorUtil;
 import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
-import com.lwohvye.modules.quartz.repository.QuartzLogRepository;
 import com.lwohvye.modules.quartz.service.IQuartzJobService;
 import com.lwohvye.utils.MailAdapter;
 import com.lwohvye.utils.SpringContextHolder;
@@ -54,7 +53,6 @@ public class ExecutionJob extends QuartzJobBean {
     public void executeInternal(JobExecutionContext context) {
         QuartzJob quartzJob = (QuartzJob) context.getMergedJobDataMap().get(QuartzJob.JOB_KEY);
         // 获取spring bean
-        QuartzLogRepository quartzLogRepository = SpringContextHolder.getBean(QuartzLogRepository.class);
         IQuartzJobService quartzJobService = SpringContextHolder.getBean(IQuartzJobService.class);
         RedisUtils redisUtils = SpringContextHolder.getBean(RedisUtils.class);
 
@@ -110,7 +108,7 @@ public class ExecutionJob extends QuartzJobBean {
                 log.error("Task Error，Name {} || Reason {} || NoticeRes {} ", quartzJob.getJobName(), e.getMessage(), res);
             }
 //            执行失败再记录日志
-            quartzLogRepository.save(quartzLog);
+            quartzJobService.saveLog(quartzLog);
         }
     }
 }

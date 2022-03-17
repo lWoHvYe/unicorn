@@ -19,6 +19,7 @@ import com.lwohvye.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.quartz.service.dto.JobQueryCriteria;
 import org.springframework.data.domain.Pageable;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
@@ -32,6 +33,7 @@ public interface IQuartzJobService {
 
     /**
      * 分页查询
+     *
      * @param criteria 条件
      * @param pageable 分页参数
      * @return /
@@ -40,6 +42,7 @@ public interface IQuartzJobService {
 
     /**
      * 查询全部
+     *
      * @param criteria 条件
      * @return /
      */
@@ -47,6 +50,7 @@ public interface IQuartzJobService {
 
     /**
      * 分页查询日志
+     *
      * @param criteria 条件
      * @param pageable 分页参数
      * @return /
@@ -55,6 +59,7 @@ public interface IQuartzJobService {
 
     /**
      * 查询全部
+     *
      * @param criteria 条件
      * @return /
      */
@@ -62,24 +67,36 @@ public interface IQuartzJobService {
 
     /**
      * 创建
+     *
      * @param resources /
      */
     void create(QuartzJob resources);
 
     /**
      * 编辑
+     *
      * @param resources /
      */
     void update(QuartzJob resources);
 
     /**
      * 删除任务
+     *
      * @param ids /
      */
     void delete(Set<Long> ids);
 
     /**
+     * 记录日志，当下只有失败才记录
+     *
+     * @param quartzLog
+     * @date 2022/3/17 11:47 PM
+     */
+    void saveLog(QuartzLog quartzLog);
+
+    /**
      * 根据ID查询
+     *
      * @param id ID
      * @return /
      */
@@ -87,18 +104,21 @@ public interface IQuartzJobService {
 
     /**
      * 更改定时任务状态
+     *
      * @param quartzJob /
      */
     void updateIsPause(QuartzJob quartzJob);
 
     /**
      * 立即执行定时任务
+     *
      * @param quartzJob /
      */
     void execution(QuartzJob quartzJob);
 
     /**
      * 导出定时任务
+     *
      * @param queryAll 待导出的数据
      * @param response /
      * @throws IOException /
@@ -107,14 +127,16 @@ public interface IQuartzJobService {
 
     /**
      * 导出定时任务日志
+     *
      * @param queryAllLog 待导出的数据
-     * @param response /
+     * @param response    /
      * @throws IOException /
      */
     void downloadLog(List<QuartzLog> queryAllLog, HttpServletResponse response) throws IOException;
 
     /**
      * 执行子任务
+     *
      * @param tasks /
      * @throws InterruptedException /
      */

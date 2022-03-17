@@ -16,11 +16,12 @@
 
 package com.lwohvye.search.modules.mongodb.service.impl;
 
+import com.lwohvye.modules.system.service.IUserService;
+import com.lwohvye.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.search.modules.mongodb.domain.MongoDBUser;
 import com.lwohvye.search.modules.mongodb.repository.MongoDBUserRepository;
 import com.lwohvye.search.modules.mongodb.service.IMongoDBUserService;
-import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 public class MongoDBUserServiceImpl implements IMongoDBUserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
     @Autowired
     private MongoDBUserRepository mongoDBUserRepository;
@@ -49,11 +50,11 @@ public class MongoDBUserServiceImpl implements IMongoDBUserService {
         mongoDBUserRepository.deleteAll();
 //        Updates an existing document or inserts a new document, depending on its document parameter
 //If the document does not contain an _id field, then the save() method calls the insert() method. During the operation, the mongo shell will create an ObjectId and assign it to the _id field.
-        userRepository.findAll().parallelStream().forEach(user -> {
+        userService.queryAll(new UserQueryCriteria()).parallelStream().forEach(user -> {
             var username = user.getUsername();
             var mongoDBUser = mongoDBUserRepository.findFirstByUserName(username).orElseGet(MongoDBUser::new);
             mongoDBUser.setId(user.getId().toString()).setUserName(username).setPassWord(user.getPassword())
-                    .setRoleName(user.getRoles().stream().map(Role::getName).collect(Collectors.joining("_")));
+                    .setRoleName(user.getRoles().stream().map(RoleSmallDto::getName).collect(Collectors.joining("_")));
             mongoDBUserRepository.save(mongoDBUser);
         });
     }

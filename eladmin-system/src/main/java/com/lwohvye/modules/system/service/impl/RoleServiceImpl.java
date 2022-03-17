@@ -19,12 +19,13 @@ import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
+import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.handler.AuthHandlerContext;
 import com.lwohvye.modules.system.observer.MenuObserver;
 import com.lwohvye.modules.system.repository.RoleRepository;
-import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.IRoleService;
+import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.RoleDto;
 import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.modules.system.service.dto.RoleSmallDto;
@@ -64,7 +65,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     private final RoleMapper roleMapper;
     private final RoleSmallMapper roleSmallMapper;
     private final RedisUtils redisUtils;
-    private final UserRepository userRepository;
+    private final IUserService userService;
     private final AuthHandlerContext authHandlerContext;
 
     @PostConstruct
@@ -183,7 +184,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
-    public List<RoleSmallDto> findByUsersId(Long userId) {
+    public List<RoleSmallDto> findByUserId(Long userId) {
         return roleSmallMapper.toDto(roleRepository.findByUserId(userId), new CycleAvoidingMappingContext());
     }
 
@@ -226,7 +227,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
 
     @Override
     public void verification(Set<Long> ids) {
-        if (userRepository.countByRoles(ids) > 0) {
+        if (userService.countByRoles(ids) > 0) {
             throw new BadRequestException("所选角色存在用户关联，请解除关联再试！");
         }
     }
@@ -235,6 +236,11 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     @Transactional(rollbackFor = Exception.class)
     public List<Role> findInMenuId(List<Long> menuIds) {
         return roleRepository.findInMenuId(menuIds);
+    }
+
+    @Override
+    public Boolean hasDepts(List<Dept> depts) {
+        return roleRepository.existsByDeptsIn(depts);
     }
 
     /**

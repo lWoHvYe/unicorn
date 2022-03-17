@@ -155,7 +155,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "SELECT count(1) FROM sys_user u, sys_users_jobs j WHERE u.user_id = j.user_id AND j.job_id IN ?1", nativeQuery = true)
-    int countByJobs(Set<Long> ids);
+    int countByJobs(Collection<Long> ids);
 
     Boolean existsByJobsIn(Collection<Job> jobs);
 
@@ -189,7 +189,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      */
     @Query(value = "SELECT count(1) FROM sys_user u, sys_users_roles r WHERE " +
                    "u.user_id = r.user_id AND r.role_id in ?1", nativeQuery = true)
-    int countByRoles(Set<Long> ids);
+    int countByRoles(Collection<Long> ids);
 
     Boolean existsByRolesIn(Collection<Role> roles);
 

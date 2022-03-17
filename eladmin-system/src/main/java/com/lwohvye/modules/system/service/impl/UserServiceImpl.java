@@ -25,6 +25,7 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.security.service.UserLocalCache;
+import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.projection.UserProj;
 import com.lwohvye.modules.system.observer.DeptObserver;
@@ -203,6 +204,21 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
         user.setPhone(resources.getPhone());
         user.setGender(resources.getGender());
         userRepository.save(user);
+    }
+
+    @Override
+    public int countByRoles(Collection<Long> rids) {
+        return userRepository.countByRoles(rids);
+    }
+
+    @Override
+    public int countByJobs(Collection<Long> jids) {
+        return userRepository.countByJobs(jids);
+    }
+
+    @Override
+    public Boolean hasDepts(List<Dept> depts) {
+        return userRepository.existsByDeptIn(depts);
     }
 
     @Override

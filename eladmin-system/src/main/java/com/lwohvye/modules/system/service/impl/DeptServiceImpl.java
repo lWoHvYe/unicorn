@@ -19,11 +19,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.modules.system.domain.Dept;
-import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.repository.DeptRepository;
-import com.lwohvye.modules.system.repository.RoleRepository;
-import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.modules.system.service.IDeptService;
+import com.lwohvye.modules.system.service.IRoleService;
+import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
 import com.lwohvye.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.DeptMapper;
@@ -42,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -55,9 +53,9 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
 
     private final DeptRepository deptRepository;
     private final DeptMapper deptMapper;
-    private final UserRepository userRepository;
+    private final IUserService userService;
+    private final IRoleService roleService;
     private final RedisUtils redisUtils;
-    private final RoleRepository roleRepository;
 
     @Override
     @Cacheable
@@ -259,9 +257,9 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
     public void verification(Set<DeptDto> deptDtos) {
 //        dto 2 entity
         var deptList = deptMapper.toEntity(new ArrayList<>(deptDtos), new CycleAvoidingMappingContext());
-        if (Boolean.TRUE.equals(userRepository.existsByDeptIn(deptList)))
+        if (Boolean.TRUE.equals(userService.hasDepts(deptList)))
             throw new BadRequestException("所选部门存在用户关联，请解除后再试！");
-        if (Boolean.TRUE.equals(roleRepository.existsByDeptsIn(deptList)))
+        if (Boolean.TRUE.equals(roleService.hasDepts(deptList)))
             throw new BadRequestException("所选部门存在角色关联，请解除后再试！");
     }
 

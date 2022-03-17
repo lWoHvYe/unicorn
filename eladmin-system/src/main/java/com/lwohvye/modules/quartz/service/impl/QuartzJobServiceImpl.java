@@ -138,6 +138,11 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
         }
     }
 
+    @Override
+    public void saveLog(QuartzLog quartzLog) {
+        quartzLogRepository.save(quartzLog);
+    }
+
     @Async
     @Override
     @Transactional(rollbackFor = Exception.class)

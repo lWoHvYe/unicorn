@@ -16,11 +16,12 @@
 
 package com.lwohvye.search.modules.mongodb.service.impl;
 
+import com.lwohvye.modules.system.service.IUserService;
+import com.lwohvye.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.search.modules.mongodb.domain.MongoDBUser;
 import com.lwohvye.search.modules.mongodb.repository.MongoDBUserRepository;
 import com.lwohvye.search.modules.mongodb.service.IMongoDBUserService;
-import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.repository.UserRepository;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class MongoDBUserServiceIOCImpl implements IMongoDBUserService {
 //    使用SPI机制的优势就是接口与实现的解耦，但是它也有部分限制。通过ServiceLoader延迟加载实现算是实现了延迟加载，
 //    但是接口的实现的实例化只能通过无参函数构建。而对于存在多种实现时，我们只能全部遍历一遍所有实现造成了资源的浪费，并且想要获取指定的实现也不太灵活。
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
     @Autowired
     private MongoDBUserRepository mongoDBUserRepository;
@@ -50,7 +51,7 @@ public class MongoDBUserServiceIOCImpl implements IMongoDBUserService {
     public void doInit() {
         // 不能使用@PostConstruct，因为在执行该注解注释的方法时，ApplicationContext还未能获取到
         log.warn("进入  +++ {}", this.getClass().getSimpleName());
-        this.userRepository = SpringContextHolder.getBean(UserRepository.class);
+        this.userService = SpringContextHolder.getBean(IUserService.class);
         this.mongoDBUserRepository = SpringContextHolder.getBean(MongoDBUserRepository.class);
     }
 
@@ -67,11 +68,11 @@ public class MongoDBUserServiceIOCImpl implements IMongoDBUserService {
 //        mongoDBUserRepository.deleteAll();
 //        Updates an existing document or inserts a new document, depending on its document parameter
 //If the document does not contain an _id field, then the save() method calls the insert() method. During the operation, the mongo shell will create an ObjectId and assign it to the _id field.
-        userRepository.findAll().parallelStream().forEach(user -> {
+        userService.queryAll(new UserQueryCriteria()).parallelStream().forEach(user -> {
             var username = user.getUsername();
             var mongoDBUser = mongoDBUserRepository.findFirstByUserName(username).orElseGet(MongoDBUser::new);
             mongoDBUser.setId(user.getId().toString()).setUserName(username).setPassWord(user.getPassword())
-                    .setRoleName(user.getRoles().stream().map(Role::getName).collect(Collectors.joining("_")));
+                    .setRoleName(user.getRoles().stream().map(RoleSmallDto::getName).collect(Collectors.joining("_")));
             mongoDBUserRepository.save(mongoDBUser);
         });
     }

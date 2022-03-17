@@ -144,8 +144,8 @@ public class UserController {
     @DeleteMapping
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         for (Long id : ids) {
-            Integer currentLevel = roleService.findByUsersId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
-            Integer optLevel = roleService.findByUsersId(id).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
+            Integer currentLevel = roleService.findByUserId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
+            Integer optLevel = roleService.findByUserId(id).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
             if (currentLevel > optLevel) {
                 throw new BadRequestException("角色权限不足，不能删除：" + userService.findById(id).getUsername());
             }
@@ -204,7 +204,7 @@ public class UserController {
      * @param resources /
      */
     private void checkLevel(User resources) {
-        Integer currentLevel = roleService.findByUsersId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
+        Integer currentLevel = roleService.findByUserId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
         Integer optLevel = roleService.findByRoles(resources.getRoles());
         if (currentLevel > optLevel) {
             throw new BadRequestException("角色权限不足");

@@ -124,7 +124,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> findByUser(Long currentUserId) {
-        List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
+        List<RoleSmallDto> roles = roleService.findByUserId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
         LinkedHashSet<Menu> menus = menuRepository.findByRoleIdsAndTypeNot(roleIds, 2);
         return menus.stream().map(menu -> menuMapper.toDto(menu, new CycleAvoidingMappingContext())).toList();
@@ -316,7 +316,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
     // 递归，多次调用数据库。不建议
     @Override
     public List<MenuDto> buildTree3(Long currentUserId) {
-        List<RoleSmallDto> roles = roleService.findByUsersId(currentUserId);
+        List<RoleSmallDto> roles = roleService.findByUserId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
         return menuRepository.findByRoleIdsAndPidIsNullAndTypeNot(roleIds, 2).orElseGet(LinkedHashSet::new)
                 .parallelStream().map(menu -> {
