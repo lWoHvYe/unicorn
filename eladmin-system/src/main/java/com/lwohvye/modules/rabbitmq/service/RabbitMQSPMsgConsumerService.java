@@ -21,7 +21,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
-import com.lwohvye.modules.security.service.UserCacheClean;
+import com.lwohvye.modules.security.service.UserLocalCache;
 import com.lwohvye.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -35,12 +35,12 @@ import java.util.Objects;
 @Slf4j
 public class RabbitMQSPMsgConsumerService {
 
-    private UserCacheClean userCacheClean;
+    private UserLocalCache userLocalCache;
 
     @Autowired // Spring循环依赖问题，可以通过将构造注入改为setter注入的方式解决（三个Map）。也可以使用@Lazy注解。还有些别的解决方式
     // 这里只是做一个记录。UserCacheClean并未构成循环依赖
-    public void setUserCacheClean(UserCacheClean userCacheClean) {
-        this.userCacheClean = userCacheClean;
+    public void setUserCacheClean(UserLocalCache userLocalCache) {
+        this.userLocalCache = userLocalCache;
     }
 
     @RabbitHandler
@@ -57,7 +57,7 @@ public class RabbitMQSPMsgConsumerService {
             if (ObjectUtil.equals(msgType, "sp")) {
                 var extraData = amqpMsgEntity.getExtraData();
                 if (StrUtil.isNotBlank(extraData))
-                    ReflectUtil.invoke(userCacheClean, extraData, msgData, false);
+                    ReflectUtil.invoke(userLocalCache, extraData, msgData, false);
             }
         } catch (Exception e) {
             log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", e.getMessage(), amqpMsgEntityStr);

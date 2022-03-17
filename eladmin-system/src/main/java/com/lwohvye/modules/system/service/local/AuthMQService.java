@@ -20,7 +20,7 @@ import cn.hutool.core.util.StrUtil;
 import com.lwohvye.log.domain.Log;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
-import com.lwohvye.modules.security.service.UserCacheClean;
+import com.lwohvye.modules.security.service.UserLocalCache;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.log.service.ILogService;
 import com.lwohvye.utils.json.JsonUtils;
@@ -60,7 +60,7 @@ public class AuthMQService {
     private IUserService userService;
 
     @Autowired
-    private UserCacheClean userCacheClean;
+    private UserLocalCache userLocalCache;
 
     @Autowired
     private RabbitMQProducerService rabbitMQProducerService;
@@ -100,7 +100,7 @@ public class AuthMQService {
 //                  修改用户状态为锁定
             userService.updateEnabled(username, false);
 //                  删除缓存中的用户信息
-            userCacheClean.cleanUserCache(username, true);
+            userLocalCache.cleanUserCache(username, true);
 //                  超过5次锁定一小时。创建延迟解锁消息
             var wait4Unlock = new AmqpMsgEntity().setMsgType("auth").setMsgData(username).setExtraData("unlockUser")
                     .setExpire(1L).setTimeUnit(TimeUnit.HOURS);
@@ -115,7 +115,7 @@ public class AuthMQService {
             return;
         userService.updateEnabled(record, true);
 //              删除缓存中的用户信息
-        userCacheClean.cleanUserCache(record, true);
+        userLocalCache.cleanUserCache(record, true);
     }
 
 }

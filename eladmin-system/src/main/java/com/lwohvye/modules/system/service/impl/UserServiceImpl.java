@@ -24,7 +24,7 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
-import com.lwohvye.modules.security.service.UserCacheClean;
+import com.lwohvye.modules.security.service.UserLocalCache;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.projection.UserProj;
 import com.lwohvye.modules.system.observer.DeptObserver;
@@ -55,7 +55,6 @@ import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -72,7 +71,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     private final UserInnerMapper userInnerMapper;
     private final FileProperties properties;
     private final RedisUtils redisUtils;
-    private final UserCacheClean userCacheClean;
+    private final UserLocalCache userLocalCache;
 
     @PostConstruct
     @Override
@@ -320,13 +319,13 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
      * @param username /
      */
     private void flushCache(String username) {
-        userCacheClean.cleanUserCache(username, true);
+        userLocalCache.cleanUserCache(username, true);
     }
 
     @Override
     public void roleUpdate(Object obj) {
         userRepository.findByRoleId((long) obj).forEach(user -> {
-            userCacheClean.cleanUserCache(user.getUsername(), true);
+            userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
             notifyObserver(user.getId());
         });
@@ -335,7 +334,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     @Override
     public void menuUpdate(Object obj) {
         userRepository.findByMenuId((long) obj).forEach(user -> {
-            userCacheClean.cleanUserCache(user.getUsername(), true);
+            userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
             notifyObserver(user.getId());
         });
@@ -344,7 +343,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     @Override
     public void deptUpdate(Object obj) {
         userRepository.findByRoleDeptId((long) obj).forEach(user -> {
-            userCacheClean.cleanUserCache(user.getUsername(), true);
+            userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
             notifyObserver(user.getId());
         });
