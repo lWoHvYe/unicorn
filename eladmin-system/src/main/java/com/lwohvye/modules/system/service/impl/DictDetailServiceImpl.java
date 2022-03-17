@@ -18,7 +18,6 @@ package com.lwohvye.modules.system.service.impl;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.modules.system.domain.DictDetail;
 import com.lwohvye.modules.system.repository.DictDetailRepository;
-import com.lwohvye.modules.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.IDictDetailService;
 import com.lwohvye.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
@@ -48,7 +47,6 @@ import java.util.Map;
 @CacheConfig(cacheNames = "dict")
 public class DictDetailServiceImpl implements IDictDetailService {
 
-    private final DictRepository dictRepository;
     private final DictDetailRepository dictDetailRepository;
     private final DictDetailMapper dictDetailMapper;
 
