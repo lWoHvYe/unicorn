@@ -53,9 +53,11 @@ public class UserLocalCache {
     @Autowired
     private IUserService userService;
 
+    @Lazy
     @Autowired
     private IRoleService roleService;
 
+    @Lazy
     @Autowired
     private IDataService dataService;
 

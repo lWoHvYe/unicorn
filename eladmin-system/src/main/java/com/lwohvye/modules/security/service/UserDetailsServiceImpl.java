@@ -48,7 +48,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public JwtUserDto loadUserByUsername(String username) {
         JwtUserDto jwtUserDto;
         if (loginProperties.isCacheEnable()) {
-            // TODO: 2022/3/17 get可能抛出异常，但未被统一异常处理的逻辑捕获，后续排查原因
+            // TODO: 2022/3/17 get可能抛出异常，但未被统一异常处理的逻辑捕获，后续排查原因，从DaoAuthenticationProvider入手
             jwtUserDto = userLocalCache.userLRUCache.get(username);
             var userInner = jwtUserDto.getUser();
             // 检查dataScope是否修改
