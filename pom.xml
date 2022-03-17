@@ -86,8 +86,6 @@
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <!--    指定版本，新版本Spring Boot发布后可移除    -->
-        <!--        <log4j2.version>2.17.0</log4j2.version>-->
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.0.1</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
@@ -99,10 +97,6 @@
         <yauaa.version>6.11</yauaa.version>
         <ip2region.version>2.6.3</ip2region.version>
         <thumbnailator.version>0.4.17</thumbnailator.version>
-        <!--        <pdfbox.version>2.0.25</pdfbox.version>-->
-        <!--        <xmlsec.version>2.3.0</xmlsec.version>-->
-        <!--        <xmlgraphics.version>2.7</xmlgraphics.version>-->
-        <!--        <batik.version>1.14</batik.version>-->
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
@@ -334,52 +328,6 @@
             <artifactId>thumbnailator</artifactId>
             <version>${thumbnailator.version}</version>
         </dependency>
-        <!--   fixed dependencies of plugins with threat ，未实际使用下面的依赖，只是在发布到中央仓库时，有显示这部分依赖，且默认版本有漏洞，不确定是何处引用   -->
-        <!--   下面几个依赖的具体用途，22-02-09，暂移除无关的依赖
-        Apache XML Graphics Commons is a library that consists of several reusable components used by Apache Batik and Apache FOP.
-        Many of these components can easily be used separately outside the domains of SVG and XSL-FO.
-        You'll find components such as a PDF library, an RTF library, Graphics2D implementations that let you generate PDF and PostScript files and much more.     -->
-        <!--   4pdfbox     -->
-        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.pdfbox</groupId>-->
-        <!--            <artifactId>pdfbox</artifactId>-->
-        <!--            <version>${pdfbox.version}</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.pdfbox</groupId>-->
-        <!--            <artifactId>fontbox</artifactId>-->
-        <!--            <version>${pdfbox.version}</version>-->
-        <!--        </dependency>-->
-        <!--    4xmlsec    -->
-        <!-- https://mvnrepository.com/artifact/org.apache.santuario/xmlsec -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.santuario</groupId>-->
-        <!--            <artifactId>xmlsec</artifactId>-->
-        <!--            <version>${xmlsec.version}</version>-->
-        <!--        </dependency>-->
-        <!--    4xmlgraphics-commons    -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.xmlgraphics</groupId>-->
-        <!--            <artifactId>xmlgraphics-commons</artifactId>-->
-        <!--            <version>${xmlgraphics.version}</version>-->
-        <!--            <exclusions>-->
-        <!--                <exclusion>-->
-        <!--                    <artifactId>commons-io</artifactId>-->
-        <!--                    <groupId>commons-io</groupId>-->
-        <!--                </exclusion>-->
-        <!--                <exclusion>-->
-        <!--                    <artifactId>commons-logging</artifactId>-->
-        <!--                    <groupId>commons-logging</groupId>-->
-        <!--                </exclusion>-->
-        <!--            </exclusions>-->
-        <!--        </dependency>-->
-        <!--    4batik  Batik is a Java-based toolkit for applications or applets that want to use images in the Scalable Vector Graphics (SVG) format for various purposes, such as display, generation or manipulation.  -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.xmlgraphics</groupId>-->
-        <!--            <artifactId>batik-all</artifactId>-->
-        <!--            <version>${batik.version}</version>-->
-        <!--        </dependency>-->
     </dependencies>
     <!--
         If you are using logstash-logback-encoder in a project (such as spring-boot) that also declares dependencies on any of the above libraries,
@@ -530,15 +478,6 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
-            <!--     https://felix.apache.org/documentation/subprojects/apache-felix-maven-bundle-plugin-bnd.html
-                     https://www.lwohvye.com/2021/12/10/osgi-%e7%90%86%e8%a7%a3/
-                     暂无打bundle-package的打算。留档
-               -->
-            <!--<plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-            </plugin>-->
             <!--     Maven JDK9 Jigsaw       -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
