@@ -21,7 +21,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.config.rabbitmq.RabbitMqConfig;
-import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
@@ -95,10 +94,8 @@ public class UserLocalCache {
             // SpringSecurity会自动转换UsernameNotFoundException为BadCredentialsException
             throw new UsernameNotFoundException("", e);
         }
-        if (Objects.isNull(user.getId()))
+        if (Objects.isNull(user.getId()) || Boolean.FALSE.equals(user.getEnabled())) // 理论上只有不存在和未激活两种情况
             throw new UsernameNotFoundException("");
-        else if (Boolean.FALSE.equals(user.getEnabled()))
-            throw new BadRequestException("账号未激活！");
 
         jwtUserDto = new JwtUserDto(
                 user,
