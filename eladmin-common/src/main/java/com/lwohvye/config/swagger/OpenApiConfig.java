@@ -13,8 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.config;
+package com.lwohvye.config.swagger;
 
+import com.lwohvye.utils.redis.RedisUtils;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -27,8 +28,13 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.redisson.api.RedissonClient;
 import org.springdoc.core.customizers.OpenApiCustomiser;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringBootVersion;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,6 +63,7 @@ import java.util.List;
 //         )
 // )
 // @io.swagger.v3.oas.annotations.security.SecurityScheme(type = SecuritySchemeType.HTTP, name = "Authorization", scheme = "Bearer", in = SecuritySchemeIn.HEADER)
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class OpenApiConfig {
@@ -128,4 +135,29 @@ public class OpenApiConfig {
                 .forEach(operation -> operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/SpInfo")));
     }
 
+    /**
+     * bean初始化前后的两个切入点
+     *
+     * @return org.springframework.beans.factory.config.BeanPostProcessor
+     * @date 2022/3/18 7:23 PM
+     */
+    @Bean
+    public static BeanPostProcessor whyBeanPostProcessor() { // 有些忘了，这里整成static是否有别的考虑
+        return new BeanPostProcessor() {
+
+            @Override
+            public Object postProcessBeforeInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
+                if (bean instanceof RedisUtils ru)
+                    log.info("The module of the RedisUtils is {}", ru.getClass().getModule());
+                return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
+            }
+
+            @Override
+            public Object postProcessAfterInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
+                if (bean instanceof RedissonClient rc)
+                    log.info("The id of the RedissonClient is {}", rc.getId());
+                return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
+            }
+        };
+    }
 }

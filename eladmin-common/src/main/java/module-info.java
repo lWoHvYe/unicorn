@@ -53,6 +53,8 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.aspect to spring.beans, spring.aop;
     exports com.lwohvye.base;
     exports com.lwohvye.config;
+    exports com.lwohvye.config.cache;
+    exports com.lwohvye.config.swagger;
     exports com.lwohvye.constant;
     exports com.lwohvye.context;
     exports com.lwohvye.exception;
@@ -66,6 +68,8 @@ module lwohvye.eladmin.common {
 
     opens com.lwohvye.base;
     opens com.lwohvye.config to spring.core;
+    opens com.lwohvye.config.cache to spring.core;
+    opens com.lwohvye.config.swagger to spring.core;
     opens com.lwohvye.utils to spring.core;
     opens com.lwohvye.utils.json to spring.core;
     opens com.lwohvye.utils.redis to spring.core;
