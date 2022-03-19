@@ -16,12 +16,11 @@
 package com.lwohvye.modules.rabbitmq.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.lwohvye.config.rabbitmq.RabbitMqConfig;
-import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.modules.rabbitmq.config.RabbitMqConfig;
 import com.lwohvye.utils.json.JsonUtils;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.utils.rabbitmq.SimpleMQProducerService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -29,10 +28,7 @@ import java.util.concurrent.TimeUnit;
 // 发消息时指定了 交换机和路由键。 所以可以把发消息 和 队列的绑定分开，发消息方定义交换机、消费方定义队列 及队列与交换机、路由键的绑定。提高灵活性。
 @Component
 @Slf4j
-public class RabbitMQProducerService {
-
-    @Autowired
-    private AmqpTemplate amqpTemplate;
+public class RabbitMQProducerService extends SimpleMQProducerService {
 
     /**
      * 发送消息
@@ -43,10 +39,6 @@ public class RabbitMQProducerService {
     public void sendMsg(AmqpMsgEntity amqpMsgEntity) {
         amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.DATA_SYNC_ROUTE_KEY, JsonUtils.toJSONString(amqpMsgEntity));
 
-    }
-
-    public void sendMsg(String exchangeName, String routeKey, AmqpMsgEntity amqpMsgEntity) {
-        amqpTemplate.convertAndSend(exchangeName, routeKey, JsonUtils.toJSONString(amqpMsgEntity));
     }
 
     /**
@@ -84,20 +76,6 @@ public class RabbitMQProducerService {
     public void sendDelayMsg(AmqpMsgEntity commonEntity) {
         amqpTemplate.convertAndSend(RabbitMqConfig.DIRECT_SYNC_DELAY_EXCHANGE,
                 RabbitMqConfig.DATA_COMMON_DELAY_ROUTE_KEY, JsonUtils.toJSONString(commonEntity),
-                message -> {
-                    var expire = commonEntity.getExpire();
-                    var timeUnit = commonEntity.getTimeUnit();
-                    if (ObjectUtil.isNotEmpty(expire) && ObjectUtil.isNotEmpty(timeUnit)) {
-                        Long expireMill = TimeUnit.MILLISECONDS.convert(expire, timeUnit);
-                        //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
-                        message.getMessageProperties().setHeader("x-delay", expireMill);
-                    }
-                    return message;
-                });
-    }
-
-    public void sendDelayMsg(String exchangeName, String routeKey, AmqpMsgEntity commonEntity) {
-        amqpTemplate.convertAndSend(exchangeName, routeKey, JsonUtils.toJSONString(commonEntity),
                 message -> {
                     var expire = commonEntity.getExpire();
                     var timeUnit = commonEntity.getTimeUnit();

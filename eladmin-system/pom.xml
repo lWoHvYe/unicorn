@@ -55,6 +55,20 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+            <!--      将spring-web的exclusions放到common中后，要加上这块，因为这个也依赖了web，否则会以Tomcat的web启动，并报错，This is very likely to create a memory leak.      -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--Spring boot 测试-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- jwt -->
@@ -80,6 +94,27 @@
             <artifactId>quartz</artifactId>
         </dependency>
 
+        <!--Mysql依赖包-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <!--scope元素主要用来控制依赖的使用范围，指定当前包的依赖范围和依赖的传递性，也就是哪些依赖在哪些classpath中可用。
+            常见的可选值有：compile, provided, runtime, test, system等。-->
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- druid数据源驱动 ; 注：使用shardingsphere时。这里不能用druid的spring-boot-starter -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+        </dependency>
+
+        <!-- Java图形验证码。该项目在gitee上有 -->
+        <dependency>
+            <groupId>com.github.whvcse</groupId>
+            <artifactId>easy-captcha</artifactId>
+        </dependency>
+
         <!-- linux的管理 -->
         <dependency>
             <groupId>ch.ethz.ganymed</groupId>
@@ -103,11 +138,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-access</artifactId>
         </dependency>
-        <!--消息队列相关依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
+
         <!--    jol查看Java对象的内存布局    -->
         <dependency>
             <groupId>org.openjdk.jol</groupId>

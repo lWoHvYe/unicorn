@@ -20,7 +20,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.LocalCoreConfig;
-import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.modules.security.service.UserLocalCache;
 import com.lwohvye.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;

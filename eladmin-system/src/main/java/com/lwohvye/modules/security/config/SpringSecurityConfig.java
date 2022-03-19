@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.security.config;
 
-import com.lwohvye.config.rabbitmq.RabbitMqConfig;
-import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.modules.rabbitmq.config.RabbitMqConfig;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.modules.security.security.CustomAccessDecisionManager;

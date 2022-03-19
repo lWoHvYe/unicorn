@@ -7,6 +7,7 @@ module lwohvye.eladmin.common {
     requires transitive java.sql;
     requires transitive java.persistence;
     requires transitive java.validation;
+    requires transitive spring.amqp;
     requires transitive spring.core;
     requires transitive spring.beans;
     requires transitive spring.context;
@@ -63,6 +64,7 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.utils.enums;
     exports com.lwohvye.utils.json;
     exports com.lwohvye.utils.mapper;
+    exports com.lwohvye.utils.rabbitmq;
     exports com.lwohvye.utils.redis;
     exports com.lwohvye.utils.result;
 
@@ -72,6 +74,7 @@ module lwohvye.eladmin.common {
     opens com.lwohvye.config.swagger to spring.core;
     opens com.lwohvye.utils to spring.core;
     opens com.lwohvye.utils.json to spring.core;
+    opens com.lwohvye.utils.rabbitmq to spring.core;
     opens com.lwohvye.utils.redis to spring.core;
     opens com.lwohvye.utils.result to spring.core;
 }

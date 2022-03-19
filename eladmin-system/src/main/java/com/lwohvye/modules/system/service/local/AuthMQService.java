@@ -18,7 +18,7 @@ package com.lwohvye.modules.system.service.local;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.log.domain.Log;
-import com.lwohvye.modules.rabbitmq.domain.AmqpMsgEntity;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.UserLocalCache;
 import com.lwohvye.modules.system.service.IUserService;

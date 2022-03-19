@@ -7,7 +7,6 @@ module lwohvye.eladmin.system {
     requires transitive java.management;
     requires transitive java.annotation;
     requires transitive java.scripting;
-    requires transitive spring.amqp;
     requires transitive spring.context.support;
     requires transitive spring.expression;
     requires transitive spring.websocket;
@@ -42,8 +41,7 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.quartz.service;
     exports com.lwohvye.modules.quartz.task to spring.beans;
     exports com.lwohvye.modules.quartz.utils to spring.beans;
-    exports com.lwohvye.modules.rabbitmq.domain;
-    exports com.lwohvye.modules.rabbitmq.service;
+    exports com.lwohvye.modules.rabbitmq.service; // 这个要export to spring.beans和unnamed module。消费者应该都是这样的
     exports com.lwohvye.modules.security.service;
     exports com.lwohvye.modules.security.service.dto;
     exports com.lwohvye.modules.security.security;
@@ -62,7 +60,6 @@ module lwohvye.eladmin.system {
 
     opens com.lwohvye.config.common;
     opens com.lwohvye.config.datasource;
-    opens com.lwohvye.config.rabbitmq;
     opens com.lwohvye.config.thread;
     opens com.lwohvye.modules.mnt.repository to spring.core;
     opens com.lwohvye.modules.mnt.rest to spring.core;
@@ -75,7 +72,8 @@ module lwohvye.eladmin.system {
     opens com.lwohvye.modules.quartz.service.impl;
     opens com.lwohvye.modules.quartz.task to spring.core;
     opens com.lwohvye.modules.quartz.utils to spring.core;
-    opens com.lwohvye.modules.rabbitmq.service;
+    opens com.lwohvye.modules.rabbitmq.config;
+    opens com.lwohvye.modules.rabbitmq.service to spring.core;
     opens com.lwohvye.modules.security.config;
     opens com.lwohvye.modules.security.config.bean;
     opens com.lwohvye.modules.security.service to spring.core;

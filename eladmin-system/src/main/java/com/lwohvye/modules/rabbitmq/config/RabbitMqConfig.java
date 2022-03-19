@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.config.rabbitmq;
+package com.lwohvye.modules.rabbitmq.config;
 
 import com.lwohvye.config.LocalCoreConfig;
 import org.springframework.amqp.core.*;
