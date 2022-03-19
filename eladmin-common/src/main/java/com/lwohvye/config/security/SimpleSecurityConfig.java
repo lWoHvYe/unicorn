@@ -16,6 +16,7 @@
 
 package com.lwohvye.config.security;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -27,6 +28,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -40,10 +42,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
 @EnableWebSecurity
+@RequiredArgsConstructor
 @ConditionalOnExpression("${local.sys.unauth:false}") // 基于配置，是否对所有请求放行。默认关闭
 @ConditionalOnClass(WebSecurityConfigurerAdapter.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SimpleSecurityConfig {
+
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -59,6 +64,11 @@ public class SimpleSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 放行所有请求
                 .authorizeRequests().anyRequest().permitAll().and()
+                .apply(securityConfigurerAdapter()).and()
                 .build();
+    }
+
+    private SimpleAuthConfigurer securityConfigurerAdapter() {
+        return new SimpleAuthConfigurer(userDetailsService);
     }
 }
