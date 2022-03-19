@@ -16,6 +16,7 @@
 package com.lwohvye.modules.system.rest;
 
 import com.lwohvye.annotation.log.Log;
+import com.lwohvye.modules.system.api.SysResourceAPI;
 import com.lwohvye.modules.system.domain.Resource;
 import com.lwohvye.modules.system.service.IResourceService;
 import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
@@ -36,28 +37,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "ResourceController", description = "资源管理")
-@RequestMapping("/api/sys/resources")
-public class ResourceController {
+public class ResourceController implements SysResourceAPI {
 
     private final IResourceService resourceService;
 
-    @GetMapping
     @Log("查询资源")
     @Operation(summary = "查询资源")
+    @Override
     public ResponseEntity<Object> query(ResourceQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(resourceService.queryAll(criteria, pageable), HttpStatus.OK);
     }
 
-    @PostMapping
     @Log("新增资源")
     @Operation(summary = "新增资源")
+    @Override
     public ResponseEntity<Object> create(@Validated @RequestBody Resource resources) {
         return new ResponseEntity<>(resourceService.create(resources), HttpStatus.CREATED);
     }
 
-    @PutMapping
     @Log("修改资源")
     @Operation(summary = "修改资源")
+    @Override
     public ResponseEntity<Object> update(@Validated @RequestBody Resource resources) {
         resourceService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -65,7 +65,7 @@ public class ResourceController {
 
     @Log("删除资源")
     @Operation(summary = "删除资源")
-    @DeleteMapping
+    @Override
     public ResponseEntity<Object> delete(@RequestBody Long[] ids) {
         resourceService.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);

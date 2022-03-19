@@ -18,6 +18,7 @@ package com.lwohvye.modules.system.rest;
 import com.lwohvye.annotation.log.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.modules.system.api.SysJobAPI;
 import com.lwohvye.modules.system.domain.Job;
 import com.lwohvye.modules.system.service.IJobService;
 import com.lwohvye.modules.system.service.dto.JobQueryCriteria;
@@ -42,8 +43,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "JobController", description = "系统：岗位管理")
-@RequestMapping("/api/sys/job")
-public class JobController {
+public class JobController implements SysJobAPI {
 
     private final IJobService jobService;
     private static final String ENTITY_NAME = "job";
@@ -55,14 +55,14 @@ public class JobController {
     }
 
     @Operation(summary = "查询岗位")
-    @GetMapping
+    @Override
     public ResponseEntity<Object> query(JobQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(jobService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增岗位")
     @Operation(summary = "新增岗位")
-    @PostMapping
+    @Override
     public ResponseEntity<Object> create(@Validated @RequestBody Job resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
@@ -73,7 +73,7 @@ public class JobController {
 
     @Log("修改岗位")
     @Operation(summary = "修改岗位")
-    @PutMapping
+    @Override
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Job resources) {
         jobService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -81,7 +81,7 @@ public class JobController {
 
     @Log("删除岗位")
     @Operation(summary = "删除岗位")
-    @DeleteMapping
+    @Override
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         // 验证是否被用户关联
         jobService.verification(ids);

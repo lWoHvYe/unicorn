@@ -20,6 +20,7 @@ import com.lwohvye.annotation.log.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.modules.system.api.SysMenuAPI;
 import com.lwohvye.modules.system.domain.Menu;
 import com.lwohvye.modules.system.service.IMenuService;
 import com.lwohvye.modules.system.service.dto.MenuDto;
@@ -48,8 +49,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "MenuController", description = "系统：菜单管理")
-@RequestMapping("/api/sys/menus")
-public class MenuController {
+public class MenuController implements SysMenuAPI {
 
     private final IMenuService menuService;
     private final MenuMapper menuMapper;
@@ -61,8 +61,8 @@ public class MenuController {
         menuService.download(menuService.queryAll(criteria, false), response);
     }
 
-    @GetMapping(value = "/build")
     @Operation(summary = "获取前端所需菜单")
+    @Override
     public ResponseEntity<Object> buildMenus() {
         // 在方法参数里用SecurityUtils.getCurrentUserId()在一些情况下会不走缓存
         var cuid = SecurityUtils.getCurrentUserId();
@@ -70,13 +70,13 @@ public class MenuController {
     }
 
     @Operation(summary = "返回全部的菜单")
-    @GetMapping(value = "/lazy")
+    @Override
     public ResponseEntity<Object> query(@RequestParam Long pid) {
         return new ResponseEntity<>(menuService.getMenus(pid), HttpStatus.OK);
     }
 
     @Operation(summary = "根据菜单ID返回所有子节点ID，包含自身ID")
-    @GetMapping(value = "/child")
+    @Override
     public ResponseEntity<Object> child(@RequestParam Long id) {
         Set<Menu> menuSet = new HashSet<>();
         List<MenuDto> menuList = menuService.getMenus(id);
@@ -86,15 +86,15 @@ public class MenuController {
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 
-    @GetMapping
     @Operation(summary = "查询菜单")
+    @Override
     public ResponseEntity<Object> query(MenuQueryCriteria criteria) throws Exception {
         List<MenuDto> menuDtoList = menuService.queryAll(criteria, true);
         return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(menuDtoList, menuDtoList.size())), HttpStatus.OK);
     }
 
     @Operation(summary = "查询菜单:根据ID获取同级与上级数据")
-    @PostMapping("/superior")
+    @Override
     public ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids) {
         Set<MenuDto> menuDtos = new LinkedHashSet<>();
         if (CollectionUtil.isNotEmpty(ids)) {
@@ -109,7 +109,7 @@ public class MenuController {
 
     @Log("新增菜单")
     @Operation(summary = "新增菜单")
-    @PostMapping
+    @Override
     public ResponseEntity<Object> create(@Validated @RequestBody Menu resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
@@ -120,7 +120,7 @@ public class MenuController {
 
     @Log("修改菜单")
     @Operation(summary = "修改菜单")
-    @PutMapping
+    @Override
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Menu resources) {
         menuService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -128,7 +128,7 @@ public class MenuController {
 
     @Log("删除菜单")
     @Operation(summary = "删除菜单")
-    @DeleteMapping
+    @Override
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         Set<Menu> menuSet = new HashSet<>();
         for (Long id : ids) {

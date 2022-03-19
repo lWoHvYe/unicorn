@@ -19,6 +19,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.annotation.log.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.modules.system.api.SysDeptAPI;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.service.IDeptService;
 import com.lwohvye.modules.system.service.dto.DeptDto;
@@ -44,8 +45,7 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "DeptController", description = "系统：部门管理")
-@RequestMapping("/api/sys/dept")
-public class DeptController {
+public class DeptController implements SysDeptAPI {
 
     private final IDeptService deptService;
     private static final String ENTITY_NAME = "dept";
@@ -57,14 +57,14 @@ public class DeptController {
     }
 
     @Operation(summary = "查询部门")
-    @GetMapping
+    @Override
     public ResponseEntity<Object> query(DeptQueryCriteria criteria) throws Exception {
         List<DeptDto> deptDtos = deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, true);
         return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(deptDtos, deptDtos.size())), HttpStatus.OK);
     }
 
     @Operation(summary = "查询部门:根据ID获取同级与上级数据")
-    @PostMapping("/superior")
+    @Override
     public ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids) {
         Set<DeptDto> deptDtos = new LinkedHashSet<>();
         for (Long id : ids) {
@@ -77,7 +77,7 @@ public class DeptController {
 
     @Log("新增部门")
     @Operation(summary = "新增部门")
-    @PostMapping
+    @Override
     public ResponseEntity<Object> create(@Validated @RequestBody Dept resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
@@ -88,7 +88,7 @@ public class DeptController {
 
     @Log("修改部门")
     @Operation(summary = "修改部门")
-    @PutMapping
+    @Override
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dept resources) {
         deptService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -96,7 +96,7 @@ public class DeptController {
 
     @Log("删除部门")
     @Operation(summary = "删除部门")
-    @DeleteMapping
+    @Override
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         Set<DeptDto> deptDtos = new HashSet<>();
         for (Long id : ids) {

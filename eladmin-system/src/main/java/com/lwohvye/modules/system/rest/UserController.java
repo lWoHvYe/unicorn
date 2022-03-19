@@ -21,6 +21,7 @@ import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.annotation.log.Log;
+import com.lwohvye.modules.system.api.SysUserAPI;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;
@@ -62,9 +63,8 @@ import java.util.Set;
 @Tag(name = "UserController", description = "系统：用户管理")
 @Slf4j
 @RestController
-@RequestMapping("/api/sys/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements SysUserAPI {
 
     private final PasswordEncoder passwordEncoder;
     private final IUserService userService;
@@ -81,7 +81,7 @@ public class UserController {
     // 关于@InitBinder，有时间可以试一下，@InitBinder属于Controller级别的SpringMVC属性编辑器（只对所在的Controller生效）,并不是全局级别
 
     @Operation(summary = "查询用户")
-    @GetMapping
+    @Override
     public ResponseEntity<Object> query(UserQueryCriteria criteria, Pageable pageable) {
         if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
             criteria.getDeptIds().add(criteria.getDeptId());
@@ -110,7 +110,7 @@ public class UserController {
 
     @Log("新增用户")
     @Operation(summary = "新增用户")
-    @PostMapping
+    @Override
     public ResponseEntity<Object> create(@Validated @RequestBody User resources) {
         checkLevel(resources);
         // 默认密码 123456
@@ -121,7 +121,7 @@ public class UserController {
 
     @Log("修改用户")
     @Operation(summary = "修改用户")
-    @PutMapping
+    @Override
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody User resources) throws Exception {
         checkLevel(resources);
         userService.update(resources);
@@ -130,7 +130,7 @@ public class UserController {
 
     @Log("修改用户：个人中心")
     @Operation(summary = "修改用户：个人中心")
-    @PutMapping(value = "center")
+    @Override
     public ResponseEntity<Object> center(@Validated(Update.class) @RequestBody User resources) {
         if (!resources.getId().equals(SecurityUtils.getCurrentUserId())) {
             throw new BadRequestException("不能修改他人资料");
@@ -141,7 +141,7 @@ public class UserController {
 
     @Log("删除用户")
     @Operation(summary = "删除用户")
-    @DeleteMapping
+    @Override
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         for (Long id : ids) {
             Integer currentLevel = roleService.findByUserId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
@@ -155,7 +155,7 @@ public class UserController {
     }
 
     @Operation(summary = "修改密码")
-    @PostMapping(value = "/updatePass")
+    @Override
     public ResponseEntity<Object> updatePass(@RequestBody UserPassVo passVo) throws Exception {
         String oldPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getOldPass());
         String newPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getNewPass());
@@ -171,14 +171,14 @@ public class UserController {
     }
 
     @Operation(summary = "修改头像")
-    @PostMapping(value = "/updateAvatar")
+    @Override
     public ResponseEntity<Object> updateAvatar(@RequestParam MultipartFile avatar) {
         return new ResponseEntity<>(userService.updateAvatar(avatar), HttpStatus.OK);
     }
 
     @Log("修改邮箱")
     @Operation(summary = "修改邮箱")
-    @PostMapping(value = "/updateEmail/{code}")
+    @Override
     public ResponseEntity<Object> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, user.getPassword());
         var userDto = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());

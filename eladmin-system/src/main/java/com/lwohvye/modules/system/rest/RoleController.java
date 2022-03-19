@@ -19,6 +19,7 @@ import cn.hutool.core.lang.Dict;
 import com.lwohvye.annotation.log.Log;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.modules.system.api.SysRoleAPI;
 import com.lwohvye.modules.system.domain.Role;
 import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.dto.RoleDto;
@@ -33,14 +34,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -49,15 +52,14 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "RoleController", description = "系统：角色管理")
-@RequestMapping("/api/sys/roles")
-public class RoleController {
+public class RoleController implements SysRoleAPI {
 
     private final IRoleService roleService;
 
     private static final String ENTITY_NAME = "role";
 
     @Operation(summary = "获取单个role")
-    @GetMapping(value = "/{id}")
+    @Override
     public ResponseEntity<Object> query(@PathVariable Long id) {
         return new ResponseEntity<>(ResultInfo.success(roleService.findById(id)), HttpStatus.OK);
     }
@@ -69,26 +71,26 @@ public class RoleController {
     }
 
     @Operation(summary = "返回全部的角色")
-    @GetMapping(value = "/all")
+    @Override
     public ResponseEntity<Object> query() {
         return new ResponseEntity<>(ResultInfo.success(roleService.queryAll()), HttpStatus.OK);
     }
 
     @Operation(summary = "查询角色")
-    @GetMapping
+    @Override
     public ResponseEntity<Object> query(RoleQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(roleService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Operation(summary = "获取用户级别")
-    @GetMapping(value = "/level")
+    @Override
     public ResponseEntity<Object> getLevel() {
         return new ResponseEntity<>(ResultInfo.success(Dict.create().set("level", getLevels(null))), HttpStatus.OK);
     }
 
     @Log("新增角色")
     @Operation(summary = "新增角色")
-    @PostMapping
+    @Override
     public ResponseEntity<Object> create(@Validated @RequestBody Role resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
@@ -100,7 +102,7 @@ public class RoleController {
 
     @Log("修改角色")
     @Operation(summary = "修改角色")
-    @PutMapping
+    @Override
     public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Role resources) {
         getLevels(resources.getLevel());
         roleService.update(resources);
@@ -109,7 +111,7 @@ public class RoleController {
 
     @Log("修改角色菜单")
     @Operation(summary = "修改角色菜单")
-    @PutMapping(value = "/menu")
+    @Override
     public ResponseEntity<Object> updateMenu(@RequestBody Role resources) {
         RoleDto role = roleService.findById(resources.getId());
         getLevels(role.getLevel());
@@ -119,7 +121,7 @@ public class RoleController {
 
     @Log("删除角色")
     @Operation(summary = "删除角色")
-    @DeleteMapping
+    @Override
     public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
         for (Long id : ids) {
             RoleDto role = roleService.findById(id);
@@ -137,12 +139,10 @@ public class RoleController {
      * @return /
      */
     private int getLevels(Integer level) {
-        List<Integer> levels = roleService.findByUserId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).collect(Collectors.toList());
+        List<Integer> levels = roleService.findByUserId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).toList();
         int min = Collections.min(levels);
-        if (level != null) {
-            if (level < min) {
-                throw new BadRequestException("权限不足，你的角色级别：" + min + "，低于操作的角色级别：" + level);
-            }
+        if (level != null && level < min) {
+            throw new BadRequestException("权限不足，你的角色级别：" + min + "，低于操作的角色级别：" + level);
         }
         return min;
     }

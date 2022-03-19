@@ -8,6 +8,7 @@ module lwohvye.eladmin.api {
     exports com.lwohvye.modules.mnt.service.dto;
     exports com.lwohvye.modules.quartz.domain;
     exports com.lwohvye.modules.quartz.service.dto;
+    exports com.lwohvye.modules.system.api;
     exports com.lwohvye.modules.system.domain;
     exports com.lwohvye.modules.system.domain.vo;
     exports com.lwohvye.modules.system.domain.projection;
