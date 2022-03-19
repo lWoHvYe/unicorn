@@ -25,9 +25,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-// @Component，在这里做通一的定义，子类通过继承拓展功能。这里就不要只用Component声明为bean了，不然当通过类型获取SimpleMQProducerService时，就会获取到多个
+/**
+ * 在这里做通一的定义，子类通过继承拓展功能。这里就不要只用Component声明为bean了，不然当通过类型获取SimpleMQProducerService时，就会获取到多个
+ *
+ * @date 2022/3/19 2:37 PM
+ */
 @Component
-@ConditionalOnMissingBean(SimpleMQProducerService.class) // 理论上可以这样，当子类未定义时，再注册这个
+@ConditionalOnMissingBean(SimpleMQProducerService.class) // 子类除了自身，还包含在父类的类型之中。采用这种方式，可以实现有子类时只注入子类的bean，无子类时再注入父类的bean
 public class SimpleMQProducerService {
 
     @Autowired
