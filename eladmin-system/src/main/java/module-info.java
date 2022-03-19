@@ -10,9 +10,6 @@ module lwohvye.eladmin.system {
     requires transitive spring.context.support;
     requires transitive spring.expression;
     requires transitive spring.websocket;
-    requires transitive spring.security.config;
-    requires transitive spring.security.crypto;
-    requires transitive spring.security.web;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
     requires transitive com.fasterxml.jackson.datatype.jsr310;

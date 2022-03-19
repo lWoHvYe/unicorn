@@ -15,6 +15,7 @@
  */
 package com.lwohvye.modules.security.config;
 
+import com.lwohvye.config.security.SimpleSecurityConfig;
 import com.lwohvye.modules.rabbitmq.config.RabbitMqConfig;
 import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
@@ -35,6 +36,7 @@ import com.lwohvye.utils.result.ResultUtil;
 import com.lwohvye.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,6 +71,7 @@ import java.util.Objects;
  * @author Zheng Jie,Hongyan Wang
  */
 @ConditionalOnExpression("!${local.sys.multi-security:false}") // 这里用了取反。非multi时开启。默认开启
+@ConditionalOnMissingBean(SimpleSecurityConfig.class) // 如果使用了简单配置，就不加载本配置了
 @Configuration
 // 添加该注解到@Configuration的类上，应用程序便可以使用自定义的WebSecurityConfigurer或拓展自WebSecurityConfigurerAdapter的配置类来装配Spring Security框架。
 @EnableWebSecurity

@@ -43,7 +43,6 @@ public class LogController {
 
     private final ILogService logService;
 
-    @Log("导出数据")
     @Operation(summary = "导出数据")
     @GetMapping(value = "/download")
     public void download(HttpServletResponse response, LogQueryCriteria criteria) throws IOException {
@@ -51,7 +50,6 @@ public class LogController {
         logService.download(logService.queryAll(criteria), response);
     }
 
-    @Log("导出错误数据")
     @Operation(summary = "导出错误数据")
     @GetMapping(value = "/error/download")
     public void downloadErrorLog(HttpServletResponse response, LogQueryCriteria criteria) throws IOException {

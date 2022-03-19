@@ -1,4 +1,3 @@
-
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围
 
@@ -106,7 +105,9 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 [Support for JDK16](https://github.com/rzwitserloot/lombok/issues/2681#)
 
 #### Java平台模块系统（JPMS）、Jigsaw 项目
+
 这个确切的讲，是在Java 9引入的
+
 ```
 JPMS对包可见性细化为：public to everyone、public but only to friend modules、public only within a module、protected、package、private
 模块系统的首要目的是为了封装。然后在有些时候，我们必须要打破封装来处理遗留代码或是运行测试。我们可以下面几个命令行参数来打破封装。
@@ -118,6 +119,7 @@ JPMS对包可见性细化为：public to everyone、public but only to friend mo
 ```
 
 Java 为 module-info.java 设计了专用的语法
+
 ```
 语法解读：(这里同样是不包括子包)
 
@@ -135,8 +137,9 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 ```
 
 在实际使用中，
+
 - 需要容器创建的bean，需要exports to spring.beans, 有的还需要spring.content，暂不清楚；
-- 包含注入的属性的bean，需要opens to spring.core。opens包含了exports，
+- 包含注入的属性的bean，需要opens to spring.core。~~opens包含了exports~~，当需要显示import时，只open是不行的，还是要export
 - controller需要exports to spring.web。
 - Aspect相关的需要 exports to aop
 - 还有那些需要反射的场景
@@ -146,28 +149,35 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 应该是有相关插件，用于生成module-info.java文件的。
 
 - [Project Jigsaw](http://openjdk.java.net/projects/jigsaw/quick-start)
-- [warn: requires transitive directive for an automatic module](https://stackoverflow.com/questions/49600947/how-to-suppress-the-requires-transitive-directive-for-an-automatic-module-warn) 
+- [warn: requires transitive directive for an automatic module](https://stackoverflow.com/questions/49600947/how-to-suppress-the-requires-transitive-directive-for-an-automatic-module-warn)
 - [jmod-example](https://github.com/khmarbaise/jdk9-jlink-jmod-example)
+
 ```shell
 # 将无法模块化的放到clib中，可模块化的放到mlib，将未升级模块的依赖放入mlib中，会自动模块化，称为自动模块
 # 当前待解决：模块 lwohvye.eladmin.starter 不具有 ModuleMainClass 属性，请使用 -m <模块>/<主类>。针对Spring Boot项目，应该有某个地方不一样
 java -p mlib -Dloader.path=clib -m lwohvye.eladmin.starter
 ```
+
 - ~~在Idea的 Run/Debug Configurations中的VM options中，部分可能需要调一下~~
-- 直接启动报异常，是因为部分依赖无法module化（无法得到 module description，在编译时有相关警告 can't extract module name from xxx.jar: Provider class xxx not int module），[具体原因](https://stackoverflow.com/questions/54682417/unable-to-derive-module-descriptor-provider-class-x-not-in-module)
+- 直接启动报异常，是因为部分依赖无法module化（无法得到 module description，在编译时有相关警告 can't extract module name from xxx.jar: Provider class xxx not int
+  module），[具体原因](https://stackoverflow.com/questions/54682417/unable-to-derive-module-descriptor-provider-class-x-not-in-module)
+
 ```
 Error occurred during initialization of boot layer
 java.lang.module.FindException: Unable to derive module descriptor for xxx.jar
 Caused by: java.lang.module.InvalidModuleDescriptorException: Provider class xxx.xxx.xxx not in module
 ```
+
 - 经简单验证，若无无法module化的依赖，是可以启动成功的
 - 另，若删除主启动类的module-info.java，以未命名模块的方式来运行，也是一种方式，这算是对Java 9之前的一个兼容
 
 IDEA中，两种启动方式的启动参数，另通过查看VM参数，module模式中有`--module-path`属性
+
 ```shell
 # 非module
 java -classpath lib com.lwohvye.AppSearchRun
 # module
 java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
 ```
+
 [SpringBoot jar包启动原理](https://www.lwohvye.com/2022/03/09/springboot-jar%e5%8c%85%e5%90%af%e5%8a%a8%e7%9a%84%e5%8e%9f%e7%90%86/)

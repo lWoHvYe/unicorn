@@ -20,7 +20,10 @@ module lwohvye.eladmin.common {
     requires transitive spring.data.commons;
     requires transitive spring.data.jpa;
     requires transitive spring.data.redis;
+    requires transitive spring.security.config;
     requires transitive spring.security.core;
+    requires transitive spring.security.crypto;
+    requires transitive spring.security.web;
     requires transitive spring.boot;
     requires transitive spring.boot.autoconfigure;
     requires transitive com.fasterxml.jackson.annotation;
@@ -55,6 +58,7 @@ module lwohvye.eladmin.common {
     exports com.lwohvye.base;
     exports com.lwohvye.config;
     exports com.lwohvye.config.cache;
+    exports com.lwohvye.config.security; // open未完全包含exports，至少import需要export
     exports com.lwohvye.config.swagger;
     exports com.lwohvye.constant;
     exports com.lwohvye.context;
@@ -71,6 +75,7 @@ module lwohvye.eladmin.common {
     opens com.lwohvye.base;
     opens com.lwohvye.config to spring.core;
     opens com.lwohvye.config.cache to spring.core;
+    opens com.lwohvye.config.security; // 这里应该能细化，先这样粗化，后续再说
     opens com.lwohvye.config.swagger to spring.core;
     opens com.lwohvye.utils to spring.core;
     opens com.lwohvye.utils.json to spring.core;
