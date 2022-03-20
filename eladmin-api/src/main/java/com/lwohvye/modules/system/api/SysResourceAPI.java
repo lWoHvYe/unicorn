@@ -43,4 +43,6 @@ public interface SysResourceAPI {
     @DeleteMapping
     ResponseEntity<Object> delete(@RequestBody Long[] ids);
 
+    @GetMapping("/queryAllRes")
+    ResponseEntity<Object> queryAllRes();
 }

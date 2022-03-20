@@ -15,7 +15,6 @@
  */
 package com.lwohvye.modules.system.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -45,12 +44,12 @@ public class UserInnerDto implements Serializable {
 
     private String username;
 
-    @JsonIgnore
+    // @JsonIgnore  // swarm化后，网关负责鉴权的化，这边就不能ignore了
     private String password;
 
     private Boolean enabled;
 
-    @JsonIgnore
+    // @JsonIgnore
     private Boolean isAdmin = false;
 
     private String description;

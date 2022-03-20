@@ -24,6 +24,7 @@ import com.lwohvye.annotation.log.Log;
 import com.lwohvye.modules.system.api.SysUserAPI;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.User;
+import com.lwohvye.modules.system.domain.vo.UserBaseVo;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;
 import com.lwohvye.modules.system.service.IDataService;
 import com.lwohvye.modules.system.service.IDeptService;
@@ -128,6 +129,13 @@ public class UserController implements SysUserAPI {
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "修改用户状态")
+    @Override
+    public ResponseEntity<Object> updateStatus(@RequestBody UserBaseVo userVo) {
+        userService.updateEnabled(userVo.getUsername(), userVo.getEnabled());
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+    }
+
     @Log("修改用户：个人中心")
     @Operation(summary = "修改用户：个人中心")
     @Override
@@ -196,6 +204,10 @@ public class UserController implements SysUserAPI {
         ReflectUtil.invoke(verifyService, "validated", CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
         userService.updateEmail(userDto.getUsername(), user.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> queryByName(@PathVariable String username) {
+        return new ResponseEntity<>(ResultInfo.success(userService.findInnerUserByName(username)), HttpStatus.OK);
     }
 
     /**

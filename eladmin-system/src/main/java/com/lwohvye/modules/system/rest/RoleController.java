@@ -133,6 +133,10 @@ public class RoleController implements SysRoleAPI {
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 
+    public ResponseEntity<Object> queryByUid(@PathVariable Long userId) {
+        return new ResponseEntity<>(ResultInfo.success(roleService.findByUserId(userId)), HttpStatus.OK);
+    }
+
     /**
      * 获取用户的角色级别
      *

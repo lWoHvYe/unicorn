@@ -39,6 +39,7 @@ import com.lwohvye.modules.system.service.mapstruct.UserMapper;
 import com.lwohvye.modules.system.subject.UserSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
+import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -285,11 +286,8 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
         }
         @NotBlank String username = user.getUsername();
         flushCache(username);
-        return new HashMap<>(1) {
-            {
-                put("avatar", file.getName());
-            }
-        };
+        return Map.of("avatar", file.getName());
+
     }
 
     @Override
@@ -304,6 +302,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(allEntries = true)
     public void updateEnabled(String username, Boolean enabled) {
+        Assert.hasText(username, "用户名不可为空");
         userRepository.updateEnabled(username, enabled);
 //        状态更新后，需清除相关信息
         flushCache(username);

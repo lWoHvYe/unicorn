@@ -20,6 +20,7 @@ import com.lwohvye.modules.system.api.SysResourceAPI;
 import com.lwohvye.modules.system.domain.Resource;
 import com.lwohvye.modules.system.service.IResourceService;
 import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +70,9 @@ public class ResourceController implements SysResourceAPI {
     public ResponseEntity<Object> delete(@RequestBody Long[] ids) {
         resourceService.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> queryAllRes() {
+        return new ResponseEntity<>(ResultInfo.success(resourceService.queryAllRes()), HttpStatus.OK);
     }
 }

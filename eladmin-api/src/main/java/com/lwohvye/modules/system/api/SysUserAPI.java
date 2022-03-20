@@ -17,8 +17,10 @@ package com.lwohvye.modules.system.api;
 
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.modules.system.domain.User;
+import com.lwohvye.modules.system.domain.vo.UserBaseVo;
 import com.lwohvye.modules.system.domain.vo.UserPassVo;
 import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -44,6 +46,9 @@ public interface SysUserAPI {
     @PutMapping
     ResponseEntity<Object> update(@Validated(Update.class) @RequestBody User resources) throws Exception;
 
+    @PostMapping("/updateStatus")
+    ResponseEntity<Object> updateStatus(@RequestBody UserBaseVo userVo);
+
     @PutMapping(value = "center")
     ResponseEntity<Object> center(@Validated(Update.class) @RequestBody User resources);
 
@@ -59,4 +64,6 @@ public interface SysUserAPI {
     @PostMapping(value = "/updateEmail/{code}")
     ResponseEntity<Object> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception;
 
+    @GetMapping("/name/{username}")
+    ResponseEntity<Object> queryByName(@PathVariable String username);
 }

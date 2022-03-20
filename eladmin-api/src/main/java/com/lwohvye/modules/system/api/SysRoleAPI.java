@@ -57,4 +57,6 @@ public interface SysRoleAPI {
     @DeleteMapping
     ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
 
+    @GetMapping("/uid/{userId}")
+    ResponseEntity<Object> queryByUid(@PathVariable Long userId);
 }

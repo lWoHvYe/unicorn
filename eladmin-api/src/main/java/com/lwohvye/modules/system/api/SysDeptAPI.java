@@ -48,4 +48,6 @@ public interface SysDeptAPI {
     @DeleteMapping
     ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
 
+    @GetMapping("/enabled/{userId}/{deptId}")
+    ResponseEntity<Object> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
 }
