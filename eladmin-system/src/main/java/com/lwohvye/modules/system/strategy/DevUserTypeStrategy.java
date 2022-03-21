@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.modules.system.handler;
+package com.lwohvye.modules.system.strategy;
 
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.modules.system.enums.UserTypeEnum;
@@ -42,5 +42,20 @@ public final class DevUserTypeStrategy implements AUserTypeStrategy {
         // 这里只是随便写一下，正常是走不到这个handler的
         permissions.add("admin-dev");
         return permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public void saySomething(Long userId) {
+        System.out.printf("%s ，能不能少整点Bug？？？%n", UserTypeEnum.DEV.getDesc());
+    }
+
+    @Override
+    public void beforeSay(Long userId) {
+        System.out.println("整理语言...");
+    }
+
+    @Override
+    public void afterSay(Long userId) {
+        System.out.println("脱口而出...");
     }
 }

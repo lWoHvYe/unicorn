@@ -21,7 +21,7 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.modules.system.domain.Dept;
 import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.handler.AuthHandlerContext;
+import com.lwohvye.modules.system.strategy.AuthHandlerContext;
 import com.lwohvye.modules.system.observer.MenuObserver;
 import com.lwohvye.modules.system.repository.RoleRepository;
 import com.lwohvye.modules.system.service.IRoleService;

@@ -13,21 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.modules.system.handler;
-
-import com.lwohvye.base.BaseService;
-import org.springframework.security.core.GrantedAuthority;
-
-import java.util.List;
 
 /**
- * 业务处理基类，密封类sealed。需通过permits指定子类。子类可以是final标记的实现类、sealed标记的密封类、non-sealed标记的非密封类
- *
- * @author Hongyan Wang
- * @date 2021年11月02日 16:42
+ * Provides basic classes for exception handling and version detection,
+ * and other core helpers that are not specific to any part of the framework.
+ * <a href="https://www.lwohvye.com/2021/11/29/java%e9%a1%b9%e7%9b%ae%e4%b8%ad%e7%9a%84package-info-java%e7%9a%84%e4%bd%9c%e7%94%a8/">package-info.java</a>
  */
-public sealed interface AUserTypeStrategy extends BaseService permits AdminUserTypeStrategy, NormalUserTypeStrategy, DevUserTypeStrategy {
+//@NonNullApi，包（Package）级别注解，指定参数和方法返回值默认不能为null；
+//@NonNullFields，包（Package）级别注解，用于变量不能为null；
+@NonNullApi
+@NonNullFields
+package com.lwohvye.modules.system.strategy;
 
-    List<GrantedAuthority> grantedAuth(Long userId);
-
-}
+import org.springframework.lang.NonNullApi;
+import org.springframework.lang.NonNullFields;

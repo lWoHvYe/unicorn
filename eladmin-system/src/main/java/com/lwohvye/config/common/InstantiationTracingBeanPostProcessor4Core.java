@@ -16,7 +16,7 @@
 package com.lwohvye.config.common;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.modules.system.handler.NormalUserTypeStrategy;
+import com.lwohvye.modules.system.strategy.NormalUserTypeStrategy;
 import com.lwohvye.modules.system.service.ITerminalService;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;

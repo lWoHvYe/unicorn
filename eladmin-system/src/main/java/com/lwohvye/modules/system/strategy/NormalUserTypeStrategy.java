@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.modules.system.handler;
+package com.lwohvye.modules.system.strategy;
 
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.modules.system.enums.UserTypeEnum;

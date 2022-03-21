@@ -45,7 +45,7 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.security.security.filter;
     exports com.lwohvye.modules.security.security.handler;
     exports com.lwohvye.modules.security.rest to spring.beans, spring.web;
-    exports com.lwohvye.modules.system.handler;
+    exports com.lwohvye.modules.system.strategy;
     exports com.lwohvye.modules.system.observer;
     exports com.lwohvye.modules.system.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.system.service;

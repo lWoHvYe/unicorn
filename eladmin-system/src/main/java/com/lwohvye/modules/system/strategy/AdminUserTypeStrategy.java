@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.modules.system.handler;
+package com.lwohvye.modules.system.strategy;
 
 import com.lwohvye.constant.SecurityConstant;
 import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
@@ -42,5 +42,16 @@ public final class AdminUserTypeStrategy implements AUserTypeStrategy {
         Set<String> permissions = new HashSet<>();
         permissions.add(SecurityConstant.ROLE_ADMIN);
         return permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public void sayHello(Long userId) {
+        System.out.printf("%s ，您好。%n", UserTypeEnum.ADMIN.getDesc());
+    }
+
+    @Override
+    public void sayBye(Long userId) {
+        // AUserTypeStrategy.super.sayBye(userId); 可以像这样调用父类公开的方法
+        System.out.printf("%s ，期待您的下次光临。%n", UserTypeEnum.ADMIN.getDesc());
     }
 }
