@@ -31,6 +31,8 @@ public class RabbitMqConfig {
     public static final String DIRECT_SYNC_EXCHANGE = "sync_direct_exchange";
     // topic交换机
     public static final String TOPIC_SYNC_EXCHANGE = "sync_topic_exchange";
+    // fanout交换机
+    public static final String FANOUT_SIMPLE_EXCHANGE = "simple_fanout_exchange";
     // 延迟队列交换机
     public static final String DIRECT_SYNC_TTL_EXCHANGE = "sync_direct_ttl_exchange";
     // 延迟队列交换机-插件版
@@ -61,7 +63,7 @@ public class RabbitMqConfig {
     // endregion
 
     /**
-     * 消费队列所绑定的交换机
+     * 消费队列所绑定的交换机。直接匹配
      */
     @Bean
     DirectExchange dataSyncDirect() {
@@ -83,6 +85,19 @@ public class RabbitMqConfig {
                 .build();
     }
 
+    /**
+     * 广播订阅。虽不如Topic灵活，但比较简单，将消息投递到所有绑定的队列，忽略Routing Key
+     *
+     * @return org.springframework.amqp.core.FanoutExchange
+     * @date 2022/3/21 3:47 PM
+     */
+    @Bean
+    FanoutExchange simpleFanoutDirect() {
+        return ExchangeBuilder
+                .fanoutExchange(FANOUT_SIMPLE_EXCHANGE)
+                .durable(true)
+                .build();
+    }
 
     /**
      * 实际消费队列
@@ -172,7 +187,7 @@ public class RabbitMqConfig {
     }
 
     /**
-     * topic交换机。支持路由通配符 *代表一个单词 #代表零个或多个单词
+     * topic交换机。支持路由通配符 *代表一个单词 #代表零个或多个单词。主题匹配
      *
      * @return org.springframework.amqp.core.TopicExchange
      * @date 2021/9/30 10:25 上午
@@ -233,7 +248,7 @@ public class RabbitMqConfig {
 
     //声明交换机
     @Bean
-    public Exchange exchangeTopicsInform() {
+    public TopicExchange exchangeTopicsInform() {
         return ExchangeBuilder.topicExchange(EXCHANGE_TOPICS_INFORM).durable(true).build();
     }
 

@@ -165,7 +165,7 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
                 Thread.sleep(5000);
                 result = (Boolean) redisUtils.get(uuid);
             }
-            if (!result) {
+            if (Boolean.FALSE.equals(result)) {
                 redisUtils.delete(uuid);
                 break;
             }

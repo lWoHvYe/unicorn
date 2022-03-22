@@ -29,10 +29,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RRateLimiter;
-import org.redisson.api.RateIntervalUnit;
-import org.redisson.api.RateType;
-import org.redisson.api.RedissonClient;
+import org.redisson.api.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -262,6 +259,61 @@ public class AuthorizationController {
             rateLimiter.acquire(2);
             // ...doSomething()
         });
+
+        // endregion
+
+        // region RKeys
+        RMap map = redissonClient.getMap("mymap"); // 支持map的相关操作，还有各种锁，属于本map纬度的各种锁（本质是把map和给定的key拼了一下）
+        map.getName(); // = mymap
+
+        RKeys keys = redissonClient.getKeys();
+
+        Iterable<String> allKeys = keys.getKeys();
+        Iterable<String> foundedKeys = keys.getKeysByPattern("key*");
+        long numOfDeletedKeys = keys.delete("obj1", "obj2", "obj3");
+        long deletedKeysAmount = keys.deleteByPattern("test?");
+        String randomKey = keys.randomKey();
+        long keysAmount = keys.count();
+        // endregion
+
+        // region Object Bucket 通用对象桶
+        RBucket<String> bucket = redissonClient.getBucket("anyObject");
+        bucket.set("str1");
+        var obj = bucket.get();
+
+        bucket.trySet("str3");
+        bucket.compareAndSet("str4", "str5"); // CAS
+        bucket.getAndSet("str6");
+        // endregion
+
+        // region HyperLogLog 基数估计算法
+        RHyperLogLog<Integer> hpLog = redissonClient.getHyperLogLog("hpLog");
+        hpLog.add(1);
+        hpLog.add(2);
+        hpLog.add(3);
+
+        hpLog.count(); // 里面方法也挺多的
+
+        var longRFuture = hpLog.countAsync();
+        if (longRFuture.isDone()) {
+            try {
+                var aLong = longRFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        // endregion
+
+        // region LongAdder 整长型累加器。对于需要并发对同一对象加减的操作，累加器比Atomic系列性能要高很多
+        RLongAdder atomicLong = redissonClient.getLongAdder("myLongAdder");
+
+        atomicLong.add(12);
+        atomicLong.increment();
+        atomicLong.decrement();
+        atomicLong.sum();
+
+        // 当不再使用整长型累加器对象的时候应该自行手动销毁，如果Redisson对象被关闭（shutdown）了，则不用手动销毁。
+        atomicLong.destroy();
 
         // endregion
 
