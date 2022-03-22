@@ -33,7 +33,7 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.mnt.service.mapstruct;
     exports com.lwohvye.modules.mnt.util;
     exports com.lwohvye.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
-    exports com.lwohvye.modules.quartz.repository to spring.beans; // 若要使用JRebel，则需要exports to unnamed module
+    exports com.lwohvye.modules.quartz.repository; // 若要使用JRebel + XRebel，则需要exports to unnamed module
     exports com.lwohvye.modules.quartz.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.quartz.service;
     exports com.lwohvye.modules.quartz.task to spring.beans;
@@ -52,8 +52,8 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.system.service.impl to spring.beans, hutool.all;
     exports com.lwohvye.modules.system.service.local;
     exports com.lwohvye.modules.system.service.mapstruct;
-    exports com.lwohvye.modules.system.subject to spring.aop;
-    exports com.lwohvye.modules.system.repository to spring.beans, lwohvye.eladmin.search; // 这里先这样
+    exports com.lwohvye.modules.system.subject to spring.aop, spring.core;
+    exports com.lwohvye.modules.system.repository; // 这里先这样
 
     opens com.lwohvye.config.common;
     opens com.lwohvye.config.datasource;
