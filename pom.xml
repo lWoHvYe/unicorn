@@ -90,7 +90,7 @@
         <logstash.version>7.0.1</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
         <logback.version>1.2.11</logback.version>
-        <redisson.version>3.16.8</redisson.version>
+        <redisson.version>3.17.0</redisson.version>
         <guava.version>31.1-jre</guava.version>
         <poi.version>5.2.2</poi.version>
         <xerces.version>2.12.2</xerces.version>
