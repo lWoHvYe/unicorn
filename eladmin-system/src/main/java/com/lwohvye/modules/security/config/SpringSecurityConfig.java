@@ -246,7 +246,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             // 针对于密码错误行为，需进行记录
             if (authenticationException instanceof BadCredentialsException) {
                 var username = request.getAttribute("username");
-                if (!Objects.isNull(username)) {
+                if (Objects.nonNull(username)) {
                     var ip = StringUtils.getIp(request);
                     var lockedIp = ip + "||authLocked||";
 

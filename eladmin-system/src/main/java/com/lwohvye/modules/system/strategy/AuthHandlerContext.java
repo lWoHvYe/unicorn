@@ -15,10 +15,18 @@
  */
 package com.lwohvye.modules.system.strategy;
 
+import com.lwohvye.modules.system.annotation.UserTypeHandlerAnno;
+import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 策略模式上下文（环境类），给外部调用，该类的注入由相关的HandlerProcessor实现
@@ -28,7 +36,34 @@ import java.util.Map;
  * @see AuthHandlerProcessor
  */
 @Slf4j
-public record AuthHandlerContext(Map<Integer, AUserTypeStrategy> handlerMap) {
+@Component
+@ConditionalOnExpression("!${local.sys.init-bf:false}")
+public class AuthHandlerContext {
+
+    Map<Integer, AUserTypeStrategy> strategyMap;
+
+    // BeanPostProcessor是在spring容器加载了bean的定义文件并且实例化bean之后执行的。BeanPostProcessor的执行顺序是在BeanFactoryPostProcessor之后。
+    // 当使用BeanFactoryPostProcessor来注入属性时，这个后置处理是不会执行到的
+    @PostConstruct
+    public void doInit() {
+        SpringContextHolder.addCallBacks(this::initStrategyMap);
+    }
+
+    public void initStrategyMap() {
+        if (Objects.isNull(strategyMap)) {
+            synchronized (this) {
+                if (Objects.isNull(strategyMap)) {
+                    strategyMap = new HashMap<>();
+                    var tCollection = SpringContextHolder.getBeansOfType(AUserTypeStrategy.class).values();
+                    for (var t : tCollection) {
+                        var userTypeHandlerAnno = t.getClass().getAnnotation(UserTypeHandlerAnno.class);
+                        if (ObjectUtils.isEmpty(userTypeHandlerAnno)) continue;
+                        strategyMap.put(userTypeHandlerAnno.value().getType(), t);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 获取实例。handlerMap由另一个类来初始化
@@ -43,7 +78,7 @@ public record AuthHandlerContext(Map<Integer, AUserTypeStrategy> handlerMap) {
 
         Assert.notNull(userType, "用户类型不可为空");
 
-        var clazz = handlerMap.get(userType);
+        var clazz = strategyMap.get(userType);
 
         Assert.notNull(clazz, "该类型无业务支撑，请期待后续支持");
 

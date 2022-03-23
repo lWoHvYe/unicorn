@@ -79,6 +79,7 @@ module lwohvye.eladmin.system {
     opens com.lwohvye.modules.system.service.impl to spring.core;
     opens com.lwohvye.modules.system.service.local;
     opens com.lwohvye.modules.system.service.mapstruct;
+    opens com.lwohvye.modules.system.strategy to spring.core;
     opens com.lwohvye.modules.system.repository to spring.core;
 
     // 理论上这几个也要opens，简单而言，未open的部分是无法被外界访问的。

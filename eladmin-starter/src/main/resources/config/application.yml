@@ -108,3 +108,5 @@ local:
       user: sys_user
     # 相同服务的各实例会有不同的配置，从而使得一些事件能被各实例都消费一次，理论上有更好地解决方案
     sp-sync-queue: xs.sp-sync.queue
+    # 某个Bean的定义方式，默认不使用BeanFactoryPostProcessor来定义她
+    init-bf: false
