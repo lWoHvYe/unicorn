@@ -54,8 +54,7 @@ public class AuthHandlerProcessor implements BeanFactoryPostProcessor {
             var beanInstance = getBeansWithAnnotation(configurableListableBeanFactory, AUserTypeStrategy.class, UserTypeHandlerAnno.class, temp.getType());
             if (Objects.nonNull(beanInstance)) handlerMap.put(temp.getType(), beanInstance);
         }
-        var context = new AuthHandlerContext();
-        context.strategyMap = handlerMap;
+        var context = new AuthHandlerContext(handlerMap);
         //单例注入，单例模式
         configurableListableBeanFactory.registerSingleton(AuthHandlerContext.class.getName(), context);
     }

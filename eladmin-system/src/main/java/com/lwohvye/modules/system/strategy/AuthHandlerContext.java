@@ -23,10 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 策略模式上下文（环境类），给外部调用，该类的注入由相关的HandlerProcessor实现
@@ -40,28 +38,29 @@ import java.util.Objects;
 @ConditionalOnExpression("!${local.sys.init-bf:false}")
 public class AuthHandlerContext {
 
-    Map<Integer, AUserTypeStrategy> strategyMap;
+    final Map<Integer, AUserTypeStrategy> strategyMap;
 
-    // BeanPostProcessor是在spring容器加载了bean的定义文件并且实例化bean之后执行的。BeanPostProcessor的执行顺序是在BeanFactoryPostProcessor之后。
-    // 当使用BeanFactoryPostProcessor来注入属性时，这个后置处理是不会执行到的
-    @PostConstruct
-    public void doInit() {
+    public AuthHandlerContext() {
+        strategyMap = new HashMap<>();
         SpringContextHolder.addCallBacks(this::initStrategyMap);
     }
 
+    public AuthHandlerContext(Map<Integer, AUserTypeStrategy> strategyMap) {
+        this.strategyMap = strategyMap;
+    }
+
+    // BeanPostProcessor是在spring容器加载了bean的定义文件并且实例化bean之后执行的。BeanPostProcessor的执行顺序是在BeanFactoryPostProcessor之后。
+    // 当使用BeanFactoryPostProcessor来注入属性时，这个后置处理是不会执行到的
+    // @PostConstruct
+    // public void doInit() {
+    // }
+
     public void initStrategyMap() {
-        if (Objects.isNull(strategyMap)) {
-            synchronized (this) {
-                if (Objects.isNull(strategyMap)) {
-                    strategyMap = new HashMap<>();
-                    var tCollection = SpringContextHolder.getBeansOfType(AUserTypeStrategy.class).values();
-                    for (var t : tCollection) {
-                        var userTypeHandlerAnno = t.getClass().getAnnotation(UserTypeHandlerAnno.class);
-                        if (ObjectUtils.isEmpty(userTypeHandlerAnno)) continue;
-                        strategyMap.put(userTypeHandlerAnno.value().getType(), t);
-                    }
-                }
-            }
+        var tCollection = SpringContextHolder.getBeansOfType(AUserTypeStrategy.class).values();
+        for (var t : tCollection) {
+            var userTypeHandlerAnno = t.getClass().getAnnotation(UserTypeHandlerAnno.class);
+            if (ObjectUtils.isEmpty(userTypeHandlerAnno)) continue;
+            strategyMap.put(userTypeHandlerAnno.value().getType(), t);
         }
     }
 
