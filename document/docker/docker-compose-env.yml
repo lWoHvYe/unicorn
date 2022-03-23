@@ -13,6 +13,40 @@ services:
       - /mydata/mysql/data/db:/var/lib/mysql #数据文件挂载
       - /mydata/mysql/data/conf:/etc/mysql/conf.d #配置文件挂载
       - /mydata/mysql/log:/var/log/mysql #日志文件挂载
+  mysql-slave01:
+    image: mysql:latest
+    container_name: mysql-slave01
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root #设置root帐号密码
+    ports:
+      - 3308:3306
+    volumes:
+      - /mydata/mysql-slave01/data/db:/var/lib/mysql #数据文件挂载
+      - /mydata/mysql-slave01/data/conf:/etc/mysql/conf.d #配置文件挂载
+      - /mydata/mysql-slave01/log:/var/log/mysql #日志文件挂载
+    depends_on:
+      - mysql
+    links:
+      - mysql
+  mysql-slave02:
+    image: mysql:latest
+    container_name: mysql-slave02
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root #设置root帐号密码
+    ports:
+      - 3310:3306
+    volumes:
+      - /mydata/mysql-slave02/data/db:/var/lib/mysql #数据文件挂载
+      - /mydata/mysql-slave02/data/conf:/etc/mysql/conf.d #配置文件挂载
+      - /mydata/mysql-slave02/log:/var/log/mysql #日志文件挂载
+    depends_on:
+      - mysql
+    links:
+      - mysql
   redis:
     image: redis:latest
     container_name: redis

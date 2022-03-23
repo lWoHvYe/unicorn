@@ -198,6 +198,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - RabbitMQ 鉴权结果记录、用户多次验证失败锁定一段时间后自动解锁、发布-订阅
 - ELK 日志系统，若不需要可调整logback-spring.xml中的配置
 - 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ记得装延迟插件，ES记得装IK
+- 若想搭建k8s版，可[参照](https://github.com/lWoHvYe/mall-swarm/tree/main/document/kubernetes/env) ,这个是基于NFS挂载的。
 
 #### 特别鸣谢
 
