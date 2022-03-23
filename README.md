@@ -161,7 +161,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 - `eladmin-generator` 为系统的代码生成模块，代码生成的模板在 system 模块中
 
-- `eladmin-starter` 启动类,项目入口，包含模块及组建配置
+- `eladmin-starter` 启动类,项目入口，包含模块及组件配置
 
 - `eladmin-search` 通过mongodb进行最基础的检索，整合elasticsearch，SPI相关demo
 
@@ -195,7 +195,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - Java 17 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
 - Redis 6.0 缓存
-- RabbitMQ 鉴权结果记录、用户多次验证失败锁定一段时间后自动解锁
+- RabbitMQ 鉴权结果记录、用户多次验证失败锁定一段时间后自动解锁、发布-订阅
 - ELK 日志系统，若不需要可调整logback-spring.xml中的配置
 - 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ记得装延迟插件，ES记得装IK
 

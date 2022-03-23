@@ -25,9 +25,9 @@ spring:
         # 连接在池中最大生存的时间
         max-evictable-idle-time-millis: 900000
         # 是否自动回收超时连接
-#        remove-abandoned: true
+        #        remove-abandoned: true
         # 超时时间(以秒数为单位)
-#        remove-abandoned-timeout: 180
+        #        remove-abandoned-timeout: 180
         test-while-idle: true
         test-on-borrow: false
         test-on-return: false
@@ -73,9 +73,9 @@ spring:
         # 连接在池中最大生存的时间
         max-evictable-idle-time-millis: 900000
         # 是否自动回收超时连接
-#        remove-abandoned: true
+        #        remove-abandoned: true
         # 超时时间(以秒数为单位)
-#        remove-abandoned-timeout: 180
+        #        remove-abandoned-timeout: 180
         # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
         test-while-idle: true
         # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
@@ -124,9 +124,9 @@ spring:
         # 连接在池中最大生存的时间
         max-evictable-idle-time-millis: 900000
         # 是否自动回收超时连接
-#        remove-abandoned: true
+        #        remove-abandoned: true
         # 超时时间(以秒数为单位)
-#        remove-abandoned-timeout: 180
+        #        remove-abandoned-timeout: 180
         # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
         test-while-idle: true
         # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
@@ -179,31 +179,33 @@ spring:
     props:
       sql:
         show：true
-# 分库分表参考：https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87
+  # 分库分表参考：https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87
 
   # cache配置
   cache:
     type: redis
   # redis配置
   redis:
-      #详细版的redisson配置可参考：https://github.com/redisson/redisson/tree/master/redisson-spring-boot-starter
-  # Connection URL, will override host, port and password (user will be ignored), e.g. redis://user:password@example.com:6379
-#    url: redis://10.211.55.140:6379
-#    timeout: 2000 # 连接或读取超时时长（毫秒）
-#    database: 0
+    #详细版的redisson配置可参考：https://github.com/redisson/redisson/tree/master/redisson-spring-boot-starter
+    # Connection URL, will override host, port and password (user will be ignored), e.g. redis://user:password@example.com:6379
+    #    url: redis://10.211.55.140:6379
+    #    timeout: 2000 # 连接或读取超时时长（毫秒）
+    #    database: 0
     redisson:
       file: classpath:redisson.yaml
-#    jedis:
-#      pool:
-#        max-active: 10  # 连接池最大连接数（使用负值表示没有限制）
-#        max-wait: 800 # 连接池最大阻塞等待时间（使用负值表示没有限制）
-#        max-idle: 5 # 连接池中的最大空闲连接
-#        min-idle: 2 # 连接池中的最小空闲连接
+  #    jedis:
+  #      pool:
+  #        max-active: 10  # 连接池最大连接数（使用负值表示没有限制）
+  #        max-wait: 800 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+  #        max-idle: 5 # 连接池中的最大空闲连接
+  #        min-idle: 2 # 连接池中的最小空闲连接
 
   ##### RabbitMQ ####
   rabbitmq:
-    host: 10.211.55.140 # rabbitmq的连接地址
-    port: 5672 # rabbitmq的连接端口号
+    #    RabbitMQ集群，通过addresses配置，多个以逗号分隔(优先取addresses，然后再取host)
+    addresses: 10.211.55.140:5672,10.211.55.140:5674
+    #    host: 10.211.55.140 # rabbitmq的连接地址
+    #    port: 5672 # rabbitmq的连接端口号
     virtual-host: /eladmin # rabbitmq的虚拟host
     username: admin # rabbitmq的用户名
     password: admin # rabbitmq的密码
@@ -232,44 +234,44 @@ spring:
       max-file-size: 20MB #限制单个文件大小
       max-request-size: 50MB #限制请求总量
 
-# 登录相关配置
-#login:
-  # 登录缓存
-#  cache-enable: true
-  #  是否限制单用户登录
-#  single-login: false
-  #  验证码
-#  login-code:
+    # 登录相关配置
+    #login:
+    # 登录缓存
+    #  cache-enable: true
+    #  是否限制单用户登录
+    #  single-login: false
+    #  验证码
+    #  login-code:
     #  验证码类型配置 查看 LoginProperties 类
-#    code-type: gif
+    #    code-type: gif
     #  登录图形验证码有效时间/分钟
-#    expiration: 2
+    #    expiration: 2
     #  验证码高度
-#    width: 111
+    #    width: 111
     #  验证码宽度
-#    height: 36
+    #    height: 36
     # 内容长度
-#    length: 4
+    #    length: 4
     # 字体名称，为空则使用默认字体
-#    font-name:
+    #    font-name:
     # 字体大小
 #    font-size: 25
 
 #jwt
 jwt:
-#  header: Authorization
+  #  header: Authorization
   # 令牌前缀
-#  token-start-with: Bearer
+  #  token-start-with: Bearer
   # 必须使用最少88位的Base64对该令牌进行编码
   base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI=
   # 令牌过期时间 此处单位/毫秒 ，默认2小时，可在此网站生成 https://www.convertworld.com/zh-hans/time/milliseconds.html
-#  token-validity-in-seconds: 7200000
+  #  token-validity-in-seconds: 7200000
   # 在线用户key
-#  online-key: online-token-
+  #  online-key: online-token-
   # 验证码
-#  code-key: code-key-
+  #  code-key: code-key-
   # token 续期检查时间范围（默认30分钟，单位毫秒），在token即将过期的一段时间内用户操作了，则给用户的token续期
-#  detect: 1800000
+  #  detect: 1800000
   # 续期时间范围，默认1小时，单位毫秒
 #  renew: 3600000
 
@@ -306,8 +308,8 @@ springdoc:
 
   # 布尔值。实现OpenApi规范的打印。
   writer-with-default-pretty-printer: true
-#  https://springdoc.org/faq.html#how-can-i-map-pageable-spring-date-commons-object-to-correct-url-parameter-in-swagger-ui
-#  当前未生效
+  #  https://springdoc.org/faq.html#how-can-i-map-pageable-spring-date-commons-object-to-correct-url-parameter-in-swagger-ui
+  #  当前未生效
   model-converters:
     pageable-converter:
       enabled: true
