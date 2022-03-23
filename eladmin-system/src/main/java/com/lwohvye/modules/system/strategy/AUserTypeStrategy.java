@@ -47,7 +47,7 @@ public sealed interface AUserTypeStrategy extends BaseService permits AdminUserT
     // endregion
 
     // region 给外部调用
-    // 使用default可以在扩展的同时，减少对下层各实现的影响
+    // 使用default可以在扩展的同时，减少对下层各实现的影响，这里也算是一种模板方法
     default void sayHello(Long userId) {
         beforeSay(userId);
         saySomething(userId); // 这也是一种设计方式，预留一些扩展点，子类可进行扩展
