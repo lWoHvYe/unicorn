@@ -104,7 +104,7 @@ public class RabbitMqConfig {
      */
     @Bean
     public Queue dataSyncQueue() {
-        return new Queue(DATA_SYNC_QUEUE);
+        return new Queue(DATA_SYNC_QUEUE); // 这种方式。默认持久化
     }
 
     /**
@@ -113,7 +113,7 @@ public class RabbitMqConfig {
     @Bean
     public Queue dataSyncTtlQueue() {
         return QueueBuilder
-                .durable(DATA_SYNC_TTL_QUEUE)
+                .durable(DATA_SYNC_TTL_QUEUE) // 这个durable，就是创建个持久化的
                 .withArgument("x-dead-letter-exchange", DIRECT_SYNC_EXCHANGE)//到期后转发的交换机
                 .withArgument("x-dead-letter-routing-key", DATA_SYNC_ROUTE_KEY)//到期后转发的路由键
                 .build();

@@ -10,6 +10,8 @@
 本项目在原eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
 ---
+本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
+
 启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
 详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)
 
