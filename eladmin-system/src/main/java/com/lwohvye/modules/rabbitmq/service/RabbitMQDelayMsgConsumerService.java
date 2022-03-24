@@ -19,10 +19,10 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.modules.rabbitmq.config.RabbitMqConfig;
-import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.modules.system.service.local.AuthMQService;
 import com.lwohvye.utils.MailAdapter;
 import com.lwohvye.utils.json.JsonUtils;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -80,6 +80,11 @@ public class RabbitMQDelayMsgConsumerService {
             log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, amqpMsgEntityStr);
             // 处理完成，根据结果记录相关表（看业务需求）。若处理报错，需邮件通知
         }
+    }
+
+    @RabbitHandler
+    public void handleMsg(byte[] bytes) {
+        handle(new String(bytes));
     }
 
 }
