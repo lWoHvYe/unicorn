@@ -50,6 +50,7 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.modules.system.rest to spring.beans, spring.web;
     exports com.lwohvye.modules.system.service;
     exports com.lwohvye.modules.system.service.impl to spring.beans, hutool.all;
+    exports com.lwohvye.modules.system.service.version to spring.beans;
     exports com.lwohvye.modules.system.service.local;
     exports com.lwohvye.modules.system.service.mapstruct;
     exports com.lwohvye.modules.system.subject to spring.aop, spring.core;
