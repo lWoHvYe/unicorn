@@ -15,19 +15,19 @@
  */
 package com.lwohvye.modules.rabbitmq.service;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.lwohvye.modules.rabbitmq.config.RabbitMqConfig;
 import com.lwohvye.modules.system.service.local.AuthMQService;
 import com.lwohvye.utils.MailAdapter;
-import com.lwohvye.utils.json.JsonUtils;
 import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.utils.rabbitmq.YRabbitAbstractConsumer;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
@@ -49,37 +49,31 @@ import java.util.Map;
 
 // @RabbitListener 可以标注在类上面，需配合 @RabbitHandler 注解一起使用
 // @RabbitListener 标注在类上面表示当有收到消息的时候，就交给 @RabbitHandler 的方法处理，具体使用哪个方法处理，根据 MessageConverter 转换后的参数类型
-public class RabbitMQDelayMsgConsumerService {
+public class RabbitMQDelayMsgConsumerService extends YRabbitAbstractConsumer {
 
     @Autowired
     private AuthMQService authMQService;
 
+    @Autowired
+    public void setRedissonClient(RedissonClient redissonClient) {
+        super.redissonClient = redissonClient;
+    }
 
     // 消费者本身是顺序消费的，且可以避免线程安全问题，有考虑过引入异步，但就无法保证顺序性了，还要解决线程安全问题。等有合适的场景了再做尝试
     @RabbitHandler
     public void handle(String amqpMsgEntityStr) {
-        var amqpMsgEntity = JsonUtils.toJavaObject(amqpMsgEntityStr, AmqpMsgEntity.class);
-        var msgType = amqpMsgEntity.getMsgType();
-        var msgData = amqpMsgEntity.getMsgData();
-        try {
-            if (StrUtil.isBlank(msgData))
-                return;
-            // 鉴权类
-            if (ObjectUtil.equals(msgType, "auth")) {
-                var extraData = amqpMsgEntity.getExtraData();
-                if (StrUtil.isNotBlank(extraData))
-                    ReflectUtil.invoke(authMQService, extraData, msgData);
-            }
-        } catch (Exception e) {
+        baseConsumer(amqpMsgEntityStr, "auth", null, msgEntity -> {
+            var extraData = msgEntity.getExtraData();
+            if (StringUtils.hasText(extraData))
+                ReflectUtil.invoke(authMQService, extraData, msgEntity.getMsgData());
+            return null;
+        }, errMsg -> {
             var to = "";
             var subject = "Consume Msg Error" + this.getClass().getSimpleName();
             var templateName = "email/noticeEmail.ftl";
-            var res = MailAdapter.sendTemplatedMail(to, subject, templateName, Map.of("errMsg", e.getMessage()));
-            log.error(" Consume Msg Error, Reason: {} || Msg detail: {} || NoticeRes {} ", e.getMessage(), amqpMsgEntityStr, res);
-        } finally {
-            log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, amqpMsgEntityStr);
-            // 处理完成，根据结果记录相关表（看业务需求）。若处理报错，需邮件通知
-        }
+            var res = MailAdapter.sendTemplatedMail(to, subject, templateName, Map.of("errMsg", errMsg));
+            log.error(" Consume Msg Error, Reason: {} || Msg detail: {} || NoticeRes {} ", errMsg, amqpMsgEntityStr, res);
+        });
     }
 
     @RabbitHandler
@@ -87,5 +81,14 @@ public class RabbitMQDelayMsgConsumerService {
         handle(new String(bytes));
     }
 
+    @Override
+    public void baseBeforeConsumer(AmqpMsgEntity msgEntity) {
+
+    }
+
+    @Override
+    public void baseBeforeMessageConsumer(AmqpMsgEntity msgEntity) {
+
+    }
 }
 
