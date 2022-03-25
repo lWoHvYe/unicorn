@@ -39,6 +39,8 @@ import java.util.concurrent.TimeUnit;
 public class RabbitMQSPMsgConsumerService {
 
     private UserLocalCache userLocalCache;
+
+    @Autowired
     private RedissonClient redissonClient;
 
     @Autowired // Spring循环依赖问题，可以通过将构造注入改为setter注入的方式解决（三个Map）。也可以使用@Lazy注解。还有些别的解决方式
