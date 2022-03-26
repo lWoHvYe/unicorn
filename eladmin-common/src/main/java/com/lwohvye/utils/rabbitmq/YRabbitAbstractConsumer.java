@@ -108,6 +108,7 @@ public abstract class YRabbitAbstractConsumer {
             return consumerFunction.apply(amqpMsgEntity);
         } catch (Exception e) {
             log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", e.getMessage(), msgBody);
+            // 这里需考量，当异常时，若做了避免重复消费的处理，应如何处理，这部分放到异常处理逻辑 consumerFailed 中更好一些，根据具体业务情况来做不同的处理
             consumerFailed.accept(e.getMessage());
             return null;
         } finally {

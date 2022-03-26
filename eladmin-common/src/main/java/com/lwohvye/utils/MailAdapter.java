@@ -17,9 +17,7 @@
 package com.lwohvye.utils;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
-import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 
 import java.util.Map;
@@ -45,17 +43,16 @@ public class MailAdapter {
      */
     public static String sendTemplatedMail(String to, String subject, String templateName, Map<String, Object> paramsMap) {
 
-        // 基于模版生成正文
-        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
-        Template template = engine.getTemplate(templateName);
-        var text = template.render(paramsMap);
-        Object mailUtils;
         try {
-            mailUtils = SpringContextHolder.getBean(BEAN_NAME);
+            // 基于模版生成正文
+            var engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+            var template = engine.getTemplate(templateName);
+            var text = template.render(paramsMap);
+            var mailUtils = SpringContextHolder.getBean(BEAN_NAME);
+            ReflectUtil.invoke(mailUtils, "sendMail", to, subject, text);
         } catch (Exception ex) {
             return String.format("获取 %s 异常，原因 %s ，请确认是否引入相关模块", BEAN_NAME, ex.getMessage());
         }
-        ReflectUtil.invoke(mailUtils, "sendMail", to, subject, text);
         return "若未收到邮件，请检查邮箱配置";
     }
 }

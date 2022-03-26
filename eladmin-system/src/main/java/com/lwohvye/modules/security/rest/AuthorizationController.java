@@ -170,7 +170,27 @@ public class AuthorizationController {
                 lock.unlock();
         }
 
-        // Redisson还提供了联锁（MultiLock）和红锁（RedLock），用于关联多个锁对象（可能来自不同的Redisson实例），加解锁保证几个锁都成功获取或释放（联锁保证全部成功，红锁保证大部分成功）
+        // Redisson还提供了联锁（MultiLock）和红锁（RedLock），用于关联多个锁对象（可能来自不同的Redisson实例），加解锁保证几个锁都成功获取或释放（联锁保证锁全部加成功，红锁保证在大部分节点锁加成功）
+        /*
+        // 锁可以来自不同的实例
+        var lock1 = redissonClient1.getLock("lock1");
+        var lock2 = redissonClient2.getLock("lock2");
+        var lock3 = redissonClient3.getLock("lock3");
+
+        var multiLock = new RedissonMultiLock(lock1, lock2, lock3);
+        // 同时加锁：lock1 lock2 lock3
+        // 所有的锁都上锁成功才算成功。
+        multiLock.lock();
+        ...
+        multiLock.unlock();
+        -----------------------------------------------------------------
+        var redLock = new RedissonRedLock(lock1, lock2, lock3);
+        // 同时加锁：lock1 lock2 lock3
+        // 红锁在大部分节点上加锁成功就算成功。
+        redLock.lock();
+        ...
+        redLock.unlock()
+        */
         // endregion
 
         // region   读写锁 RReadWriteLock
