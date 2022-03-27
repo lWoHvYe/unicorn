@@ -165,4 +165,14 @@ public abstract class YRabbitAbstractConsumer {
         });
     }
 
+    protected <T> void reConsumeMsg(Consumer<T> consumer, T tMsg) {
+        if (Message.class.isInstance(tMsg)) {
+            reConsumeMsg((Consumer<Message>) consumer, Message.class.cast(tMsg));
+        } else if (String.class.isInstance(tMsg)) {
+            reConsumeMsg((Consumer<String>) consumer, String.class.cast(tMsg));
+        } else {
+            log.warn("暂不支持类型 {} ，请自行定义扩展", tMsg.getClass().getSimpleName());
+        }
+    }
+
 }
