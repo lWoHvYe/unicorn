@@ -68,6 +68,7 @@ public class RabbitMQDelayMsgConsumerService extends YRabbitAbstractConsumer {
                 ReflectUtil.invoke(authMQService, extraData, msgEntity.getMsgData());
             return null;
         }, errMsg -> {
+            // reConsumeMsg(this::handle, amqpMsgEntityStr);
             var to = "";
             var subject = "Consume Msg Error" + this.getClass().getSimpleName();
             var templateName = "email/noticeEmail.ftl";

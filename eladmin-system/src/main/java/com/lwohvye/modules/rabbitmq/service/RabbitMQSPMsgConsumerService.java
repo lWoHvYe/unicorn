@@ -51,12 +51,17 @@ public class RabbitMQSPMsgConsumerService extends YRabbitAbstractConsumer {
     @RabbitHandler
     @RabbitListener(queues = "#{localCoreConfig.SP_SYNC_DELAY_QUEUE}") // 可以通过SpEL从别处获取监听的队列名
     public void spMsgConsumer(Message message) {
-        baseMessageConsumer(message, "sp", LocalCoreConfig.ORIGIN, "ConsumerSpMsgId", msgEntity -> {
+        var curOrigin = LocalCoreConfig.ORIGIN;
+        var checkedCache = "ConsumerSpMsgId";
+        baseMessageConsumer(message, "sp", curOrigin, checkedCache, msgEntity -> {
             var extraData = msgEntity.getExtraData();
             if (StringUtils.hasText(extraData))
                 ReflectUtil.invoke(userLocalCache, extraData, msgEntity.getMsgData(), false);
             return null;
         }, s -> {
+            // 先移除消费过的标志，再主动重新消费一下。考虑了一下，这种cancel还是交给子类，否则要额外传个Consumer进去了
+            redissonClient.getMapCache(checkedCache + curOrigin).remove(message.getMessageProperties().getMessageId());
+            reConsumeMsg(this::spMsgConsumer, message);
         });
     }
 

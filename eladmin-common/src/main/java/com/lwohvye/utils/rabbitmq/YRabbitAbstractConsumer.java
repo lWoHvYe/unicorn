@@ -23,6 +23,8 @@ import org.springframework.amqp.core.Message;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -34,6 +36,10 @@ import java.util.function.Function;
  */
 @Slf4j
 public abstract class YRabbitAbstractConsumer {
+
+    // 使用线程池，做资源隔离
+    static final ThreadPoolExecutor SIMPLE_EXECUTOR = new ThreadPoolExecutor(8, 10, 200, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100));
+
 
     // 若用到该属性，子类需通过set注入
     protected RedissonClient redissonClient;
@@ -108,7 +114,6 @@ public abstract class YRabbitAbstractConsumer {
             return consumerFunction.apply(amqpMsgEntity);
         } catch (Exception e) {
             log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", e.getMessage(), msgBody);
-            // 这里需考量，当异常时，若做了避免重复消费的处理，应如何处理，这部分放到异常处理逻辑 consumerFailed 中更好一些，根据具体业务情况来做不同的处理
             consumerFailed.accept(e.getMessage());
             return null;
         } finally {
@@ -117,5 +122,47 @@ public abstract class YRabbitAbstractConsumer {
     }
 
     public abstract void baseBeforeMessageConsumer(AmqpMsgEntity msgEntity);
+
+    /**
+     * 暂停2s后，重新消费，只会重复一次
+     *
+     * @param consumer 消费逻辑
+     * @param message  消费对象
+     * @date 2022/3/27 10:52 AM
+     */
+    protected void reConsumeMsg(Consumer<Message> consumer, Message message) {
+        // 线程池来执行，异步
+        SIMPLE_EXECUTOR.execute(() -> {
+            // 打个标记，只会重消费一次，不然就无穷无尽了
+            var mask = "ReConsumed";
+            var header = message.getMessageProperties().getHeader(mask);
+            if (Objects.isNull(header)) {
+                message.getMessageProperties().setHeader(mask, "Ignored");
+                try {
+                    // 暂停2s后，再重新消费一次
+                    Thread.sleep(1500L);
+                    consumer.accept(message);
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+    }
+
+    protected void reConsumeMsg(Consumer<String> consumer, String strMsg) {
+        SIMPLE_EXECUTOR.execute(() -> {
+            var amqpMsgEntity = JsonUtils.toJavaObject(strMsg, AmqpMsgEntity.class);
+            if (!amqpMsgEntity.isConsumed()) {
+                amqpMsgEntity.setConsumed(true);
+                try {
+                    // 暂停2s后，再重新消费一次
+                    Thread.sleep(1500L);
+                    consumer.accept(JsonUtils.toJSONString(amqpMsgEntity));
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+    }
 
 }

@@ -49,4 +49,6 @@ public class AmqpMsgEntity {
     //    标识消息的来源，用于来源方消费者忽略
     private String origin;
 
+    //    标记已消费过，用于重试
+    private boolean consumed;
 }

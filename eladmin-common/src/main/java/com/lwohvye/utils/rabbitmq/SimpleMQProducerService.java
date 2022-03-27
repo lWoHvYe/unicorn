@@ -99,7 +99,7 @@ public class SimpleMQProducerService {
                     if (ObjectUtil.isNotEmpty(expire) && ObjectUtil.isNotEmpty(timeUnit)) {
                         Long expireMill = TimeUnit.MILLISECONDS.convert(expire, timeUnit);
                         //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
-                        message.getMessageProperties().setHeader("x-delay", expireMill);
+                        message.getMessageProperties().setHeader(MessageProperties.X_DELAY, expireMill);
                     }
                     return message;
                 });
@@ -114,7 +114,7 @@ public class SimpleMQProducerService {
                 .setContentType(MessageProperties.CONTENT_TYPE_JSON)
                 .setContentEncoding("utf-8")
                 //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
-                .setHeader("x-delay", TimeUnit.MILLISECONDS.convert(expire, timeUnit))
+                .setHeader(MessageProperties.X_DELAY, TimeUnit.MILLISECONDS.convert(expire, timeUnit))
                 .setMessageId(String.valueOf(IdUtil.getSnowflakeNextId()))
                 .build();
         amqpTemplate.send(exchangeName, routeKey, message);
