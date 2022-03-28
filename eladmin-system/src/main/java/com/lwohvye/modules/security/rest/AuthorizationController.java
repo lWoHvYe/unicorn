@@ -116,7 +116,7 @@ public class AuthorizationController {
         // region Java 锁 Lock
         var reentrantLock = new ReentrantLock();
         var condition = reentrantLock.newCondition(); // 条件对象。基于Condition，可以更细粒度的控制等待与唤醒
-        reentrantLock.lock();
+        reentrantLock.lock(); // 加锁究竟放在try-catch外还是放在其中，感觉也有所考量
         // var lockRes = reentrantLock.tryLock(); 加锁成功返回true，否则返回false，这样不会阻塞，也可以设置超时
         try {
             while (!RandomUtil.randomBoolean()) // 条件不满足时，保持await()。这样写避免虚假唤醒
@@ -128,6 +128,14 @@ public class AuthorizationController {
             Thread.currentThread().interrupt(); // 异常后，中断线程。这里只是标记中断，具体中断事宜由线程自己处理
         } finally {
             reentrantLock.unlock();
+        }
+
+
+        try {
+            // 可被中断的获取锁。优先考虑响应中断，可在等待锁的时候中断
+            reentrantLock.lockInterruptibly();
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
 
         //---------------------------------------------------------------
