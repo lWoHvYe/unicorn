@@ -165,11 +165,12 @@ public abstract class YRabbitAbstractConsumer {
         });
     }
 
+    @SuppressWarnings("unchecked")
     protected <T> void reConsumeMsg(Consumer<T> consumer, T tMsg) {
-        if (Message.class.isInstance(tMsg)) {
-            reConsumeMsg((Consumer<Message>) consumer, Message.class.cast(tMsg));
-        } else if (String.class.isInstance(tMsg)) {
-            reConsumeMsg((Consumer<String>) consumer, String.class.cast(tMsg));
+        if (tMsg instanceof Message message) {
+            reConsumeMsg((Consumer<Message>) consumer, message);
+        } else if (tMsg instanceof String strMsg) {
+            reConsumeMsg((Consumer<String>) consumer, strMsg);
         } else {
             log.warn("暂不支持类型 {} ，请自行定义扩展", tMsg.getClass().getSimpleName());
         }
