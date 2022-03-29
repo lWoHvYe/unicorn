@@ -53,6 +53,9 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     private static final Ip2regionSearcher IP_SEARCHER = SpringContextHolder.getBean(Ip2regionSearcher.class);
 
 
+    // If you make the UserAgentAnalyzer a static member of a class then cleaning it up after use may be a problem.
+    // One case where this happens is in the context of something like Tomcat where a webapp is loaded and then unloaded.
+    // If the analyzer is a static member of your servlet then this unloading may retain a lot of the memory used for the internal data structures.
     private static final UserAgentAnalyzer USER_AGENT_ANALYZER = UserAgentAnalyzer
             .newBuilder()
             .hideMatcherLoadStats()
@@ -243,7 +246,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     public static String getBrowser(HttpServletRequest request) {
-        UserAgent.ImmutableUserAgent userAgent = USER_AGENT_ANALYZER.parse(request.getHeader("User-Agent"));
+        var userAgent = USER_AGENT_ANALYZER.parse(request.getHeader("User-Agent"));
         return userAgent.get(UserAgent.AGENT_NAME_VERSION).getValue();
     }
 

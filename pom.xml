@@ -239,7 +239,7 @@
                 <version>1.6.2</version>
             </dependency>
 
-            <!-- 解析客户端操作系统、浏览器信息 -->
+            <!-- 解析客户端操作系统、浏览器信息 Yauaa: Yet Another UserAgent Analyzer -->
             <dependency>
                 <groupId>nl.basjes.parse.useragent</groupId>
                 <artifactId>yauaa</artifactId>
