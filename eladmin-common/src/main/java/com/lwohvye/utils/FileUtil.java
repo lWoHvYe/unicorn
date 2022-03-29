@@ -15,7 +15,9 @@
  */
 package com.lwohvye.utils;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -25,6 +27,8 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -40,6 +44,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -238,6 +243,35 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
         writer.flush(out, true);
         //此处记得关闭输出Servlet流
         IoUtil.close(out);
+    }
+
+    /**
+     * 通过bean生成excel
+     *
+     * @param aliasMap 属性与标题的映射，要保证顺序性可使用LinkedHashMap
+     * @param tList    集合
+     * @param temPath  导出的目录
+     * @param title    文件标题
+     * @date 2022/3/29 7:51 PM
+     */
+    public static <T> String createExcel(Map<String, String> aliasMap, @NonNull List<T> tList, String temPath, @NonNull String title) {
+        temPath = StringUtils.hasText(temPath) ? temPath + File.separator : SYS_TEM_DIR;
+        var fileName = DateUtil.today() + " " + LocalTime.now().toString().replace(":", "_").substring(0, 8) + "-" + title + ".xlsx";
+        var writer = ExcelUtil.getBigWriter(temPath + fileName);
+        if (MapUtil.isNotEmpty(aliasMap)) {
+            // 自定义标题别名
+            aliasMap.forEach(writer::addHeaderAlias);
+            // 默认的，未添加alias的属性也会写出，如果想只写出加了别名的字段，可以调用此方法排除之
+            writer.setOnlyAlias(true);
+
+            // 合并单元格后的标题行，使用默认标题样式
+            writer.merge(aliasMap.size() - 1, title);
+        }
+        // 一次性写出内容，使用默认样式
+        writer.write(tList);
+        // 关闭writer，释放内存
+        writer.close();
+        return fileName;
     }
 
     public static String getFileType(String type) {

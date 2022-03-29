@@ -101,6 +101,7 @@
         <logback.version>1.2.11</logback.version>
         <redisson.version>3.17.0</redisson.version>
         <guava.version>31.1-jre</guava.version>
+        <caffeine.version>3.0.6</caffeine.version>
         <poi.version>5.2.2</poi.version>
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>6.12</yauaa.version>
@@ -237,6 +238,12 @@
                 <groupId>com.github.whvcse</groupId>
                 <artifactId>easy-captcha</artifactId>
                 <version>1.6.2</version>
+            </dependency>
+            <!-- 从 Ehcache 到 Guava Cache 再到 Caffeine -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
             </dependency>
 
             <!-- 解析客户端操作系统、浏览器信息 Yauaa: Yet Another UserAgent Analyzer -->

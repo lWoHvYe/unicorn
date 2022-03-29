@@ -13,6 +13,7 @@ module lwohvye.eladmin.system {
     requires transitive spring.rabbit;
     requires transitive spring.retry;
     requires transitive com.fasterxml.jackson.datatype.jsr310;
+    requires transitive com.github.benmanes.caffeine;
     requires transitive com.github.oshi;
     requires transitive druid;
     requires transitive easy.captcha;

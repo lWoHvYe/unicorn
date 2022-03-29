@@ -16,13 +16,11 @@
 
 package com.lwohvye.modules.security.service;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.lwohvye.config.LocalCoreConfig;
-import com.lwohvye.modules.rabbitmq.config.RabbitMqConfig;
 import com.lwohvye.exception.EntityNotFoundException;
-import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.modules.rabbitmq.config.RabbitMqConfig;
 import com.lwohvye.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.system.service.IDataService;
@@ -30,15 +28,15 @@ import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.IUserService;
 import com.lwohvye.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.StringUtils;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: liaojinlong
@@ -66,22 +64,18 @@ public class UserLocalCache {
     /**
      * 用户信息缓存
      */
-    //  这种本地缓存的方式，也是解决热Key的一种方案，可以减轻Redis的压力（多个Redis集群，单个Redis不再保存全量数据，分散）。针对失效、过期等，后续可接入RQ，进行相关事件通知。
+    //  这种本地缓存的方式，也是解决热Key的一种方案，可以减轻Redis的压力（多个Redis集群，单个Redis不再保存全量数据，分散）。针对失效、过期等，可接入RQ，进行相关事件通知。
     //  不能存redis中，使用fastjson时没什么问题。但使用jackson反序列化需要实体有空参构造。而SimpleGrantedAuthority无空参构造。
-    LoadingCache<String, JwtUserDto> userLRUCache = CacheBuilder.newBuilder()
-            .concurrencyLevel(Runtime.getRuntime().availableProcessors()) // 设置并发级别为CPU核心数
+    LoadingCache<String, JwtUserDto> userLRUCache = Caffeine.newBuilder()
             .initialCapacity(16) // 合理设置初始容量
             .maximumSize(32) // 最大容量，当缓存数量达到或接近该最大值时，Cache将清除掉那些最近最少使用的缓存
-            .expireAfterAccess(Duration.of(24, ChronoUnit.MINUTES)) // 读写缓存后多久过期
+            .expireAfterAccess(24L, TimeUnit.MINUTES) // 读写缓存后多久过期
+            .refreshAfterWrite(12L, TimeUnit.MINUTES) // 写入多久后刷新，刷新是一个异步的过程。理论上对时效性不强的，可以将这个与expire配合使用。这个刷新也是惰性的，访问时若满足刷新条件了才会刷新，另外若此时已满足过期的条件，会走过期的逻辑
             // .expireAfterWrite() // 写缓存后多久过期
             // .weigher((Weigher<String, JwtUserDto>) (username, jwtUserDto) -> jwtUserDto.isEnabled() ? 1 : 0) // 基于权重的清除策略，weigher can not be combined with maximum size
             // .softValues() // 可把key设为weak的，value可为weak或soft的
-            .build(new CacheLoader<>() {
-                @Override
-                public @NotNull JwtUserDto load(@NotNull String username) throws Exception { // 数据不存在时，会调用load方法来获取
-                    return getUserDB(username);
-                }
-            });
+            .removalListener((key, user, cause) -> System.out.printf("Key %s was removed (%s)%n", key, cause)) // 当元素被移除（主动/被动时触发监听）
+            .build(this::getUserDB); // 数据不存在时，会调用load方法来获取
 
 
     @NotNull

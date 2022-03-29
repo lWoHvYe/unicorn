@@ -109,6 +109,11 @@
             <artifactId>druid</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- Java图形验证码。该项目在gitee上有 -->
         <dependency>
             <groupId>com.github.whvcse</groupId>
