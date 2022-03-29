@@ -35,7 +35,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 
 ```shell
 #在未来的3.0.1版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
-nohup java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.1.jar >nohup.out 2>&1 &
+nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.1.jar >nohup.out 2>&1 &
 ```
 
 | key                | 目的                                                         |
