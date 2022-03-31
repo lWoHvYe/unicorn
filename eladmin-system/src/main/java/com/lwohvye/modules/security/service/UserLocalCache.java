@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author: liaojinlong
+ * @author: liaojinlong, lWoHvYe
  * @date: 2020/6/11 18:01
  * @apiNote: 用于清理 用户登录信息缓存，为防止Spring循环依赖与安全考虑 ，单独构成工具类
  */
@@ -74,7 +74,7 @@ public class UserLocalCache {
             // .expireAfterWrite() // 写缓存后多久过期
             // .weigher((Weigher<String, JwtUserDto>) (username, jwtUserDto) -> jwtUserDto.isEnabled() ? 1 : 0) // 基于权重的清除策略，weigher can not be combined with maximum size
             // .softValues() // 可把key设为weak的，value可为weak或soft的
-            .removalListener((key, user, cause) -> System.out.printf("Key %s was removed (%s)%n", key, cause)) // 当元素被移除（主动/被动时触发监听）
+            // .removalListener((key, user, cause) -> System.out.printf("Key %s was removed (%s)%n", key, cause)) // 当元素被移除（主动/被动时触发监听）
             .build(this::getUserDB); // 数据不存在时，会调用load方法来获取
 
 

@@ -47,12 +47,10 @@ public class MailUtils {
             mailVo.setError(e.getMessage());
             return mailVo;
         }
-
     }
 
     public void sendMail(String to, String subject, String text) {
-        var mailVo = new MailVo().setTo(StringUtils.isBlank(to) ? getMailDefaultTo() : to)
-                .setSubject(subject).setText(text);
+        var mailVo = new MailVo().setTo(StringUtils.isBlank(to) ? getMailDefaultTo() : to).setSubject(subject).setText(text);
         sendMail(mailVo);
     }
 
@@ -85,7 +83,6 @@ public class MailUtils {
             if (mailVo.getMultipartFiles() != null)
                 for (MultipartFile multipartFile : mailVo.getMultipartFiles())
                     messageHelper.addAttachment(Objects.requireNonNull(multipartFile.getOriginalFilename()), multipartFile);
-
 
             if (ObjectUtil.isEmpty(mailVo.getSentDate())) {
                 mailVo.setSentDate(new Date());
