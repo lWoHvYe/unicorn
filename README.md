@@ -13,7 +13,8 @@
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
 
 启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
-详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)
+详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
+删除，以非module化运行。
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS。在对项目完成相关改造之前（当前未找到jar启动的方式），应该只能用ALL-UNNAMED表示对所有未命名模块开放）。
@@ -34,7 +35,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 ```
 
 ```shell
-#在未来的3.0.1版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
+#在未来的3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
 nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.1.jar >nohup.out 2>&1 &
 ```
 

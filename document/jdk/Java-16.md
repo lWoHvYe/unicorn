@@ -152,6 +152,11 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 - [warn: requires transitive directive for an automatic module](https://stackoverflow.com/questions/49600947/how-to-suppress-the-requires-transitive-directive-for-an-automatic-module-warn)
 - [jmod-example](https://github.com/khmarbaise/jdk9-jlink-jmod-example)
 
+基于下面这俩链接，基本说明了在下一个大版本，将对JPMS进行支持
+
+- [Spring Boot Java 9+ modularity](https://github.com/spring-projects/spring-boot/issues/13799)
+- [Declare Spring modules with JDK 9 module metadata [SPR-13501]](https://github.com/spring-projects/spring-framework/issues/18079)
+
 ```shell
 # 将无法模块化的放到clib中，可模块化的放到mlib，将未升级模块的依赖放入mlib中，会自动模块化，称为自动模块
 # 当前待解决：模块 lwohvye.eladmin.starter 不具有 ModuleMainClass 属性，请使用 -m <模块>/<主类>。针对Spring Boot项目，应该有某个地方不一样
