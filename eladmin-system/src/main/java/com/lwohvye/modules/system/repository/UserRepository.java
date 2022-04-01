@@ -108,8 +108,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     void updateEmail(String username, String email);
 
     @Modifying
-    @Query(value = "update sys_user set enabled = ?2 where username = ?1", nativeQuery = true)
-    void updateEnabled(String username, Boolean enabled);
+    @Query(value = "update sys_user set enabled = ?3 where username = ?1 and enabled = ?2", nativeQuery = true)
+    void updateEnabled(String username, Boolean expectStatus, Boolean enabled);
 
     /**
      * 根据角色查询用户

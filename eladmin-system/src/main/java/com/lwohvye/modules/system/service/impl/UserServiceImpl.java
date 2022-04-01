@@ -303,7 +303,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     @CacheEvict(allEntries = true)
     public void updateEnabled(String username, Boolean enabled) {
         Assert.hasText(username, "用户名不可为空");
-        userRepository.updateEnabled(username, enabled);
+        userRepository.updateEnabled(username, !enabled, enabled);
 //        状态更新后，需清除相关信息
         flushCache(username);
     }

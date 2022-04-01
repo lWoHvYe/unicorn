@@ -88,4 +88,10 @@ public class RabbitMQProducerService extends SimpleMQProducerService {
         commonEntity.setExpire(500L).setTimeUnit(TimeUnit.MILLISECONDS);
         sendDelayMsg(RabbitMqConfig.TOPIC_SYNC_DELAY_EXCHANGE, routeKey, commonEntity);
     }
+
+    public void sendSyncDelayMsgEntity(String routeKey, AmqpMsgEntity commonEntity) {
+        // 延时500ms
+        commonEntity.setExpire(500L).setTimeUnit(TimeUnit.MILLISECONDS);
+        sendDelayMsgEntity(RabbitMqConfig.TOPIC_SYNC_DELAY_EXCHANGE, routeKey, commonEntity);
+    }
 }

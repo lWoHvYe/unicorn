@@ -110,7 +110,7 @@ public class UserLocalCache {
         if (StringUtils.isNotEmpty(userName)) {
             if (Boolean.TRUE.equals(doSync)) { // 广播事件
                 var amqpMsg = new AmqpMsgEntity().setMsgType("sp").setMsgData(userName).setExtraData("cleanUserCache").setOrigin(LocalCoreConfig.ORIGIN);
-                rabbitMQProducerService.sendSyncDelayMsg(RabbitMqConfig.SP_SYNC_ROUTE_KEY, amqpMsg);
+                rabbitMQProducerService.sendSyncDelayMsgEntity(RabbitMqConfig.SP_SYNC_ROUTE_KEY, amqpMsg);
             }
             userLRUCache.invalidate(userName); // 清除单个key
         }
