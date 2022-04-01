@@ -24,5 +24,5 @@ cd /opt/app
 echo '授权当前用户'
 chmod 555 ./*.jar
 echo '执行....'
-nohup ${JAVA_HOME}/bin/java -Xms100m -Xmx500m --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-system-3.0.1.jar >elog.out 2>&1 &
+nohup ${JAVA_HOME}/bin/java -Xms100m -Xmx500m --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-system-3.0.2.jar >elog.out 2>&1 &
 echo '启动成功'

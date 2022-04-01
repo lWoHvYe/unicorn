@@ -36,7 +36,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 
 ```shell
 #在未来的3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
-nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.1.jar >nohup.out 2>&1 &
+nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.2.jar >nohup.out 2>&1 &
 ```
 
 | key                | 目的                                                         |
@@ -85,7 +85,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 <dependency>
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <type>pom</type>
 </dependency>
 

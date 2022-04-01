@@ -53,7 +53,7 @@ import java.util.List;
 // @OpenAPIDefinition(
 //         info = @io.swagger.v3.oas.annotations.info.Info(
 //                 title = "EL-Admin Api Doc",
-//                 version = "3.0.1",
+//                 version = "3.0.2",
 //                 description = "'1101100_1010111_1101111_1001000_1110110_1011001_1100101' + SpringBootVersion.getVersion()",
 //                 contact = @Contact(name = "lWoHvYe")
 //         ),

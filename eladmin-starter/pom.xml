@@ -31,7 +31,7 @@
 
     <properties>
         <java.version>18</java.version>
-        <project.core.version>3.0.1</project.core.version>
+        <project.core.version>3.0.2</project.core.version>
         <maven.compiler.release>17</maven.compiler.release>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <javassist.version>3.28.0-GA</javassist.version>
