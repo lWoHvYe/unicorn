@@ -23,7 +23,7 @@
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
 
     <name>EL-ADMIN 管理系统</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
@@ -49,7 +49,7 @@
         <connection>scm:git:git://github.com/lWoHvYe/eladmin.git</connection>
         <developerConnection>scm:git:ssh://github.com/lWoHvYe/eladmin.git</developerConnection>
         <url>https://github.com/lWoHvYe/eladmin/tree/main</url>
-        <tag>eladmin-v3.0.2</tag>
+        <tag>eladmin-v3.0.3</tag>
     </scm>
 
     <modules>
@@ -76,7 +76,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--开发版本-->
         <java.version>18</java.version>
-        <project.core.version>3.0.2</project.core.version>
+        <project.core.version>3.0.3</project.core.version>
         <!--支持Java 18，问题不在这，这里不升级也没啥问题，用release就可以了-->
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <!--https://maven.apache.org/plugins/maven-compiler-plugin/-->
