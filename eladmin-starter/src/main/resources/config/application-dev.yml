@@ -54,7 +54,7 @@ spring:
       read-ds-0:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -105,7 +105,7 @@ spring:
       read-ds-1:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-        url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3310}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
         #        从库改用只读账号
         username: ${DB_USER:reader}
         password: ${DB_PWD:123456}
@@ -160,9 +160,9 @@ spring:
       # 这里指定了规则，读写分离
       readwrite-splitting:
         data-sources:
-          # 这个pr_ds不要漏了。
+          # 这个readwrite_ds不要漏了。
           # <data-source-name> (+): # 读写分离逻辑数据源名称
-          pr_ds:
+          readwrite_ds:
             write-data-source-name: write-ds #主库数据源名称
             read-data-source-names:
               # - <replica-data_source-name> (+) # 从库数据源名称

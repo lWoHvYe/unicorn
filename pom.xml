@@ -120,12 +120,6 @@
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
-            <!--    Redisson与Spring Data Redis整合，上面的starter引入的是25的版本    -->
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-data-26</artifactId>
-                <version>${redisson.version}</version>
-            </dependency>
 
             <!--监控sql日志-->
             <dependency>
