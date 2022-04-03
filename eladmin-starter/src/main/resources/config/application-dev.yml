@@ -156,25 +156,32 @@ spring:
     # shardingsphere 主从模型中，事务中的数据读写均用主库
     # 读写分离参考：https://github.com/apache/shardingsphere/blob/master/examples/shardingsphere-jdbc-example/single-feature-example/readwrite-splitting-example/readwrite-splitting-spring-boot-jpa-example
     # https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB
-    rules:
-      # 这里指定了规则，读写分离
-      readwrite-splitting:
-        data-sources:
-          # 这个readwrite_ds不要漏了。
-          # <data-source-name> (+): # 读写分离逻辑数据源名称
-          readwrite_ds:
-            write-data-source-name: write-ds #主库数据源名称
-            read-data-source-names:
-              # - <replica-data_source-name> (+) # 从库数据源名称
-              - read-ds-0
-              - read-ds-1
-            load-balancer-name: round_robin # 负载均衡算法名称
-        # 负载均衡算法配置
-        load-balancers:
-          # <load-balancer-name> (+): # 负载均衡算法名称
-          round_robin:
-            type: ROUND_ROBIN # 负载均衡算法类型
-          #  props: # 负载均衡算法属性配置
+#    rules:
+#      # 这里指定了规则，读写分离
+#      readwrite-splitting:
+#        data-sources:
+#          # 这个readwrite_ds不要漏了。
+#          # <data-source-name> (+): # 读写分离逻辑数据源名称
+#          readwrite_ds:
+#            write-data-source-name: write-ds #主库数据源名称
+#            read-data-source-names:
+#              # - <replica-data_source-name> (+) # 从库数据源名称
+#              - read-ds-0
+#              - read-ds-1
+#            load-balancer-name: round_robin # 负载均衡算法名称
+#        # 负载均衡算法配置
+#        load-balancers:
+#          # <load-balancer-name> (+): # 负载均衡算法名称
+#          round_robin:
+#            type: ROUND_ROBIN # 负载均衡算法类型
+#          #  props: # 负载均衡算法属性配置
+
+    #    主从配置，5.x搞不定，先继续用4.1.1
+    masterSlave:
+      load-balance-algorithm-type: round_robin
+      name: ds_msr
+      master-data-source-name: write-ds
+      slave-data-source-names: read-ds-0,read-ds-1
 
     props:
       sql:

@@ -35,7 +35,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <javassist.version>3.28.0-GA</javassist.version>
-        <shardingsphere.version>5.0.0</shardingsphere.version>
+        <shardingsphere.version>4.1.1</shardingsphere.version>
     </properties>
 
     <dependencies>
@@ -60,7 +60,7 @@
         <!--分库分表中间件-->
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
             <version>${shardingsphere.version}</version>
             <exclusions>
                 <exclusion>
