@@ -112,6 +112,7 @@ public class LogServiceImpl implements ILogService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void save(Log resource) {
         logRepository.save(resource);
     }

@@ -33,6 +33,7 @@ public interface ILogService {
 
     /**
      * 分页查询
+     *
      * @param criteria 查询条件
      * @param pageable 分页参数
      * @return /
@@ -41,6 +42,7 @@ public interface ILogService {
 
     /**
      * 查询全部数据
+     *
      * @param criteria 查询条件
      * @return /
      */
@@ -48,6 +50,7 @@ public interface ILogService {
 
     /**
      * 查询用户日志
+     *
      * @param criteria 查询条件
      * @param pageable 分页参数
      * @return -
@@ -56,18 +59,22 @@ public interface ILogService {
 
     /**
      * 保存日志数据。异步写日志
-     * @param username 用户
-     * @param browser 浏览器
-     * @param ip 请求IP
+     *
+     * @param username  用户
+     * @param browser   浏览器
+     * @param ip        请求IP
      * @param joinPoint /
-     * @param log 日志实体
+     * @param log       日志实体
      */
     @Async
     void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, Log log);
 
+    @Async
     void save(Log resource);
+
     /**
      * 查询异常详情
+     *
      * @param id 日志ID
      * @return Object
      */
@@ -75,7 +82,8 @@ public interface ILogService {
 
     /**
      * 导出日志
-     * @param logs 待导出的数据
+     *
+     * @param logs     待导出的数据
      * @param response /
      * @throws IOException /
      */

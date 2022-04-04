@@ -28,6 +28,7 @@ module lwohvye.eladmin.common {
     requires transitive spring.boot.autoconfigure;
     requires transitive com.fasterxml.jackson.annotation;
     requires transitive com.fasterxml.jackson.databind;
+    requires transitive com.github.benmanes.caffeine;
     requires transitive hutool.all;
     requires transitive io.swagger.v3.oas.models;
     requires transitive io.swagger.v3.oas.annotations;

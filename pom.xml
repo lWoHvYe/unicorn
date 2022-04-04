@@ -105,7 +105,7 @@
         <poi.version>5.2.2</poi.version>
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>6.12</yauaa.version>
-        <ip2region.version>2.6.3</ip2region.version>
+        <ip2region.version>2.6.6</ip2region.version>
         <thumbnailator.version>0.4.17</thumbnailator.version>
         <argLine>
             -Dfile.encoding=UTF-8
@@ -249,6 +249,10 @@
                     <exclusion>
                         <artifactId>commons-collections4</artifactId>
                         <groupId>org.apache.commons</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.ben-manes.caffeine</groupId>
+                        <artifactId>caffeine</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
