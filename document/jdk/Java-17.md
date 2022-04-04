@@ -14,6 +14,8 @@
 
 [ZGC](https://wiki.openjdk.java.net/display/zgc/Main)
 
+[ZGC探索](https://www.lwohvye.com/2021/05/26/%e6%96%b0%e4%b8%80%e4%bb%a3%e5%9e%83%e5%9c%be%e5%9b%9e%e6%94%b6%e5%99%a8zgc%e7%9a%84%e6%8e%a2%e7%b4%a2%e4%b8%8e%e5%ae%9e%e8%b7%b5/)
+
 ```shell
 java -XX:+UseZGC 
 ```
