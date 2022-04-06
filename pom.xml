@@ -325,6 +325,7 @@
                     <!--for lombok annotations to resolve-->
                     <!--contradictory to maven, intelliJ fails with this-->
                     <annotationProcessorPaths>
+                        <!-- lombok和mapstruct都是编译时的增强，当需要设置执行顺序时，可采用下面的配置，从上到下，上面的先执行 -->
                         <!--4lombok-->
                         <path>
                             <groupId>org.projectlombok</groupId>

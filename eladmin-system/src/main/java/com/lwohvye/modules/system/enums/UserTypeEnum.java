@@ -32,7 +32,7 @@ public enum UserTypeEnum {
     NORMAL(0, "未来的VIP"),
     DEV(-1, "Ctrl C + V");
 
-    private Integer type;
+    private final Integer type;
 
-    private String desc;
+    private final String desc;
 }
