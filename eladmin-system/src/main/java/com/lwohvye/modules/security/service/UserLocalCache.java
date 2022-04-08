@@ -26,7 +26,7 @@ import com.lwohvye.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.modules.system.service.IDataService;
 import com.lwohvye.modules.system.service.IRoleService;
 import com.lwohvye.modules.system.service.IUserService;
-import com.lwohvye.modules.system.service.dto.UserInnerDto;
+import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import org.jetbrains.annotations.NotNull;

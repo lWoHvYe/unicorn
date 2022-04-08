@@ -16,9 +16,9 @@
 package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.service.dto.DictDetailDto;
-import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
-import com.lwohvye.modules.system.domain.DictDetail;
+import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
+import com.lwohvye.api.modules.system.service.dto.DictDetailQueryCriteria;
+import com.lwohvye.api.modules.system.domain.DictDetail;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;

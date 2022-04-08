@@ -15,10 +15,10 @@
  */
 package com.lwohvye.modules.system.service;
 
-import com.lwohvye.modules.system.domain.Resource;
+import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.service.dto.ResourceDto;
-import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.ResourceDto;
+import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Map;

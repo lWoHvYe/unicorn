@@ -17,11 +17,11 @@ package com.lwohvye.modules.mnt.service.impl;
 
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.mnt.domain.App;
+import com.lwohvye.api.modules.mnt.domain.App;
 import com.lwohvye.modules.mnt.repository.AppRepository;
 import com.lwohvye.modules.mnt.service.IAppService;
-import com.lwohvye.modules.mnt.service.dto.AppDto;
-import com.lwohvye.modules.mnt.service.dto.AppQueryCriteria;
+import com.lwohvye.api.modules.mnt.service.dto.AppDto;
+import com.lwohvye.api.modules.mnt.service.dto.AppQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.AppMapper;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.PageUtil;

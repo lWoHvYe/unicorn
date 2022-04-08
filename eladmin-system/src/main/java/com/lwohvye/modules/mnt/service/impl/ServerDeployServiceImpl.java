@@ -16,11 +16,11 @@
 package com.lwohvye.modules.mnt.service.impl;
 
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.modules.mnt.domain.ServerDeploy;
+import com.lwohvye.api.modules.mnt.domain.ServerDeploy;
 import com.lwohvye.modules.mnt.repository.ServerDeployRepository;
 import com.lwohvye.modules.mnt.service.IServerDeployService;
-import com.lwohvye.modules.mnt.service.dto.ServerDeployDto;
-import com.lwohvye.modules.mnt.service.dto.ServerDeployQueryCriteria;
+import com.lwohvye.api.modules.mnt.service.dto.ServerDeployDto;
+import com.lwohvye.api.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.ServerDeployMapper;
 import com.lwohvye.modules.mnt.util.ExecuteShellUtil;
 import com.lwohvye.utils.FileUtil;

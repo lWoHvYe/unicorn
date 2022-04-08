@@ -4,23 +4,23 @@ module lwohvye.eladmin.api {
 
     exports com.lwohvye.api.annotation;
     exports com.lwohvye.api.utils;
-    exports com.lwohvye.modules.mnt.domain;
-    exports com.lwohvye.modules.mnt.service.dto;
-    exports com.lwohvye.modules.quartz.domain;
-    exports com.lwohvye.modules.quartz.service.dto;
-    exports com.lwohvye.modules.system.api;
-    exports com.lwohvye.modules.system.domain;
-    exports com.lwohvye.modules.system.domain.vo;
-    exports com.lwohvye.modules.system.domain.projection;
-    exports com.lwohvye.modules.system.service.dto;
+    exports com.lwohvye.api.modules.mnt.domain;
+    exports com.lwohvye.api.modules.mnt.service.dto;
+    exports com.lwohvye.api.modules.quartz.domain;
+    exports com.lwohvye.api.modules.quartz.service.dto;
+    exports com.lwohvye.api.modules.system.api;
+    exports com.lwohvye.api.modules.system.domain;
+    exports com.lwohvye.api.modules.system.domain.vo;
+    exports com.lwohvye.api.modules.system.domain.projection;
+    exports com.lwohvye.api.modules.system.service.dto;
 
-    opens com.lwohvye.modules.mnt.domain;
-    opens com.lwohvye.modules.mnt.service.dto;
-    opens com.lwohvye.modules.quartz.domain;
-    opens com.lwohvye.modules.quartz.service.dto;
-    opens com.lwohvye.modules.system.domain;
-    opens com.lwohvye.modules.system.domain.vo;
-    opens com.lwohvye.modules.system.domain.projection;
-    opens com.lwohvye.modules.system.service.dto;
+    opens com.lwohvye.api.modules.mnt.domain;
+    opens com.lwohvye.api.modules.mnt.service.dto;
+    opens com.lwohvye.api.modules.quartz.domain;
+    opens com.lwohvye.api.modules.quartz.service.dto;
+    opens com.lwohvye.api.modules.system.domain;
+    opens com.lwohvye.api.modules.system.domain.vo;
+    opens com.lwohvye.api.modules.system.domain.projection;
+    opens com.lwohvye.api.modules.system.service.dto;
 
 }

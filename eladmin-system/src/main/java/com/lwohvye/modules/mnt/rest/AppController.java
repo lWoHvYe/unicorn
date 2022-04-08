@@ -16,8 +16,8 @@
 package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.annotation.log.Log;
-import com.lwohvye.modules.mnt.domain.App;
-import com.lwohvye.modules.mnt.service.dto.AppQueryCriteria;
+import com.lwohvye.api.modules.mnt.domain.App;
+import com.lwohvye.api.modules.mnt.service.dto.AppQueryCriteria;
 import com.lwohvye.modules.mnt.service.IAppService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;

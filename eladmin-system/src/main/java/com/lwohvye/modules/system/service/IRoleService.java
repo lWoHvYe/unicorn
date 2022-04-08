@@ -16,11 +16,11 @@
 package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.domain.Dept;
-import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.service.dto.RoleDto;
-import com.lwohvye.modules.system.service.dto.RoleQueryCriteria;
-import com.lwohvye.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.Role;
+import com.lwohvye.api.modules.system.service.dto.RoleDto;
+import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 

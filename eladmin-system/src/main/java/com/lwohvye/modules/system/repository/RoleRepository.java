@@ -15,8 +15,8 @@
  */
 package com.lwohvye.modules.system.repository;
 
-import com.lwohvye.modules.system.domain.Dept;
-import com.lwohvye.modules.system.domain.Role;
+import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

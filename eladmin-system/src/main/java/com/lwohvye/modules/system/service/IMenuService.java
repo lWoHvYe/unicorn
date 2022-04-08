@@ -16,9 +16,9 @@
 package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.domain.Menu;
-import com.lwohvye.modules.system.service.dto.MenuDto;
-import com.lwohvye.modules.system.service.dto.MenuQueryCriteria;
+import com.lwohvye.api.modules.system.domain.Menu;
+import com.lwohvye.api.modules.system.service.dto.MenuDto;
+import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

@@ -16,7 +16,6 @@
 package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.service.dto.UserDto;
 
 import java.util.List;
 

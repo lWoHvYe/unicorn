@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.quartz.config;
 
-import com.lwohvye.modules.quartz.domain.QuartzJob;
+import com.lwohvye.api.modules.quartz.domain.QuartzJob;
 import com.lwohvye.modules.quartz.repository.QuartzJobRepository;
 import com.lwohvye.modules.quartz.utils.QuartzManage;
 import lombok.RequiredArgsConstructor;

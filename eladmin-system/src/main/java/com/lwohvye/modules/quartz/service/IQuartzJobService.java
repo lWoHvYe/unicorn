@@ -15,9 +15,9 @@
  */
 package com.lwohvye.modules.quartz.service;
 
-import com.lwohvye.modules.quartz.domain.QuartzJob;
-import com.lwohvye.modules.quartz.domain.QuartzLog;
-import com.lwohvye.modules.quartz.service.dto.JobQueryCriteria;
+import com.lwohvye.api.modules.quartz.domain.QuartzJob;
+import com.lwohvye.api.modules.quartz.domain.QuartzLog;
+import com.lwohvye.api.modules.quartz.service.dto.JobQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;

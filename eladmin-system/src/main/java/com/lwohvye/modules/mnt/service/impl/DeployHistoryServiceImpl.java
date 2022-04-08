@@ -17,11 +17,11 @@ package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.modules.mnt.domain.DeployHistory;
+import com.lwohvye.api.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.repository.DeployHistoryRepository;
 import com.lwohvye.modules.mnt.service.IDeployHistoryService;
-import com.lwohvye.modules.mnt.service.dto.DeployHistoryDto;
-import com.lwohvye.modules.mnt.service.dto.DeployHistoryQueryCriteria;
+import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryDto;
+import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.DeployHistoryMapper;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.PageUtil;

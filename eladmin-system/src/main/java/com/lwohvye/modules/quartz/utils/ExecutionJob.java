@@ -17,8 +17,8 @@ package com.lwohvye.modules.quartz.utils;
 
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.config.thread.ThreadPoolExecutorUtil;
-import com.lwohvye.modules.quartz.domain.QuartzJob;
-import com.lwohvye.modules.quartz.domain.QuartzLog;
+import com.lwohvye.api.modules.quartz.domain.QuartzJob;
+import com.lwohvye.api.modules.quartz.domain.QuartzLog;
 import com.lwohvye.modules.quartz.service.IQuartzJobService;
 import com.lwohvye.utils.MailAdapter;
 import com.lwohvye.utils.SpringContextHolder;

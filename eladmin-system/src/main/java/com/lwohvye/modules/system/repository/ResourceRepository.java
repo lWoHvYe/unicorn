@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.system.repository;
 
-import com.lwohvye.modules.system.domain.Resource;
+import com.lwohvye.api.modules.system.domain.Resource;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

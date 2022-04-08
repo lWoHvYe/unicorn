@@ -16,10 +16,10 @@
 package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.annotation.log.Log;
-import com.lwohvye.modules.mnt.domain.Deploy;
-import com.lwohvye.modules.mnt.domain.DeployHistory;
+import com.lwohvye.api.modules.mnt.domain.Deploy;
+import com.lwohvye.api.modules.mnt.domain.DeployHistory;
 import com.lwohvye.modules.mnt.service.IDeployService;
-import com.lwohvye.modules.mnt.service.dto.DeployQueryCriteria;
+import com.lwohvye.api.modules.mnt.service.dto.DeployQueryCriteria;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;

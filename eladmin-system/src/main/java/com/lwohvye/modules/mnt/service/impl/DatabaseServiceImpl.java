@@ -17,11 +17,11 @@ package com.lwohvye.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.modules.mnt.domain.Database;
+import com.lwohvye.api.modules.mnt.domain.Database;
 import com.lwohvye.modules.mnt.repository.DatabaseRepository;
 import com.lwohvye.modules.mnt.service.IDatabaseService;
-import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
-import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
+import com.lwohvye.api.modules.mnt.service.dto.DatabaseDto;
+import com.lwohvye.api.modules.mnt.service.dto.DatabaseQueryCriteria;
 import com.lwohvye.modules.mnt.service.mapstruct.DatabaseMapper;
 import com.lwohvye.modules.mnt.util.SqlUtils;
 import com.lwohvye.utils.FileUtil;

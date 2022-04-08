@@ -16,11 +16,11 @@
 package com.lwohvye.modules.system.service.impl;
 
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.modules.system.domain.DictDetail;
+import com.lwohvye.api.modules.system.domain.DictDetail;
 import com.lwohvye.modules.system.repository.DictDetailRepository;
 import com.lwohvye.modules.system.service.IDictDetailService;
-import com.lwohvye.modules.system.service.dto.DictDetailDto;
-import com.lwohvye.modules.system.service.dto.DictDetailQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
+import com.lwohvye.api.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.DictDetailMapper;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;

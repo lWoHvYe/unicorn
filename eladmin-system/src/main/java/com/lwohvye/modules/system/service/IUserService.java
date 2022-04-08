@@ -16,11 +16,11 @@
 package com.lwohvye.modules.system.service;
 
 import com.lwohvye.base.BaseService;
-import com.lwohvye.modules.system.domain.Dept;
-import com.lwohvye.modules.system.service.dto.UserDto;
-import com.lwohvye.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.modules.system.service.dto.UserQueryCriteria;
-import com.lwohvye.modules.system.domain.User;
+import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.service.dto.UserDto;
+import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
+import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
+import com.lwohvye.api.modules.system.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 

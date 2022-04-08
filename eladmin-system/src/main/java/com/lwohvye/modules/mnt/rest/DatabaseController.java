@@ -17,10 +17,10 @@ package com.lwohvye.modules.mnt.rest;
 
 import com.lwohvye.annotation.log.Log;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.modules.mnt.domain.Database;
+import com.lwohvye.api.modules.mnt.domain.Database;
 import com.lwohvye.modules.mnt.service.IDatabaseService;
-import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
-import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
+import com.lwohvye.api.modules.mnt.service.dto.DatabaseDto;
+import com.lwohvye.api.modules.mnt.service.dto.DatabaseQueryCriteria;
 import com.lwohvye.modules.mnt.util.SqlUtils;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.result.ResultInfo;

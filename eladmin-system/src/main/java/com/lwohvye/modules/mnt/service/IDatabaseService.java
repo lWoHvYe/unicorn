@@ -15,9 +15,9 @@
  */
 package com.lwohvye.modules.mnt.service;
 
-import com.lwohvye.modules.mnt.domain.Database;
-import com.lwohvye.modules.mnt.service.dto.DatabaseDto;
-import com.lwohvye.modules.mnt.service.dto.DatabaseQueryCriteria;
+import com.lwohvye.api.modules.mnt.domain.Database;
+import com.lwohvye.api.modules.mnt.service.dto.DatabaseDto;
+import com.lwohvye.api.modules.mnt.service.dto.DatabaseQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;

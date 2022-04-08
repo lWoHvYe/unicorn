@@ -17,12 +17,12 @@ package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.modules.system.domain.Dict;
+import com.lwohvye.api.modules.system.domain.Dict;
 import com.lwohvye.modules.system.repository.DictRepository;
 import com.lwohvye.modules.system.service.IDictService;
-import com.lwohvye.modules.system.service.dto.DictDetailDto;
-import com.lwohvye.modules.system.service.dto.DictDto;
-import com.lwohvye.modules.system.service.dto.DictQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
+import com.lwohvye.api.modules.system.service.dto.DictDto;
+import com.lwohvye.api.modules.system.service.dto.DictQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.DictMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;

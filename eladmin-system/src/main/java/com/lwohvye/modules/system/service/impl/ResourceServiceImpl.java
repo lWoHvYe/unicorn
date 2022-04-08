@@ -17,12 +17,12 @@ package com.lwohvye.modules.system.service.impl;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.modules.system.domain.Resource;
+import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.modules.system.observer.RoleObserver;
 import com.lwohvye.modules.system.repository.ResourceRepository;
 import com.lwohvye.modules.system.service.IResourceService;
-import com.lwohvye.modules.system.service.dto.ResourceDto;
-import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.ResourceDto;
+import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
 import com.lwohvye.modules.system.service.mapstruct.ResourceMapper;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;

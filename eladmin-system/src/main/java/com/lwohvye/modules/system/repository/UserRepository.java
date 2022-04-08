@@ -15,10 +15,10 @@
  */
 package com.lwohvye.modules.system.repository;
 
-import com.lwohvye.modules.system.domain.Dept;
-import com.lwohvye.modules.system.domain.Job;
-import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.domain.User;
+import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.Job;
+import com.lwohvye.api.modules.system.domain.Role;
+import com.lwohvye.api.modules.system.domain.User;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

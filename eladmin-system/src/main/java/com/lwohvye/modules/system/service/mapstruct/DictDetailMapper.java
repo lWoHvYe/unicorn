@@ -16,8 +16,8 @@
 package com.lwohvye.modules.system.service.mapstruct;
 
 import com.lwohvye.base.BaseMapper;
-import com.lwohvye.modules.system.domain.DictDetail;
-import com.lwohvye.modules.system.service.dto.DictDetailDto;
+import com.lwohvye.api.modules.system.domain.DictDetail;
+import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

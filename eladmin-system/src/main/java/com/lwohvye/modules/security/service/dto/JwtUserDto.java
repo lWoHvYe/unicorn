@@ -16,7 +16,7 @@
 package com.lwohvye.modules.security.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lwohvye.modules.system.service.dto.UserInnerDto;
+import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

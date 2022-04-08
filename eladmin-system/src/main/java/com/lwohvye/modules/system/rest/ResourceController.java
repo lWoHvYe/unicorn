@@ -16,10 +16,10 @@
 package com.lwohvye.modules.system.rest;
 
 import com.lwohvye.annotation.log.Log;
-import com.lwohvye.modules.system.api.SysResourceAPI;
-import com.lwohvye.modules.system.domain.Resource;
+import com.lwohvye.api.modules.system.api.SysResourceAPI;
+import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.modules.system.service.IResourceService;
-import com.lwohvye.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

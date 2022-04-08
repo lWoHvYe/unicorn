@@ -16,8 +16,8 @@
 package com.lwohvye.modules.system.service.mapstruct;
 
 import com.lwohvye.base.BaseMapper;
-import com.lwohvye.modules.system.domain.Job;
-import com.lwohvye.modules.system.service.dto.JobDto;
+import com.lwohvye.api.modules.system.domain.Job;
+import com.lwohvye.api.modules.system.service.dto.JobDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.modules.system.repository;
 
-import com.lwohvye.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.Dept;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;

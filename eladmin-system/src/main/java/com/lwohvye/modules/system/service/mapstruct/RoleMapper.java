@@ -17,10 +17,10 @@ package com.lwohvye.modules.system.service.mapstruct;
 
 import com.lwohvye.base.BaseMapper;
 import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.modules.system.domain.Resource;
-import com.lwohvye.modules.system.domain.Role;
-import com.lwohvye.modules.system.domain.vo.ResourceVo;
-import com.lwohvye.modules.system.service.dto.RoleDto;
+import com.lwohvye.api.modules.system.domain.Resource;
+import com.lwohvye.api.modules.system.domain.Role;
+import com.lwohvye.api.modules.system.domain.vo.ResourceVo;
+import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
