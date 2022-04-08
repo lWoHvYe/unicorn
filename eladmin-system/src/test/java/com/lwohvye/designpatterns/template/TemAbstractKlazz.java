@@ -16,11 +16,13 @@
 
 package com.lwohvye.designpatterns.template;
 
+import com.lwohvye.sys.modules.system.strategy.AUserTypeStrategy;
+
 /**
  * 模版方法，抽象父类，与接口型的相比，能做很多抽象类可以做，接口不能做的事。但接口在加新抽象方法时，可整为default，从而不影响子类
  *
  * @date 2022/3/23 5:58 PM
- * @see com.lwohvye.modules.system.strategy.AUserTypeStrategy
+ * @see AUserTypeStrategy
  */
 public abstract class TemAbstractKlazz {
 

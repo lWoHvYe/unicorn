@@ -26,62 +26,62 @@ module lwohvye.eladmin.system {
     requires transitive quartz;
     // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
 
-    exports com.lwohvye.config.condition to spring.beans;
-    exports com.lwohvye.modules.mnt.repository to spring.beans;
-    exports com.lwohvye.modules.mnt.rest to spring.beans, spring.web;
-    exports com.lwohvye.modules.mnt.service;
-    exports com.lwohvye.modules.mnt.service.mapstruct;
-    exports com.lwohvye.modules.mnt.util;
-    exports com.lwohvye.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
-    exports com.lwohvye.modules.quartz.repository; // 若要使用JRebel + XRebel，则需要exports to unnamed module
-    exports com.lwohvye.modules.quartz.rest to spring.beans, spring.web;
-    exports com.lwohvye.modules.quartz.service;
-    exports com.lwohvye.modules.quartz.task to spring.beans;
-    exports com.lwohvye.modules.quartz.utils to spring.beans;
-    exports com.lwohvye.modules.rabbitmq.service; // 这个要export to spring.beans和unnamed module。消费者应该都是这样的
-    exports com.lwohvye.modules.security.service;
-    exports com.lwohvye.modules.security.service.dto;
-    exports com.lwohvye.modules.security.security;
-    exports com.lwohvye.modules.security.security.filter;
-    exports com.lwohvye.modules.security.security.handler;
-    exports com.lwohvye.modules.security.rest to spring.beans, spring.web;
-    exports com.lwohvye.modules.system.strategy;
-    exports com.lwohvye.modules.system.observer;
-    exports com.lwohvye.modules.system.rest to spring.beans, spring.web;
-    exports com.lwohvye.modules.system.service;
-    exports com.lwohvye.modules.system.service.impl to spring.beans, hutool.all;
-    exports com.lwohvye.modules.system.service.version to spring.beans;
-    exports com.lwohvye.modules.system.service.local;
-    exports com.lwohvye.modules.system.service.mapstruct;
-    exports com.lwohvye.modules.system.subject to spring.aop, spring.core;
-    exports com.lwohvye.modules.system.repository; // 这里先这样
+    exports com.lwohvye.sys.config.condition to spring.beans;
+    exports com.lwohvye.sys.modules.mnt.repository to spring.beans;
+    exports com.lwohvye.sys.modules.mnt.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.mnt.service;
+    exports com.lwohvye.sys.modules.mnt.service.mapstruct;
+    exports com.lwohvye.sys.modules.mnt.util;
+    exports com.lwohvye.sys.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
+    exports com.lwohvye.sys.modules.quartz.repository; // 若要使用JRebel + XRebel，则需要exports to unnamed module
+    exports com.lwohvye.sys.modules.quartz.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.quartz.service;
+    exports com.lwohvye.sys.modules.quartz.task to spring.beans;
+    exports com.lwohvye.sys.modules.quartz.utils to spring.beans;
+    exports com.lwohvye.sys.modules.rabbitmq.service; // 这个要export to spring.beans和unnamed module。消费者应该都是这样的
+    exports com.lwohvye.sys.modules.security.service;
+    exports com.lwohvye.sys.modules.security.service.dto;
+    exports com.lwohvye.sys.modules.security.security;
+    exports com.lwohvye.sys.modules.security.security.filter;
+    exports com.lwohvye.sys.modules.security.security.handler;
+    exports com.lwohvye.sys.modules.security.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.system.strategy;
+    exports com.lwohvye.sys.modules.system.observer;
+    exports com.lwohvye.sys.modules.system.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.system.service;
+    exports com.lwohvye.sys.modules.system.service.impl to spring.beans, hutool.all;
+    exports com.lwohvye.sys.modules.system.service.version to spring.beans;
+    exports com.lwohvye.sys.modules.system.service.local;
+    exports com.lwohvye.sys.modules.system.service.mapstruct;
+    exports com.lwohvye.sys.modules.system.subject to spring.aop, spring.core;
+    exports com.lwohvye.sys.modules.system.repository; // 这里先这样
 
-    opens com.lwohvye.config.common;
-    opens com.lwohvye.config.datasource;
-    opens com.lwohvye.config.thread;
-    opens com.lwohvye.modules.mnt.repository to spring.core;
-    opens com.lwohvye.modules.mnt.rest to spring.core;
-    opens com.lwohvye.modules.mnt.service.mapstruct;
-    opens com.lwohvye.modules.mnt.service.impl;
-    opens com.lwohvye.modules.mnt.websocket to spring.core;
-    opens com.lwohvye.modules.quartz.config;
-    opens com.lwohvye.modules.quartz.repository to spring.core;
-    opens com.lwohvye.modules.quartz.rest to spring.core;
-    opens com.lwohvye.modules.quartz.service.impl;
-    opens com.lwohvye.modules.quartz.task to spring.core;
-    opens com.lwohvye.modules.quartz.utils to spring.core;
-    opens com.lwohvye.modules.rabbitmq.config;
-    opens com.lwohvye.modules.rabbitmq.service to spring.core;
-    opens com.lwohvye.modules.security.config;
-    opens com.lwohvye.modules.security.config.bean;
-    opens com.lwohvye.modules.security.service to spring.core;
-    opens com.lwohvye.modules.security.rest to spring.core;
-    opens com.lwohvye.modules.system.rest to spring.core;
-    opens com.lwohvye.modules.system.service.impl to spring.core;
-    opens com.lwohvye.modules.system.service.local;
-    opens com.lwohvye.modules.system.service.mapstruct;
-    opens com.lwohvye.modules.system.strategy to spring.core;
-    opens com.lwohvye.modules.system.repository to spring.core;
+    opens com.lwohvye.sys.config.common;
+    opens com.lwohvye.sys.config.datasource;
+    opens com.lwohvye.sys.config.thread;
+    opens com.lwohvye.sys.modules.mnt.repository to spring.core;
+    opens com.lwohvye.sys.modules.mnt.rest to spring.core;
+    opens com.lwohvye.sys.modules.mnt.service.mapstruct;
+    opens com.lwohvye.sys.modules.mnt.service.impl;
+    opens com.lwohvye.sys.modules.mnt.websocket to spring.core;
+    opens com.lwohvye.sys.modules.quartz.config;
+    opens com.lwohvye.sys.modules.quartz.repository to spring.core;
+    opens com.lwohvye.sys.modules.quartz.rest to spring.core;
+    opens com.lwohvye.sys.modules.quartz.service.impl;
+    opens com.lwohvye.sys.modules.quartz.task to spring.core;
+    opens com.lwohvye.sys.modules.quartz.utils to spring.core;
+    opens com.lwohvye.sys.modules.rabbitmq.config;
+    opens com.lwohvye.sys.modules.rabbitmq.service to spring.core;
+    opens com.lwohvye.sys.modules.security.config;
+    opens com.lwohvye.sys.modules.security.config.bean;
+    opens com.lwohvye.sys.modules.security.service to spring.core;
+    opens com.lwohvye.sys.modules.security.rest to spring.core;
+    opens com.lwohvye.sys.modules.system.rest to spring.core;
+    opens com.lwohvye.sys.modules.system.service.impl to spring.core;
+    opens com.lwohvye.sys.modules.system.service.local;
+    opens com.lwohvye.sys.modules.system.service.mapstruct;
+    opens com.lwohvye.sys.modules.system.strategy to spring.core;
+    opens com.lwohvye.sys.modules.system.repository to spring.core;
 
     // 理论上这几个也要opens，简单而言，未open的部分是无法被外界访问的。
     opens template.email;
