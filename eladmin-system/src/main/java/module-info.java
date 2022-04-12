@@ -12,6 +12,7 @@ module lwohvye.eladmin.system {
     requires transitive spring.websocket;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
+    requires transitive captcha;
     requires transitive com.fasterxml.jackson.datatype.jsr310;
     requires transitive com.github.oshi;
     requires transitive druid;
@@ -25,6 +26,7 @@ module lwohvye.eladmin.system {
     requires transitive org.apache.commons.io;
     requires transitive quartz;
     // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
+    provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
     exports com.lwohvye.sys.config.condition to spring.beans;
     exports com.lwohvye.sys.modules.mnt.repository to spring.beans;

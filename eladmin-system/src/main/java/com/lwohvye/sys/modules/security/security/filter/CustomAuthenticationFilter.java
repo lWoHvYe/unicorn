@@ -15,9 +15,13 @@
  */
 package com.lwohvye.sys.modules.security.security.filter;
 
+import com.anji.captcha.model.vo.CaptchaVO;
+import com.anji.captcha.service.CaptchaService;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.sys.modules.security.service.dto.AuthUserDto;
-import com.lwohvye.utils.*;
+import com.lwohvye.utils.RsaUtils;
+import com.lwohvye.utils.SpringContextHolder;
+import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.json.JsonUtils;
 import com.lwohvye.utils.redis.RedisUtils;
 import com.lwohvye.utils.result.ResultUtil;
@@ -29,9 +33,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
+import java.util.Objects;
 
 /**
  * AuthenticationFilter that supports rest login(json login) and form login.
@@ -40,6 +46,19 @@ import java.io.InputStream;
  */
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private RedisUtils redisUtils;
+    private CaptchaService captchaService;
+
+    @PostConstruct
+    public void doInit() {
+        SpringContextHolder.addCallBacks(this::doRegister);
+    }
+
+    public void doRegister() {
+        if (Objects.isNull(redisUtils)) redisUtils = SpringContextHolder.getBean(RedisUtils.class);
+        if (Objects.isNull(captchaService)) captchaService = SpringContextHolder.getBean(CaptchaService.class);
+    }
+
     @Override
     @SneakyThrows
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -47,7 +66,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         //attempt Authentication when Content-Type is json
         if (request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
             UsernamePasswordAuthenticationToken authRequest;
-            var redisUtils = SpringContextHolder.getBean(RedisUtils.class);
 
             try (InputStream is = request.getInputStream()) {
                 var authUser = JsonUtils.toJavaObject(is, AuthUserDto.class);
@@ -70,17 +88,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 password = StringUtils.isNotBlank(password) ? RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, password) : "";
 
                 // 查询验证码
-                String code = (String) redisUtils.get(authUser.getUuid());
-                // 清除验证码
-                redisUtils.delete(authUser.getUuid());
-
-                if (StringUtils.isBlank(code)) {
-                    ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, "验证码不存在或已过期");
-                    return null;
-                }
-
-                if (StringUtils.isBlank(authUser.getCode()) || !authUser.getCode().equalsIgnoreCase(code)) {
-                    ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, "验证码错误");
+                var captchaVO = new CaptchaVO();
+                captchaVO.setCaptchaVerification(authUser.getCaptchaVerification());
+                // 验证验证码
+                var verifyRes = captchaService.verification(captchaVO);
+                if (!verifyRes.isSuccess()) {
+                    //验证码校验失败，返回信息告诉前端
+                    ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, verifyRes.getRepMsg());
                     return null;
                 }
 

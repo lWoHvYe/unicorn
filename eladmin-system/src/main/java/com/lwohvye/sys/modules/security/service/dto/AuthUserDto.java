@@ -17,6 +17,7 @@ package com.lwohvye.sys.modules.security.service.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -34,6 +35,9 @@ public class AuthUserDto {
     private String password;
 
     private String code;
+
+    @NotBlank
+    private String captchaVerification;
 
     private String uuid = "";
 }
