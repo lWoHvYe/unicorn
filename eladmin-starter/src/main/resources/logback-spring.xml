@@ -93,4 +93,6 @@
         <appender-ref ref="stash"/>
     </logger>
 
+    <logger name="com.anji.captcha" level="OFF" />
+
 </configuration>

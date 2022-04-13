@@ -1,6 +1,6 @@
 #配置数据源
 spring:
-  shardingsphere:
+  sharding-sphere:
     datasource:
       names: write-ds,read-ds-0,read-ds-1
       #     主数据源
