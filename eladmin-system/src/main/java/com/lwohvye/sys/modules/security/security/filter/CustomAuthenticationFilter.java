@@ -87,10 +87,10 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 var password = authUser.getPassword();
                 password = StringUtils.isNotBlank(password) ? RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, password) : "";
 
-                // 查询验证码
+                // 前端回传二次验证参数
                 var captchaVO = new CaptchaVO();
                 captchaVO.setCaptchaVerification(authUser.getCaptchaVerification());
-                // 验证验证码
+                // 对参数进行验证
                 var verifyRes = captchaService.verification(captchaVO);
                 if (!verifyRes.isSuccess()) {
                     //验证码校验失败，返回信息告诉前端
