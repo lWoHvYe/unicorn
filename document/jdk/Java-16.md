@@ -152,6 +152,11 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 - [warn: requires transitive directive for an automatic module](https://stackoverflow.com/questions/49600947/how-to-suppress-the-requires-transitive-directive-for-an-automatic-module-warn)
 - [jmod-example](https://github.com/khmarbaise/jdk9-jlink-jmod-example)
 
+迁移中遇到的一些问题
+
+- [module xxx read package xxx from both xxx and xxx ](https://stackoverflow.com/questions/44697738/how-to-resolve-module-reads-package-error-in-java9)
+- [java-9-migration-guide 强烈推荐](https://nipafx.dev/java-9-migration-guide/)
+
 基于下面这俩链接，基本说明了在下一个大版本，将对JPMS进行支持
 
 - [Spring Boot Java 9+ modularity](https://github.com/spring-projects/spring-boot/issues/13799)
