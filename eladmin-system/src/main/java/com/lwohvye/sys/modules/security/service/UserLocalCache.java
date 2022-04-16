@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.security.service;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.sys.modules.rabbitmq.config.RabbitMqConfig;
@@ -26,12 +27,12 @@ import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -88,8 +89,10 @@ public class UserLocalCache {
             // SpringSecurity会自动转换UsernameNotFoundException为BadCredentialsException
             throw new UsernameNotFoundException("", e);
         }
-        if (Objects.isNull(user.getId()) || Boolean.FALSE.equals(user.getEnabled())) // 理论上只有不存在和未激活两种情况
+        if (Objects.isNull(user.getId()))
             throw new UsernameNotFoundException("");
+        if (Boolean.FALSE.equals(user.getEnabled())) // 理论上只有不存在和未激活两种情况
+            throw new InternalAuthenticationServiceException("用户已锁定");
 
         jwtUserDto = new JwtUserDto(
                 user,

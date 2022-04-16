@@ -114,8 +114,6 @@ public class AuthMQService {
         if (StrUtil.isBlank(record))
             return;
         userService.updateEnabled(record, true);
-//              删除缓存中的用户信息
-        userLocalCache.cleanUserCache(record, true);
     }
 
 }
