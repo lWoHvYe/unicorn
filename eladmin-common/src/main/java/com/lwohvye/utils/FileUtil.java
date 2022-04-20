@@ -405,6 +405,10 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
         // 传统方式
         // try (FileInputStream in = new FileInputStream(source)) {
         //     try (FileOutputStream out = new FileOutputStream(target)) {
+        //          Java 9开始的方式，在本身就是流时，用下面这种更简洁一些，否则还是用Files.copy吧
+        //          This method may block indefinitely reading from the input stream, or writing to the output stream. 这个是block的
+        //          in.transferTo(out);
+        //          原始方式
         //         var bytes = new byte[1024];
         //         int bytesRead;
         //         while ((bytesRead = in.read(bytes)) != -1)
