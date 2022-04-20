@@ -35,10 +35,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
@@ -406,16 +403,16 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
      */
     public static void fileCopy(String source, String target) throws IOException {
         // 传统方式
-        try (FileInputStream in = new FileInputStream(source)) {
-            try (FileOutputStream out = new FileOutputStream(target)) {
-                var bytes = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(bytes)) != -1)
-                    out.write(bytes, 0, bytesRead);
-            }
-        }
+        // try (FileInputStream in = new FileInputStream(source)) {
+        //     try (FileOutputStream out = new FileOutputStream(target)) {
+        //         var bytes = new byte[1024];
+        //         int bytesRead;
+        //         while ((bytesRead = in.read(bytes)) != -1)
+        //             out.write(bytes, 0, bytesRead);
+        //     }
+        // }
         // 7开始，新的方式
-        // Files.copy(Paths.get(source), Paths.get(target));
+        Files.copy(Paths.get(source), Paths.get(target));
     }
 
     /**
@@ -432,14 +429,18 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
                 var outChannel = out.getChannel();
 
                 // 带缓冲区的拷贝
-                var buffer = ByteBuffer.allocate(4096);
-                while (inChannel.read(buffer) != -1) {
-                    buffer.flip(); // 读写模式切换
-                    outChannel.write(buffer);
-                    buffer.clear(); // 写完清空 + 为下一轮的读操作作准备
-                }
+                // var buffer = ByteBuffer.allocate(4096);
+                // while (inChannel.read(buffer) != -1) {
+                //     buffer.flip(); // 读写模式切换
+                //     outChannel.write(buffer);
+                //     buffer.clear(); // 写完清空 + 为下一轮的读操作作准备
+                // }
+                // FileChannel的transferTo()/transferFrom()，底层就是sendfile() 系统调用函数。Kafka 这个开源项目就用到它，其为什么这么快，就可以提到零拷贝sendfile这个点。
+                // 拓展，零拷贝实现的几种方式
                 // 另一种方式。比上面的简洁很多
-                // outChannel.transferFrom(inChannel, 0, inChannel.size());
+                outChannel.transferFrom(inChannel, 0, inChannel.size());
+                // 另一种写法
+                // inChannel.transferTo(0, inChannel.size(), outChannel);
             }
         }
     }
