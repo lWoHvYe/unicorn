@@ -1,0 +1,46 @@
+/*
+ *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package com.lwohvye.starter.modules.service.impl;
+
+import com.lwohvye.starter.modules.service.ITSService;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.WebApplicationContext;
+
+@Service
+// 解决Bean链中某个Bean需要多例的问题
+// 使用session和request产生了一个新问题，生成controller的时候需要service作为controller的成员，但是service只在收到请求（可能是request也可能是session）时才会被实例化，controller拿不到service实例。
+// 为了解决这个问题，@Scope注解添加了一个proxyMode的属性，有两个值ScopedProxyMode.INTERFACES和ScopedProxyMode.TARGET_CLASS，前一个表示表示Service是一个接口，后一个表示Service是一个类。
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
+public class TSServiceImpl implements ITSService {
+
+    private String tsName;
+
+    @Override
+    public void setField(String str) {
+        if (StringUtils.hasText(str)) tsName = str;
+    }
+
+    @Override
+    public String outIn() {
+        System.out.println(Thread.currentThread().getName() + " " + tsName);
+
+        return tsName;
+    }
+}
