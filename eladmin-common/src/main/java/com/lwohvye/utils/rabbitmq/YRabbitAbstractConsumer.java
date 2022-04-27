@@ -37,8 +37,8 @@ import java.util.function.Function;
 @Slf4j
 public abstract class YRabbitAbstractConsumer {
 
-    // 使用线程池，做资源隔离
-    static final ThreadPoolExecutor SIMPLE_EXECUTOR = new ThreadPoolExecutor(8, 10, 200, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100));
+    // 使用线程池，做资源隔离。考虑到服务器配置，因为会有多个独立的线程池，这里根据需要调小一些
+    static final ThreadPoolExecutor SIMPLE_EXECUTOR = new ThreadPoolExecutor(4, 6, 200, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100));
 
 
     // 若用到该属性，子类需通过set注入

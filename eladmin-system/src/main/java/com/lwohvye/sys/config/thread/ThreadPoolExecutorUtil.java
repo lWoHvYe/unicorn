@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 用于获取自定义线程池。当前用于定时任务的执行
+ * 用于获取自定义线程池。当前用于定时任务的执行，参数可以根据需要调整。虽然用了异步线程池的参数，但跟其是隔离的
  *
  * @author Zheng Jie
  * @date 2019年10月31日18:16:47
@@ -31,9 +31,10 @@ public class ThreadPoolExecutorUtil {
 
     public static ThreadPoolExecutor getPoll() {
         AsyncTaskProperties properties = SpringContextHolder.getBean(AsyncTaskProperties.class);
+        // 这里只有异步线程池的一半
         return new ThreadPoolExecutor(
-                properties.getCorePoolSize(),
-                properties.getMaxPoolSize(),
+                properties.getCorePoolSize() >> 1,
+                properties.getMaxPoolSize() >> 1,
                 properties.getKeepAliveSeconds(),
                 TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(properties.getQueueCapacity()),
