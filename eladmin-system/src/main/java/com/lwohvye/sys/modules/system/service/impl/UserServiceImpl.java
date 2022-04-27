@@ -88,15 +88,14 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
      */
     @Override
     public void doRegister() {
-        var roleService = SpringContextHolder.getBean("roleServiceImpl");
-        ReflectUtil.invoke(roleService, "addObserver", this);
-
-        var menuService = SpringContextHolder.getBean("menuServiceImpl");
-        ReflectUtil.invoke(menuService, "addObserver", this);
-
-        var deptService = SpringContextHolder.getBean("deptServiceImpl");
-        ReflectUtil.invoke(deptService, "addObserver", this);
-
+        Arrays.stream(this.getClass().getInterfaces())
+                .filter(aClass -> aClass.getSimpleName().endsWith("Observer"))
+                .forEach(aClass -> {
+                    var aName = aClass.getSimpleName();
+                    var aType = StringUtils.lowerFirstChar(aName.substring(0, aName.indexOf("Observer"))); // 首字母要转小写
+                    var aService = SpringContextHolder.getBean(aType + "ServiceImpl");
+                    ReflectUtil.invoke(aService, "addObserver", this);
+                });
     }
 
     @Override
