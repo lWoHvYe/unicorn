@@ -15,6 +15,7 @@
  */
 package com.lwohvye.sys.config.thread;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Zheng Jie
  * @date 2019年10月31日17:49:55
  */
+@Slf4j
 @Component
 public class TheadFactoryName implements ThreadFactory {
 
@@ -69,6 +71,8 @@ public class TheadFactoryName implements ThreadFactory {
             t.setDaemon(false);
         if (t.getPriority() != Thread.NORM_PRIORITY)
             t.setPriority(Thread.NORM_PRIORITY);
+        // 默认情况下，线程执行出错，应该是无反馈的，可设置UncaughtExceptionHandler，在其中处理异常，另外若未设置该属性，但设置了ThreadGroup，会用group，其本身也是UncaughtExceptionHandler的一个实现
+        t.setUncaughtExceptionHandler((t1, e) -> log.error("{} 线程执行出错，原因：{}", t1.getName(), e.getMessage()));
         return t;
     }
 }

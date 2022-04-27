@@ -74,6 +74,19 @@ public class AsyncTaskExecutePool implements AsyncConfigurer {
         return executor;
     }
 
+    /**
+     * 这里定义了异步执行异常的处理。
+     * 线程池执行异常处理方式有四种：
+     * 自行try-cache、
+     * 返回Future调用其get()会阻塞的返回结果，若执行出错会抛出异常
+     * 在new Thread时设置UncaughtExceptionHandler、
+     * 重写ThreadPoolExecutor的afterExecute方法，处理传递的异常引用
+     * 在Java 8中，CompletableFuture，这种同步/异步编程，也支持定义异常处理等
+     * 针对异步这个，一般用Spring的ThreadPoolTaskExecutor，可以通过下面的方式定义异常处理
+     *
+     * @return org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
+     * @date 2022/4/27 6:33 PM
+     */
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, objects) -> {
