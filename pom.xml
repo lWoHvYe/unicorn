@@ -101,7 +101,7 @@
         <logback.version>1.2.11</logback.version>
         <redisson.version>3.17.0</redisson.version>
         <guava.version>31.1-jre</guava.version>
-        <caffeine.version>3.0.6</caffeine.version>
+        <caffeine.version>3.1.0</caffeine.version>
         <poi.version>5.2.2</poi.version>
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>6.12</yauaa.version>
