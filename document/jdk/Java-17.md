@@ -36,5 +36,5 @@ There's no preferred pronunciation, both are fine.
 - [JEP 425: Virtual Threads](https://openjdk.java.net/jeps/425)
 - [Project Loom](https://wiki.openjdk.java.net/display/loom)
 - [Project Loom: Fibers and Continuations for the Java Virtual Machine](http://cr.openjdk.java.net/~rpressler/loom/Loom-Proposal.html)
-
+- 2020-04-28更新，`JEP 425:Virtual Threads (Preview)` 在Java 19 Preview，	 review ends: 2022/05/05
 
