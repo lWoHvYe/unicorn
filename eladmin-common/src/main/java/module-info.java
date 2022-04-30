@@ -7,6 +7,7 @@ module lwohvye.eladmin.common {
     requires transitive java.sql;
     requires transitive java.persistence;
     requires transitive java.validation;
+    requires transitive jdk.unsupported;
     requires transitive spring.amqp;
     requires transitive spring.core;
     requires transitive spring.beans;
