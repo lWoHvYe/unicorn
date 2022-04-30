@@ -42,6 +42,8 @@ public enum CodeBiEnum {
     private final Integer code;
     private final String description;
 
+    // private static final String des = "sd";
+
     public static CodeBiEnum find(Integer code) {
         return Arrays.stream(CodeBiEnum.values()).filter(codeBiEnum -> Objects.equals(codeBiEnum.code, code)).findFirst().orElse(null);
     }

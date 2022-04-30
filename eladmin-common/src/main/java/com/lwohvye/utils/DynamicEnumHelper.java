@@ -17,7 +17,6 @@
 package com.lwohvye.utils;
 
 
-import com.lwohvye.utils.enums.CodeBiEnum;
 import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
@@ -37,14 +36,8 @@ import java.util.List;
  */
 public class DynamicEnumHelper {
     private static MethodHandles.Lookup implLookup = null;
-    private static boolean isSetup = false;
-    private static Unsafe unsafe = null;
 
-    private static void setup() {
-        if (isSetup) {
-            return;
-        }
-
+    static {
         try {
             /*
              * After Java 9, sun.reflect package was moved to jdk.internal.reflect and it requires extra operations to access.
@@ -54,32 +47,24 @@ public class DynamicEnumHelper {
              * How to rewrite a static final field in jdk12+
              */
             // 这里只能这样获取，通过Unsafe.getUnsafe()直接获取会抛出异常
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
+            var unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
             unsafeField.trySetAccessible();
-            unsafe = (Unsafe) unsafeField.get(null);
-            /*
-            Field IMPL_LOOKUP = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
-            IMPL_LOOKUP.setAccessible(true);
-            MethodHandles.Lookup lkp = (MethodHandles.Lookup) IMPL_LOOKUP.get(null);
-            MethodHandle methodHandle= lkp.findSpecial(t.getClass(), getMethodName, MethodType.methodType(String.class), t.getClass());
-            value = methodHandle.bindTo(t).invoke();
-            */
+            var unsafe = (Unsafe) unsafeField.get(null);
+
             // IMPL_LOOKUP 是用来判断私有方法是否被信任的标识，用来控制访问权限的.默认是false
-            Field implLookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
+            var implLookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
             // implLookupField.trySetAccessible();
+            // 当前这里只能通过Unsafe来获取，后续再试试其他的获取方式，比如被注释的通过反射获取的，既然有人这样写，理论上是可行的，只是某些条件不满足
             implLookup =
-                    // (MethodHandles.Lookup) implLookupField.get(null); 这种方式获取不到。。。。
+                    // (MethodHandles.Lookup) implLookupField.get(null); 这种方式获取不到，因为上面的trySetAccessible()会返回false表示设置失败，所以无法这样获取值
                     (MethodHandles.Lookup) unsafe.getObject(unsafe.staticFieldBase(implLookupField), unsafe.staticFieldOffset(implLookupField));
         } catch (Exception ignored) {
         }
-
-        isSetup = true;
     }
 
     private static <T extends Enum<?>> T makeEnum(Class<T> enumClass, String value, int ordinal, Class<?>[] additionalTypes, Object[] additionalValues) throws Throwable {
-        int additionalParamsCount = additionalValues == null ? 0 : additionalValues.length;
-        Object[] params = new Object[additionalParamsCount + 2];
+        var additionalParamsCount = additionalValues == null ? 0 : additionalValues.length;
+        var params = new Object[additionalParamsCount + 2];
         params[0] = value;
         params[1] = ordinal;
         if (additionalValues != null) {
@@ -108,7 +93,7 @@ public class DynamicEnumHelper {
     }
 
     private static void blankField(Class<?> enumClass, String fieldName) throws Throwable {
-        for (Field field : Class.class.getDeclaredFields()) {
+        for (var field : Class.class.getDeclaredFields()) {
             if (field.getName().contains(fieldName)) {
                 setFailsafeFieldValue(field, enumClass, null);
                 break;
@@ -116,6 +101,14 @@ public class DynamicEnumHelper {
         }
     }
 
+    /**
+     * 设置属性的值，可以设置 private static final的Field，后续看看都有哪些是Unsafe可以实现，但MethodHandle做不了的
+     *
+     * @param field  /
+     * @param target /
+     * @param value  /
+     * @date 2022/5/1 12:10 AM
+     */
     public static void setFailsafeFieldValue(Field field, Object target, Object value) throws Throwable {
         if (target != null) {
             implLookup.findSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(target, value);
@@ -137,17 +130,18 @@ public class DynamicEnumHelper {
      */
     @SuppressWarnings({"unchecked"})
     public static <T extends Enum<?>> T addEnum(final Class<T> enumType, String enumName, final Class<?>[] paramTypes, Object[] paramValues) {
+
         // 0. Sanity checks
-        if (!isSetup) {
-            setup();
+        if (!Enum.class.isAssignableFrom(enumType)) {
+            throw new RuntimeException("class " + enumType + " is not an instance of Enum");
         }
 
         // 1. Lookup "$VALUES" holder in enum class and get previous enum instances
         Field valuesField = null;
-        Field[] fields = enumType.getDeclaredFields();
+        var fields = enumType.getDeclaredFields();
 
-        for (Field field : fields) {
-            String name = field.getName();
+        for (var field : fields) {
+            var name = field.getName();
             if (name.equals("$VALUES") || name.equals("ENUM$VALUES")) //Added 'ENUM$VALUES' because Eclipse's internal compiler doesn't follow standards
             {
                 valuesField = field;
@@ -157,10 +151,10 @@ public class DynamicEnumHelper {
 
         int flags = (Modifier.PUBLIC) | Modifier.STATIC | Modifier.FINAL | 0x1000 /*SYNTHETIC*/;
         if (valuesField == null) {
-            String valueType = String.format("[L%s;", enumType.getName().replace('.', '/'));
+            var valueType = String.format("[L%s;", enumType.getName().replace('.', '/'));
 
-            for (Field field : fields) {
-                if ((field.getModifiers() & flags) == flags &&
+            for (var field : fields) {
+                if ((field.getModifiers() & flags) == flags && // 最内层的括号通过与运算做可见性判断
                     field.getType().getName().replace('.', '/').equals(valueType)) //Apparently some JVMs return .'s and some don't..
                 {
                     valuesField = field;
@@ -175,8 +169,8 @@ public class DynamicEnumHelper {
             //lines.add(String.format("Runtime Deobf: %s", FMLForgePlugin.RUNTIME_DEOBF));
             lines.add(String.format("Flags: %s", String.format("%16s", Integer.toBinaryString(flags)).replace(' ', '0')));
             lines.add("Fields:");
-            for (Field field : fields) {
-                String mods = String.format("%16s", Integer.toBinaryString(field.getModifiers())).replace(' ', '0');
+            for (var field : fields) {
+                var mods = String.format("%16s", Integer.toBinaryString(field.getModifiers())).replace(' ', '0');
                 lines.add(String.format("       %s %s: %s", mods, field.getName(), field.getType().getName()));
             }
 
@@ -187,11 +181,12 @@ public class DynamicEnumHelper {
 
         try {
             // 2. Copy it
-            T[] previousValues = (T[]) valuesField.get(enumType);
-            List<T> values = new ArrayList<>(Arrays.asList(previousValues));
+            var previousValues = (T[]) valuesField.get(enumType);
+            var values = new ArrayList<>(Arrays.asList(previousValues));
 
             // 3. build new enum
-            T newValue = (T) makeEnum(enumType, enumName, values.size(), paramTypes, paramValues);
+            // 枚举本身是有一个String类型的value和int类型的ordinal，所以在下面的逻辑中会加两个参数进去
+            var newValue = makeEnum(enumType, enumName, values.size(), paramTypes, paramValues);
 
             // 4. add new value
             values.add(newValue);
@@ -209,29 +204,25 @@ public class DynamicEnumHelper {
         }
     }
 
-    static {
-        if (!isSetup) {
-            setup();
-        }
-    }
-
     public static void setField(Object obj, Object value, Field field) throws ReflectiveOperationException {
         if (obj == null) {
             setStaticField(field, value);
         } else {
-            try {
-                unsafe.putObject(obj, unsafe.objectFieldOffset(field), value);
-            } catch (Exception e) {
-                throw new ReflectiveOperationException(e);
-            }
+            // 针对于非static的属性，即便是final的也可以通过下面的方式修改
+            implLookup.findVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).set(obj, value);
+            // implLookup.findSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(obj, value);
+            // unsafe.putObject(obj, unsafe.objectFieldOffset(field), value);
         }
     }
 
     public static void setStaticField(Field field, Object value) throws ReflectiveOperationException {
         try {
             implLookup.ensureInitialized(field.getDeclaringClass());
-            unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), value);
-        } catch (Exception e) {
+            // implLookup.findStaticVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).set(value); // 这种支持static但不支持final的，更细节的可以看findStaticVarHandle()上的注释
+            implLookup.findStaticSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(value); // 这种可以，虽然注释似乎意思是不支持final的样子：if access checking fails, or if the field is not static or is final
+            // Unsafe类的强大之处就在于，无视属性的访问限定，可以对其读取/修改。即便是static final的也一样
+            // unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), value);
+        } catch (Throwable e) {
             throw new ReflectiveOperationException(e);
         }
     }
@@ -240,26 +231,27 @@ public class DynamicEnumHelper {
         if (obj == null) {
             return getStaticField(field);
         } else {
-            try {
-                return (T) unsafe.getObject(obj, unsafe.objectFieldOffset(field));
-            } catch (Exception e) {
-                throw new ReflectiveOperationException(e);
-            }
+            return (T) implLookup.findVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).get(obj);
+            // return (T) implLookup.findGetter(field.getDeclaringClass(),field.getName(),field.getType()).invoke(obj);
+            // return (T) unsafe.getObject(obj, unsafe.objectFieldOffset(field));
         }
     }
 
     public static <T> T getStaticField(Field field) throws ReflectiveOperationException {
-        try {
-            implLookup.ensureInitialized(field.getDeclaringClass());
-            return (T) unsafe.getObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field));
-        } catch (Exception e) {
-            throw new ReflectiveOperationException(e);
-        }
+        implLookup.ensureInitialized(field.getDeclaringClass());
+        return (T) implLookup.findStaticVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).get();
+        // return (T) implLookup.findStaticGetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke();
+        // return (T) unsafe.getObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field));
+
     }
 
-    public static void main(String[] args) {
-        System.out.println(Arrays.toString(CodeBiEnum.values()));
-        addEnum(CodeBiEnum.class, "FOUR", new Class[]{Integer.class, String.class}, new Object[]{4, "动态加进去一个"});
-        System.out.println(Arrays.toString(CodeBiEnum.values()));
-    }
+    // public static void main(String[] args) throws ReflectiveOperationException {
+    //     System.out.println(Arrays.toString(CodeBiEnum.values()));
+    //     addEnum(CodeBiEnum.class, "FOUR", new Class[]{Integer.class, String.class}, new Object[]{4, "动态加进去一个"});
+    //     System.out.println(Arrays.toString(CodeBiEnum.values()));
+    //     var des = CodeBiEnum.class.getDeclaredField("des");
+    //     setField(null, "sds", des);
+    //     var code = CodeBiEnum.class.getDeclaredField("code");
+    //     setField(CodeBiEnum.ONE, 5, code);
+    // }
 }

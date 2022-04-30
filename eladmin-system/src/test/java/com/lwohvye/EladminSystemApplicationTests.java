@@ -140,6 +140,7 @@ public class EladminSystemApplicationTests {
         // MethodHandle和VarHandle
         var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
         System.out.println("get：" + nameVarHandle.get(person));
+        // nameVarHandle.set(person, "试一试"); 原因暂不清楚，也许因为Person是record，使得无法通过这种方式重新设置值，或者是lookup的类型的问题，总之这种是不行的
 
         var accessor = PropertyAccessorFactory.getPropertyAccessor(Person.class);
         assertEquals(person.name(), accessor.getValue(person, "name"));
