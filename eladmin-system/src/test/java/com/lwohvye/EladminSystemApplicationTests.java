@@ -140,7 +140,8 @@ public class EladminSystemApplicationTests {
         // MethodHandle和VarHandle
         var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
         System.out.println("get：" + nameVarHandle.get(person));
-        // nameVarHandle.set(person, "试一试"); 原因暂不清楚，也许因为Person是record，使得无法通过这种方式重新设置值，或者是lookup的类型的问题，总之这种是不行的
+        // nameVarHandle.set(person, "试一试"); //因为Person是record，使得无法通过这种方式重新设置值，即便用IMPL_LOOKUP也不行，因为返回的VarHandle是ReadOnly的，`this.allowedModes == TRUSTED && !getField.isTrustedFinalField()` 针对于record，第二个为 `!true` ，更换lookup只影响第一个
+        // DynamicEnumHelper.unsafe.putObject(person,DynamicEnumHelper.unsafe.objectFieldOffset(Person.class.getDeclaredField("name")),"试一试"); // Unsafe: can't get field offset on a record class
 
         var accessor = PropertyAccessorFactory.getPropertyAccessor(Person.class);
         assertEquals(person.name(), accessor.getValue(person, "name"));
