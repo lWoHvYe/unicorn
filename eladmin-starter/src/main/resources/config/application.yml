@@ -110,3 +110,8 @@ local:
     sp-sync-queue: xs.sp-sync.queue
     # 某个Bean的定义方式，默认不使用BeanFactoryPostProcessor来定义她
     init-bf: false
+    #   这里试试数组类的，也可以参考file那边整成实体
+    extra-ut:
+      list:
+        - { name: 'FOUR',type: 4, desc: '猜猜我是谁' }
+        - { name: 'FIVE',type: 5, desc: 'you know who' }
