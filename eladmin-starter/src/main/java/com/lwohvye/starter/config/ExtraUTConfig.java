@@ -24,6 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Objects;
 
 @Configuration
 @ConfigurationProperties(prefix = "local.sys.extra-ut")
@@ -37,7 +38,8 @@ public class ExtraUTConfig {
     public void setList(List<EUTo> list) {
         ExtraUTConfig.list = list;
 // TODO: 2022/5/1 除非把这部分下沉，否则想不到一个好的切入点来执行这个，当前想到的就是预留钩子给子类
-        refreshUserTypeEnum();
+        if (Objects.nonNull(list))
+            refreshUserTypeEnum();
     }
 
     /**
@@ -53,7 +55,7 @@ public class ExtraUTConfig {
 
     @Getter
     @Setter
-    public static class EUTo {
+    public static class EUTo { // inner class may be static
         private String name;
         private Integer type;
         private String desc;

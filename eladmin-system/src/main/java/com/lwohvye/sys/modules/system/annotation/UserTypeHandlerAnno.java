@@ -30,5 +30,8 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 public @interface UserTypeHandlerAnno {
-    UserTypeEnum value();
+    UserTypeEnum value() default UserTypeEnum.EXTRA;
+
+    // 扩展使用
+    String typeName() default "";
 }

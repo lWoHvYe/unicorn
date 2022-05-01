@@ -28,7 +28,7 @@ import java.util.List;
  * @author Hongyan Wang
  * @date 2021年11月02日 16:42
  */
-public sealed interface AUserTypeStrategy extends BaseService permits AdminUserTypeStrategy, NormalUserTypeStrategy, DevUserTypeStrategy {
+public sealed interface AUserTypeStrategy extends BaseService permits AdminUserTypeStrategy, DevUserTypeStrategy, ExtraUserTypeStrategy, NormalUserTypeStrategy {
 
     List<GrantedAuthority> grantedAuth(Long userId);
 

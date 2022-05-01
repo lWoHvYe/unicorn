@@ -16,15 +16,17 @@
 package com.lwohvye.sys.modules.system.strategy;
 
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno;
+import com.lwohvye.sys.modules.system.enums.UserTypeEnum;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 策略模式上下文（环境类），给外部调用，该类的注入由相关的HandlerProcessor实现
@@ -59,8 +61,14 @@ public class AuthHandlerContext {
         var tCollection = SpringContextHolder.getBeansOfType(AUserTypeStrategy.class).values();
         for (var t : tCollection) {
             var userTypeHandlerAnno = t.getClass().getAnnotation(UserTypeHandlerAnno.class);
-            if (ObjectUtils.isEmpty(userTypeHandlerAnno)) continue;
-            strategyMap.put(userTypeHandlerAnno.value().getType(), t);
+            if (Objects.equals(userTypeHandlerAnno.value(), UserTypeEnum.EXTRA)) {
+                var typeName = userTypeHandlerAnno.typeName();
+                if (StringUtils.hasText(typeName)) {
+                    strategyMap.put(UserTypeEnum.valueOf(typeName).getType(), t);
+                }
+            } else {
+                strategyMap.put(userTypeHandlerAnno.value().getType(), t);
+            }
         }
     }
 

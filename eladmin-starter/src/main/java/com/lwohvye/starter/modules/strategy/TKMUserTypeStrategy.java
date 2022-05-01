@@ -14,12 +14,21 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.system.strategy;
+package com.lwohvye.starter.modules.strategy;
 
-/**
- * 留给外部的一个扩展点，通过继承该类并添加注解来扩展UserType。另外父类为密封类，该子类标记为了非密封类
- *
- * @date 2022/5/1 2:44 PM
- */
-public abstract non-sealed class ExtraUserTypeStrategy implements AUserTypeStrategy {
+import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno;
+import com.lwohvye.sys.modules.system.strategy.ExtraUserTypeStrategy;
+import java.util.Collections;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@UserTypeHandlerAnno(typeName = "FOUR")
+public class TKMUserTypeStrategy extends ExtraUserTypeStrategy {
+    @Override
+    public List<GrantedAuthority> grantedAuth(Long userId) {
+        return Collections.emptyList();
+    }
 }

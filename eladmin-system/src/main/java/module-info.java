@@ -47,6 +47,8 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.sys.modules.security.security.filter;
     exports com.lwohvye.sys.modules.security.security.handler;
     exports com.lwohvye.sys.modules.security.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.system.annotation;
+    exports com.lwohvye.sys.modules.system.enums;
     exports com.lwohvye.sys.modules.system.strategy;
     exports com.lwohvye.sys.modules.system.observer;
     exports com.lwohvye.sys.modules.system.rest to spring.beans, spring.web;
@@ -78,6 +80,7 @@ module lwohvye.eladmin.system {
     opens com.lwohvye.sys.modules.security.config.bean;
     opens com.lwohvye.sys.modules.security.service to spring.core;
     opens com.lwohvye.sys.modules.security.rest to spring.core;
+    opens com.lwohvye.sys.modules.system.enums to lwohvye.eladmin.common; // common中的工具要通过反射访问enum中的部分属性，所以要对其open
     opens com.lwohvye.sys.modules.system.rest to spring.core;
     opens com.lwohvye.sys.modules.system.service.impl to spring.core;
     opens com.lwohvye.sys.modules.system.service.local;
