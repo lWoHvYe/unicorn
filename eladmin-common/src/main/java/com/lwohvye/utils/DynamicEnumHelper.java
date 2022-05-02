@@ -254,4 +254,26 @@ public class DynamicEnumHelper {
     //     var code = CodeBiEnum.class.getDeclaredField("code");
     //     setField(CodeBiEnum.ONE, 5, code);
     // }
+
+    /**
+     * 在Java 12之前，可以通过该方式，修改final Field，针对static final Field也可以。已验证
+     *
+     * @param object        /
+     * @param fieldName     /
+     * @param newFieldValue /
+     * @date 2022/5/2 9:06 AM
+     * @deprecated Java 12 is unsupported for this way
+     */
+    @Deprecated(since = "Java 12")
+    public static void modifyFinalField(Object object, String fieldName, Object newFieldValue) throws NoSuchFieldException, IllegalAccessException {
+        var field = object.getClass().getDeclaredField(fieldName);
+        var modifiersField = Field.class.getDeclaredField("modifiers"); // 获取Field的访问修饰符，java.lang.NoSuchFieldException: modifiers
+        modifiersField.trySetAccessible(); //Field 的 modifiers 是私有的
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL); // 将Field的访问修饰符设置为非final的
+        field.trySetAccessible();
+        field.set(object, newFieldValue);
+        // 另，field本身是一个副本，我们修改的Modifier和Accessible都是针对该副本的，若在此处再次获取个fieldNew，其Modifier之类的还是原来的。这一点需记住
+        // var fieldAfterModifier = object.getClass().getDeclaredField(fieldName); // 如果原来是final的话，这里还是final的
+    }
+
 }

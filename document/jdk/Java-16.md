@@ -203,23 +203,26 @@ java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
 #### 附：
 
 - 修改final属性的方式：
-    - 非静态final属性，可以通过修改访问修饰符，将其改为非final的
+    - 非静态final属性，可以通过反射修改访问修饰符，将其改为非final的
   ```java
-    public static void modify(Object object, String fieldName, Object newFieldValue) throws Exception {
+    public static void modifyFinalField(Object object, String fieldName, Object newFieldValue) throws Exception {
       Field field = object.getClass().getDeclaredField(fieldName);
       Field modifiersField = Field.class.getDeclaredField("modifiers"); // 获取Field的访问修饰符
       modifiersField.trySetAccessible(); //Field 的 modifiers 是私有的
       modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL); // 将Field的访问修饰符设置为非final的
-      field.trySetAccessable();
+      field.trySetAccessible();
       field.set(object, newFieldValue);
     }
   ```
-    - 如果是静态final属性，同样可以先改为非final的（注意如果这里在去掉 final 之前就取了一次值,就会 set 失败, 因为 Class 默认开启了 useCaches 缓存, get 的时候会获取到 root field 的 FieldAccessor,
-      后面的重设就会失效）
+    - 如果是静态final属性，同样可以先改为非final的（~~注意如果这里在去掉 final 之前就取了一次值,就会 set 失败, 因为 Class 默认开启了 useCaches 缓存, get 的时候会获取到 root field 的 FieldAccessor,
+      后面的重设就会失效，~~ 这一点没能验证）
     - 针对上面两种方式，可能代码执行下来没问题，但输出又还是原来的值？但总是可以通过反射方式获取到修改后的新值。这就是 Java 编译器对 final 属型的内联优化，即编译时把该 final
       的值直接放到了引用它的地方。即使是反射修改了该属性，引用的地方还是原值。Java对基本类型及Literal String 类型(直接双引号字符串)的final值会进行内联优化，而包装类型及通过new String("xx")创建的final值是不会被内联优化的，总之：只要不会被编译器内联优化的
-      final 属性就可以通过反射有效的进行修改,修改后代码中可使用到新的值
-    - 还可以通过Unsafe的相关方法实现修改，这个是无视访问修饰符的 putXXX()
+      final 属性就可以通过反射有效的进行修改,修改后代码中可使用到新的值，另外如果 final 属性值是通过构造函数传入的也不会被编译器内联优化，所以能被有效的修改。
+  
+    - We can not change the static final fields by getAndChangeModifiers since JDK12.（java.lang.NoSuchFieldException: modifiers）。从Java 12开始已经不行咯，用下面的方式吧
+  
+    - 可以通过Unsafe的相关方法实现修改，这个是无视访问修饰符的 putXXX()
   ```java
     unsafe.putObject(obj, unsafe.objectFieldOffset(field), value); // 实例对象属性
     unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), value); // 静态属性
@@ -227,7 +230,7 @@ java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
      unsafe.getObject(obj, unsafe.objectFieldOffset(field));
      unsafe.getObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field));
   ```
-    - 不推荐使用Unsafe，所以在1.7出现了MethodHandle，通过不同的lookup，获取到find系列方法，然后invoke系列执行。牵涉到final，要用IMPL_LOOKUP(绕过一些检查)
+    - 不推荐使用Unsafe，所以在1.7出现了MethodHandle，通过不同的lookup，获取到find系列方法，然后invoke系列执行，其与反射类似，但效率很高。牵涉到final，要用IMPL_LOOKUP(绕过一些检查)
     ```java
       implLookup.findSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(obj, value);
       implLookup.findStaticSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(value); // 这种可以，虽然注释似乎意思是不支持final的样子：if access checking fails, or if the field is not static or is final
