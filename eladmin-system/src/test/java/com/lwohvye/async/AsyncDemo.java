@@ -71,6 +71,7 @@ public class AsyncDemo {
      *
      * @date 2022/3/4 10:33 PM
      */
+    // 若异步线程池也需要做隔离，方法为，先通过@Bean定义各线程池，然后@Async("线程池Bean名称")这样来指定异步使用的线程池
     @Async
     public void asyncVoid() {
         System.out.println("void - 开始");
