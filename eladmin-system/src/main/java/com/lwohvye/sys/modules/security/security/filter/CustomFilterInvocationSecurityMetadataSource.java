@@ -110,6 +110,7 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
         record PatternMatchCarrier(String methodType, PathPattern pathPattern) {
         }
 
+        // 关于parallelStream，其是使用ForkJoinPool采用分治法来解决问题，池中默认线程为核数-1，需注意提交任务的main线程也参与任务的执行，即实际执行任务的是main线程+池中的线程
         // 根据方法类型分组。值为pattern的集合
         anonymousPaths = handlerMethodMap.entrySet().parallelStream()
                 // 有匿名访问注解
