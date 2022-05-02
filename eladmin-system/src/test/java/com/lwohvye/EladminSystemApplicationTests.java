@@ -137,11 +137,17 @@ public class EladminSystemApplicationTests {
 
         var friend = new Friend("在一起", 8);
         var person = new Person(1L, "咸鱼", 1, 12, true, 18.0F, friend, new ListNode(10));
+        System.out.println("person.name() = " + person.name()); // 通过这种方式访问属性
         // MethodHandle和VarHandle
         var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
         System.out.println("get：" + nameVarHandle.get(person));
         // nameVarHandle.set(person, "试一试"); //因为Person是record，使得无法通过这种方式重新设置值，即便用IMPL_LOOKUP也不行，因为返回的VarHandle是ReadOnly的，`this.allowedModes == TRUSTED && !getField.isTrustedFinalField()` 针对于record，第二个为 `!true` ，更换lookup只影响第一个
         // DynamicEnumHelper.unsafe.putObject(person,DynamicEnumHelper.unsafe.objectFieldOffset(Person.class.getDeclaredField("name")),"试一试"); // Unsafe: can't get field offset on a record class
+        if (Person.class.isRecord()) {
+            for (var recordComponent : Person.class.getRecordComponents()) {
+                System.out.println(recordComponent);
+            }
+        }
 
         var accessor = PropertyAccessorFactory.getPropertyAccessor(Person.class);
         assertEquals(person.name(), accessor.getValue(person, "name"));

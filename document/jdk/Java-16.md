@@ -194,11 +194,23 @@ java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
 
 #### Records
 
+Enhance the Java programming language with records, which are classes that act as transparent carriers for immutable data. Records can be thought of as nominal
+tuples.
+
 - [JEP 395: Records](https://openjdk.java.net/jeps/395)
 - 当前已知的几点，
     - Unsafe的部分方法不支持，例如：Unsafe: can't get field offset on a record class
     - 通过一些方式，可以对final属性进行修改，但record的似乎不行
+- Motivation: It is a common complaint that "Java is too verbose" or has "too much ceremony".
 - 初步判断，Record与原本的类存在一些差异，部分功能当前还未支持Record，白天进一步验证
+- Record推出背后的目标是使开发人员能够将相关字段作为单个不可变数据项组合在一起，而不需要编写冗长的代码。这意味着，每当您想要向您的记录添加更多的字段/方法时，请考虑是否应该使用完整的类来代替它。(详见Goals and Non-Goals)
+- Record类，本身属性是private final的，内部允许有其他属性，这些需要是static的(Instance field is not allowed in record)
+- Record类的父类为java.lang.Record，所以不能再继承其他类，但可实现接口
+- 之前基于业务需要，可能会用到元组tuple，这部分用 [Local Class](https://docs.oracle.com/javase/specs/jls/se14/html/jls-14.html#jls-14.3) 来做可能更好一些，对此record也支持local record class (A
+  record class with components is clearer and safer than an anonymous tuple of implicitly params.)
+- Like nested record classes, local record classes are implicitly static. The fact that local record classes are implicitly static is in contrast to local
+  classes, which are not implicitly static. In fact, local classes are never static — implicitly or explicitly — and can always access variables in the
+  enclosing method.
 
 #### 附：
 
@@ -219,9 +231,9 @@ java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
     - 针对上面两种方式，可能代码执行下来没问题，但输出又还是原来的值？但总是可以通过反射方式获取到修改后的新值。这就是 Java 编译器对 final 属型的内联优化，即编译时把该 final
       的值直接放到了引用它的地方。即使是反射修改了该属性，引用的地方还是原值。Java对基本类型及Literal String 类型(直接双引号字符串)的final值会进行内联优化，而包装类型及通过new String("xx")创建的final值是不会被内联优化的，总之：只要不会被编译器内联优化的
       final 属性就可以通过反射有效的进行修改,修改后代码中可使用到新的值，另外如果 final 属性值是通过构造函数传入的也不会被编译器内联优化，所以能被有效的修改。
-  
+
     - We can not change the static final fields by getAndChangeModifiers since JDK12.（java.lang.NoSuchFieldException: modifiers）。从Java 12开始已经不行咯，用下面的方式吧
-  
+
     - 可以通过Unsafe的相关方法实现修改，这个是无视访问修饰符的 putXXX()
   ```java
     unsafe.putObject(obj, unsafe.objectFieldOffset(field), value); // 实例对象属性

@@ -20,9 +20,13 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.*;
 
 /**
+ * Record类，本身属性是private final的，内部允许有其他属性，这些需要是static的(Instance field is not allowed in record)
+ *
  * @author Hongyan Wang
  * @date 2021年04月10日 10:10
  */
@@ -36,12 +40,47 @@ public record Person(Long id, String name, Integer sex, Integer age, Boolean isM
 
     static BigDecimal bigDecimal;
 
-    static List<Friend> friends;
+    static Set<Friend> friends = new HashSet<>();
+
+    private static final Random RANDOM;
+
+    static {
+        try {
+            RANDOM = SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 //    static ListNode listNode;
 
+    /**
+     * Record类的构造是这样的，与传统的类是不一样的
+     *
+     * @param id       /
+     * @param name     /
+     * @param sex      /
+     * @param age      /
+     * @param isMember /
+     * @param point    /
+     * @param friend   /
+     * @param listNode /
+     * @date 2022/5/2 12:55 PM
+     */
+    public Person {
+        age >>= 1;
+        point *= 2;
+        if (Objects.isNull(d)) d = Double.valueOf(point);
+        friends.add(friend);
+    }
+
+    // A record class can declare instance methods.
     public void copy(Person source) {
         BeanUtil.copyProperties(source, this, CopyOptions.create().setIgnoreNullValue(true));
     }
 
+    // A record class can declare static methods, fields, and initializers.
+    public static int joy() throws NoSuchAlgorithmException {
+        return RANDOM.nextInt();
+    }
 }

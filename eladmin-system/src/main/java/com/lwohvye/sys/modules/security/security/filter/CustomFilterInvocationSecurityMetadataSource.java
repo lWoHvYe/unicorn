@@ -22,7 +22,6 @@ import com.lwohvye.sys.modules.system.service.IResourceService;
 import com.lwohvye.utils.enums.RequestMethodEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.util.Pair;
 import org.springframework.http.server.PathContainer;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -107,6 +106,10 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
         var pathPatternsClass = PathPatternsRequestCondition.class;
         var patternsClass = PatternsRequestCondition.class;
         PathPatternParser parser = new PathPatternParser();
+        // Local record classes。A record class with components is clearer and safer than an anonymous tuple of implicitly params.
+        record PatternMatchCarrier(String methodType, PathPattern pathPattern) {
+        }
+
         // 根据方法类型分组。值为pattern的集合
         anonymousPaths = handlerMethodMap.entrySet().parallelStream()
                 // 有匿名访问注解
@@ -127,10 +130,11 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
                     // 返回一个Stream流，由flatMap进行合并
                     return patterns.stream().map(pattern ->
                             // 二元组。first为methodType，second为pattern
-                            Pair.of(request.getType(), parser.parse(pattern))
+                            // Pair.of(request.getType(), parser.parse(pattern))
+                            new PatternMatchCarrier(request.getType(), parser.parse(pattern))
                     );
                 })
-                .collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toUnmodifiableList())));
+                .collect(Collectors.groupingBy(PatternMatchCarrier::methodType, Collectors.mapping(PatternMatchCarrier::pathPattern, Collectors.toUnmodifiableList())));
     }
 
     /**
