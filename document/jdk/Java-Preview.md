@@ -44,3 +44,9 @@
       copying a frame from the h-stack to the v-stack is called thawing. The prototype also optionally thaws just a small portion of the h-stack when mounting
       using an approach called lazy copy; see the JVMLS 2018 talk as well as the section on performance for more detail.（针对线程的Stack，采用的方式是yield时，copy stack,
       stored on the Java heap）
+
+#### Foreign Function & Memory API
+
+- Introduce an API by which Java programs can interoperate with code and data outside of the Java runtime.
+- [JEP 424: Foreign Function & Memory API](https://openjdk.java.net/jeps/424)
+- 主体是针对 JNI 及 Unsafe (accessing foreign memory) 这两块，提供了新的实现，跟Virtual Threads相关应该也有些关系
