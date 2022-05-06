@@ -16,24 +16,24 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.service.dto.DeptDto;
+import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.sys.modules.system.repository.DeptRepository;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.api.modules.system.service.dto.DeptDto;
-import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.sys.modules.system.service.mapstruct.DeptMapper;
 import com.lwohvye.sys.modules.system.subject.DeptSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.enums.DataScopeEnum;
-import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +55,8 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
     private final DeptMapper deptMapper;
     private final IUserService userService;
     private final IRoleService roleService;
-    private final RedisUtils redisUtils;
+
+    private final ConversionService conversionService;
 
     @Override
     @Cacheable
@@ -104,7 +105,7 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
     public DeptDto findById(Long id) {
         Dept dept = deptRepository.findById(id).orElseGet(Dept::new);
         ValidationUtil.isNull(dept.getId(), "Dept", "id", id);
-        return deptMapper.toDto(dept, new CycleAvoidingMappingContext());
+        return conversionService.convert(dept, DeptDto.class);
     }
 
     @Override
@@ -185,7 +186,7 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
     @Transactional(rollbackFor = Exception.class)
     public Set<DeptDto> getDeleteDepts(List<Dept> menuList, Set<DeptDto> deptDtos) {
         for (Dept dept : menuList) {
-            deptDtos.add(deptMapper.toDto(dept, new CycleAvoidingMappingContext()));
+            deptDtos.add(conversionService.convert(dept, DeptDto.class));
             List<Dept> depts = deptRepository.findByPid(dept.getId());
             if (depts != null && !depts.isEmpty()) {
                 getDeleteDepts(depts, deptDtos);

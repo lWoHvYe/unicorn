@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,8 @@ public class ResourceServiceImpl implements IResourceService, RoleObserver {
 
     private final ResourceRepository resourceRepository;
     private final ResourceMapper resourceMapper;
+
+    private final ConversionService conversionService;
     private final RedisUtils redisUtils;
 
     @PostConstruct
@@ -81,7 +84,7 @@ public class ResourceServiceImpl implements IResourceService, RoleObserver {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(ResourceQueryCriteria criteria, Pageable pageable) {
         Page<Resource> page = resourceRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(resource -> resourceMapper.toDto(resource, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(resource -> conversionService.convert(resource, ResourceDto.class)));
     }
 
     @Override
@@ -102,7 +105,7 @@ public class ResourceServiceImpl implements IResourceService, RoleObserver {
     public ResourceDto findById(Long resourceId) {
         Resource resource = resourceRepository.findById(resourceId).orElseGet(Resource::new);
         ValidationUtil.isNull(resource.getResourceId(), "Resource", "resourceId", resourceId);
-        return resourceMapper.toDto(resource, new CycleAvoidingMappingContext());
+        return conversionService.convert(resource, ResourceDto.class);
     }
 
     @Override
@@ -110,7 +113,7 @@ public class ResourceServiceImpl implements IResourceService, RoleObserver {
     @Transactional(rollbackFor = Exception.class)
     public ResourceDto create(Resource resources) {
         var save = resourceRepository.save(resources);
-        return resourceMapper.toDto(save, new CycleAvoidingMappingContext());
+        return conversionService.convert(save, ResourceDto.class);
     }
 
     @Override

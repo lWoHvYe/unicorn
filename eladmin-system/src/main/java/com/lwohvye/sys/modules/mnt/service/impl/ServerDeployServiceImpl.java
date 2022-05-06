@@ -28,6 +28,7 @@ import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,11 +49,13 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     private final ServerDeployRepository serverDeployRepository;
     private final ServerDeployMapper serverDeployMapper;
 
+    private final ConversionService conversionService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
         Page<ServerDeploy> page = serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(serverDeploy -> serverDeployMapper.toDto(serverDeploy, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(serverDeploy -> conversionService.convert(serverDeploy, ServerDeployDto.class)));
     }
 
     @Override
@@ -66,14 +69,14 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     public ServerDeployDto findById(Long id) {
         ServerDeploy server = serverDeployRepository.findById(id).orElseGet(ServerDeploy::new);
         ValidationUtil.isNull(server.getId(), "ServerDeploy", "id", id);
-        return serverDeployMapper.toDto(server, new CycleAvoidingMappingContext());
+        return conversionService.convert(server, ServerDeployDto.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServerDeployDto findByIp(String ip) {
         ServerDeploy deploy = serverDeployRepository.findByIp(ip);
-        return serverDeployMapper.toDto(deploy, new CycleAvoidingMappingContext());
+        return conversionService.convert(deploy, ServerDeployDto.class);
     }
 
     @Override

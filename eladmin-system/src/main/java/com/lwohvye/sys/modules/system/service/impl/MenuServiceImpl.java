@@ -41,6 +41,7 @@ import lombok.SneakyThrows;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +65,8 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
 
     private final MenuRepository menuRepository;
     private final MenuMapper menuMapper;
+
+    private final ConversionService conversionService;
     private final IRoleService roleService;
     private final RedisUtils redisUtils;
 
@@ -112,7 +115,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
     public MenuDto findById(long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
-        return menuMapper.toDto(menu, new CycleAvoidingMappingContext());
+        return conversionService.convert(menu, MenuDto.class);
     }
 
     /**
@@ -127,7 +130,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
         List<RoleSmallDto> roles = roleService.findByUserId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
         LinkedHashSet<Menu> menus = menuRepository.findByRoleIdsAndTypeNot(roleIds, 2);
-        return menus.stream().map(menu -> menuMapper.toDto(menu, new CycleAvoidingMappingContext())).toList();
+        return menus.stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList();
     }
 
     @Override
@@ -320,7 +323,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
         return menuRepository.findByRoleIdsAndPidIsNullAndTypeNot(roleIds, 2).orElseGet(LinkedHashSet::new)
                 .parallelStream().map(menu -> {
-                    var dto = menuMapper.toDto(menu, new CycleAvoidingMappingContext());
+                    var dto = conversionService.convert(menu, MenuDto.class);
                     var id = dto.getId();
                     dto.setChildren(getChild4CurUser(id, roleIds));
                     return dto;
@@ -331,7 +334,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
     private List<MenuDto> getChild4CurUser(Long pid, Set<Long> roleIds) {
         return menuRepository.findByRoleIdsAndPidAndTypeNot(roleIds, pid, 2).orElseGet(LinkedHashSet::new)
                 .parallelStream().map(menu -> {
-                    var dto = menuMapper.toDto(menu, new CycleAvoidingMappingContext());
+                    var dto = conversionService.convert(menu, MenuDto.class);
                     var id = dto.getId();
                     dto.setChildren(getChild4CurUser(id, roleIds));
                     return dto;

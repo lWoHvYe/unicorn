@@ -40,6 +40,7 @@ import com.lwohvye.sys.modules.mnt.websocket.WebSocketServer;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -58,9 +59,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DeployServiceImpl implements IDeployService {
 
-    private final String FILE_SEPARATOR = "/";
+    private static final String FILE_SEPARATOR = "/";
     private final DeployRepository deployRepository;
     private final DeployMapper deployMapper;
+
+    private final ConversionService conversionService;
     private final IServerDeployService serverDeployService;
     private final IDeployHistoryService deployHistoryService;
 
@@ -74,7 +77,7 @@ public class DeployServiceImpl implements IDeployService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployQueryCriteria criteria, Pageable pageable) {
         Page<Deploy> page = deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(deploy -> deployMapper.toDto(deploy, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(deploy -> conversionService.convert(deploy, DeployDto.class)));
     }
 
     @Override
@@ -88,7 +91,7 @@ public class DeployServiceImpl implements IDeployService {
     public DeployDto findById(Long id) {
         Deploy deploy = deployRepository.findById(id).orElseGet(Deploy::new);
         ValidationUtil.isNull(deploy.getId(), "Deploy", "id", id);
-        return deployMapper.toDto(deploy, new CycleAvoidingMappingContext());
+        return conversionService.convert(deploy, DeployDto.class);
     }
 
     @Override

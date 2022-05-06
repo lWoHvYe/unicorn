@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,8 @@ public class JobServiceImpl implements IJobService {
 
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
+
+    private final ConversionService conversionService;
     private final IUserService userService;
 
     @Override
@@ -57,7 +60,7 @@ public class JobServiceImpl implements IJobService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
         Page<Job> page = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(job -> jobMapper.toDto(job, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(job -> conversionService.convert(job, JobDto.class)));
     }
 
     @Override
@@ -73,7 +76,7 @@ public class JobServiceImpl implements IJobService {
     public JobDto findById(Long id) {
         Job job = jobRepository.findById(id).orElseGet(Job::new);
         ValidationUtil.isNull(job.getId(), "Job", "id", id);
-        return jobMapper.toDto(job, new CycleAvoidingMappingContext());
+        return conversionService.convert(job, JobDto.class);
     }
 
     @Override

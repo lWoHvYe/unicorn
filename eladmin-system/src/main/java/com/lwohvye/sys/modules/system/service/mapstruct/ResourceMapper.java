@@ -15,12 +15,11 @@
  */
 package com.lwohvye.sys.modules.system.service.mapstruct;
 
-import com.lwohvye.base.BaseMapper;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.ResourceDto;
-import org.mapstruct.Context;
+import com.lwohvye.base.BaseMapper;
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -41,7 +40,8 @@ public interface ResourceMapper extends BaseMapper<ResourceDto, Resource> {
     @Override
     @Mapping(target = "roleCodes", expression = "java(genSimpleRole(entity.getRoles()))")
         // ⚠️ 若不加@Context，则toDto(List<T> list) 不会用 toDto(T t)。
-    ResourceDto toDto(Resource entity, @Context CycleAvoidingMappingContext context);
+        // ResourceDto toDto(Resource entity, @Context CycleAvoidingMappingContext context);
+    ResourceDto convert(@NotNull Resource entity);
 
     default List<String> genSimpleRole(Collection<Role> roles) {
         if (Objects.isNull(roles))

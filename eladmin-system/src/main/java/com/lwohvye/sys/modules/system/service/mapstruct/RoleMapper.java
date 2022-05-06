@@ -15,13 +15,12 @@
  */
 package com.lwohvye.sys.modules.system.service.mapstruct;
 
-import com.lwohvye.base.BaseMapper;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.domain.vo.ResourceVo;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
-import org.mapstruct.Context;
+import com.lwohvye.base.BaseMapper;
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -38,7 +37,7 @@ public interface RoleMapper extends BaseMapper<RoleDto, Role> {
 
     @Override
     @Mapping(target = "resourcesOt", expression = "java(toRVo(entity.getResources()))")
-    RoleDto toDto(Role entity, @Context CycleAvoidingMappingContext context);
+    RoleDto convert(@NotNull Role entity);
 
     default Set<ResourceVo> toRVo(Set<Resource> resources) {
         return resources.stream().map(ResourceVo::toVo).collect(Collectors.toSet());

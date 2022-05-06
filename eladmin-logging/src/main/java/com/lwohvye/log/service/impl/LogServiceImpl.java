@@ -18,17 +18,17 @@ package com.lwohvye.log.service.impl;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.log.domain.Log;
 import com.lwohvye.log.repository.LogRepository;
 import com.lwohvye.log.service.ILogService;
-import com.lwohvye.log.service.mapstruct.LogErrorMapper;
-import com.lwohvye.log.service.mapstruct.LogSmallMapper;
+import com.lwohvye.log.service.dto.LogErrorDTO;
 import com.lwohvye.log.service.dto.LogQueryCriteria;
+import com.lwohvye.log.service.dto.LogSmallDTO;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,8 +52,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class LogServiceImpl implements ILogService {
     private final LogRepository logRepository;
-    private final LogErrorMapper logErrorMapper;
-    private final LogSmallMapper logSmallMapper;
+
+    private final ConversionService conversionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -61,7 +61,7 @@ public class LogServiceImpl implements ILogService {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         String status = "ERROR";
         if (status.equals(criteria.getLogType())) {
-            return PageUtil.toPage(page.map(errInfo -> logErrorMapper.toDto(errInfo, new CycleAvoidingMappingContext())));
+            return PageUtil.toPage(page.map(errInfo -> conversionService.convert(errInfo, LogErrorDTO.class)));
         }
         return page;
     }
@@ -76,7 +76,7 @@ public class LogServiceImpl implements ILogService {
     @Transactional(rollbackFor = Exception.class)
     public Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
-        return PageUtil.toPage(page.map(logInfo -> logSmallMapper.toDto(logInfo, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(logInfo -> conversionService.convert(logInfo, LogSmallDTO.class)));
     }
 
     /**

@@ -39,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -64,6 +65,8 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
     private final RoleSmallMapper roleSmallMapper;
+
+    private final ConversionService conversionService;
     private final RedisUtils redisUtils;
     private final IUserService userService;
     private final AuthHandlerContext authHandlerContext;
@@ -104,7 +107,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(RoleQueryCriteria criteria, Pageable pageable) {
         Page<Role> page = roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(role -> roleMapper.toDto(role, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(role -> conversionService.convert(role, RoleDto.class)));
     }
 
     @Override
@@ -115,7 +118,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     public RoleDto findById(long id) {
         Role role = roleRepository.findById(id).orElseGet(Role::new);
         ValidationUtil.isNull(role.getId(), "Role", "id", id);
-        return roleMapper.toDto(role, new CycleAvoidingMappingContext());
+        return conversionService.convert(role, RoleDto.class);
     }
 
     @Override

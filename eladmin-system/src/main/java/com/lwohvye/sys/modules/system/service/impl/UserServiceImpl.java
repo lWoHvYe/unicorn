@@ -19,6 +19,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.User;
+import com.lwohvye.api.modules.system.domain.projection.UserProj;
 import com.lwohvye.api.modules.system.service.dto.*;
 import com.lwohvye.config.FileProperties;
 import com.lwohvye.context.CycleAvoidingMappingContext;
@@ -26,15 +29,11 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.sys.modules.security.service.UserLocalCache;
-import com.lwohvye.api.modules.system.domain.Dept;
-import com.lwohvye.api.modules.system.domain.User;
-import com.lwohvye.api.modules.system.domain.projection.UserProj;
 import com.lwohvye.sys.modules.system.observer.DeptObserver;
 import com.lwohvye.sys.modules.system.observer.MenuObserver;
 import com.lwohvye.sys.modules.system.observer.RoleObserver;
 import com.lwohvye.sys.modules.system.repository.UserRepository;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.sys.modules.system.service.mapstruct.UserInnerMapper;
 import com.lwohvye.sys.modules.system.service.mapstruct.UserMapper;
 import com.lwohvye.sys.modules.system.subject.UserSubject;
 import com.lwohvye.utils.*;
@@ -44,6 +43,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Pageable;
@@ -70,7 +70,8 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final UserInnerMapper userInnerMapper;
+
+    private final ConversionService conversionService;
     private final FileProperties properties;
     private final RedisUtils redisUtils;
     private final UserLocalCache userLocalCache;
@@ -103,7 +104,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
         var page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(user -> userMapper.toDto(user, new CycleAvoidingMappingContext()))); // 这里使用toPage，在无符合条件的记录时，也有构筑结果并缓存，也算是一定程度上缓解缓存穿透
+        return PageUtil.toPage(page.map(user -> conversionService.convert(user, UserDto.class))); // 这里使用toPage，在无符合条件的记录时，也有构筑结果并缓存，也算是一定程度上缓解缓存穿透
     }
 
     @Override
@@ -128,7 +129,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     public UserDto findById(long id) {
         User user = userRepository.findById(id).orElseGet(User::new);
         ValidationUtil.isNull(user.getId(), "User", "id", id);
-        return userMapper.toDto(user, new CycleAvoidingMappingContext());
+        return conversionService.convert(user, UserDto.class);
     }
 
     @Override
@@ -240,7 +241,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
         if (Objects.isNull(user))
             throw new EntityNotFoundException(User.class, "name", userName);
         else
-            return userMapper.toDto(user, new CycleAvoidingMappingContext());
+            return conversionService.convert(user, UserDto.class);
     }
 
     @Override
@@ -251,7 +252,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
         if (Objects.isNull(user))
             throw new EntityNotFoundException(User.class, "name", userName);
         else
-            return userInnerMapper.toDto(user, new CycleAvoidingMappingContext());
+            return conversionService.convert(user, UserInnerDto.class);
     }
 
     @Override

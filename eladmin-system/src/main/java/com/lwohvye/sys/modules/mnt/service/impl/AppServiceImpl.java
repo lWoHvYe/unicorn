@@ -28,6 +28,7 @@ import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,11 +49,13 @@ public class AppServiceImpl implements IAppService {
     private final AppRepository appRepository;
     private final AppMapper appMapper;
 
+    private final ConversionService conversionService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(AppQueryCriteria criteria, Pageable pageable) {
         Page<App> page = appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(app -> appMapper.toDto(app, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(app -> conversionService.convert(app, AppDto.class)));
     }
 
     @Override
@@ -66,7 +69,7 @@ public class AppServiceImpl implements IAppService {
     public AppDto findById(Long id) {
         App app = appRepository.findById(id).orElseGet(App::new);
         ValidationUtil.isNull(app.getId(), "App", "id", id);
-        return appMapper.toDto(app, new CycleAvoidingMappingContext());
+        return conversionService.convert(app, AppDto.class);
     }
 
     @Override

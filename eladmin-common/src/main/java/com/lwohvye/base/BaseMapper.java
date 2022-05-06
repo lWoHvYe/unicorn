@@ -19,6 +19,7 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.utils.json.JsonUtils;
 import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
+import org.springframework.core.convert.converter.Converter;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Map;
  * @author Zheng Jie
  * @date 2018-11-23
  */
-public interface BaseMapper<D, E> {
+public interface BaseMapper<D, E> extends Converter<E, D> {
 /*
     @Mapper 表示该接口作为映射接口，编译时MapStruct处理器的入口。
     @Mappings 一组映射关系
@@ -46,12 +47,14 @@ public interface BaseMapper<D, E> {
     E toEntity(D dto, @Context CycleAvoidingMappingContext context);
 
     /**
-     * Entity转DTO
+     * Entity转DTO，由Spring的Converter替换。这个只能单向转换，当都是这个方向时，用这个可以减少Mapper的注入
+     * @see https://mapstruct.org/news/2022-02-07-mapstruct-spring-extensions-0-1-1-released/
      *
      * @param entity /
      * @return /
      */
-    D toDto(E entity, @Context CycleAvoidingMappingContext context);
+    // D toDto(E entity, @Context CycleAvoidingMappingContext context);
+
 
     /**
      * DTO集合转Entity集合

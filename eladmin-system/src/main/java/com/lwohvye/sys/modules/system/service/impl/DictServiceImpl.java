@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,12 +51,14 @@ public class DictServiceImpl implements IDictService {
     private final DictRepository dictRepository;
     private final DictMapper dictMapper;
 
+    private final ConversionService conversionService;
+
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictQueryCriteria criteria, Pageable pageable) {
         Page<Dict> page = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(dict -> dictMapper.toDto(dict, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(dict -> conversionService.convert(dict, DictDto.class)));
     }
 
     @Override

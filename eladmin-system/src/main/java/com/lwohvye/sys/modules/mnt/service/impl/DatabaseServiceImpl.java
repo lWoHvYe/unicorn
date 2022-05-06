@@ -30,6 +30,7 @@ import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,11 +52,13 @@ public class DatabaseServiceImpl implements IDatabaseService {
     private final DatabaseRepository databaseRepository;
     private final DatabaseMapper databaseMapper;
 
+    private final ConversionService conversionService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable) {
         Page<Database> page = databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(database -> databaseMapper.toDto(database, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(database -> conversionService.convert(database, DatabaseDto.class)));
     }
 
     @Override
@@ -69,7 +72,7 @@ public class DatabaseServiceImpl implements IDatabaseService {
     public DatabaseDto findById(String id) {
         Database database = databaseRepository.findById(id).orElseGet(Database::new);
         ValidationUtil.isNull(database.getId(), "Database", "id", id);
-        return databaseMapper.toDto(database, new CycleAvoidingMappingContext());
+        return conversionService.convert(database, DatabaseDto.class);
     }
 
     @Override

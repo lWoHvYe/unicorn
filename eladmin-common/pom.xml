@@ -180,6 +180,10 @@
             <artifactId>mapstruct-processor</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct.extensions.spring</groupId>
+            <artifactId>mapstruct-spring-extensions</artifactId>
+        </dependency>
 
         <!--   具体可以看看这个，https://jcp.org/en/jsr/detail?id=330     -->
         <dependency>

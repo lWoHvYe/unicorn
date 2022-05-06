@@ -27,6 +27,7 @@ import com.lwohvye.tools.service.dto.LocalStorageQueryCriteria;
 import com.lwohvye.tools.service.mapstruct.LocalStorageMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,13 +52,15 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
 
     private final LocalStorageRepository localStorageRepository;
     private final LocalStorageMapper localStorageMapper;
+
+    private final ConversionService conversionService;
     private final FileProperties properties;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable) {
         Page<LocalStorage> page = localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(localStorage -> localStorageMapper.toDto(localStorage, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(localStorage -> conversionService.convert(localStorage, LocalStorageDto.class)));
     }
 
     @Override
@@ -71,7 +74,7 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
     public LocalStorageDto findById(Long id) {
         LocalStorage localStorage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);
         ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", id);
-        return localStorageMapper.toDto(localStorage, new CycleAvoidingMappingContext());
+        return conversionService.convert(localStorage, LocalStorageDto.class);
     }
 
     @Override

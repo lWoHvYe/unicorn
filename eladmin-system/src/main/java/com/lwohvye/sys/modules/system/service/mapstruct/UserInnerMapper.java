@@ -15,13 +15,12 @@
  */
 package com.lwohvye.sys.modules.system.service.mapstruct;
 
-import com.lwohvye.base.BaseMapper;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.system.domain.Job;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
-import org.mapstruct.Context;
+import com.lwohvye.base.BaseMapper;
+import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -41,7 +40,7 @@ public interface UserInnerMapper extends BaseMapper<UserInnerDto, User> {
     @Mapping(target = "roleIds", expression = "java(entity.getRoles().stream().map(this::getRoleId).toList())")
     @Mapping(target = "jobIds", expression = "java(this.getJobIds(entity.getJobs()))")
     @Mapping(target = "deptId", source = "dept.id")
-    UserInnerDto toDto(User entity, @Context CycleAvoidingMappingContext context);
+    UserInnerDto convert(@NotNull User entity);
 
     default Long getRoleId(Role role) {
         return role.getId();

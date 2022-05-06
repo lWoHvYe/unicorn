@@ -28,6 +28,7 @@ import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,11 +49,13 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
     private final DeployHistoryRepository deployHistoryRepository;
     private final DeployHistoryMapper deployHistoryMapper;
 
+    private final ConversionService conversionService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         Page<DeployHistory> page = deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(deployHistory -> deployHistoryMapper.toDto(deployHistory, new CycleAvoidingMappingContext())));
+        return PageUtil.toPage(page.map(deployHistory -> conversionService.convert(deployHistory, DeployHistoryDto.class)));
     }
 
     @Override
@@ -66,7 +69,7 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
     public DeployHistoryDto findById(String id) {
         DeployHistory deployhistory = deployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
         ValidationUtil.isNull(deployhistory.getId(), "DeployHistory", "id", id);
-        return deployHistoryMapper.toDto(deployhistory, new CycleAvoidingMappingContext());
+        return conversionService.convert(deployhistory, DeployHistoryDto.class);
     }
 
     @Override
