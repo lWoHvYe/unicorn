@@ -16,14 +16,12 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.system.domain.Resource;
+import com.lwohvye.api.modules.system.service.dto.ResourceDto;
+import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
 import com.lwohvye.sys.modules.system.observer.RoleObserver;
 import com.lwohvye.sys.modules.system.repository.ResourceRepository;
 import com.lwohvye.sys.modules.system.service.IResourceService;
-import com.lwohvye.api.modules.system.service.dto.ResourceDto;
-import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
-import com.lwohvye.sys.modules.system.service.mapstruct.ResourceMapper;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +55,6 @@ import java.util.Map;
 public class ResourceServiceImpl implements IResourceService, RoleObserver {
 
     private final ResourceRepository resourceRepository;
-    private final ResourceMapper resourceMapper;
 
     private final ConversionService conversionService;
     private final RedisUtils redisUtils;
@@ -89,15 +86,15 @@ public class ResourceServiceImpl implements IResourceService, RoleObserver {
 
     @Override
     public List<ResourceDto> queryAll(ResourceQueryCriteria criteria) {
-        var list = resourceRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return resourceMapper.toDto(list, new CycleAvoidingMappingContext());
+        return resourceRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(resource -> conversionService.convert(resource, ResourceDto.class)).toList();
     }
 
     @Override
     @Cacheable(key = " #root.target.getSysName() + 'allResources' ")
     @Transactional(rollbackFor = Exception.class)
     public List<ResourceDto> queryAllRes() {
-        return resourceMapper.toDto(resourceRepository.findAll(), new CycleAvoidingMappingContext());
+        return resourceRepository.findAll().stream().map(resource -> conversionService.convert(resource, ResourceDto.class)).toList();
     }
 
     @Override

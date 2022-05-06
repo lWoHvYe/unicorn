@@ -24,7 +24,6 @@ import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.projection.UserProj;
 import com.lwohvye.api.modules.system.service.dto.*;
 import com.lwohvye.config.FileProperties;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
@@ -34,7 +33,6 @@ import com.lwohvye.sys.modules.system.observer.MenuObserver;
 import com.lwohvye.sys.modules.system.observer.RoleObserver;
 import com.lwohvye.sys.modules.system.repository.UserRepository;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.sys.modules.system.service.mapstruct.UserMapper;
 import com.lwohvye.sys.modules.system.subject.UserSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -69,7 +67,6 @@ import java.util.*;
 public class UserServiceImpl extends UserSubject implements IUserService, RoleObserver, MenuObserver, DeptObserver {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
     private final ConversionService conversionService;
     private final FileProperties properties;
@@ -110,8 +107,8 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
-        List<User> users = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return userMapper.toDto(users, new CycleAvoidingMappingContext());
+        return userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(user -> conversionService.convert(user, UserDto.class)).toList();
     }
 
     @Override

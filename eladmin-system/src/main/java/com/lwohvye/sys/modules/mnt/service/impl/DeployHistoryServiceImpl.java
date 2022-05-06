@@ -16,13 +16,11 @@
 package com.lwohvye.sys.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.mnt.domain.DeployHistory;
-import com.lwohvye.sys.modules.mnt.repository.DeployHistoryRepository;
-import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
 import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryDto;
 import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryQueryCriteria;
-import com.lwohvye.sys.modules.mnt.service.mapstruct.DeployHistoryMapper;
+import com.lwohvye.sys.modules.mnt.repository.DeployHistoryRepository;
+import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
@@ -47,7 +45,6 @@ import java.util.*;
 public class DeployHistoryServiceImpl implements IDeployHistoryService {
 
     private final DeployHistoryRepository deployHistoryRepository;
-    private final DeployHistoryMapper deployHistoryMapper;
 
     private final ConversionService conversionService;
 
@@ -61,7 +58,8 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DeployHistoryDto> queryAll(DeployHistoryQueryCriteria criteria) {
-        return deployHistoryMapper.toDto(deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
+        return deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(deployHistory -> conversionService.convert(deployHistory, DeployHistoryDto.class)).toList();
     }
 
     @Override

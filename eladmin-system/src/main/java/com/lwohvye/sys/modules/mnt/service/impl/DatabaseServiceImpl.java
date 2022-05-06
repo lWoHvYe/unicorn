@@ -16,13 +16,11 @@
 package com.lwohvye.sys.modules.mnt.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.mnt.domain.Database;
-import com.lwohvye.sys.modules.mnt.repository.DatabaseRepository;
-import com.lwohvye.sys.modules.mnt.service.IDatabaseService;
 import com.lwohvye.api.modules.mnt.service.dto.DatabaseDto;
 import com.lwohvye.api.modules.mnt.service.dto.DatabaseQueryCriteria;
-import com.lwohvye.sys.modules.mnt.service.mapstruct.DatabaseMapper;
+import com.lwohvye.sys.modules.mnt.repository.DatabaseRepository;
+import com.lwohvye.sys.modules.mnt.service.IDatabaseService;
 import com.lwohvye.sys.modules.mnt.util.SqlUtils;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.PageUtil;
@@ -50,7 +48,6 @@ import java.util.*;
 public class DatabaseServiceImpl implements IDatabaseService {
 
     private final DatabaseRepository databaseRepository;
-    private final DatabaseMapper databaseMapper;
 
     private final ConversionService conversionService;
 
@@ -64,7 +61,8 @@ public class DatabaseServiceImpl implements IDatabaseService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DatabaseDto> queryAll(DatabaseQueryCriteria criteria) {
-        return databaseMapper.toDto(databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
+        return databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(database -> conversionService.convert(database, DatabaseDto.class)).toList();
     }
 
     @Override

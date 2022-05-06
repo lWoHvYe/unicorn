@@ -19,20 +19,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.domain.vo.MenuMetaVo;
 import com.lwohvye.api.modules.system.domain.vo.MenuVo;
+import com.lwohvye.api.modules.system.service.dto.MenuDto;
+import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.sys.modules.system.observer.UserObserver;
 import com.lwohvye.sys.modules.system.repository.MenuRepository;
 import com.lwohvye.sys.modules.system.service.IMenuService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
-import com.lwohvye.api.modules.system.service.dto.MenuDto;
-import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
-import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
-import com.lwohvye.sys.modules.system.service.mapstruct.MenuMapper;
 import com.lwohvye.sys.modules.system.subject.MenuSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -64,7 +62,6 @@ import java.util.stream.Collectors;
 public class MenuServiceImpl extends MenuSubject implements IMenuService, UserObserver {
 
     private final MenuRepository menuRepository;
-    private final MenuMapper menuMapper;
 
     private final ConversionService conversionService;
     private final IRoleService roleService;
@@ -106,7 +103,8 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
                 }
             }
         }
-        return menuMapper.toDto(menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort), new CycleAvoidingMappingContext());
+        return menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
+                .stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList();
     }
 
     @Override
@@ -238,7 +236,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
         else
             menus = menuRepository.findByPidIsNull();
 
-        return menuMapper.toDto(menus, new CycleAvoidingMappingContext());
+        return menus.stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList();
     }
 
     @Override
@@ -246,7 +244,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
     public List<MenuDto> getSuperior(MenuDto menuDto, List<Menu> menus) {
         if (menuDto.getPid() == null) {
             menus.addAll(menuRepository.findByPidIsNull());
-            return menuMapper.toDto(menus, new CycleAvoidingMappingContext());
+            return menus.stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList();
         }
         menus.addAll(menuRepository.findByPid(menuDto.getPid()));
         return getSuperior(findById(menuDto.getPid()), menus);

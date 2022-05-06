@@ -46,6 +46,7 @@ module lwohvye.eladmin.common {
     requires transitive org.hibernate.validator;
     requires transitive org.jetbrains.annotations;
     requires transitive org.mapstruct;
+    requires transitive mapstruct.spring.extensions;
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
     requires transitive redisson;

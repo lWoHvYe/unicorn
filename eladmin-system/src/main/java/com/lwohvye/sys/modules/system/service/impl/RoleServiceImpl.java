@@ -16,21 +16,20 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.Role;
+import com.lwohvye.api.modules.system.service.dto.RoleDto;
+import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
+import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.api.modules.system.domain.Dept;
-import com.lwohvye.api.modules.system.domain.Role;
-import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext;
 import com.lwohvye.sys.modules.system.observer.MenuObserver;
 import com.lwohvye.sys.modules.system.repository.RoleRepository;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.api.modules.system.service.dto.RoleDto;
-import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
-import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.sys.modules.system.service.mapstruct.RoleMapper;
-import com.lwohvye.sys.modules.system.service.mapstruct.RoleSmallMapper;
+import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext;
 import com.lwohvye.sys.modules.system.subject.RoleSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
@@ -64,7 +63,6 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
-    private final RoleSmallMapper roleSmallMapper;
 
     private final ConversionService conversionService;
     private final RedisUtils redisUtils;
@@ -93,13 +91,14 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
-        return roleMapper.toDto(roleRepository.findAll(sort), new CycleAvoidingMappingContext());
+        return roleRepository.findAll(sort).stream().map(role -> conversionService.convert(role, RoleDto.class)).toList();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll(RoleQueryCriteria criteria) {
-        return roleMapper.toDto(roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
+        return roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(role -> conversionService.convert(role, RoleDto.class)).toList();
     }
 
     @Override
@@ -188,7 +187,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<RoleSmallDto> findByUserId(Long userId) {
-        return roleSmallMapper.toDto(roleRepository.findByUserId(userId), new CycleAvoidingMappingContext());
+        return roleRepository.findByUserId(userId).stream().map(role -> conversionService.convert(role, RoleSmallDto.class)).toList();
     }
 
     @Override

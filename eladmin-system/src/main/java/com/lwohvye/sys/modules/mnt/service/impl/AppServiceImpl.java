@@ -15,14 +15,12 @@
  */
 package com.lwohvye.sys.modules.mnt.service.impl;
 
-import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.api.modules.mnt.domain.App;
-import com.lwohvye.sys.modules.mnt.repository.AppRepository;
-import com.lwohvye.sys.modules.mnt.service.IAppService;
 import com.lwohvye.api.modules.mnt.service.dto.AppDto;
 import com.lwohvye.api.modules.mnt.service.dto.AppQueryCriteria;
-import com.lwohvye.sys.modules.mnt.service.mapstruct.AppMapper;
+import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.sys.modules.mnt.repository.AppRepository;
+import com.lwohvye.sys.modules.mnt.service.IAppService;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
@@ -47,7 +45,6 @@ import java.util.*;
 public class AppServiceImpl implements IAppService {
 
     private final AppRepository appRepository;
-    private final AppMapper appMapper;
 
     private final ConversionService conversionService;
 
@@ -61,7 +58,8 @@ public class AppServiceImpl implements IAppService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<AppDto> queryAll(AppQueryCriteria criteria) {
-        return appMapper.toDto(appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
+        return appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(app -> conversionService.convert(app, AppDto.class)).toList();
     }
 
     @Override

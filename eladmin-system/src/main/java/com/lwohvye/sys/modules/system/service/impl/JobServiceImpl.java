@@ -15,17 +15,18 @@
  */
 package com.lwohvye.sys.modules.system.service.impl;
 
-import com.lwohvye.context.CycleAvoidingMappingContext;
+import com.lwohvye.api.modules.system.domain.Job;
+import com.lwohvye.api.modules.system.service.dto.JobDto;
+import com.lwohvye.api.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.api.modules.system.domain.Job;
 import com.lwohvye.sys.modules.system.repository.JobRepository;
 import com.lwohvye.sys.modules.system.service.IJobService;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.api.modules.system.service.dto.JobDto;
-import com.lwohvye.api.modules.system.service.dto.JobQueryCriteria;
-import com.lwohvye.sys.modules.system.service.mapstruct.JobMapper;
-import com.lwohvye.utils.*;
+import com.lwohvye.utils.FileUtil;
+import com.lwohvye.utils.PageUtil;
+import com.lwohvye.utils.QueryHelp;
+import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -50,7 +51,6 @@ import java.util.*;
 public class JobServiceImpl implements IJobService {
 
     private final JobRepository jobRepository;
-    private final JobMapper jobMapper;
 
     private final ConversionService conversionService;
     private final IUserService userService;
@@ -66,8 +66,8 @@ public class JobServiceImpl implements IJobService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<JobDto> queryAll(JobQueryCriteria criteria) {
-        List<Job> list = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return jobMapper.toDto(list, new CycleAvoidingMappingContext());
+        return jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(job -> conversionService.convert(job, JobDto.class)).toList();
     }
 
     @Override

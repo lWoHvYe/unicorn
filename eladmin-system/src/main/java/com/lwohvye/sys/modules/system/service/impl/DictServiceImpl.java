@@ -16,15 +16,16 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.system.domain.Dict;
-import com.lwohvye.sys.modules.system.repository.DictRepository;
-import com.lwohvye.sys.modules.system.service.IDictService;
 import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.api.modules.system.service.dto.DictDto;
 import com.lwohvye.api.modules.system.service.dto.DictQueryCriteria;
-import com.lwohvye.sys.modules.system.service.mapstruct.DictMapper;
-import com.lwohvye.utils.*;
+import com.lwohvye.sys.modules.system.repository.DictRepository;
+import com.lwohvye.sys.modules.system.service.IDictService;
+import com.lwohvye.utils.FileUtil;
+import com.lwohvye.utils.PageUtil;
+import com.lwohvye.utils.QueryHelp;
+import com.lwohvye.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -49,7 +50,6 @@ import java.util.*;
 public class DictServiceImpl implements IDictService {
 
     private final DictRepository dictRepository;
-    private final DictMapper dictMapper;
 
     private final ConversionService conversionService;
 
@@ -64,8 +64,8 @@ public class DictServiceImpl implements IDictService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DictDto> queryAll(DictQueryCriteria criteria) {
-        List<Dict> list = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return dictMapper.toDto(list, new CycleAvoidingMappingContext());
+        return dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(dict -> conversionService.convert(dict, DictDto.class)).toList();
     }
 
     @Override

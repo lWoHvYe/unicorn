@@ -91,7 +91,8 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
 //                }
 //            }
         }
-        List<DeptDto> list = deptMapper.toDto(deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort), new CycleAvoidingMappingContext());
+        List<DeptDto> list = deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
+                .stream().map(dept -> conversionService.convert(dept, DeptDto.class)).toList();
         // 如果为空，就代表为自定义权限或者本级权限，就需要去重，不理解可以注释掉，看查询结果
         if (StringUtils.isBlank(dataScopeType)) {
             return deduplication(list);
@@ -212,7 +213,7 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
     public List<DeptDto> getSuperior(DeptDto deptDto, List<Dept> depts) {
         if (deptDto.getPid() == null) {
             depts.addAll(deptRepository.findByPidIsNull());
-            return deptMapper.toDto(depts, new CycleAvoidingMappingContext());
+            return depts.stream().map(dept -> conversionService.convert(dept, DeptDto.class)).toList();
         }
         depts.addAll(deptRepository.findByPid(deptDto.getPid()));
         return getSuperior(findById(deptDto.getPid()), depts);

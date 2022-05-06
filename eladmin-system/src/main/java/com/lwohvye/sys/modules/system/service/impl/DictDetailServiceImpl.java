@@ -15,13 +15,11 @@
  */
 package com.lwohvye.sys.modules.system.service.impl;
 
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.system.domain.DictDetail;
-import com.lwohvye.sys.modules.system.repository.DictDetailRepository;
-import com.lwohvye.sys.modules.system.service.IDictDetailService;
 import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.api.modules.system.service.dto.DictDetailQueryCriteria;
-import com.lwohvye.sys.modules.system.service.mapstruct.DictDetailMapper;
+import com.lwohvye.sys.modules.system.repository.DictDetailRepository;
+import com.lwohvye.sys.modules.system.service.IDictDetailService;
 import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.QueryHelp;
 import com.lwohvye.utils.ValidationUtil;
@@ -49,7 +47,6 @@ import java.util.Map;
 public class DictDetailServiceImpl implements IDictDetailService {
 
     private final DictDetailRepository dictDetailRepository;
-    private final DictDetailMapper dictDetailMapper;
 
     private final ConversionService conversionService;
 
@@ -82,7 +79,7 @@ public class DictDetailServiceImpl implements IDictDetailService {
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = " #root.target.getSysName() + 'name:' + #p0")
     public List<DictDetailDto> getDictByName(String name) {
-        return dictDetailMapper.toDto(dictDetailRepository.findByDictName(name), new CycleAvoidingMappingContext());
+        return dictDetailRepository.findByDictName(name).stream().map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)).toList();
     }
 
     @Override

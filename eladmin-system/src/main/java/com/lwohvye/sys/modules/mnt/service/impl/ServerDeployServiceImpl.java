@@ -15,13 +15,11 @@
  */
 package com.lwohvye.sys.modules.mnt.service.impl;
 
-import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.api.modules.mnt.domain.ServerDeploy;
-import com.lwohvye.sys.modules.mnt.repository.ServerDeployRepository;
-import com.lwohvye.sys.modules.mnt.service.IServerDeployService;
 import com.lwohvye.api.modules.mnt.service.dto.ServerDeployDto;
 import com.lwohvye.api.modules.mnt.service.dto.ServerDeployQueryCriteria;
-import com.lwohvye.sys.modules.mnt.service.mapstruct.ServerDeployMapper;
+import com.lwohvye.sys.modules.mnt.repository.ServerDeployRepository;
+import com.lwohvye.sys.modules.mnt.service.IServerDeployService;
 import com.lwohvye.sys.modules.mnt.util.ExecuteShellUtil;
 import com.lwohvye.utils.FileUtil;
 import com.lwohvye.utils.PageUtil;
@@ -47,7 +45,6 @@ import java.util.*;
 public class ServerDeployServiceImpl implements IServerDeployService {
 
     private final ServerDeployRepository serverDeployRepository;
-    private final ServerDeployMapper serverDeployMapper;
 
     private final ConversionService conversionService;
 
@@ -61,7 +58,8 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria) {
-        return serverDeployMapper.toDto(serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
+        return serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(serverDeploy -> conversionService.convert(serverDeploy, ServerDeployDto.class)).toList();
     }
 
     @Override

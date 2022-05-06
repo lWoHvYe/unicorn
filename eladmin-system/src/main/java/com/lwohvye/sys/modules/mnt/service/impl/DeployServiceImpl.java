@@ -17,21 +17,19 @@ package com.lwohvye.sys.modules.mnt.service.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.api.modules.mnt.domain.App;
 import com.lwohvye.api.modules.mnt.domain.Deploy;
 import com.lwohvye.api.modules.mnt.domain.DeployHistory;
 import com.lwohvye.api.modules.mnt.domain.ServerDeploy;
-import com.lwohvye.sys.modules.mnt.repository.DeployRepository;
-import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
-import com.lwohvye.sys.modules.mnt.service.IDeployService;
-import com.lwohvye.sys.modules.mnt.service.IServerDeployService;
 import com.lwohvye.api.modules.mnt.service.dto.AppDto;
 import com.lwohvye.api.modules.mnt.service.dto.DeployDto;
 import com.lwohvye.api.modules.mnt.service.dto.DeployQueryCriteria;
 import com.lwohvye.api.modules.mnt.service.dto.ServerDeployDto;
-import com.lwohvye.sys.modules.mnt.service.mapstruct.DeployMapper;
+import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.sys.modules.mnt.repository.DeployRepository;
+import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
+import com.lwohvye.sys.modules.mnt.service.IDeployService;
+import com.lwohvye.sys.modules.mnt.service.IServerDeployService;
 import com.lwohvye.sys.modules.mnt.util.ExecuteShellUtil;
 import com.lwohvye.sys.modules.mnt.util.ScpClientUtil;
 import com.lwohvye.sys.modules.mnt.websocket.MsgType;
@@ -61,7 +59,6 @@ public class DeployServiceImpl implements IDeployService {
 
     private static final String FILE_SEPARATOR = "/";
     private final DeployRepository deployRepository;
-    private final DeployMapper deployMapper;
 
     private final ConversionService conversionService;
     private final IServerDeployService serverDeployService;
@@ -83,7 +80,8 @@ public class DeployServiceImpl implements IDeployService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<DeployDto> queryAll(DeployQueryCriteria criteria) {
-        return deployMapper.toDto(deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
+        return deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(deploy -> conversionService.convert(deploy, DeployDto.class)).toList();
     }
 
     @Override

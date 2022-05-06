@@ -17,14 +17,12 @@ package com.lwohvye.tools.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.config.FileProperties;
-import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.tools.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.tools.domain.LocalStorage;
 import com.lwohvye.tools.repository.LocalStorageRepository;
 import com.lwohvye.tools.service.ILocalStorageService;
 import com.lwohvye.tools.service.dto.LocalStorageDto;
 import com.lwohvye.tools.service.dto.LocalStorageQueryCriteria;
-import com.lwohvye.tools.service.mapstruct.LocalStorageMapper;
 import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
@@ -51,7 +49,6 @@ import java.util.Map;
 public class LocalStorageServiceImpl implements ILocalStorageService {
 
     private final LocalStorageRepository localStorageRepository;
-    private final LocalStorageMapper localStorageMapper;
 
     private final ConversionService conversionService;
     private final FileProperties properties;
@@ -66,7 +63,8 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria) {
-        return localStorageMapper.toDto(localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), new CycleAvoidingMappingContext());
+        return localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(localStorage -> conversionService.convert(localStorage,LocalStorageDto.class)).toList();
     }
 
     @Override
