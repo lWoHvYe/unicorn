@@ -32,7 +32,6 @@ import ${package}.repository.${className}Repository;
 import ${package}.service.I${className}Service;
 import ${package}.service.dto.${className}Dto;
 import ${package}.service.dto.${className}QueryCriteria;
-import ${package}.service.mapstruct.${className}Mapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 <#if !auto && pkColumnType = 'Long'>
@@ -45,6 +44,7 @@ import cn.hutool.core.util.IdUtil;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.lwohvye.utils.PageUtil;
@@ -68,19 +68,20 @@ import java.util.LinkedHashMap;
 public class ${className}ServiceImpl implements I${className}Service {
 
     private final ${className}Repository ${changeClassName}Repository;
-    private final ${className}Mapper ${changeClassName}Mapper;
+    private final ConversionService conversionService;
 
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> queryAll(${className}QueryCriteria criteria, Pageable pageable){
         Page<${className}> page = ${changeClassName}Repository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
-        return PageUtil.toPage(page.map(${changeClassName}Mapper::toDto));
+        return PageUtil.toPage(page.map(${changeClassName} -> conversionService.convert(${changeClassName}, ${className}Dto.class)));
     }
 
     @Override
     public List<${className}Dto> queryAll(${className}QueryCriteria criteria){
-        return ${changeClassName}Mapper.toDto(${changeClassName}Repository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder)));
+        return ${changeClassName}Repository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder))
+                    .stream().map(${changeClassName} -> conversionService.convert(${changeClassName}, ${className}Dto.class)).toList();
     }
 
     @Override
@@ -88,7 +89,7 @@ public class ${className}ServiceImpl implements I${className}Service {
     public ${className}Dto findById(${pkColumnType} ${pkChangeColName}) {
         ${className} ${changeClassName} = ${changeClassName}Repository.findById(${pkChangeColName}).orElseGet(${className}::new);
         ValidationUtil.isNull(${changeClassName}.get${pkCapitalColName}(),"${className}","${pkChangeColName}",${pkChangeColName});
-        return ${changeClassName}Mapper.toDto(${changeClassName});
+        return conversionService.convert(${changeClassName}, ${className}Dto.class);
     }
 
     @Override
@@ -111,7 +112,8 @@ public class ${className}ServiceImpl implements I${className}Service {
     </#if>
     </#list>
 </#if>
-        return ${changeClassName}Mapper.toDto(${changeClassName}Repository.save(resources));
+        var save = ${changeClassName}Repository.save(resources);
+        return conversionService.convert(save, ${className}Dto.class);
     }
 
     @Override
