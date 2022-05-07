@@ -17,7 +17,6 @@ package com.lwohvye.sys.modules.system.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.domain.User;
@@ -54,6 +53,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.*;
 
 /**
@@ -86,13 +87,20 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
      */
     @Override
     public void doRegister() {
+        var lookup = MethodHandles.lookup();
         Arrays.stream(this.getClass().getInterfaces())
                 .filter(aClass -> aClass.getSimpleName().endsWith("Observer"))
                 .forEach(aClass -> {
                     var aName = aClass.getSimpleName();
                     var aType = StringUtils.lowerFirstChar(aName.substring(0, aName.indexOf("Observer"))); // 首字母要转小写
                     var aService = SpringContextHolder.getBean(aType + "ServiceImpl");
-                    ReflectUtil.invoke(aService, "addObserver", this);
+                    var methodType = MethodType.methodType(void.class, new Class[]{aClass}); // 注意这里要用xxxObserver而不是this
+                    try {
+                        // 这里在控制台 invoke 是不行的：MethodHandle.invoke cannot be invoked reflectively。另外这里注入的是未被代理的类，需注意一下
+                        lookup.findVirtual(aService.getClass(), "addObserver", methodType).invoke(aService, this);
+                    } catch (Throwable ignored) {
+                    }
+                    // ReflectUtil.invoke(aService, "addObserver", this);
                 });
     }
 
