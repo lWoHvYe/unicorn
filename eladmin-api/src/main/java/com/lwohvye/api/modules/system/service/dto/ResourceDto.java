@@ -15,25 +15,26 @@
  */
 package com.lwohvye.api.modules.system.service.dto;
 
-import lombok.Data;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 /**
  * @author Super idol lv
  * @website https://el-admin.vip
  * @date 2021-11-27
  **/
-@Data
+@Getter
+@Setter
 public class ResourceDto implements Serializable {
 
     /** ID */
     /**
-     * 防止精度丢失
+     * 防止精度丢失，当使用雪花生成Id时，因为长度问题，添加了个这个
      */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long resourceId;

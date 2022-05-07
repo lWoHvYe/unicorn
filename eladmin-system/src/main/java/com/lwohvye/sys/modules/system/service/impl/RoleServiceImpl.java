@@ -187,7 +187,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<RoleSmallDto> findByUserId(Long userId) {
-        return roleRepository.findByUserId(userId).stream().map(role -> conversionService.convert(role, RoleSmallDto.class)).toList();
+        return new ArrayList<>(roleRepository.findByUserId(userId).stream().map(role -> conversionService.convert(role, RoleSmallDto.class)).toList());
     }
 
     @Override

@@ -103,8 +103,8 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
                 }
             }
         }
-        return menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
-                .stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList();
+        return new ArrayList<>(menuRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
+                .stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList());
     }
 
     @Override
@@ -236,7 +236,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
         else
             menus = menuRepository.findByPidIsNull();
 
-        return menus.stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList();
+        return new ArrayList<>(menus.stream().map(menu -> conversionService.convert(menu, MenuDto.class)).toList());
     }
 
     @Override

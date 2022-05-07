@@ -33,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class DictDetailServiceImpl implements IDictDetailService {
     @Transactional(rollbackFor = Exception.class)
     @Cacheable(key = " #root.target.getSysName() + 'name:' + #p0")
     public List<DictDetailDto> getDictByName(String name) {
-        return dictDetailRepository.findByDictName(name).stream().map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)).toList();
+        return new ArrayList<>(dictDetailRepository.findByDictName(name).stream().map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)).toList());
     }
 
     @Override

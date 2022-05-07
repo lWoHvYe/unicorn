@@ -94,7 +94,12 @@ public class ResourceServiceImpl implements IResourceService, RoleObserver {
     @Cacheable(key = " #root.target.getSysName() + 'allResources' ")
     @Transactional(rollbackFor = Exception.class)
     public List<ResourceDto> queryAllRes() {
-        return resourceRepository.findAll().stream().map(resource -> conversionService.convert(resource, ResourceDto.class)).toList();
+        // 序列化是一个数组，无法反序列化。序列化结果为：[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]
+        // return resourceRepository.findAll().stream().map(resource -> conversionService.convert(resource, ResourceDto.class)).toList();
+        // 这种可以。[“java.util.ArrayList”,[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]]
+        return new ArrayList<>(resourceRepository.findAll().stream().map(resource -> conversionService.convert(resource, ResourceDto.class)).toList());
+        // 之前的这种可以，是因为内部有new ArrayList
+        // return resourceMapper.toDto(list, new CycleAvoidingMappingContext());
     }
 
     @Override

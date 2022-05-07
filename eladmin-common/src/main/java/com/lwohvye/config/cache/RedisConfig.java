@@ -130,7 +130,36 @@ public class RedisConfig extends CachingConfigurerSupport {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        // 必须设置，否则无法将JSON转化为对象，会转化成Map类型。指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会抛出异常
+        // enableDefaultTyping 可以认为是序列化是，添加复杂类型的默认类型，以便反序列化时可以精确类型。有下面五种选型
+        // - JAVA_LANG_OBJECT：表示将Object类型作为声明类型的属性 设置默认类型。但尽管设置Object，一般都为复杂类型的值，像基本类型和其包装类型的值(String、Boolean、Integer、Double)不会添加默认类型。像自定义对象，List，map等实际对象的都会被添加。
+        // - OBJECT_AND_NON_CONCRETE：当属性为Object或非具体类型(抽象类或接口)，但不包括数组类型。当我们定义一个含有接口类的属性时，会设置默认类型
+        // - NON_CONCRETE_AND_ARRAYS：OBJECT_AND_NON_CONCRETE值说明了不包含array类型。此属性专门添加了array类型
+        // - NON_FINAL：表示将应用与除final修饰外的所有属性，以及所有非final的数组。基本上Object类型和array类型及interface、abstract修饰的类。这些都足以进行序列化。
+        // - EVERYTHING：在新版本添加的，如其名
+        // 其重载方法包含了两个参数DefaultTyping类型和JsonTypeInfo.As类型
+        // JsonTypeInfo.As
+        // PROPERTY
+        // 它将包含@class属性，作为序列化的一个属性，值就是完全限定名类型。当前类及其属性都会添加这个名为@class的属性。
+        // WRAPPER_OBJECT
+        // 将完全限定名类型直接作为key，将值作为序列化值
+        // WRAPPER_ARRAY
+        // 将序列化的结果变为array类型，格式与不加JsonTypeInfo.As一致
+        // EXISTING_PROPERTY
+        // 仅包含序列化内容，TypeSerializer将不会执行任何操作。与@JsonTypeId注解相似
+        //
+        // JsonTypeInfo.Id
+        // NONE
+        // 不包括类型，仅为标准的json序列化值
+        // CLASS
+        // 使用@class属性标注类型
+        // MINIMAL_CLASS
+        // 使用@c属性标注类型
+        // NAME
+        // 使用@type属性标注类型，但只有类名，不是完全限定名，需要将名称单独解析为实际的具体类型（类）。
+        // CUSTOM
+        //
+        // 使用自定义的实现TypeSerializer和TypeDeserializer
+        // 必须设置，否则无法将JSON转化为对象，会转化成Map类型。指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会抛出异常（使用NON_FINAL时）
         objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
         return jackson2JsonRedisSerializer;
@@ -142,7 +171,6 @@ public class RedisConfig extends CachingConfigurerSupport {
      * 新增操作：清除列表查询缓存。暂不做加入缓存操作
      * 修改操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
      * 删除操作：清除列表查询缓存、清除该记录相关的其他缓存（比如findById等）。暂不做加入缓存操作
-     *
      */
     @Bean
     @Override

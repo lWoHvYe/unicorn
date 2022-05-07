@@ -97,7 +97,7 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
         if (StringUtils.isBlank(dataScopeType)) {
             return deduplication(list);
         }
-        return list;
+        return new ArrayList<>(list);
     }
 
     @Override

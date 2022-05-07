@@ -63,8 +63,8 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<LocalStorageDto> queryAll(LocalStorageQueryCriteria criteria) {
-        return localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
-                .stream().map(localStorage -> conversionService.convert(localStorage,LocalStorageDto.class)).toList();
+        return new ArrayList<>(localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
+                .stream().map(localStorage -> conversionService.convert(localStorage, LocalStorageDto.class)).toList());
     }
 
     @Override
