@@ -28,7 +28,6 @@ import javax.script.ScriptEngineManager;
 import java.io.FileReader;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
@@ -38,8 +37,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// @ExtendWith(SpringExtension.class)
-// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EladminSystemApplicationTests {
 
     @Test
@@ -161,10 +160,21 @@ public class EladminSystemApplicationTests {
         // 用invoke时支持向上转型之类的。参数是Number类型，传其子类进去是可以的。这两点还是比较容易理解的
         System.out.println(MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVirtual(aClass, "haveJoy", methodType2).invoke(person, Long.parseLong(String.valueOf(Person.joy()))));
         System.out.println(MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVirtual(aClass, "haveJoy", methodType2).invoke(person, Person.joy()));
+
+        // 返回值这里是不支持向上/向下转型的
+        // var methodType3 = MethodType.methodType(Object.class, new Class[]{Integer.class, String.class});
+        // System.out.println(MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVirtual(aClass, "haveJoy", methodType3).invoke(person, Person.joy(), "up/down"));
+        // var methodType4 = MethodType.methodType(String.class, new Class[]{Long.class, String.class});
+        // System.out.println(MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVirtual(aClass, "haveJoy", methodType4).invoke(person, Long.parseLong(String.valueOf(Person.joy())), "up/down"));
+
         // 与MethodHandle相比，反射的确更简单。但效率上反射低的有点多了
         var haveJoyMethod = aClass.getDeclaredMethod("haveJoy", Integer.class, String.class);
         haveJoyMethod.trySetAccessible(); // 反射对非public的要加这一步
         System.out.println(haveJoyMethod.invoke(person, Person.joy(), "byReflect"));
+        // 反射这块也不支持向下转型
+        // var haveJoyMethod2 = aClass.getDeclaredMethod("haveJoy", Number.class, String.class);
+        // 向上转型也不支持
+        // var haveJoyMethod3 = aClass.getDeclaredMethod("haveJoy", Long.class);
 
         System.out.println();
         // 访问public方法

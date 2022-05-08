@@ -100,7 +100,7 @@ public record Person(Long id, String name, Integer sex, Integer age, Boolean isM
         return String.format("Integer + msg %s or %s and %s | %s", name, i, msg, isMember);
     }
 
-    private String haveJoy(Long i, String msg) {
+    private Object haveJoy(Long i, String msg) {
         return String.format("Long + msg %s or %s and %s | %s", name, i, msg, isMember);
     }
 }

@@ -94,7 +94,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
                     var aName = aClass.getSimpleName();
                     var aType = StringUtils.lowerFirstChar(aName.substring(0, aName.indexOf("Observer"))); // 首字母要转小写
                     var aService = SpringContextHolder.getBean(aType + "ServiceImpl");
-                    var methodType = MethodType.methodType(void.class, new Class[]{aClass}); // 注意这里要用xxxObserver而不是this
+                    var methodType = MethodType.methodType(void.class, new Class[]{aClass}); // 注意这里要用xxxObserver而不是this。获取时，methodType需与方法签名一致，不支持向上转型。返回值也不支持向上/向下转型（不支持向下很容易理解）
                     try {
                         // 这里在控制台 invoke 是不行的：MethodHandle.invoke cannot be invoked reflectively。另外这里注入的是未被代理的类，需注意一下
                         lookup.findVirtual(aService.getClass(), "addObserver", methodType).invoke(aService, this);
