@@ -27,6 +27,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.script.ScriptEngineManager;
 import java.io.FileReader;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
@@ -36,8 +38,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+// @ExtendWith(SpringExtension.class)
+// @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EladminSystemApplicationTests {
 
     @Test
@@ -141,6 +143,32 @@ public class EladminSystemApplicationTests {
         // MethodHandle和VarHandle
         var nameVarHandle = MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVarHandle(Person.class, "name", String.class);
         System.out.println("get：" + nameVarHandle.get(person));
+        // 对私有方法，用privateLookupIn。下面这个findSpecial还没搞明白
+        // System.out.println(MethodHandles.lookup().findSpecial(Person.class, "doJoy", MethodType.methodType(String.class), Person.class).invoke(person));
+        System.out.println(MethodHandles.privateLookupIn(Person.class, MethodHandles.lookup()).findVirtual(Person.class, "doJoy", MethodType.methodType(String.class)).invoke(person));
+        System.out.println("-----------------");
+        // 下面这三行算是一个使用场景，获取类对象的方式有很多，这算是比较复杂的一种情况了
+        // 首先要能拿到类对象
+        Class<?> aClass = Class.forName("com.lwohvye.Person");
+        // 目标方法参数也是已知的。
+        var methodType = MethodType.methodType(String.class, new Class[]{Integer.class});
+        // 用invoke时可能还有向上转型之类的
+        System.out.println(MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVirtual(aClass, "haveJoy", methodType).invoke(person, Person.joy()));
+
+        // 这里不支持向上转型，比如参数是Number的话，用Long去找是找不到的
+        // var methodType2 = MethodType.methodType(String.class, new Class[]{Long.class});
+        var methodType2 = MethodType.methodType(String.class, new Class[]{Number.class});
+        // 用invoke时支持向上转型之类的。参数是Number类型，传其子类进去是可以的。这两点还是比较容易理解的
+        System.out.println(MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVirtual(aClass, "haveJoy", methodType2).invoke(person, Long.parseLong(String.valueOf(Person.joy()))));
+        System.out.println(MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVirtual(aClass, "haveJoy", methodType2).invoke(person, Person.joy()));
+        // 与MethodHandle相比，反射的确更简单。但效率上反射低的有点多了
+        var haveJoyMethod = aClass.getDeclaredMethod("haveJoy", Integer.class, String.class);
+        haveJoyMethod.trySetAccessible(); // 反射对非public的要加这一步
+        System.out.println(haveJoyMethod.invoke(person, Person.joy(), "byReflect"));
+
+        System.out.println();
+        // 访问public方法
+        System.out.println(MethodHandles.lookup().findVirtual(Person.class, "name", MethodType.methodType(String.class)).invoke(person));
         // nameVarHandle.set(person, "试一试"); //因为Person是record，使得无法通过这种方式重新设置值，即便用IMPL_LOOKUP也不行，因为返回的VarHandle是ReadOnly的，`this.allowedModes == TRUSTED && !getField.isTrustedFinalField()` 针对于record，第二个为 `!true` ，更换lookup只影响第一个
         // DynamicEnumHelper.unsafe.putObject(person,DynamicEnumHelper.unsafe.objectFieldOffset(Person.class.getDeclaredField("name")),"试一试"); // Unsafe: can't get field offset on a record class
         if (Person.class.isRecord()) {

@@ -80,7 +80,27 @@ public record Person(Long id, String name, Integer sex, Integer age, Boolean isM
     }
 
     // A record class can declare static methods, fields, and initializers.
-    public static int joy() throws NoSuchAlgorithmException {
+    public static int joy() {
         return RANDOM.nextInt();
+    }
+
+    private String doJoy() {
+        return name + isMember();
+    }
+
+    private String haveJoy(Integer i) {
+        return String.format("Integer %s or %s and %s", name, i, isMember);
+    }
+
+    private String haveJoy(Number i) {
+        return String.format("Number %s or %s and %s", name, i, isMember);
+    }
+
+    private String haveJoy(Integer i, String msg) {
+        return String.format("Integer + msg %s or %s and %s | %s", name, i, msg, isMember);
+    }
+
+    private String haveJoy(Long i, String msg) {
+        return String.format("Long + msg %s or %s and %s | %s", name, i, msg, isMember);
     }
 }
