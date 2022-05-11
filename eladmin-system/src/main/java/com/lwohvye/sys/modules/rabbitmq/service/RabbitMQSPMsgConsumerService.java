@@ -56,6 +56,7 @@ public class RabbitMQSPMsgConsumerService extends YRabbitAbstractConsumer {
         baseMessageConsumer(message, "sp", curOrigin, checkedCache, msgEntity -> {
             var extraData = msgEntity.getExtraData();
             if (StringUtils.hasText(extraData))
+                // 这里的逻辑比较简单，首先内部已经做了忽略本实例产生的消息的逻辑。视情况可能还要做：有时需要忽略本集群产生的事件，有时需要向内部传递调用方为MQ消费者从而视情况不进行事件的扩散（虽然一般都是来自消费者的调用不做数据及事件的同步）
                 ReflectUtil.invoke(userLocalCache, extraData, msgEntity.getMsgData(), false);
             return null;
         }, s -> {
