@@ -16,16 +16,11 @@
 
 package com.lwohvye.mock;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@Service
-public class SomeBusiness {
-    @Autowired
-    DataService dataService;
-    public List<String> fetchAllData(String s) {
-        return dataService.getAll(s);
+public class StaticBS {
+    public static String pr() {
+        return "Local";
+    }
+    public static String pr(String s) {
+        return String.format("%s PTR", s);
     }
 }

@@ -23,8 +23,8 @@ import java.util.List;
 
 @Repository
 public class DataService {
-    public List<String> getAll() {
-        System.out.println("get All from database ");
+    public List<String> getAll(String s) {
+        System.out.println("get All from database " + s);
         return Collections.emptyList();
     }
 }

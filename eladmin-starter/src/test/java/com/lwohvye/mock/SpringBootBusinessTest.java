@@ -24,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK) // 默认就是MOCK
@@ -35,7 +36,7 @@ public class SpringBootBusinessTest {
 
     @Test
     public void testSpringMock() {
-        when(dataService.getAll()).thenReturn(Arrays.asList("1", "2", "3"));
-        Assertions.assertEquals(Arrays.asList("1", "2", "3"), business.fetchAllData());
+        when(dataService.getAll(anyString())).thenReturn(Arrays.asList("1", "2", "3"));
+        Assertions.assertEquals(Arrays.asList("1", "2", "3"), business.fetchAllData(anyString()));
     }
 }

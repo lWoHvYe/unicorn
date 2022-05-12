@@ -103,6 +103,14 @@
             <artifactId>javassist</artifactId>
             <version>${javassist.version}</version>
         </dependency>
+        <!--Mockito's inline mock maker supports static mocks based on the Instrumentation API.
+        You can simply enable this mock mode, by placing the 'mockito-inline' artifact where you are currently using 'mockito-core'.
+        Note that Mockito's inline mock maker is not supported on Android.-->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

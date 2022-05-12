@@ -19,12 +19,16 @@ package com.lwohvye.mock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +46,32 @@ public class TestTutorialApplicationTests {
     @Test
     public void testFetchAll() {
         // 定义当调用指定方法时的，Mock值 stub
-        when(dataService.getAll()).thenReturn(Arrays.asList("1", "2", "3"));
-        Assertions.assertEquals(Arrays.asList("1", "2", "3"), someBusiness.fetchAllData());
+        // 对于带参数的，可以用anyString()、anyInt()这些
+        when(dataService.getAll(anyString())).thenReturn(Arrays.asList("1", "2", "3"));
+        Assertions.assertEquals(Arrays.asList("1", "2", "3"), someBusiness.fetchAllData(anyString()));
     }
+
+    // 参数化测试注释。不加报错org.junit.jupiter.api.extension.ParameterResolutionException: No ParameterResolver registered for parameter [xx] in method xxx
+    @ParameterizedTest(name = "汉:{0},数:{1}") // name这块应用在显示结果那里
+    // 数据源。另有注解从文件中读取
+    @CsvSource({
+            "one,1",
+            "two,2",
+            "three,3",
+            "zero,0"
+    })
+    public void testStatic(String s, Integer i) {
+        System.out.println(StaticBS.pr(s) + i); // 原值Local
+        try (var bsMockedStatic = Mockito.mockStatic(StaticBS.class)) { // 这个得关闭
+            // 这里支持   when(StaticBS::pr) 和 when(() -> StaticBS.pr(s)) 两种方式
+            bsMockedStatic.when(() -> StaticBS.pr(s)).thenReturn("First Try").thenReturn("Last Try").thenCallRealMethod().thenThrow(new RuntimeException("别调了"));
+            System.out.println(StaticBS.pr(s)); // First Try
+            System.out.println(StaticBS.pr(s)); // Last Try
+            System.out.println(StaticBS.pr(s)); // 原值Local
+            System.out.println(StaticBS.pr(s)); // 抛出异常
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
 }
