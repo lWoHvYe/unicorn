@@ -28,22 +28,28 @@ public class PeriodicPublisher {
     // Used to generate sleep time
     final static Random sleepTimeGenerator = new Random();
 
+    /**
+     * 发布订阅的基础测试
+     *
+     * @param args
+     * @date 2022/5/15 4:32 PM
+     */
     public static void main(String[] args) {
-        SubmissionPublisher<Long> pub = new SubmissionPublisher<>();
-        // Create three subscribers
-        SimpleSubscriber sub1 = new SimpleSubscriber("S1", 2);
-        SimpleSubscriber sub2 = new SimpleSubscriber("S2", 5);
-        SimpleSubscriber sub3 = new SimpleSubscriber("S3", 6);
-        SimpleSubscriber sub4 = new SimpleSubscriber("S4", 10);
-        // Subscriber to the publisher
-        pub.subscribe(sub1);
-        pub.subscribe(sub2);
-        pub.subscribe(sub3);
-        // Subscribe the 4th subscriber after 2 seconds
-        subscribe(pub, sub4, 2);
-        // Start publishing items
-        Thread pubThread = publish(pub, 5);
-        try {
+
+        try (var pub = new SubmissionPublisher<Long>()) {
+            // Create three subscribers
+            var sub1 = new SimpleSubscriber("S1", 2);
+            var sub2 = new SimpleSubscriber("S2", 5);
+            var sub3 = new SimpleSubscriber("S3", 6);
+            var sub4 = new SimpleSubscriber("S4", 10);
+            // Subscriber to the publisher
+            pub.subscribe(sub1);
+            pub.subscribe(sub2);
+            pub.subscribe(sub3);
+            // Subscribe the 4th subscriber after 2 seconds
+            subscribe(pub, sub4, 2);
+            // Start publishing items
+            var pubThread = publish(pub, 10);
             // Wait until the publisher is finished
             pubThread.join();
         } catch (InterruptedException e) {
@@ -52,7 +58,7 @@ public class PeriodicPublisher {
     }
 
     public static Thread publish(SubmissionPublisher<Long> pub, long count) {
-        Thread t = new Thread(() -> {
+        var t = new Thread(() -> {
             for (long i = 1; i <= count; i++) {
                 // submit 1 to 5
                 pub.submit(i);
@@ -68,7 +74,7 @@ public class PeriodicPublisher {
 
     private static void sleep(Long item) {
         // Wait for 1 to 3 seconds
-        int sleepTime = sleepTimeGenerator.nextInt(MAX_SLEEP_DURATION) + 1;
+        var sleepTime = sleepTimeGenerator.nextInt(MAX_SLEEP_DURATION) + 1;
         try {
             System.out.printf("Published %d. Sleeping for %d sec.%n", item, sleepTime);
             TimeUnit.SECONDS.sleep(sleepTime);

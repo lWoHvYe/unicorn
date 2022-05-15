@@ -17,25 +17,30 @@
 // ProcessorTest.java
 package com.lwohvye.rx;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
 public class ProcessorTest {
+    /**
+     * 处理者的基础测试
+     *
+     * @param args
+     * @date 2022/5/15 4:32 PM
+     */
     public static void main(String[] args) {
-        CompletableFuture<Void> subTask = null;
+        // CompletableFuture<Void> subTask = null;
         // The publisher is closed when the try block exits
-        try (SubmissionPublisher<Long> pub = new SubmissionPublisher<>()) {
+        try (var pub = new SubmissionPublisher<Long>()) {
             // Create a Subscriber
-            SimpleSubscriber sub = new SimpleSubscriber("S1", 10);
+            var sub = new SimpleSubscriber("S1", 5);
             // Create a processor
-            FilterProcessor<Long> filter = new FilterProcessor<>(n -> n % 2 == 0);
+            var filter = new FilterProcessor<Long>(n -> n % 2 == 0);
             // Subscribe the filter to the publisher and a subscriber to the filter
             pub.subscribe(filter);
             filter.subscribe(sub);
-            // Generate and publish 6 integers
-            LongStream.range(1L, 7L)
+            // Generate and publish 14 integers
+            LongStream.range(1L, 15L)
                     .forEach(pub::submit);
         }
         try {

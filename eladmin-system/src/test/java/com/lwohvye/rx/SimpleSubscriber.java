@@ -64,6 +64,6 @@ public class SimpleSubscriber implements Flow.Subscriber<Long> {
 
     @Override
     public void onComplete() {
-        System.out.printf("%s is complete.%n", name);
+        System.out.printf("%s is complete. The count of process is %s %n", name, counter);
     }
 }

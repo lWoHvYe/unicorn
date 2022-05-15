@@ -39,9 +39,11 @@ public class FilterProcessor<T> extends SubmissionPublisher<T> implements Proces
     @Override
     public void onNext(T item) {
         // If the item passes the filter publish it. Otherwise, no action is needed.
-        System.out.println("Filter received: " + item);
+        System.out.printf("Filter received: %s%n", item);
         if (filter.test(item)) {
             this.submit(item);
+        } else {
+            System.out.printf(" %s 不满足要求，舍弃 %n", item);
         }
     }
 

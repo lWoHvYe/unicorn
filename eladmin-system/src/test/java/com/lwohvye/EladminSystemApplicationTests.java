@@ -20,9 +20,7 @@ import com.lwohvye.hiddenclass.Customer;
 import com.lwohvye.hiddenclass.PropertyAccessorFactory;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.script.ScriptEngineManager;
 import java.io.FileReader;
@@ -37,7 +35,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
+// @ExtendWith(SpringExtension.class) SpringBootTest本身已经包含这个注解了
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EladminSystemApplicationTests {
 
