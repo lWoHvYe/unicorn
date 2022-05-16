@@ -61,8 +61,6 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 ---
 
-[近期log4j相关](https://www.lwohvye.com/2021/12/11/log4j2-2021-12-09/)
-
 #### Maven引用方式 🎵
 
 最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
@@ -196,7 +194,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - Java 17 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
 - Redis 6.0 缓存
-- RabbitMQ 鉴权结果记录、用户多次验证失败锁定一段时间后自动解锁、发布-订阅
+- RabbitMQ 发布-订阅（解耦、异步）
 - ELK 日志系统，若不需要可调整logback-spring.xml中的配置
 - 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ记得装延迟插件，ES记得装IK
 - 若想搭建k8s版，可[参照](https://github.com/lWoHvYe/mall-swarm/tree/main/document/kubernetes/env) ,这个是基于NFS挂载的。
@@ -231,14 +229,3 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可启动，当下无法打包成功（3.0版本时明明可以打包成功的，只是启动不起来）,也未找到jar包的启动方式，故暂缓，可能要等到Spring 6.x 及 Spring Boot 3.X对 JPMS相关支持及Java 17了）
 - db中时间的存储格式可以用datetime或者timestamp，datetime占用8个字节、存在时区问题但可存储的时间范围广，timestamp占用4个字节、只能存储1970～2037但无时区问题，后续确定是否需要由datetime转为timestamp
-
-#### TODO
-
-- ResourceBundle用于解决国际化和本地化问题，当前有输出相关信息，
-
-```
-ResourceBundleMessageSource is configured to read resources with encoding 'ISO-8859-1' but ResourceBundle.Control not supported in current system environment: ResourceBundle.Control not supported in named modules - falling back to plain ResourceBundle.getBundle retrieval with the platform default encoding. Consider setting the 'defaultEncoding' property to 'null' for participating in the platform default and therefore avoiding this log message.
-```
-
-根据API Note，有ResourceBundle.Control is not supported in named modules. If the ResourceBundle.getBundle method with a ResourceBundle.Control is called in a named
-module, the method will throw an UnsupportedOperationException. Any service providers of ResourceBundleControlProvider are ignored in named modules.

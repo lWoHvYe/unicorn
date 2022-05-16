@@ -19,6 +19,7 @@ package com.lwohvye;
 import com.lwohvye.hiddenclass.Customer;
 import com.lwohvye.hiddenclass.PropertyAccessorFactory;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -33,11 +34,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 // @ExtendWith(SpringExtension.class) SpringBootTest本身已经包含这个注解了
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EladminSystemApplicationTests {
+public class AppRunTests {
 
     @Test
     public void contextLoads() {
@@ -186,10 +187,10 @@ public class EladminSystemApplicationTests {
         }
 
         var accessor = PropertyAccessorFactory.getPropertyAccessor(Person.class);
-        assertEquals(person.name(), accessor.getValue(person, "name"));
-        assertEquals(person.age(), accessor.getValue(person, "age"));
+        Assertions.assertEquals(person.name(), accessor.getValue(person, "name"));
+        Assertions.assertEquals(person.age(), accessor.getValue(person, "age"));
 
-        assertTrue(accessor.getClass().isHidden());
+        Assertions.assertTrue(accessor.getClass().isHidden());
         assertNull(accessor.getClass().getCanonicalName());
     }
 
