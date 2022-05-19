@@ -34,8 +34,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 // @ExtendWith(SpringExtension.class) SpringBootTest本身已经包含这个注解了
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AppRunTests {
@@ -185,13 +183,13 @@ public class AppRunTests {
                 System.out.println(recordComponent);
             }
         }
-
+        // 下面这块，要把module-info.java删除掉，才能执行成功，因为需要requires org.objectweb.asm; 但ams和lombok中都有这个包，出现了包冲突。感觉JPMS要推行有太多的依赖需要跟进调整，难度有些大
         var accessor = PropertyAccessorFactory.getPropertyAccessor(Person.class);
         Assertions.assertEquals(person.name(), accessor.getValue(person, "name"));
         Assertions.assertEquals(person.age(), accessor.getValue(person, "age"));
 
         Assertions.assertTrue(accessor.getClass().isHidden());
-        assertNull(accessor.getClass().getCanonicalName());
+        Assertions.assertNull(accessor.getClass().getCanonicalName());
     }
 
     @Test

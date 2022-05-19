@@ -91,7 +91,7 @@ public class PropertyAccessorFactory implements Opcodes {
             methodVisitor.visitEnd();
         }
         {
-            // getValue方法
+            // getValue(T instance, String property)方法
             methodVisitor = classWriter.visitMethod(ACC_PUBLIC, "getValue",
                     "(" + descriptor + "Ljava/lang/String;)Ljava/lang/Object;", null, null);
             methodVisitor.visitParameter("instance", 0);
@@ -149,6 +149,7 @@ public class PropertyAccessorFactory implements Opcodes {
             methodVisitor.visitEnd();
         }
         {
+            // getValue(Object instance, String property)
             methodVisitor = classWriter.visitMethod(ACC_PUBLIC | ACC_BRIDGE | ACC_SYNTHETIC, "getValue",
                     "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;", null, null);
             methodVisitor.visitParameter("instance", ACC_SYNTHETIC);
@@ -161,6 +162,7 @@ public class PropertyAccessorFactory implements Opcodes {
             methodVisitor.visitVarInsn(ALOAD, 1);
             methodVisitor.visitTypeInsn(CHECKCAST, className);
             methodVisitor.visitVarInsn(ALOAD, 2);
+            // 这里是直接调用了上面的getValue。感觉当前逻辑下，是不会走到这个方法的
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, accessorClassName, "getValue", "(" + descriptor + "Ljava/lang/String;)Ljava/lang/Object;", false);
             methodVisitor.visitInsn(ARETURN);
             var label1 = new Label();
