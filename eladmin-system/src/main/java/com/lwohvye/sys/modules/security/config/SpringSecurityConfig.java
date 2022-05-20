@@ -19,21 +19,20 @@ import com.lwohvye.config.security.SimpleSecurityConfig;
 import com.lwohvye.sys.modules.rabbitmq.config.RabbitMqConfig;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
+import com.lwohvye.sys.modules.security.security.CustomAccessDecisionManager;
 import com.lwohvye.sys.modules.security.security.JwtAuthTokenConfigurer;
 import com.lwohvye.sys.modules.security.security.TokenProvider;
-import com.lwohvye.sys.modules.security.security.filter.CustomAuthenticationFilter;
 import com.lwohvye.sys.modules.security.security.filter.CustomFilterInvocationSecurityMetadataSource;
 import com.lwohvye.sys.modules.security.security.handler.CustomLogoutHandler;
 import com.lwohvye.sys.modules.security.security.handler.CustomLogoutSuccessHandler;
 import com.lwohvye.sys.modules.security.security.handler.JwtAccessDeniedHandler;
 import com.lwohvye.sys.modules.security.security.handler.JwtAuthenticationEntryPoint;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.sys.modules.security.security.CustomAccessDecisionManager;
 import com.lwohvye.sys.modules.system.service.IResourceService;
-import com.lwohvye.utils.json.JsonUtils;
-import com.lwohvye.utils.result.ResultUtil;
 import com.lwohvye.utils.StringUtils;
+import com.lwohvye.utils.json.JsonUtils;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.utils.result.ResultUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,13 +45,13 @@ import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -74,6 +73,8 @@ import java.util.Objects;
 @ConditionalOnMissingBean(SimpleSecurityConfig.class) // 如果使用了简单配置，就不加载本配置了
 @Configuration
 // 添加该注解到@Configuration的类上，应用程序便可以使用自定义的WebSecurityConfigurer或拓展自WebSecurityConfigurerAdapter的配置类来装配Spring Security框架。
+// 在5.4开始引入新的配置方式 https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
+// Spring Security lambda DSL
 @EnableWebSecurity
 @RequiredArgsConstructor
 // 使用 @EnableGlobalMethodSecurity 注解来启用全局方法安全注解功能。该注解提供了三种不同的机制来实现同一种功能
@@ -81,7 +82,7 @@ import java.util.Objects;
 // 设置 prePostEnabled 为 true ，则开启了基于表达式的方法安全控制。通过表达式运算结果的布尔值来决定是否可以访问（true 开放， false 拒绝 ）
 // 设置 securedEnabled 为 true ，就开启了角色注解 @Secured ，该注解功能要简单的多，默认情况下只能基于角色（默认需要带前缀 ROLE_）集合来进行访问控制决策。
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SpringSecurityConfig {
 
     private final SecurityProperties properties;
     private final TokenProvider tokenProvider;
@@ -105,16 +106,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+    @Bean
+    SecurityFilterChain filterChainDefault(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
                 // 一般来讲，为了防御CSRF攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。
                 .csrf().disable()
-                //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter
-                // （这里实际上是放到了前面，security自带的Filter在轮到自己执行的时候，会判断当前登录状态，如果已经被之前的Filter验证过了，自己这关就直接放行）
-                .addFilterAt(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                // 这样注册自定义的UsernamePasswordAuthenticationFilter
+                .apply(MyCustomDsl.customDsl(authenticationSuccessHandler(), authenticationFailureHandler()))
+                .and()
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 // 授权异常
                 .exceptionHandling()
@@ -141,7 +142,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // 所有请求都需要认证
                 .anyRequest().authenticated().withObjectPostProcessor(filterSecurityInterceptorObjectPostProcessor())
-                .and().apply(securityConfigurerAdapter());
+                .and().apply(securityConfigurerAdapter())
+                .and().build();
     }
 
     private JwtAuthTokenConfigurer securityConfigurerAdapter() {
@@ -189,19 +191,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     // endregion
 
     // region loginFilter、handler
-
-    //注册自定义的UsernamePasswordAuthenticationFilter
-    @Bean
-    CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
-        filter.setAuthenticationSuccessHandler(authenticationSuccessHandler());
-        filter.setAuthenticationFailureHandler(authenticationFailureHandler());
-        filter.setFilterProcessesUrl("/auth/login");
-
-        //这句很关键，重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
-        filter.setAuthenticationManager(authenticationManagerBean());
-        return filter;
-    }
 
     /**
      * 处理登录成功后返回 JWT Token 对.
