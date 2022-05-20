@@ -53,8 +53,9 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 
         SpringContextHolder.applicationContext = applicationContext;
         if (addCallback) {
-            for (CallBack callBack : SpringContextHolder.CALL_BACKS)
+            for (var callBack : SpringContextHolder.CALL_BACKS)
                 callBack.executor();
+            // 执行完成后，记得情况释放掉引用，避免因为此处的引用导致该被GC时无法被GC
             CALL_BACKS.clear();
         }
         SpringContextHolder.addCallback = false; // 这个只在启动后执行一下，后面就没必要了。CALL_BACKS里存的就是预先放进去，要在初始化完成后执行的任务。

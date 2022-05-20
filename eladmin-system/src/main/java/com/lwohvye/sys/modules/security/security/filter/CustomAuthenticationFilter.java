@@ -33,7 +33,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
@@ -49,10 +48,10 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     private RedisUtils redisUtils;
     private CaptchaService captchaService;
 
-    @PostConstruct
-    public void doInit() {
-        SpringContextHolder.addCallBacks(this::doRegister);
-    }
+    // @PostConstruct
+    // public void doInit() {
+    //     SpringContextHolder.addCallBacks(this::doRegister);
+    // }
 
     public void doRegister() {
         if (Objects.isNull(redisUtils)) redisUtils = SpringContextHolder.getBean(RedisUtils.class);

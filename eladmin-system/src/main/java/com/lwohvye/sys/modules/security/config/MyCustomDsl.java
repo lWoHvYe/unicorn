@@ -17,6 +17,7 @@
 package com.lwohvye.sys.modules.security.config;
 
 import com.lwohvye.sys.modules.security.security.filter.CustomAuthenticationFilter;
+import com.lwohvye.utils.SpringContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,6 +45,9 @@ public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurit
         customAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
         customAuthenticationFilter.setFilterProcessesUrl("/auth/login");
         customAuthenticationFilter.setAuthenticationManager(authenticationManager);
+        // 不再以bean的形式管理customFilter后，@PostConstruct就不会生效了，这样应该可以注入
+        SpringContextHolder.addCallBacks(customAuthenticationFilter::doRegister);
+
         //用重写的Filter替换掉原有的UsernamePasswordAuthenticationFilter
         // （这里实际上是放到了前面，security自带的Filter在轮到自己执行的时候，会判断当前登录状态，如果已经被之前的Filter验证过了，自己这关就直接放行）
         http.addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
