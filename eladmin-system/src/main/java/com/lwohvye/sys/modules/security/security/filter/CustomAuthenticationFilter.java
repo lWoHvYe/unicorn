@@ -108,7 +108,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             // UserDetailService, 用户认证通过Provider来做，所以Provider需要拿到系统已经保存的认证信息，获取用户信息的接口spring-security抽象成UserDetailService。
             // AuthenticationToken, 所有提交给AuthenticationManager的认证请求都会被封装成一个Token的实现
             // SecurityContext，当用户通过认证之后，就会为这个用户生成一个唯一的SecurityContext，里面包含用户的认证信息Authentication。
-            // 通过SecurityContext我们可以获取到用户的标识Principle和授权信息GrantedAuthrity。在系统的任何地方只要通过SecurityHolder.getSecruityContext()就可以获取到SecurityContext。
+            // 通过SecurityContext我们可以获取到用户的标识Principle和授权信息GrantedAuthority。在系统的任何地方只要通过SecurityHolder.getSecurityContext()就可以获取到SecurityContext。
             /*
              * 尝试对通过Authentication实例对象封装的身份信息进行验证。
              * 如果验证成功，则返回完全填充的Authentication对象（包括授予的权限）。
