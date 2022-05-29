@@ -50,3 +50,10 @@
 - Introduce an API by which Java programs can interoperate with code and data outside of the Java runtime.
 - [JEP 424: Foreign Function & Memory API](https://openjdk.java.net/jeps/424)
 - 主体是针对 JNI 及 Unsafe (accessing foreign memory) 这两块，提供了新的实现，跟Virtual Threads相关应该也有些关系
+
+#### Structured Concurrency (Incubator)
+
+- Simplify multithreaded programming by introducing a library for structured concurrency. Structured concurrency treats multiple tasks running in different
+  threads as a single unit of work, thereby streamlining error handling and cancellation, improving reliability, and enhancing observability.
+- [JEP 428: Structured Concurrency (Incubator)](https://openjdk.java.net/jeps/428)
+- 多线程相关的，诸如 ExecutorService and Future 这些，实际上跟Virtual Threads也有些相关。主体感觉在Virtual Threads提出后，又出现了不少相关的新东西
