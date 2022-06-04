@@ -19,14 +19,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
+import java.util.jar.JarFile;
 
 /**
  * 可用来获取IOC注册的Bean
@@ -43,6 +51,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
 
     //    Spring应用上下文环境
     private static ApplicationContext applicationContext = null;
+    private static DefaultListableBeanFactory defaultListableBeanFactory = null;
     private static final List<CallBack> CALL_BACKS = new ArrayList<>();
     private static boolean addCallback = true;
 
@@ -59,6 +68,8 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
             CALL_BACKS.clear();
         }
         SpringContextHolder.addCallback = false; // 这个只在启动后执行一下，后面就没必要了。CALL_BACKS里存的就是预先放进去，要在初始化完成后执行的任务。
+
+        defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
     }
 
     public static ApplicationContext getApplicationContext() {
@@ -221,4 +232,87 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
         log.debug("清除SpringContextHolder中的ApplicationContext: {}", applicationContext);
         applicationContext = null;
     }
+
+    // region 加载jar中的class并将bean注入/移出Spring容器
+
+    /**
+     * 加入jar包后 动态注册bean到spring容器，包括bean的依赖
+     *
+     * @param jarAddress jar文件路径为jarAddress， /xxx，若是windows下的路径，下面的jarPath应该改为"file:/" + jarAddress 好像，未验证，当然最稳妥的就是通过file来获取
+     */
+    public static void registerBeanInJar(String jarAddress) throws IOException, ClassNotFoundException {
+        // jar的Url路径为jarPath，jarPath = "file:" + jarAddress。也可以这样：
+        var file = new File(jarAddress);
+        var jarPath = file.toURI().toURL();
+        // 通过线程的上下文类加载器来加载
+        // URLClassLoader既可以加载本地文件系统的jar包，也可以加载远程jar包。比如URL jarPath = "https://repo1.maven.org/maven2/com/lwohvye/eladmin-common/3.0.2/eladmin-common-3.0.2.jar" 也可以，只是会比较慢
+        // 这种远程执行，印象中在哪里看过
+        try (var urlClassLoader = new URLClassLoader(new URL[]{jarPath}, Thread.currentThread().getContextClassLoader())) {
+            var classNameSet = readJarFile(jarAddress);
+            for (var className : classNameSet) {
+                var clazz = urlClassLoader.loadClass(className);
+                if (isSpringBeanClass(clazz)) {
+                    var beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
+                    // 向容器中注册bean，视情况是否允许覆盖
+                    defaultListableBeanFactory.registerBeanDefinition(StringUtils.lowerFirstChar(className), beanDefinitionBuilder.getBeanDefinition());
+                }
+            }
+        }
+    }
+
+    /**
+     * 删除jar包时 需要在spring容器删除注入
+     */
+    public static void deleteBeanInJar(String jarAddress) throws IOException, ClassNotFoundException {
+        try (var urlClassLoader = new URLClassLoader(new URL[]{new URL("file:" + jarAddress)}, Thread.currentThread().getContextClassLoader())) {
+            var classNameSet = readJarFile(jarAddress);
+            for (var className : classNameSet) {
+                // 这里load一下，只是为了拿一下注解，看是不是Spring的Bean
+                var clazz = urlClassLoader.loadClass(className);
+                if (isSpringBeanClass(clazz)) {
+                    // 从容器中删除bean
+                    defaultListableBeanFactory.removeBeanDefinition(StringUtils.lowerFirstChar(className));
+                }
+            }
+        }
+    }
+
+    /**
+     * 读取jar包中所有类文件
+     */
+    public static Set<String> readJarFile(String jarAddress) throws IOException {
+        var classNameSet = new HashSet<String>();
+        try (var jarFile = new JarFile(jarAddress)) {
+            var entries = jarFile.entries();//遍历整个jar文件
+            while (entries.hasMoreElements()) {
+                var jarEntry = entries.nextElement();
+                var name = jarEntry.getName();
+                // module-info.java和package-info.java要忽略的
+                if (name.endsWith(".class") && !(name.contains("module-info") || name.contains("package-info"))) {
+                    var className = name.replace(".class", "").replace("/", ".");
+                    classNameSet.add(className);
+                }
+            }
+        }
+        return classNameSet;
+    }
+
+    /**
+     * 方法描述 判断class对象是否带有spring的注解
+     */
+    public static boolean isSpringBeanClass(Class<?> cla) {
+        if (cla == null) {
+            return false;
+        }
+        //是否是接口
+        if (cla.isInterface()) {
+            return false;
+        }
+        //是否是抽象类
+        if (Modifier.isAbstract(cla.getModifiers())) {
+            return false;
+        }
+        return cla.getAnnotation(Component.class) != null || cla.getAnnotation(Repository.class) != null || cla.getAnnotation(Service.class) != null;
+    }
+    // endregion
 }
