@@ -34,7 +34,7 @@
         <project.core.version>3.0.3</project.core.version>
         <maven.compiler.release>17</maven.compiler.release>
         <lombok.version>1.18.24</lombok.version>
-        <mapstruct.version>1.4.2.Final</mapstruct.version>
+        <mapstruct.version>1.5.1.Final</mapstruct.version>
         <druid.version>1.2.8</druid.version>
     </properties>
 

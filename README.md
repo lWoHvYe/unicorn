@@ -51,15 +51,6 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 参考：[executable-jar.launching](https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching)
 
 ---
-在 **Spring Boot 2.6.0 +** 版本，需在配置文件中添加。解决springfox启动报错问题
-
-```yaml
-spring.mvc.pathmatch.matching-strategy=ant_path_matcher
-```
-
-注意不要使用actuator系列依赖，否则需要添加配置支持。详见：[SpringBoot-2.6.0](document/springboot/SpringBoot-2.6.0.md)
-
----
 
 #### Maven引用方式 🎵
 
@@ -93,13 +84,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### 项目简介
 
-一个基于最新的Java 17版本、 Spring Boot 2.6、 Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的后台管理系统
-
-**开发文档：**  [https://el-admin.vip](https://el-admin.vip)
-
-**体验地址：**  [https://el-admin.xin](https://el-admin.xin)
-
-**账号密码：** `admin / 123456`
+一个基于最新的Java 17版本、 Spring Boot 2.7、 Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的管理系统
 
 #### 项目源码
 
@@ -111,7 +96,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.6。
+- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.7。
 - 高效率开发，代码生成器可一键生成前后端代码
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持数据字典，可方便地对一些状态进行管理
@@ -122,7 +107,7 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 提供服务器性能监控功能
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
-- 使用ShardingSphere实现多数据源和读写分离（Sharding-JDBC）。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
+- 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
 
@@ -148,19 +133,19 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `eladmin-common` 为系统的公共模块，各种工具类，公共配置存在该模块
+- `eladmin-common` 系统的公共模块，各种工具类，公共配置存在该模块
 
-- `eladmin-api` 基础实体及DTO，方便后续服务拆分
+- `eladmin-api` 基础实体及API，方便后续服务拆分
 
-- `eladmin-system` 为系统核心模块，包含管理侧权限配置等。包含api模块service层的具体实现
+- `eladmin-system` 系统核心模块，包含管理侧权限配置等。
 
-- `eladmin-logging` 为系统的日志模块，其他模块如果需要记录日志需要引入该模块
+- `eladmin-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
-- `eladmin-tools` 为第三方工具模块，包含：邮件、OSS、SMS、本地存储
+- `eladmin-tools` 第三方工具模块，包含：邮件、OSS、SMS、本地存储
 
-- `eladmin-generator` 为系统的代码生成模块，代码生成的模板在 system 模块中
+- `eladmin-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化
 
-- `eladmin-starter` 启动类,项目入口，包含模块及组件配置
+- `eladmin-starter` 启动类,项目入口，包含模块及组件配置，枚举类动态扩展的简单demo
 
 - `eladmin-search` 通过mongodb进行最基础的检索，整合elasticsearch，SPI相关demo
 
@@ -215,11 +200,6 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 
 - 感谢 [elunez](https://github.com/elunez) 大佬提供的eladmin项目
 
-#### 项目捐赠
-
-项目的发展离不开你的支持，请作者喝杯咖啡吧☕  [Donate](https://el-admin.vip/donation/)
-
-
 ---
 
 #### Feature list
@@ -228,4 +208,3 @@ spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可启动，当下无法打包成功（3.0版本时明明可以打包成功的，只是启动不起来）,也未找到jar包的启动方式，故暂缓，可能要等到Spring 6.x 及 Spring Boot 3.X对 JPMS相关支持及Java 17了）
-- db中时间的存储格式可以用datetime或者timestamp，datetime占用8个字节、存在时区问题但可存储的时间范围广，timestamp占用4个字节、只能存储1970～2037但无时区问题，后续确定是否需要由datetime转为timestamp
