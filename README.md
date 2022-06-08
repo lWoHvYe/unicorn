@@ -74,7 +74,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 <dependency>
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <type>pom</type>
 </dependency>
 
