@@ -3,6 +3,7 @@ module lwohvye.eladmin.starter {
     requires lwohvye.eladmin.system;
     requires lwohvye.eladmin.tools;
     requires lwohvye.eladmin.generator;
+    requires hystrix.core;
 
     exports com.lwohvye.starter.config to spring.beans, spring.context, spring.boot;
     exports com.lwohvye.starter.modules.service to spring.aop;
