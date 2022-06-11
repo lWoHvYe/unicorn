@@ -34,11 +34,11 @@ public class SimHTTPServiceCommand extends HystrixCommand<String> {
 
     queue()：以异步非堵塞方式执行run()。调用queue()就直接返回一个Future对象，同时hystrix创建一个新线程运行run()，调用程序通过Future.get()拿到run()的返回结果，而Future.get()是堵塞执行的。
 
-    observe()：事件注册前执行run()/construct()。
+    observe()：事件注册前执行run()/construct()。响应式异步执行，立即获取
        第一步是事件注册前，先调用observe()自动触发执行run()/construct()（如果继承的是HystrixCommand，hystrix将创建新线程非堵塞执行run()；如果继承的是HystrixObservableCommand，将以调用程序线程堵塞执行construct()），
        第二步是从observe()返回后调用程序调用subscribe()完成事件注册，如果run()/construct()执行成功则触发onNext()和onCompleted()，如果执行异常则触发onError()。
 
-    toObservable()：事件注册后执行run()/construct()。
+    toObservable()：事件注册后执行run()/construct()。响应式异步执行，惰性获取
        第一步是事件注册前，调用toObservable()就直接返回一个Observable<String>对象，
        第二步调用subscribe()完成事件注册后自动触发执行run()/construct()（如果继承的是HystrixCommand，hystrix将创建新线程非堵塞执行run()，调用程序不必等待run()；
           如果继承的是HystrixObservableCommand，将以调用程序线程堵塞执行construct()，调用程序等待construct()执行完才能继续往下走），如果run()/construct()执行成功则触发onNext()和onCompleted()，如果执行异常则触发onError()

@@ -16,7 +16,15 @@
 
 package com.lwohvye;
 
+import com.lwohvye.starter.modules.handler.SimRestErrorHandler;
+import com.lwohvye.starter.modules.service.SimHTTPServiceCommand;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ModuleXTest {
 
@@ -26,5 +34,25 @@ public class ModuleXTest {
         Class<? extends ModuleXTest> aClass = this.getClass();
         var classLoader = aClass.getClassLoader();
         var module = aClass.getModule();
+    }
+
+
+    @Test
+    public void httpGetTest() throws ExecutionException, InterruptedException {
+        var restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(new SimRestErrorHandler());
+        var url = "https://www.lwohvye.com";
+        var futures = new ArrayList<Future<String>>();
+        for (int i = 0; i < 12; i++) { // 共24个，8个直接执行，12个进队列，4个被直接拒绝
+            var postFuture = new SimHTTPServiceCommand(restTemplate, "common", url, Map.of("username", "WHY", "pw", "000000")).queue();
+            var getFuture = new SimHTTPServiceCommand(restTemplate, "common", url, null).queue();
+            // System.out.println("get " + getFuture);
+            // System.out.println("post " + postFuture.get());
+            futures.add(postFuture);
+            futures.add(getFuture);
+        }
+        for (Future<String> future : futures) {
+            System.out.println("----" + future.get());
+        }
     }
 }
