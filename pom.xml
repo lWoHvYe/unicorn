@@ -153,6 +153,11 @@
                 <artifactId>springdoc-openapi-javadoc</artifactId>
                 <version>${springdoc.openapi.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-core</artifactId>
+                <version>${swagger-api.version}</version>
+            </dependency>
             <!--    swagger-core依赖该包，部分原因，需单独升级依赖版本    -->
             <dependency>
                 <groupId>com.google.guava</groupId>
