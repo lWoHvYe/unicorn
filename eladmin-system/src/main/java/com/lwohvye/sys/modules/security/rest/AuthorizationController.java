@@ -268,10 +268,23 @@ public class AuthorizationController {
             var res01 = rPermitsRFuture.get(); // 阻塞获取，可加超时
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
         // CompletableFuture的getNow(T valueIfAbsent)，本质为Returns the result value (or throws any encountered exception) if completed, else returns the given valueIfAbsent.
-        var resNow01 = rPermitsRFuture.getNow(); // 这里应该是要么返回具体结果，要么就是null之类的，不会阻塞
+        /* 方法过期了，官方给出的替代方案不是很清晰
+         * Use snippet below instead.
+         *
+         * <pre>
+         *                 try {
+         *                     return toCompletableFuture().getNow(null);
+         *                 } catch (Exception e) {
+         *                     return null;
+         *                 }
+         * </pre>
+         *
+         */
+        // var resNow01 = rPermitsRFuture.getNow(); // 这里应该是要么返回具体结果，要么就是null之类的，不会阻塞
         // 异步编程，主体就是Future，而对Future的操作，主体就是那几种
 
         // 获取令牌

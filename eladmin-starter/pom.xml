@@ -31,11 +31,11 @@
 
     <properties>
         <java.version>18</java.version>
-        <project.core.version>3.0.3</project.core.version>
+        <project.core.version>3.1.0</project.core.version>
         <maven.compiler.release>17</maven.compiler.release>
         <lombok.version>1.18.24</lombok.version>
-        <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <javassist.version>3.28.0-GA</javassist.version>
+        <mapstruct.version>1.5.1.Final</mapstruct.version>
+        <javassist.version>3.29.0-GA</javassist.version>
         <shardingsphere.version>4.1.1</shardingsphere.version>
     </properties>
 
@@ -110,6 +110,11 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            <version>2.2.10.RELEASE</version>
         </dependency>
     </dependencies>
 

@@ -46,7 +46,7 @@ public class DynamicEnumHelper {
              * See: https://stackoverflow.com/questions/61141836/change-static-final-field-in-java-12
              * How to rewrite a static final field in jdk12+
              */
-            // 这里只能这样获取，通过Unsafe.getUnsafe()直接获取会抛出异常
+            // 这里只能这样获取，通过Unsafe.getUnsafe()直接获取会抛出异常 if (!VM.isSystemDomainLoader(caller.getClassLoader()))
             var unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
             unsafeField.trySetAccessible();
             var unsafe = (Unsafe) unsafeField.get(null);

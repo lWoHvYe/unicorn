@@ -17,7 +17,12 @@
 package com.lwohvye.utils;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.mock.web.MockMultipartFile;
+
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import static com.lwohvye.utils.FileUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,5 +53,28 @@ public class FileUtilTest {
         assertEquals("1.00KB   ", getSize(1024));
         assertEquals("1.00MB   ", getSize(1048576));
         assertEquals("1.00GB   ", getSize(1073741824));
+    }
+
+    @Test
+    public void testLoadClass() throws Exception {
+        String jarAddress = "/Users/lWoHvYe/IdeaProjects/eladmin/eladmin-common/target/eladmin-common-3.0.3.jar";
+        // jar的Url路径为jarPath，jarPath = "file:" + jarAddress。也可以这样：
+        var file = new File(jarAddress);
+        var jarPath = file.toURI().toURL();
+        try (var urlClassLoader = new URLClassLoader(new URL[]{jarPath}, Thread.currentThread().getContextClassLoader())) {
+            var classNameSet = SpringContextHolder.readJarFile(jarAddress);
+            for (var className : classNameSet) {
+                var clazz = urlClassLoader.loadClass(className);
+                System.out.println(clazz.getName());
+            }
+        }
+
+        // 因为测试类在common中，这里如果读远程的common的化，可能要结果不那么突出，因为本地的也可以被加载，所以改读api了
+        jarPath = new URL("https://repo1.maven.org/maven2/com/lwohvye/eladmin-api/3.0.2/eladmin-api-3.0.2.jar");
+        try (var urlClassLoader = new URLClassLoader(new URL[]{jarPath}, Thread.currentThread().getContextClassLoader())) {
+            // Class<?> aClass = urlClassLoader.loadClass("com.lwohvye.api.modules.system.api.SysUserAPI"); // 3.0.3开始的结构，读3.0.2的jar会报类找不到，这是正确的
+            Class<?> aClass = urlClassLoader.loadClass("com.lwohvye.modules.system.api.SysUserAPI"); // 3.0.2时的结构
+            System.out.println(aClass.descriptorString());
+        }
     }
 }

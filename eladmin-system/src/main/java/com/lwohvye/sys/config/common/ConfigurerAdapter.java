@@ -87,7 +87,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
 
 
     /**
-     * 通用拦截器排除设置，所有拦截器都会自动加springdoc-opapi相关的资源排除信息，不用在应用程序自身拦截器定义的地方去添加，算是良心解耦实现。
+     * 通用拦截器排除设置，所有拦截器都会自动加springdoc-openapi相关的资源排除信息，不用在应用程序自身拦截器定义的地方去添加，算是良心解耦实现。
      */
     @SuppressWarnings("unchecked")
     @Override
