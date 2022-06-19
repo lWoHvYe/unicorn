@@ -16,8 +16,8 @@
 
 package com.lwohvye;
 
+import com.lwohvye.command.SimHTTPServiceCommand;
 import com.lwohvye.starter.modules.handler.SimRestErrorHandler;
-import com.lwohvye.starter.modules.service.SimHTTPServiceCommand;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
@@ -54,5 +54,18 @@ public class ModuleXTest {
         for (Future<String> future : futures) {
             System.out.println("----" + future.get());
         }
+    }
+
+    @Test
+    public void httpGetTest2() throws ExecutionException, InterruptedException {
+        /**
+         * 使用 使用restTemplate访问restful接口非常的简单
+         * (url, requestMap,ResponseBean.class)这三个参数分别代表 REST请求地址、请求参数、HTTP响应转换被转换成的对象类型。
+         */
+        var restTemplate = new RestTemplate();
+        var url = "https://www.lwohvye.com";
+        var postFuture = new SimHTTPServiceCommand(restTemplate, "common", url, Map.of("username", "WHY", "pw", "000000")).queue();
+        System.out.println(new SimHTTPServiceCommand(restTemplate, "common", url, null).execute());
+        System.out.println(postFuture.get());
     }
 }

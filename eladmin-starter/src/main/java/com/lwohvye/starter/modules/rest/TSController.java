@@ -17,15 +17,12 @@
 package com.lwohvye.starter.modules.rest;
 
 import com.lwohvye.starter.modules.service.ITSService;
-import com.lwohvye.starter.modules.service.SimHTTPServiceCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/anonymous/tsScope")
@@ -34,11 +31,6 @@ public class TSController {
     @Autowired
     private ITSService ITSService;
 
-    /**
-     * 使用 使用restTemplate访问restful接口非常的简单
-     * (url, requestMap,ResponseBean.class)这三个参数分别代表 REST请求地址、请求参数、HTTP响应转换被转换成的对象类型。
-     */
-    private final RestTemplate restTemplate = new RestTemplate();
 
     private String name;
 
@@ -62,11 +54,4 @@ public class TSController {
         }
     }
 
-    @GetMapping(value = "tg")
-    public void httpGetTest() throws ExecutionException, InterruptedException {
-        var url = "https://www.lwohvye.com";
-        var postFuture = new SimHTTPServiceCommand(restTemplate, "common", url, Map.of("username", "WHY", "pw", "000000")).queue();
-        System.out.println(new SimHTTPServiceCommand(restTemplate, "common", url, null).execute());
-        System.out.println(postFuture.get());
-    }
 }

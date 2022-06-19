@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.service;
+package com.lwohvye.command;
 
 import com.netflix.hystrix.*;
 import org.springframework.http.HttpEntity;
