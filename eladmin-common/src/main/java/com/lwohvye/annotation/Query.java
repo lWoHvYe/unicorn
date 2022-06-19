@@ -89,6 +89,8 @@ public @interface Query {
         , IN_INNER_LIKE
         // why 使用逗号分割的多值中，某一个值的筛选
         , EQUAL_IN_MULTI
+        // why 这个看起来比上面的 EQUAL_IN_MULTI 要优雅一些，且需注意上面这个用的or查询，若对应列无索引会导致所有的索引失效（用 and 连接的其他条件也不走索引），而这个因为用了库函数，该列的索引是失效的，所以看情况选择吧
+        , FUNCTION_FIND_IN_SET
         // why 原连接查询都是单条件的。针对业务，多条件连接查询，QueryCriteria中使用一个实体来承载属性
         , EQUAL_IN_MULTI_JOIN
         // why 2021/11/07 from_base64函数。当前函数只能对属性使用，不能对值使用

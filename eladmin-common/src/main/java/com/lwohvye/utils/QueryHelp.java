@@ -309,6 +309,21 @@ public class QueryHelp {
 //                            设置查询
                 list.add(cb.or(predicates));
                 break;
+            case FUNCTION_FIND_IN_SET:
+                // https://github.com/elunez/eladmin/pull/745
+                // if we have a table with column tags， the column value of tags is comma split string, like："a,b,c"
+                // we want to quey it by 'querytag' (ex 'a'), using follow sql：
+                // SELECT * FROM table WHERE FIND_IN_SET('a', table.tags); 这是很常见的用法
+                // FIND_IN_SET函数是IN函数的升级版.功能类似.区别在于:如果是常量，则可以直接用IN， 否则要用FIND_IN_SET()函数
+                // MySQL中原型为：FIND_IN_SET(str,strlist)。 假如字符串str 在由N 子链组成的字符串列表strlist 中(子链指的是`,`分隔的字符串)，则返回值的范围在 1 到 N 之间.
+                // 如果str不在strlist 或strlist 为空字符串，则返回值为 0 。如任意一个参数为NULL，则返回值为 NULL。这个函数在第一个参数包含一个逗号( , )时将无法正常运行。
+                // 注意；以下只是纯sql查询的情况，这里用了cb是没问题的，in也正常，估价如果用Mybatis可能会遇到这种坑
+                // select * from table where xxx in (list); // list = List.of("abc","def","str"); 这里是查不出来的，虽然list中有str，但list是变量
+                // select * from table where xxx in ('abc','def','str'); // 这个可以，因为in 里面是常量
+                // select * from table where FIND_IN_SET('str', list); // 这种也可以
+                // 需注意，调用function后会产生结果，在外层要指定对结果的使用
+                list.add(cb.greaterThan(cb.function("FIND_IN_SET", Integer.class, cb.literal(val.toString()), getExpression(attributeName, join, root)), 0));
+                break;
             case EQUAL_IN_MULTI_JOIN:
 //                            该注解只针对Join查询。非join不处理
                 if (Objects.isNull(join))
