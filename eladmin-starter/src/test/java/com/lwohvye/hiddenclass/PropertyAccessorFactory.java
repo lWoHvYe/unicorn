@@ -23,6 +23,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 
 import static java.lang.invoke.MethodType.methodType;
+import static org.springframework.asm.Opcodes.V17;
 
 /**
  * Very basic property accessor generator; doesn't take care of primitive boxing etc.
