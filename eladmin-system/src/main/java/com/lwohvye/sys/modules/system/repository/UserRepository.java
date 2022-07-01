@@ -48,6 +48,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     /**
      * 若配置了Graph图，则查询会变成查满足条件的所有。然后内存分页。故分页类查询不建议使用。下面两个只作为存档。
      * 但一些根据特定条件只过滤出很少记录的，可以考虑使用，比如这里的根据id、name等的查询
+     * 这个感觉跟MyBatis中配置的多对一的association标签，一对多的collection标签差不多，感觉很美好，但内存分页是硬伤
      *
      * @param spec
      * @param pageable
