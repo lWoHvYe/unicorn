@@ -15,3 +15,16 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    # Use allow | ignore to manage update
+    ignore:
+#       - dependency-name: "express"
+        # For Express, ignore all updates for version 4 and 5
+#         versions: ["4.x", "5.x"]
+        # For Lodash, ignore all updates
+#       - dependency-name: "lodash"
+        # For AWS SDK, ignore all patch updates
+#       - dependency-name: "aws-sdk"
+#         update-types: ["version-update:semver-patch"]
+      - dependency-name: "com.aliyun.oss:aliyun-sdk-oss"
+      - dependency-name: "com.aliyun:dysmsapi20170525"
+      - dependency-name: "net.dreamlu:mica-ip2region"
