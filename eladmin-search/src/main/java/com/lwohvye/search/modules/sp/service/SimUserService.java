@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.sp.service;
+package com.lwohvye.search.modules.sp.service;
 
 import cn.hutool.core.util.RandomUtil;
-import com.lwohvye.starter.modules.sp.repository.SimUserRepository;
-import com.lwohvye.starter.modules.sp.service.dto.URMDto;
+import com.lwohvye.search.modules.sp.repository.SimUserRepository;
+import com.lwohvye.search.modules.sp.service.dto.URMDto;
 import com.lwohvye.utils.SpringContextHolder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
@@ -29,12 +29,10 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-
-import static com.lwohvye.starter.modules.sp.domain.QSimMenu.simMenu;
-import static com.lwohvye.starter.modules.sp.domain.QSimRole.simRole;
-import static com.lwohvye.starter.modules.sp.domain.QSimUser.simUser;
-import static com.lwohvye.starter.modules.sp.domain.QSimUserRole.simUserRole;
+import static com.lwohvye.search.modules.sp.domain.QSimMenu.simMenu;
+import static com.lwohvye.search.modules.sp.domain.QSimRole.simRole;
+import static com.lwohvye.search.modules.sp.domain.QSimUser.simUser;
+import static com.lwohvye.search.modules.sp.domain.QSimUserRole.simUserRole;
 
 
 @Slf4j

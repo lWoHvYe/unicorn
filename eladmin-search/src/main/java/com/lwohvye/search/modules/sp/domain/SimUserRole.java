@@ -14,18 +14,25 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.sp.service.dto;
+package com.lwohvye.search.modules.sp.domain;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
 @Getter
 @Setter
-public class URMDto {
+@Table(name = "sys_users_roles")
+public class SimUserRole {
 
-    private String userName;
+    @Column(name = "user_id")
+    private Long userId;
 
-    private String roleName;
+    @Column(name = "role_id")
+    private Long roleId;
 
-    private String menuTitle;
 }

@@ -14,19 +14,18 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.config;
+package com.lwohvye.search.modules.sp.service.dto;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.EntityManager;
+@Getter
+@Setter
+public class URMDto {
 
-@Configuration
-public class ExtraBeanConfig {
-    // 为了使用QueryDsl，需注册一个JPAQueryFactory Bean
-    @Bean
-    public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
-        return new JPAQueryFactory(entityManager);
-    }
+    private String userName;
+
+    private String roleName;
+
+    private String menuTitle;
 }

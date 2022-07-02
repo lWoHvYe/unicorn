@@ -14,12 +14,19 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.sp.repository;
+package com.lwohvye.search.config;
 
-import com.lwohvye.starter.modules.sp.domain.SimUser;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-// 要使用Querydsl在创建repository时，一定要继承QueryDslPredicateExecutor接口，这种PredicateExecutor，也是一种动态条件的方式
-public interface SimUserRepository extends JpaRepository<SimUser, Long>, QuerydslPredicateExecutor<SimUser> {
+import javax.persistence.EntityManager;
+
+@Configuration
+public class ExtraBeanConfig {
+    // 为了使用QueryDsl，需注册一个JPAQueryFactory Bean
+    @Bean
+    public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
+        return new JPAQueryFactory(entityManager);
+    }
 }

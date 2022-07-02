@@ -14,25 +14,12 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.sp.domain;
+package com.lwohvye.search.modules.sp.repository;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.lwohvye.search.modules.sp.domain.SimUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
-@Entity
-@Getter
-@Setter
-@Table(name = "sys_users_roles")
-public class SimUserRole {
-
-    @Column(name = "user_id")
-    private Long userId;
-
-    @Column(name = "role_id")
-    private Long roleId;
-
+// 要使用Querydsl在创建repository时，一定要继承QueryDslPredicateExecutor接口，这种PredicateExecutor，也是一种动态条件的方式
+public interface SimUserRepository extends JpaRepository<SimUser, Long>, QuerydslPredicateExecutor<SimUser> {
 }
