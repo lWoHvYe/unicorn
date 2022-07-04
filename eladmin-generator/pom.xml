@@ -29,7 +29,7 @@
     <name>代码生成模块</name>
 
     <properties>
-        <configuration.version>2.7</configuration.version>
+        <configuration.version>2.8.0</configuration.version>
         <beanutils.version>1.9.4</beanutils.version>
     </properties>
 
