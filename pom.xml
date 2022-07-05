@@ -394,10 +394,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <!--For maven package error:  javadoc command: The environment variable JAVA_HOME is not correctly set.-->
-                <configuration>
-                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
-                </configuration>
+                <!--For maven package error（on Mac）:  javadoc command: The environment variable JAVA_HOME is not correctly set.改为自行在Maven Runner中自行配置JAVA_HOME变量-->
+                <!--<configuration>-->
+                <!--    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>-->
+                <!--</configuration>-->
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -436,7 +436,7 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
-            <!--     Maven JDK9 Jigsaw       -->
+            <!--     Maven JDK9 Jigsaw。这个暂时并没有用到       -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jmod-plugin</artifactId>

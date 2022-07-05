@@ -154,14 +154,14 @@
                             <artifactId>spring-boot-configuration-processor</artifactId>
                         </exclude>
                     </excludes>
-                    <includes>
-                        <!-- 不存在的include引用，相当于排除所有maven依赖jar，没有任何三方jar文件打入输出jar -->
-                        <include>
-                            <groupId>nothing</groupId>
-                            <artifactId>nothing</artifactId>
-                        </include>
-                    </includes>
-                    <layout>ZIP</layout>
+<!--                    <includes>-->
+<!--                        &lt;!&ndash; 不存在的include引用，相当于排除所有maven依赖jar，没有任何三方jar文件打入输出jar &ndash;&gt;-->
+<!--                        <include>-->
+<!--                            <groupId>nothing</groupId>-->
+<!--                            <artifactId>nothing</artifactId>-->
+<!--                        </include>-->
+<!--                    </includes>-->
+<!--                    <layout>ZIP</layout>-->
                 </configuration>
                 <executions>
                     <execution>
@@ -207,35 +207,35 @@
                 </executions>
             </plugin>
             <!-- jar包内剔除所有配置文件 -->
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <!--不打入jar包的文件类型或者路径-->
-                    <excludes>
-                        <exclude>config/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <artifactId>maven-jar-plugin</artifactId>-->
+<!--                <configuration>-->
+<!--                    &lt;!&ndash;不打入jar包的文件类型或者路径&ndash;&gt;-->
+<!--                    <excludes>-->
+<!--                        <exclude>config/**</exclude>-->
+<!--                    </excludes>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <!-- 拷贝项目所有依赖jar文件到构建lib目录下 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <excludeTransitive>false</excludeTransitive>
-                            <stripVersion>false</stripVersion>
-                            <silent>true</silent>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-dependency-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>copy-dependencies</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>copy-dependencies</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <outputDirectory>${project.build.directory}/lib</outputDirectory>-->
+<!--                            <excludeTransitive>false</excludeTransitive>-->
+<!--                            <stripVersion>false</stripVersion>-->
+<!--                            <silent>true</silent>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <!-- 解决 Java-16下 lombok报错：
             Fatal error compiling: java.lang.IllegalAccessError: class lombok.javac.apt.LombokProcessor (in unnamed module @0x486bcaa) cannot access class com.sun.tools.javac.processing.JavacProcessingEnvironment (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.processing to unnamed module @0x486bcaa
             -->
@@ -268,12 +268,12 @@
                 </configuration>
             </plugin>
             <!--     Maven JDK9 Jigsaw       -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jmod-plugin</artifactId>
-                <version>3.0.0-alpha-1</version>
-                <extensions>true</extensions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-jmod-plugin</artifactId>-->
+<!--                <version>3.0.0-alpha-1</version>-->
+<!--                <extensions>true</extensions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>

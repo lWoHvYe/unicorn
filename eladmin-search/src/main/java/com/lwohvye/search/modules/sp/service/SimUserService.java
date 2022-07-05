@@ -23,6 +23,7 @@ import com.lwohvye.utils.SpringContextHolder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.Visitor;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -97,5 +98,11 @@ public class SimUserService {
         // limit 10
         // where 第一个条件中的 escape '!' 不清楚是什么🐢
         // 另外还支持分页，而动态排序需通过OrderSpecifier来定义
+
+        // To create a subquery you use the static factory methods of JPAExpressions and define the query parameters via from, where etc.
+        jpaQueryFactory.selectFrom(simUser).where(simUser.id.in(
+                JPAExpressions.select(simUserRole.userId).from(simRole, simUserRole).where(simRole.id.eq(simUserRole.roleId), simRole.name.eq(str)))
+        ).fetch().forEach(su -> log.warn(su.toString()));
+        // 看了MyBatis Dynamic SQL的Doc后，感觉很不错，并提供了不错的扩展点，后续有机会打算试一下
     }
 }
