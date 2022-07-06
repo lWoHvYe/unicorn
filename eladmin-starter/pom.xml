@@ -163,15 +163,15 @@
 <!--                    </includes>-->
 <!--                    <layout>ZIP</layout>-->
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
-                        <!--<configuration>
-                            <classifier>exec</classifier>
-                        </configuration>-->
-                    </execution>
-                </executions>
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>repackage</id>-->
+<!--                        &lt;!&ndash;这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置&ndash;&gt;-->
+<!--                        &lt;!&ndash;<configuration>-->
+<!--                            <classifier>exec</classifier>-->
+<!--                        </configuration>&ndash;&gt;-->
+<!--                    </execution>-->
+<!--                </executions>-->
             </plugin>
             <!-- 跳过单元测试 -->
             <plugin>

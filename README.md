@@ -14,7 +14,7 @@
 
 启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
 详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
-删除，以非module化运行。~~，模块化打包部署暂未找到支持外置配置及依赖的方式
+删除，以非module化运行。~~，~~模块化打包部署暂未找到支持外置配置及依赖的方式~~，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的，但外置依赖尚未找到引入的方式
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS。在对项目完成相关改造之前（当前未找到jar启动的方式），应该只能用ALL-UNNAMED表示对所有未命名模块开放）。
@@ -207,4 +207,4 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - dev_3.0 Springdoc相关。Web侧跟进（无限delay）
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
-- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署不支持外置配置和依赖，故仍使用原非模块化的方式
+- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚有些问题未搞清）
