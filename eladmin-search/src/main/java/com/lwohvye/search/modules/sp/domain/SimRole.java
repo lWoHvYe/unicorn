@@ -36,7 +36,7 @@ import java.util.Set;
 @Setter
 @ToString
 @Accessors(chain = true)
-@Table(name = "sys_role")
+@Table(name = "sys_role_view")
 public class SimRole implements Serializable {
 
     @Id

@@ -32,7 +32,7 @@ import java.io.Serializable;
 @Setter
 @ToString
 @Accessors(chain = true)
-@Table(name = "sys_menu")
+@Table(name = "sys_menu_view")
 public class SimMenu implements Serializable {
 
     @Id

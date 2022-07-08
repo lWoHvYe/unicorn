@@ -16,11 +16,14 @@
 
 package com.lwohvye.search.config;
 
+import com.blazebit.persistence.Criteria;
+import com.blazebit.persistence.CriteriaBuilderFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 @Configuration
 public class ExtraBeanConfig {
@@ -28,5 +31,9 @@ public class ExtraBeanConfig {
     @Bean
     public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
         return new JPAQueryFactory(entityManager);
+    }
+    @Bean
+    public CriteriaBuilderFactory createCriteriaBuilderFactory(EntityManagerFactory entityManagerFactory) {
+        return Criteria.getDefault().createCriteriaBuilderFactory(entityManagerFactory);
     }
 }

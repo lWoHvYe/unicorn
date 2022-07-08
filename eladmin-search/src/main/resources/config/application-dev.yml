@@ -82,7 +82,7 @@ spring:
 
   ##### RabbitMQ ####
   rabbitmq:
-    addresses: 10.211.55.140:5672,10.211.55.140:5674
+    addresses: 10.211.55.140:5672
     #    host: 10.211.55.140 # rabbitmq的连接地址
     #    port: 5672 # rabbitmq的连接端口号
     virtual-host: /eladmin # rabbitmq的虚拟host

@@ -112,4 +112,11 @@ public class SimHTTPServiceCommand extends HystrixCommand<String> {
         return "调用失败、请稍后重试";
     }
 
+    // Hystrix-RequestCache
+    @Override
+    protected String getCacheKey() {
+        return super.getCacheKey();
+    }
+
+    // 合并请求 HystrixCollapser。需要被调用端也支持batch才行
 }
