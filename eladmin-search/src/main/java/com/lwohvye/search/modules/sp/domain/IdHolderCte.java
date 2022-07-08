@@ -14,20 +14,20 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.search.modules.sp.service.dto;
+package com.lwohvye.search.modules.sp.domain;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.blazebit.persistence.CTE;
 
-@Getter
-@Setter
-@ToString
-public class URMDto {
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
-    private String userName;
+@CTE
+@Entity
+public class IdHolderCte {
 
-    private String roleName;
+    @Id
+    Long id;
 
-    private String menuTitle;
+    String name;
+
 }

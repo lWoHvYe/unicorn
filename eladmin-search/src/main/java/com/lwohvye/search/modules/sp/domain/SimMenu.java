@@ -50,6 +50,8 @@ public class SimMenu implements Serializable {
     private Long pid;
 
     // 下面这个属性是不存在的，这是启动失败的根源
-    private Long roleId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
+    private SimRole simRole;
 
 }

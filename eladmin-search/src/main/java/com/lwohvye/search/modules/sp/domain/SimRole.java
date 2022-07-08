@@ -48,7 +48,8 @@ public class SimRole implements Serializable {
     @Transient
     private Set<SimUser> simUsers;
 
-    @Transient
+    @JoinColumn(name = "role_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<SimMenu> simMenus;
 
     private String name;
