@@ -166,7 +166,7 @@ public class SimUserService {
 
         List<Tuple> fetch = query.fetch();
 
-        // Regular association joins 下面这两个算是两种写法吧，都是聚合，但有循环依赖问题
+        // Regular association joins 下面这两个算是两种写法吧，都是聚合
         // select simrole0_.role_id as role_id1_21_0_, simmenus1_.menu_id as menu_id1_16_1_, simrole0_.code
         // as code2_21_0_, simrole0_.description as descript3_21_0_, simrole0_.name as name4_21_0_, simmenus1_.name
         // as name2_16_1_, simmenus1_.pid as pid3_16_1_, simmenus1_.role_id as role_id6_16_1_, simmenus1_.title

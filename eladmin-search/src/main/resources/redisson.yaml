@@ -1,7 +1,6 @@
----
-# 主从节点配置  参考：org.redisson.config.Config.java 按照需求配置。
+# 单节点配置  参考：org.redisson.config.Config.java 按照需求配置。
 # Redisson支持单点、集群、主从、哨兵等
-masterSlaveServersConfig:
+singleServerConfig:
   # 连接空闲超时，单位：毫秒
   idleConnectionTimeout: 10000
   # 连接超时，单位：毫秒
@@ -19,23 +18,16 @@ masterSlaveServersConfig:
   subscriptionsPerConnection: 5
   # 客户端名称
   clientName: null
-  loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> { }
+  #  # 节点地址
+  address: redis://10.211.55.140:6379
   # 发布和订阅连接的最小空闲连接数
   subscriptionConnectionMinimumIdleSize: 1
   # 发布和订阅连接池大小
   subscriptionConnectionPoolSize: 50
   # 最小空闲连接数
-  slaveConnectionMinimumIdleSize: 32
+  connectionMinimumIdleSize: 32
   # 连接池大小
-  slaveConnectionPoolSize: 64
-  masterConnectionMinimumIdleSize: 32
-  masterConnectionPoolSize: 64
-  readMode: "SLAVE"
-  # 节点地址
-  slaveAddresses:
-    - "redis://10.211.55.140:6378"
-    - "redis://10.211.55.140:6380"
-  masterAddress: "redis://10.211.55.140:6379"
+  connectionPoolSize: 64
   # 数据库编号
   database: 6
   # DNS监测时间间隔，单位：毫秒

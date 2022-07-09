@@ -15,9 +15,9 @@
  */
 package com.lwohvye.search.modules.sp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -30,7 +30,6 @@ import java.io.Serializable;
 @Entity
 @Getter
 @Setter
-@ToString
 @Accessors(chain = true)
 @Table(name = "sys_menu_view")
 public class SimMenu implements Serializable {
@@ -49,9 +48,16 @@ public class SimMenu implements Serializable {
 
     private Long pid;
 
-    // 下面这个属性是不存在的，这是启动失败的根源
+    // 设置Ignore，也许就能打破循环依赖了
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private SimRole simRole;
 
+    // 改下toString总行了吧。剔除simRole
+    @Override
+    public String toString() {
+        Long var10000 = this.getId();
+        return "SimMenu(id=" + var10000 + ", title=" + this.getTitle() + ", componentName=" + this.getComponentName() + ", type=" + this.getType() + ", pid=" + this.getPid() + ")";
+    }
 }
