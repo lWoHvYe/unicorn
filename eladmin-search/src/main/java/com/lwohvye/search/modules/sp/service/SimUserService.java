@@ -19,7 +19,6 @@ package com.lwohvye.search.modules.sp.service;
 import com.blazebit.persistence.CriteriaBuilderFactory;
 import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.blazebit.persistence.querydsl.JPQLNextExpressions;
-import com.lwohvye.search.modules.sp.domain.SimUser;
 import com.lwohvye.search.modules.sp.repository.SimUserRepository;
 import com.lwohvye.search.modules.sp.service.dto.URMDto;
 import com.lwohvye.utils.SpringContextHolder;
@@ -52,7 +51,7 @@ import static com.lwohvye.search.modules.sp.domain.QSimUserRole.simUserRole;
 @Service
 public class SimUserService {
 
-    @Lazy
+    @Lazy // entity配置懒加载后，就有了no session问题，CallBack的注入方式又因本方法注入导致事物失效，所以注入自己来调用，但未解决循环依赖，有需要懒注入@Lazy
     @Autowired
     private SimUserService simUserService;
 
@@ -138,7 +137,6 @@ public class SimUserService {
                 .leftJoin(simUserRole).on(simUser.id.eq(simUserRole.userId))
                 .leftJoin(simRole).on(simRole.id.eq(simUserRole.roleId))
                 .leftJoin(simMenu).on(simMenu.simRole.eq(simRole));
-        // blazeJPAQuery.where(simMenu.title.like(str + "%"));
         blazeJPAQuery.where(simUser.enabled.isTrue());
         blazeJPAQuery.where(simRole.code.isNotNull().and(simRole.code.like(str + "%")));
 
@@ -180,33 +178,10 @@ public class SimUserService {
                 .transform(GroupBy.groupBy(simRole).as(GroupBy.list(simMenu)));
 
         // Regular entity joins
-        // select simrole0_.role_id as role_id1_21_0_, simmenu1_.menu_id as menu_id1_16_1_, simrole0_.code
-        // as code2_21_0_, simrole0_.description as descript3_21_0_, simrole0_.name as name4_21_0_, simmenu1_.name
-        // as name2_16_1_, simmenu1_.pid as pid3_16_1_, simmenu1_.role_id as role_id6_16_1_, simmenu1_.title
-        // as title4_16_1_, simmenu1_.type as type5_16_1_
-        // from sys_role_view simrole0_ inner join sys_menu_view simmenu1_ on (simmenu1_.role_id=simrole0_.role_id)
         var booksByAuthor02 = new BlazeJPAQuery<>(entityManager, criteriaBuilderFactory)
                 .from(simRole)
                 .innerJoin(simMenu).on(simMenu.simRole.eq(simRole))
                 .transform(GroupBy.groupBy(simRole).as(GroupBy.list(simMenu)));
-
-        //  Managed type value clause
-        // Add a VALUES clause for values of the given value class to the from clause. This introduces a parameter named like the given alias.
-        // select simuser0_.user_id as user_id1_25_, simuser0_.enabled as enabled2_25_, simuser0_.password
-        // as password3_25_, simuser0_.phone as phone4_25_, simuser0_.username as username5_25_
-        // from (select * from
-        //          (select null as enabled,null as user_id,null as password,null as phone,null as username from dual
-        //          union all
-        //          select NULL,NULL,'tpw',NULL,'tun' from dual ) fltr_nulls_tbl_als_
-        //          where fltr_nulls_tbl_als_.enabled is not null or fltr_nulls_tbl_als_.user_id is not null or fltr_nulls_tbl_als_.password is not null or fltr_nulls_tbl_als_.phone is not null or fltr_nulls_tbl_als_.username is not null
-        //       ) simuser0_
-        var theUser = new SimUser();
-        theUser.setUsername("tun");
-        theUser.setPassword("tpw");
-        var fetch02 = new BlazeJPAQuery<>(entityManager, criteriaBuilderFactory)
-                .fromValues(simUser, Collections.singleton(theUser))
-                .select(simUser)
-                .fetch();
 
         // Managed attribute value clause
         // Add a VALUES clause for values of the type as determined by the given entity attribute to the from clause. This introduces a parameter named like the given alias.
@@ -218,20 +193,39 @@ public class SimUserService {
                 .select(catName)
                 .fetch();
 
-        // Window functions。这个后续看一下
+        // Window functions。主体可以认为是调用函数。https://persistence.blazebit.com/documentation/1.6/core/manual/en_US/index.html#window-functions-2
+        // Window functions provide the ability to perform aggregate calculations across sets of rows that are related to the current query row. Unlike regular aggregate functions,
+        // use of a window function does not cause rows to become grouped into a single output row. 这个需要DB Support，主要有下面这些
+        // Aggregate window functions:Any built-in aggregate function and ordered set-aggregate functions can be used as a window function. These are:
+        //      SUM - Returns the sum across the rows in the window
+        //      AVG - Returns the average value across the rows in the window
+        //      MAX - Returns the maximal across the rows in the window
+        //      MIN - Returns the minimal across the rows in the window
+        //      COUNT - Returns the count across the rows in the window
+        // General-Purpose Window Functions:The SQL standard defines the following window functions:
+        //      ROW_NUMBER - Returns the number of the current row within its partition, counting from 1
+        //      RANK - Returns the rank of the current row considering gaps
+        //      DENSE_RANK - Returns the rank of the current row disregarding gaps
+        //      PERCENT_RANK - Returns the relative rank of the current row: (rank - 1) / (total rows - 1)
+        //      CUME_DIST - Returns the relative rank of the current row: (number of rows preceding or peer with current row) / (total rows)
+        //      NTILE - Returns an integer ranging from 1 to the argument value, dividing the partition as equally as possible
+        //      LEAD - Returns the value evaluated at the row that is offset rows after the current row within the partition; if there is no such row, instead return the specified default value (which must be of the same type as value). Both the offset and default value are evaluated with respect to the current row. If omitted, the offset defaults to 1 and default to null.
+        //      LAG - Returns the value evaluated at the row that is offset rows before the current row within the partition; if there is no such row, instead return the specified default value (which must be of the same type as value). Both the offset and default value are evaluated with respect to the current row. If omitted, the offset defaults to 1 and default to null.
+        //      FIRST_VALUE - Returns the value evaluated at the row that is the first row of the window frame
+        //      LAST_VALUE - Returns the value evaluated at the row that is the last row of the window frame
+        //      NTH_VALUE - Returns the value evaluated at the row that is the nth row of the window frame
+        // Named Windows:Through the CriteriaBuilder API one can create named windows which can be reused between window function calls.(这个知道就行了)
         // Window functions are available through the various static utility methods in JPQLNextExpressions. For convenience, its recommended to add a star-import to com.blazebit.persistence.querydsl.JPQLNextExpressions.*.
         // select simuser0_.username as col_0_0_, ROW_NUMBER() OVER () as col_1_0_, LAST_VALUE(simuser0_.username) OVER (PARTITION BY simuser0_.user_id) as col_2_0_ from sys_user_view simuser0_
         var query05 = new BlazeJPAQuery<Tuple>(entityManager, criteriaBuilderFactory).from(simUser)
                 .select(simUser.username, JPQLNextExpressions.rowNumber(), JPQLNextExpressions.lastValue(simUser.username).over().partitionBy(simUser.id));
         List<Tuple> fetch05 = query05.fetch();
 
-        // Named window functions
-        // NamedWindow myWindow = new NamedWindow("myWindow").partitionBy(simUser.id);
-        // BlazeJPAQuery<Tuple> query06 = new BlazeJPAQuery<Tuple>(entityManager, criteriaBuilderFactory).from(simUser)
-        //         .select(simUser.username, JPQLNextExpressions.rowNumber().over(myWindow), JPQLNextExpressions.lastValue(simUser.username).over(myWindow));
-        // List<Tuple> fetch06 = query06.fetch();
-
-        // Common Table Expressions 这个也是个高级的用法，还没搞明白
+        // Common Table Expressions https://persistence.blazebit.com/documentation/1.6/core/manual/en_US/index.html#ctes
+        // the CTE annotation is applied which treats it like a view。似乎可以当成view来看。暂时没有太多场景
+        // CTEs not only provide a way to extract subqueries or use subqueries in the FROM clause, but also to implement recursive queries.
+        // CTEs provide a way to introduce statements into a larger query that can be reused. CTEs are like temporary entity sets/tables that are created for the scope of the query and then deleted.
+        // A CTE normally contains a SELECT statement, but depending on the DBMS support, can also contain INSERT, UPDATE and DELETE statements.
         // select idholderct0_.id as col_0_0_ from
         //  (select null id,null name from dual where 1=0
         //  union all
@@ -243,12 +237,6 @@ public class SimUserService {
                         JPQLNextExpressions.bind(idHolderCte.name, simMenu.title)).from(simMenu))
                 .select(idHolderCte.id).from(idHolderCte)
                 .fetch();
-        //     List<Long> fetch08 = new BlazeJPAQuery<>(entityManager, criteriaBuilderFactory)
-        //             .with(idHolderCte, new BlazeJPAQuery()
-        //                     .bind(idHolderCte.id, simMenu.id),
-        //             .bind(idHolderCte.name, simMenu.title)).from(simMenu))
-        // .select(idHolderCte.id).from(idHolderCte)
-        //             .fetch();
 
     }
 }
