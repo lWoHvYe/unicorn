@@ -154,6 +154,18 @@ public class SimUserService {
                 JPAExpressions.select(simUserRole.userId).from(simRole, simUserRole).where(simRole.id.eq(simUserRole.roleId), simRole.name.eq(str)))
         ).fetch().forEach(su -> log.warn(su.toString()));
         // 看了MyBatis Dynamic SQL的Doc后，感觉很不错，并提供了不错的扩展点，后续有机会打算试一下
+        // 修正一个错误，MyBatis Dynamic SQL可以，通过 offset(%d)和fetchFirst(%d).rowsOnly()进行Pagination，这个是Standard的方式，Support 大部分DB，
+        // 而上面JPA-DSL的offset-limit不清楚Support的scenario，已知传统JPA是Support大部分DB的，并可配置dialect
+        // 另结合 https://mybatis.org/mybatis-dynamic-sql/docs/howItWorks.html https://mybatis.org/mybatis-dynamic-sql/docs/extending.html 可以做些extend
+        /*
+        SelectStatementProvider selectStatement = select(animalData.allColumns())
+            .from(animalData)
+            .orderBy(id)
+            .offset(22)
+            .fetchFirst(3).rowsOnly()
+            .build()
+            .render(RenderingStrategies.MYBATIS3);
+         */
     }
 
     @Transactional(rollbackFor = Exception.class)
