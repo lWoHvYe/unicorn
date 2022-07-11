@@ -21,10 +21,12 @@ import com.blazebit.persistence.querydsl.BlazeJPAQuery;
 import com.blazebit.persistence.querydsl.JPQLNextExpressions;
 import com.lwohvye.search.modules.sp.repository.SimUserRepository;
 import com.lwohvye.search.modules.sp.service.dto.URMDto;
+import com.lwohvye.search.modules.util.DynamicDslOrderUtil;
 import com.lwohvye.utils.SpringContextHolder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
@@ -131,16 +133,25 @@ public class SimUserService {
 
         // Among other advanced query features, Blaze-Persistence makes it possible to select from subqueries in JPQL.
         var blazeJPAQuery = new BlazeJPAQuery<URMDto>(entityManager, criteriaBuilderFactory);
-        blazeJPAQuery.select(Projections.bean(URMDto.class, simUser.username.as("userName"), simRole.name.as("roleName"), simMenu.title.as("menuTitle")))
+        // 关于Expressions还不是很理解。但Expressions.constant(静态属性，与列相关的应该不行，所以列运算这种先不要想了)，比如Expressions.constant("" + simUser.username + " : " + simRole.name)
+        // 用Projections.bean时，要指定映射的FileName
+        blazeJPAQuery.select(Projections.bean(URMDto.class, /*Expressions.constant("aStr"), */Expressions.FOUR.as("itg"), Expressions.TRUE.as("bb"),
+                        new CaseBuilder()
+                                .when(simUser.username.eq("admin")).then("Salt")
+                                .when(simUser.username.eq("test")).then("Good")
+                                .otherwise("You know Who").as("csStr"),
+                        simUser.enabled.when(Boolean.TRUE).then(1).otherwise(0).as("csi"),
+                        simUser.username.as("userName"), simRole.name.as("roleName"), simMenu.title.as("menuTitle")))
                 .from(simUser)
-                // 下面这些join感觉灵活性很高，在entiy的定义之外。在主查询的场合更灵活，但针对增删改，就没JPA那么智能了
+                // 下面这些join感觉灵活性很高，在entity的定义之外。在主查询的场合更灵活，但针对增删改，就没JPA那么智能了
                 .leftJoin(simUserRole).on(simUser.id.eq(simUserRole.userId))
                 .leftJoin(simRole).on(simRole.id.eq(simUserRole.roleId))
                 .leftJoin(simMenu).on(simMenu.simRole.eq(simRole));
         blazeJPAQuery.where(simUser.enabled.isTrue());
         blazeJPAQuery.where(simRole.code.isNotNull().and(simRole.code.like(str + "%")));
 
-        blazeJPAQuery.orderBy(simUser.username.desc());// order by case when simuser0_.username is null then 1 else 0 end, simuser0_.username ASC 针对String当做asc时，会有这种优化
+        blazeJPAQuery.orderBy(DynamicDslOrderUtil.orderByField(simUser, "desc", "username"));
+        // blazeJPAQuery.orderBy(simUser.username.desc());// order by case when simuser0_.username is null then 1 else 0 end, simuser0_.username ASC 针对String当做asc时，会有这种优化
         // 获取总记录数，若放到jpqlQuery.offset(10).limit(5);之后，会报 No transactional EntityManager available
         var totalCount02 = blazeJPAQuery.fetchCount();
         blazeJPAQuery.offset(10).limit(5); // 分页信息
@@ -155,7 +166,7 @@ public class SimUserService {
         ).fetch().forEach(su -> log.warn(su.toString()));
         // 看了MyBatis Dynamic SQL的Doc后，感觉很不错，并提供了不错的扩展点，后续有机会打算试一下
         // 修正一个错误，MyBatis Dynamic SQL可以，通过 offset(%d)和fetchFirst(%d).rowsOnly()进行Pagination，这个是Standard的方式，Support 大部分DB，
-        // 而上面JPA-DSL的offset-limit不清楚Support的scenario，已知传统JPA是Support大部分DB的，并可配置dialect
+        // 而上面JPA-DSL的offset-limit对大多数DB Support，但Oracle依旧是传统的rownum，而比较Standard的 offset %d rows fetch first %d rows only，已知传统JPA是Support大部分DB的，并可配置dialect
         // 另结合 https://mybatis.org/mybatis-dynamic-sql/docs/howItWorks.html https://mybatis.org/mybatis-dynamic-sql/docs/extending.html 可以做些extend
         /*
         SelectStatementProvider selectStatement = select(animalData.allColumns())

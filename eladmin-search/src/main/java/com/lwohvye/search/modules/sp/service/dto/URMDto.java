@@ -25,6 +25,16 @@ import lombok.ToString;
 @ToString
 public class URMDto {
 
+    // private String str;
+
+    private Integer itg;
+
+    private Boolean bb;
+
+    private String csStr;
+
+    private Integer csi;
+
     private String userName;
 
     private String roleName;
