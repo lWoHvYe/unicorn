@@ -164,9 +164,9 @@ public class SimUserService {
         jpaQueryFactory.selectFrom(simUser).where(simUser.id.in(
                 JPAExpressions.select(simUserRole.userId).from(simRole, simUserRole).where(simRole.id.eq(simUserRole.roleId), simRole.name.eq(str)))
         ).fetch().forEach(su -> log.warn(su.toString()));
-        // 看了MyBatis Dynamic SQL的Doc后，感觉很不错，并提供了不错的扩展点，后续有机会打算试一下
+        // 看了MyBatis Dynamic SQL的Doc后，感觉很不错，并提供了不错的扩展点，感觉本质还是利用了MyBatis基于SQL执行的方式-SQL的直接拼接。相较的QueryDSL应该与HQL有些关系
         // 修正一个错误，MyBatis Dynamic SQL可以，通过 offset(%d)和fetchFirst(%d).rowsOnly()进行Pagination，这个是Standard的方式，Support 大部分DB，
-        // 而上面JPA-DSL的offset-limit对大多数DB Support，但Oracle依旧是传统的rownum，而比较Standard的 offset %d rows fetch first %d rows only，已知传统JPA是Support大部分DB的，并可配置dialect
+        // 而上面JPA-DSL的offset-limit对大多数DB Support，但Oracle依旧是传统的rownum，而非比较Standard的 offset %d rows fetch first %d rows only，已知传统JPA是Support大部分DB的，并可配置dialect
         // 另结合 https://mybatis.org/mybatis-dynamic-sql/docs/howItWorks.html https://mybatis.org/mybatis-dynamic-sql/docs/extending.html 可以做些extend
         /*
         SelectStatementProvider selectStatement = select(animalData.allColumns())

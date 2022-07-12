@@ -275,7 +275,8 @@
                             <goal>process</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/generated-sources/java</outputDirectory>
+                            <!--  target/generated-sources/annotations会自动被mark为source，所以改用这个目录  -->
+                            <outputDirectory>target/generated-sources/annotations</outputDirectory>
                             <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>
