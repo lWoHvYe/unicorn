@@ -25,6 +25,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,6 +55,9 @@ public class SimUser implements Serializable {
 
     @Transient
     private List<SimRole> simRoles;
+
+    @Transient
+    private Date birDay;
 
     // @JsonAlias注解需要依赖于setter、getter，而@JsonProperty注解不需要
     @Column(unique = true)
