@@ -21,18 +21,21 @@ import com.lwohvye.api.modules.system.service.dto.DeptDto;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.sys.modules.system.event.DeptEvent;
 import com.lwohvye.sys.modules.system.repository.DeptRepository;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.sys.modules.system.service.mapstruct.DeptMapper;
-import com.lwohvye.sys.modules.system.subject.DeptSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.enums.DataScopeEnum;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -49,7 +52,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "dept")
-public class DeptServiceImpl extends DeptSubject implements IDeptService {
+public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherAware {
 
     private final DeptRepository deptRepository;
     private final DeptMapper deptMapper;
@@ -57,6 +60,8 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
     private final IRoleService roleService;
 
     private final ConversionService conversionService;
+
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     @Cacheable
@@ -296,6 +301,15 @@ public class DeptServiceImpl extends DeptSubject implements IDeptService {
      */
     public void delCaches(Long id) {
         // 发布部门更新事件
-        notifyObserver(id);
+        publishDeptEvent(new Dept().setId(id));
+    }
+
+    @Override
+    public void setApplicationEventPublisher(@NotNull ApplicationEventPublisher applicationEventPublisher) {
+        this.eventPublisher = applicationEventPublisher;
+    }
+
+    public void publishDeptEvent(Dept dept) {
+        eventPublisher.publishEvent(new DeptEvent(this, dept));
     }
 }

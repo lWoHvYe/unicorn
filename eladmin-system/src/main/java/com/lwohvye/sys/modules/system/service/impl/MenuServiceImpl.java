@@ -18,8 +18,8 @@ package com.lwohvye.sys.modules.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.modules.system.domain.Menu;
+import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.vo.MenuMetaVo;
 import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
@@ -27,24 +27,27 @@ import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.sys.modules.system.observer.UserObserver;
+import com.lwohvye.sys.modules.system.event.MenuEvent;
+import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.repository.MenuRepository;
 import com.lwohvye.sys.modules.system.service.IMenuService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
-import com.lwohvye.sys.modules.system.subject.MenuSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -59,7 +62,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "menu")
-public class MenuServiceImpl extends MenuSubject implements IMenuService, UserObserver {
+public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherAware {
 
     private final MenuRepository menuRepository;
 
@@ -67,22 +70,7 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
     private final IRoleService roleService;
     private final RedisUtils redisUtils;
 
-    @PostConstruct
-    @Override
-    public void doInit() {
-        SpringContextHolder.addCallBacks(this::doRegister);
-    }
-
-    /**
-     * 注册观察者
-     *
-     * @date 2022/3/13 9:38 PM
-     */
-    @Override
-    public void doRegister() {
-        var userService = SpringContextHolder.getBean("userServiceImpl");
-        ReflectUtil.invoke(userService, "addObserver", this);
-    }
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     @Cacheable
@@ -454,11 +442,20 @@ public class MenuServiceImpl extends MenuSubject implements IMenuService, UserOb
      */
     public void delCaches(Long id) {
         // 发布菜单更新事件
-        notifyObserver(id);
+        publishMenuEvent(new Menu().setId(id));
     }
 
     @Override
-    public void userUpdate(Object obj) {
-        redisUtils.delInRC(CacheKey.MENU_USER, obj);
+    public void setApplicationEventPublisher(@NotNull ApplicationEventPublisher applicationEventPublisher) {
+        this.eventPublisher = applicationEventPublisher;
+    }
+
+    public void publishMenuEvent(Menu menu) {
+        eventPublisher.publishEvent(new MenuEvent(this, menu));
+    }
+
+    @EventListener
+    public void objUpdate(UserEvent userEvent) {
+        redisUtils.delInRC(CacheKey.MENU_USER, userEvent.getEventData().getId());
     }
 }

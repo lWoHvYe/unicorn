@@ -19,6 +19,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.Menu;
+import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.projection.UserProj;
 import com.lwohvye.api.modules.system.service.dto.*;
@@ -27,19 +29,23 @@ import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
 import com.lwohvye.exception.EntityNotFoundException;
 import com.lwohvye.sys.modules.security.service.UserLocalCache;
-import com.lwohvye.sys.modules.system.observer.DeptObserver;
-import com.lwohvye.sys.modules.system.observer.MenuObserver;
-import com.lwohvye.sys.modules.system.observer.RoleObserver;
+import com.lwohvye.sys.modules.system.event.DeptEvent;
+import com.lwohvye.sys.modules.system.event.MenuEvent;
+import com.lwohvye.sys.modules.system.event.RoleEvent;
+import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.repository.UserRepository;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.sys.modules.system.subject.UserSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -48,13 +54,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.*;
 
 /**
@@ -65,7 +68,7 @@ import java.util.*;
 @RequiredArgsConstructor
 //配置该类缓存的公共前缀
 @CacheConfig(cacheNames = "user")
-public class UserServiceImpl extends UserSubject implements IUserService, RoleObserver, MenuObserver, DeptObserver {
+public class UserServiceImpl implements IUserService, ApplicationEventPublisherAware {
 
     private final UserRepository userRepository;
 
@@ -74,17 +77,23 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     private final RedisUtils redisUtils;
     private final UserLocalCache userLocalCache;
 
+    private ApplicationEventPublisher eventPublisher;
+
+    /*
     @PostConstruct
     @Override
     public void doInit() {
         SpringContextHolder.addCallBacks(this::doRegister);
     }
 
+    */
+
     /**
      * 注册观察者
      *
      * @date 2022/3/13 9:40 PM
      */
+    /*
     @Override
     public void doRegister() {
         var lookup = MethodHandles.lookup();
@@ -102,8 +111,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
                     }
                     // ReflectUtil.invoke(aService, "addObserver", this);
                 });
-    }
-
+    }*/
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
@@ -192,7 +200,7 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
         userRepository.save(user);
 
         // 发布用户更新事件
-        notifyObserver(resources.getId());
+        publishUserEvent(resources);
         // 清除本地缓存
         flushCache(user.getUsername());
     }
@@ -343,29 +351,39 @@ public class UserServiceImpl extends UserSubject implements IUserService, RoleOb
     }
 
     @Override
-    public void roleUpdate(Object obj) {
-        userRepository.findByRoleId((long) obj).forEach(user -> {
+    public void setApplicationEventPublisher(@NotNull ApplicationEventPublisher applicationEventPublisher) {
+        this.eventPublisher = applicationEventPublisher;
+    }
+
+    public void publishUserEvent(User user) {
+        eventPublisher.publishEvent(new UserEvent(this, user));
+    }
+
+    // 需注意，这里方法的参数是Event对象。另点击方法旁的标志可以查看publisher和listener
+    @EventListener
+    public void objUpdate(RoleEvent roleEvent) {
+        userRepository.findByRoleId(roleEvent.getEventData().getId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
-            notifyObserver(user.getId());
+            publishUserEvent(user);
         });
     }
 
-    @Override
-    public void menuUpdate(Object obj) {
-        userRepository.findByMenuId((long) obj).forEach(user -> {
+    @EventListener
+    public void objUpdate(MenuEvent menuEvent) {
+        userRepository.findByMenuId(menuEvent.getEventData().getId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
-            notifyObserver(user.getId());
+            publishUserEvent(user);
         });
     }
 
-    @Override
-    public void deptUpdate(Object obj) {
-        userRepository.findByRoleDeptId((long) obj).forEach(user -> {
+    @EventListener
+    public void objUpdate(DeptEvent deptEvent) {
+        userRepository.findByRoleDeptId(deptEvent.getEventData().getId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
-            notifyObserver(user.getId());
+            publishUserEvent(user);
         });
     }
 }

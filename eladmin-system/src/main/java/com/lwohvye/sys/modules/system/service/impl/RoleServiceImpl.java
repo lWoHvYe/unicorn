@@ -15,8 +15,8 @@
  */
 package com.lwohvye.sys.modules.system.service.impl;
 
-import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
@@ -24,20 +24,24 @@ import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.exception.EntityExistException;
-import com.lwohvye.sys.modules.system.observer.MenuObserver;
+import com.lwohvye.sys.modules.system.event.MenuEvent;
+import com.lwohvye.sys.modules.system.event.RoleEvent;
 import com.lwohvye.sys.modules.system.repository.RoleRepository;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.sys.modules.system.service.mapstruct.RoleMapper;
 import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext;
-import com.lwohvye.sys.modules.system.subject.RoleSubject;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +50,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
@@ -59,7 +62,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "role")
-public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuObserver {
+public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherAware {
 
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
@@ -69,22 +72,7 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
     private final IUserService userService;
     private final AuthHandlerContext authHandlerContext;
 
-    @PostConstruct
-    @Override
-    public void doInit() {
-        SpringContextHolder.addCallBacks(this::doRegister);
-    }
-
-    /**
-     * 注册观察者
-     *
-     * @date 2022/3/13 9:35 PM
-     */
-    @Override
-    public void doRegister() {
-        var menuService = SpringContextHolder.getBean("menuServiceImpl");
-        ReflectUtil.invoke(menuService, "addObserver", this);
-    }
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     @Cacheable(key = " #root.target.getSysName() + 'all-roles'")
@@ -252,14 +240,23 @@ public class RoleServiceImpl extends RoleSubject implements IRoleService, MenuOb
      */
     public void delCaches(Long id) {
         // 发布角色更新事件
-        notifyObserver(id);
+        publishRoleEvent(new Role().setId(id));
     }
 
     @Override
-    public void menuUpdate(Object obj) {
-        roleRepository.findInMenuId(Collections.singletonList((long) obj)).forEach(role -> {
+    public void setApplicationEventPublisher(@NotNull ApplicationEventPublisher applicationEventPublisher) {
+        this.eventPublisher = applicationEventPublisher;
+    }
+
+    public void publishRoleEvent(Role role) {
+        eventPublisher.publishEvent(new RoleEvent(this, role));
+    }
+
+    @EventListener
+    public void objUpdate(MenuEvent menuEvent) {
+        roleRepository.findInMenuId(Collections.singletonList(menuEvent.getEventData().getId())).forEach(role -> {
             redisUtils.delInRC(CacheKey.ROLE_ID, role.getId());
-            notifyObserver(role.getId());
+            publishRoleEvent(role);
         });
     }
 }

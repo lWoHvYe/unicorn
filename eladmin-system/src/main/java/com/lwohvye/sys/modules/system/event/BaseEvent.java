@@ -14,9 +14,27 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.system.observer;
+package com.lwohvye.sys.modules.system.event;
 
-// 抽象观察者
-public interface RoleObserver {
-    void roleUpdate(Object obj); // 反应
+import lombok.Getter;
+import org.springframework.context.ApplicationEvent;
+
+@Getter
+public abstract class BaseEvent<T> extends ApplicationEvent {
+
+    /**
+     * 该类型事件携带的信息
+     */
+    private T eventData;
+
+    /**
+     *
+     * @param source 最初触发该事件的对象
+     * @param eventData 该类型事件携带的信息
+     */
+    public BaseEvent(Object source, T eventData) {
+        super(source);
+        this.eventData = eventData;
+    }
+
 }

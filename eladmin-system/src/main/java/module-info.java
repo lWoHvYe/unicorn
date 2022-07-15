@@ -50,14 +50,13 @@ module lwohvye.eladmin.system {
     exports com.lwohvye.sys.modules.system.annotation;
     exports com.lwohvye.sys.modules.system.enums;
     exports com.lwohvye.sys.modules.system.strategy;
-    exports com.lwohvye.sys.modules.system.observer;
+    exports com.lwohvye.sys.modules.system.event;
     exports com.lwohvye.sys.modules.system.rest to spring.beans, spring.web;
     exports com.lwohvye.sys.modules.system.service;
-    exports com.lwohvye.sys.modules.system.service.impl to spring.beans, hutool.all;
+    exports com.lwohvye.sys.modules.system.service.impl to spring.beans, spring.context, hutool.all;
     exports com.lwohvye.sys.modules.system.service.version to spring.beans;
     exports com.lwohvye.sys.modules.system.service.local;
     exports com.lwohvye.sys.modules.system.service.mapstruct;
-    exports com.lwohvye.sys.modules.system.subject to spring.aop, spring.core;
     exports com.lwohvye.sys.modules.system.repository; // 这里先这样
 
     opens com.lwohvye.sys.config.common;

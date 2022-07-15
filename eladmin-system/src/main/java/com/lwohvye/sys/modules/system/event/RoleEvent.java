@@ -14,9 +14,16 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.system.observer;
+package com.lwohvye.sys.modules.system.event;
 
-// 抽象观察者
-public interface DeptObserver {
-    void deptUpdate(Object obj); // 反应
+import com.lwohvye.api.modules.system.domain.Role;
+
+public class RoleEvent extends BaseEvent<Role>{
+    /**
+     * @param source    最初触发该事件的对象
+     * @param eventData 该类型事件携带的信息
+     */
+    public RoleEvent(Object source, Role eventData) {
+        super(source, eventData);
+    }
 }

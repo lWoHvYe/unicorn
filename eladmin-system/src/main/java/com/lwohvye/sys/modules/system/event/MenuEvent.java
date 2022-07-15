@@ -14,9 +14,16 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.system.observer;
+package com.lwohvye.sys.modules.system.event;
 
-// 抽象观察者
-public interface MenuObserver {
-    void menuUpdate(Object obj); // 反应
+import com.lwohvye.api.modules.system.domain.Menu;
+
+public class MenuEvent extends BaseEvent<Menu>{
+    /**
+     * @param source    最初触发该事件的对象
+     * @param eventData 该类型事件携带的信息
+     */
+    public MenuEvent(Object source, Menu eventData) {
+        super(source, eventData);
+    }
 }

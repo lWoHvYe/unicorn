@@ -15,23 +15,22 @@
  */
 package com.lwohvye.sys.modules.system.service.impl;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.sys.modules.system.observer.UserObserver;
-import com.lwohvye.sys.modules.system.service.IDataService;
-import com.lwohvye.utils.CacheKey;
-import com.lwohvye.utils.SpringContextHolder;
-import com.lwohvye.utils.redis.RedisUtils;
-import lombok.RequiredArgsConstructor;
 import com.lwohvye.api.modules.system.domain.Dept;
+import com.lwohvye.api.modules.system.domain.User;
+import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.sys.modules.system.event.UserEvent;
+import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
-import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.utils.CacheKey;
 import com.lwohvye.utils.enums.DataScopeEnum;
+import com.lwohvye.utils.redis.RedisUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -44,28 +43,11 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "data")
-public class DataServiceImpl implements IDataService, UserObserver {
+public class DataServiceImpl implements IDataService {
 
     private final IRoleService roleService;
     private final IDeptService deptService;
     private final RedisUtils redisUtils;
-
-    @PostConstruct
-    @Override
-    public void doInit() {
-        SpringContextHolder.addCallBacks(this::doRegister);
-    }
-
-    /**
-     * 注册观察者
-     *
-     * @date 2022/3/13 9:36 PM
-     */
-    @Override
-    public void doRegister() {
-        var userService = SpringContextHolder.getBean("userServiceImpl");
-        ReflectUtil.invoke(userService, "addObserver", this);
-    }
 
     /**
      * 用户角色改变时需清理缓存
@@ -117,8 +99,8 @@ public class DataServiceImpl implements IDataService, UserObserver {
         return deptIds;
     }
 
-    @Override
-    public void userUpdate(Object obj) {
-        redisUtils.delInRC(CacheKey.DATA_USER, obj);
+    @EventListener
+    public void objUpdate(UserEvent userEvent) {
+        redisUtils.delInRC(CacheKey.DATA_USER, userEvent.getEventData().getId());
     }
 }
