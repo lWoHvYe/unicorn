@@ -14,10 +14,10 @@
 
 启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
 详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
-删除，以非module化运行。~~，~~模块化打包部署暂未找到支持外置配置及依赖的方式~~，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的，但外置依赖尚未找到引入的方式
+删除，以非module化运行。~~，~~模块化打包部署暂未找到支持外置配置及依赖的方式~~，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
-``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS。在对项目完成相关改造之前（当前未找到jar启动的方式），应该只能用ALL-UNNAMED表示对所有未命名模块开放）。
+``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS/Jigsaw）。
 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
 后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和 System.out（有一个箭头的表示以覆盖的方式重定向，而有两个箭头的表示以追加的方式重定向。如果需要将标准输出以及标准错误输出同时重定向到一个文件，需要将某个输出转换为另一个输出，例如 2>&1
@@ -30,12 +30,12 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 若外置依赖启动参数需添加，``-Dloader.path=lib``引入依赖。外置依赖可以大大减少jar包的体积。方便后续更新部署
 
 ```shell
-#启动示例
+#2.x版本启动示例
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.2.jar >nohup.out 2>&1 &
 ```
 
 ```shell
-#在未来的3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
+#3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
 nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.3.jar >nohup.out 2>&1 &
 ```
 
@@ -97,9 +97,9 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 #### 主要特性
 
 - 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.7。
-- 高效率开发，代码生成器可一键生成前后端代码
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持数据字典，可方便地对一些状态进行管理
+- 高效率开发，代码生成器可一键生成前后端代码
 - 支持接口限流，避免恶意请求导致服务层压力过大
 - 支持接口级别的功能权限与数据权限，可自定义操作
 - 自定义权限注解与匿名接口注解，可快速对接口拦截与放行
@@ -110,6 +110,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息。
+- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入common模块即可，权限、日志、3rd Tools模块可插拔可独立部署
 
 #### 系统功能
 
@@ -141,9 +142,9 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - `eladmin-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
-- `eladmin-tools` 第三方工具模块，包含：邮件、OSS、SMS、本地存储
+- `eladmin-tools` 第三方工具模块，包含：邮件、OSS、SMS、本地存储，可视情况引入
 
-- `eladmin-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化
+- `eladmin-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
 
 - `eladmin-starter` 启动类,项目入口，包含模块及组件配置，枚举类动态扩展的简单demo
 

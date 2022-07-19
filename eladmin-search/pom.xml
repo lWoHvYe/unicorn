@@ -115,6 +115,13 @@
             <version>${blaze-persistence.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!--    netflix    -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            <version>2.2.10.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

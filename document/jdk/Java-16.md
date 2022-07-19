@@ -183,9 +183,11 @@ Caused by: java.lang.module.InvalidModuleDescriptorException: Provider class xxx
 - 2022-07-06更新：
     - 打包报错在使用maven-jar-plugin从jar中剔除配置文件时出现，若不从中剔除则可正常打包
     - 基于加载规则，外置的配置项会覆盖内置的，所以对正常使用影响不大，一般active不同的profiles，且往往通过配置中心获取配置
-    - 当前模块化部署未找到外置依赖的方式，使用 `-Dloader.path=lib` 会报类找不到
+    - ~~当前模块化部署未找到外置依赖的方式，使用 `-Dloader.path=lib` 会报类找不到~~
     - 打包可正常运行，虽似乎的确是模块化的方式（因该不是，这就更奇怪了，module-info.java也有打进去，等Spring Boot 3.x吧），但从内部获取Module却是unnamed module不是很理解，
       因为之前unnamed module应该需要加 `--add-opens java.base/java.lang=ALL-UNNAMED` （又试了一下，不加也行，忘了怎么配置导致的不需要加这个了）
+- 2022-07-19更新：
+    - 已外置依赖成功（推测是在maven-jar-plugin中配置了addClasspath，解决了之前的问题，classpath写在META-INF/MANIFEST.MF中）
 
 IDEA中，两种启动方式的启动参数，另通过查看VM参数，module模式中有`--module-path`属性
 

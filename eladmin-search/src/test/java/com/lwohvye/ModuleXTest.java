@@ -17,7 +17,7 @@
 package com.lwohvye;
 
 import com.lwohvye.command.SimHTTPServiceCommand;
-import com.lwohvye.starter.modules.handler.SimRestErrorHandler;
+import com.lwohvye.search.modules.handler.SimRestErrorHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
