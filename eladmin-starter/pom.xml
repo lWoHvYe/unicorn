@@ -139,6 +139,77 @@
                 <modifier>-prod</modifier>
             </properties>
         </profile>
+        <!--    未来的Jigsaw. profile中可以配置dependency, build/plugin这些，这是之前不知道的,但这个dependency不能影响正常的run，因为只在build/package时会使用的样子    -->
+        <profile>
+            <id>jigsaw</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-configuration-processor</artifactId>
+                                </exclude>
+                            </excludes>
+                            <includes>
+                                <!-- 不存在的include引用，相当于排除所有maven依赖jar，没有任何三方jar文件打入输出jar -->
+                                <include>
+                                    <groupId>nothing</groupId>
+                                    <artifactId>nothing</artifactId>
+                                </include>
+                            </includes>
+                            <layout>ZIP</layout>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>repackage</id>
+                                <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
+                                <!--<configuration>
+                                    <classifier>exec</classifier>
+                                </configuration>-->
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--maven-jar-plugin:   jar: Package config missing from ModulePackages class file attribute;  Could not create modular JAR file. The JDK jar tool exited with 1-->
+                    <!-- jar包内剔除所有配置文件 -->
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <!--不打入jar包的文件类型或者路径-->
+                            <excludes>
+                                <exclude>config/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <!-- 拷贝项目所有依赖jar文件到构建lib目录下 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                    <excludeTransitive>false</excludeTransitive>
+                                    <stripVersion>false</stripVersion>
+                                    <silent>true</silent>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <!-- 打包 -->
     <build>
@@ -154,24 +225,16 @@
                             <artifactId>spring-boot-configuration-processor</artifactId>
                         </exclude>
                     </excludes>
-<!--                    <includes>-->
-<!--                        &lt;!&ndash; 不存在的include引用，相当于排除所有maven依赖jar，没有任何三方jar文件打入输出jar &ndash;&gt;-->
-<!--                        <include>-->
-<!--                            <groupId>nothing</groupId>-->
-<!--                            <artifactId>nothing</artifactId>-->
-<!--                        </include>-->
-<!--                    </includes>-->
-<!--                    <layout>ZIP</layout>-->
                 </configuration>
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>repackage</id>-->
-<!--                        &lt;!&ndash;这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置&ndash;&gt;-->
-<!--                        &lt;!&ndash;<configuration>-->
-<!--                            <classifier>exec</classifier>-->
-<!--                        </configuration>&ndash;&gt;-->
-<!--                    </execution>-->
-<!--                </executions>-->
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
+                        <!--<configuration>
+                            <classifier>exec</classifier>
+                        </configuration>-->
+                    </execution>
+                </executions>
             </plugin>
             <!-- 跳过单元测试 -->
             <plugin>
@@ -206,36 +269,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- jar包内剔除所有配置文件 -->
-<!--            <plugin>-->
-<!--                <artifactId>maven-jar-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    &lt;!&ndash;不打入jar包的文件类型或者路径&ndash;&gt;-->
-<!--                    <excludes>-->
-<!--                        <exclude>config/**</exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-            <!-- 拷贝项目所有依赖jar文件到构建lib目录下 -->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-dependency-plugin</artifactId>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>copy-dependencies</id>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>copy-dependencies</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <outputDirectory>${project.build.directory}/lib</outputDirectory>-->
-<!--                            <excludeTransitive>false</excludeTransitive>-->
-<!--                            <stripVersion>false</stripVersion>-->
-<!--                            <silent>true</silent>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
             <!-- 解决 Java-16下 lombok报错：
             Fatal error compiling: java.lang.IllegalAccessError: class lombok.javac.apt.LombokProcessor (in unnamed module @0x486bcaa) cannot access class com.sun.tools.javac.processing.JavacProcessingEnvironment (in module jdk.compiler) because module jdk.compiler does not export com.sun.tools.javac.processing to unnamed module @0x486bcaa
             -->
@@ -267,13 +300,6 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-            <!--     Maven JDK9 Jigsaw       -->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-jmod-plugin</artifactId>-->
-<!--                <version>3.0.0-alpha-1</version>-->
-<!--                <extensions>true</extensions>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 </project>

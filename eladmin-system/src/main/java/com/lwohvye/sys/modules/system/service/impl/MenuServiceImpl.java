@@ -19,7 +19,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.api.modules.system.domain.Menu;
-import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.vo.MenuMetaVo;
 import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
@@ -456,6 +455,6 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
 
     @EventListener
     public void objUpdate(UserEvent userEvent) {
-        redisUtils.delInRC(CacheKey.MENU_USER, userEvent.getEventData().getId());
+        redisUtils.delInRC(CacheKey.MENU_USER, userEvent.getDataId());
     }
 }

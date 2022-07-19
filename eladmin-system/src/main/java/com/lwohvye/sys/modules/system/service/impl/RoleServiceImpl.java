@@ -16,7 +16,6 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import com.lwohvye.api.modules.system.domain.Dept;
-import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
@@ -254,7 +253,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
 
     @EventListener
     public void objUpdate(MenuEvent menuEvent) {
-        roleRepository.findInMenuId(Collections.singletonList(menuEvent.getEventData().getId())).forEach(role -> {
+        roleRepository.findInMenuId(Collections.singletonList(menuEvent.getDataId())).forEach(role -> {
             redisUtils.delInRC(CacheKey.ROLE_ID, role.getId());
             publishRoleEvent(role);
         });

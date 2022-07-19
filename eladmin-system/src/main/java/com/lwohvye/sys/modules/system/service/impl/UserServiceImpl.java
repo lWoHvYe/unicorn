@@ -19,8 +19,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.api.modules.system.domain.Dept;
-import com.lwohvye.api.modules.system.domain.Menu;
-import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.projection.UserProj;
 import com.lwohvye.api.modules.system.service.dto.*;
@@ -362,7 +360,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     // 需注意，这里方法的参数是Event对象。另点击方法旁的标志可以查看publisher和listener
     @EventListener
     public void objUpdate(RoleEvent roleEvent) {
-        userRepository.findByRoleId(roleEvent.getEventData().getId()).forEach(user -> {
+        userRepository.findByRoleId(roleEvent.getDataId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
             publishUserEvent(user);
@@ -371,7 +369,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
 
     @EventListener
     public void objUpdate(MenuEvent menuEvent) {
-        userRepository.findByMenuId(menuEvent.getEventData().getId()).forEach(user -> {
+        userRepository.findByMenuId(menuEvent.getDataId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
             publishUserEvent(user);
@@ -380,7 +378,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
 
     @EventListener
     public void objUpdate(DeptEvent deptEvent) {
-        userRepository.findByRoleDeptId(deptEvent.getEventData().getId()).forEach(user -> {
+        userRepository.findByRoleDeptId(deptEvent.getDataId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(CacheKey.USER_ID, user.getId());
             publishUserEvent(user);

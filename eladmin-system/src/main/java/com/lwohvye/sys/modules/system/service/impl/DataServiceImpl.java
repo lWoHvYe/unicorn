@@ -16,7 +16,6 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import com.lwohvye.api.modules.system.domain.Dept;
-import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.service.IDataService;
@@ -101,6 +100,6 @@ public class DataServiceImpl implements IDataService {
 
     @EventListener
     public void objUpdate(UserEvent userEvent) {
-        redisUtils.delInRC(CacheKey.DATA_USER, userEvent.getEventData().getId());
+        redisUtils.delInRC(CacheKey.DATA_USER, userEvent.getDataId());
     }
 }

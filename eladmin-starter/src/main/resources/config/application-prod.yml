@@ -4,9 +4,9 @@ spring:
     druid:
       db-type: com.alibaba.druid.pool.DruidDataSource
       driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      url: jdbc:log4jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
       username: ${DB_USER:root}
-      password: ${DB_PWD:123456}
+      password: ${DB_PWD:root}
       # 初始连接数
       initial-size: 5
       # 最小连接数
@@ -24,7 +24,7 @@ spring:
       # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
       test-while-idle: true
       # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
-      test-on-borrow: true
+      test-on-borrow: false
       # 是否在归还到池中前进行检验
       test-on-return: false
       # 检测连接是否有效
@@ -50,46 +50,99 @@ spring:
           config:
             multi-statement-allow: true
 
+  # cache配置
+  cache:
+    type: redis
+  # redis配置
+  redis:
+    #详细版的redisson配置可参考：https://github.com/redisson/redisson/tree/master/redisson-spring-boot-starter
+    # Connection URL, will override host, port and password (user will be ignored), e.g. redis://user:password@example.com:6379
+    #    url: redis://10.211.55.140:6379
+    #    timeout: 2000 # 连接或读取超时时长（毫秒）
+    #    database: 0
+    redisson:
+      file: classpath:redisson.yaml
+  #    jedis:
+  #      pool:
+  #        max-active: 10  # 连接池最大连接数（使用负值表示没有限制）
+  #        max-wait: 800 # 连接池最大阻塞等待时间（使用负值表示没有限制）
+  #        max-idle: 5 # 连接池中的最大空闲连接
+  #        min-idle: 2 # 连接池中的最小空闲连接
+
+  ##### RabbitMQ ####
+  rabbitmq:
+    #    RabbitMQ集群，通过addresses配置，多个以逗号分隔(优先取addresses，然后再取host)
+    addresses: 10.211.55.140:5672
+    #    host: 10.211.55.140 # rabbitmq的连接地址
+    #    port: 5672 # rabbitmq的连接端口号
+    virtual-host: /eladmin # rabbitmq的虚拟host
+    username: admin # rabbitmq的用户名
+    password: admin # rabbitmq的密码
+    ####开始消费最大重试次数，避免一直重复消费的问题
+    listener:
+      simple:
+        concurrency: 1 # Minimum number of consumers.
+        max-concurrency: 20 # Maximum number of consumers.
+        prefetch: 50
+        default-requeue-rejected: true #意思是，消息被拒后（即未消费），重新（true）放入队列
+        retry:
+          enabled: true #是否开启消费者重试（为false时关闭消费者重试，这时消费端代码异常会一直重复收到消息）
+          max-attempts: 3 #最大重试次数
+          initial-interval: 5000ms
+  ##### 邮箱配置
+  mail:
+    host: xxx.com #SMTP server host
+    username: xxx #login user
+    password: xxx #login password
+    properties:
+      from: xxx@xxx.com #发件人（邮箱）
+      to-dev: xxx@oo.com #信息默认接收人（邮箱）
+
+  servlet:
+    multipart:
+      max-file-size: 20MB #限制单个文件大小
+      max-request-size: 50MB #限制请求总量
+
 # 登录相关配置
-login:
-  # 登录缓存
-  cache-enable: true
-  #  是否限制单用户登录
-  single-login: false
-  #  验证码
-  login-code:
-    #  验证码类型配置 查看 LoginProperties 类
-    code-type: arithmetic
-    #  登录图形验证码有效时间/分钟
-    expiration: 2
-    #  验证码高度
-    width: 111
-    #  验证码宽度
-    height: 36
-    # 内容长度
-    length: 2
-    # 字体名称，为空则使用默认字体，如遇到线上乱码，设置其他字体即可
-    font-name:
-    # 字体大小
-    font-size: 25
+#login:
+#  # 登录缓存
+#  cache-enable: true
+#  #  是否限制单用户登录
+#  single-login: false
+#  #  验证码
+#  login-code:
+#    #  验证码类型配置 查看 LoginProperties 类
+#    code-type: arithmetic
+#    #  登录图形验证码有效时间/分钟
+#    expiration: 2
+#    #  验证码高度
+#    width: 111
+#    #  验证码宽度
+#    height: 36
+#    # 内容长度
+#    length: 2
+#    # 字体名称，为空则使用默认字体，如遇到线上乱码，设置其他字体即可
+#    font-name:
+#    # 字体大小
+#    font-size: 25
 
 #jwt
 jwt:
-  header: Authorization
+#  header: Authorization
   # 令牌前缀
-  token-start-with: Bearer
+#  token-start-with: Bearer
   # 必须使用最少88位的Base64对该令牌进行编码
   base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI=
   # 令牌过期时间 此处单位/毫秒 ，默认2小时，可在此网站生成 https://www.convertworld.com/zh-hans/time/milliseconds.html
-  token-validity-in-seconds: 7200000
+#  token-validity-in-seconds: 7200000
   # 在线用户key
-  online-key: online-token-
+#  online-key: online-token-
   # 验证码
-  code-key: code-key-
+#  code-key: code-key-
   # token 续期检查时间范围（默认30分钟，单位默认毫秒），在token即将过期的一段时间内用户操作了，则给用户的token续期
-  detect: 1800000
+#  detect: 1800000
   # 续期时间范围，默认 1小时，这里单位毫秒
-  renew: 3600000
+#  renew: 3600000
 
 # IP 本地解析
 ip:
@@ -99,16 +152,16 @@ ip:
 generator:
   enabled: false
 
-#如果生产环境要开启swagger，需要配置请求地址
-#springfox:
-#  documentation:
-#    swagger:
-#      v2:
-#        host: # 接口域名或外网ip
+# ===== SpringDoc配置 ===== #
+springdoc:
+  api-docs:
+    # enabled the /v3/api-docs endpoint
+    enabled: false
 
-#是否开启 swagger-ui
-swagger:
-  enabled: false
+# 滑动验证码
+aj:
+  captcha:
+    cache-type: redis
 
 # 文件存储路径
 file:
@@ -124,3 +177,15 @@ file:
   # 文件大小 /M
   maxSize: 100
   avatarMaxSize: 5
+
+# oss配置
+alibaba:
+  cloud:
+    access-key: xx
+    secret-key: xx
+    oss:
+      endpoint: xx
+      # 自定义属性 bucketName
+      bucket-name: xx
+      # 自定义属性 filePath
+      file-path: xx/xx/

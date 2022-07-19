@@ -145,6 +145,7 @@ public class QueryHelp {
 
             for (var entity : joinNames) {
                 // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
+                // 业务中应该没有需要对同一张table多次join，甚至joinType还不同的情形。这里是不支持此类场景的
                 checkJoin:
                 {
                     if (Objects.isNull(join)) {
