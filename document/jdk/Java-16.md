@@ -188,6 +188,11 @@ Caused by: java.lang.module.InvalidModuleDescriptorException: Provider class xxx
       因为之前unnamed module应该需要加 `--add-opens java.base/java.lang=ALL-UNNAMED` （又试了一下，不加也行，忘了怎么配置导致的不需要加这个了）
 - 2022-07-19更新：
     - 已外置依赖成功（推测是在maven-jar-plugin中配置了addClasspath，解决了之前的问题，classpath写在META-INF/MANIFEST.MF中）
+- 2022-07-20更新：
+    - 通过IDEA启动应该偏向于普通的project的加载执行方式，而打包部署时，则是Spring Boot Jar Package的加载执行方式，这俩是不一样的，
+      When run through IDEA the Classloader is `jdk.internal.loader.ClassLoaders$AppClassLoader`,
+      and When run through package-jar the Classloader is `org.springframework.boot.loader.LaunchedURLClassLoader`.
+      When do package,spring-boot-loader and spring-boot-jarmode-layertools are added to the lib automatically.
 
 IDEA中，两种启动方式的启动参数，另通过查看VM参数，module模式中有`--module-path`属性
 
