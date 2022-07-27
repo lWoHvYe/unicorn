@@ -21,6 +21,12 @@ import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
+/**
+ * 实现Processor和实现Publisher/使用SubmissionPublisher是两种方式
+ * 感觉处理者Processor主要是包在Subscriber外侧，做一些逻辑(或者说Event可以先通知Processor再由其转给Subscriber)，比如filter，需注意例子中的Predicate也是实现类自己的实例变量，具体根据业务场景可以做很多事情
+ *
+ * @date 2022/7/27 8:06 AM
+ */
 public class ProcessorTest {
     /**
      * 处理者的基础测试

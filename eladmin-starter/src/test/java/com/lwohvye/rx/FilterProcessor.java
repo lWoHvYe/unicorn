@@ -32,6 +32,7 @@ public class FilterProcessor<T> extends SubmissionPublisher<T> implements Proces
 
     @Override
     public void onSubscribe(Flow.Subscription subscription) {
+        System.out.println("Filter onSubscribe");
         // Request an unbounded number of items
         subscription.request(Long.MAX_VALUE);
     }
