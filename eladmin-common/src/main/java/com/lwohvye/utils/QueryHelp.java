@@ -79,8 +79,7 @@ public class QueryHelp {
                         var blurrys = blurry.split(",");
                         var orPredicate = new ArrayList<Predicate>();
                         for (String s : blurrys) {
-                            orPredicate.add(cb.like(root.get(s)
-                                    .as(String.class), "%" + val + "%"));
+                            orPredicate.add(cb.like(root.get(s).as(String.class), "%" + val + "%"));
                         }
                         var p = new Predicate[orPredicate.size()];
                         list.add(cb.or(orPredicate.toArray(p)));
@@ -215,6 +214,9 @@ public class QueryHelp {
             case EQUAL:
                 list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
                 break;
+            case NOT_EQUAL:
+                list.add(cb.notEqual(getExpression(attributeName, join, root), val));
+                break;
             case GREATER_THAN:
                 // var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
                 // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
@@ -238,25 +240,26 @@ public class QueryHelp {
             case RIGHT_LIKE:
                 list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
                 break;
+            case LIKE_STR:
+                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
+                break;
+            case IN_INNER_LIKE:
+                if (val instanceof List objList) {
+//                                构建数组
+                    var predicates = new Predicate[objList.size()];
+                    for (int i = 0; i < objList.size(); i++) {
+                        var obj = objList.get(i);
+                        predicates[i] = cb.like(getExpression(attributeName, join, root)
+                                .as(String.class), "%" + obj.toString() + "%");
+                    }
+//                                设置or查询
+                    list.add(cb.or(predicates));
+                }
+                break;
             case IN:
                 if (val instanceof Collection<?> col && !col.isEmpty()) {
                     // 这里不能用fieldType.cast(val)。因为in()方法的重载，会走进in(Object... var1)中，正常要进in(Collection<?> var1)
                     list.add(getExpression(attributeName, join, root).in(col));
-                }
-                break;
-            case NOT_EQUAL:
-                list.add(cb.notEqual(getExpression(attributeName, join, root), val));
-                break;
-            case NOT_NULL:
-                list.add(cb.isNotNull(getExpression(attributeName, join, root)));
-                break;
-            case IS_NULL:
-                list.add(cb.isNull(getExpression(attributeName, join, root)));
-                break;
-            case BETWEEN:
-                if (val instanceof List col && col.size() == 2 && col.get(0) instanceof Comparable start && col.get(1) instanceof Comparable end) {
-                    var eleType = (Class<? extends Comparable>) col.get(0).getClass();
-                    list.add(cb.between(getExpression(attributeName, join, root).as(eleType), start, end));
                 }
                 break;
             case NOT_IN:
@@ -264,8 +267,17 @@ public class QueryHelp {
                     list.add(cb.not(getExpression(attributeName, join, root).in(col)));
                 }
                 break;
-            case LIKE_STR:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
+            case BETWEEN:
+                if (val instanceof List col && col.size() == 2 && col.get(0) instanceof Comparable start && col.get(1) instanceof Comparable end) {
+                    var eleType = (Class<? extends Comparable>) col.get(0).getClass();
+                    list.add(cb.between(getExpression(attributeName, join, root).as(eleType), start, end));
+                }
+                break;
+            case NOT_NULL:
+                list.add(cb.isNotNull(getExpression(attributeName, join, root)));
+                break;
+            case IS_NULL:
+                list.add(cb.isNull(getExpression(attributeName, join, root)));
                 break;
             case IN_OR_ISNULL:
                 if (val instanceof Collection<?> col && !col.isEmpty()) {
@@ -283,19 +295,6 @@ public class QueryHelp {
                 list.add((Long) val == -1L ?
                         cb.isNull(getExpression(attributeName, join, root).as(fieldType)) :
                         cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
-                break;
-            case IN_INNER_LIKE:
-                if (val instanceof List objList) {
-//                                构建数组
-                    var predicates = new Predicate[objList.size()];
-                    for (int i = 0; i < objList.size(); i++) {
-                        var obj = objList.get(i);
-                        predicates[i] = cb.like(getExpression(attributeName, join, root)
-                                .as(String.class), "%" + obj.toString() + "%");
-                    }
-//                                设置or查询
-                    list.add(cb.or(predicates));
-                }
                 break;
             case EQUAL_IN_MULTI:
                 var predicates = new Predicate[4];

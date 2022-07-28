@@ -16,8 +16,12 @@
 
 package com.lwohvye.utils;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 
 /**
@@ -88,7 +92,7 @@ public class DateUtil {
      * 日期 格式化
      *
      * @param localDateTime /
-     * @param patten /
+     * @param patten        /
      * @return /
      */
     public static String localDateTimeFormat(LocalDateTime localDateTime, String patten) {
@@ -100,7 +104,7 @@ public class DateUtil {
      * 日期 格式化
      *
      * @param localDateTime /
-     * @param df /
+     * @param df            /
      * @return /
      */
     public static String localDateTimeFormat(LocalDateTime localDateTime, DateTimeFormatter df) {
@@ -156,5 +160,27 @@ public class DateUtil {
      */
     public static LocalDateTime parseLocalDateTimeFormatyMdHms(String localDateTime) {
         return LocalDateTime.from(DFY_MD_HMS.parse(localDateTime));
+    }
+
+    /**
+     * 这系列API拥有各时间纬度的魔法。获取在时间周期中的位置。计算两时间在各维度的差值
+     * 虽然可以获得最后一天，但无法直接获取最后一天的最后时刻
+     *
+     * @return java.time.ZonedDateTime
+     * @date 2022/7/29 12:31 AM
+     */
+    public static @NotNull ZonedDateTime startOfCurMonth() {
+        var now = LocalDateTime.now();
+        return now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate().atStartOfDay().atZone(ZoneId.systemDefault());
+    }
+
+    @Contract(" -> new")
+    public static @NotNull ZonedDateTime startOfPreMonth() {
+        return startOfCurMonth().plusMonths(-1);
+    }
+
+    public static @NotNull ZonedDateTime startOfNextMonth() {
+        var now = LocalDate.now(); // 直接用LocalDate更好一些的样子
+        return now.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay().atZone(ZoneId.systemDefault());
     }
 }

@@ -110,6 +110,7 @@
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
+        <kotlin.version>1.7.10</kotlin.version>
     </properties>
 
     <dependencyManagement>
@@ -313,7 +314,34 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-jdk9</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
     <build>
+        <sourceDirectory>target/generated-sources/annotations</sourceDirectory>
         <plugins>
             <!-- 打包时跳过测试 -->
             <plugin>
@@ -441,6 +469,30 @@
                 <artifactId>maven-jmod-plugin</artifactId>
                 <version>3.0.0-alpha-1</version>
                 <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${maven.compiler.release}</jvmTarget>
+                </configuration>
             </plugin>
             <!--     Toolchains are ignored, 'javadocExecutable' parameter is set to。这个插件是用来配置maven run的jdk的，当前是通过其他方式配置了     -->
             <!--<plugin>
