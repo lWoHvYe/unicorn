@@ -161,7 +161,7 @@
         <profile>
             <id>jigsaw</id>
             <properties>
-                <profiles.active>dev</profiles.active>
+                <profiles.active>jigsaw</profiles.active>
             </properties>
             <build>
                 <plugins>

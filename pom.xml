@@ -313,6 +313,66 @@
         </dependencies>
     </dependencyManagement>
 
+    <profiles>
+        <profile>
+            <id>github-pkg</id>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub OWNER Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/lWoHvYe/eladmin</url>
+                </repository>
+            </distributionManagement>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>ossrh-mc</id>
+            <build>
+                <plugins>
+                    <!--自动发布插件-->
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.13</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                    <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <!-- 打包时跳过测试 -->
@@ -366,18 +426,6 @@
                     <!--<proc>none</proc>-->
                 </configuration>
             </plugin>
-            <!--自动发布插件-->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -407,21 +455,6 @@
                         <configuration>
                             <doclint>none</doclint>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -466,20 +499,4 @@
             </plugin>-->
         </plugins>
     </build>
-
-    <distributionManagement>
-        <!--        <repository>-->
-        <!--            <id>github</id>-->
-        <!--            <name>GitHub OWNER Apache Maven Packages</name>-->
-        <!--            <url>https://maven.pkg.github.com/lWoHvYe/eladmin</url>-->
-        <!--        </repository>-->
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 </project>
