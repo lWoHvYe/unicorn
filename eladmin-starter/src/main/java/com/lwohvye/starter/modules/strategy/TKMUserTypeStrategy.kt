@@ -29,6 +29,9 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
 
         println("Start")
 
+        // kotlinx.coroutines将在1.7版本支持JPMS。当前报错 `module kotlin.stdlib does not read module kotlinx.coroutines.core.jvm`
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2237
+        // https://github.com/Kotlin/kotlinx.coroutines/pull/3297
         // 使用launch{}函数 启动一个协程
         GlobalScope.launch {
             runBlocking { // 在 runBlocking {} 包装中使用 delay，它启动了一个协程并等待直到它结束
@@ -53,6 +56,6 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
 
     suspend fun workload(n: Int): Int { // 使用suspend修饰
         delay(1000)
-        return n
+        return n + 2
     }
 }

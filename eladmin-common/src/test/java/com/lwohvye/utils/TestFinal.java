@@ -1,4 +1,4 @@
-package com.lwohvye.utils;/*
+/*
  *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,7 @@ package com.lwohvye.utils;/*
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.lwohvye.utils;
 
 import static com.lwohvye.utils.DynamicEnumHelper.modifyFinalField;
 
@@ -46,10 +47,10 @@ public class TestFinal {
 
         System.out.println(jordan.city); //Miami
         // 下面两个初步证明static的逻辑与非static的一致
-        modifyFinalField(jordan,"sfName","Michael");
+        modifyFinalField(jordan, "sfName", "Michael");
         System.out.println(Person.sfName);//sfName，Debug看到的已经修改成功了，甚至通过反射拿到的也是新值,但实际输出的还是原值
 
-        modifyFinalField(jordan,"sfnName","Michael");
+        modifyFinalField(jordan, "sfnName", "Michael");
         System.out.println(Person.sfnName);//Michael
 
     }
