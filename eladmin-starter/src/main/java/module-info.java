@@ -3,6 +3,8 @@ module lwohvye.eladmin.starter {
     requires lwohvye.eladmin.system;
     requires lwohvye.eladmin.tools;
     requires lwohvye.eladmin.generator;
+    requires org.apache.httpcomponents.httpcore;
+    requires org.apache.httpcomponents.httpclient;
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core.jvm;
 
