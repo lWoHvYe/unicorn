@@ -22,7 +22,7 @@ jobs:
     - name: Delete Package Versions
       uses: actions/delete-package-versions@v3.0.0
       with:
-        package-version-ids: 'PV_lADOFOUqEc4ADKq8zgFWQ6Y, PV_lADOFOUqEc4ADKq3zgFWQ60, PV_lADOFOUqEc4ADKq2zgFWQ7U, PV_lADOFOUqEc4ADKq1zgFWQ6A, PV_lADOFOUqEc4ADKq0zgFWQ3k, PV_lADOFOUqEc4ADKqzzgFWQ3g'
+        package-version-ids: 'PV_lADOFOUqEc4ADKq3zgFWQ60,PV_lADOFOUqEc4ADKq2zgFWQ7U,PV_lADOFOUqEc4ADKq1zgFWQ6A,PV_lADOFOUqEc4ADKq0zgFWQ3k,PV_lADOFOUqEc4ADKqzzgFWQ3g'
         min-versions-to-keep: 1
 
     - uses: actions/checkout@v3
