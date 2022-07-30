@@ -47,6 +47,11 @@
             <artifactId>eladmin-system</artifactId>
             <version>${project.core.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-logging</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>
         <!-- 代码生成模块 -->
         <dependency>
             <groupId>com.lwohvye</groupId>

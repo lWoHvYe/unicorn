@@ -16,7 +16,7 @@
 package com.lwohvye.sys.modules.security.config;
 
 import com.lwohvye.config.security.SimpleSecurityConfig;
-import com.lwohvye.sys.modules.rabbitmq.config.RabbitMqConfig;
+import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.sys.modules.security.security.CustomAccessDecisionManager;
@@ -211,8 +211,8 @@ public class SpringSecurityConfig {
             String token = tokenProvider.createToken(authentication);
             final JwtUserDto jwtUserDto = (JwtUserDto) authentication.getPrincipal();
             // 用户登录成功后，写一条消息
-            var authSuccessMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
-            rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
+            var authSuccessMsg = new AmqpMsgEntity().setMsgType("authSave").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
+            rabbitMQProducerService.sendMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
 
             // 返回 token 与 用户信息
             var authInfo = Map.of("token", properties.getTokenStartWith() + token, "user", jwtUserDto);
@@ -245,7 +245,7 @@ public class SpringSecurityConfig {
                     infoMap.put("lockedIp", lockedIp);
                     var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(JsonUtils.toJSONString(infoMap)).setExtraData("solveAuthFailed");
                     //  发送消息
-                    rabbitMQProducerService.sendMsg(RabbitMqConfig.DIRECT_SYNC_EXCHANGE, RabbitMqConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
+                    rabbitMQProducerService.sendMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
                 }
             }
             // 返回错误信息。用下面的sendError会被EntryPoint拦截并覆盖。

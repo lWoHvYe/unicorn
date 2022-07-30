@@ -13,11 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.sys.modules.rabbitmq.service;
+package com.lwohvye.log.rabbitmq;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
-import com.lwohvye.sys.modules.system.service.local.AuthMQService;
+import com.lwohvye.log.service.local.AuthLogService;
 import com.lwohvye.utils.MailAdapter;
 import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.utils.rabbitmq.YRabbitAbstractConsumer;
@@ -33,26 +32,12 @@ import java.util.Map;
 
 @Component
 @Slf4j
-// 监听延迟插件相关队列的消息
-@RabbitListener(queues = RabbitMQConfig.DATA_COMMON_DELAY_QUEUE)
-// 支持多种配置方式 property placeholders and SpEL  https://docs.spring.io/spring-amqp/docs/current/reference/html/#choose-container
-//@RabbitListener(queues = "#{'${property.with.comma.delimited.queue.names}'.split(',')}" )
-// 还可调用静态和非静态方法
-// SpEL https://www.lwohvye.com/2021/06/11/spring-%e8%a1%a8%e8%be%be%e5%bc%8f%e8%af%ad%e8%a8%80-spel/
-//@RabbitListener(queues = "#{T(全类名).静态方法名}")
-//@RabbitListener(queues = "#{beanName.方法名}")
-
-// 当将@RabbitListener注解放在类上时，一些情况下会报 org.springframework.amqp.AmqpException: No method found for class [B
-// 相关原因参见：https://jira.spring.io/browse/AMQP-573
-// 可使用将@RabbitListener放到方法上的方式。因为类型推断只适用于方法级别的@RabbitListener
-// 使用@Payload注解可以获取消息中的body信息，使用@Headers注解可以获取消息中的headers信息，也可以使用@Header获取单个header属性
-
-// @RabbitListener 可以标注在类上面，需配合 @RabbitHandler 注解一起使用
-// @RabbitListener 标注在类上面表示当有收到消息的时候，就交给 @RabbitHandler 的方法处理，具体使用哪个方法处理，根据 MessageConverter 转换后的参数类型
-public class RabbitMQDelayMsgConsumerService extends YRabbitAbstractConsumer {
+// 监听日志Save相关队列的消息。可以取配置文件中属性
+@RabbitListener(queues = "${auth.log.queue-name:auth.log.queue}")
+public class RabbitMQAuthMsgConsumerService extends YRabbitAbstractConsumer {
 
     @Autowired
-    private AuthMQService authMQService;
+    private AuthLogService authLogService;
 
     @Autowired
     public void setRedissonClient(RedissonClient redissonClient) {
@@ -62,10 +47,10 @@ public class RabbitMQDelayMsgConsumerService extends YRabbitAbstractConsumer {
     // 消费者本身是顺序消费的，且可以避免线程安全问题，有考虑过引入异步，但就无法保证顺序性了，还要解决线程安全问题。等有合适的场景了再做尝试
     @RabbitHandler
     public void handle(String amqpMsgEntityStr) {
-        baseConsumer(amqpMsgEntityStr, "auth", null, msgEntity -> {
+        baseConsumer(amqpMsgEntityStr, "authSave", null, msgEntity -> {
             var extraData = msgEntity.getExtraData();
             if (StringUtils.hasText(extraData))
-                ReflectUtil.invoke(authMQService, extraData, msgEntity.getMsgData());
+                ReflectUtil.invoke(authLogService, extraData, msgEntity.getMsgData());
             return null;
         }, errMsg -> {
             // reConsumeMsg(this::handle, amqpMsgEntityStr);

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class RabbitMqConfig {
+public class RabbitMQConfig {
 
     // region 交换机
     // direct交换机
@@ -58,6 +58,8 @@ public class RabbitMqConfig {
     public static final String DATA_SYNC_TTL_QUEUE = "data.sync.ttl.queue";
 
     public static final String DATA_COMMON_DELAY_QUEUE = "data.common.delay.queue";
+
+    public static final String AUTH_LOG_QUEUE = "auth.log.queue";
 
 
     // endregion
@@ -233,6 +235,20 @@ public class RabbitMqConfig {
     @Bean
     public Binding spSyncBinding(CustomExchange topicDelayExchange, Queue spSyncQueue) {
         return BindingBuilder.bind(spSyncQueue).to(topicDelayExchange).with("sp.sync.*").noargs();
+    }
+
+
+    @Bean
+    public Queue authLogQueue() {
+        return QueueBuilder.durable(AUTH_LOG_QUEUE).build();
+    }
+
+    @Bean
+    public Binding authLogBinding(DirectExchange dataSyncDirect, Queue authLogQueue) {
+        return BindingBuilder
+                .bind(authLogQueue)
+                .to(dataSyncDirect)
+                .with(AUTH_LOCAL_ROUTE_KEY);
     }
 
     // region 消费失败后，重试一定次数，之后转发到死信队列中

@@ -51,10 +51,10 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- 同时需要common模块和logging模块只需要引入logging模块即可 -->
+        <!-- 需要common模块 -->
         <dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-logging</artifactId>
+            <artifactId>eladmin-common</artifactId>
             <version>${project.core.version}</version>
         </dependency>
 

@@ -27,6 +27,8 @@
 
     <artifactId>eladmin-api</artifactId>
     <name>Api基础模块-服务拆分</name>
+    <url>https://github.com/lWoHvYe/eladmin</url>
+    <description>Domain data for System module</description>
 
     <dependencies>
         <dependency>

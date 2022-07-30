@@ -27,6 +27,8 @@
 
     <artifactId>eladmin-system</artifactId>
     <name>核心模块</name>
+    <url>https://github.com/lWoHvYe/eladmin</url>
+    <description>System module with Security and Management</description>
 
     <properties>
         <jjwt.version>0.11.5</jjwt.version>
@@ -41,13 +43,6 @@
         <dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>eladmin-api</artifactId>
-            <version>${project.core.version}</version>
-        </dependency>
-
-        <!-- logging 模块 -->
-        <dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-logging</artifactId>
             <version>${project.core.version}</version>
         </dependency>
 

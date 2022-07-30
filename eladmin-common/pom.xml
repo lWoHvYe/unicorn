@@ -27,6 +27,8 @@
 
     <artifactId>eladmin-common</artifactId>
     <name>公共模块</name>
+    <url>https://github.com/lWoHvYe/eladmin</url>
+    <description>Common module with BaseConfig, Utils, QueryAnno and so on</description>
 
     <dependencies>
         <!--Spring boot 核心-->

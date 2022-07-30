@@ -17,17 +17,15 @@ package com.lwohvye.sys.modules.system.service.local;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.log.domain.Log;
-import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.service.UserLocalCache;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.log.service.ILogService;
 import com.lwohvye.utils.json.JsonUtils;
+import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,16 +39,8 @@ import java.util.concurrent.TimeUnit;
  * @date 2021年04月21日 21:29
  */
 @Slf4j
-@Component
+@Service
 public class AuthMQService {
-    //    -------------------记录鉴权信息-----------------------------
-    @Autowired
-    private ILogService logService;
-
-    public void saveAuthorizeLog(String record) {
-        var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(record);
-        logService.save(log);
-    }
     //    ----------------------登录失败-----------------------------
 
     @Autowired

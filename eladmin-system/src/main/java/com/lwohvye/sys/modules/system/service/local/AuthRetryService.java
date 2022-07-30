@@ -22,12 +22,12 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 @Slf4j
-@Component
+@Service
 public class AuthRetryService {
 
     // https://github.com/spring-projects/spring-retry

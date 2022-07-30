@@ -27,6 +27,8 @@
 
     <artifactId>eladmin-logging</artifactId>
     <name>日志模块</name>
+    <url>https://github.com/lWoHvYe/eladmin</url>
+    <description>Logging module with API for store and retrieve</description>
 
     <dependencies>
         <dependency>

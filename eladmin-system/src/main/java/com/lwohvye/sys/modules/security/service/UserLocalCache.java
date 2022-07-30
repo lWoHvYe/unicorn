@@ -21,7 +21,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.config.LocalCoreConfig;
 import com.lwohvye.exception.EntityNotFoundException;
-import com.lwohvye.sys.modules.rabbitmq.config.RabbitMqConfig;
+import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IDataService;
@@ -116,7 +116,7 @@ public class UserLocalCache {
         if (StringUtils.isNotEmpty(userName)) {
             if (Boolean.TRUE.equals(doSync)) { // 广播事件
                 var amqpMsg = new AmqpMsgEntity().setMsgType("sp").setMsgData(userName).setExtraData("cleanUserCache").setOrigin(LocalCoreConfig.ORIGIN);
-                rabbitMQProducerService.sendSyncDelayMsgEntity(RabbitMqConfig.SP_SYNC_ROUTE_KEY, amqpMsg);
+                rabbitMQProducerService.sendSyncDelayMsgEntity(RabbitMQConfig.SP_SYNC_ROUTE_KEY, amqpMsg);
             }
             userLRUCache.invalidate(userName); // 清除单个key
         }
