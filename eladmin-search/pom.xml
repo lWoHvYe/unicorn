@@ -27,11 +27,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>eladmin-search</artifactId>
-    <name>搜索服务-MongoDB</name>
+    <name>Search Starter</name>
 
     <properties>
         <java.version>18</java.version>
-        <project.core.version>3.1.0</project.core.version>
+        <project.core.version>3.1.0-SNAPSHOT</project.core.version>
         <maven.compiler.release>17</maven.compiler.release>
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>

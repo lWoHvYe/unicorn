@@ -13,14 +13,17 @@
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
 
 启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
-详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
+详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。~~
+注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
 删除，以非module化运行。~~，~~模块化打包部署暂未找到支持外置配置及依赖的方式~~，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS/Jigsaw）。
 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
-后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和 System.out（有一个箭头的表示以覆盖的方式重定向，而有两个箭头的表示以追加的方式重定向。如果需要将标准输出以及标准错误输出同时重定向到一个文件，需要将某个输出转换为另一个输出，例如 2>&1
+后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和
+System.out（有一个箭头的表示以覆盖的方式重定向，而有两个箭头的表示以追加的方式重定向。如果需要将标准输出以及标准错误输出同时重定向到一个文件，需要将某个输出转换为另一个输出，例如
+2>&1
 表示将标准错误输出转换为标准输出）。
 
 ```shell
@@ -84,7 +87,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### 项目简介
 
-一个基于最新的Java 17版本、 Spring Boot 2.7、 Jpa、 JWT、Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的管理系统
+一个基于最新的Java 17版本、 Spring Boot 2.7、 Jpa、 Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
 
@@ -109,7 +112,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 支持运维管理，可方便地对远程服务器的应用进行部署与管理
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能，读写分离
-- 整合消息队列RabbitMQ，实现消息通知、延迟消息。
+- 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
 - 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入common模块即可，权限、日志、3rd Tools模块可插拔可独立部署
 
 #### 系统功能
@@ -158,6 +161,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
     - aspect 自定义注解的切面
     - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper
     - config 自定义权限实现、redis配置、openApi配置、Rsa配置等
+        - security 权限控制，为swarm化，提供全局关闭Security功能
     - exception 项目统一异常的处理
     - utils 系统通用工具类
 - eladmin-api 基础实体及DTO
@@ -166,9 +170,13 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
     - utils 通用工具类扩展
 - eladmin-system 系统核心模块
 	- config 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
+	    - common 基础等各类配置
 	    - thread 线程池相关
-	    - rabbitmq 消息队列相关
 	- modules 系统相关模块(登录授权、消息队列、系统监控、定时任务、运维管理等)
+	    - quartz 定时任务
+	    - rabbitmq 消息队列相关
+	    - security 权限控制
+	    - system 用户-权限管理
 - eladmin-starter 系统启动入口。相关示例
 - eladmin-logging 系统日志模块
 - eladmin-tools 系统第三方工具模块
@@ -207,5 +215,6 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - dev_3.0 Springdoc相关。Web侧跟进（无限delay）
 - ASM字节码增强
-- 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
+- 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的
+  refreshToken
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚有些问题未搞清）

@@ -157,31 +157,16 @@ public class QueryHelp {
                             }
                         }
                     }
-                    switch (q.join()) {
+                    // Switch Expressions。这个只是一个sweets 语法糖
+                    var stubJoin = Objects.nonNull(join) && Objects.nonNull(val);
+                    join = switch (q.join()) {
                         case LEFT:
-                            if (Objects.nonNull(join) && Objects.nonNull(val)) {
-                                join = join.join(entity, JoinType.LEFT);
-                            } else {
-                                join = root.join(entity, JoinType.LEFT);
-                            }
-                            break;
+                            yield stubJoin ? join.join(entity, JoinType.LEFT) : root.join(entity, JoinType.LEFT);
                         case RIGHT:
-                            if (Objects.nonNull(join) && Objects.nonNull(val)) {
-                                join = join.join(entity, JoinType.RIGHT);
-                            } else {
-                                join = root.join(entity, JoinType.RIGHT);
-                            }
-                            break;
+                            yield stubJoin ? join.join(entity, JoinType.RIGHT) : root.join(entity, JoinType.RIGHT);
                         case INNER:
-                            if (Objects.nonNull(join) && Objects.nonNull(val)) {
-                                join = join.join(entity, JoinType.INNER);
-                            } else {
-                                join = root.join(entity, JoinType.INNER);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                            yield stubJoin ? join.join(entity, JoinType.INNER) : root.join(entity, JoinType.INNER);
+                    };
                 }
             }
         }
@@ -210,40 +195,24 @@ public class QueryHelp {
                                                                                  Query q, String attributeName,
                                                                                  Class<T> fieldType, Class<C> cecType, Object val,
                                                                                  Join<R, ?> join) {
+        // switch 的 -> 语法也只是语法糖
         switch (q.type()) {
-            case EQUAL:
-                list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
-                break;
-            case NOT_EQUAL:
-                list.add(cb.notEqual(getExpression(attributeName, join, root), val));
-                break;
-            case GREATER_THAN:
+            case EQUAL -> list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
+            case NOT_EQUAL -> list.add(cb.notEqual(getExpression(attributeName, join, root), val));
+            case GREATER_THAN ->
                 // var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
                 // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
                 //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
                 //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
                 //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
-                list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
-                break;
-            case LESS_THAN:
-                list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
-                break;
-            case LESS_THAN_NQ:
-                list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
-                break;
-            case INNER_LIKE:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
-                break;
-            case LEFT_LIKE:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val));
-                break;
-            case RIGHT_LIKE:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
-                break;
-            case LIKE_STR:
-                list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
-                break;
-            case IN_INNER_LIKE:
+                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
+            case LESS_THAN -> list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
+            case LESS_THAN_NQ -> list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
+            case INNER_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
+            case LEFT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val));
+            case RIGHT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
+            case LIKE_STR -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
+            case IN_INNER_LIKE -> {
                 if (val instanceof List objList) {
 //                                构建数组
                     var predicates = new Predicate[objList.size()];
@@ -255,31 +224,27 @@ public class QueryHelp {
 //                                设置or查询
                     list.add(cb.or(predicates));
                 }
-                break;
-            case IN:
+            }
+            case IN -> {
                 if (val instanceof Collection<?> col && !col.isEmpty()) {
                     // 这里不能用fieldType.cast(val)。因为in()方法的重载，会走进in(Object... var1)中，正常要进in(Collection<?> var1)
                     list.add(getExpression(attributeName, join, root).in(col));
                 }
-                break;
-            case NOT_IN:
+            }
+            case NOT_IN -> {
                 if (val instanceof Collection<?> col && !col.isEmpty()) {
                     list.add(cb.not(getExpression(attributeName, join, root).in(col)));
                 }
-                break;
-            case BETWEEN:
+            }
+            case BETWEEN -> {
                 if (val instanceof List col && col.size() == 2 && col.get(0) instanceof Comparable start && col.get(1) instanceof Comparable end) {
                     var eleType = (Class<? extends Comparable>) col.get(0).getClass();
                     list.add(cb.between(getExpression(attributeName, join, root).as(eleType), start, end));
                 }
-                break;
-            case NOT_NULL:
-                list.add(cb.isNotNull(getExpression(attributeName, join, root)));
-                break;
-            case IS_NULL:
-                list.add(cb.isNull(getExpression(attributeName, join, root)));
-                break;
-            case IN_OR_ISNULL:
+            }
+            case NOT_NULL -> list.add(cb.isNotNull(getExpression(attributeName, join, root)));
+            case IS_NULL -> list.add(cb.isNull(getExpression(attributeName, join, root)));
+            case IN_OR_ISNULL -> {
                 if (val instanceof Collection<?> col && !col.isEmpty()) {
                     list.add(
 //                                        在集合中
@@ -290,13 +255,11 @@ public class QueryHelp {
                                     , cb.equal(getExpression(attributeName, join, root).as(String.class), ""))
                     );
                 }
-                break;
-            case IS_OR_NULL:
-                list.add((Long) val == -1L ?
-                        cb.isNull(getExpression(attributeName, join, root).as(fieldType)) :
-                        cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
-                break;
-            case EQUAL_IN_MULTI:
+            }
+            case IS_OR_NULL -> list.add((Long) val == -1L ?
+                    cb.isNull(getExpression(attributeName, join, root).as(fieldType)) :
+                    cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
+            case EQUAL_IN_MULTI -> {
                 var predicates = new Predicate[4];
 //                            like val
                 predicates[0] = cb.like(getExpression(attributeName, join, root).as(String.class), val.toString());
@@ -308,8 +271,8 @@ public class QueryHelp {
                 predicates[3] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val);
 //                            设置查询
                 list.add(cb.or(predicates));
-                break;
-            case FUNCTION_FIND_IN_SET:
+            }
+            case FUNCTION_FIND_IN_SET ->
                 // https://github.com/elunez/eladmin/pull/745
                 // if we have a table with column tags， the column value of tags is comma split string, like："a,b,c"
                 // we want to quey it by 'querytag' (ex 'a'), using follow sql：
@@ -322,9 +285,8 @@ public class QueryHelp {
                 // select * from table where xxx in ('abc','def','str'); // 这个可以，因为in 里面是常量
                 // select * from table where FIND_IN_SET('str', list); // 这种也可以
                 // 需注意，调用function后会产生结果，在外层要指定对结果的使用
-                list.add(cb.greaterThan(cb.function("FIND_IN_SET", Integer.class, cb.literal(val.toString()), getExpression(attributeName, join, root)), 0));
-                break;
-            case EQUAL_IN_MULTI_JOIN:
+                    list.add(cb.greaterThan(cb.function("FIND_IN_SET", Integer.class, cb.literal(val.toString()), getExpression(attributeName, join, root)), 0));
+            case EQUAL_IN_MULTI_JOIN -> {
 //                            该注解只针对Join查询。非join不处理
                 if (Objects.isNull(join))
                     break;
@@ -376,18 +338,16 @@ public class QueryHelp {
                 }
                 if (CollUtil.isNotEmpty(arrayList))
                     list.add(cb.and(arrayList.toArray(new Predicate[0])));
-                break;
+            }
 //            case FUNCTION_FROM_BASE64:
             // where (from_base64(user0_.description) like to_base64(user0_.description))。如何设置to_base64的参数为 fieldValue，是接下来的事情
             //    list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)), cb.function("to_base64", fieldType, getExpression(attributeName, join, root)))); // 多个是支持的
             // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
 //                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%")); // 这种把调用函数硬编码了
 //                break; 后续移除
-            case FUNCTION_4_EQUAL:
-                list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), val));
-                break;
-            default:
-                break;
+            case FUNCTION_4_EQUAL -> list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), val));
+            default -> {
+            }
         }
     }
 

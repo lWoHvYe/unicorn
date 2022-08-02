@@ -27,6 +27,8 @@
 
     <artifactId>eladmin-generator</artifactId>
     <name>代码生成模块</name>
+    <url>https://github.com/lWoHvYe/eladmin</url>
+    <description>Server and Web Code Generator</description>
 
     <properties>
         <configuration.version>2.8.0</configuration.version>
