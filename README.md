@@ -1,10 +1,12 @@
-<h1 style="text-align: center">EL-ADMIN 后台管理系统</h1>
+<h1 style="text-align: center">EL-ADMIN</h1>
 <div style="text-align: center">
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/lWoHvYe/eladmin/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/lWoHvYe/eladmin.svg?style=social&label=Stars)](https://github.com/lWoHvYe/eladmin)
 [![GitHub forks](https://img.shields.io/github/forks/lWoHvYe/eladmin.svg?style=social&label=Fork)](https://github.com/lWoHvYe/eladmin)
-
+[![Dependency Review](https://github.com/lWoHvYe/eladmin/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/dependency-review.yml)
+[![CodeQL](https://github.com/lWoHvYe/eladmin/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/codeql-analysis.yml)
+[![Maven Package](https://github.com/lWoHvYe/eladmin/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/maven-publish.yml)
 </div>
 
 本项目在原eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。

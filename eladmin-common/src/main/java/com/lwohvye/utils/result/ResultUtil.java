@@ -26,10 +26,7 @@ import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 主动返回数据
@@ -65,6 +62,12 @@ public class ResultUtil {
                 ? tClass.cast(resultInfo.getResult()) : null;
     }
 
+    @Nullable // 放在参数上，表示参数可为null，放在属性上，表示属性可为null，放在方法上，表示方法可能返回null
+    public static <T> T getEntityFromResp(ResponseEntity<ResultInfo<T>> responseEntity) {
+        checkResp(responseEntity);
+        return Optional.ofNullable(responseEntity.getBody()).orElse(ResultInfo.success()).getResult();
+    }
+
     /**
      * 从Restful调用的结果中，获取目标集合。若返回的是分页结果集，则只返回结果集部分
      *
@@ -78,6 +81,11 @@ public class ResultUtil {
         return responseEntity.getBody() instanceof ResultInfo<?> resultInfo ? (List<T>) resultInfo.getContent() : Collections.emptyList();
     }
 
+    public static <T> List<T> getListFromResp(ResponseEntity<ResultInfo<T>> responseEntity) {
+        checkResp(responseEntity);
+        return Optional.ofNullable(responseEntity.getBody()).orElse(ResultInfo.success()).getContent();
+    }
+
     /**
      * 从Restful调用的结果中，获取Map
      *
@@ -88,6 +96,11 @@ public class ResultUtil {
     public static Map getMapFromResp(ResponseEntity<?> responseEntity) {
         checkResp(responseEntity);
         return responseEntity.getBody() instanceof ResultInfo<?> resultInfo ? resultInfo.getResultMap() : Collections.emptyMap();
+    }
+
+    public static Map getMapFromRespGRIC(ResponseEntity<ResultInfo<Map<String, Object>>> responseEntity) {
+        checkResp(responseEntity);
+        return Optional.ofNullable(responseEntity.getBody()).orElse(ResultInfo.success(Collections.emptyMap())).getResultMap();
     }
 
     /**
