@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,14 +33,16 @@ public interface IDeployHistoryService {
 
     /**
      * 分页查询
+     *
      * @param criteria 条件
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部
+     *
      * @param criteria 条件
      * @return /
      */
@@ -47,6 +50,7 @@ public interface IDeployHistoryService {
 
     /**
      * 根据ID查询
+     *
      * @param id /
      * @return /
      */
@@ -54,18 +58,21 @@ public interface IDeployHistoryService {
 
     /**
      * 创建
+     *
      * @param resources /
      */
     void create(DeployHistory resources);
 
     /**
      * 删除
+     *
      * @param ids /
      */
     void delete(Set<String> ids);
 
     /**
      * 导出数据
+     *
      * @param queryAll /
      * @param response /
      * @throws IOException /

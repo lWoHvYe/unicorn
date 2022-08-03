@@ -54,21 +54,21 @@ public class ${className}Controller {
     @GetMapping
     @Log("查询${apiAlias}")
     @Operation(summary = "查询${apiAlias}")
-    public ResponseEntity<Object> query(${className}QueryCriteria criteria, Pageable pageable){
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(${className}QueryCriteria criteria, Pageable pageable){
         return new ResponseEntity<>(${changeClassName}Service.queryAll(criteria,pageable),HttpStatus.OK);
     }
 
     @PostMapping
     @Log("新增${apiAlias}")
     @Operation(summary = "新增${apiAlias}")
-    public ResponseEntity<Object> create(@Validated @RequestBody ${className} resources){
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody ${className} resources){
         return new ResponseEntity<>(${changeClassName}Service.create(resources),HttpStatus.CREATED);
     }
 
     @PutMapping
     @Log("修改${apiAlias}")
     @Operation(summary = "修改${apiAlias}")
-    public ResponseEntity<Object> update(@Validated @RequestBody ${className} resources){
+    public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody ${className} resources){
         ${changeClassName}Service.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -76,7 +76,7 @@ public class ${className}Controller {
     @Log("删除${apiAlias}")
     @Operation(summary = "删除${apiAlias}")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody ${pkColumnType}[] ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody ${pkColumnType}[] ids) {
         ${changeClassName}Service.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);
     }

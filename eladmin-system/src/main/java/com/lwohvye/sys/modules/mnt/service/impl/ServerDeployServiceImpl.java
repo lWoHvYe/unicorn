@@ -50,7 +50,7 @@ public class ServerDeployServiceImpl implements IServerDeployService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
         Page<ServerDeploy> page = serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(serverDeploy -> conversionService.convert(serverDeploy, ServerDeployDto.class)));
     }

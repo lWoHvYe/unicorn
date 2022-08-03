@@ -18,11 +18,13 @@ package com.lwohvye.api.modules.system.api;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,20 +35,20 @@ import java.util.Set;
 public interface SysDeptAPI {
 
     @GetMapping("/api/sys/dept")
-    ResponseEntity<Object> query(DeptQueryCriteria criteria) throws Exception;
+    ResponseEntity<ResultInfo<Map<String,Object>>> query(DeptQueryCriteria criteria) throws Exception;
 
     @PostMapping("/api/sys/dept/superior")
-    ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids);
+    ResponseEntity<ResultInfo<Map<String,Object>>> getSuperior(@RequestBody List<Long> ids);
 
     @PostMapping("/api/sys/dept")
-    ResponseEntity<Object> create(@Validated @RequestBody Dept resources);
+    ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Dept resources);
 
     @PutMapping("/api/sys/dept")
-    ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dept resources);
+    ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dept resources);
 
     @DeleteMapping("/api/sys/dept")
-    ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
+    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
 
     @GetMapping("/api/sys/dept/enabled/{userId}/{deptId}")
-    ResponseEntity<Object> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
+    ResponseEntity<ResultInfo<Long>> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
 }

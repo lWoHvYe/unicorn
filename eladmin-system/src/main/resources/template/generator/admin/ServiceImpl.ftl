@@ -73,7 +73,7 @@ public class ${className}ServiceImpl implements I${className}Service {
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> queryAll(${className}QueryCriteria criteria, Pageable pageable){
+    public Map<String, Object> queryAll(${className}QueryCriteria criteria, Pageable pageable){
         Page<${className}> page = ${changeClassName}Repository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(${changeClassName} -> conversionService.convert(${changeClassName}, ${className}Dto.class)));
     }

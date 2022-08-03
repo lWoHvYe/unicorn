@@ -113,7 +113,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(UserQueryCriteria criteria, Pageable pageable) {
         var page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(user -> conversionService.convert(user, UserDto.class))); // 这里使用toPage，在无符合条件的记录时，也有构筑结果并缓存，也算是一定程度上缓解缓存穿透
     }
@@ -126,7 +126,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     }
 
     @Override
-    public Object queryAll(User expUser, Pageable pageable) {
+    public List<User> queryAll(User expUser, Pageable pageable) {
         var matcher = ExampleMatcher.matching()
                 .withMatcher("username", ExampleMatcher.GenericPropertyMatcher::contains)
                 .withMatcher("nickName", match -> match.startsWith().ignoreCase());

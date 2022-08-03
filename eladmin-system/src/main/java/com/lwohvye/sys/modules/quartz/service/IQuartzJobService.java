@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,7 +39,7 @@ public interface IQuartzJobService {
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(JobQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部
@@ -55,7 +56,7 @@ public interface IQuartzJobService {
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAllLog(JobQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAllLog(JobQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部

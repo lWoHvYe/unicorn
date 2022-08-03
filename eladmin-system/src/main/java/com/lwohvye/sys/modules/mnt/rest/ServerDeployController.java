@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,14 +54,14 @@ public class ServerDeployController {
 
     @Operation(summary = "查询服务器")
     @GetMapping
-    public ResponseEntity<Object> query(ServerDeployQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(ServerDeployQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(serverDeployService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增服务器")
     @Operation(summary = "新增服务器")
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody ServerDeploy resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.create(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
@@ -68,7 +69,7 @@ public class ServerDeployController {
     @Log("修改服务器")
     @Operation(summary = "修改服务器")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated @RequestBody ServerDeploy resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -76,7 +77,7 @@ public class ServerDeployController {
     @Log("删除服务器")
     @Operation(summary = "删除Server")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         serverDeployService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
@@ -84,7 +85,7 @@ public class ServerDeployController {
     @Log("测试连接服务器")
     @Operation(summary = "测试连接服务器")
     @PostMapping("/testConnect")
-    public ResponseEntity<Object> testConnect(@Validated @RequestBody ServerDeploy resources) {
+    public ResponseEntity<ResultInfo<Boolean>> testConnect(@Validated @RequestBody ServerDeploy resources) {
         return new ResponseEntity<>(ResultInfo.success(serverDeployService.testConnect(resources)), HttpStatus.CREATED);
     }
 }

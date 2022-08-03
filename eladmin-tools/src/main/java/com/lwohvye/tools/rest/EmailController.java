@@ -42,14 +42,14 @@ public class EmailController {
     private final IEmailService emailService;
 
     @GetMapping
-    public ResponseEntity<Object> queryConfig() {
+    public ResponseEntity<EmailConfig> queryConfig() {
         return new ResponseEntity<>(emailService.find(), HttpStatus.OK);
     }
 
     @Log("配置邮件")
     @PutMapping
     @Operation(summary = "配置邮件")
-    public ResponseEntity<Object> updateConfig(@Validated @RequestBody EmailConfig emailConfig) throws Exception {
+    public ResponseEntity<String> updateConfig(@Validated @RequestBody EmailConfig emailConfig) throws Exception {
         emailService.config(emailConfig, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -57,7 +57,7 @@ public class EmailController {
     @Log("发送邮件")
     @PostMapping
     @Operation(summary = "发送邮件")
-    public ResponseEntity<Object> sendEmail(@Validated @RequestBody EmailVo emailVo) {
+    public ResponseEntity<String> sendEmail(@Validated @RequestBody EmailVo emailVo) {
         emailService.send(emailVo, emailService.find());
         return new ResponseEntity<>(HttpStatus.OK);
     }

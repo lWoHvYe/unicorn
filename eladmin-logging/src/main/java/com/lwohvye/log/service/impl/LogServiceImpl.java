@@ -57,13 +57,13 @@ public class LogServiceImpl implements ILogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(LogQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(LogQueryCriteria criteria, Pageable pageable) {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         String status = "ERROR";
         if (status.equals(criteria.getLogType())) {
             return PageUtil.toPage(page.map(errInfo -> conversionService.convert(errInfo, LogErrorDTO.class)));
         }
-        return page;
+        return PageUtil.toPage(page);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class LogServiceImpl implements ILogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         return PageUtil.toPage(page.map(logInfo -> conversionService.convert(logInfo, LogSmallDTO.class)));
     }
@@ -149,7 +149,7 @@ public class LogServiceImpl implements ILogService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object findByErrDetail(Long id) {
+    public Dict findByErrDetail(Long id) {
         Log log = logRepository.findById(id).orElseGet(Log::new);
         ValidationUtil.isNull(log.getId(), "Log", "id", id);
         byte[] details = log.getExceptionDetail();

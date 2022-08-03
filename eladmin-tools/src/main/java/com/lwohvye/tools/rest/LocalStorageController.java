@@ -16,8 +16,8 @@
 package com.lwohvye.tools.rest;
 
 import com.lwohvye.annotation.log.Log;
-import com.lwohvye.tools.domain.LocalStorage;
 import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.tools.domain.LocalStorage;
 import com.lwohvye.tools.service.ILocalStorageService;
 import com.lwohvye.tools.service.dto.LocalStorageQueryCriteria;
 import com.lwohvye.utils.FileUtil;
@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Zheng Jie
@@ -48,7 +49,7 @@ public class LocalStorageController {
 
     @Operation(summary = "查询文件")
     @GetMapping
-    public ResponseEntity<Object> query(LocalStorageQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<Map<String, Object>> query(LocalStorageQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(localStorageService.queryAll(criteria, pageable), HttpStatus.OK);
     }
 
@@ -60,14 +61,14 @@ public class LocalStorageController {
 
     @Operation(summary = "上传文件")
     @PostMapping
-    public ResponseEntity<Object> create(@RequestParam String name, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> create(@RequestParam String name, @RequestParam("file") MultipartFile file) {
         localStorageService.create(name, file);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/pictures")
     @Operation(summary = "上传图片")
-    public ResponseEntity<Object> upload(@RequestParam MultipartFile file) {
+    public ResponseEntity<LocalStorage> upload(@RequestParam MultipartFile file) {
         // 判断文件是否为图片
         String suffix = FileUtil.getExtensionName(file.getOriginalFilename());
         if (!FileUtil.IMAGE.equals(FileUtil.getFileType(suffix))) {
@@ -80,7 +81,7 @@ public class LocalStorageController {
     @Log("修改文件")
     @Operation(summary = "修改文件")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated @RequestBody LocalStorage resources) {
+    public ResponseEntity<String> update(@Validated @RequestBody LocalStorage resources) {
         localStorageService.update(resources);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -88,7 +89,7 @@ public class LocalStorageController {
     @Log("删除文件")
     @DeleteMapping
     @Operation(summary = "多选删除")
-    public ResponseEntity<Object> delete(@RequestBody Long[] ids) {
+    public ResponseEntity<String> delete(@RequestBody Long[] ids) {
         localStorageService.deleteAll(ids);
         return new ResponseEntity<>(HttpStatus.OK);
     }

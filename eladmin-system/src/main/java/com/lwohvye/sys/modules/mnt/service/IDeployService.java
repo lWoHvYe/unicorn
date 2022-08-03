@@ -24,24 +24,27 @@ import org.springframework.data.domain.Pageable;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author zhanghouying
+ * @date 2019-08-24
+ */
 public interface IDeployService {
 
     /**
      * 分页查询
+     *
      * @param criteria 条件
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(DeployQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(DeployQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部数据
+     *
      * @param criteria 条件
      * @return /
      */
@@ -49,6 +52,7 @@ public interface IDeployService {
 
     /**
      * 根据ID查询
+     *
      * @param id /
      * @return /
      */
@@ -56,6 +60,7 @@ public interface IDeployService {
 
     /**
      * 创建
+     *
      * @param resources /
      */
     void create(Deploy resources);
@@ -63,37 +68,45 @@ public interface IDeployService {
 
     /**
      * 编辑
+     *
      * @param resources /
      */
     void update(Deploy resources);
 
     /**
      * 删除
+     *
      * @param ids /
      */
     void delete(Set<Long> ids);
 
-	/**
-	 * 部署文件到服务器
-	 * @param fileSavePath 文件路径
-	 * @param appId 应用ID
+    /**
+     * 部署文件到服务器
+     *
+     * @param fileSavePath 文件路径
+     * @param appId        应用ID
      */
-	void deploy(String fileSavePath, Long appId);
+    void deploy(String fileSavePath, Long appId);
 
     /**
      * 查询部署状态
+     *
      * @param resources /
      * @return /
      */
     String serverStatus(Deploy resources);
+
     /**
      * 启动服务
+     *
      * @param resources /
      * @return /
      */
     String startServer(Deploy resources);
+
     /**
      * 停止服务
+     *
      * @param resources /
      * @return /
      */
@@ -101,6 +114,7 @@ public interface IDeployService {
 
     /**
      * 停止服务
+     *
      * @param resources /
      * @return /
      */
@@ -108,6 +122,7 @@ public interface IDeployService {
 
     /**
      * 导出数据
+     *
      * @param queryAll /
      * @param response /
      * @throws IOException /

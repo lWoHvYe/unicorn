@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -52,7 +53,7 @@ public class QuartzJobController {
 
     @Operation(summary = "查询定时任务")
     @GetMapping
-    public ResponseEntity<Object> query(JobQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(JobQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(quartzJobService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
@@ -70,14 +71,14 @@ public class QuartzJobController {
 
     @Operation(summary = "查询任务执行日志")
     @GetMapping(value = "/logs")
-    public ResponseEntity<Object> queryJobLog(JobQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> queryJobLog(JobQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(quartzJobService.queryAllLog(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增定时任务")
     @Operation(summary = "新增定时任务")
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody QuartzJob resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody QuartzJob resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
@@ -88,7 +89,7 @@ public class QuartzJobController {
     @Log("修改定时任务")
     @Operation(summary = "修改定时任务")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody QuartzJob resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody QuartzJob resources) {
         quartzJobService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -96,7 +97,7 @@ public class QuartzJobController {
     @Log("更改定时任务状态")
     @Operation(summary = "更改定时任务状态")
     @PutMapping(value = "/{id}")
-    public ResponseEntity<Object> update(@PathVariable Long id) {
+    public ResponseEntity<ResultInfo<String>> update(@PathVariable Long id) {
         quartzJobService.updateIsPause(quartzJobService.findById(id));
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -104,7 +105,7 @@ public class QuartzJobController {
     @Log("执行定时任务")
     @Operation(summary = "执行定时任务")
     @PutMapping(value = "/exec/{id}")
-    public ResponseEntity<Object> execution(@PathVariable Long id) {
+    public ResponseEntity<ResultInfo<String>> execution(@PathVariable Long id) {
         quartzJobService.execution(quartzJobService.findById(id));
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -112,7 +113,7 @@ public class QuartzJobController {
     @Log("删除定时任务")
     @Operation(summary = "删除定时任务")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         quartzJobService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

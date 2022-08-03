@@ -54,13 +54,13 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(JobQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
         return PageUtil.toPage(quartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAllLog(JobQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAllLog(JobQueryCriteria criteria, Pageable pageable) {
         return PageUtil.toPage(quartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 

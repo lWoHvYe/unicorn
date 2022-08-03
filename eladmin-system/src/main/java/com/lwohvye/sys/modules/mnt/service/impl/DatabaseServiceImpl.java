@@ -53,7 +53,7 @@ public class DatabaseServiceImpl implements IDatabaseService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(DatabaseQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(DatabaseQueryCriteria criteria, Pageable pageable) {
         Page<Database> page = databaseRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(database -> conversionService.convert(database, DatabaseDto.class)));
     }

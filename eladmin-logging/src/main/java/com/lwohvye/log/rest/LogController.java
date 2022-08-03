@@ -15,6 +15,7 @@
  */
 package com.lwohvye.log.rest;
 
+import cn.hutool.core.lang.Dict;
 import com.lwohvye.annotation.log.Log;
 import com.lwohvye.log.service.ILogService;
 import com.lwohvye.log.service.dto.LogQueryCriteria;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Zheng Jie
@@ -59,14 +61,14 @@ public class LogController {
 
     @GetMapping
     @Operation(summary = "日志查询")
-    public ResponseEntity<Object> query(LogQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(LogQueryCriteria criteria, Pageable pageable) {
         criteria.setLogType("INFO");
         return new ResponseEntity<>(ResultInfo.success(logService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/user")
     @Operation(summary = "用户日志查询")
-    public ResponseEntity<Object> queryUserLog(LogQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> queryUserLog(LogQueryCriteria criteria, Pageable pageable) {
         criteria.setLogType("INFO");
         criteria.setBlurry(SecurityUtils.getCurrentUsername());
         return new ResponseEntity<>(ResultInfo.success(logService.queryAllByUser(criteria, pageable)), HttpStatus.OK);
@@ -74,21 +76,21 @@ public class LogController {
 
     @GetMapping(value = "/error")
     @Operation(summary = "错误日志查询")
-    public ResponseEntity<Object> queryErrorLog(LogQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> queryErrorLog(LogQueryCriteria criteria, Pageable pageable) {
         criteria.setLogType("ERROR");
         return new ResponseEntity<>(ResultInfo.success(logService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/error/{id}")
     @Operation(summary = "日志异常详情查询")
-    public ResponseEntity<Object> queryErrorLogs(@PathVariable Long id) {
+    public ResponseEntity<ResultInfo<Dict>> queryErrorLogs(@PathVariable Long id) {
         return new ResponseEntity<>(ResultInfo.success(logService.findByErrDetail(id)), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/del/error")
     @Log("删除所有ERROR日志")
     @Operation(summary = "删除所有ERROR日志")
-    public ResponseEntity<Object> delAllErrorLog() {
+    public ResponseEntity<ResultInfo<String>> delAllErrorLog() {
         logService.delAllByError();
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
@@ -96,7 +98,7 @@ public class LogController {
     @DeleteMapping(value = "/del/info")
     @Log("删除所有INFO日志")
     @Operation(summary = "删除所有INFO日志")
-    public ResponseEntity<Object> delAllInfoLog() {
+    public ResponseEntity<ResultInfo<String>> delAllInfoLog() {
         logService.delAllByInfo();
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

@@ -15,6 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.service;
 
+import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.base.BaseService;
 import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
@@ -90,9 +91,9 @@ public interface IMenuService extends BaseService {
      * @param menuDtos /
      * @return /
      */
-    Object buildMenus(List<MenuDto> menuDtos);
+    List<MenuVo> buildMenus(List<MenuDto> menuDtos);
 
-    Object buildWebMenus(Long uid);
+    List<MenuVo> buildWebMenus(Long uid);
 
     /**
      * 根据ID查询

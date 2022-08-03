@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * @author Zheng Jie
  * @date 2020-05-02
@@ -39,7 +41,7 @@ public class MonitorController {
 
     @GetMapping
     @Operation(summary = "查询服务监控")
-    public ResponseEntity<Object> query() {
+    public ResponseEntity<Map<String, Object>> query() {
         return new ResponseEntity<>(serverService.getServers(), HttpStatus.OK);
     }
 }

@@ -18,8 +18,9 @@ package com.lwohvye.sys.modules.system.rest;
 import com.lwohvye.annotation.log.Log;
 import com.lwohvye.api.modules.system.api.SysResourceAPI;
 import com.lwohvye.api.modules.system.domain.Resource;
-import com.lwohvye.sys.modules.system.service.IResourceService;
+import com.lwohvye.api.modules.system.service.dto.ResourceDto;
 import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.sys.modules.system.service.IResourceService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +29,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * @author Super idol lv
@@ -45,34 +49,35 @@ public class ResourceController implements SysResourceAPI {
     @Log("查询资源")
     @Operation(summary = "查询资源")
     @Override
-    public ResponseEntity<Object> query(ResourceQueryCriteria criteria, Pageable pageable) {
-        return new ResponseEntity<>(resourceService.queryAll(criteria, pageable), HttpStatus.OK);
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(ResourceQueryCriteria criteria, Pageable pageable) {
+        return new ResponseEntity<>(ResultInfo.success(resourceService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增资源")
     @Operation(summary = "新增资源")
     @Override
-    public ResponseEntity<Object> create(@Validated @RequestBody Resource resources) {
-        return new ResponseEntity<>(resourceService.create(resources), HttpStatus.CREATED);
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Resource resources) {
+        resourceService.create(resources);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
 
     @Log("修改资源")
     @Operation(summary = "修改资源")
     @Override
-    public ResponseEntity<Object> update(@Validated @RequestBody Resource resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody Resource resources) {
         resourceService.update(resources);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
 
     @Log("删除资源")
     @Operation(summary = "删除资源")
     @Override
-    public ResponseEntity<Object> delete(@RequestBody Long[] ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Long[] ids) {
         resourceService.deleteAll(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> queryAllRes() {
+    public ResponseEntity<ResultInfo<ResourceDto>> queryAllRes() {
         return new ResponseEntity<>(ResultInfo.success(resourceService.queryAllRes()), HttpStatus.OK);
     }
 }

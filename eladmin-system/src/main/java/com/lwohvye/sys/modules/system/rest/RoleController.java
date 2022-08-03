@@ -34,15 +34,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -60,38 +58,38 @@ public class RoleController implements SysRoleAPI {
 
     @Operation(summary = "获取单个role")
     @Override
-    public ResponseEntity<Object> query(@PathVariable Long id) {
+    public ResponseEntity<ResultInfo<RoleDto>> query(@PathVariable Long id) {
         return new ResponseEntity<>(ResultInfo.success(roleService.findById(id)), HttpStatus.OK);
     }
 
     @Operation(summary = "导出角色数据")
-    @GetMapping(value = "/download")
+    @GetMapping(value = "/api/sys/roles/download")
     public void download(HttpServletResponse response, RoleQueryCriteria criteria) throws IOException {
         roleService.download(roleService.queryAll(criteria), response);
     }
 
     @Operation(summary = "返回全部的角色")
     @Override
-    public ResponseEntity<Object> query() {
+    public ResponseEntity<ResultInfo<RoleDto>> query() {
         return new ResponseEntity<>(ResultInfo.success(roleService.queryAll()), HttpStatus.OK);
     }
 
     @Operation(summary = "查询角色")
     @Override
-    public ResponseEntity<Object> query(RoleQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(RoleQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(roleService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Operation(summary = "获取用户级别")
     @Override
-    public ResponseEntity<Object> getLevel() {
+    public ResponseEntity<ResultInfo<Dict>> getLevel() {
         return new ResponseEntity<>(ResultInfo.success(Dict.create().set("level", getLevels(null))), HttpStatus.OK);
     }
 
     @Log("新增角色")
     @Operation(summary = "新增角色")
     @Override
-    public ResponseEntity<Object> create(@Validated @RequestBody Role resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Role resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
@@ -103,7 +101,7 @@ public class RoleController implements SysRoleAPI {
     @Log("修改角色")
     @Operation(summary = "修改角色")
     @Override
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Role resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Role resources) {
         getLevels(resources.getLevel());
         roleService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -112,7 +110,7 @@ public class RoleController implements SysRoleAPI {
     @Log("修改角色菜单")
     @Operation(summary = "修改角色菜单")
     @Override
-    public ResponseEntity<Object> updateMenu(@RequestBody Role resources) {
+    public ResponseEntity<ResultInfo<String>> updateMenu(@RequestBody Role resources) {
         RoleDto role = roleService.findById(resources.getId());
         getLevels(role.getLevel());
         roleService.updateMenu(resources, role);
@@ -122,7 +120,7 @@ public class RoleController implements SysRoleAPI {
     @Log("删除角色")
     @Operation(summary = "删除角色")
     @Override
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         for (Long id : ids) {
             RoleDto role = roleService.findById(id);
             getLevels(role.getLevel());
@@ -133,7 +131,7 @@ public class RoleController implements SysRoleAPI {
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> queryByUid(@PathVariable Long userId) {
+    public ResponseEntity<ResultInfo<RoleSmallDto>> queryByUid(@PathVariable Long userId) {
         return new ResponseEntity<>(ResultInfo.success(roleService.findByUserId(userId)), HttpStatus.OK);
     }
 

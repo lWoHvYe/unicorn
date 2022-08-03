@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -51,14 +52,14 @@ public class DeployHistoryController {
 
     @Operation(summary = "查询部署历史")
     @GetMapping
-    public ResponseEntity<Object> query(DeployHistoryQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(deployHistoryService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("删除DeployHistory")
     @Operation(summary = "删除部署历史")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Set<String> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<String> ids) {
         deployHistoryService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

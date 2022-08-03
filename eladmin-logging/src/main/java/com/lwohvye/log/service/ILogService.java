@@ -15,6 +15,7 @@
  */
 package com.lwohvye.log.service;
 
+import cn.hutool.core.lang.Dict;
 import com.lwohvye.log.service.dto.LogQueryCriteria;
 import com.lwohvye.log.domain.Log;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -24,6 +25,7 @@ import org.springframework.scheduling.annotation.Async;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Zheng Jie
@@ -38,7 +40,7 @@ public interface ILogService {
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(LogQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(LogQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部数据
@@ -55,7 +57,7 @@ public interface ILogService {
      * @param pageable 分页参数
      * @return -
      */
-    Object queryAllByUser(LogQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAllByUser(LogQueryCriteria criteria, Pageable pageable);
 
     /**
      * 保存日志数据。异步写日志
@@ -78,7 +80,7 @@ public interface ILogService {
      * @param id 日志ID
      * @return Object
      */
-    Object findByErrDetail(Long id);
+    Dict findByErrDetail(Long id);
 
     /**
      * 导出日志

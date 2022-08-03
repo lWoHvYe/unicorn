@@ -45,7 +45,7 @@ public class VerifyController {
 
     @PostMapping(value = "/resetEmail")
     @Operation(summary = "重置邮箱，发送验证码")
-    public ResponseEntity<Object> resetEmail(@RequestParam String email) {
+    public ResponseEntity<ResultInfo<String>> resetEmail(@RequestParam String email) {
         EmailVo emailVo = verificationCodeService.sendEmail(email, CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey());
         emailService.send(emailVo, emailService.find());
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
@@ -53,7 +53,7 @@ public class VerifyController {
 
     @PostMapping(value = "/email/resetPass")
     @Operation(summary = "重置密码，发送验证码")
-    public ResponseEntity<Object> resetPass(@RequestParam String email) {
+    public ResponseEntity<ResultInfo<String>> resetPass(@RequestParam String email) {
         EmailVo emailVo = verificationCodeService.sendEmail(email, CodeEnum.EMAIL_RESET_PWD_CODE.getKey());
         emailService.send(emailVo, emailService.find());
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
@@ -61,7 +61,7 @@ public class VerifyController {
 
     @GetMapping(value = "/validated")
     @Operation(summary = "验证码验证")
-    public ResponseEntity<Object> validated(@RequestParam String email, @RequestParam String code, @RequestParam Integer codeBi) {
+    public ResponseEntity<ResultInfo<String>> validated(@RequestParam String email, @RequestParam String code, @RequestParam Integer codeBi) {
         CodeBiEnum biEnum = CodeBiEnum.find(codeBi);
         switch (Objects.requireNonNull(biEnum)) {
             case ONE:

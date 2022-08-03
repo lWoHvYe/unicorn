@@ -15,17 +15,20 @@
  */
 package com.lwohvye.api.modules.system.api;
 
+import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.vo.UserBaseVo;
 import com.lwohvye.api.modules.system.domain.vo.UserPassVo;
 import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -36,32 +39,32 @@ import java.util.Set;
 public interface SysUserAPI {
 
     @GetMapping("/api/sys/users")
-    ResponseEntity<Object> query(UserQueryCriteria criteria, Pageable pageable);
+    ResponseEntity<ResultInfo<Map<String, Object>>> query(UserQueryCriteria criteria, Pageable pageable);
 
     @PostMapping("/api/sys/users")
-    ResponseEntity<Object> create(@Validated @RequestBody User resources);
+    ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody User resources);
 
     @PutMapping("/api/sys/users")
-    ResponseEntity<Object> update(@Validated(Update.class) @RequestBody User resources) throws Exception;
+    ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody User resources) throws Exception;
 
     @PostMapping("/api/sys/users/updateStatus")
-    ResponseEntity<Object> updateStatus(@RequestBody UserBaseVo userVo);
+    ResponseEntity<ResultInfo<String>> updateStatus(@RequestBody UserBaseVo userVo);
 
     @PutMapping("/api/sys/users/center")
-    ResponseEntity<Object> center(@Validated(Update.class) @RequestBody User resources);
+    ResponseEntity<ResultInfo<String>> center(@Validated(Update.class) @RequestBody User resources);
 
     @DeleteMapping("/api/sys/users")
-    ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
+    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
 
     @PostMapping("/api/sys/users/updatePass")
-    ResponseEntity<Object> updatePass(@RequestBody UserPassVo passVo) throws Exception;
+    ResponseEntity<ResultInfo<String>> updatePass(@RequestBody UserPassVo passVo) throws Exception;
 
     @PostMapping("/api/sys/users/updateAvatar")
-    ResponseEntity<Object> updateAvatar(@RequestParam MultipartFile avatar);
+    ResponseEntity<Map<String, String>> updateAvatar(@RequestParam MultipartFile avatar);
 
     @PostMapping("/api/sys/users/updateEmail/{code}")
-    ResponseEntity<Object> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception;
+    ResponseEntity<ResultInfo<String>> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception;
 
     @GetMapping("/api/sys/users/name/{username}")
-    ResponseEntity<Object> queryByName(@PathVariable String username);
+    ResponseEntity<ResultInfo<UserInnerDto>> queryByName(@PathVariable String username);
 }

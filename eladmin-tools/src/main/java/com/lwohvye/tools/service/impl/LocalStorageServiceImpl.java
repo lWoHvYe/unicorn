@@ -55,7 +55,7 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(LocalStorageQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(LocalStorageQueryCriteria criteria, Pageable pageable) {
         Page<LocalStorage> page = localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(localStorage -> conversionService.convert(localStorage, LocalStorageDto.class)));
     }

@@ -16,11 +16,15 @@
 package com.lwohvye.api.modules.system.api;
 
 import com.lwohvye.api.modules.system.domain.Resource;
+import com.lwohvye.api.modules.system.service.dto.ResourceDto;
 import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * @author Super idol lv
@@ -31,17 +35,17 @@ public interface SysResourceAPI {
 
 
     @GetMapping("/api/sys/resources")
-    ResponseEntity<Object> query(ResourceQueryCriteria criteria, Pageable pageable);
+    ResponseEntity<ResultInfo<Map<String, Object>>> query(ResourceQueryCriteria criteria, Pageable pageable);
 
     @PostMapping("/api/sys/resources")
-    ResponseEntity<Object> create(@Validated @RequestBody Resource resources);
+    ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Resource resources);
 
     @PutMapping("/api/sys/resources")
-    ResponseEntity<Object> update(@Validated @RequestBody Resource resources);
+    ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody Resource resources);
 
     @DeleteMapping("/api/sys/resources")
-    ResponseEntity<Object> delete(@RequestBody Long[] ids);
+    ResponseEntity<ResultInfo<String>> delete(@RequestBody Long[] ids);
 
     @GetMapping("/api/sys/resources/queryAllRes")
-    ResponseEntity<Object> queryAllRes();
+    ResponseEntity<ResultInfo<ResourceDto>> queryAllRes();
 }

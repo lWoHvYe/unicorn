@@ -50,7 +50,7 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         Page<DeployHistory> page = deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(deployHistory -> conversionService.convert(deployHistory, DeployHistoryDto.class)));
     }

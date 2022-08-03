@@ -16,6 +16,7 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import com.lwohvye.annotation.log.Log;
+import com.lwohvye.api.modules.system.service.dto.DictDto;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.api.modules.system.domain.Dict;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,20 +58,20 @@ public class DictController {
 
     @Operation(summary = "查询字典")
     @GetMapping(value = "/all")
-    public ResponseEntity<Object> queryAll() {
+    public ResponseEntity<ResultInfo<DictDto>> queryAll() {
         return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(new DictQueryCriteria())), HttpStatus.OK);
     }
 
     @Operation(summary = "查询字典")
     @GetMapping
-    public ResponseEntity<Object> query(DictQueryCriteria resources, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DictQueryCriteria resources, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(resources, pageable)), HttpStatus.OK);
     }
 
     @Log("新增字典")
     @Operation(summary = "新增字典")
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody Dict resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Dict resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
@@ -80,7 +82,7 @@ public class DictController {
     @Log("修改字典")
     @Operation(summary = "修改字典")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dict resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dict resources) {
         dictService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -88,7 +90,7 @@ public class DictController {
     @Log("删除字典")
     @Operation(summary = "删除字典")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         dictService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

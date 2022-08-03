@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,13 +67,13 @@ public class AuthorizationController {
 
     @Operation(summary = "获取用户信息")
     @GetMapping(value = "/info")
-    public ResponseEntity<Object> getUserInfo() {
+    public ResponseEntity<UserDetails> getUserInfo() {
         return ResponseEntity.ok(SecurityUtils.getCurrentUser());
     }
 
     @Operation(summary = "获取验证码")
     @AnonymousGetMapping(value = "/code")
-    public ResponseEntity<Object> getCode() {
+    public ResponseEntity<Map<String, String>> getCode() {
         // 获取运算的结果
         Captcha captcha = loginProperties.getCaptcha();
         String uuid = properties.getCodeKey() + IdUtil.simpleUUID();
@@ -97,7 +98,7 @@ public class AuthorizationController {
      */
     @Hidden
     @GetMapping(value = "/doBusiness5Lock")
-    public ResponseEntity<Object> doBusiness5Lock(HttpServletRequest request) {
+    public ResponseEntity<String> doBusiness5Lock(HttpServletRequest request) {
 
         // --------------Session相关，可考虑接入Redisson的 Spring会话管理 (Spring Session Manager)--------------
 
@@ -358,6 +359,6 @@ public class AuthorizationController {
 
         // endregion
 
-        return null;
+        return ResponseEntity.ok("Finish");
     }
 }

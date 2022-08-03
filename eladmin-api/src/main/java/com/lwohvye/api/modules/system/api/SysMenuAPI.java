@@ -15,14 +15,18 @@
  */
 package com.lwohvye.api.modules.system.api;
 
+import com.lwohvye.api.modules.system.domain.vo.MenuVo;
+import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,27 +37,27 @@ import java.util.Set;
 public interface SysMenuAPI {
 
     @GetMapping("/api/sys/menus/build")
-    ResponseEntity<Object> buildMenus();
+    ResponseEntity<List<MenuVo>> buildMenus();
 
     @GetMapping("/api/sys/menus/lazy")
-    ResponseEntity<Object> query(@RequestParam Long pid);
+    ResponseEntity<List<MenuDto>> query(@RequestParam Long pid);
 
     @GetMapping("/api/sys/menus/child")
-    ResponseEntity<Object> child(@RequestParam Long id);
+    ResponseEntity<Set<Long>> child(@RequestParam Long id);
 
     @GetMapping("/api/sys/menus")
-    ResponseEntity<Object> query(MenuQueryCriteria criteria) throws Exception;
+    ResponseEntity<ResultInfo<Map<String, Object>>> query(MenuQueryCriteria criteria) throws Exception;
 
     @PostMapping("/api/sys/menus/superior")
-    ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids);
+    ResponseEntity<List<MenuDto>> getSuperior(@RequestBody List<Long> ids);
 
     @PostMapping("/api/sys/menus")
-    ResponseEntity<Object> create(@Validated @RequestBody Menu resources);
+    ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Menu resources);
 
     @PutMapping("/api/sys/menus")
-    ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Menu resources);
+    ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Menu resources);
 
     @DeleteMapping("/api/sys/menus")
-    ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
+    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
 
 }

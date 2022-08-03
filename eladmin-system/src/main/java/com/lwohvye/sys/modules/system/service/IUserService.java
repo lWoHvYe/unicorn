@@ -115,7 +115,7 @@ public interface IUserService extends BaseService {
      * @param pageable 分页参数
      * @return /
      */
-    Object queryAll(UserQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(UserQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部不分页
@@ -125,7 +125,7 @@ public interface IUserService extends BaseService {
      */
     List<UserDto> queryAll(UserQueryCriteria criteria);
 
-    Object queryAll(User expUser, Pageable pageable);
+    List<User> queryAll(User expUser, Pageable pageable);
 
     /**
      * 导出数据

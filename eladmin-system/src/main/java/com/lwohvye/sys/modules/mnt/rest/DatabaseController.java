@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,14 +62,14 @@ public class DatabaseController {
 
     @Operation(summary = "查询数据库")
     @GetMapping
-    public ResponseEntity<Object> query(DatabaseQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DatabaseQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(databaseService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增数据库")
     @Operation(summary = "新增数据库")
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody Database resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Database resources) {
         databaseService.create(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
@@ -76,7 +77,7 @@ public class DatabaseController {
     @Log("修改数据库")
     @Operation(summary = "修改数据库")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated @RequestBody Database resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody Database resources) {
         databaseService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -84,7 +85,7 @@ public class DatabaseController {
     @Log("删除数据库")
     @Operation(summary = "删除数据库")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Set<String> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<String> ids) {
         databaseService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
@@ -92,14 +93,14 @@ public class DatabaseController {
     @Log("测试数据库链接")
     @Operation(summary = "测试数据库链接")
     @PostMapping("/testConnect")
-    public ResponseEntity<Object> testConnect(@Validated @RequestBody Database resources) {
+    public ResponseEntity<Boolean> testConnect(@Validated @RequestBody Database resources) {
         return new ResponseEntity<>(databaseService.testConnection(resources), HttpStatus.CREATED);
     }
 
     @Log("执行SQL脚本")
     @Operation(summary = "执行SQL脚本")
     @PostMapping(value = "/upload")
-    public ResponseEntity<Object> upload(@RequestBody MultipartFile file, HttpServletRequest request) throws Exception {
+    public ResponseEntity<String> upload(@RequestBody MultipartFile file, HttpServletRequest request) throws Exception {
         String id = request.getParameter("id");
         DatabaseDto database = databaseService.findById(id);
         String fileName;

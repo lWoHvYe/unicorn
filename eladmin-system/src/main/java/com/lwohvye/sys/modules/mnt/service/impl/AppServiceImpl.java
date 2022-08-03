@@ -50,7 +50,7 @@ public class AppServiceImpl implements IAppService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(AppQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(AppQueryCriteria criteria, Pageable pageable) {
         Page<App> page = appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(app -> conversionService.convert(app, AppDto.class)));
     }

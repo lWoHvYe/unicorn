@@ -63,14 +63,14 @@ public class DeployController {
 
     @Operation(summary = "查询部署")
     @GetMapping
-    public ResponseEntity<Object> query(DeployQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DeployQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(deployService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增部署")
     @Operation(summary = "新增部署")
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody Deploy resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Deploy resources) {
         deployService.create(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
@@ -78,7 +78,7 @@ public class DeployController {
     @Log("修改部署")
     @Operation(summary = "修改部署")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated @RequestBody Deploy resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody Deploy resources) {
         deployService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -86,7 +86,7 @@ public class DeployController {
     @Log("删除部署")
     @Operation(summary = "删除部署")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         deployService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
@@ -94,7 +94,7 @@ public class DeployController {
     @Log("上传文件部署")
     @Operation(summary = "上传文件部署")
     @PostMapping(value = "/upload")
-    public ResponseEntity<Object> upload(@RequestBody MultipartFile file, HttpServletRequest request) throws Exception {
+    public ResponseEntity<Map<String, Object>> upload(@RequestBody MultipartFile file, HttpServletRequest request) throws Exception {
         Long id = Long.valueOf(request.getParameter("id"));
         String fileName = "";
         if (file != null) {
@@ -117,7 +117,7 @@ public class DeployController {
     @Log("系统还原")
     @Operation(summary = "系统还原")
     @PostMapping(value = "/serverReduction")
-    public ResponseEntity<Object> serverReduction(@Validated @RequestBody DeployHistory resources) {
+    public ResponseEntity<String> serverReduction(@Validated @RequestBody DeployHistory resources) {
         String result = deployService.serverReduction(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -125,7 +125,7 @@ public class DeployController {
     @Log("服务运行状态")
     @Operation(summary = "服务运行状态")
     @PostMapping(value = "/serverStatus")
-    public ResponseEntity<Object> serverStatus(@Validated @RequestBody Deploy resources) {
+    public ResponseEntity<String> serverStatus(@Validated @RequestBody Deploy resources) {
         String result = deployService.serverStatus(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -133,7 +133,7 @@ public class DeployController {
     @Log("启动服务")
     @Operation(summary = "启动服务")
     @PostMapping(value = "/startServer")
-    public ResponseEntity<Object> startServer(@Validated @RequestBody Deploy resources) {
+    public ResponseEntity<String> startServer(@Validated @RequestBody Deploy resources) {
         String result = deployService.startServer(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -141,7 +141,7 @@ public class DeployController {
     @Log("停止服务")
     @Operation(summary = "停止服务")
     @PostMapping(value = "/stopServer")
-    public ResponseEntity<Object> stopServer(@Validated @RequestBody Deploy resources) {
+    public ResponseEntity<String> stopServer(@Validated @RequestBody Deploy resources) {
         String result = deployService.stopServer(resources);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

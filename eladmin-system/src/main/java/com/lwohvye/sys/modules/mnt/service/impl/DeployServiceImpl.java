@@ -72,7 +72,7 @@ public class DeployServiceImpl implements IDeployService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object queryAll(DeployQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryAll(DeployQueryCriteria criteria, Pageable pageable) {
         Page<Deploy> page = deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtil.toPage(page.map(deploy -> conversionService.convert(deploy, DeployDto.class)));
     }

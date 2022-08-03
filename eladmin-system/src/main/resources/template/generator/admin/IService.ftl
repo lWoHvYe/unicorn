@@ -37,9 +37,9 @@ public interface I${className}Service extends BaseService {
     * 查询数据分页
     * @param criteria 条件
     * @param pageable 分页参数
-    * @return Map<String,Object>
+    * @return Map<String, Object>
     */
-    Map<String,Object> queryAll(${className}QueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(${className}QueryCriteria criteria, Pageable pageable);
 
     /**
     * 查询所有数据不分页

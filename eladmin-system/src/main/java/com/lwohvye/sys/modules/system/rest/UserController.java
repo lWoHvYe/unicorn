@@ -17,6 +17,7 @@ package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
+import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.config.RsaProperties;
 import com.lwohvye.exception.BadRequestException;
@@ -55,6 +56,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -74,7 +76,7 @@ public class UserController implements SysUserAPI {
     private final IRoleService roleService;
 
     @Operation(summary = "导出用户数据")
-    @GetMapping(value = "/download")
+    @GetMapping(value = "/api/sys/users/download")
     public void download(HttpServletResponse response, UserQueryCriteria criteria) throws IOException {
         userService.download(userService.queryAll(criteria), response);
     }
@@ -83,7 +85,7 @@ public class UserController implements SysUserAPI {
 
     @Operation(summary = "查询用户")
     @Override
-    public ResponseEntity<Object> query(UserQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(UserQueryCriteria criteria, Pageable pageable) {
         if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
             criteria.getDeptIds().add(criteria.getDeptId());
             // 先查找是否存在子节点
@@ -112,7 +114,7 @@ public class UserController implements SysUserAPI {
     @Log("新增用户")
     @Operation(summary = "新增用户")
     @Override
-    public ResponseEntity<Object> create(@Validated @RequestBody User resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody User resources) {
         checkLevel(resources);
         // 默认密码 123456
         resources.setPassword(passwordEncoder.encode("123456"));
@@ -123,7 +125,7 @@ public class UserController implements SysUserAPI {
     @Log("修改用户")
     @Operation(summary = "修改用户")
     @Override
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody User resources) throws Exception {
+    public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody User resources) throws Exception {
         checkLevel(resources);
         userService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
@@ -131,7 +133,7 @@ public class UserController implements SysUserAPI {
 
     @Operation(summary = "修改用户状态")
     @Override
-    public ResponseEntity<Object> updateStatus(@RequestBody UserBaseVo userVo) {
+    public ResponseEntity<ResultInfo<String>> updateStatus(@RequestBody UserBaseVo userVo) {
         userService.updateEnabled(userVo.getUsername(), userVo.getEnabled());
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -139,7 +141,7 @@ public class UserController implements SysUserAPI {
     @Log("修改用户：个人中心")
     @Operation(summary = "修改用户：个人中心")
     @Override
-    public ResponseEntity<Object> center(@Validated(Update.class) @RequestBody User resources) {
+    public ResponseEntity<ResultInfo<String>> center(@Validated(Update.class) @RequestBody User resources) {
         if (!resources.getId().equals(SecurityUtils.getCurrentUserId())) {
             throw new BadRequestException("不能修改他人资料");
         }
@@ -150,7 +152,7 @@ public class UserController implements SysUserAPI {
     @Log("删除用户")
     @Operation(summary = "删除用户")
     @Override
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         for (Long id : ids) {
             Integer currentLevel = roleService.findByUserId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
             Integer optLevel = roleService.findByUserId(id).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
@@ -164,7 +166,7 @@ public class UserController implements SysUserAPI {
 
     @Operation(summary = "修改密码")
     @Override
-    public ResponseEntity<Object> updatePass(@RequestBody UserPassVo passVo) throws Exception {
+    public ResponseEntity<ResultInfo<String>> updatePass(@RequestBody UserPassVo passVo) throws Exception {
         String oldPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getOldPass());
         String newPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getNewPass());
         var user = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
@@ -180,14 +182,14 @@ public class UserController implements SysUserAPI {
 
     @Operation(summary = "修改头像")
     @Override
-    public ResponseEntity<Object> updateAvatar(@RequestParam MultipartFile avatar) {
+    public ResponseEntity<Map<String,String>> updateAvatar(@RequestParam MultipartFile avatar) {
         return new ResponseEntity<>(userService.updateAvatar(avatar), HttpStatus.OK);
     }
 
     @Log("修改邮箱")
     @Operation(summary = "修改邮箱")
     @Override
-    public ResponseEntity<Object> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {
+    public ResponseEntity<ResultInfo<String>> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, user.getPassword());
         var userDto = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
         if (!passwordEncoder.matches(password, userDto.getPassword())) {
@@ -206,7 +208,7 @@ public class UserController implements SysUserAPI {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> queryByName(@PathVariable String username) {
+    public ResponseEntity<ResultInfo<UserInnerDto>> queryByName(@PathVariable String username) {
         return new ResponseEntity<>(ResultInfo.success(userService.findInnerUserByName(username)), HttpStatus.OK);
     }
 

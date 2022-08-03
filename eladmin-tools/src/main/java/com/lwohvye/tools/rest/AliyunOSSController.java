@@ -44,14 +44,14 @@ public class AliyunOSSController {
 
     @PostMapping
     @Operation(summary = "分片上传")
-    public ResponseEntity<Object> multipartUpload(MultipartFile file) {
+    public ResponseEntity<ResultInfo<String>> multipartUpload(MultipartFile file) {
         aliyunOSSService.multipartUploadFile(file);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 
     @GetMapping
     @Operation(summary = "断点续传下载")
-    public ResponseEntity<Object> downloadFile(String ossUri, String downloadPath) {
+    public ResponseEntity<ResultInfo<String>> downloadFile(String ossUri, String downloadPath) {
         aliyunOSSService.downloadFile(ossUri, downloadPath);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

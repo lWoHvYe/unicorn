@@ -16,11 +16,11 @@
 package com.lwohvye.generator.rest;
 
 import com.lwohvye.generator.domain.GenConfig;
+import com.lwohvye.generator.service.IGenConfigService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.generator.service.IGenConfigService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -40,13 +40,13 @@ public class GenConfigController {
 
     @Operation(summary = "查询")
     @GetMapping(value = "/{tableName}")
-    public ResponseEntity<Object> query(@PathVariable String tableName) {
+    public ResponseEntity<ResultInfo<GenConfig>> query(@PathVariable String tableName) {
         return new ResponseEntity<>(ResultInfo.success(genConfigService.find(tableName)), HttpStatus.OK);
     }
 
     @Operation(summary = "修改")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated @RequestBody GenConfig genConfig) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody GenConfig genConfig) {
         genConfigService.update(genConfig.getTableName(), genConfig);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

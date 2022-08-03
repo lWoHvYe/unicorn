@@ -53,21 +53,21 @@ public class DeptController implements SysDeptAPI {
     private static final String ENTITY_NAME = "dept";
 
     @Operation(summary = "导出部门数据")
-    @GetMapping(value = "/download")
+    @GetMapping(value = "/api/sys/dept/download")
     public void download(HttpServletResponse response, DeptQueryCriteria criteria) throws Exception {
         deptService.download(deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, false), response);
     }
 
     @Operation(summary = "查询部门")
     @Override
-    public ResponseEntity<Object> query(DeptQueryCriteria criteria) throws Exception {
+    public ResponseEntity<ResultInfo<Map<String,Object>>> query(DeptQueryCriteria criteria) throws Exception {
         List<DeptDto> deptDtos = deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, true);
         return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(deptDtos, deptDtos.size())), HttpStatus.OK);
     }
 
     @Operation(summary = "查询部门:根据ID获取同级与上级数据")
     @Override
-    public ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids) {
+    public ResponseEntity<ResultInfo<Map<String,Object>>> getSuperior(@RequestBody List<Long> ids) {
         Set<DeptDto> deptDtos = new LinkedHashSet<>();
         for (Long id : ids) {
             DeptDto deptDto = deptService.findById(id);
@@ -80,7 +80,7 @@ public class DeptController implements SysDeptAPI {
     @Log("新增部门")
     @Operation(summary = "新增部门")
     @Override
-    public ResponseEntity<Object> create(@Validated @RequestBody Dept resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Dept resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
@@ -91,7 +91,7 @@ public class DeptController implements SysDeptAPI {
     @Log("修改部门")
     @Operation(summary = "修改部门")
     @Override
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dept resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dept resources) {
         deptService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -99,7 +99,7 @@ public class DeptController implements SysDeptAPI {
     @Log("删除部门")
     @Operation(summary = "删除部门")
     @Override
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         Set<DeptDto> deptDtos = new HashSet<>();
         for (Long id : ids) {
             List<Dept> deptList = deptService.findByPid(id);
@@ -114,7 +114,7 @@ public class DeptController implements SysDeptAPI {
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Object> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId) {
+    public ResponseEntity<ResultInfo<Long>> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId) {
         return new ResponseEntity<>(ResultInfo.success(dataService.getDeptIds(userId, deptId)), HttpStatus.OK);
     }
 }

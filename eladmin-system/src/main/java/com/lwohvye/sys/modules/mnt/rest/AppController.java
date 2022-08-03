@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,14 +54,14 @@ public class AppController {
 
     @Operation(summary = "查询应用")
     @GetMapping
-    public ResponseEntity<Object> query(AppQueryCriteria criteria, Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(AppQueryCriteria criteria, Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(appService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Log("新增应用")
     @Operation(summary = "新增应用")
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody App resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody App resources) {
         appService.create(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
     }
@@ -68,7 +69,7 @@ public class AppController {
     @Log("修改应用")
     @Operation(summary = "修改应用")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated @RequestBody App resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody App resources) {
         appService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -76,7 +77,7 @@ public class AppController {
     @Log("删除应用")
     @Operation(summary = "删除应用")
     @DeleteMapping
-    public ResponseEntity<Object> delete(@RequestBody Set<Long> ids) {
+    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
         appService.delete(ids);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

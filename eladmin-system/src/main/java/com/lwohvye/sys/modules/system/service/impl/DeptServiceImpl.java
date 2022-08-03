@@ -225,7 +225,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     }
 
     @Override
-    public Object buildTree(List<DeptDto> deptDtos) {
+    public Map<String, Object> buildTree(List<DeptDto> deptDtos) {
         Set<DeptDto> trees = new LinkedHashSet<>();
         Set<DeptDto> depts = new LinkedHashSet<>();
         List<String> deptNames = deptDtos.stream().map(DeptDto::getName).toList();

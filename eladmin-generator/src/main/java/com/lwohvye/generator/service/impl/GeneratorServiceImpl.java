@@ -31,8 +31,6 @@ import com.lwohvye.utils.PageUtil;
 import com.lwohvye.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -60,7 +58,7 @@ public class GeneratorServiceImpl implements IGeneratorService {
     private final ColumnInfoRepository columnInfoRepository;
 
     @Override
-    public Object getTables() {
+    public List getTables() {
         // 使用预编译防止sql注入
         String sql = "select table_name ,create_time , engine, table_collation, table_comment from information_schema.tables " +
                 "where table_schema = (select database()) " +
@@ -70,7 +68,7 @@ public class GeneratorServiceImpl implements IGeneratorService {
     }
 
     @Override
-    public Object getTables(String name, int[] startEnd) {
+    public Map<String, Object> getTables(String name, int[] startEnd) {
         // 使用预编译防止sql注入
         String sql = "select table_name ,create_time , engine, table_collation, table_comment from information_schema.tables " +
                 "where table_schema = (select database()) " +
@@ -180,12 +178,12 @@ public class GeneratorServiceImpl implements IGeneratorService {
     }
 
     @Override
-    public ResponseEntity<Object> preview(GenConfig genConfig, List<ColumnInfo> columns) {
+    public List<Map<String, Object>> preview(GenConfig genConfig, List<ColumnInfo> columns) {
         if (genConfig.getId() == null) {
             throw new BadRequestException("请先配置生成器");
         }
         List<Map<String, Object>> genList = GenUtil.preview(columns, genConfig);
-        return new ResponseEntity<>(genList, HttpStatus.OK);
+        return genList;
     }
 
     @Override

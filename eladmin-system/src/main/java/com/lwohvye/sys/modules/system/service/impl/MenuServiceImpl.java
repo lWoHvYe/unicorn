@@ -391,7 +391,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @Override
     @Cacheable(key = " target.getSysName() + 'menu4user:' + #p0")
     @Transactional(rollbackFor = Exception.class)
-    public Object buildWebMenus(Long uid) {
+    public List<MenuVo> buildWebMenus(Long uid) {
         CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
                 .thenApply(this::buildTree)
                 .thenApply(this::buildMenus);

@@ -15,14 +15,19 @@
  */
 package com.lwohvye.api.modules.system.api;
 
+import cn.hutool.core.lang.Dict;
+import com.lwohvye.api.modules.system.service.dto.RoleDto;
+import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,29 +38,29 @@ import java.util.Set;
 public interface SysRoleAPI {
 
     @GetMapping("/api/sys/roles/{id}")
-    ResponseEntity<Object> query(@PathVariable Long id);
+    ResponseEntity<ResultInfo<RoleDto>> query(@PathVariable Long id);
 
     @GetMapping("/api/sys/roles/all")
-    ResponseEntity<Object> query();
+    ResponseEntity<ResultInfo<RoleDto>> query();
 
     @GetMapping("/api/sys/roles")
-    ResponseEntity<Object> query(RoleQueryCriteria criteria, Pageable pageable);
+    ResponseEntity<ResultInfo<Map<String, Object>>> query(RoleQueryCriteria criteria, Pageable pageable);
 
     @GetMapping("/api/sys/roles/level")
-    ResponseEntity<Object> getLevel();
+    ResponseEntity<ResultInfo<Dict>> getLevel();
 
     @PostMapping("/api/sys/roles")
-    ResponseEntity<Object> create(@Validated @RequestBody Role resources);
+    ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Role resources);
 
     @PutMapping("/api/sys/roles")
-    ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Role resources);
+    ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Role resources);
 
     @PutMapping("/api/sys/roles/menu")
-    ResponseEntity<Object> updateMenu(@RequestBody Role resources);
+    ResponseEntity<ResultInfo<String>> updateMenu(@RequestBody Role resources);
 
     @DeleteMapping("/api/sys/roles")
-    ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
+    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
 
     @GetMapping("/api/sys/roles/uid/{userId}")
-    ResponseEntity<Object> queryByUid(@PathVariable Long userId);
+    ResponseEntity<ResultInfo<RoleSmallDto>> queryByUid(@PathVariable Long userId);
 }

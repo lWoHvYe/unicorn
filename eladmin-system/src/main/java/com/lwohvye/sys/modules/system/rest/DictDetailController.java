@@ -53,14 +53,14 @@ public class DictDetailController {
 
     @Operation(summary = "查询字典详情")
     @GetMapping
-    public ResponseEntity<Object> query(DictDetailQueryCriteria criteria,
-                                        @PageableDefault(sort = {"dictSort"}, direction = Sort.Direction.ASC) Pageable pageable) {
+    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DictDetailQueryCriteria criteria,
+                                                                 @PageableDefault(sort = {"dictSort"}, direction = Sort.Direction.ASC) Pageable pageable) {
         return new ResponseEntity<>(ResultInfo.success(dictDetailService.queryAll(criteria, pageable)), HttpStatus.OK);
     }
 
     @Operation(summary = "查询多个字典详情")
     @GetMapping(value = "/map")
-    public ResponseEntity<Object> getDictDetailMaps(@RequestParam String dictName) {
+    public ResponseEntity<ResultInfo<Map<String, List<DictDetailDto>>>> getDictDetailMaps(@RequestParam String dictName) {
         String[] names = dictName.split("[,，]");
         Map<String, List<DictDetailDto>> dictMap = new HashMap<>(16);
         for (String name : names) {
@@ -72,7 +72,7 @@ public class DictDetailController {
     @Log("新增字典详情")
     @Operation(summary = "新增字典详情")
     @PostMapping
-    public ResponseEntity<Object> create(@Validated @RequestBody DictDetail resources) {
+    public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody DictDetail resources) {
         if (resources.getId() != null) {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
@@ -83,7 +83,7 @@ public class DictDetailController {
     @Log("修改字典详情")
     @Operation(summary = "修改字典详情")
     @PutMapping
-    public ResponseEntity<Object> update(@Validated(Update.class) @RequestBody DictDetail resources) {
+    public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody DictDetail resources) {
         dictDetailService.update(resources);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
     }
@@ -91,7 +91,7 @@ public class DictDetailController {
     @Log("删除字典详情")
     @Operation(summary = "删除字典详情")
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Object> delete(@PathVariable Long id) {
+    public ResponseEntity<ResultInfo<String>> delete(@PathVariable Long id) {
         dictDetailService.delete(id);
         return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
     }

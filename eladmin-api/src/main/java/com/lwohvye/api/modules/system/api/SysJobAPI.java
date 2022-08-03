@@ -18,11 +18,13 @@ package com.lwohvye.api.modules.system.api;
 import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.Job;
 import com.lwohvye.api.modules.system.service.dto.JobQueryCriteria;
+import com.lwohvye.utils.result.ResultInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -33,15 +35,15 @@ import java.util.Set;
 public interface SysJobAPI {
 
     @GetMapping("/api/sys/job")
-    ResponseEntity<Object> query(JobQueryCriteria criteria, Pageable pageable);
+    ResponseEntity<ResultInfo<Map<String, Object>>> query(JobQueryCriteria criteria, Pageable pageable);
 
     @PostMapping("/api/sys/job")
-    ResponseEntity<Object> create(@Validated @RequestBody Job resources);
+    ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Job resources);
 
     @PutMapping("/api/sys/job")
-    ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Job resources);
+    ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Job resources);
 
     @DeleteMapping("/api/sys/job")
-    ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
+    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
 
 }
