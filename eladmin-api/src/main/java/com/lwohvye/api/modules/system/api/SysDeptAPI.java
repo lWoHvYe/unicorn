@@ -30,24 +30,23 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
-@RequestMapping("/api/sys/dept")
 public interface SysDeptAPI {
 
-    @GetMapping
+    @GetMapping("/api/sys/dept")
     ResponseEntity<Object> query(DeptQueryCriteria criteria) throws Exception;
 
-    @PostMapping("/superior")
+    @PostMapping("/api/sys/dept/superior")
     ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids);
 
-    @PostMapping
+    @PostMapping("/api/sys/dept")
     ResponseEntity<Object> create(@Validated @RequestBody Dept resources);
 
-    @PutMapping
+    @PutMapping("/api/sys/dept")
     ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Dept resources);
 
-    @DeleteMapping
+    @DeleteMapping("/api/sys/dept")
     ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
 
-    @GetMapping("/enabled/{userId}/{deptId}")
+    @GetMapping("/api/sys/dept/enabled/{userId}/{deptId}")
     ResponseEntity<Object> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
 }

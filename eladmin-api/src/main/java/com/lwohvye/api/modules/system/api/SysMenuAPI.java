@@ -30,31 +30,30 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
-@RequestMapping("/api/sys/menus")
 public interface SysMenuAPI {
 
-    @GetMapping(value = "/build")
+    @GetMapping("/api/sys/menus/build")
     ResponseEntity<Object> buildMenus();
 
-    @GetMapping(value = "/lazy")
+    @GetMapping("/api/sys/menus/lazy")
     ResponseEntity<Object> query(@RequestParam Long pid);
 
-    @GetMapping(value = "/child")
+    @GetMapping("/api/sys/menus/child")
     ResponseEntity<Object> child(@RequestParam Long id);
 
-    @GetMapping
+    @GetMapping("/api/sys/menus")
     ResponseEntity<Object> query(MenuQueryCriteria criteria) throws Exception;
 
-    @PostMapping("/superior")
+    @PostMapping("/api/sys/menus/superior")
     ResponseEntity<Object> getSuperior(@RequestBody List<Long> ids);
 
-    @PostMapping
+    @PostMapping("/api/sys/menus")
     ResponseEntity<Object> create(@Validated @RequestBody Menu resources);
 
-    @PutMapping
+    @PutMapping("/api/sys/menus")
     ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Menu resources);
 
-    @DeleteMapping
+    @DeleteMapping("/api/sys/menus")
     ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
 
 }

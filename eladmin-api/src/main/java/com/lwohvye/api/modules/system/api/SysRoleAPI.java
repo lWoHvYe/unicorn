@@ -30,33 +30,32 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
-@RequestMapping("/api/sys/roles")
 public interface SysRoleAPI {
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/api/sys/roles/{id}")
     ResponseEntity<Object> query(@PathVariable Long id);
 
-    @GetMapping(value = "/all")
+    @GetMapping("/api/sys/roles/all")
     ResponseEntity<Object> query();
 
-    @GetMapping
+    @GetMapping("/api/sys/roles")
     ResponseEntity<Object> query(RoleQueryCriteria criteria, Pageable pageable);
 
-    @GetMapping(value = "/level")
+    @GetMapping("/api/sys/roles/level")
     ResponseEntity<Object> getLevel();
 
-    @PostMapping
+    @PostMapping("/api/sys/roles")
     ResponseEntity<Object> create(@Validated @RequestBody Role resources);
 
-    @PutMapping
+    @PutMapping("/api/sys/roles")
     ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Role resources);
 
-    @PutMapping(value = "/menu")
+    @PutMapping("/api/sys/roles/menu")
     ResponseEntity<Object> updateMenu(@RequestBody Role resources);
 
-    @DeleteMapping
+    @DeleteMapping("/api/sys/roles")
     ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
 
-    @GetMapping("/uid/{userId}")
+    @GetMapping("/api/sys/roles/uid/{userId}")
     ResponseEntity<Object> queryByUid(@PathVariable Long userId);
 }

@@ -27,22 +27,21 @@ import org.springframework.web.bind.annotation.*;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
-@RequestMapping("/api/sys/resources")
 public interface SysResourceAPI {
 
 
-    @GetMapping
+    @GetMapping("/api/sys/resources")
     ResponseEntity<Object> query(ResourceQueryCriteria criteria, Pageable pageable);
 
-    @PostMapping
+    @PostMapping("/api/sys/resources")
     ResponseEntity<Object> create(@Validated @RequestBody Resource resources);
 
-    @PutMapping
+    @PutMapping("/api/sys/resources")
     ResponseEntity<Object> update(@Validated @RequestBody Resource resources);
 
-    @DeleteMapping
+    @DeleteMapping("/api/sys/resources")
     ResponseEntity<Object> delete(@RequestBody Long[] ids);
 
-    @GetMapping("/queryAllRes")
+    @GetMapping("/api/sys/resources/queryAllRes")
     ResponseEntity<Object> queryAllRes();
 }

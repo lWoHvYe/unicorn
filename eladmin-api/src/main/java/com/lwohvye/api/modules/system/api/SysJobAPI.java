@@ -30,19 +30,18 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
-@RequestMapping("/api/sys/job")
 public interface SysJobAPI {
 
-    @GetMapping
+    @GetMapping("/api/sys/job")
     ResponseEntity<Object> query(JobQueryCriteria criteria, Pageable pageable);
 
-    @PostMapping
+    @PostMapping("/api/sys/job")
     ResponseEntity<Object> create(@Validated @RequestBody Job resources);
 
-    @PutMapping
+    @PutMapping("/api/sys/job")
     ResponseEntity<Object> update(@Validated(Update.class) @RequestBody Job resources);
 
-    @DeleteMapping
+    @DeleteMapping("/api/sys/job")
     ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
 
 }

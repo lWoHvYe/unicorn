@@ -33,36 +33,35 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
-@RequestMapping("/api/sys/users")
 public interface SysUserAPI {
 
-    @GetMapping
+    @GetMapping("/api/sys/users")
     ResponseEntity<Object> query(UserQueryCriteria criteria, Pageable pageable);
 
-    @PostMapping
+    @PostMapping("/api/sys/users")
     ResponseEntity<Object> create(@Validated @RequestBody User resources);
 
-    @PutMapping
+    @PutMapping("/api/sys/users")
     ResponseEntity<Object> update(@Validated(Update.class) @RequestBody User resources) throws Exception;
 
-    @PostMapping("/updateStatus")
+    @PostMapping("/api/sys/users/updateStatus")
     ResponseEntity<Object> updateStatus(@RequestBody UserBaseVo userVo);
 
-    @PutMapping(value = "center")
+    @PutMapping("/api/sys/users/center")
     ResponseEntity<Object> center(@Validated(Update.class) @RequestBody User resources);
 
-    @DeleteMapping
+    @DeleteMapping("/api/sys/users")
     ResponseEntity<Object> delete(@RequestBody Set<Long> ids);
 
-    @PostMapping(value = "/updatePass")
+    @PostMapping("/api/sys/users/updatePass")
     ResponseEntity<Object> updatePass(@RequestBody UserPassVo passVo) throws Exception;
 
-    @PostMapping(value = "/updateAvatar")
+    @PostMapping("/api/sys/users/updateAvatar")
     ResponseEntity<Object> updateAvatar(@RequestParam MultipartFile avatar);
 
-    @PostMapping(value = "/updateEmail/{code}")
+    @PostMapping("/api/sys/users/updateEmail/{code}")
     ResponseEntity<Object> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception;
 
-    @GetMapping("/name/{username}")
+    @GetMapping("/api/sys/users/name/{username}")
     ResponseEntity<Object> queryByName(@PathVariable String username);
 }
