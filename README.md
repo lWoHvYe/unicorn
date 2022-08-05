@@ -15,7 +15,7 @@
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
 
 启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
-详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。
+详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。 You can find the minimum to run in [Valentine's Day](valentine-starter).
 ~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
 删除，以非module化运行，模块化打包部署暂未找到支持外置配置及依赖的方式~~，模块化package已完成，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
 

@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>valentine-starter</artifactId>
+    <name>Valentine P2P</name>
+
+    <properties>
+        <java.version>18</java.version>
+        <project.core.version>3.1.0-SNAPSHOT</project.core.version>
+        <maven.compiler.release>18</maven.compiler.release>
+        <lombok.version>1.18.24</lombok.version>
+        <mapstruct.version>1.5.2.Final</mapstruct.version>
+        <druid.version>1.2.11</druid.version>
+        <kotlin.version>1.7.10</kotlin.version>
+    </properties>
+
+    <dependencies>
+        <!--    下面四个模块视需要引入    -->
+        <!--    system模块    -->
+        <dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-system</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>
+        <!--   logging模块     -->
+        <dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-logging</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>
+        <!--   tools模块     -->
+        <!--<dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-tools</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>-->
+        <!-- 代码生成模块 -->
+        <!--<dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>eladmin-generator</artifactId>
+            <version>${project.core.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--lombok插件-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!--mapStruct依赖-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-jdk9</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- 本地开发环境 -->
+            <id>dev</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 生产环境 -->
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+                <modifier>-prod</modifier>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>       <!-- 默认的，不加参数时执行这个profile -->
+            </activation>
+        </profile>
+        <!--    未来的Jigsaw. profile中可以配置dependency, build/plugin这些，这是之前不知道的,但这个dependency不能影响正常的run，因为只在build/package时会使用的样子    -->
+        <profile>
+            <id>jigsaw</id>
+            <properties>
+                <profiles.active>jigsaw</profiles.active>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-configuration-processor</artifactId>
+                                </exclude>
+                            </excludes>
+                            <includes>
+                                <!-- 不存在的include引用，相当于排除所有maven依赖jar，没有任何三方jar文件打入输出jar -->
+                                <include>
+                                    <groupId>nothing</groupId>
+                                    <artifactId>nothing</artifactId>
+                                </include>
+                            </includes>
+                            <layout>ZIP</layout>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>repackage</id>
+                                <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
+                                <!--<configuration>
+                                    <classifier>exec</classifier>
+                                </configuration>-->
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--maven-jar-plugin:   jar: Package config missing from ModulePackages class file attribute;  Could not create modular JAR file. The JDK jar tool exited with 1-->
+                    <!-- jar包内剔除所有配置文件 -->
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <!--   https://maven.apache.org/plugins/maven-jar-plugin/usage.html   -->
+                            <!--   https://maven.apache.org/shared/maven-archiver/examples/classpath.html   -->
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                </manifest>
+                            </archive>
+                            <!--不打入jar包的文件类型或者路径-->
+                            <!--<excludes>-->
+                            <!--    <exclude>config/**</exclude>-->
+                            <!--</excludes>-->
+                        </configuration>
+                    </plugin>
+                    <!-- 拷贝项目所有依赖jar文件到构建lib目录下 -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                    <excludeTransitive>false</excludeTransitive>
+                                    <stripVersion>false</stripVersion>
+                                    <silent>true</silent>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <!-- 打包 -->
+    <build>
+        <plugins>
+            <!-- Spring Boot模块jar构建 https://docs.spring.io/spring-boot/docs/current/maven-plugin/reference/htmlsingle/#packaging.examples.custom-classifier -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
+                        <!--<configuration>
+                            <classifier>exec</classifier>
+                        </configuration>-->
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 跳过单元测试 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <!-- 复制指定配置文件到指定目录 -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/config</directory>
+                                    <includes>
+                                        <include>application.yml</include>
+                                        <include>application-${profiles.active}.yml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${project.build.directory}/config</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <source>src/main/java</source>
+                                <source>target/generated-sources/annotations</source>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>${maven.compiler.release}</jvmTarget>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- 这里主要为lombok和mapstruct的配置。 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <!--for lombok annotations to resolve-->
+                    <!--contradictory to maven, intelliJ fails with this-->
+                    <annotationProcessorPaths>
+                        <!--4lombok-->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <!-- Support for Java 16
+                            https://github.com/rzwitserloot/lombok/issues/2681#
+                            -->
+                            <version>${lombok.version}</version>
+                        </path>
+                        <!--4mapstruct-->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
