@@ -15,9 +15,9 @@
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
 
 启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
-详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。~~
-注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
-删除，以非module化运行。~~，~~模块化打包部署暂未找到支持外置配置及依赖的方式~~，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
+详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。
+~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
+删除，以非module化运行，模块化打包部署暂未找到支持外置配置及依赖的方式~~，模块化package已完成，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS/Jigsaw）。
@@ -105,7 +105,6 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持数据字典，可方便地对一些状态进行管理
 - 高效率开发，代码生成器可一键生成前后端代码
-- 支持接口限流，避免恶意请求导致服务层压力过大
 - 支持接口级别的功能权限与数据权限，可自定义操作
 - 自定义权限注解与匿名接口注解，可快速对接口拦截与放行
 - 对一些常用前端组件封装：表格数据请求、数据字典等
@@ -115,7 +114,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
-- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入common模块即可，权限、日志、3rd Tools模块可插拔可独立部署
+- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入common模块即可，权限、日志、3rd Tools模块可插拔可独立部署，除了传统To B业务，还可用于To C业务
 
 #### 系统功能
 
@@ -130,10 +129,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 定时任务：整合Quartz做定时任务，加入任务日志，任务运行情况一目了然
 - 代码生成：高灵活度生成前后端代码，减少大量重复的工作任务
 - 邮件工具：配合富文本，发送html格式的邮件
-- 阿里云OSS：可实现基础的上传及下载功能
-- 阿里短信通道SMS：可实现基础的发送短信功能
 - 服务监控：监控服务器的负载情况
-- 运维管理：一键部署你的应用
 
 #### 项目结构
 
@@ -141,7 +137,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - `eladmin-common` 系统的公共模块，各种工具类，公共配置存在该模块
 
-- `eladmin-api` 基础实体及API，方便后续服务拆分
+- `eladmin-api` Sys Module基础实体及API，方便后续服务拆分
 
 - `eladmin-system` 系统核心模块，包含管理侧权限配置等。
 
@@ -219,4 +215,4 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的
   refreshToken
-- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚有些问题未搞清）
+- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，推测是Spring Boot的 ClassLoader不支持Jigsaw）
