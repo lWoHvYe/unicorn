@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.sys.modules.system.service;
+package com.lwohvye.api.modules.system.service;
 
 import com.lwohvye.base.BaseService;
 import com.lwohvye.api.modules.system.domain.Dept;
@@ -78,7 +78,7 @@ public interface IRoleService extends BaseService {
      * @param id 用户ID
      * @return /
      */
-    List<RoleSmallDto> findByUserId(Long id);
+    List<RoleSmallDto> findByUserId(Long userId);
 
     /**
      * 根据角色查询角色级别

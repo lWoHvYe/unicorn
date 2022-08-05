@@ -17,7 +17,7 @@ package com.lwohvye.sys.modules.security.service;
 
 import com.lwohvye.sys.modules.security.config.bean.LoginProperties;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.sys.modules.system.service.IDataService;
+import com.lwohvye.api.modules.system.service.IDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;

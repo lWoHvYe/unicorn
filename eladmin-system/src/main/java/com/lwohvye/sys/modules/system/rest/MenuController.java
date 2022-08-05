@@ -23,7 +23,7 @@ import com.lwohvye.context.CycleAvoidingMappingContext;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysMenuAPI;
 import com.lwohvye.api.modules.system.domain.Menu;
-import com.lwohvye.sys.modules.system.service.IMenuService;
+import com.lwohvye.api.modules.system.service.IMenuService;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.sys.modules.system.service.mapstruct.MenuMapper;

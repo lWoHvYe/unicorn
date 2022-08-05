@@ -32,7 +32,7 @@ import com.lwohvye.sys.modules.system.event.MenuEvent;
 import com.lwohvye.sys.modules.system.event.RoleEvent;
 import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.repository.UserRepository;
-import com.lwohvye.sys.modules.system.service.IUserService;
+import com.lwohvye.api.modules.system.service.IUserService;
 import com.lwohvye.utils.*;
 import com.lwohvye.utils.redis.RedisUtils;
 import io.jsonwebtoken.lang.Assert;

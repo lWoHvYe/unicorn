@@ -17,7 +17,7 @@ package com.lwohvye.sys.modules.system.strategy;
 
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.sys.modules.system.enums.UserTypeEnum;
-import com.lwohvye.sys.modules.system.service.IRoleService;
+import com.lwohvye.api.modules.system.service.IRoleService;
 import com.lwohvye.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
