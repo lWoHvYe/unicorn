@@ -1,4 +1,4 @@
-<h1 style="text-align: center">EL-ADMIN</h1>
+<h1 style="text-align: center">Unicorn</h1>
 <div style="text-align: center">
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/lWoHvYe/eladmin/blob/main/LICENSE)
@@ -14,9 +14,9 @@
 ---
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
 
-启动类 [AppRun.java](eladmin-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](eladmin-starter/src/main/resources)
-详见 [eladmin-starter](eladmin-starter) 模块。[启停脚本](script)。 You can find the minimum to run in [Valentine's Day](valentine-starter).
-~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](eladmin-starter/src/main/java/module-info.java)
+启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](unicorn-starter/src/main/resources)
+详见 [unicorn-starter](unicorn-starter) 模块。[启停脚本](script)。 You can find the minimum to run in [Valentine's Day](valentine-starter).
+~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](unicorn-starter/src/main/java/module-info.java)
 删除，以非module化运行，模块化打包部署暂未找到支持外置配置及依赖的方式~~，模块化package已完成，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
@@ -29,19 +29,19 @@ System.out（有一个箭头的表示以覆盖的方式重定向，而有两个�
 表示将标准错误输出转换为标准输出）。
 
 ```shell
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar eladmin-starter-3.0.0.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar unicorn-starter-3.0.0.jar >nohup.out 2>&1 &
 ```
 
 若外置依赖启动参数需添加，``-Dloader.path=lib``引入依赖。外置依赖可以大大减少jar包的体积。方便后续更新部署
 
 ```shell
 #2.x版本启动示例
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.2.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
 ```
 
 ```shell
 #3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
-nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-3.0.3.jar >nohup.out 2>&1 &
+nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar unicorn-starter-3.0.3.jar >nohup.out 2>&1 &
 ```
 
 | key                | 目的                                                         |
@@ -135,26 +135,26 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `eladmin-common` 系统的公共模块，各种工具类，公共配置存在该模块
+- `unicorn-common` 系统的公共模块，各种工具类，公共配置存在该模块
 
-- `eladmin-api` Sys Module基础实体及API，方便后续服务拆分
+- `unicorn-sys-api` Sys Module基础实体及API，方便后续服务拆分
 
-- `eladmin-system` 系统核心模块，包含管理侧权限配置等。
+- `unicorn-system` 系统核心模块，包含管理侧权限配置等。
 
-- `eladmin-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
+- `unicorn-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
-- `eladmin-tools` 第三方工具模块，包含：邮件、OSS、SMS、本地存储，可视情况引入
+- `unicorn-tp-tools` 第三方工具模块，包含：邮件、OSS、SMS、本地存储，可视情况引入
 
-- `eladmin-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
+- `unicorn-cd-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
 
-- `eladmin-starter` 启动类,项目入口，包含模块及组件配置，枚举类动态扩展的简单demo
+- `unicorn-starter` 启动类,项目入口，包含模块及组件配置，枚举类动态扩展的简单demo
 
-- `eladmin-search` 通过mongodb进行最基础的检索，整合elasticsearch，SPI相关demo
+- `valentine-search` 通过mongodb进行最基础的检索，整合elasticsearch，SPI相关demo
 
 #### 详细结构
 
 ```
-- eladmin-common 公共模块
+- unicorn-common 公共模块
     - annotation 为系统自定义注解
     - aspect 自定义注解的切面
     - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper
@@ -162,11 +162,11 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
         - security 权限控制，为swarm化，提供全局关闭Security功能
     - exception 项目统一异常的处理
     - utils 系统通用工具类
-- eladmin-api 基础实体及DTO
+- unicorn-sys-api 基础实体及DTO
     - annotation 为模块自定义注解
     - modules 基础实体及接口定义
     - utils 通用工具类扩展
-- eladmin-system 系统核心模块
+- unicorn-system 系统核心模块
 	- config 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
 	    - common 基础等各类配置
 	    - thread 线程池相关
@@ -175,10 +175,10 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 	    - rabbitmq 消息队列相关
 	    - security 权限控制
 	    - system 用户-权限管理
-- eladmin-starter 系统启动入口。相关示例
-- eladmin-logging 系统日志模块
-- eladmin-tools 系统第三方工具模块
-- eladmin-generator 系统代码生成模块
+- unicorn-starter 系统启动入口。相关示例
+- unicorn-logging 系统日志模块
+- unicorn-tp-tools 系统第三方工具模块
+- unicorn-cd-generator 系统代码生成模块
 ```
 
 #### 运行环境

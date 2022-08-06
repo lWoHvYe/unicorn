@@ -31,7 +31,7 @@
 
     <properties>
         <java.version>18</java.version>
-        <project.core.version>3.1.0-SNAPSHOT</project.core.version>
+        <project.core.version>3.2.0-SNAPSHOT</project.core.version>
         <maven.compiler.release>18</maven.compiler.release>
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
@@ -44,25 +44,25 @@
         <!--    system模块    -->
         <dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-system</artifactId>
+            <artifactId>unicorn-system</artifactId>
             <version>${project.core.version}</version>
         </dependency>
         <!--   logging模块     -->
         <dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-logging</artifactId>
+            <artifactId>unicorn-logging</artifactId>
             <version>${project.core.version}</version>
         </dependency>
         <!--   tools模块     -->
         <!--<dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-tools</artifactId>
+            <artifactId>unicorn-tp-tools</artifactId>
             <version>${project.core.version}</version>
         </dependency>-->
         <!-- 代码生成模块 -->
         <!--<dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>eladmin-generator</artifactId>
+            <artifactId>unicorn-cd-generator</artifactId>
             <version>${project.core.version}</version>
         </dependency>-->
         <dependency>

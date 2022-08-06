@@ -1,6 +1,6 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.valentine.starter {
-    requires lwohvye.eladmin.system;
+    requires lwohvye.unicorn.system;
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core.jvm;
 
