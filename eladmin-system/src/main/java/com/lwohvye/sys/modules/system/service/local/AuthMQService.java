@@ -19,7 +19,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.service.UserLocalCache;
-import com.lwohvye.api.modules.system.service.IUserService;
+import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.utils.json.JsonUtils;
 import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.utils.redis.RedisUtils;

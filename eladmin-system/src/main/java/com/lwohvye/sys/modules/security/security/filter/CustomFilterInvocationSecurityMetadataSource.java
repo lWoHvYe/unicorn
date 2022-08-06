@@ -18,7 +18,7 @@ package com.lwohvye.sys.modules.security.security.filter;
 import com.lwohvye.annotation.AnonymousAccess;
 import com.lwohvye.constant.SecurityConstant;
 import com.lwohvye.sys.modules.security.config.SpringSecurityConfig;
-import com.lwohvye.api.modules.system.service.IResourceService;
+import com.lwohvye.sys.modules.system.service.IResourceService;
 import com.lwohvye.utils.enums.RequestMethodEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;

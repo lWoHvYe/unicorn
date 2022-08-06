@@ -16,7 +16,7 @@
 
 package com.lwohvye.search.modules.mongodb.service.impl;
 
-import com.lwohvye.api.modules.system.service.IUserService;
+import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.search.modules.mongodb.domain.MongoDBUser;

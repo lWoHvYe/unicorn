@@ -28,7 +28,7 @@ import com.lwohvye.sys.modules.security.security.handler.CustomLogoutSuccessHand
 import com.lwohvye.sys.modules.security.security.handler.JwtAccessDeniedHandler;
 import com.lwohvye.sys.modules.security.security.handler.JwtAuthenticationEntryPoint;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.api.modules.system.service.IResourceService;
+import com.lwohvye.sys.modules.system.service.IResourceService;
 import com.lwohvye.utils.StringUtils;
 import com.lwohvye.utils.json.JsonUtils;
 import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;

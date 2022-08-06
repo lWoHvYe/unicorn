@@ -20,7 +20,7 @@ import com.lwohvye.api.modules.system.api.SysResourceAPI;
 import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.api.modules.system.service.dto.ResourceDto;
 import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
-import com.lwohvye.api.modules.system.service.IResourceService;
+import com.lwohvye.sys.modules.system.service.IResourceService;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

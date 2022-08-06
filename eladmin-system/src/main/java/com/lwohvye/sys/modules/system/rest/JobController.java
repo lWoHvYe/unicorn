@@ -20,7 +20,7 @@ import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysJobAPI;
 import com.lwohvye.api.modules.system.domain.Job;
-import com.lwohvye.api.modules.system.service.IJobService;
+import com.lwohvye.sys.modules.system.service.IJobService;
 import com.lwohvye.api.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;

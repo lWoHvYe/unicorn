@@ -21,7 +21,7 @@ import com.lwohvye.base.BaseEntity.Update;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysRoleAPI;
 import com.lwohvye.api.modules.system.domain.Role;
-import com.lwohvye.api.modules.system.service.IRoleService;
+import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;

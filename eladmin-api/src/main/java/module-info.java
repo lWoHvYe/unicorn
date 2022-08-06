@@ -12,7 +12,6 @@ module lwohvye.eladmin.api {
     exports com.lwohvye.api.modules.system.domain;
     exports com.lwohvye.api.modules.system.domain.vo;
     exports com.lwohvye.api.modules.system.domain.projection;
-    exports com.lwohvye.api.modules.system.service;
     exports com.lwohvye.api.modules.system.service.dto;
 
     opens com.lwohvye.api.modules.mnt.domain;
