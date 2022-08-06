@@ -208,8 +208,8 @@ public class SpringSecurityConfig {
             // UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
             // Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             // SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = tokenProvider.createToken(authentication);
-            final JwtUserDto jwtUserDto = (JwtUserDto) authentication.getPrincipal();
+            var token = tokenProvider.createToken(authentication);
+            final var jwtUserDto = (JwtUserDto) authentication.getPrincipal();
             // 用户登录成功后，写一条消息
             var authSuccessMsg = new AmqpMsgEntity().setMsgType("authSave").setMsgData(jwtUserDto.getUser().toString()).setExtraData("saveAuthorizeLog");
             rabbitMQProducerService.sendMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);

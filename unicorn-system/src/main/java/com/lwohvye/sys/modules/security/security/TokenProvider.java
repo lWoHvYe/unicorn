@@ -15,7 +15,6 @@
  */
 package com.lwohvye.sys.modules.security.security;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.sys.modules.mnt.websocket.MsgType;
 import com.lwohvye.sys.modules.mnt.websocket.SocketMsg;
@@ -23,8 +22,8 @@ import com.lwohvye.sys.modules.mnt.websocket.WebSocketServer;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.security.utils.SecuritySysUtil;
+import com.lwohvye.utils.DateUtil;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.DefaultClock;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +40,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -57,7 +57,6 @@ public class TokenProvider implements InitializingBean {
     private final RedissonClient redisson;
     private final UserDetailsService userDetailsService;
     public static final String AUTHORITIES_KEY = "user";
-    private static final Clock clock = DefaultClock.INSTANCE;
     private JwtParser jwtParser;
     private JwtBuilder jwtBuilder;
 
@@ -99,8 +98,8 @@ public class TokenProvider implements InitializingBean {
      * @return /
      */
     public String createToken(Authentication authentication) {
-        var curDate = clock.now();
-        final Date expirationDate = calculateExpirationDate(curDate);
+        var curDate = LocalDateTime.now();
+        final Date expirationDate = DateUtil.toDate(curDate.plusSeconds(properties.getTokenValidityInSeconds()));
         return jwtBuilder
                 // 加入ID确保生成的 Token 都不一致
                 .setId(IdUtil.simpleUUID())
@@ -114,21 +113,10 @@ public class TokenProvider implements InitializingBean {
                 // 所以请求携带的token中，比较主要的属性就是username。用户的具体信息，都是通过用户名称去方法中获取的。这样做使得在用户的角色权限等变更时，原token可继续使用，且权限已为最新的
                 .setSubject(authentication.getName())
                 // 设置颁发时间
-                .setIssuedAt(curDate)
+                .setIssuedAt(DateUtil.toDate(curDate))
                 // 设置过期时间，
                 .setExpiration(expirationDate)
                 .compact();
-    }
-
-    /**
-     * 计算过期时间
-     *
-     * @param createdDate /
-     * @return java.util.Date
-     * @date 2021/11/13 11:10 上午
-     */
-    private Date calculateExpirationDate(Date createdDate) {
-        return new Date(createdDate.getTime() + properties.getTokenValidityInSeconds());
     }
 
     /**
@@ -192,15 +180,15 @@ public class TokenProvider implements InitializingBean {
     // region ⏰即将过期
     // 先validate通过。若即将过期，进行一次通知
     public void noticeExpire5Token(String token) {
-        var curDate = clock.now();
+        var curDate = LocalDateTime.now();
         var claims = getClaims(token);
-        var expiration = claims.getExpiration();
-        if (expiration.getTime() - curDate.getTime() < properties.getDetect()) {
+        var expirationDate = DateUtil.toLocalDateTime(claims.getExpiration());
+        if (curDate.plusSeconds(properties.getDetect()).isAfter(expirationDate)) {
             // 已通知过，跳过
             var rMapCache = redisson.getMapCache(SecuritySysUtil.getExpireNoticeKey(properties));
             // RMapCache，可以对单key设置过期时间
             // 使用fastPutIfAbsent。当key不存在时，设置值。成功设置时返回true
-            var putResult = rMapCache.fastPutIfAbsent(token, DateUtil.now(), properties.getDetect(), TimeUnit.MILLISECONDS);
+            var putResult = rMapCache.fastPutIfAbsent(token, LocalDateTime.now().toString(), properties.getDetect(), TimeUnit.MILLISECONDS);
             if (Boolean.TRUE.equals(putResult)) {
                 try {
                     // 提醒

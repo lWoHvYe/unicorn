@@ -42,9 +42,9 @@ public class SecurityProperties {
     private String base64Secret;
 
     /**
-     * 令牌过期时间 此处单位/毫秒。默认2小时
+     * 令牌过期时间 此处单位/秒。默认2小时
      */
-    private Long tokenValidityInSeconds = 7200000L;
+    private Long tokenValidityInSeconds = 7200L;
 
     /**
      * 验证码 key
@@ -52,9 +52,9 @@ public class SecurityProperties {
     private String codeKey = "code-key-";
 
     /**
-     * token 失效前通知检查，单位/毫秒。默认15分钟
+     * token 失效前通知检查，单位/秒。默认15分钟
      */
-    private Long detect = 900000L;
+    private Long detect = 900L;
 
     // 登录即将过期通知，单系统只通知一次
     private String expireNoticeKey = "expire-notice-token-";

@@ -14,36 +14,35 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.config.security;
+package com.lwohvye.reactive.config.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Objects;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class SimpleAuthFilter extends OncePerRequestFilter {
+public class SimpleAuthFilter implements WebFilter {
 
-    private final UserDetailsService userDetailsService;
+    private final ReactiveUserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var username = request.getAttribute("gwuname"); // 可以在网关处把用户名放进来，这样后侧的服务可以做一些处理
-        if (Objects.nonNull(username) && username instanceof String str) {
-            var userDetails = userDetailsService.loadUserByUsername(str);
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        var request = exchange.getRequest();
+        var gwuNames = request.getHeaders().get("GWUName");
+        if (CollectionUtils.isEmpty(gwuNames)) return Mono.empty();
+        var username = gwuNames.get(0);
+        userDetailsService.findByUsername(username).subscribe(userDetails -> {
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        }
-        filterChain.doFilter(request, response);
+        }).dispose();
+        // 继续下一个过滤器链的调用
+        return chain.filter(exchange);
     }
 }

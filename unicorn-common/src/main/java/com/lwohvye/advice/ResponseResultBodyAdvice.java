@@ -19,6 +19,7 @@ import com.lwohvye.annotation.ResponseResultBody;
 import com.lwohvye.exception.BadRequestException;
 import com.lwohvye.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpHeaders;
@@ -43,6 +44,7 @@ import java.lang.annotation.Annotation;
  * @date 2021/11/10 12:42 下午
  */
 @Slf4j
+@ConditionalOnClass(name = "org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice")
 @RestControllerAdvice
 public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
 

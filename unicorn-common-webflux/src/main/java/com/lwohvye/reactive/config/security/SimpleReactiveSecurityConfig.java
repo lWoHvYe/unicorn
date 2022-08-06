@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.config.security;
+package com.lwohvye.reactive.config.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +23,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
 /**
  * Spring Security依赖上浮比较困难，保留一种对所有请求放行的方式，用于不需要权限认证的环境（比如前面已经有网关做这些了）
@@ -39,33 +39,28 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
-@EnableWebSecurity
+@EnableWebFluxSecurity
 @RequiredArgsConstructor
 @ConditionalOnExpression("${local.sys.unauth:false}") // 基于配置，是否对所有请求放行。默认关闭
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-public class SimpleSecurityConfig {
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+public class SimpleReactiveSecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final ReactiveUserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         // 密码加密方式
-        return new BCryptPasswordEncoder();
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
-    SecurityFilterChain filterChainSimple(HttpSecurity httpSecurity) throws Exception {
+    SecurityWebFilterChain filterChainSimple(ServerHttpSecurity httpSecurity) {
+        var customFilter = new SimpleAuthFilter(userDetailsService);
         return httpSecurity
                 .csrf().disable()
-                // 不创建会话
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                // 放行所有请求
-                .authorizeRequests().anyRequest().permitAll().and()
-                .apply(securityConfigurerAdapter()).and()
+                .authorizeExchange(exchanges -> exchanges
+                        .anyExchange().permitAll()
+                ).addFilterBefore(customFilter, SecurityWebFiltersOrder.FORM_LOGIN)
                 .build();
-    }
-
-    private SimpleAuthConfigurer securityConfigurerAdapter() {
-        return new SimpleAuthConfigurer(userDetailsService);
     }
 }

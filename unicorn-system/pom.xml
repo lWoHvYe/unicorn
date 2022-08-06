@@ -59,6 +59,17 @@
             </exclusions>
         </dependency>
 
+        <!-- Swagger UI 相关 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+        </dependency>
+        <!--    his dependency helps ignoring @AuthenticationPrincipal in case its used on REST Controllers    -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-security</artifactId>
+        </dependency>
+
         <!--Spring boot 测试-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

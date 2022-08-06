@@ -8,6 +8,7 @@ module lwohvye.unicorn.system {
     requires transitive java.scripting;
     requires transitive spring.context.support;
     requires transitive spring.expression;
+    requires transitive spring.webmvc;
     requires transitive spring.websocket;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
@@ -24,6 +25,7 @@ module lwohvye.unicorn.system {
     requires transitive jsch;
     requires transitive org.apache.commons.io;
     requires transitive quartz;
+
     // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
