@@ -44,6 +44,7 @@ public interface SysUserAPI {
     // 然后调用SpringMvcContract.processAnnotationOnMethod()内部又通过AnnotatedElementUtils获取包含父类方法的注解，但子类没有相关注解就走不进去，子类如果有又会覆盖父类，那考虑父类的目的是什么
 
     // FeignClient不支持get方式传递实体类。通过把参数前的@RequestBody替换成@SpringQueryMap可以解决这个问题，但只支持单个实体类参数
+    // 解决方案是引入 io.github.openfeign:feign-httpclient 并在配置中 feign.httpclient.enabled = true配置激活，之后即可配合@SpringQueryMap使用，且多个实体只需在第一个上添加。单个实体似乎是不用添加的
     @GetMapping("/api/sys/users")
     ResponseEntity<ResultInfo<Map<String, Object>>> query(UserQueryCriteria criteria, Pageable pageable);
 

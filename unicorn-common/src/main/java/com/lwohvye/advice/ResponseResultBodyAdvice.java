@@ -44,7 +44,8 @@ import java.lang.annotation.Annotation;
  * @date 2021/11/10 12:42 下午
  */
 @Slf4j
-@ConditionalOnClass(name = "org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice")
+// @ConditionalOnClass(name = "org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice") // 这种比较适合目标类在上层，无法直接引用的情况，毕竟类名有些长
+@ConditionalOnClass(ResponseBodyAdvice.class) // 这个跟上面那种是等价的，Conditional系列不会报ClassNotFound的Exception。
 @RestControllerAdvice
 public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
 

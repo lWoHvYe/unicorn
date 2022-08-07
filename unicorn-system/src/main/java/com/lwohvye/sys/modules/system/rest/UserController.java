@@ -182,7 +182,7 @@ public class UserController implements SysUserAPI {
 
     @Operation(summary = "修改头像")
     @Override
-    public ResponseEntity<Map<String,String>> updateAvatar(@RequestParam MultipartFile avatar) {
+    public ResponseEntity<Map<String, String>> updateAvatar(@RequestParam MultipartFile avatar) {
         return new ResponseEntity<>(userService.updateAvatar(avatar), HttpStatus.OK);
     }
 
