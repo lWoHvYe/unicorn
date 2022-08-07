@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public enum DataTypeEnum {
 
     /** mysql */
-    MYSQL("mysql", "mysql", "com.mysql.jdbc.Driver", "`", "`", "'", "'"),
+    MYSQL("mysql", "mysql", "com.mysql.cj.jdbc.Driver", "`", "`", "'", "'"),
 
     /** oracle */
     ORACLE("oracle", "oracle", "oracle.jdbc.driver.OracleDriver", "\"", "\"", "\"", "\""),

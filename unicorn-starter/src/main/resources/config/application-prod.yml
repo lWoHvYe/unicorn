@@ -1,54 +1,70 @@
 #配置数据源
 spring:
-  datasource:
-    druid:
-      db-type: com.alibaba.druid.pool.DruidDataSource
-      driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${DB_USER:root}
-      password: ${DB_PWD:root}
-      # 初始连接数
-      initial-size: 5
-      # 最小连接数
-      min-idle: 15
-      # 最大连接数
-      max-active: 30
-      # 获取连接超时时间
-      max-wait: 5000
-      # 连接有效性检测时间
-      time-between-eviction-runs-millis: 60000
-      # 连接在池中最小生存的时间
-      min-evictable-idle-time-millis: 300000
-      # 连接在池中最大生存的时间
-      max-evictable-idle-time-millis: 900000
-      # 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除
-      test-while-idle: true
-      # 指明是否在从池中取出连接前进行检验,如果检验失败, 则从池中去除连接并尝试取出另一个
-      test-on-borrow: false
-      # 是否在归还到池中前进行检验
-      test-on-return: false
-      # 检测连接是否有效
-      validation-query: select 1
-      # 配置监控统计
-      webStatFilter:
-        enabled: true
-      stat-view-servlet:
-        enabled: true
-        # 控制台管理用户名和密码
-        url-pattern: /druid/*
-        reset-enable: false
-        login-username: admin
-        login-password: 123456
-      filter:
-        stat:
-          enabled: true
-          # 记录慢SQL
-          log-slow-sql: true
-          slow-sql-millis: 1000
-          merge-sql: true
-        wall:
-          config:
-            multi-statement-allow: true
+  sharding-sphere:
+    datasource:
+      names: write-ds,read-ds-0,read-ds-1
+      #     主数据源
+      write-ds:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        jdbc-url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        username: ${DB_USER:root}
+        password: ${DB_PWD:root}
+        pool-name: WriteDBP
+
+      #     分数据源
+      read-ds-0:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        jdbc-url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        #        从库改用只读账号
+        username: ${DB_USER:reader}
+        password: ${DB_PWD:123456}
+        pool-name: ReadDBP_0
+      #     分数据源
+      read-ds-1:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        jdbc-url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3310}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+        #        从库改用只读账号
+        username: ${DB_USER:reader}
+        password: ${DB_PWD:123456}
+        pool-name: ReadDBP_1
+    #    主从配置
+    # shardingsphere 主从模型中，事务中的数据读写均用主库
+    # 读写分离参考：https://github.com/apache/shardingsphere/blob/master/examples/shardingsphere-jdbc-example/single-feature-example/readwrite-splitting-example/readwrite-splitting-spring-boot-jpa-example
+    # https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB
+    #    rules:
+    #      # 这里指定了规则，读写分离
+    #      readwrite-splitting:
+    #        data-sources:
+    #          # 这个readwrite_ds不要漏了。
+    #          # <data-source-name> (+): # 读写分离逻辑数据源名称
+    #          readwrite_ds:
+    #            write-data-source-name: write-ds #主库数据源名称
+    #            read-data-source-names:
+    #              # - <replica-data_source-name> (+) # 从库数据源名称
+    #              - read-ds-0
+    #              - read-ds-1
+    #            load-balancer-name: round_robin # 负载均衡算法名称
+    #        # 负载均衡算法配置
+    #        load-balancers:
+    #          # <load-balancer-name> (+): # 负载均衡算法名称
+    #          round_robin:
+    #            type: ROUND_ROBIN # 负载均衡算法类型
+    #          #  props: # 负载均衡算法属性配置
+
+    #    主从配置，5.x搞不定，先继续用4.1.1
+    masterSlave:
+      load-balance-algorithm-type: round_robin
+      name: ds_msr
+      master-data-source-name: write-ds
+      slave-data-source-names: read-ds-0,read-ds-1
+
+    props:
+      sql:
+        show：true
+  # 分库分表参考：https://shardingsphere.apache.org/document/5.0.0/cn/reference/api-change-history/shardingsphere-jdbc/yaml-configuration/#%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87
 
   # cache配置
   cache:
@@ -72,7 +88,7 @@ spring:
   ##### RabbitMQ ####
   rabbitmq:
     #    RabbitMQ集群，通过addresses配置，多个以逗号分隔(优先取addresses，然后再取host)
-    addresses: 10.211.55.140:5672
+    addresses: 10.211.55.140:5672,10.211.55.140:5674
     #    host: 10.211.55.140 # rabbitmq的连接地址
     #    port: 5672 # rabbitmq的连接端口号
     virtual-host: /eladmin # rabbitmq的虚拟host
@@ -103,63 +119,75 @@ spring:
       max-file-size: 20MB #限制单个文件大小
       max-request-size: 50MB #限制请求总量
 
-# 登录相关配置
-#login:
-#  # 登录缓存
-#  cache-enable: true
-#  #  是否限制单用户登录
-#  single-login: false
-#  #  验证码
-#  login-code:
-#    #  验证码类型配置 查看 LoginProperties 类
-#    code-type: arithmetic
-#    #  登录图形验证码有效时间/分钟
-#    expiration: 2
-#    #  验证码高度
-#    width: 111
-#    #  验证码宽度
-#    height: 36
-#    # 内容长度
-#    length: 2
-#    # 字体名称，为空则使用默认字体，如遇到线上乱码，设置其他字体即可
-#    font-name:
-#    # 字体大小
-#    font-size: 25
-
 #jwt
 jwt:
-#  header: Authorization
+  #  header: Authorization
   # 令牌前缀
-#  token-start-with: Bearer
+  #  token-start-with: Bearer
   # 必须使用最少88位的Base64对该令牌进行编码
   base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI=
   # 令牌过期时间 此处单位/秒 ，默认2小时，可在此网站生成 https://www.convertworld.com/zh-hans/time/milliseconds.html
-#  token-validity-in-seconds: 7200
-  # 在线用户key
-#  online-key: online-token-
-  # 验证码
-#  code-key: code-key-
-  # token 续期检查时间范围（默认30分钟，单位默认秒），在token即将过期的一段时间内用户操作了，则给用户的token续期
-#  detect: 1800
+  #  token-validity-in-seconds: 7200
 
-# IP 本地解析
-ip:
-  local-parsing: false
+# ===== SpringDoc配置 ===== #
+springdoc:
+  swagger-ui:
+    # 自定义的文档界面访问路径。默认访问路径是/swagger-ui.html
+    path: /swagger-ui.html
+
+    # 字符串类型，一共三个值来控制操作和标记的默认展开设置。它可以是“list”（仅展开标记）、“full”（展开标记和操作）或“none”（不展开任何内容）。
+    docExpansion: none
+
+    # 布尔值。控制“试用”请求的请求持续时间（毫秒）的显示。
+    displayRequestDuration: true
+
+    # 布尔值。控制供应商扩展（x-）字段和操作、参数和架构值的显示。
+    showExtensions: true
+
+    # 布尔值。控制参数的扩展名（pattern、maxLength、minLength、maximum、minminimum）字段和值的显示。
+    showCommonExtensions: true
+
+    # 布尔值。禁用swagger用户界面默认petstore url。（从v1.4.1开始提供）。
+    disable-swagger-default-url: true
+
+  api-docs:
+    # enabled the /v3/api-docs endpoint
+    enabled: true
+
+    # 自定义的文档api元数据访问路径。默认访问路径是/v3/api-docs
+    path: /v3/api-docs
+
+    # 布尔值。在@Schema（名称name、标题title和说明description，三个属性）上启用属性解析程序。
+    resolve-schema-properties: true
+
+  # 布尔值。实现OpenApi规范的打印。
+  writer-with-default-pretty-printer: true
+  #  https://springdoc.org/faq.html#how-can-i-map-pageable-spring-date-commons-object-to-correct-url-parameter-in-swagger-ui
+  #  当前未生效
+  model-converters:
+    pageable-converter:
+      enabled: true
+
+# ===== 自定义swagger配置 ===== #
+swagger:
+  application-name: ${spring.application.name}
+  application-version: 3.2.0
+  application-description: 1101100_1010111_1101111_1001000_1110110_1011001_1100101
+  try-host: http://localhost:${server.port}
 
 #是否允许生成代码，生产环境设置为false
 generator:
   enabled: false
 
-# ===== SpringDoc配置 ===== #
-springdoc:
-  api-docs:
-    # enabled the /v3/api-docs endpoint
-    enabled: false
-
 # 滑动验证码
 aj:
   captcha:
     cache-type: redis
+
+# IP 本地解析
+ip:
+  local-parsing: true
+
 
 # 文件存储路径
 file:
@@ -173,8 +201,9 @@ file:
     path: C:\eladmin\file\
     avatar: C:\eladmin\avatar\
   # 文件大小 /M
-  maxSize: 100
-  avatarMaxSize: 5
+#  maxSize: 100
+#  avatarMaxSize: 5
+
 
 # oss配置
 alibaba:

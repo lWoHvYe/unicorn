@@ -44,7 +44,7 @@
                         {
                         "project": "lwohvye-eladmin",
                         "level": "%level",
-                        "service": "eladmin-starter",
+                        "service": "unicorn-starter",
                         "pid": "${PID:-}",
                         "thread": "%thread",
                         "class": "%logger",

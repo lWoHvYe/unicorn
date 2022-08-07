@@ -15,7 +15,6 @@ module lwohvye.unicorn.system {
     requires transitive captcha;
     requires transitive com.fasterxml.jackson.datatype.jsr310;
     requires transitive com.github.oshi;
-    requires transitive druid;
     requires transitive easy.captcha;
     requires transitive ganymed.ssh2;
     requires transitive io.netty.common;
@@ -61,7 +60,6 @@ module lwohvye.unicorn.system {
     exports com.lwohvye.sys.modules.system.repository; // 这里先这样
 
     opens com.lwohvye.sys.config.common;
-    opens com.lwohvye.sys.config.datasource;
     opens com.lwohvye.sys.config.thread;
     opens com.lwohvye.sys.modules.mnt.repository to spring.core;
     opens com.lwohvye.sys.modules.mnt.rest to spring.core;

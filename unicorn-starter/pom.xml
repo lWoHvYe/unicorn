@@ -36,6 +36,7 @@
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <javassist.version>3.29.0-GA</javassist.version>
+        <hikaricp.version>5.0.1</hikaricp.version>
         <shardingsphere.version>4.1.1</shardingsphere.version>
         <kotlin.version>1.7.10</kotlin.version>
     </properties>
@@ -64,22 +65,6 @@
             <groupId>com.lwohvye</groupId>
             <artifactId>unicorn-cd-generator</artifactId>
             <version>${project.core.version}</version>
-        </dependency>
-        <!--分库分表中间件-->
-        <dependency>
-            <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
-            <version>${shardingsphere.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>error_prone_annotations</artifactId>
-                    <groupId>com.google.errorprone</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -155,20 +140,31 @@
                 <activeByDefault>true</activeByDefault>       <!-- 默认的，不加参数时执行这个profile -->
             </activation>
         </profile>
-        <profile>
-            <!-- 生产环境 -->
-            <id>prod</id>
-            <properties>
-                <profiles.active>prod</profiles.active>
-                <modifier>-prod</modifier>
-            </properties>
-        </profile>
         <!--    未来的Jigsaw. profile中可以配置dependency, build/plugin这些，这是之前不知道的,但这个dependency不能影响正常的run，因为只在build/package时会使用的样子    -->
         <profile>
             <id>jigsaw</id>
             <properties>
-                <profiles.active>jigsaw</profiles.active>
+                <profiles.active>prod</profiles.active>
+                <modifier>-prod</modifier>
             </properties>
+            <dependencies>
+                <!--分库分表中间件-->
+                <dependency>
+                    <groupId>org.apache.shardingsphere</groupId>
+                    <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
+                    <version>${shardingsphere.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <artifactId>guava</artifactId>
+                            <groupId>com.google.guava</groupId>
+                        </exclusion>
+                        <exclusion>
+                            <artifactId>error_prone_annotations</artifactId>
+                            <groupId>com.google.errorprone</groupId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -193,10 +189,6 @@
                         <executions>
                             <execution>
                                 <id>repackage</id>
-                                <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
-                                <!--<configuration>
-                                    <classifier>exec</classifier>
-                                </configuration>-->
                             </execution>
                         </executions>
                     </plugin>
