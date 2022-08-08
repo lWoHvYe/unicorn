@@ -16,10 +16,10 @@
 
 package com.lwohvye.search.modules.elasticsearch.rest;
 
-import com.lwohvye.annotation.rest.AnonymousGetMapping;
-import com.lwohvye.annotation.rest.AnonymousPatchMapping;
+import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
+import com.lwohvye.core.annotation.rest.AnonymousPatchMapping;
 import com.lwohvye.search.modules.elasticsearch.service.IEsUserService;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

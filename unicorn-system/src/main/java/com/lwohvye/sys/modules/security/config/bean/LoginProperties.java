@@ -18,8 +18,8 @@ package com.lwohvye.sys.modules.security.config.bean;
 import com.wf.captcha.*;
 import com.wf.captcha.base.Captcha;
 import lombok.Data;
-import com.lwohvye.exception.BadConfigurationException;
-import com.lwohvye.utils.StringUtils;
+import com.lwohvye.core.exception.BadConfigurationException;
+import com.lwohvye.core.utils.StringUtils;
 
 import java.awt.*;
 import java.util.Objects;

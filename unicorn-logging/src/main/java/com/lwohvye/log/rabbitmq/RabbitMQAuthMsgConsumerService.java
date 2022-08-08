@@ -17,9 +17,9 @@ package com.lwohvye.log.rabbitmq;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.log.service.local.AuthLogService;
-import com.lwohvye.utils.MailAdapter;
-import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.utils.rabbitmq.YRabbitAbstractConsumer;
+import com.lwohvye.core.utils.MailAdapter;
+import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;

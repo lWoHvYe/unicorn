@@ -15,14 +15,14 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
-import com.lwohvye.annotation.log.Log;
-import com.lwohvye.base.BaseEntity.Update;
-import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.base.BaseEntity.Update;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.domain.DictDetail;
 import com.lwohvye.sys.modules.system.service.IDictDetailService;
 import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.api.modules.system.service.dto.DictDetailQueryCriteria;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

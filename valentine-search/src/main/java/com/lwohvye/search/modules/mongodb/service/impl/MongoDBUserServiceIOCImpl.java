@@ -22,7 +22,7 @@ import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
 import com.lwohvye.search.modules.mongodb.domain.MongoDBUser;
 import com.lwohvye.search.modules.mongodb.repository.MongoDBUserRepository;
 import com.lwohvye.search.modules.mongodb.service.IMongoDBUserService;
-import com.lwohvye.utils.SpringContextHolder;
+import com.lwohvye.core.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -16,18 +16,18 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.annotation.log.Log;
-import com.lwohvye.base.BaseEntity.Update;
-import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.base.BaseEntity.Update;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysDeptAPI;
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.api.modules.system.service.dto.DeptDto;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
-import com.lwohvye.utils.PageUtil;
-import com.lwohvye.utils.SecurityUtils;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.SecurityUtils;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

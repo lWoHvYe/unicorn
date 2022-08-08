@@ -17,7 +17,7 @@ package com.lwohvye.generator.rest;
 
 import com.lwohvye.generator.domain.GenConfig;
 import com.lwohvye.generator.service.IGenConfigService;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

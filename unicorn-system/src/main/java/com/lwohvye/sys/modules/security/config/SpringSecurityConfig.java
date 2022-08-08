@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.config;
 
-import com.lwohvye.config.security.SimpleSecurityConfig;
+import com.lwohvye.core.config.security.SimpleSecurityConfig;
 import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
@@ -29,10 +29,10 @@ import com.lwohvye.sys.modules.security.security.handler.JwtAccessDeniedHandler;
 import com.lwohvye.sys.modules.security.security.handler.JwtAuthenticationEntryPoint;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IResourceService;
-import com.lwohvye.utils.StringUtils;
-import com.lwohvye.utils.json.JsonUtils;
-import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.utils.result.ResultUtil;
+import com.lwohvye.core.utils.StringUtils;
+import com.lwohvye.core.utils.json.JsonUtils;
+import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.core.utils.result.ResultUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

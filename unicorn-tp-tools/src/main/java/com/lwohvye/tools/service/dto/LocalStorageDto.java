@@ -15,7 +15,7 @@
  */
 package com.lwohvye.tools.service.dto;
 
-import com.lwohvye.base.BaseDTO;
+import com.lwohvye.core.base.BaseDTO;
 import lombok.Getter;
 import lombok.Setter;
 

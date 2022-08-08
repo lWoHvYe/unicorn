@@ -17,7 +17,7 @@ package com.lwohvye.api.modules.system.service.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.lwohvye.annotation.Query;
+import com.lwohvye.core.annotation.Query;
 import java.sql.Timestamp;
 import java.util.List;
 

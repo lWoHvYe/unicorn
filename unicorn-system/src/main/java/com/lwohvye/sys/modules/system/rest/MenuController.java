@@ -16,20 +16,20 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.annotation.log.Log;
+import com.lwohvye.core.annotation.log.Log;
 import com.lwohvye.api.modules.system.domain.vo.MenuVo;
-import com.lwohvye.base.BaseEntity.Update;
-import com.lwohvye.context.CycleAvoidingMappingContext;
-import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.core.base.BaseEntity.Update;
+import com.lwohvye.core.context.CycleAvoidingMappingContext;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysMenuAPI;
 import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.sys.modules.system.service.IMenuService;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.sys.modules.system.service.mapstruct.MenuMapper;
-import com.lwohvye.utils.PageUtil;
-import com.lwohvye.utils.SecurityUtils;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.SecurityUtils;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

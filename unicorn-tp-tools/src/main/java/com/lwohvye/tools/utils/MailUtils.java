@@ -17,8 +17,8 @@ package com.lwohvye.tools.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.tools.domain.vo.MailVo;
-import com.lwohvye.exception.BadRequestException;
-import com.lwohvye.utils.StringUtils;
+import com.lwohvye.core.exception.BadRequestException;
+import com.lwohvye.core.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;

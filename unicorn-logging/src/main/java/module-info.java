@@ -1,6 +1,6 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.unicorn.logging {
-    requires transitive lwohvye.unicorn.common;
+    requires transitive lwohvye.unicorn.core;
     requires transitive spring.rabbit;
 
     exports com.lwohvye.log.aspect to spring.beans, spring.aop;

@@ -17,7 +17,7 @@
 package com.lwohvye.sys.modules.security.service;
 
 import com.anji.captcha.service.CaptchaCacheService;
-import com.lwohvye.utils.redis.RedisUtils;
+import com.lwohvye.core.utils.redis.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

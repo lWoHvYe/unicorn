@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.quartz.utils;
 
-import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.quartz.domain.QuartzJob;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;

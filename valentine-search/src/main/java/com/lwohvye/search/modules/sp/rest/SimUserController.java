@@ -16,7 +16,7 @@
 
 package com.lwohvye.search.modules.sp.rest;
 
-import com.lwohvye.annotation.rest.AnonymousGetMapping;
+import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.search.modules.sp.domain.SimUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

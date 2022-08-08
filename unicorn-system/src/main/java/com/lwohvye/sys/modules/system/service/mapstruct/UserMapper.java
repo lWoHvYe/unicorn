@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.service.mapstruct;
 
-import com.lwohvye.base.BaseMapper;
+import com.lwohvye.core.base.BaseMapper;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.service.dto.UserDto;
 import org.mapstruct.Mapper;

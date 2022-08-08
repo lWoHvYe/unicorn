@@ -16,8 +16,6 @@
 package com.lwohvye.api.modules.system.service.dto;
 
 import lombok.Data;
-import java.util.List;
-import com.lwohvye.annotation.Query;
 
 /**
 * @website https://el-admin.vip

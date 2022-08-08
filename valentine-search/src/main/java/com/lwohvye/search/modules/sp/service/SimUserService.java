@@ -22,7 +22,7 @@ import com.blazebit.persistence.querydsl.JPQLNextExpressions;
 import com.lwohvye.search.modules.sp.repository.SimUserRepository;
 import com.lwohvye.search.modules.sp.service.dto.URMDto;
 import com.lwohvye.search.modules.util.DynamicDslOrderUtil;
-import com.lwohvye.utils.SpringContextHolder;
+import com.lwohvye.core.utils.SpringContextHolder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;

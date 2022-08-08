@@ -15,13 +15,13 @@
  */
 package com.lwohvye.sys.modules.quartz.rest;
 
-import com.lwohvye.annotation.log.Log;
-import com.lwohvye.base.BaseEntity.Update;
-import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.base.BaseEntity.Update;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.quartz.domain.QuartzJob;
 import com.lwohvye.sys.modules.quartz.service.IQuartzJobService;
 import com.lwohvye.api.modules.quartz.service.dto.JobQueryCriteria;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

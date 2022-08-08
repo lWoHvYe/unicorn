@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.utils;
 
-import com.lwohvye.config.LocalCoreConfig;
+import com.lwohvye.core.config.LocalCoreConfig;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
 import org.springframework.util.Assert;
 

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.security.handler;
 
-import com.lwohvye.utils.StringUtils;
+import com.lwohvye.core.utils.StringUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;

@@ -16,7 +16,7 @@
 package com.lwohvye.api.modules.system.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lwohvye.base.BaseDTO;
+import com.lwohvye.core.base.BaseDTO;
 import lombok.Getter;
 import lombok.Setter;
 

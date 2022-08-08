@@ -16,7 +16,7 @@
 
 package com.lwohvye.search.modules.mongodb.service;
 
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 
 /**
  * @author Hongyan Wang

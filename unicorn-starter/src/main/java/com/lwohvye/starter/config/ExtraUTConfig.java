@@ -17,7 +17,7 @@
 package com.lwohvye.starter.config;
 
 import com.lwohvye.sys.modules.system.enums.UserTypeEnum;
-import com.lwohvye.utils.DynamicEnumHelper;
+import com.lwohvye.core.utils.DynamicEnumHelper;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

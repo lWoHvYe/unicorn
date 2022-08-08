@@ -17,12 +17,12 @@ package com.lwohvye.sys.modules.security.rest;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.lwohvye.annotation.rest.AnonymousGetMapping;
+import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.sys.modules.security.config.bean.LoginCodeEnum;
 import com.lwohvye.sys.modules.security.config.bean.LoginProperties;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
-import com.lwohvye.utils.SecurityUtils;
-import com.lwohvye.utils.redis.RedisUtils;
+import com.lwohvye.core.utils.SecurityUtils;
+import com.lwohvye.core.utils.redis.RedisUtils;
 import com.wf.captcha.base.Captcha;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;

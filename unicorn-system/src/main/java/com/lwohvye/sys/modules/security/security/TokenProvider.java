@@ -22,7 +22,7 @@ import com.lwohvye.sys.modules.mnt.websocket.WebSocketServer;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.security.utils.SecuritySysUtil;
-import com.lwohvye.utils.DateUtil;
+import com.lwohvye.core.utils.DateUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

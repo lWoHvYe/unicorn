@@ -16,11 +16,11 @@
 package com.lwohvye.generator.rest;
 
 import com.lwohvye.generator.domain.ColumnInfo;
-import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.generator.service.IGenConfigService;
 import com.lwohvye.generator.service.IGeneratorService;
-import com.lwohvye.utils.PageUtil;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

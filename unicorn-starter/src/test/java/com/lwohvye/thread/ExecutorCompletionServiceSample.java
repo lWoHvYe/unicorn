@@ -16,7 +16,7 @@
 
 package com.lwohvye.thread;
 
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

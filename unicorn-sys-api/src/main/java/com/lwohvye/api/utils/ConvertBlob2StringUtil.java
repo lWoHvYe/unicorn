@@ -16,7 +16,7 @@
 package com.lwohvye.api.utils;
 
 import com.lwohvye.api.annotation.Blob2String;
-import com.lwohvye.utils.StringUtils;
+import com.lwohvye.core.utils.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**

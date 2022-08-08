@@ -15,8 +15,8 @@
  */
 package com.lwohvye
 
-import com.lwohvye.annotation.rest.AnonymousGetMapping
-import com.lwohvye.utils.SpringContextHolder
+import com.lwohvye.core.annotation.rest.AnonymousGetMapping
+import com.lwohvye.core.utils.SpringContextHolder
 import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication

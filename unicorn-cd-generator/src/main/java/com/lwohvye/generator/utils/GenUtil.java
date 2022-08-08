@@ -19,8 +19,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.*;
 import com.lwohvye.generator.domain.ColumnInfo;
 import com.lwohvye.generator.domain.GenConfig;
-import com.lwohvye.utils.FileUtil;
-import com.lwohvye.utils.StringUtils;
+import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
 
@@ -31,7 +31,7 @@ import java.io.Writer;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.lwohvye.utils.FileUtil.SYS_TEM_DIR;
+import static com.lwohvye.core.utils.FileUtil.SYS_TEM_DIR;
 
 /**
  * 代码生成

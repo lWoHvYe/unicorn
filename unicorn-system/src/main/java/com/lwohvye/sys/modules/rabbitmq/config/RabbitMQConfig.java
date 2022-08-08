@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.rabbitmq.config;
 
-import com.lwohvye.config.LocalCoreConfig;
+import com.lwohvye.core.config.LocalCoreConfig;
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

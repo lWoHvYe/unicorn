@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.service;
 
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.api.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.api.modules.system.domain.DictDetail;

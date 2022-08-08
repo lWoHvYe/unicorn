@@ -16,7 +16,7 @@
 package com.lwohvye.api.modules.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lwohvye.base.BaseEntity;
+import com.lwohvye.core.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

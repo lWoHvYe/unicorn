@@ -16,7 +16,7 @@
 package com.lwohvye.api.modules.mnt.service.dto;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.base.BaseDTO;
+import com.lwohvye.core.base.BaseDTO;
 import lombok.Getter;
 import lombok.Setter;
 

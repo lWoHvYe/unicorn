@@ -21,7 +21,7 @@ import com.lwohvye.search.modules.elasticsearch.domain.EsUser;
 import com.lwohvye.search.modules.elasticsearch.repository.EsUserRepository;
 import com.lwohvye.search.modules.elasticsearch.service.IEsUserService;
 import com.lwohvye.search.modules.mongodb.repository.MongoDBUserRepository;
-import com.lwohvye.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;

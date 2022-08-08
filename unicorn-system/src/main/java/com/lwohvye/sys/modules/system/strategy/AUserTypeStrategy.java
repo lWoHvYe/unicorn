@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.strategy;
 
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;

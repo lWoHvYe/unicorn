@@ -16,7 +16,7 @@
 
 package com.lwohvye.search.modules.elasticsearch.service;
 
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 
 public interface IEsUserService extends BaseService {
 

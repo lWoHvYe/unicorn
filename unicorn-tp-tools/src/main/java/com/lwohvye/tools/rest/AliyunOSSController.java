@@ -16,7 +16,7 @@
 package com.lwohvye.tools.rest;
 
 import com.lwohvye.tools.service.IAliyunOSSService;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

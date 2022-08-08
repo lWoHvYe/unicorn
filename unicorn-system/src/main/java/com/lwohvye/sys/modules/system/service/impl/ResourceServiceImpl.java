@@ -16,14 +16,13 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import com.lwohvye.api.modules.system.domain.Resource;
-import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.ResourceDto;
 import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.core.utils.*;
+import com.lwohvye.core.utils.redis.RedisUtils;
 import com.lwohvye.sys.modules.system.event.RoleEvent;
 import com.lwohvye.sys.modules.system.repository.ResourceRepository;
 import com.lwohvye.sys.modules.system.service.IResourceService;
-import com.lwohvye.utils.*;
-import com.lwohvye.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;

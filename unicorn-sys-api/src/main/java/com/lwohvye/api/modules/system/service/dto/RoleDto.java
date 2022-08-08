@@ -18,7 +18,7 @@ package com.lwohvye.api.modules.system.service.dto;
 import com.lwohvye.api.modules.system.domain.vo.ResourceVo;
 import lombok.Getter;
 import lombok.Setter;
-import com.lwohvye.base.BaseDTO;
+import com.lwohvye.core.base.BaseDTO;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;

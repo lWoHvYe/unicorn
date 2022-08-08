@@ -19,7 +19,7 @@ import com.lwohvye.api.modules.system.domain.Job;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.base.BaseMapper;
+import com.lwohvye.core.base.BaseMapper;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

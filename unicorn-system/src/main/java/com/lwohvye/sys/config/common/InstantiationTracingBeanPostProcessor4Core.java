@@ -18,7 +18,7 @@ package com.lwohvye.sys.config.common;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.sys.modules.system.strategy.NormalUserTypeStrategy;
 import com.lwohvye.sys.modules.system.service.ITerminalService;
-import com.lwohvye.utils.SpringContextHolder;
+import com.lwohvye.core.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationListener;

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.service;
 
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 import com.lwohvye.api.modules.system.service.dto.JobDto;
 import com.lwohvye.api.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.api.modules.system.domain.Job;

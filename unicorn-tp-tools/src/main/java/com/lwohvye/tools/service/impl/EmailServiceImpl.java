@@ -17,12 +17,12 @@ package com.lwohvye.tools.service.impl;
 
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
-import com.lwohvye.exception.BadRequestException;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.tools.domain.EmailConfig;
 import com.lwohvye.tools.domain.vo.EmailVo;
 import com.lwohvye.tools.repository.EmailRepository;
 import com.lwohvye.tools.service.IEmailService;
-import com.lwohvye.utils.EncryptUtils;
+import com.lwohvye.core.utils.EncryptUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;

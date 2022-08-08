@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.service;
 
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 
 import java.util.List;
 

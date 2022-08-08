@@ -17,7 +17,7 @@ package com.lwohvye.search.modules.config;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.search.modules.mongodb.rest.MongoDBUserController;
-import com.lwohvye.utils.SpringContextHolder;
+import com.lwohvye.core.utils.SpringContextHolder;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;

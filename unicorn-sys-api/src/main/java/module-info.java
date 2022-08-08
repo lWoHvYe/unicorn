@@ -1,6 +1,6 @@
 @SuppressWarnings({ "requires-automatic", "requires-transitive-automatic" })
 module lwohvye.unicorn.sys_api {
-    requires transitive lwohvye.unicorn.common;
+    requires transitive lwohvye.unicorn.core;
 
     exports com.lwohvye.api.annotation;
     exports com.lwohvye.api.utils;

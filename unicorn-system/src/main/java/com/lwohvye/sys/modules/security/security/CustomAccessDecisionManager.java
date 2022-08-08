@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.security;
 
-import com.lwohvye.constant.SecurityConstant;
+import com.lwohvye.core.constant.SecurityConstant;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;

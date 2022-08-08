@@ -15,10 +15,10 @@
  */
 package com.lwohvye.sys.modules.mnt.rest;
 
-import com.lwohvye.annotation.log.Log;
+import com.lwohvye.core.annotation.log.Log;
 import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

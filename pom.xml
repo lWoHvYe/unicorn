@@ -53,8 +53,8 @@
     </scm>
 
     <modules>
-        <module>unicorn-common</module>
-        <module>unicorn-common-webflux</module>
+        <module>unicorn-core</module>
+        <module>unicorn-reactive</module>
         <module>unicorn-sys-api</module>
         <module>unicorn-logging</module>
         <module>unicorn-system</module>

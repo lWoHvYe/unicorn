@@ -15,7 +15,7 @@
  */
 package com.lwohvye.tools.service;
 
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 import com.lwohvye.tools.domain.vo.EmailVo;
 
 /**

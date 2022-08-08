@@ -16,7 +16,7 @@
 package com.lwohvye.api.modules.system.service.dto;
 
 import lombok.Data;
-import com.lwohvye.annotation.Query;
+import com.lwohvye.core.annotation.Query;
 
 /**
 * @author Zheng Jie

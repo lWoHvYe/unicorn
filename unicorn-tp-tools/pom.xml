@@ -54,7 +54,7 @@
         <!-- 需要common模块 -->
         <dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-common</artifactId>
+            <artifactId>unicorn-core</artifactId>
             <version>${project.core.version}</version>
         </dependency>
 

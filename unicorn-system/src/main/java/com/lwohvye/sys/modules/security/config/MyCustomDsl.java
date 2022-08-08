@@ -17,7 +17,7 @@
 package com.lwohvye.sys.modules.security.config;
 
 import com.lwohvye.sys.modules.security.security.filter.CustomAuthenticationFilter;
-import com.lwohvye.utils.SpringContextHolder;
+import com.lwohvye.core.utils.SpringContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

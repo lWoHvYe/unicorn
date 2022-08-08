@@ -15,10 +15,10 @@
  */
 package com.lwohvye.api.modules.system.api;
 
-import com.lwohvye.base.BaseEntity.Update;
+import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.Job;
 import com.lwohvye.api.modules.system.service.dto.JobQueryCriteria;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

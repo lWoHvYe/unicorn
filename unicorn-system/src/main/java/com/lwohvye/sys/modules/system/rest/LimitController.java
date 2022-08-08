@@ -15,8 +15,8 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
-import com.lwohvye.annotation.Limit;
-import com.lwohvye.annotation.rest.AnonymousGetMapping;
+import com.lwohvye.core.annotation.Limit;
+import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;

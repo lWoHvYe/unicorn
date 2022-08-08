@@ -15,7 +15,7 @@
  */
 package com.lwohvye.log.service.mapstruct;
 
-import com.lwohvye.base.BaseMapper;
+import com.lwohvye.core.base.BaseMapper;
 import com.lwohvye.log.domain.Log;
 import com.lwohvye.log.service.dto.LogSmallDTO;
 import org.mapstruct.Mapper;

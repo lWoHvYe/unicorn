@@ -25,7 +25,7 @@ import com.aliyun.dysmsapi20170525.models.QuerySendDetailsResponse;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.teaopenapi.models.Config;
-import com.lwohvye.config.AliCloudConfig;
+import com.lwohvye.core.config.AliCloudConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 

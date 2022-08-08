@@ -17,10 +17,10 @@
 package com.lwohvye.sys.modules.rabbitmq.service;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.config.LocalCoreConfig;
+import com.lwohvye.core.config.LocalCoreConfig;
 import com.lwohvye.sys.modules.security.service.UserLocalCache;
-import com.lwohvye.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.utils.rabbitmq.YRabbitAbstractConsumer;
+import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.core.Message;

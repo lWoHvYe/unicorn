@@ -18,7 +18,7 @@ package com.lwohvye.tools.service.impl;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
 import com.lwohvye.tools.service.IAliyunOSSService;
-import com.lwohvye.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

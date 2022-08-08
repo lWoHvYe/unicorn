@@ -15,10 +15,10 @@
  */
 package com.lwohvye.api.modules.system.api;
 
-import com.lwohvye.base.BaseEntity.Update;
+import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

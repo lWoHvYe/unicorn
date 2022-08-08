@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.strategy;
 
-import com.lwohvye.constant.SecurityConstant;
+import com.lwohvye.core.constant.SecurityConstant;
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.sys.modules.system.enums.UserTypeEnum;
 import lombok.extern.slf4j.Slf4j;

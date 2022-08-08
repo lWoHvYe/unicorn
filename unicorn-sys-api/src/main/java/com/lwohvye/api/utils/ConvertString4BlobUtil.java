@@ -18,7 +18,7 @@ package com.lwohvye.api.utils;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.annotation.String4Blob;
-import com.lwohvye.utils.StringUtils;
+import com.lwohvye.core.utils.StringUtils;
 
 import java.util.Arrays;
 

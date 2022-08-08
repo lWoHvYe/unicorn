@@ -135,7 +135,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-common` 系统的公共模块，各种工具类，公共配置存在该模块
+- `unicorn-core` 系统的公共模块，各种工具类，公共配置存在该模块
 
 - `unicorn-sys-api` Sys Module基础实体及API，方便后续服务拆分
 
@@ -154,7 +154,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 #### 详细结构
 
 ```
-- unicorn-common 公共模块
+- unicorn-core 公共模块
     - annotation 为系统自定义注解
     - aspect 自定义注解的切面
     - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper

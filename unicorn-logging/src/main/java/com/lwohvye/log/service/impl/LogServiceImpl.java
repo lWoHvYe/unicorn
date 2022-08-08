@@ -18,13 +18,13 @@ package com.lwohvye.log.service.impl;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.lwohvye.core.utils.*;
 import com.lwohvye.log.domain.Log;
 import com.lwohvye.log.repository.LogRepository;
 import com.lwohvye.log.service.ILogService;
 import com.lwohvye.log.service.dto.LogErrorDTO;
 import com.lwohvye.log.service.dto.LogQueryCriteria;
 import com.lwohvye.log.service.dto.LogSmallDTO;
-import com.lwohvye.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -91,7 +91,7 @@ public class LogServiceImpl implements ILogService {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        com.lwohvye.annotation.log.Log aopLog = method.getAnnotation(com.lwohvye.annotation.log.Log.class);
+        com.lwohvye.core.annotation.log.Log aopLog = method.getAnnotation(com.lwohvye.core.annotation.log.Log.class);
 
         // 方法路径
         String methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";

@@ -17,9 +17,9 @@ package com.lwohvye.api.modules.system.service.dto;
 
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.api.modules.system.domain.Role;
-import com.lwohvye.utils.StringUtils;
+import com.lwohvye.core.utils.StringUtils;
 import lombok.Data;
-import com.lwohvye.annotation.Query;
+import com.lwohvye.core.annotation.Query;
 
 import java.io.Serializable;
 import java.sql.Timestamp;

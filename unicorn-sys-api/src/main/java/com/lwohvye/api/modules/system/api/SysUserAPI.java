@@ -16,12 +16,12 @@
 package com.lwohvye.api.modules.system.api;
 
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.base.BaseEntity.Update;
+import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.vo.UserBaseVo;
 import com.lwohvye.api.modules.system.domain.vo.UserPassVo;
 import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.result.ResultInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

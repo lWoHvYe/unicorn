@@ -16,7 +16,7 @@
 package com.lwohvye.sys.modules.system.service;
 
 import com.lwohvye.api.modules.system.domain.Resource;
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 import com.lwohvye.api.modules.system.service.dto.ResourceDto;
 import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
 import org.springframework.data.domain.Pageable;

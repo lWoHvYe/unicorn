@@ -1,6 +1,6 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.unicorn.tp_tools {
-    requires transitive lwohvye.unicorn.common;
+    requires transitive lwohvye.unicorn.core;
     requires transitive aliyun.sdk.oss;
     requires transitive dysmsapi20170525;
     requires transitive spring.context.support;

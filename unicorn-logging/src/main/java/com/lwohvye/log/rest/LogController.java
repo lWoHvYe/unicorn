@@ -16,11 +16,11 @@
 package com.lwohvye.log.rest;
 
 import cn.hutool.core.lang.Dict;
-import com.lwohvye.annotation.log.Log;
+import com.lwohvye.core.annotation.log.Log;
 import com.lwohvye.log.service.ILogService;
 import com.lwohvye.log.service.dto.LogQueryCriteria;
-import com.lwohvye.utils.SecurityUtils;
-import com.lwohvye.utils.result.ResultInfo;
+import com.lwohvye.core.utils.SecurityUtils;
+import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

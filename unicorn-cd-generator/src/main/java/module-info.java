@@ -1,6 +1,6 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.unicorn.cd_generator {
-    requires transitive lwohvye.unicorn.common;
+    requires transitive lwohvye.unicorn.core;
     requires transitive org.apache.commons.configuration2;
 
     exports com.lwohvye.generator.domain;
