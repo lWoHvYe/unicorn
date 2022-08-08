@@ -135,11 +135,11 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-core` 系统的公共模块，各种工具类，公共配置存在该模块
+- `unicorn-core` 系统的核心模块，各种工具类，公共配置存在该模块
 
-- `unicorn-sys-api` Sys Module基础实体及API，方便后续服务拆分
+- `unicorn-sys-api` Sys Module基础实体及API，方便服务拆分
 
-- `unicorn-system` 系统核心模块，包含管理侧权限配置等。
+- `unicorn-system` 系统权限模块，包含权限配置管理等。
 
 - `unicorn-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
@@ -147,9 +147,11 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - `unicorn-cd-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
 
-- `unicorn-starter` 启动类,项目入口，包含模块及组件配置，枚举类动态扩展的简单demo
+- `unicorn-starter` 启动类，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离），枚举类动态扩展的简单demo
 
 - `valentine-search` 通过mongodb进行最基础的检索，整合elasticsearch，SPI相关demo
+
+- `valentine-starter` 启动配置示例，最小环境依赖启动
 
 #### 详细结构
 
@@ -216,3 +218,4 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的
   refreshToken
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，推测是Spring Boot的 ClassLoader不支持Jigsaw）
+- swarm化，可以参考[why-swarm (施工中)](https://github.com/WHY-lWoHvYe/why-swarm)

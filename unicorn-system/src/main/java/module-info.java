@@ -78,7 +78,7 @@ module lwohvye.unicorn.system {
     opens com.lwohvye.sys.modules.security.config.bean;
     opens com.lwohvye.sys.modules.security.service to spring.core;
     opens com.lwohvye.sys.modules.security.rest to spring.core;
-    opens com.lwohvye.sys.modules.system.enums to lwohvye.unicorn.common; // common中的工具要通过反射访问enum中的部分属性，所以要对其open
+    opens com.lwohvye.sys.modules.system.enums to lwohvye.unicorn.core; // common中的工具要通过反射访问enum中的部分属性，所以要对其open
     opens com.lwohvye.sys.modules.system.rest to spring.core;
     opens com.lwohvye.sys.modules.system.service.impl to spring.core;
     opens com.lwohvye.sys.modules.system.service.local;

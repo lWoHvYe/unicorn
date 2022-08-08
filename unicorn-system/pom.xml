@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>unicorn-system</artifactId>
-    <name>权限模块</name>
+    <name>权限管理模块</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
     <description>System module with Security and Management</description>
 

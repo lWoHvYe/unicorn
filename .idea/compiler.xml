@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for Server Base" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.2.Final/mapstruct-processor-1.5.2.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.2.Final/mapstruct-1.5.2.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/therapi/therapi-runtime-javadoc-scribe/0.13.0/therapi-runtime-javadoc-scribe-0.13.0.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/therapi/therapi-runtime-javadoc/0.13.0/therapi-runtime-javadoc-0.13.0.jar" />
+        </processorPath>
+        <module name="unicorn-tp-tools" />
+        <module name="unicorn-cd-generator" />
+        <module name="unicorn-sys-api" />
+        <module name="unicorn-core" />
+        <module name="unicorn-reactive" />
+        <module name="unicorn-system" />
+        <module name="unicorn-logging" />
+      </profile>
+      <profile name="Annotation profile for Valentine P2P" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.2.Final/mapstruct-processor-1.5.2.Final.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.2.Final/mapstruct-1.5.2.Final.jar" />
+        </processorPath>
+        <module name="unicorn-starter" />
+        <module name="valentine-starter" />
+        <module name="valentine-search" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="unicorn-cd-generator" options="-parameters" />
+      <module name="unicorn-core" options="-parameters" />
+      <module name="unicorn-logging" options="-parameters" />
+      <module name="unicorn-reactive" options="-parameters" />
+      <module name="unicorn-starter" options="-parameters" />
+      <module name="unicorn-sys-api" options="-parameters" />
+      <module name="unicorn-system" options="-parameters" />
+      <module name="unicorn-tp-tools" options="-parameters" />
+      <module name="valentine-search" options="-parameters" />
+      <module name="valentine-starter" options="-parameters" />
+    </option>
+  </component>
+</project>
