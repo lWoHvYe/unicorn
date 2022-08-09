@@ -14,6 +14,7 @@ boot的 [ Release-Notes ](https://github.com/spring-projects/spring-boot/wiki/Sp
 - 第三种修复方式更为推荐。具体为将springfox中springfox.documentation.spring.web.plugins包下的WebMvcRequestHandlerProvider.java拷贝到项目下(包路径不要变)，进行修改，主体为过滤掉PatternsRequestCondition为null的handlerMappings。详见：[git commit](https://github.com/lWoHvYe/eladmin/commit/e4c94d2c6e18d474a6b2b620cd78e4e5464419b4) , [扩展](https://www.lwohvye.com/2021/11/30/%e6%b5%85%e8%b0%88%e5%9c%a8jar%e4%b8%ad%e5%90%8c%e5%90%8d%e7%b1%bb%e5%86%b2%e7%aa%81%e9%97%ae%e9%a2%98%e5%8f%8a%e8%a6%86%e5%86%99%e7%ac%ac%e4%b8%89%e6%96%b9jar%e4%b8%ad%e7%9a%84%e7%b1%bb/)
 - 第四种修复方式更好一些。通过实现BeanPostProcessor，在bean初始化前后插入一些操作。详见：[git commit](https://github.com/lWoHvYe/eladmin/commit/5261b859ac5ff7e96e38894c5005355991d6d0ba) , [出处](https://github.com/springfox/springfox/issues/3462#issuecomment-983144080)
 - 一直有新的修复方式加入，针对问题的不同切入点
+- 之前一直没看懂，但最先接触到的下面这种定义 WebMvcEndpointHandlerMapping Bean的方式就是一种解决方案，具体细节还没搞懂，但跟上面这些是不同的方式，上面都是在处理前exclude the `/actuator` 系列，这种方式是为其设置了patternsCondition (在构造WebMvcEndpointHandlerMapping时，不传pathPatternParser或传null，就会有以上结果)
 
 ⌚️马上🕑了。天亮再继续。考虑从springfox迁移到springdoc了
 
