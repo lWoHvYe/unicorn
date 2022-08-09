@@ -41,7 +41,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 
 ```shell
 #3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
-nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar unicorn-starter-3.0.3.jar >nohup.out 2>&1 &
+nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar unicorn-starter-3.1.0.jar >nohup.out 2>&1 &
 ```
 
 | key                | 目的                                                         |
@@ -79,7 +79,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 <dependency>
     <groupId>com.lwohvye</groupId>
     <artifactId>eladmin</artifactId>
-    <version>3.0.3</version>
+    <version>3.1.0</version>
     <type>pom</type>
 </dependency>
 

@@ -37,6 +37,7 @@
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <javassist.version>3.29.0-GA</javassist.version>
         <hikaricp.version>5.0.1</hikaricp.version>
+        <caffeine.version>3.1.1</caffeine.version>
         <shardingsphere.version>4.1.1</shardingsphere.version>
         <kotlin.version>1.7.10</kotlin.version>
     </properties>

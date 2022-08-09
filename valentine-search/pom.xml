@@ -36,6 +36,7 @@
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <druid.version>1.2.11</druid.version>
+        <caffeine.version>3.1.1</caffeine.version>
         <querydsl.version>5.0.0</querydsl.version>
         <blaze-persistence.version>1.6.6</blaze-persistence.version>
         <kotlin.version>1.7.10</kotlin.version>
