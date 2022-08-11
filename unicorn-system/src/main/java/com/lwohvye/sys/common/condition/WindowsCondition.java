@@ -13,15 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.sys.config.condition;
+package com.lwohvye.sys.common.condition;
 
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-public class LinuxCondition implements Condition {
+public class WindowsCondition implements Condition {
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return context.getEnvironment().getProperty("os.name", "GUN/Linux").contains("Linux");
+        //包含Windows则说明是windows系统，返回true
+        return context.getEnvironment().getProperty("os.name", "UNIX").contains("Windows");
     }
 }

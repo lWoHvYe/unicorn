@@ -137,6 +137,8 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - `unicorn-core` 系统的核心模块，各种工具类，公共配置存在该模块
 
+- `unicorn-reactive` core模块默认基于MVC，因为Gateway是基于WebFlux的，以此进行适配
+
 - `unicorn-sys-api` Sys Module基础实体及API，方便服务拆分
 
 - `unicorn-system` 系统权限模块，包含权限配置管理等。
@@ -169,9 +171,11 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
     - modules 基础实体及接口定义
     - utils 通用工具类扩展
 - unicorn-system 系统核心模块
-	- config 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
-	    - common 基础等各类配置
+	- common 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
+	    - init 容器启动后的钩子call back
+	    - orm jpa-entity的部分配置，eg: Table Mapping
 	    - thread 线程池相关
+	    - web corsFilter configurer and so on
 	- modules 系统相关模块(登录授权、消息队列、系统监控、定时任务、运维管理等)
 	    - quartz 定时任务
 	    - rabbitmq 消息队列相关

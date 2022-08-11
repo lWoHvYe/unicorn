@@ -1,4 +1,4 @@
-@SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
+@SuppressWarnings({"requires-automatic"})
 module lwohvye.valentine.starter {
     requires lwohvye.unicorn.system;
     requires kotlin.stdlib;

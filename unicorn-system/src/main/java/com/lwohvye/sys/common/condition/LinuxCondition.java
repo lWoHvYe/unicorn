@@ -13,16 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.sys.config.condition;
+package com.lwohvye.sys.common.condition;
 
-import cn.hutool.core.util.RandomUtil;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-public class DoLoadOSCondition implements Condition {
+public class LinuxCondition implements Condition {
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return RandomUtil.randomBoolean();
+        return context.getEnvironment().getProperty("os.name", "GUN/Linux").contains("Linux");
     }
 }

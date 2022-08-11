@@ -28,7 +28,8 @@ module lwohvye.unicorn.system {
     // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
-    exports com.lwohvye.sys.config.condition to spring.beans;
+    exports com.lwohvye.sys.common.annotation;
+    exports com.lwohvye.sys.common.condition to spring.beans;
     exports com.lwohvye.sys.modules.mnt.repository to spring.beans;
     exports com.lwohvye.sys.modules.mnt.rest to spring.beans, spring.web;
     exports com.lwohvye.sys.modules.mnt.service;
@@ -59,8 +60,13 @@ module lwohvye.unicorn.system {
     exports com.lwohvye.sys.modules.system.service.mapstruct;
     exports com.lwohvye.sys.modules.system.repository; // 这里先这样
 
-    opens com.lwohvye.sys.config.common;
-    opens com.lwohvye.sys.config.thread;
+    opens com.lwohvye.sys.common.condition;
+    opens com.lwohvye.sys.common.config;
+    opens com.lwohvye.sys.common.handler;
+    opens com.lwohvye.sys.common.init;
+    opens com.lwohvye.sys.common.orm;
+    opens com.lwohvye.sys.common.thread;
+    opens com.lwohvye.sys.common.web;
     opens com.lwohvye.sys.modules.mnt.repository to spring.core;
     opens com.lwohvye.sys.modules.mnt.rest to spring.core;
     opens com.lwohvye.sys.modules.mnt.service.mapstruct;

@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.sys.config.thread;
+package com.lwohvye.sys.common.thread;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

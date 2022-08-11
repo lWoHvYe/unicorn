@@ -49,7 +49,7 @@ public class SimUser implements Serializable {
     @Column(name = "user_id")
     // 在jpa insert操作时，可以指定插入对主键id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "lid")
-    @GenericGenerator(name = "lid", strategy = "com.lwohvye.sys.config.common.LocalInsertGenerator")
+    @GenericGenerator(name = "lid", strategy = "com.lwohvye.sys.common.orm.LocalInsertGenerator")
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

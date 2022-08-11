@@ -13,11 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.sys.config.common;
+package com.lwohvye.sys.common.config;
 
-import com.lwohvye.sys.config.condition.LinuxCondition;
-import com.lwohvye.sys.config.condition.MacOSCondition;
-import com.lwohvye.sys.config.condition.WindowsCondition;
+import com.lwohvye.sys.common.condition.LinuxCondition;
+import com.lwohvye.sys.common.condition.MacOSCondition;
+import com.lwohvye.sys.common.condition.WindowsCondition;
 import com.lwohvye.sys.modules.system.service.ITerminalService;
 import com.lwohvye.sys.modules.system.service.local.LinuxTerminalServiceImpl;
 import com.lwohvye.sys.modules.system.service.local.MacOSTerminalServiceImpl;

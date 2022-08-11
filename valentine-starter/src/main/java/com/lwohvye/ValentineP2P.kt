@@ -17,6 +17,7 @@ package com.lwohvye
 
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
 import com.lwohvye.core.utils.SpringContextHolder
+import com.lwohvye.sys.common.annotation.ApiVersion
 import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -26,6 +27,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.transaction.annotation.EnableTransactionManagement
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -75,11 +77,19 @@ open class ValentineP2P {
 
     /**
      * 访问首页提示
-     *
+     * 因为自定义了处理逻辑，所以下面这俩的RequestCondition是不一样的，所以能共存，且因为定义了优先新版本，所以在v1时走第一个，[v2+ 走第二个
+     * @see com.lwohvye.sys.common.handler.ApiVersionRequestMappingHandlerMapping
      * @return /
      */
-    @AnonymousGetMapping("/")
-    fun index(): String {
+    @ApiVersion
+    @AnonymousGetMapping("/valentine/{version}/p2p")
+    fun index(@PathVariable version: String): String {
         return "Backend service started successfully"
+    }
+
+    @ApiVersion(2)
+    @AnonymousGetMapping("/valentine/{version}/p2p")
+    fun indexVersion(@PathVariable version: String): String {
+        return String.format("Version %s Backend service started successfully", version)
     }
 }

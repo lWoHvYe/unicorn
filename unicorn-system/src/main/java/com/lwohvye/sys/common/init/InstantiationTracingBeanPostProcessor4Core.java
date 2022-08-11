@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.sys.config.common;
+package com.lwohvye.sys.common.init;
 
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.sys.modules.system.strategy.NormalUserTypeStrategy;
