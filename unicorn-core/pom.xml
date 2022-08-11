@@ -108,7 +108,7 @@
 
         <!--监控sql日志-->
         <dependency>
-            <groupId>org.bgee.log4jdbc-log4j2</groupId>
+            <groupId>com.lwohvye.log4jdbc-log4j2</groupId>
             <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
         </dependency>
 

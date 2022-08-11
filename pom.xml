@@ -86,7 +86,7 @@
         <!--Starting JDK 9, release can be used to do the things what source and target can do
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
         <maven.compiler.release>17</maven.compiler.release>
-        <log4jdbc.version>1.16</log4jdbc.version>
+        <log4jdbc.version>1.18</log4jdbc.version>
         <springdoc.openapi.version>1.6.6</springdoc.openapi.version>
         <druid.version>1.2.11</druid.version>
         <hikaricp.version>5.0.1</hikaricp.version>
@@ -125,7 +125,7 @@
 
             <!--监控sql日志 https://log4jdbc.brunorozendo.com/-->
             <dependency>
-                <groupId>org.bgee.log4jdbc-log4j2</groupId>
+                <groupId>com.lwohvye.log4jdbc-log4j2</groupId>
                 <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
                 <version>${log4jdbc.version}</version>
             </dependency>
