@@ -42,7 +42,7 @@
                 <pattern>
                     <pattern>
                         {
-                        "project": "lwohvye-eladmin",
+                        "project": "lwohvye-unicorn",
                         "level": "%level",
                         "service": "unicorn-starter",
                         "pid": "${PID:-}",

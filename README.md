@@ -1,4 +1,7 @@
-<h1 style="text-align: center">Unicorn</h1>
+<div align="center">
+  <img src="document/images/chaste unicorn.png" width="200" style="vertical-align:middle;" alt="Chaste Unicorn"> 
+  <span style="color:#b700ff;font-size: 80px;font-weight:bold">Unicorn</span>  
+</div>
 <div style="text-align: center">
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/lWoHvYe/eladmin/blob/main/LICENSE)
@@ -9,7 +12,7 @@
 [![Maven Package](https://github.com/lWoHvYe/eladmin/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/maven-publish.yml)
 </div>
 
-本项目在原eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
+本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
 ---
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK

@@ -33,12 +33,23 @@
         <java.version>18</java.version>
         <project.core.version>3.2.0-SNAPSHOT</project.core.version>
         <maven.compiler.release>18</maven.compiler.release>
-        <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <caffeine.version>3.1.1</caffeine.version>
         <kotlin.version>1.7.10</kotlin.version>
     </properties>
+    <!--这个意义不大-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.lwohvye</groupId>
+                <artifactId>unicorn</artifactId>
+                <version>${project.core.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!--    下面四个模块视需要引入    -->
@@ -81,12 +92,10 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
