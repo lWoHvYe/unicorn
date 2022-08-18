@@ -92,4 +92,12 @@ open class ValentineP2P {
     fun indexVersion(@PathVariable version: String): String {
         return String.format("Version %s Backend service started successfully", version)
     }
+
+    /**
+     * 匹配采用的最佳适配，当传v4时，会匹配到这个方法
+     */
+    @AnonymousGetMapping("/valentine/v4/p2p")
+    fun indexClVer(): String {
+        return String.format("ClVersion %s Backend service started successfully", "v4")
+    }
 }

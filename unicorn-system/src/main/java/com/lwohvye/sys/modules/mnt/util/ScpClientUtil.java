@@ -43,12 +43,10 @@ public class ScpClientUtil {
     private String username;
     private String password;
 
-    static private Map<String, ScpClientUtil> instance = Maps.newHashMap();
+    private static Map<String, ScpClientUtil> instance = Maps.newHashMap();
 
-    static synchronized public ScpClientUtil getInstance(String ip, int port, String username, String password) {
-        if (instance.get(ip) == null) {
-            instance.put(ip, new ScpClientUtil(ip, port, username, password));
-        }
+    public static synchronized ScpClientUtil getInstance(String ip, int port, String username, String password) {
+        instance.computeIfAbsent(ip, cip -> instance.put(cip, new ScpClientUtil(cip, port, username, password)));
         return instance.get(ip);
     }
 

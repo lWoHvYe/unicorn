@@ -141,7 +141,7 @@
                 <activeByDefault>true</activeByDefault>       <!-- 默认的，不加参数时执行这个profile -->
             </activation>
         </profile>
-        <!--    未来的Jigsaw. profile中可以配置dependency, build/plugin这些，这是之前不知道的,但这个dependency不能影响正常的run，因为只在build/package时会使用的样子    -->
+        <!--    未来的Jigsaw. profile中可以配置dependency, build/plugin这些，在active相关的profile后，可以在Idea Run中使用相关依赖，这里不active就是单表模式，active后会使用sharding-sphere分库分表    -->
         <profile>
             <id>jigsaw</id>
             <properties>
