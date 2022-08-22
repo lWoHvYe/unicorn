@@ -87,7 +87,7 @@
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
         <maven.compiler.release>17</maven.compiler.release>
         <log4jdbc.version>1.18</log4jdbc.version>
-        <springdoc.openapi.version>1.6.10</springdoc.openapi.version>
+        <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <druid.version>1.2.11</druid.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <hutool.version>5.8.5</hutool.version>
