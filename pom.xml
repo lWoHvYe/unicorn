@@ -106,7 +106,7 @@
         <caffeine.version>3.1.1</caffeine.version>
         <poi.version>5.2.2</poi.version>
         <xerces.version>2.12.2</xerces.version>
-        <yauaa.version>7.4.0</yauaa.version>
+        <yauaa.version>7.5.0</yauaa.version>
         <ip2region.version>2.7.2</ip2region.version>
         <thumbnailator.version>0.4.17</thumbnailator.version>
         <argLine>
