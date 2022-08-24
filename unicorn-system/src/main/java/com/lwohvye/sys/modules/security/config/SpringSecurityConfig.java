@@ -215,7 +215,7 @@ public class SpringSecurityConfig {
             rabbitMQProducerService.sendMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.AUTH_LOCAL_ROUTE_KEY, authSuccessMsg);
 
             // 返回 token 与 用户信息
-            var authInfo = Map.of("token", properties.getTokenStartWith() + token, "user", jwtUserDto);
+            var authInfo = Map.of("id_token", properties.getTokenStartWith() + token, "user", jwtUserDto);
             // 这里需要进行响应
             ResultUtil.resultJson(response, HttpServletResponse.SC_OK, JsonUtils.toJSONString(authInfo));
         };

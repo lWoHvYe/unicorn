@@ -73,8 +73,7 @@ public class TokenProvider implements InitializingBean {
     }
 
     /**
-     * 创建Token 设置永不过期，
-     * Token 的时间有效性转到Redis 维护
+     * 创建Token ，
      * JWT是由三段信息构成的，将这三段信息文本用.链接一起就构成了Jwt字符串
      * 第一部分称为头部（header),第二部分称其为载荷（payload, 类似于飞机上承载的物品)，第三部分是签证（signature).
      * header，jwt的头部承载两部分信息：声明类型，这里是jwt、声明加密的算法（通常直接使用 HMAC SHA256）。对其进行base64编码，得到第一部分

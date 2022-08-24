@@ -130,3 +130,18 @@ file:
   # 文件大小 /M
   maxSize: 100
   avatarMaxSize: 5
+
+server:
+  servlet:
+    session:
+      cookie:
+        # 是否对会话 cookie 使用 "HttpOnly"cookie default true
+        http-only: true
+        # 是否总是将会话 cookie 标记为安全 default false
+        secure: true
+        # SameSite属性可以让 Cookie 在跨站请求时不会被发送，从而阻止了跨站请求伪造攻击（CSRF）并可保护用户隐私。它有三个属性值
+        # - Strict 完全禁止第三方 Cookie，跨站点时，任何情况下都不会发送 Cookie。
+        # - Lax 允许部分第三方请求携带 Cookie。
+        # - None 无论是否跨站都会发送 Cookie。
+        # Chrome的SameSite默认值是Lax，而Safari的默认值是Strict
+        same-site: LAX

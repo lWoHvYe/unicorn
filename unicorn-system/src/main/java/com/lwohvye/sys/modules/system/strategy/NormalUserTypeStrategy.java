@@ -50,7 +50,7 @@ public final class NormalUserTypeStrategy implements AUserTypeStrategy {
      */
     @Override
     public void doInit() {
-        if (Objects.isNull(roleService))
+        if (Objects.isNull(roleService)) // 这里只是为了适配一些情况，当前默认情况是不需要这部分init的，但通过调整参数使用PostProcessor来Inject StrategyBean时，field会是null，此时需要这块逻辑
             this.roleService = SpringContextHolder.getBean(IRoleService.class);
     }
 

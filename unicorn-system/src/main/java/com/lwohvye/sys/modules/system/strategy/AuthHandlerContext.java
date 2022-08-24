@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 策略模式上下文（环境类），给外部调用，该类的注入由相关的HandlerProcessor实现
+ * 策略模式上下文（环境类），给外部调用，该类的注入可由相关的HandlerProcessor实现（Has Deprecated），当前改为通过initStrategyMap()来实现Init @ Inject
  *
  * @author Hongyan Wang
  * @date 2021年11月02日 16:33
@@ -57,6 +57,11 @@ public class AuthHandlerContext {
     // public void doInit() {
     // }
 
+    /**
+     * 这里主要进行相关bean等注入，较 AuthHandlerProcessor 中的方式，解决了注入的bean中属性为null的问题
+     *
+     * @date 2022/8/21 5:49 PM
+     */
     public void initStrategyMap() {
         var tCollection = SpringContextHolder.getBeansOfType(AUserTypeStrategy.class).values();
         for (var t : tCollection) {
