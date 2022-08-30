@@ -2,6 +2,5 @@
 documentation:
 - document/**/*.md
 
-@domain/core:
-- unicorn-core/src/main/java/*
+foundational:
 - unicorn-core/src/main/java/**/*
