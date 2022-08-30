@@ -1,6 +1,5 @@
-// 暂作为open module。允许其他模块通过反射访问，后续缩小范围
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
-        // 抑制compile warn: requires transitive directive for an automatic module
+// 抑制compile warn: requires transitive directive for an automatic module
 module lwohvye.unicorn.core {
     requires transitive java.compiler;
     requires transitive java.servlet;
