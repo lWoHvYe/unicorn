@@ -1,1 +1,6 @@
 
+documentation
+- document/**/*.md
+
+java
+- **/*.java
