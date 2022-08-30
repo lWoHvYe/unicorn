@@ -117,7 +117,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
-- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入common模块即可，权限、日志、3rd Tools模块可插拔可独立部署，除了传统To B业务，还可用于To C业务
+- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，除了传统To B业务，还可用于To C业务
 
 #### 系统功能
 
@@ -130,7 +130,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 系统日志：记录用户操作日志与异常日志，方便开发人员定位排错
 - SQL监控：采用druid 监控数据库访问性能，默认用户名admin，密码admin
 - 定时任务：整合Quartz做定时任务，加入任务日志，任务运行情况一目了然
-- 代码生成：高灵活度生成前后端代码，减少大量重复的工作任务
+- 代码生成：高灵活度生成前后端代码，减少大量重复的工作任务（逆向有很多方案，这种基于template的有一定的灵活性）
 - 邮件工具：配合富文本，发送html格式的邮件
 - 服务监控：监控服务器的负载情况
 

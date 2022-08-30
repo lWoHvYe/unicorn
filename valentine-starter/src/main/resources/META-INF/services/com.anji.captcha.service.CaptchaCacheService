@@ -13,5 +13,5 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-#  module化之后，需在module-info.java中进行配置，此种配置方式已被ignore
+#  module化之后，需在module-info.java中进行配置，此种配置方式已被ignore，留在这里兼容非module的模式
 com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl

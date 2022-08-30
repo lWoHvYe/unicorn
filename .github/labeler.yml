@@ -1,0 +1,7 @@
+
+documentation:
+  - document/**/*.md
+
+foundational:
+  - unicorn-core/src/main/java/**/*
+  - unicorn-reactive/src/main/java/**/*
