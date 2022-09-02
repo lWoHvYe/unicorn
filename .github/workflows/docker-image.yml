@@ -1,0 +1,35 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Setup Java JDK
+      uses: actions/setup-java@v3.4.1
+      with:
+        java-version: '18'
+        distribution: 'corretto'
+        check-latest: true        
+
+    - name: Build Core
+      run: mvn -B install --file pom.xml
+    - name: Build Valentine's Day
+      run: mvn -B package --file valentine-starter/pom.xml
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag unicorn_web:$(date +%s)
