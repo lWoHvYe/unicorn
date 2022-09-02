@@ -40,7 +40,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
 @ConditionalOnExpression("${local.sys.unauth:false}") // 基于配置，是否对所有请求放行。默认关闭
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE) // 指定Init Bean的Condition，需要是Reactive（比如WebFlux）
 public class SimpleReactiveSecurityConfig {
 
     private final ReactiveUserDetailsService userDetailsService;
@@ -56,8 +56,8 @@ public class SimpleReactiveSecurityConfig {
         var customFilter = new SimpleAuthFilter(userDetailsService);
         return httpSecurity
                 .csrf().disable()
-                .authorizeExchange(exchanges -> exchanges
-                        .anyExchange().permitAll()
+                .authorizeExchange(exchanges ->
+                        exchanges.anyExchange().permitAll()
                 ).addFilterBefore(customFilter, SecurityWebFiltersOrder.FORM_LOGIN)
                 .build();
     }

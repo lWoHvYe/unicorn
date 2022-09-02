@@ -40,7 +40,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @ConditionalOnExpression("${local.sys.unauth:false}") // 基于配置，是否对所有请求放行。默认关闭
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // 指定Init Bean的Condition，需要是Servlet（比如WebMVC）
 public class SimpleSecurityConfig {
 
     private final UserDetailsService userDetailsService;

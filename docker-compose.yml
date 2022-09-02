@@ -1,0 +1,10 @@
+version: '3'
+services:
+  web:
+    build: valentine-starter
+    restart: always
+    container_name: valentine-day-8082
+    ports:
+      - "8082:8082"
+    volumes:
+      - /root/el_app/8082/log:/unicorn_app/log

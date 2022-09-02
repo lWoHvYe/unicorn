@@ -45,7 +45,7 @@ import java.lang.annotation.Annotation;
  */
 @Slf4j
 // @ConditionalOnClass(name = "org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice") // 这种比较适合目标类在上层，无法直接引用的情况，毕竟类名有些长
-@ConditionalOnClass(ResponseBodyAdvice.class) // 这个跟上面那种是等价的，Conditional系列不会报ClassNotFound的Exception。
+@ConditionalOnClass(ResponseBodyAdvice.class) // 这个跟上面那种是等价的，Conditional系列不会报ClassNotFound的Exception。这个配置用于实现当exclude WebMVC使用 WebFlux时，不会init该Bean，也不会报错
 @RestControllerAdvice
 public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
 
