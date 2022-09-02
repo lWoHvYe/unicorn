@@ -31,7 +31,7 @@
 
     <properties>
         <java.version>18</java.version>
-        <project.core.version>3.2.0-SNAPSHOT</project.core.version>
+        <unicorn.core.version>3.2.0-SNAPSHOT</unicorn.core.version>
         <maven.compiler.release>18</maven.compiler.release>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <hikaricp.version>5.0.1</hikaricp.version>
@@ -44,7 +44,7 @@
             <dependency>
                 <groupId>com.lwohvye</groupId>
                 <artifactId>unicorn</artifactId>
-                <version>${project.core.version}</version>
+                <version>${unicorn.core.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -57,13 +57,13 @@
         <dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>unicorn-system</artifactId>
-            <version>${project.core.version}</version>
+            <version>${unicorn.core.version}</version>
         </dependency>
         <!--   logging模块     -->
         <dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>unicorn-logging</artifactId>
-            <version>${project.core.version}</version>
+            <version>${unicorn.core.version}</version>
         </dependency>
         <!--   tools模块     -->
         <!--<dependency>
@@ -145,7 +145,7 @@
     </profiles>
     <!-- 打包 -->
     <build>
-        <finalName>valentine-starter-${project.core.version}</finalName>
+        <finalName>valentine-starter-${unicorn.core.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

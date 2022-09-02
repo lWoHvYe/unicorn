@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    build: valentine-starter
+    build: .
     restart: always
     container_name: valentine-day-8082
     ports:
