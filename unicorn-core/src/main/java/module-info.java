@@ -34,10 +34,10 @@ module lwohvye.unicorn.core {
     requires transitive io.swagger.v3.oas.models;
     requires transitive io.swagger.v3.oas.annotations;
     requires transitive lombok;
-    requires transitive mica.ip2region;
-    requires transitive nl.basjes.parse.useragent;
-    requires transitive org.apache.commons.codec;
-    requires transitive org.apache.commons.lang3;
+    requires mica.ip2region;
+    requires nl.basjes.parse.useragent;
+    requires org.apache.commons.codec;
+    requires org.apache.commons.lang3;
     requires transitive org.apache.poi.poi;
     requires transitive org.apache.poi.ooxml;
     requires transitive org.aspectj.weaver;
@@ -50,7 +50,7 @@ module lwohvye.unicorn.core {
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
     requires transitive redisson;
-    requires transitive thumbnailator;
+    requires thumbnailator;
 
     exports com.lwohvye.core.advice;
     exports com.lwohvye.core.annotation;

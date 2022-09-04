@@ -53,6 +53,15 @@ spring:
           max-attempts: 3 #最大重试次数
           initial-interval: 5000ms
 
+  ##### 邮箱配置
+  mail:
+    host: xxx.com #SMTP server host
+    username: xxx #login user
+    password: xxx #login password
+    properties:
+      from: xxx@xxx.com #发件人（邮箱）
+      to-dev: xxx@oo.com #信息默认接收人（邮箱）
+
   servlet:
     multipart:
       max-file-size: 20MB #限制单个文件大小
@@ -145,3 +154,15 @@ server:
         # - None 无论是否跨站都会发送 Cookie。
         # Chrome的SameSite默认值是Lax，而Safari的默认值是Strict
         same-site: LAX
+
+# oss配置
+alibaba:
+  cloud:
+    access-key: xx
+    secret-key: xx
+    oss:
+      endpoint: xx
+      # 自定义属性 bucketName
+      bucket-name: xx
+      # 自定义属性 filePath
+      file-path: xx/xx/

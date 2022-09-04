@@ -206,7 +206,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     @Override
     public CacheErrorHandler errorHandler() {
         // 异常处理，当Redis发生异常时，打印日志，但是程序正常走
-        log.info("初始化 -> [{}]", "Redis CacheErrorHandler");
+        log.info(" Init -> [{}]", "Redis CacheErrorHandler");
         return new CacheErrorHandler() {
             @Override
             public void handleCacheGetError(RuntimeException e, Cache cache, Object key) {

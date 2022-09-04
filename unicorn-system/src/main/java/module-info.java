@@ -9,19 +9,19 @@ module lwohvye.unicorn.system {
     requires transitive spring.context.support;
     requires transitive spring.expression;
     requires transitive spring.webmvc;
-    requires transitive spring.websocket;
+    requires spring.websocket;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
     requires transitive captcha;
     requires transitive com.fasterxml.jackson.datatype.jsr310;
-    requires transitive com.github.oshi;
-    requires transitive easy.captcha;
-    requires transitive ganymed.ssh2;
+    requires com.github.oshi;
+    requires easy.captcha;
+    requires ganymed.ssh2;
     requires transitive io.netty.common;
     requires transitive jakarta.websocket.api;
     requires transitive jjwt.api;
     requires transitive jjwt.impl;
-    requires transitive jsch;
+    requires jsch;
     requires transitive org.apache.commons.io;
     requires transitive quartz;
 
@@ -92,7 +92,7 @@ module lwohvye.unicorn.system {
     opens com.lwohvye.sys.modules.system.strategy to spring.core;
     opens com.lwohvye.sys.modules.system.repository to spring.core;
 
-    // 理论上这几个也要opens，简单而言，未open的部分是无法被外界访问的。
+    // 这几个Resource也要open，简单而言，未open的部分是无法被外界访问的。
     opens template.email;
     opens template.generator.admin;
     opens template.generator.front;

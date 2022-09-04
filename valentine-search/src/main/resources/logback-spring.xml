@@ -93,4 +93,7 @@
         <appender-ref ref="LOGSTASH"/>
     </logger>
 
+    <logger name="com.anji.captcha" level="OFF"/>
+
+    <logger name="nl.basjes.parse" level="OFF"/>
 </configuration>

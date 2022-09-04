@@ -59,6 +59,8 @@
         <appender-ref ref="CONSOLE"/>
     </logger>
 
-    <logger name="com.anji.captcha" level="OFF" />
+    <logger name="com.anji.captcha" level="OFF"/>
+
+    <logger name="nl.basjes.parse" level="OFF"/>
 
 </configuration>

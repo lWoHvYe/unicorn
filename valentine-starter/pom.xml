@@ -64,18 +64,21 @@
             <groupId>com.lwohvye</groupId>
             <artifactId>unicorn-logging</artifactId>
             <version>${unicorn.core.version}</version>
+            <optional>true</optional>
         </dependency>
         <!--   tools模块     -->
         <!--<dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>unicorn-tp-tools</artifactId>
-            <version>${project.core.version}</version>
+            <version>${unicorn.core.version}</version>
+            <optional>true</optional>
         </dependency>-->
         <!-- 代码生成模块 -->
         <!--<dependency>
             <groupId>com.lwohvye</groupId>
             <artifactId>unicorn-cd-generator</artifactId>
-            <version>${project.core.version}</version>
+            <version>${unicorn.core.version}</version>
+            <optional>true</optional>
         </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

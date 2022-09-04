@@ -3,8 +3,8 @@ module lwohvye.unicorn.tp_tools {
     requires transitive lwohvye.unicorn.core;
     requires transitive aliyun.sdk.oss;
     requires transitive dysmsapi20170525;
-    requires transitive spring.context.support;
-    requires transitive tea.openapi;
+    requires spring.context.support;
+    requires tea.openapi;
 
     exports com.lwohvye.tools.config to spring.beans, spring.context;
     exports com.lwohvye.tools.domain.vo;
