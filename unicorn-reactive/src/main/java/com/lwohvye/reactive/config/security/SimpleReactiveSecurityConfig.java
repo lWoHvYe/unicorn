@@ -39,7 +39,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
-@ConditionalOnExpression("${local.sys.unauth:false}") // 基于配置，是否对所有请求放行。默认关闭
+@ConditionalOnExpression("${local.sys.un-auth:false}") // 基于配置，是否对所有请求放行。默认关闭
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE) // 指定Init Bean的Condition，需要是Reactive（比如WebFlux）
 public class SimpleReactiveSecurityConfig {
 

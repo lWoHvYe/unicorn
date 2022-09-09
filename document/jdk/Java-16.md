@@ -138,8 +138,16 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 
 在实际使用中，
 
+- https://www.oracle.com/corporate/features/understanding-java-9-modules.html
+- An exports module directive specifies one of the module’s packages whose public types (and their nested public and protected types) should be accessible to
+  code in all other modules.
+- opens is used to specify `Allowing runtime-only access to a package`
+- open module if used to specify `Allowing runtime-only access to all packages in a module`
+- 如果一个package是exports的，我们可以在其他modules中通过反射创建对象，执行方法，但不能对非public的类型执行setAccessible(true)。
+- 如果一个package是open的，我们不可以在其他modules 直接声明对象，但可以在其他modules中通过反射创建对象，执行方法，也可以对非public的类型执行setAccessible(true)。
+  open可以修辞module，也可以是package，并允许限定范围。通过open关键字，像spring这样的DI框架就可以很容易地注入实现类。通过uses和providers…with，ServiceLoader可以实现相同的功能。
 - 需要容器创建的bean，需要exports to spring.beans, 有的还需要spring.content，暂不清楚；
-- 包含注入的属性的bean，需要opens to spring.core。~~opens包含了exports~~，当需要显示import时，只open是不行的，还是要export
+- 包含注入的属性的bean，需要opens to spring.core。
 - controller需要exports to spring.web。
 - Aspect相关的需要 exports to aop
 - 还有那些需要反射的场景
@@ -169,8 +177,9 @@ java -p mlib -Dloader.path=clib -m lwohvye.eladmin.starter
 ```
 
 - ~~在Idea的 Run/Debug Configurations中的VM options中，部分可能需要调一下~~
-- 直接启动报异常，是因为部分依赖无法module化（无法得到 module description，在编译时有相关警告 can't extract module name from xxx.jar: Provider class xxx not int
-  module），[具体原因](https://stackoverflow.com/questions/54682417/unable-to-derive-module-descriptor-provider-class-x-not-in-module)
+- 直接启动报异常，是因为部分依赖无法module化（无法得到 module description，在编译时有相关警告
+  can't extract module name from xxx.jar: Provider class xxx not int module）
+  ，[具体原因](https://stackoverflow.com/questions/54682417/unable-to-derive-module-descriptor-provider-class-x-not-in-module)
 
 ```
 Error occurred during initialization of boot layer
@@ -216,11 +225,12 @@ tuples.
     - 通过一些方式，可以对final属性进行修改，但record的似乎不行
 - Motivation: It is a common complaint that "Java is too verbose" or has "too much ceremony".
 - 初步判断，Record与原本的类存在一些差异，部分功能当前还未支持Record，白天进一步验证
-- Record推出背后的目标是使开发人员能够将相关字段作为单个不可变数据项组合在一起，而不需要编写冗长的代码。这意味着，每当您想要向您的记录添加更多的字段/方法时，请考虑是否应该使用完整的类来代替它。(详见Goals and Non-Goals)
+- Record推出背后的目标是使开发人员能够将相关字段作为单个不可变数据项组合在一起，而不需要编写冗长的代码。这意味着，每当您想要向您的记录添加更多的字段/方法时，请考虑是否应该使用完整的类来代替它。
+  (详见Goals and Non-Goals)
 - Record类，本身属性是private final的，内部允许有其他属性，这些需要是static的(Instance field is not allowed in record)
 - Record类的父类为java.lang.Record，所以不能再继承其他类，但可实现接口
-- 之前基于业务需要，可能会用到元组tuple，这部分用 [Local Class](https://docs.oracle.com/javase/specs/jls/se14/html/jls-14.html#jls-14.3) 来做可能更好一些，对此record也支持local record class (A
-  record class with components is clearer and safer than an anonymous tuple of implicitly params.)
+- 之前基于业务需要，可能会用到元组tuple，这部分用 [Local Class](https://docs.oracle.com/javase/specs/jls/se14/html/jls-14.html#jls-14.3) 来做可能更好一些，对此record也支持local
+  record class (A record class with components is clearer and safer than an anonymous tuple of implicitly params.)
 - Like nested record classes, local record classes are implicitly static. The fact that local record classes are implicitly static is in contrast to local
   classes, which are not implicitly static. In fact, local classes are never static — implicitly or explicitly — and can always access variables in the
   enclosing method.
@@ -239,14 +249,13 @@ tuples.
       field.set(object, newFieldValue);
     }
   ```
-    - 如果是静态final属性，同样可以先改为非final的（~~注意如果这里在去掉 final 之前就取了一次值,就会 set 失败, 因为 Class 默认开启了 useCaches 缓存, get 的时候会获取到 root field 的 FieldAccessor,
-      后面的重设就会失效，~~ 这一点没能验证）
-    - 针对上面两种方式，可能代码执行下来没问题，但输出又还是原来的值？但总是可以通过反射方式获取到修改后的新值。这就是 Java 编译器对 final 属型的内联优化，即编译时把该 final
-      的值直接放到了引用它的地方。即使是反射修改了该属性，引用的地方还是原值。Java对基本类型及Literal String 类型(直接双引号字符串)的final值会进行内联优化，而包装类型及通过new String("xx")创建的final值是不会被内联优化的，总之：只要不会被编译器内联优化的
+    - 如果是静态final属性，同样可以先改为非final的（~~注意如果这里在去掉 final 之前就取了一次值,就会 set 失败, 因为 Class 默认开启了 useCaches 缓存,
+      get 的时候会获取到 root field 的 FieldAccessor, 后面的重设就会失效，~~ 这一点没能验证）
+    - 针对上面两种方式，可能代码执行下来没问题，但输出又还是原来的值？但总是可以通过反射方式获取到修改后的新值。这就是 Java 编译器对 final 属型的内联优化，即编译时把该
+      final 的值直接放到了引用它的地方。即使是反射修改了该属性，引用的地方还是原值。Java对基本类型及Literal String 类型(直接双引号字符串)的final值会进行内联优化，
+      而包装类型及通过new String("xx")创建的final值是不会被内联优化的，总之：只要不会被编译器内联优化的
       final 属性就可以通过反射有效的进行修改,修改后代码中可使用到新的值，另外如果 final 属性值是通过构造函数传入的也不会被编译器内联优化，所以能被有效的修改。
-
     - We can not change the static final fields by getAndChangeModifiers since JDK12.（java.lang.NoSuchFieldException: modifiers）。从Java 12开始已经不行咯，用下面的方式吧
-
     - 可以通过Unsafe的相关方法实现修改，这个是无视访问修饰符的 putXXX()
   ```java
     unsafe.putObject(obj, unsafe.objectFieldOffset(field), value); // 实例对象属性
@@ -255,7 +264,8 @@ tuples.
      unsafe.getObject(obj, unsafe.objectFieldOffset(field));
      unsafe.getObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field));
   ```
-    - 不推荐使用Unsafe，所以在1.7出现了MethodHandle，通过不同的lookup，获取到find系列方法，然后invoke系列执行，其与反射类似，但效率很高。牵涉到final，要用IMPL_LOOKUP(绕过一些检查)
+    - 不推荐使用Unsafe，所以在1.7出现了MethodHandle，通过不同的lookup，获取到find系列方法，然后invoke系列执行，其与反射类似，但效率很高。
+      牵涉到final，要用IMPL_LOOKUP(绕过一些检查)
     ```java
       implLookup.findSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(obj, value);
       implLookup.findStaticSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(value); // 这种可以，虽然注释似乎意思是不支持final的样子：if access checking fails, or if the field is not static or is final

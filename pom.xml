@@ -444,6 +444,10 @@
                     </annotationProcessorPaths>
                     <!--https://docs.spring.io/spring-boot/docs/2.4.4/reference/html/appendix-configuration-metadata.html#configuration-metadata-annotation-processor-->
                     <!--<proc>none</proc>-->
+                    <!--https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html-->
+                    <!--<compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>-->
                 </configuration>
             </plugin>
             <plugin>

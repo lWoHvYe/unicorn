@@ -40,6 +40,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Hidden
 @SpringBootApplication // 核心配置类
+// 通过exclude SecurityAutoConfiguration可以屏蔽Spring Security的相关Control，这比定一个Config然后anyRequest().permitAll()要优雅，直接exclude AutoConfig，这是之前没有想到的方法，后续在别的地方应该还会用到
+//@SpringBootApplication(exclude = [SecurityAutoConfiguration::class])
 @EnableTransactionManagement // 开启事务
 @EnableJpaAuditing(auditorAwareRef = "auditorAware") // 开启Jpa审计
 @EnableRetry //开启重试机制
@@ -78,6 +80,7 @@ open class ValentineP2P {
     /**
      * 访问首页提示
      * 因为自定义了处理逻辑，所以下面这俩的RequestCondition是不一样的，所以能共存，且因为定义了优先新版本，所以在v1时走第一个，[v2+ 走第二个
+     * 但注意⚠️：这种path上带param是与定义的匿名访问注解AnonymousAccess不兼容的（不生效）
      * @see com.lwohvye.sys.common.handler.ApiVersionRequestMappingHandlerMapping
      * @return /
      */
@@ -87,8 +90,8 @@ open class ValentineP2P {
         return "Backend service started successfully"
     }
 
-    @ApiVersion(2)
-    @AnonymousGetMapping("/valentine/{version}/p2p")
+    @ApiVersion(2) // 指定从v2开始
+    @AnonymousGetMapping("/valentine/{version}/p2p", "/valentine/{version}/default") // @RequestMapping的path是支持多个的
     fun indexVersion(@PathVariable version: String): String {
         return String.format("Version %s Backend service started successfully", version)
     }

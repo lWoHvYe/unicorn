@@ -61,7 +61,7 @@ module lwohvye.unicorn.core {
     exports com.lwohvye.core.base;
     exports com.lwohvye.core.config;
     exports com.lwohvye.core.config.cache;
-    exports com.lwohvye.core.config.security; // open未完全包含exports，至少import需要export
+    exports com.lwohvye.core.config.security; // opens是针对reflect，exports主要是针对import，这俩不存在包含关系
     exports com.lwohvye.core.config.swagger;
     exports com.lwohvye.core.constant;
     exports com.lwohvye.core.context;
