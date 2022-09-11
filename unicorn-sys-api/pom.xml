@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>unicorn-sys-api</artifactId>
-    <name>权限基础模块</name>
+    <name>Sys Domain</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
     <description>Domain data for System module</description>
 

@@ -16,15 +16,15 @@
 
 package com.lwohvye.core.utils;
 
-import com.lwohvye.core.utils.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
 
 import static com.lwohvye.core.utils.StringUtils.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class StringUtilsTest {
 

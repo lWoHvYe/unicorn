@@ -20,18 +20,20 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lwohvye.core.config.FileProperties;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,10 +95,10 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         try {
-            var registrationsField = FieldUtils.getField(InterceptorRegistry.class, "registrations", true);
-            var registrations = (List<InterceptorRegistration>) ReflectionUtils.getField(registrationsField, registry);
+            var registrationsVarHandle = MethodHandles.privateLookupIn(InterceptorRegistry.class, MethodHandles.lookup()).findVarHandle(InterceptorRegistry.class, "registrations", List.class);
+            var registrations = (List<InterceptorRegistration>) registrationsVarHandle.get(registry);
             if (registrations != null) {
-                for (InterceptorRegistration interceptorRegistration : registrations) {
+                for (var interceptorRegistration : registrations) {
                     interceptorRegistration.excludePathPatterns("/v3/api-docs/**", "/swagger-ui/**");
                 }
             }
@@ -107,9 +109,9 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        FileProperties.ElPath path = properties.getOSPath();
-        String avatarUtl = "file:" + path.getAvatar().replace("\\", "/");
-        String pathUtl = "file:" + path.getPath().replace("\\", "/");
+        var path = properties.getOSPath();
+        var avatarUtl = "file:" + path.getAvatar().replace("\\", "/");
+        var pathUtl = "file:" + path.getPath().replace("\\", "/");
         registry.addResourceHandler("/avatar/**").addResourceLocations(avatarUtl).setCachePeriod(0);
         registry.addResourceHandler("/file/**").addResourceLocations(pathUtl).setCachePeriod(0);
         registry.addResourceHandler("/**").addResourceLocations("classpath:/META-INF/resources/").setCachePeriod(0);

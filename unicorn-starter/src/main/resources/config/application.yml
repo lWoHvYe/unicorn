@@ -101,8 +101,8 @@ local:
     load-os: true
     # 使用多个策略配置。默认false
     multi-security: false
-    # 关闭权限验证，默认false
-    un-auth: false
+    # 简单权限验证，默认false
+    sim-auth: false
     # 表名映射
     table-name:
       user: sys_user

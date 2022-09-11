@@ -16,8 +16,8 @@
 package com.lwohvye.sys.modules.quartz.utils;
 
 import com.lwohvye.core.utils.SpringContextHolder;
+import com.lwohvye.core.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ReflectionUtils;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;

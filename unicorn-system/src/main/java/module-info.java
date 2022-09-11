@@ -13,7 +13,7 @@ module lwohvye.unicorn.system {
     requires transitive spring.rabbit;
     requires transitive spring.retry;
     requires transitive captcha;
-    requires transitive com.fasterxml.jackson.datatype.jsr310;
+    requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
     requires easy.captcha;
     requires ganymed.ssh2;

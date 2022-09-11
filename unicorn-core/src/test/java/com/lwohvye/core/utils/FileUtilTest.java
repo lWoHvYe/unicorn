@@ -16,7 +16,6 @@
 
 package com.lwohvye.core.utils;
 
-import com.lwohvye.core.utils.SpringContextHolder;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -25,7 +24,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import static com.lwohvye.core.utils.FileUtil.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileUtilTest {
 

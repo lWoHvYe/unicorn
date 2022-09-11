@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>unicorn-core</artifactId>
-    <name>系统核心模块</name>
+    <name>Base Core</name>
     <url>https://github.com/lWoHvYe/eladmin</url>
     <description>Common module with BaseConfig, Utils, QueryAnno and so on</description>
 

@@ -18,9 +18,11 @@ package com.lwohvye.reactive.config.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
@@ -39,11 +41,13 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
 @EnableWebFluxSecurity
 @RequiredArgsConstructor
-@ConditionalOnExpression("${local.sys.un-auth:false}") // 基于配置，是否对所有请求放行。默认关闭
+@ConditionalOnExpression("${local.sys.sim-auth:false}") // 基于配置，是否对所有请求放行。默认关闭
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE) // 指定Init Bean的Condition，需要是Reactive（比如WebFlux）
 public class SimpleReactiveSecurityConfig {
 
-    private final ReactiveUserDetailsService userDetailsService;
+    @Lazy
+    @Autowired
+    private ReactiveUserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,12 +57,14 @@ public class SimpleReactiveSecurityConfig {
 
     @Bean
     SecurityWebFilterChain filterChainSimple(ServerHttpSecurity httpSecurity) {
-        var customFilter = new SimpleAuthFilter(userDetailsService);
         return httpSecurity
                 .csrf().disable()
-                .authorizeExchange(exchanges ->
-                        exchanges.anyExchange().permitAll()
-                ).addFilterBefore(customFilter, SecurityWebFiltersOrder.FORM_LOGIN)
+                .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+                .addFilterBefore(securityAuthFilter(), SecurityWebFiltersOrder.FORM_LOGIN)
                 .build();
+    }
+
+    private SimpleAuthFilter securityAuthFilter() {
+        return new SimpleAuthFilter(userDetailsService);
     }
 }

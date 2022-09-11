@@ -22,35 +22,36 @@ import java.util.Map;
 /**
  * @author: liaojinlong
  * @date: 2020/6/11 15:49
- * @apiNote: 关于缓存的Key集合
+ * @apiNote: 关于缓存的Key集合，这里只保留一种方式，能在Interface中定义Constant，实际不建议使用
  */
 public interface CacheKey {
 
-    String CACHE_NAME = "cacheName";
+    String CACHE_NAME = "cacheName"; // public static final String在编译时，会执行常量替换
 
+    String CACHE_KEY = "key";
     /**
      * 用户
      */
     // 接口中可以定义属性，默认（指不用加，但也不能改）是 public static final 的
-    Map<String, String> USER_ID = Map.of(CACHE_NAME, "user", "key", LocalCoreConfig.SYS_NAME + "id:");
+    Map<String, String> USER_ID = Map.of(CACHE_NAME, "user", CACHE_KEY, LocalCoreConfig.SYS_NAME + "id:");
     /**
      * 数据
      */
-    Map<String, String> DATA_USER = Map.of(CACHE_NAME, "data", "key", LocalCoreConfig.SYS_NAME + "user:");
+    Map<String, String> DATA_USER = Map.of(CACHE_NAME, "data", CACHE_KEY, LocalCoreConfig.SYS_NAME + "user:");
     /**
      * 菜单
      */
-    Map<String, String> MENU_ID = Map.of(CACHE_NAME, "menu", "key", LocalCoreConfig.SYS_NAME + "id:");
+    Map<String, String> MENU_ID = Map.of(CACHE_NAME, "menu", CACHE_KEY, LocalCoreConfig.SYS_NAME + "id:");
 
-    Map<String, String> MENU_USER = Map.of(CACHE_NAME, "menu", "key", LocalCoreConfig.SYS_NAME + "menu4user:");
+    Map<String, String> MENU_USER = Map.of(CACHE_NAME, "menu", CACHE_KEY, LocalCoreConfig.SYS_NAME + "menu4user:");
     /**
      * 角色信息
      */
-    Map<String, String> ROLE_ID = Map.of(CACHE_NAME, "role", "key", LocalCoreConfig.SYS_NAME + "id:");
+    Map<String, String> ROLE_ID = Map.of(CACHE_NAME, "role", CACHE_KEY, LocalCoreConfig.SYS_NAME + "id:");
     /**
      * 部门
      */
-    Map<String, String> DEPT_ID = Map.of(CACHE_NAME, "dept", "key", LocalCoreConfig.SYS_NAME + "id:");
+    Map<String, String> DEPT_ID = Map.of(CACHE_NAME, "dept", CACHE_KEY, LocalCoreConfig.SYS_NAME + "id:");
 
-    Map<String, String> RESOURCE_ALL = Map.of(CACHE_NAME, "resource", "key", LocalCoreConfig.SYS_NAME + "allResources");
+    Map<String, String> RESOURCE_ALL = Map.of(CACHE_NAME, "resource", CACHE_KEY, LocalCoreConfig.SYS_NAME + "allResources");
 }

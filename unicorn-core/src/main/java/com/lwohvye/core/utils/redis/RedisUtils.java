@@ -1927,7 +1927,7 @@ public class RedisUtils {
      */
     public void delInRC(Map<String, String> map, Object suf) {
         var mapCache = redissonClient.getMapCache(map.get(CacheKey.CACHE_NAME));
-        var prefix = map.get("key");
+        var prefix = map.get(CacheKey.CACHE_KEY);
         mapCache.remove(Objects.nonNull(suf) ? prefix + suf : prefix);
     }
 
@@ -1936,12 +1936,11 @@ public class RedisUtils {
      * @param ids id
      */
     public void delByKeys4Business(Map<String, String> map, Set<Long> ids) {
-        Set<Object> keys = new HashSet<>();
+        // Set<Object> keys = new HashSet<>();
         var mapCache = redissonClient.getMapCache(map.get(CacheKey.CACHE_NAME));
-        var prefix = map.get("key");
-        for (Long id : ids) {
+        var prefix = map.get(CacheKey.CACHE_KEY);
+        for (Long id : ids)
             mapCache.remove(prefix + id);
-        }
     }
 
     /**
