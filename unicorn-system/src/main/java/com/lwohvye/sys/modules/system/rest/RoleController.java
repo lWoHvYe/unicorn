@@ -16,8 +16,8 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.lang.Dict;
-import com.lwohvye.core.annotation.ResponseResultBody;
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysRoleAPI;
@@ -50,7 +50,7 @@ import java.util.Set;
  */
 @Tag(name = "RoleController", description = "系统：角色管理")
 @RestController
-@ResponseResultBody
+@RespResultBody
 @RequiredArgsConstructor
 public class RoleController implements SysRoleAPI {
 
@@ -88,7 +88,7 @@ public class RoleController implements SysRoleAPI {
         return Dict.create().set("level", getLevels(null));
     }
 
-    @Log("新增角色")
+    @OprLog("新增角色")
     @Operation(summary = "新增角色")
     @Override
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Role resources) {
@@ -100,7 +100,7 @@ public class RoleController implements SysRoleAPI {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改角色")
+    @OprLog("修改角色")
     @Operation(summary = "修改角色")
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Role resources) {
@@ -109,7 +109,7 @@ public class RoleController implements SysRoleAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("修改角色菜单")
+    @OprLog("修改角色菜单")
     @Operation(summary = "修改角色菜单")
     @Override
     public ResponseEntity<ResultInfo<String>> updateMenu(@RequestBody Role resources) {
@@ -119,7 +119,7 @@ public class RoleController implements SysRoleAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除角色")
+    @OprLog("删除角色")
     @Operation(summary = "删除角色")
     @Override
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {

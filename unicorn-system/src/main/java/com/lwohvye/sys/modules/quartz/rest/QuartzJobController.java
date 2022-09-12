@@ -15,7 +15,8 @@
  */
 package com.lwohvye.sys.modules.quartz.rest;
 
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.quartz.domain.QuartzJob;
@@ -41,11 +42,12 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2019-01-07
  */
+@Tag(name = "QuartzJobController", description = "系统：定时任务管理")
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/jobs")
-@Tag(name = "QuartzJobController", description = "系统：定时任务管理")
+@RespResultBody
+@RequiredArgsConstructor
 public class QuartzJobController {
 
     private static final String ENTITY_NAME = "quartzJob";
@@ -53,8 +55,8 @@ public class QuartzJobController {
 
     @Operation(summary = "查询定时任务")
     @GetMapping
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(JobQueryCriteria criteria, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(quartzJobService.queryAll(criteria, pageable)), HttpStatus.OK);
+    public Map<String, Object> query(JobQueryCriteria criteria, Pageable pageable) {
+        return quartzJobService.queryAll(criteria, pageable);
     }
 
     @Operation(summary = "导出任务数据")
@@ -71,11 +73,11 @@ public class QuartzJobController {
 
     @Operation(summary = "查询任务执行日志")
     @GetMapping(value = "/logs")
-    public ResponseEntity<ResultInfo<Map<String, Object>>> queryJobLog(JobQueryCriteria criteria, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(quartzJobService.queryAllLog(criteria, pageable)), HttpStatus.OK);
+    public Map<String, Object> queryJobLog(JobQueryCriteria criteria, Pageable pageable) {
+        return quartzJobService.queryAllLog(criteria, pageable);
     }
 
-    @Log("新增定时任务")
+    @OprLog("新增定时任务")
     @Operation(summary = "新增定时任务")
     @PostMapping
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody QuartzJob resources) {
@@ -83,38 +85,38 @@ public class QuartzJobController {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
         quartzJobService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改定时任务")
+    @OprLog("修改定时任务")
     @Operation(summary = "修改定时任务")
     @PutMapping
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody QuartzJob resources) {
         quartzJobService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("更改定时任务状态")
+    @OprLog("更改定时任务状态")
     @Operation(summary = "更改定时任务状态")
     @PutMapping(value = "/{id}")
     public ResponseEntity<ResultInfo<String>> update(@PathVariable Long id) {
         quartzJobService.updateIsPause(quartzJobService.findById(id));
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("执行定时任务")
+    @OprLog("执行定时任务")
     @Operation(summary = "执行定时任务")
     @PutMapping(value = "/exec/{id}")
     public ResponseEntity<ResultInfo<String>> execution(@PathVariable Long id) {
         quartzJobService.execution(quartzJobService.findById(id));
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除定时任务")
+    @OprLog("删除定时任务")
     @Operation(summary = "删除定时任务")
     @DeleteMapping
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         quartzJobService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

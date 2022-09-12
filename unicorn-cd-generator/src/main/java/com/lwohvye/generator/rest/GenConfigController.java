@@ -15,6 +15,7 @@
  */
 package com.lwohvye.generator.rest;
 
+import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.generator.domain.GenConfig;
 import com.lwohvye.generator.service.IGenConfigService;
 import com.lwohvye.core.utils.result.ResultInfo;
@@ -39,15 +40,16 @@ public class GenConfigController {
     private final IGenConfigService genConfigService;
 
     @Operation(summary = "查询")
+    @RespResultBody
     @GetMapping(value = "/{tableName}")
-    public ResponseEntity<ResultInfo<GenConfig>> query(@PathVariable String tableName) {
-        return new ResponseEntity<>(ResultInfo.success(genConfigService.find(tableName)), HttpStatus.OK);
+    public GenConfig query(@PathVariable String tableName) {
+        return genConfigService.find(tableName);
     }
 
     @Operation(summary = "修改")
     @PutMapping
     public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody GenConfig genConfig) {
         genConfigService.update(genConfig.getTableName(), genConfig);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

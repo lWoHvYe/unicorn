@@ -15,7 +15,8 @@
  */
 package com.lwohvye.sys.modules.mnt.rest;
 
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.api.modules.mnt.domain.ServerDeploy;
 import com.lwohvye.sys.modules.mnt.service.IServerDeployService;
 import com.lwohvye.api.modules.mnt.service.dto.ServerDeployQueryCriteria;
@@ -38,10 +39,10 @@ import java.util.Set;
  * @author zhanghouying
  * @date 2019-08-24
  */
-@RestController
 @Tag(name = "ServerDeployController", description = "运维：服务器管理")
-@RequiredArgsConstructor
+@RestController
 @RequestMapping("/api/serverDeploy")
+@RequiredArgsConstructor
 public class ServerDeployController {
 
     private final IServerDeployService serverDeployService;
@@ -53,39 +54,42 @@ public class ServerDeployController {
     }
 
     @Operation(summary = "查询服务器")
+    @RespResultBody
     @GetMapping
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(ServerDeployQueryCriteria criteria, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(serverDeployService.queryAll(criteria, pageable)), HttpStatus.OK);
+    public Map<String, Object> query(ServerDeployQueryCriteria criteria, Pageable pageable) {
+        return serverDeployService.queryAll(criteria, pageable);
     }
 
-    @Log("新增服务器")
+    @OprLog("新增服务器")
     @Operation(summary = "新增服务器")
+    @RespResultBody
     @PostMapping
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改服务器")
+    @OprLog("修改服务器")
     @Operation(summary = "修改服务器")
     @PutMapping
     public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody ServerDeploy resources) {
         serverDeployService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除服务器")
+    @OprLog("删除服务器")
     @Operation(summary = "删除Server")
     @DeleteMapping
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         serverDeployService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 
-    @Log("测试连接服务器")
+    @OprLog("测试连接服务器")
     @Operation(summary = "测试连接服务器")
     @PostMapping("/testConnect")
-    public ResponseEntity<ResultInfo<Boolean>> testConnect(@Validated @RequestBody ServerDeploy resources) {
-        return new ResponseEntity<>(ResultInfo.success(serverDeployService.testConnect(resources)), HttpStatus.CREATED);
+    public ResultInfo<Boolean> testConnect(@Validated @RequestBody ServerDeploy resources) {
+        var res = serverDeployService.testConnect(resources);
+        return ResultInfo.success(res);
     }
 }

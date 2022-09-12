@@ -15,8 +15,8 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
-import com.lwohvye.core.annotation.ResponseResultBody;
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysJobAPI;
@@ -44,7 +44,7 @@ import java.util.Set;
  */
 @Tag(name = "JobController", description = "系统：岗位管理")
 @RestController
-@ResponseResultBody
+@RespResultBody
 @RequiredArgsConstructor
 public class JobController implements SysJobAPI {
 
@@ -63,7 +63,7 @@ public class JobController implements SysJobAPI {
         return jobService.queryAll(criteria, pageable);
     }
 
-    @Log("新增岗位")
+    @OprLog("新增岗位")
     @Operation(summary = "新增岗位")
     @Override
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Job resources) {
@@ -74,7 +74,7 @@ public class JobController implements SysJobAPI {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改岗位")
+    @OprLog("修改岗位")
     @Operation(summary = "修改岗位")
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Job resources) {
@@ -82,7 +82,7 @@ public class JobController implements SysJobAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除岗位")
+    @OprLog("删除岗位")
     @Operation(summary = "删除岗位")
     @Override
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {

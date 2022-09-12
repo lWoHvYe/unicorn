@@ -18,11 +18,11 @@ package com.lwohvye.sys.modules.system.rest;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.core.annotation.ResponseResultBody;
+import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.config.RsaProperties;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.api.modules.system.api.SysUserAPI;
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.domain.User;
@@ -67,7 +67,7 @@ import java.util.Set;
 @Tag(name = "UserController", description = "系统：用户管理")
 @Slf4j
 @RestController
-@ResponseResultBody // 暂未知对export的影响
+@RespResultBody // 暂未知对export的影响
 @RequiredArgsConstructor
 public class UserController implements SysUserAPI {
 
@@ -113,7 +113,7 @@ public class UserController implements SysUserAPI {
         return PageUtil.toPage(null, 0);
     }
 
-    @Log("新增用户")
+    @OprLog("新增用户")
     @Operation(summary = "新增用户")
     @Override
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody User resources) {
@@ -124,7 +124,7 @@ public class UserController implements SysUserAPI {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改用户")
+    @OprLog("修改用户")
     @Operation(summary = "修改用户")
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody User resources) throws Exception {
@@ -140,7 +140,7 @@ public class UserController implements SysUserAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("修改用户：个人中心")
+    @OprLog("修改用户：个人中心")
     @Operation(summary = "修改用户：个人中心")
     @Override
     public ResponseEntity<ResultInfo<String>> center(@Validated(Update.class) @RequestBody User resources) {
@@ -151,7 +151,7 @@ public class UserController implements SysUserAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除用户")
+    @OprLog("删除用户")
     @Operation(summary = "删除用户")
     @Override
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
@@ -188,7 +188,7 @@ public class UserController implements SysUserAPI {
         return userService.updateAvatar(avatar);
     }
 
-    @Log("修改邮箱")
+    @OprLog("修改邮箱")
     @Operation(summary = "修改邮箱")
     @Override
     public ResultInfo<String> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {

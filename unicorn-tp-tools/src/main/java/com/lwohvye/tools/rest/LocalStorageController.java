@@ -15,7 +15,7 @@
  */
 package com.lwohvye.tools.rest;
 
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.tools.domain.LocalStorage;
 import com.lwohvye.tools.service.ILocalStorageService;
@@ -78,7 +78,7 @@ public class LocalStorageController {
         return new ResponseEntity<>(localStorage, HttpStatus.OK);
     }
 
-    @Log("修改文件")
+    @OprLog("修改文件")
     @Operation(summary = "修改文件")
     @PutMapping
     public ResponseEntity<String> update(@Validated @RequestBody LocalStorage resources) {
@@ -86,7 +86,7 @@ public class LocalStorageController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除文件")
+    @OprLog("删除文件")
     @DeleteMapping
     @Operation(summary = "多选删除")
     public ResponseEntity<String> delete(@RequestBody Long[] ids) {

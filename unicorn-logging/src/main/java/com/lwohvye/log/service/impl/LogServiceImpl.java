@@ -18,6 +18,7 @@ package com.lwohvye.log.service.impl;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.log.domain.Log;
 import com.lwohvye.log.repository.LogRepository;
@@ -40,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
@@ -89,12 +89,12 @@ public class LogServiceImpl implements ILogService {
     @Transactional(rollbackFor = Exception.class)
     public void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, Log log) {
 
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method method = signature.getMethod();
-        com.lwohvye.core.annotation.log.Log aopLog = method.getAnnotation(com.lwohvye.core.annotation.log.Log.class);
+        var signature = (MethodSignature) joinPoint.getSignature();
+        var method = signature.getMethod();
+        var aopLog = method.getAnnotation(OprLog.class);
 
         // 方法路径
-        String methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";
+        var methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";
 
         // 描述
         if (log != null) {
@@ -121,19 +121,19 @@ public class LogServiceImpl implements ILogService {
      * 根据方法和传入的参数获取请求参数
      */
     private String getParameter(Method method, Object[] args) {
-        List<Object> argList = new ArrayList<>();
-        Parameter[] parameters = method.getParameters();
+        var argList = new ArrayList<>();
+        var parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
             //将RequestBody注解修饰的参数作为请求参数
-            RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
+            var requestBody = parameters[i].getAnnotation(RequestBody.class);
             if (requestBody != null) {
                 argList.add(args[i]);
             }
             //将RequestParam注解修饰的参数作为请求参数
-            RequestParam requestParam = parameters[i].getAnnotation(RequestParam.class);
+            var requestParam = parameters[i].getAnnotation(RequestParam.class);
             if (requestParam != null) {
-                Map<String, Object> map = new HashMap<>();
-                String key = parameters[i].getName();
+                var map = new HashMap<>();
+                var key = parameters[i].getName();
                 if (!StringUtils.isEmpty(requestParam.value())) {
                     key = requestParam.value();
                 }

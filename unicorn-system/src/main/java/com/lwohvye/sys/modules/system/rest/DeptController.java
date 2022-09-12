@@ -16,8 +16,8 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.core.annotation.ResponseResultBody;
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysDeptAPI;
@@ -46,7 +46,7 @@ import java.util.*;
  */
 @Tag(name = "DeptController", description = "系统：部门管理")
 @RestController
-@ResponseResultBody
+@RespResultBody
 @RequiredArgsConstructor
 public class DeptController implements SysDeptAPI {
 
@@ -79,7 +79,7 @@ public class DeptController implements SysDeptAPI {
         return deptService.buildTree(new ArrayList<>(deptDtos));
     }
 
-    @Log("新增部门")
+    @OprLog("新增部门")
     @Operation(summary = "新增部门")
     @Override
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Dept resources) {
@@ -90,7 +90,7 @@ public class DeptController implements SysDeptAPI {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改部门")
+    @OprLog("修改部门")
     @Operation(summary = "修改部门")
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dept resources) {
@@ -98,7 +98,7 @@ public class DeptController implements SysDeptAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除部门")
+    @OprLog("删除部门")
     @Operation(summary = "删除部门")
     @Override
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {

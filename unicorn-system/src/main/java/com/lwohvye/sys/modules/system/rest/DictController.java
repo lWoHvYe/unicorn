@@ -18,8 +18,8 @@ package com.lwohvye.sys.modules.system.rest;
 import com.lwohvye.api.modules.system.domain.Dict;
 import com.lwohvye.api.modules.system.service.dto.DictDto;
 import com.lwohvye.api.modules.system.service.dto.DictQueryCriteria;
-import com.lwohvye.core.annotation.ResponseResultBody;
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.result.ResultInfo;
@@ -44,7 +44,7 @@ import java.util.Set;
 @Tag(name = "DictController", description = "系统：字典管理")
 @RestController
 @RequestMapping("/api/sys/dict")
-@ResponseResultBody
+@RespResultBody
 @RequiredArgsConstructor
 public class DictController {
 
@@ -63,7 +63,7 @@ public class DictController {
         return dictService.queryAll(resources, pageable);
     }
 
-    @Log("新增字典")
+    @OprLog("新增字典")
     @Operation(summary = "新增字典")
     @PostMapping
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Dict resources) {
@@ -74,7 +74,7 @@ public class DictController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改字典")
+    @OprLog("修改字典")
     @Operation(summary = "修改字典")
     @PutMapping
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dict resources) {
@@ -82,7 +82,7 @@ public class DictController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除字典")
+    @OprLog("删除字典")
     @Operation(summary = "删除字典")
     @DeleteMapping
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {

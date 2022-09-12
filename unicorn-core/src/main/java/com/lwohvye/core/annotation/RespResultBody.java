@@ -22,6 +22,9 @@ import java.lang.annotation.*;
 
 /**
  * 通用返回注解
+ * 当ReturnType = ResponseEntity<ResultInfo<T>> && HttpStatus = OK 时，改为 T + @RespResultBody
+ * 当 HttpStatus = OK 时，可略去ResponseEntity这一层
+ * 当 HttpStatus != OK 时，使用@RespResultBody可略去body中对ResultInfo.success(T) 的调用，只保留T
  *
  * @author Hongyan Wang
  * @date 2021/1/15 19:44
@@ -30,6 +33,6 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
 @ResponseBody
-public @interface ResponseResultBody {
+public @interface RespResultBody {
 
 }

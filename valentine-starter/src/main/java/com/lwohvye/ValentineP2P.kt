@@ -15,7 +15,7 @@
  */
 package com.lwohvye
 
-import com.lwohvye.core.annotation.ResponseResultBody
+import com.lwohvye.core.annotation.RespResultBody
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
 import com.lwohvye.core.utils.SpringContextHolder
 import com.lwohvye.core.utils.result.ResultInfo
@@ -88,7 +88,7 @@ open class ValentineP2P {
      * @see com.lwohvye.sys.common.handler.ApiVersionRequestMappingHandlerMapping
      * @return /
      */
-    @ResponseResultBody
+    @RespResultBody
     @ApiVersion
     @AnonymousGetMapping("/valentine/{version}/p2p")
     fun index(@PathVariable version: String): String? {
@@ -96,7 +96,7 @@ open class ValentineP2P {
 //        return "Backend service started successfully"
     }
 
-    @ResponseResultBody
+    @RespResultBody
     @ApiVersion(2)
     @AnonymousGetMapping("/valentine/{version}/p2p")
     fun indexCCVer(@PathVariable version: String): List<String> {
@@ -104,7 +104,7 @@ open class ValentineP2P {
     }
 
 
-    @ResponseResultBody
+    @RespResultBody
     @ApiVersion(3) // 指定从v3开始
     @AnonymousGetMapping("/valentine/{version}/p2p", "/valentine/{version}/default") // @RequestMapping的path是支持多个的
     fun indexVersion(@PathVariable version: String): ResultInfo<String>? {
@@ -115,7 +115,7 @@ open class ValentineP2P {
     /**
      * 匹配采用的最佳适配，当传v4时，会匹配到这个方法
      */
-    @ResponseResultBody
+    @RespResultBody
     @AnonymousGetMapping("/valentine/v4/p2p")
     fun indexClVer(): ResponseEntity<ResultInfo<String>> {
         return ResponseEntity(ResultInfo.success("ClVersion v4 Backend service started successfully"), HttpStatus.CREATED)

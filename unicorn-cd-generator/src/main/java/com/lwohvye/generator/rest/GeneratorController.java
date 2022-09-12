@@ -15,6 +15,7 @@
  */
 package com.lwohvye.generator.rest;
 
+import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.generator.domain.ColumnInfo;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.generator.service.IGenConfigService;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -57,26 +59,29 @@ public class GeneratorController {
     }
 
     @Operation(summary = "查询数据库数据")
+    @RespResultBody
     @GetMapping(value = "/tables")
-    public ResponseEntity<ResultInfo<Map<String, Object>>> queryTables(@RequestParam(defaultValue = "") String name,
-                                                                       @RequestParam(defaultValue = "0") Integer page,
-                                                                       @RequestParam(defaultValue = "10") Integer size) {
+    public Map<String, Object> queryTables(@RequestParam(defaultValue = "") String name,
+                                           @RequestParam(defaultValue = "0") Integer page,
+                                           @RequestParam(defaultValue = "10") Integer size) {
         int[] startEnd = PageUtil.transToStartEnd(page, size);
-        return new ResponseEntity<>(ResultInfo.success(generatorService.getTables(name, startEnd)), HttpStatus.OK);
+        return generatorService.getTables(name, startEnd);
     }
 
     @Operation(summary = "查询字段数据")
+    @RespResultBody
     @GetMapping(value = "/columns")
-    public ResponseEntity<ResultInfo<Map<String, Object>>> queryColumns(@RequestParam String tableName) {
+    public Map<String, Object> queryColumns(@RequestParam String tableName) {
         List<ColumnInfo> columnInfos = generatorService.getColumns(tableName);
-        return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(columnInfos, columnInfos.size())), HttpStatus.OK);
+        return PageUtil.toPage(columnInfos, columnInfos.size());
     }
 
     @Operation(summary = "保存字段数据")
+    @RespResultBody
     @PutMapping
     public ResponseEntity<ResultInfo<String>> save(@RequestBody List<ColumnInfo> columnInfos) {
         generatorService.save(columnInfos);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "同步字段数据")
@@ -85,13 +90,14 @@ public class GeneratorController {
         for (String table : tables) {
             generatorService.sync(generatorService.getColumns(table), generatorService.query(table));
         }
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Operation(summary = "生成代码")
+    @RespResultBody
     @PostMapping(value = "/{tableName}/{type}")
-    public ResponseEntity<ResultInfo<Map<String, Object>>> generator(@PathVariable String tableName, @PathVariable Integer type, HttpServletRequest request, HttpServletResponse response) {
-        if (!generatorEnabled && type == 0) {
+    public List<Map<String, Object>> generator(@PathVariable String tableName, @PathVariable Integer type, HttpServletRequest request, HttpServletResponse response) {
+        if (Boolean.FALSE.equals(generatorEnabled) && type == 0) {
             throw new BadRequestException("此环境不允许生成代码，请选择预览或者下载查看！");
         }
         switch (type) {
@@ -101,7 +107,7 @@ public class GeneratorController {
                 break;
             // 预览
             case 1:
-                return new ResponseEntity<>(ResultInfo.success(generatorService.preview(genConfigService.find(tableName), generatorService.getColumns(tableName))), HttpStatus.OK);
+                return generatorService.preview(genConfigService.find(tableName), generatorService.getColumns(tableName));
             // 打包
             case 2:
                 generatorService.download(genConfigService.find(tableName), generatorService.getColumns(tableName), request, response);
@@ -109,6 +115,6 @@ public class GeneratorController {
             default:
                 throw new BadRequestException("没有这个选项");
         }
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return Collections.emptyList();
     }
 }

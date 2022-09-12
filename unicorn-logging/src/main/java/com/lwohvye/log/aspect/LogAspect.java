@@ -52,7 +52,7 @@ public class LogAspect {
     /**
      * 配置切入点
      */
-    @Pointcut("@annotation(com.lwohvye.core.annotation.log.Log)")
+    @Pointcut("@annotation(com.lwohvye.core.annotation.log.OprLog)")
     public void logPointcut() {
         // 该方法无方法体,主要为了让同类中其他方法使用此切入点
     }

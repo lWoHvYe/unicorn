@@ -15,7 +15,7 @@
  */
 package com.lwohvye.tools.rest;
 
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.tools.domain.EmailConfig;
 import com.lwohvye.tools.domain.vo.EmailVo;
 import com.lwohvye.tools.service.IEmailService;
@@ -42,11 +42,11 @@ public class EmailController {
     private final IEmailService emailService;
 
     @GetMapping
-    public ResponseEntity<EmailConfig> queryConfig() {
-        return new ResponseEntity<>(emailService.find(), HttpStatus.OK);
+    public EmailConfig queryConfig() {
+        return emailService.find();
     }
 
-    @Log("配置邮件")
+    @OprLog("配置邮件")
     @PutMapping
     @Operation(summary = "配置邮件")
     public ResponseEntity<String> updateConfig(@Validated @RequestBody EmailConfig emailConfig) throws Exception {
@@ -54,7 +54,7 @@ public class EmailController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Log("发送邮件")
+    @OprLog("发送邮件")
     @PostMapping
     @Operation(summary = "发送邮件")
     public ResponseEntity<String> sendEmail(@Validated @RequestBody EmailVo emailVo) {

@@ -15,17 +15,15 @@
  */
 package com.lwohvye.tools.rest;
 
-import com.lwohvye.tools.domain.vo.EmailVo;
-import com.lwohvye.tools.service.IVerifyService;
-import com.lwohvye.tools.service.IEmailService;
 import com.lwohvye.core.utils.enums.CodeBiEnum;
 import com.lwohvye.core.utils.enums.CodeEnum;
 import com.lwohvye.core.utils.result.ResultInfo;
+import com.lwohvye.tools.domain.vo.EmailVo;
+import com.lwohvye.tools.service.IEmailService;
+import com.lwohvye.tools.service.IVerifyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -45,34 +43,30 @@ public class VerifyController {
 
     @PostMapping(value = "/resetEmail")
     @Operation(summary = "重置邮箱，发送验证码")
-    public ResponseEntity<ResultInfo<String>> resetEmail(@RequestParam String email) {
+    public ResultInfo<String> resetEmail(@RequestParam String email) {
         EmailVo emailVo = verificationCodeService.sendEmail(email, CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey());
         emailService.send(emailVo, emailService.find());
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 
     @PostMapping(value = "/email/resetPass")
     @Operation(summary = "重置密码，发送验证码")
-    public ResponseEntity<ResultInfo<String>> resetPass(@RequestParam String email) {
+    public ResultInfo<String> resetPass(@RequestParam String email) {
         EmailVo emailVo = verificationCodeService.sendEmail(email, CodeEnum.EMAIL_RESET_PWD_CODE.getKey());
         emailService.send(emailVo, emailService.find());
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 
     @GetMapping(value = "/validated")
     @Operation(summary = "验证码验证")
-    public ResponseEntity<ResultInfo<String>> validated(@RequestParam String email, @RequestParam String code, @RequestParam Integer codeBi) {
+    public ResultInfo<String> validated(@RequestParam String email, @RequestParam String code, @RequestParam Integer codeBi) {
         CodeBiEnum biEnum = CodeBiEnum.find(codeBi);
         switch (Objects.requireNonNull(biEnum)) {
-            case ONE:
-                verificationCodeService.validated(CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + email, code);
-                break;
-            case TWO:
-                verificationCodeService.validated(CodeEnum.EMAIL_RESET_PWD_CODE.getKey() + email, code);
-                break;
-            default:
-                break;
+            case ONE -> verificationCodeService.validated(CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + email, code);
+            case TWO -> verificationCodeService.validated(CodeEnum.EMAIL_RESET_PWD_CODE.getKey() + email, code);
+            default -> {
+            }
         }
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

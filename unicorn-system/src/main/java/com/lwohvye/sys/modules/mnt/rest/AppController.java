@@ -15,7 +15,8 @@
  */
 package com.lwohvye.sys.modules.mnt.rest;
 
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.api.modules.mnt.domain.App;
 import com.lwohvye.api.modules.mnt.service.dto.AppQueryCriteria;
 import com.lwohvye.sys.modules.mnt.service.IAppService;
@@ -38,10 +39,11 @@ import java.util.Set;
  * @author zhanghouying
  * @date 2019-08-24
  */
-@RestController
-@RequiredArgsConstructor
 @Tag(name = "AppController", description = "运维：应用管理")
+@RestController
 @RequestMapping("/api/app")
+@RespResultBody
+@RequiredArgsConstructor
 public class AppController {
 
     private final IAppService appService;
@@ -54,31 +56,31 @@ public class AppController {
 
     @Operation(summary = "查询应用")
     @GetMapping
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(AppQueryCriteria criteria, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(appService.queryAll(criteria, pageable)), HttpStatus.OK);
+    public Map<String, Object> query(AppQueryCriteria criteria, Pageable pageable) {
+        return appService.queryAll(criteria, pageable);
     }
 
-    @Log("新增应用")
+    @OprLog("新增应用")
     @Operation(summary = "新增应用")
     @PostMapping
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody App resources) {
         appService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改应用")
+    @OprLog("修改应用")
     @Operation(summary = "修改应用")
     @PutMapping
     public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody App resources) {
         appService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除应用")
+    @OprLog("删除应用")
     @Operation(summary = "删除应用")
     @DeleteMapping
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         appService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

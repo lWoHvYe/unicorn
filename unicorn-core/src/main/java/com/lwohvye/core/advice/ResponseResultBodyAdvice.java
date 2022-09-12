@@ -15,11 +15,13 @@
  */
 package com.lwohvye.core.advice;
 
-import com.lwohvye.core.annotation.ResponseResultBody;
+import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.ThrowableUtil;
 import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -46,7 +48,7 @@ import java.lang.annotation.Annotation;
 import java.util.Objects;
 
 /**
- * 这也是一种统一数据返回的方式。可视情况整合。与{@link ResponseResultBody}配合使用
+ * 这也是一种统一数据返回的方式。可视情况整合。与{@link RespResultBody}配合使用
  * ResponseBodyAdvice 实现了这个接口的类，处理返回的值在传递给 HttpMessageConverter之前。应用场景为spring项目开发过程中，对controller层返回值进行修改增强处理（比如加密、统一返回格式等）。
  * 另外还有RequestBodyAdvice用于在请求之前进行一些操作
  *
@@ -58,7 +60,7 @@ import java.util.Objects;
 @ControllerAdvice // 这里用@RestControllerAdvice与@ControllerAdvice好像没区别，本质也是处理链，这只是上面的一环
 public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
 
-    private static final Class<? extends Annotation> ANNOTATION_TYPE = ResponseResultBody.class;
+    private static final Class<? extends Annotation> ANNOTATION_TYPE = RespResultBody.class;
 
     /**
      * 判断类或者方法是否使用了 @ResponseResultBody
@@ -74,7 +76,12 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     // TODO: 2022/9/11 如方法所言，这里设置的是Body，所以是无法改变ResponseStatus的（虽然一般不用管），另外针对String类型的处理还有些问题
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(@Nullable Object body,
+                                  MethodParameter returnType,
+                                  MediaType selectedContentType,
+                                  Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                  ServerHttpRequest request,
+                                  ServerHttpResponse response) {
         if (Objects.isNull(body)) {
             var parameterType = returnType.getParameterType(); // 或者GenericParameterType
             if (Objects.equals(String.class, parameterType)) // String类型会转成空字符串

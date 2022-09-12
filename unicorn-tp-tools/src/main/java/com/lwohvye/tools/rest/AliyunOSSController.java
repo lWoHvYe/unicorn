@@ -15,14 +15,12 @@
  */
 package com.lwohvye.tools.rest;
 
-import com.lwohvye.tools.service.IAliyunOSSService;
 import com.lwohvye.core.utils.result.ResultInfo;
+import com.lwohvye.tools.service.IAliyunOSSService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,16 +42,16 @@ public class AliyunOSSController {
 
     @PostMapping
     @Operation(summary = "分片上传")
-    public ResponseEntity<ResultInfo<String>> multipartUpload(MultipartFile file) {
+    public ResultInfo<String> multipartUpload(MultipartFile file) {
         aliyunOSSService.multipartUploadFile(file);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 
     @GetMapping
     @Operation(summary = "断点续传下载")
-    public ResponseEntity<ResultInfo<String>> downloadFile(String ossUri, String downloadPath) {
+    public ResultInfo<String> downloadFile(String ossUri, String downloadPath) {
         aliyunOSSService.downloadFile(ossUri, downloadPath);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 
 }

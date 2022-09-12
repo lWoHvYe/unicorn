@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
-import com.lwohvye.core.annotation.ResponseResultBody;
+import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.sys.modules.system.service.IMonitorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +38,7 @@ public class MonitorController {
 
     private final IMonitorService serverService;
 
-    @ResponseResultBody
+    @RespResultBody
     @GetMapping
     @Operation(summary = "查询服务监控")
     public Map<String, Object> query() {

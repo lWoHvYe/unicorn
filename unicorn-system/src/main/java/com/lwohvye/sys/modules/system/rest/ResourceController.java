@@ -15,8 +15,8 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
-import com.lwohvye.core.annotation.ResponseResultBody;
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.api.modules.system.api.SysResourceAPI;
 import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.api.modules.system.service.dto.ResourceDto;
@@ -43,20 +43,20 @@ import java.util.Map;
  **/
 @Tag(name = "ResourceController", description = "资源管理")
 @RestController
-@ResponseResultBody
+@RespResultBody
 @RequiredArgsConstructor
 public class ResourceController implements SysResourceAPI {
 
     private final IResourceService resourceService;
 
-    @Log("查询资源")
+    @OprLog("查询资源")
     @Operation(summary = "查询资源")
     @Override
     public Map<String, Object> query(ResourceQueryCriteria criteria, Pageable pageable) {
         return resourceService.queryAll(criteria, pageable);
     }
 
-    @Log("新增资源")
+    @OprLog("新增资源")
     @Operation(summary = "新增资源")
     @Override
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Resource resources) {
@@ -64,7 +64,7 @@ public class ResourceController implements SysResourceAPI {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改资源")
+    @OprLog("修改资源")
     @Operation(summary = "修改资源")
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody Resource resources) {
@@ -72,7 +72,7 @@ public class ResourceController implements SysResourceAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除资源")
+    @OprLog("删除资源")
     @Operation(summary = "删除资源")
     @Override
     public ResultInfo<String> delete(@RequestBody Long[] ids) {

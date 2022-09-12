@@ -16,8 +16,8 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.core.annotation.ResponseResultBody;
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.context.CycleAvoidingMappingContext;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
 @Tag(name = "MenuController", description = "系统：菜单管理")
 @RestController
-@ResponseResultBody
+@RespResultBody
 @RequiredArgsConstructor
 public class MenuController implements SysMenuAPI {
 
@@ -110,7 +110,7 @@ public class MenuController implements SysMenuAPI {
         return menuService.getMenus(null);
     }
 
-    @Log("新增菜单")
+    @OprLog("新增菜单")
     @Operation(summary = "新增菜单")
     @Override
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Menu resources) {
@@ -121,7 +121,7 @@ public class MenuController implements SysMenuAPI {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Log("修改菜单")
+    @OprLog("修改菜单")
     @Operation(summary = "修改菜单")
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Menu resources) {
@@ -129,7 +129,7 @@ public class MenuController implements SysMenuAPI {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @Log("删除菜单")
+    @OprLog("删除菜单")
     @Operation(summary = "删除菜单")
     @Override
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {

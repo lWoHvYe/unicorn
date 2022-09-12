@@ -15,7 +15,8 @@
  */
 package com.lwohvye.sys.modules.mnt.rest;
 
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
 import com.lwohvye.core.utils.result.ResultInfo;
@@ -23,8 +24,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -36,10 +35,10 @@ import java.util.Set;
  * @author zhanghouying
  * @date 2019-08-24
  */
-@RestController
-@RequiredArgsConstructor
 @Tag(name = "DeployHistoryController", description = "运维：部署历史管理")
+@RestController
 @RequestMapping("/api/deployHistory")
+@RequiredArgsConstructor
 public class DeployHistoryController {
 
     private final IDeployHistoryService deployHistoryService;
@@ -51,16 +50,17 @@ public class DeployHistoryController {
     }
 
     @Operation(summary = "查询部署历史")
+    @RespResultBody
     @GetMapping
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DeployHistoryQueryCriteria criteria, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(deployHistoryService.queryAll(criteria, pageable)), HttpStatus.OK);
+    public Map<String, Object> query(DeployHistoryQueryCriteria criteria, Pageable pageable) {
+        return deployHistoryService.queryAll(criteria, pageable);
     }
 
-    @Log("删除DeployHistory")
+    @OprLog("删除DeployHistory")
     @Operation(summary = "删除部署历史")
     @DeleteMapping
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<String> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<String> ids) {
         deployHistoryService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

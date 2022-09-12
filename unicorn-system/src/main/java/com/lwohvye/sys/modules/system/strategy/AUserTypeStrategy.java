@@ -64,7 +64,7 @@ public sealed interface AUserTypeStrategy extends BaseService permits AdminUserT
     // endregion
 
     // 接口中可以有private方法，
-    private void doNothing(Long userId) {
+    private void doNothing(Long ignoredUserId) {
         System.out.println("...");
     }
 }
