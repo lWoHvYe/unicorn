@@ -15,14 +15,12 @@
  */
 package com.lwohvye.sys.modules.system.service;
 
-import com.lwohvye.core.base.BaseService;
+import com.lwohvye.api.modules.system.domain.Dict;
 import com.lwohvye.api.modules.system.service.dto.DictDto;
 import com.lwohvye.api.modules.system.service.dto.DictQueryCriteria;
-import com.lwohvye.api.modules.system.domain.Dict;
+import com.lwohvye.core.base.BaseService;
 import org.springframework.data.domain.Pageable;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,13 +66,4 @@ public interface IDictService extends BaseService {
      * @param ids /
      */
     void delete(Set<Long> ids);
-
-    /**
-     * 导出数据
-     *
-     * @param queryAll 待导出的数据
-     * @param response /
-     * @throws IOException /
-     */
-    void download(List<DictDto> queryAll, HttpServletResponse response) throws IOException;
 }

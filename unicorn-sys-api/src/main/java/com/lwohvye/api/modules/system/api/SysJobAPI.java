@@ -35,7 +35,7 @@ import java.util.Set;
 public interface SysJobAPI {
 
     @GetMapping("/api/sys/job")
-    ResponseEntity<ResultInfo<Map<String, Object>>> query(JobQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> query(JobQueryCriteria criteria, Pageable pageable);
 
     @PostMapping("/api/sys/job")
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Job resources);
@@ -44,6 +44,6 @@ public interface SysJobAPI {
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Job resources);
 
     @DeleteMapping("/api/sys/job")
-    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
+    ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
 }

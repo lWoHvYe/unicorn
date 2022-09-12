@@ -15,14 +15,15 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
-import com.lwohvye.core.annotation.log.Log;
+import com.lwohvye.api.modules.system.domain.Dict;
 import com.lwohvye.api.modules.system.service.dto.DictDto;
+import com.lwohvye.api.modules.system.service.dto.DictQueryCriteria;
+import com.lwohvye.core.annotation.ResponseResultBody;
+import com.lwohvye.core.annotation.log.Log;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.api.modules.system.domain.Dict;
-import com.lwohvye.sys.modules.system.service.IDictService;
-import com.lwohvye.api.modules.system.service.dto.DictQueryCriteria;
 import com.lwohvye.core.utils.result.ResultInfo;
+import com.lwohvye.sys.modules.system.service.IDictService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,31 +41,26 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2019-04-10
  */
-@RestController
-@RequiredArgsConstructor
 @Tag(name = "DictController", description = "系统：字典管理")
+@RestController
 @RequestMapping("/api/sys/dict")
+@ResponseResultBody
+@RequiredArgsConstructor
 public class DictController {
 
     private final IDictService dictService;
     private static final String ENTITY_NAME = "dict";
 
-    @Operation(summary = "导出字典数据")
-    @GetMapping(value = "/download")
-    public void download(HttpServletResponse response, DictQueryCriteria criteria) throws IOException {
-        dictService.download(dictService.queryAll(criteria), response);
-    }
-
     @Operation(summary = "查询字典")
     @GetMapping(value = "/all")
-    public ResponseEntity<ResultInfo<DictDto>> queryAll() {
-        return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(new DictQueryCriteria())), HttpStatus.OK);
+    public List<DictDto> queryAll() {
+        return dictService.queryAll(new DictQueryCriteria());
     }
 
     @Operation(summary = "查询字典")
     @GetMapping
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DictQueryCriteria resources, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(dictService.queryAll(resources, pageable)), HttpStatus.OK);
+    public Map<String, Object> query(DictQueryCriteria resources, Pageable pageable) {
+        return dictService.queryAll(resources, pageable);
     }
 
     @Log("新增字典")
@@ -76,7 +71,7 @@ public class DictController {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
         dictService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Log("修改字典")
@@ -84,14 +79,14 @@ public class DictController {
     @PutMapping
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dict resources) {
         dictService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Log("删除字典")
     @Operation(summary = "删除字典")
     @DeleteMapping
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         dictService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

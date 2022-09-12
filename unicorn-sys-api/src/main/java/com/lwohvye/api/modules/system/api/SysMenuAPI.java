@@ -37,19 +37,19 @@ import java.util.Set;
 public interface SysMenuAPI {
 
     @GetMapping("/api/sys/menus/build")
-    ResponseEntity<List<MenuVo>> buildMenus();
+    List<MenuVo> buildMenus();
 
     @GetMapping("/api/sys/menus/lazy")
-    ResponseEntity<List<MenuDto>> query(@RequestParam Long pid);
+    List<MenuDto> query(@RequestParam Long pid);
 
     @GetMapping("/api/sys/menus/child")
-    ResponseEntity<Set<Long>> child(@RequestParam Long id);
+    List<Long> child(@RequestParam Long id);
 
     @GetMapping("/api/sys/menus")
-    ResponseEntity<ResultInfo<Map<String, Object>>> query(MenuQueryCriteria criteria) throws Exception;
+    Map<String, Object> query(MenuQueryCriteria criteria) throws Exception;
 
     @PostMapping("/api/sys/menus/superior")
-    ResponseEntity<List<MenuDto>> getSuperior(@RequestBody List<Long> ids);
+    List<MenuDto> getSuperior(@RequestBody List<Long> ids);
 
     @PostMapping("/api/sys/menus")
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Menu resources);
@@ -58,6 +58,6 @@ public interface SysMenuAPI {
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Menu resources);
 
     @DeleteMapping("/api/sys/menus")
-    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
+    ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
 }

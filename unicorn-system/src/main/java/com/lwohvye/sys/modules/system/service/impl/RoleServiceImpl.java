@@ -22,7 +22,6 @@ import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.core.context.CycleAvoidingMappingContext;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.exception.EntityExistException;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.core.utils.redis.RedisUtils;
 import com.lwohvye.sys.modules.system.event.MenuEvent;
@@ -49,6 +48,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
@@ -78,7 +78,8 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
-        return roleRepository.findAll(sort).stream().map(role -> conversionService.convert(role, RoleDto.class)).toList();
+        // Unexpected token (START_OBJECT), expected VALUE_STRING: need JSON String that contains type id (for subtype of java.lang.Object)，放人redis的，不要是Stream.toList()，无法decoder
+        return new ArrayList<>(roleRepository.findAll(sort).stream().map(role -> conversionService.convert(role, RoleDto.class)).toList());
     }
 
     @Override
@@ -112,7 +113,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public void create(Role resources) {
         if (roleRepository.findByName(resources.getName()) != null) {
-            throw new EntityExistException(Role.class, "username", resources.getName());
+            throw new EntityExistsException(StringUtils.generateExcMsg(Role.class, "username", resources.getName(), "existed"));
         }
         roleRepository.save(resources);
     }
@@ -127,7 +128,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
         Role role1 = roleRepository.findByName(resources.getName());
 
         if (role1 != null && !role1.getId().equals(role.getId())) {
-            throw new EntityExistException(Role.class, "username", resources.getName());
+            throw new EntityExistsException(StringUtils.generateExcMsg(Role.class, "username", resources.getName(), "existed"));
         }
         role.setName(resources.getName());
         role.setDescription(resources.getDescription());

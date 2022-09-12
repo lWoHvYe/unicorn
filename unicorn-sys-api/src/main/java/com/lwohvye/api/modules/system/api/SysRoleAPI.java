@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,16 +39,16 @@ import java.util.Set;
 public interface SysRoleAPI {
 
     @GetMapping("/api/sys/roles/{id}")
-    ResponseEntity<ResultInfo<RoleDto>> query(@PathVariable Long id);
+    RoleDto query(@PathVariable Long id);
 
     @GetMapping("/api/sys/roles/all")
-    ResponseEntity<ResultInfo<RoleDto>> query();
+    List<RoleDto> query();
 
     @GetMapping("/api/sys/roles")
-    ResponseEntity<ResultInfo<Map<String, Object>>> query(RoleQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> query(RoleQueryCriteria criteria, Pageable pageable);
 
     @GetMapping("/api/sys/roles/level")
-    ResponseEntity<ResultInfo<Dict>> getLevel();
+    Dict getLevel();
 
     @PostMapping("/api/sys/roles")
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Role resources);
@@ -59,8 +60,8 @@ public interface SysRoleAPI {
     ResponseEntity<ResultInfo<String>> updateMenu(@RequestBody Role resources);
 
     @DeleteMapping("/api/sys/roles")
-    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
+    ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
     @GetMapping("/api/sys/roles/uid/{userId}")
-    ResponseEntity<ResultInfo<RoleSmallDto>> queryByUid(@PathVariable Long userId);
+    List<RoleSmallDto> queryByUid(@PathVariable Long userId);
 }

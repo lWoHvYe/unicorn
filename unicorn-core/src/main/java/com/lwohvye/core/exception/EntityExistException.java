@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
  * @author Zheng Jie
  * @date 2018-11-23
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class EntityExistException extends RuntimeException {
 
     public EntityExistException(Class clazz, String field, String val) {
@@ -28,7 +29,6 @@ public class EntityExistException extends RuntimeException {
     }
 
     private static String generateMessage(String entity, String field, String val) {
-        return StringUtils.capitalize(entity)
-                + " with " + field + " "+ val + " existed";
+        return StringUtils.capitalize(entity) + " with " + field + " " + val + " existed";
     }
 }

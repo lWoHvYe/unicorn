@@ -15,6 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
+import com.lwohvye.core.annotation.ResponseResultBody;
 import com.lwohvye.core.annotation.log.Log;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
@@ -41,9 +42,10 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2019-03-29
  */
-@RestController
-@RequiredArgsConstructor
 @Tag(name = "JobController", description = "系统：岗位管理")
+@RestController
+@ResponseResultBody
+@RequiredArgsConstructor
 public class JobController implements SysJobAPI {
 
     private final IJobService jobService;
@@ -57,8 +59,8 @@ public class JobController implements SysJobAPI {
 
     @Operation(summary = "查询岗位")
     @Override
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(JobQueryCriteria criteria, Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(jobService.queryAll(criteria, pageable)), HttpStatus.OK);
+    public Map<String, Object> query(JobQueryCriteria criteria, Pageable pageable) {
+        return jobService.queryAll(criteria, pageable);
     }
 
     @Log("新增岗位")
@@ -69,7 +71,7 @@ public class JobController implements SysJobAPI {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
         jobService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Log("修改岗位")
@@ -77,16 +79,16 @@ public class JobController implements SysJobAPI {
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Job resources) {
         jobService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Log("删除岗位")
     @Operation(summary = "删除岗位")
     @Override
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         // 验证是否被用户关联
         jobService.verification(ids);
         jobService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

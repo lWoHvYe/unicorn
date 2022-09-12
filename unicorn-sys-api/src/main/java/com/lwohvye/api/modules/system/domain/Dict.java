@@ -15,6 +15,7 @@
  */
 package com.lwohvye.api.modules.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.core.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -28,30 +29,31 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
-* @author Zheng Jie
-* @date 2019-04-10
-*/
+ * @author Zheng Jie
+ * @date 2019-04-10
+ */
 @Entity
 @Getter
 @Setter
 @Accessors(chain = true)
-@Table(name="sys_dict")
+@Table(name = "sys_dict")
 public class Dict extends BaseEntity implements Serializable {
 
     @Id
     @Column(name = "dict_id")
     @NotNull(groups = Update.class)
-    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "dict",cascade={CascadeType.PERSIST,CascadeType.REMOVE})
-    private List<DictDetail> dictDetails;
+    @JsonIgnore
+    @OneToMany(mappedBy = "dict", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}) // 配置这个主体就是为了级联删除
+    private List<DictDetail> dictDetails; // 用transient出现了级联删除失效，改用@JsonIgnore
 
     @NotBlank
-    @Schema(description = "名称" )
+    @Schema(description = "名称")
     private String name;
 
-    @Schema(description = "描述" )
+    @Schema(description = "描述")
     private String description;
 }

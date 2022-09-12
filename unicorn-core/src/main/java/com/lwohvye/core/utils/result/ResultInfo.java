@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.exception.handler.ApiGlobalExceptionHandler;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.domain.Page;
 
 import java.io.Serial;
@@ -31,6 +32,7 @@ import java.util.*;
  * Created by cy on 2021/01/08.
  */
 @Getter
+@ToString
 @SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class ResultInfo<T> implements IResultInfo<T> {
     @Serial

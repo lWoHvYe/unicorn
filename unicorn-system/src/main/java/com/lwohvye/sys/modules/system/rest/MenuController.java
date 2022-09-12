@@ -16,6 +16,7 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.lwohvye.core.annotation.ResponseResultBody;
 import com.lwohvye.core.annotation.log.Log;
 import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.core.base.BaseEntity.Update;
@@ -47,9 +48,10 @@ import java.util.stream.Collectors;
  * @date 2018-12-03
  */
 
-@RestController
-@RequiredArgsConstructor
 @Tag(name = "MenuController", description = "系统：菜单管理")
+@RestController
+@ResponseResultBody
+@RequiredArgsConstructor
 public class MenuController implements SysMenuAPI {
 
     private final IMenuService menuService;
@@ -64,48 +66,48 @@ public class MenuController implements SysMenuAPI {
 
     @Operation(summary = "获取前端所需菜单")
     @Override
-    public ResponseEntity<List<MenuVo>> buildMenus() {
+    public List<MenuVo> buildMenus() {
         // 在方法参数里用SecurityUtils.getCurrentUserId()在一些情况下会不走缓存
         var cuid = SecurityUtils.getCurrentUserId();
-        return new ResponseEntity<>(menuService.buildWebMenus(cuid), HttpStatus.OK);
+        return menuService.buildWebMenus(cuid);
     }
 
     @Operation(summary = "返回全部的菜单")
     @Override
-    public ResponseEntity<List<MenuDto>> query(@RequestParam Long pid) {
-        return new ResponseEntity<>(menuService.getMenus(pid), HttpStatus.OK);
+    public List<MenuDto> query(@RequestParam Long pid) {
+        return menuService.getMenus(pid);
     }
 
     @Operation(summary = "根据菜单ID返回所有子节点ID，包含自身ID")
     @Override
-    public ResponseEntity<Set<Long>> child(@RequestParam Long id) {
+    public List<Long> child(@RequestParam Long id) {
         Set<Menu> menuSet = new HashSet<>();
         List<MenuDto> menuList = menuService.getMenus(id);
         menuSet.add(menuService.findOne(id));
         menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList, new CycleAvoidingMappingContext()), menuSet);
         Set<Long> ids = menuSet.stream().map(Menu::getId).collect(Collectors.toSet());
-        return new ResponseEntity<>(ids, HttpStatus.OK);
+        return new ArrayList<>(ids);
     }
 
     @Operation(summary = "查询菜单")
     @Override
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(MenuQueryCriteria criteria) throws Exception {
+    public Map<String, Object> query(MenuQueryCriteria criteria) throws Exception {
         List<MenuDto> menuDtoList = menuService.queryAll(criteria, true);
-        return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(menuDtoList, menuDtoList.size())), HttpStatus.OK);
+        return PageUtil.toPage(menuDtoList, menuDtoList.size());
     }
 
     @Operation(summary = "查询菜单:根据ID获取同级与上级数据")
     @Override
-    public ResponseEntity<List<MenuDto>> getSuperior(@RequestBody List<Long> ids) {
+    public List<MenuDto> getSuperior(@RequestBody List<Long> ids) {
         Set<MenuDto> menuDtos = new LinkedHashSet<>();
         if (CollectionUtil.isNotEmpty(ids)) {
             for (Long id : ids) {
                 MenuDto menuDto = menuService.findById(id);
                 menuDtos.addAll(menuService.getSuperior(menuDto, new ArrayList<>()));
             }
-            return new ResponseEntity<>(menuService.buildTree(new ArrayList<>(menuDtos)), HttpStatus.OK);
+            return menuService.buildTree(new ArrayList<>(menuDtos));
         }
-        return new ResponseEntity<>(menuService.getMenus(null), HttpStatus.OK);
+        return menuService.getMenus(null);
     }
 
     @Log("新增菜单")
@@ -116,7 +118,7 @@ public class MenuController implements SysMenuAPI {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
         menuService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Log("修改菜单")
@@ -124,13 +126,13 @@ public class MenuController implements SysMenuAPI {
     @Override
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Menu resources) {
         menuService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Log("删除菜单")
     @Operation(summary = "删除菜单")
     @Override
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         Set<Menu> menuSet = new HashSet<>();
         for (Long id : ids) {
             List<MenuDto> menuList = menuService.getMenus(id);
@@ -138,6 +140,6 @@ public class MenuController implements SysMenuAPI {
             menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList, new CycleAvoidingMappingContext()), menuSet);
         }
         menuService.delete(menuSet);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

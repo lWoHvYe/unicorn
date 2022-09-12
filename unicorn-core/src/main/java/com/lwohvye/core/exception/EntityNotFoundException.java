@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
  * @author Zheng Jie
  * @date 2018-11-23
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class EntityNotFoundException extends RuntimeException {
 
     public EntityNotFoundException(Class clazz, String field, String val) {

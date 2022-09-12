@@ -35,10 +35,10 @@ import java.util.Set;
 public interface SysDeptAPI {
 
     @GetMapping("/api/sys/dept")
-    ResponseEntity<ResultInfo<Map<String,Object>>> query(DeptQueryCriteria criteria) throws Exception;
+    Map<String, Object> query(DeptQueryCriteria criteria) throws Exception;
 
     @PostMapping("/api/sys/dept/superior")
-    ResponseEntity<ResultInfo<Map<String,Object>>> getSuperior(@RequestBody List<Long> ids);
+    Map<String, Object> getSuperior(@RequestBody List<Long> ids);
 
     @PostMapping("/api/sys/dept")
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Dept resources);
@@ -47,8 +47,8 @@ public interface SysDeptAPI {
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dept resources);
 
     @DeleteMapping("/api/sys/dept")
-    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
+    ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
     @GetMapping("/api/sys/dept/enabled/{userId}/{deptId}")
-    ResponseEntity<ResultInfo<Long>> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
+    List<Long> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
 }

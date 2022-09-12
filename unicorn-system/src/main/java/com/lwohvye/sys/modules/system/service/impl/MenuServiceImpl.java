@@ -25,7 +25,6 @@ import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.exception.EntityExistException;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.core.utils.redis.RedisUtils;
 import com.lwohvye.sys.modules.system.event.MenuEvent;
@@ -47,6 +46,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -123,11 +123,10 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public void create(Menu resources) {
         if (menuRepository.findByTitle(resources.getTitle()) != null)
-            throw new EntityExistException(Menu.class, "title", resources.getTitle());
+            throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "title", resources.getTitle(), "existed"));
 
-        if (StringUtils.isNotBlank(resources.getComponentName()))
-            if (menuRepository.findByComponentName(resources.getComponentName()) != null)
-                throw new EntityExistException(Menu.class, "componentName", resources.getComponentName());
+        if (StringUtils.isNotBlank(resources.getComponentName()) && menuRepository.findByComponentName(resources.getComponentName()) != null)
+            throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "componentName", resources.getComponentName(), "existed"));
 
         if (resources.getPid().equals(0L))
             resources.setPid(null);
@@ -161,7 +160,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         Menu menu1 = menuRepository.findByTitle(resources.getTitle());
 
         if (menu1 != null && !menu1.getId().equals(menu.getId()))
-            throw new EntityExistException(Menu.class, "title", resources.getTitle());
+            throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "title", resources.getTitle(), "existed"));
 
         if (resources.getPid().equals(0L))
             resources.setPid(null);
@@ -173,7 +172,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         if (StringUtils.isNotBlank(resources.getComponentName())) {
             menu1 = menuRepository.findByComponentName(resources.getComponentName());
             if (menu1 != null && !menu1.getId().equals(menu.getId()))
-                throw new EntityExistException(Menu.class, "componentName", resources.getComponentName());
+                throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "componentName", resources.getComponentName(), "existed"));
         }
         menu.setTitle(resources.getTitle()).setComponent(resources.getComponent()).setPath(resources.getPath()).setIcon(resources.getIcon())
                 .setIFrame(resources.getIFrame()).setPid(resources.getPid()).setMenuSort(resources.getMenuSort()).setCache(resources.getCache())

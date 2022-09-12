@@ -15,12 +15,11 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
+import com.lwohvye.core.annotation.ResponseResultBody;
 import com.lwohvye.sys.modules.system.service.IMonitorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,17 +30,18 @@ import java.util.Map;
  * @author Zheng Jie
  * @date 2020-05-02
  */
-@RestController
-@RequiredArgsConstructor
 @Tag(name = "MonitorController", description = "系统：服务监控管理")
+@RestController
 @RequestMapping("/api/monitor")
+@RequiredArgsConstructor
 public class MonitorController {
 
     private final IMonitorService serverService;
 
+    @ResponseResultBody
     @GetMapping
     @Operation(summary = "查询服务监控")
-    public ResponseEntity<Map<String, Object>> query() {
-        return new ResponseEntity<>(serverService.getServers(), HttpStatus.OK);
+    public Map<String, Object> query() {
+        return serverService.getServers();
     }
 }

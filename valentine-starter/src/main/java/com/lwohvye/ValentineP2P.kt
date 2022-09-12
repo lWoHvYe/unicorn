@@ -15,8 +15,10 @@
  */
 package com.lwohvye
 
+import com.lwohvye.core.annotation.ResponseResultBody
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
 import com.lwohvye.core.utils.SpringContextHolder
+import com.lwohvye.core.utils.result.ResultInfo
 import com.lwohvye.sys.common.annotation.ApiVersion
 import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.boot.SpringApplication
@@ -24,6 +26,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.transaction.annotation.EnableTransactionManagement
@@ -84,23 +88,36 @@ open class ValentineP2P {
      * @see com.lwohvye.sys.common.handler.ApiVersionRequestMappingHandlerMapping
      * @return /
      */
+    @ResponseResultBody
     @ApiVersion
     @AnonymousGetMapping("/valentine/{version}/p2p")
-    fun index(@PathVariable version: String): String {
-        return "Backend service started successfully"
+    fun index(@PathVariable version: String): String? {
+        return null
+//        return "Backend service started successfully"
     }
 
-    @ApiVersion(2) // 指定从v2开始
+    @ResponseResultBody
+    @ApiVersion(2)
+    @AnonymousGetMapping("/valentine/{version}/p2p")
+    fun indexCCVer(@PathVariable version: String): List<String> {
+        return listOf("CCVer $version Backend service started successfully")
+    }
+
+
+    @ResponseResultBody
+    @ApiVersion(3) // 指定从v3开始
     @AnonymousGetMapping("/valentine/{version}/p2p", "/valentine/{version}/default") // @RequestMapping的path是支持多个的
-    fun indexVersion(@PathVariable version: String): String {
-        return String.format("Version %s Backend service started successfully", version)
+    fun indexVersion(@PathVariable version: String): ResultInfo<String>? {
+//        return null
+        return ResultInfo.success("Version $version Backend service started successfully")
     }
 
     /**
      * 匹配采用的最佳适配，当传v4时，会匹配到这个方法
      */
+    @ResponseResultBody
     @AnonymousGetMapping("/valentine/v4/p2p")
-    fun indexClVer(): String {
-        return String.format("ClVersion %s Backend service started successfully", "v4")
+    fun indexClVer(): ResponseEntity<ResultInfo<String>> {
+        return ResponseEntity(ResultInfo.success("ClVersion v4 Backend service started successfully"), HttpStatus.CREATED)
     }
 }

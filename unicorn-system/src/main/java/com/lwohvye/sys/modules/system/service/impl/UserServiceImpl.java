@@ -24,8 +24,6 @@ import com.lwohvye.api.modules.system.domain.projection.UserProj;
 import com.lwohvye.api.modules.system.service.dto.*;
 import com.lwohvye.core.config.FileProperties;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.exception.EntityExistException;
-import com.lwohvye.core.exception.EntityNotFoundException;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.core.utils.redis.RedisUtils;
 import com.lwohvye.sys.modules.security.service.UserLocalCache;
@@ -52,6 +50,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
@@ -148,15 +148,12 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(User resources) {
-        if (userRepository.findByUsername(resources.getUsername()) != null) {
-            throw new EntityExistException(User.class, "username", resources.getUsername());
-        }
-        if (userRepository.findByEmail(resources.getEmail()) != null) {
-            throw new EntityExistException(User.class, "email", resources.getEmail());
-        }
-        if (userRepository.findByPhone(resources.getPhone()) != null) {
-            throw new EntityExistException(User.class, "phone", resources.getPhone());
-        }
+        if (userRepository.findByUsername(resources.getUsername()) != null)
+            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
+        if (userRepository.findByEmail(resources.getEmail()) != null)
+            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
+        if (userRepository.findByPhone(resources.getPhone()) != null)
+            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
         userRepository.save(resources);
     }
 
@@ -169,16 +166,12 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
         User user1 = userRepository.findByUsername(resources.getUsername());
         User user2 = userRepository.findByEmail(resources.getEmail());
         User user3 = userRepository.findByPhone(resources.getPhone());
-        if (user1 != null && !user.getId().equals(user1.getId())) {
-            throw new EntityExistException(User.class, "username", resources.getUsername());
-        }
-        if (user2 != null && !user.getId().equals(user2.getId())) {
-            throw new EntityExistException(User.class, "email", resources.getEmail());
-        }
-        if (user3 != null && !user.getId().equals(user3.getId())) {
-            throw new EntityExistException(User.class, "phone", resources.getPhone());
-        }
-
+        if (user1 != null && !user.getId().equals(user1.getId()))
+            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
+        if (user2 != null && !user.getId().equals(user2.getId()))
+            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
+        if (user3 != null && !user.getId().equals(user3.getId()))
+            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
 //        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
 //        不确定是否需要进行赋值。理论上传递的是引用。更改会影响到这方
 //        convertString4BlobUtil.convert(user);
@@ -209,9 +202,8 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     public void updateCenter(User resources) {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         User user1 = userRepository.findByPhone(resources.getPhone());
-        if (user1 != null && !user.getId().equals(user1.getId())) {
-            throw new EntityExistException(User.class, "phone", resources.getPhone());
-        }
+        if (user1 != null && !user.getId().equals(user1.getId()))
+            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
         user.setNickName(resources.getNickName());
         user.setPhone(resources.getPhone());
         user.setGender(resources.getGender());
@@ -250,7 +242,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
             var upj = userRepository.findByUsername(userName, UserProj.class);
         }
         if (Objects.isNull(user))
-            throw new EntityNotFoundException(User.class, "name", userName);
+            throw new EntityNotFoundException(StringUtils.generateExcMsg(User.class, "name", userName, "NotExist"));
         else
             return conversionService.convert(user, UserDto.class);
     }
@@ -261,7 +253,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
         // 方法内调用，Spring aop不会生效，所以若直接调 findByName(String username) 方法不会走缓存
         var user = userRepository.findByUsername(userName);
         if (Objects.isNull(user))
-            throw new EntityNotFoundException(User.class, "name", userName);
+            throw new EntityNotFoundException(StringUtils.generateExcMsg(User.class, "name", userName, "NotExist"));
         else
             return conversionService.convert(user, UserInnerDto.class);
     }

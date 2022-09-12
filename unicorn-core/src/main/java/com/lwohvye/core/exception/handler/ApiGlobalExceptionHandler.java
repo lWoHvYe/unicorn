@@ -16,10 +16,8 @@
 package com.lwohvye.core.exception.handler;
 
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.exception.EntityExistException;
-import com.lwohvye.core.exception.EntityNotFoundException;
-import com.lwohvye.core.utils.result.ResultInfo;
 import com.lwohvye.core.utils.ThrowableUtil;
+import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -35,6 +33,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import java.util.Objects;
 
 
@@ -43,12 +43,14 @@ import java.util.Objects;
  * 统一异常处理，因为已在SpringSecurityConfig里配置了401和403的handler，所以鉴权中的，401和403异常无法处理，需⚠️。但@el.check中但403可以被处理
  * Created by cy on 2021/01/08.
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 @RestControllerAdvice
 // 使用Order使其先于GlobalExceptionHandler执行，这里把优先级设置为了最高。原统一异常处理可移除
 @Order(Ordered.HIGHEST_PRECEDENCE) // 移除GlobalExceptionHandler后，可能需要调整下Order
 @Slf4j
 @ConditionalOnWebApplication // 在Spring为Web服务时生效
-@ConditionalOnMissingBean(ApiGlobalExceptionHandler.class) // 避免Bean冲突
+@ConditionalOnMissingBean(ApiGlobalExceptionHandler.class) // 这样配置的直接结果就是该bean不会初始化了，从而所有的异常处理都在另一个（ResponseResultBodyAdvice）中进行了
+// @ConditionalOnMissingBean(name = "apiGlobalExceptionHandler") // 这个也不行的，记忆已经模糊了，当初为何要配置这个？？
 public class ApiGlobalExceptionHandler {
 
     /**
@@ -73,7 +75,7 @@ public class ApiGlobalExceptionHandler {
      */
     @ResponseBody
     @ExceptionHandler({
-            EntityExistException.class // 实体已存在
+            EntityExistsException.class // 实体已存在
             , EntityNotFoundException.class // 实体不存在
             , BadRequestException.class // 自定义异常
             , IllegalStateException.class // Assert相关

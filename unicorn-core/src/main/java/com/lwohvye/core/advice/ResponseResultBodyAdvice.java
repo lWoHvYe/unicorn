@@ -17,11 +17,13 @@ package com.lwohvye.core.advice;
 
 import com.lwohvye.core.annotation.ResponseResultBody;
 import com.lwohvye.core.exception.BadRequestException;
+import com.lwohvye.core.utils.ThrowableUtil;
 import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,24 +31,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import org.springframework.web.util.WebUtils;
 
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 
 /**
  * 这也是一种统一数据返回的方式。可视情况整合。与{@link ResponseResultBody}配合使用
  * ResponseBodyAdvice 实现了这个接口的类，处理返回的值在传递给 HttpMessageConverter之前。应用场景为spring项目开发过程中，对controller层返回值进行修改增强处理（比如加密、统一返回格式等）。
+ * 另外还有RequestBodyAdvice用于在请求之前进行一些操作
  *
  * @date 2021/11/10 12:42 下午
  */
 @Slf4j
 // @ConditionalOnClass(name = "org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice") // 这种比较适合目标类在上层，无法直接引用的情况，毕竟类名有些长
 @ConditionalOnClass(ResponseBodyAdvice.class) // 这个跟上面那种是等价的，Conditional系列不会报ClassNotFound的Exception。这个配置用于实现当exclude WebMVC使用 WebFlux时，不会init该Bean，也不会报错
-@RestControllerAdvice
+@ControllerAdvice // 这里用@RestControllerAdvice与@ControllerAdvice好像没区别，本质也是处理链，这只是上面的一环
 public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
 
     private static final Class<? extends Annotation> ANNOTATION_TYPE = ResponseResultBody.class;
@@ -60,17 +69,30 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     /**
-     * 当类或者方法使用了 @ResponseResultBody 就会调用这个方法
+     * 当类或者方法使用了 @ResponseResultBody 就会调用这个方法，尽量不要直接返回String，别的应该都可以
+     * 针对status是200的可以只返回body，否则可以返回ResponseEntity，这里只改body部分，所以都支持
      */
-    // TODO: 2021/2/4 当前已将数据返回都使用ResultInfo.success的方式。可以着手整合这种方式了，但原来返回的是 ResponseEntity。处理方式待定
+    // TODO: 2022/9/11 如方法所言，这里设置的是Body，所以是无法改变ResponseStatus的（虽然一般不用管），另外针对String类型的处理还有些问题
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        if (body instanceof ResultInfo) {
-            return body;
+        if (Objects.isNull(body)) {
+            var parameterType = returnType.getParameterType(); // 或者GenericParameterType
+            if (Objects.equals(String.class, parameterType)) // String类型会转成空字符串
+                return "";
+            return ResultInfo.success(); // 别的都转成标准格式
+
         }
+        if (body instanceof ResultInfo<?> resInfo) // 如果返回值是标准格式，就不需要再次封装，如果不加该判断的话，异常的结果会被封装两次
+            return resInfo;
+        if (body instanceof String str) // String 类型很特殊，不能直接用ResultInfo.success，最后会将其转为String类型，然后出现ClassCastException:
+            // class com.lwohvye.core.utils.result.ResultInfo cannot be cast to class java.lang.String
+            // 主体是因为selectedContentType和selectedConverterType的差异（这个是与方法的returnType有关），String时是: text/html 和 class org.springframework.http.converter.StringHttpMessageConverter，
+            // 其他类型时是："application/json" 和 "class org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
+            return ResultInfo.success(str).toString();
         return ResultInfo.success(body);
     }
 
+// region 统一异常处理，后续参考 ApiGlobalExceptionHandler进行重构
 
     /**
      * 提供对标准Spring MVC异常的处理
@@ -79,32 +101,103 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      * @param request the current request
      */
     @ExceptionHandler(Exception.class)
-    public final ResponseEntity<ResultInfo<?>> exceptionHandler(Exception ex, WebRequest request) {
-        log.error("ExceptionHandler: {}", ex.getMessage());
-        HttpHeaders headers = new HttpHeaders();
-        if (ex instanceof BadRequestException e) {
-            return this.handleResultException(e, headers, request);
-        }
-        return this.handleException(ex, headers, request);
-    }
-
-    /**
-     * 对ResultException类返回返回结果的处理
-     */
-    protected ResponseEntity<ResultInfo<?>> handleResultException(BadRequestException ex, HttpHeaders headers, WebRequest request) {
+    public final ResponseEntity<ResultInfo<?>> handleException(Exception ex, WebRequest request) {
+        log.error(ThrowableUtil.getStackTrace(ex));
         ResultInfo<?> body = ResultInfo.failed(ex.getMessage());
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        return this.handleExceptionInternal(ex, body, headers, status, request);
-    }
-
-    /**
-     * 异常类的统一处理
-     */
-    protected ResponseEntity<ResultInfo<?>> handleException(Exception ex, HttpHeaders headers, WebRequest request) {
-        ResultInfo<?> body = ResultInfo.failed("");
+        var headers = new HttpHeaders();
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         return this.handleExceptionInternal(ex, body, headers, status, request);
     }
+
+    /**
+     * 部分非受检异常，统一处理
+     *
+     * @param ex /
+     * @return ResponseEntity/
+     * @date 2022/2/24 10:59 AM
+     */
+    @ExceptionHandler({
+            EntityExistsException.class // 实体已存在
+            , EntityNotFoundException.class // 实体不存在
+            , BadRequestException.class // 自定义异常
+            , IllegalStateException.class // Assert相关
+            , IllegalArgumentException.class // Assert相关
+    })
+    public final ResponseEntity<ResultInfo<?>> handleServletException(RuntimeException ex, WebRequest request) {
+        log.error(ThrowableUtil.getStackTrace(ex));
+        var body = ResultInfo.failed(ex.getMessage());
+        var headers = new HttpHeaders();
+        var status = HttpStatus.BAD_REQUEST;
+        return this.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    /**
+     * 处理无权限访问异常 AccessDeniedException 403
+     * 401和403有配置处理，故不会走到这边来
+     *
+     * @param ex /
+     * @return ResponseEntity
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public final ResponseEntity<ResultInfo<?>> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        log.error(ThrowableUtil.getStackTrace(ex));
+        var body = ResultInfo.forbidden(ex.getMessage());
+        var headers = new HttpHeaders();
+        var status = HttpStatus.FORBIDDEN;
+        return this.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    /**
+     * 处理请求方法不支持的异常 HttpRequestMethodNotSupportedException
+     *
+     * @param ex /
+     * @return ResponseEntity
+     */
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public final ResponseEntity<ResultInfo<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, WebRequest request) {
+        log.error(ThrowableUtil.getStackTrace(ex));
+        var body = ResultInfo.methodNotAllowed(ex.getMessage());
+        var headers = new HttpHeaders();
+        var status = HttpStatus.METHOD_NOT_ALLOWED;
+        return this.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    /**
+     * 处理请求参数不正确的异常 HttpRequestMethodNotSupportedException
+     *
+     * @param ex /
+     * @return ResponseEntity
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public final ResponseEntity<ResultInfo<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
+        log.error(ThrowableUtil.getStackTrace(ex));
+        var str = Objects.requireNonNull(ex.getBindingResult().getAllErrors().get(0).getCodes())[1].split("\\.");
+        var message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        if ("不能为空".equals(message)) {
+            message = str[1] + ":" + message;
+        }
+        var body = ResultInfo.validateFailed(message);
+        var headers = new HttpHeaders();
+        var status = HttpStatus.BAD_REQUEST;
+        return this.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    /**
+     * 添加或更新的数据中有非空字段设置为null。或者未使用级联删除外键，均会出此异常
+     *
+     * @return org.springframework.http.ResponseEntity
+     * @params e /
+     * @date 2021/1/9 21:42
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public final ResponseEntity<ResultInfo<?>> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+        log.error(ThrowableUtil.getStackTrace(ex));
+        var body = ResultInfo.methodNotAllowed(ex.getMessage());
+        var headers = new HttpHeaders();
+        var status = HttpStatus.BAD_REQUEST;
+        return this.handleExceptionInternal(ex, body, headers, status, request);
+    }
+// endregion
 
     /**
      * org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler#handleExceptionInternal(java.lang.Exception, java.lang.Object, org.springframework.http.HttpHeaders, org.springframework.http.HttpStatus, org.springframework.web.context.request.WebRequest)

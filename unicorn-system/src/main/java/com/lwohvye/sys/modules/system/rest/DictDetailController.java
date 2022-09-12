@@ -15,6 +15,7 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
+import com.lwohvye.core.annotation.ResponseResultBody;
 import com.lwohvye.core.annotation.log.Log;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
@@ -42,10 +43,11 @@ import java.util.Map;
  * @author Zheng Jie
  * @date 2019-04-10
  */
-@RestController
-@RequiredArgsConstructor
 @Tag(name = "DictDetailController", description = "系统：字典详情管理")
+@RestController
 @RequestMapping("/api/sys/dictDetail")
+@ResponseResultBody
+@RequiredArgsConstructor
 public class DictDetailController {
 
     private final IDictDetailService dictDetailService;
@@ -53,20 +55,19 @@ public class DictDetailController {
 
     @Operation(summary = "查询字典详情")
     @GetMapping
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(DictDetailQueryCriteria criteria,
-                                                                 @PageableDefault(sort = {"dictSort"}, direction = Sort.Direction.ASC) Pageable pageable) {
-        return new ResponseEntity<>(ResultInfo.success(dictDetailService.queryAll(criteria, pageable)), HttpStatus.OK);
+    public Map<String, Object> query(DictDetailQueryCriteria criteria, @PageableDefault(sort = {"dictSort"}, direction = Sort.Direction.ASC) Pageable pageable) {
+        return dictDetailService.queryAll(criteria, pageable);
     }
 
     @Operation(summary = "查询多个字典详情")
     @GetMapping(value = "/map")
-    public ResponseEntity<ResultInfo<Map<String, List<DictDetailDto>>>> getDictDetailMaps(@RequestParam String dictName) {
+    public Map<String, List<DictDetailDto>> getDictDetailMaps(@RequestParam String dictName) {
         String[] names = dictName.split("[,，]");
         Map<String, List<DictDetailDto>> dictMap = new HashMap<>(16);
         for (String name : names) {
             dictMap.put(name, dictDetailService.getDictByName(name));
         }
-        return new ResponseEntity<>(ResultInfo.success(dictMap), HttpStatus.OK);
+        return dictMap;
     }
 
     @Log("新增字典详情")
@@ -77,7 +78,7 @@ public class DictDetailController {
             throw new BadRequestException("A new " + ENTITY_NAME + " cannot already have an ID");
         }
         dictDetailService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Log("修改字典详情")
@@ -85,14 +86,14 @@ public class DictDetailController {
     @PutMapping
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody DictDetail resources) {
         dictDetailService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Log("删除字典详情")
     @Operation(summary = "删除字典详情")
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<ResultInfo<String>> delete(@PathVariable Long id) {
+    public ResultInfo<String> delete(@PathVariable Long id) {
         dictDetailService.delete(id);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 }

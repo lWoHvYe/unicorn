@@ -15,11 +15,11 @@
  */
 package com.lwohvye.api.modules.system.service.dto;
 
+import com.lwohvye.core.base.BaseDTO;
 import lombok.Getter;
 import lombok.Setter;
-import com.lwohvye.core.base.BaseDTO;
+
 import java.io.Serializable;
-import java.util.List;
 
 /**
 * @author Zheng Jie
@@ -30,8 +30,6 @@ import java.util.List;
 public class DictDto extends BaseDTO implements Serializable {
 
     private Long id;
-
-    private List<DictDetailDto> dictDetails;
 
     private String name;
 

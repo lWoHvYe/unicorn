@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.system.rest;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
+import com.lwohvye.core.annotation.ResponseResultBody;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.config.RsaProperties;
 import com.lwohvye.core.exception.BadRequestException;
@@ -66,6 +67,7 @@ import java.util.Set;
 @Tag(name = "UserController", description = "系统：用户管理")
 @Slf4j
 @RestController
+@ResponseResultBody // 暂未知对export的影响
 @RequiredArgsConstructor
 public class UserController implements SysUserAPI {
 
@@ -85,7 +87,7 @@ public class UserController implements SysUserAPI {
 
     @Operation(summary = "查询用户")
     @Override
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(UserQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> query(UserQueryCriteria criteria, Pageable pageable) {
         if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
             criteria.getDeptIds().add(criteria.getDeptId());
             // 先查找是否存在子节点
@@ -101,14 +103,14 @@ public class UserController implements SysUserAPI {
             // 取交集
             criteria.getDeptIds().retainAll(dataScopes);
             if (!CollUtil.isEmpty(criteria.getDeptIds())) {
-                return new ResponseEntity<>(ResultInfo.success(userService.queryAll(criteria, pageable)), HttpStatus.OK);
+                return userService.queryAll(criteria, pageable);
             }
         } else {
             // 否则取并集
             criteria.getDeptIds().addAll(dataScopes);
-            return new ResponseEntity<>(ResultInfo.success(userService.queryAll(criteria, pageable)), HttpStatus.OK);
+            return userService.queryAll(criteria, pageable);
         }
-        return new ResponseEntity<>(ResultInfo.success(PageUtil.toPage(null, 0)), HttpStatus.OK);
+        return PageUtil.toPage(null, 0);
     }
 
     @Log("新增用户")
@@ -119,7 +121,7 @@ public class UserController implements SysUserAPI {
         // 默认密码 123456
         resources.setPassword(passwordEncoder.encode("123456"));
         userService.create(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Log("修改用户")
@@ -128,14 +130,14 @@ public class UserController implements SysUserAPI {
     public ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody User resources) throws Exception {
         checkLevel(resources);
         userService.update(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 会直接忽略body，因为是204 No_Content
     }
 
     @Operation(summary = "修改用户状态")
     @Override
     public ResponseEntity<ResultInfo<String>> updateStatus(@RequestBody UserBaseVo userVo) {
         userService.updateEnabled(userVo.getUsername(), userVo.getEnabled());
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Log("修改用户：个人中心")
@@ -146,13 +148,13 @@ public class UserController implements SysUserAPI {
             throw new BadRequestException("不能修改他人资料");
         }
         userService.updateCenter(resources);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Log("删除用户")
     @Operation(summary = "删除用户")
     @Override
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids) {
+    public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         for (Long id : ids) {
             Integer currentLevel = roleService.findByUserId(SecurityUtils.getCurrentUserId()).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
             Integer optLevel = roleService.findByUserId(id).stream().map(RoleSmallDto::getLevel).min(Integer::compareTo).orElseThrow();
@@ -161,12 +163,12 @@ public class UserController implements SysUserAPI {
             }
         }
         userService.delete(ids);
-        return new ResponseEntity<>(ResultInfo.success(), HttpStatus.OK);
+        return ResultInfo.success();
     }
 
     @Operation(summary = "修改密码")
     @Override
-    public ResponseEntity<ResultInfo<String>> updatePass(@RequestBody UserPassVo passVo) throws Exception {
+    public ResultInfo<String> updatePass(@RequestBody UserPassVo passVo) throws Exception {
         String oldPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getOldPass());
         String newPass = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, passVo.getNewPass());
         var user = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
@@ -177,26 +179,26 @@ public class UserController implements SysUserAPI {
             throw new BadRequestException("新密码不能与旧密码相同");
         }
         userService.updatePass(user.getUsername(), passwordEncoder.encode(newPass));
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResultInfo.success();
     }
 
     @Operation(summary = "修改头像")
     @Override
-    public ResponseEntity<Map<String, String>> updateAvatar(@RequestParam MultipartFile avatar) {
-        return new ResponseEntity<>(userService.updateAvatar(avatar), HttpStatus.OK);
+    public Map<String, String> updateAvatar(@RequestParam MultipartFile avatar) {
+        return userService.updateAvatar(avatar);
     }
 
     @Log("修改邮箱")
     @Operation(summary = "修改邮箱")
     @Override
-    public ResponseEntity<ResultInfo<String>> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {
+    public ResultInfo<String> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception {
         String password = RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, user.getPassword());
         var userDto = userService.findInnerUserByName(SecurityUtils.getCurrentUsername());
         if (!passwordEncoder.matches(password, userDto.getPassword())) {
             throw new BadRequestException("密码错误");
         }
         var beanName = "verifyServiceImpl";
-        Object verifyService = null;
+        Object verifyService;
         try {
             verifyService = SpringContextHolder.getBean(beanName);
         } catch (Exception ex) {
@@ -205,11 +207,11 @@ public class UserController implements SysUserAPI {
         }
         ReflectUtil.invoke(verifyService, "validated", CodeEnum.EMAIL_RESET_EMAIL_CODE.getKey() + user.getEmail(), code);
         userService.updateEmail(userDto.getUsername(), user.getEmail());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResultInfo.success();
     }
 
-    public ResponseEntity<ResultInfo<UserInnerDto>> queryByName(@PathVariable String username) {
-        return new ResponseEntity<>(ResultInfo.success(userService.findInnerUserByName(username)), HttpStatus.OK);
+    public UserInnerDto queryByName(@PathVariable String username) {
+        return userService.findInnerUserByName(username);
     }
 
     /**

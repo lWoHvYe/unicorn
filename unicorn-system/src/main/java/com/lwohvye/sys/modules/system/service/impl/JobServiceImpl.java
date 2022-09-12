@@ -19,14 +19,10 @@ import com.lwohvye.api.modules.system.domain.Job;
 import com.lwohvye.api.modules.system.service.dto.JobDto;
 import com.lwohvye.api.modules.system.service.dto.JobQueryCriteria;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.exception.EntityExistException;
+import com.lwohvye.core.utils.*;
 import com.lwohvye.sys.modules.system.repository.JobRepository;
 import com.lwohvye.sys.modules.system.service.IJobService;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import com.lwohvye.core.utils.FileUtil;
-import com.lwohvye.core.utils.PageUtil;
-import com.lwohvye.core.utils.QueryHelp;
-import com.lwohvye.core.utils.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -37,6 +33,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
@@ -85,7 +82,7 @@ public class JobServiceImpl implements IJobService {
     public void create(Job resources) {
         Job job = jobRepository.findByName(resources.getName());
         if (job != null) {
-            throw new EntityExistException(Job.class, "name", resources.getName());
+            throw new EntityExistsException(StringUtils.generateExcMsg(Job.class, "name", resources.getName(), "existed"));
         }
         jobRepository.save(resources);
     }
@@ -98,7 +95,7 @@ public class JobServiceImpl implements IJobService {
         Job job = jobRepository.findById(resources.getId()).orElseGet(Job::new);
         Job old = jobRepository.findByName(resources.getName());
         if (old != null && !old.getId().equals(resources.getId())) {
-            throw new EntityExistException(Job.class, "name", resources.getName());
+            throw new EntityExistsException(StringUtils.generateExcMsg(Job.class, "name", resources.getName(), "existed"));
         }
         ValidationUtil.isNull(job.getId(), "Job", "id", resources.getId());
         resources.setId(job.getId());

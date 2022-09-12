@@ -80,7 +80,7 @@ public class User extends BaseEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "job_id", referencedColumnName = "job_id")})
     private Set<Job> jobs;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "dept_id")
     @Schema(description = "用户部门")
     private Dept dept;

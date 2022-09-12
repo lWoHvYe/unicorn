@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +36,7 @@ public interface SysResourceAPI {
 
 
     @GetMapping("/api/sys/resources")
-    ResponseEntity<ResultInfo<Map<String, Object>>> query(ResourceQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> query(ResourceQueryCriteria criteria, Pageable pageable);
 
     @PostMapping("/api/sys/resources")
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Resource resources);
@@ -44,8 +45,8 @@ public interface SysResourceAPI {
     ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody Resource resources);
 
     @DeleteMapping("/api/sys/resources")
-    ResponseEntity<ResultInfo<String>> delete(@RequestBody Long[] ids);
+    ResultInfo<String> delete(@RequestBody Long[] ids);
 
     @GetMapping("/api/sys/resources/queryAllRes")
-    ResponseEntity<ResultInfo<ResourceDto>> queryAllRes();
+    List<ResourceDto> queryAllRes();
 }

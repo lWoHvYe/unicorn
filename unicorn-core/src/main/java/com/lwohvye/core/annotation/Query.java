@@ -92,7 +92,7 @@ public @interface Query {
         // why 这个看起来比上面的 EQUAL_IN_MULTI 要优雅一些，且需注意上面这个用的or查询，若对应列无索引会导致所有的索引失效（用 and 连接的其他条件也不走索引,另外有双端模糊不清楚影响情况），而这个因为用了库函数，该列的索引是失效的，所以看情况选择吧
         , FUNCTION_FIND_IN_SET
         // why 原连接查询都是单条件的。针对业务，多条件连接查询，QueryCriteria中使用一个实体来承载属性
-        , @Deprecated(since = "3.10") EQUAL_IN_MULTI_JOIN //2022-07-28 这个的设计，主要是当初无法解决对同一个entity配置多个join就join多次的问题，当前已解决，所以deprecated该查询方式
+        , @Deprecated(since = "3.1.0", forRemoval = true) EQUAL_IN_MULTI_JOIN //2022-07-28 这个的设计，主要是当初无法解决对同一个entity配置多个join就join多次的问题，当前已解决，所以deprecated该查询方式
         // why 2021/11/07 from_base64函数。当前函数只能对属性使用，不能对值使用
         // , FUNCTION_FROM_BASE64
         // why 2021/11/07 库函数，做相等查询

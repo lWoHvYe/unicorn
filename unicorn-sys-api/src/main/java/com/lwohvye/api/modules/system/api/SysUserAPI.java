@@ -46,7 +46,7 @@ public interface SysUserAPI {
     // FeignClient不支持get方式传递实体类。通过把参数前的@RequestBody替换成@SpringQueryMap可以解决这个问题，但只支持单个实体类参数
     // 解决方案是引入 io.github.openfeign:feign-httpclient 并在配置中 feign.httpclient.enabled = true配置激活，之后即可配合@SpringQueryMap使用，且多个实体只需在第一个上添加。单个实体似乎是不用添加的
     @GetMapping("/api/sys/users")
-    ResponseEntity<ResultInfo<Map<String, Object>>> query(UserQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> query(UserQueryCriteria criteria, Pageable pageable);
 
     @PostMapping("/api/sys/users")
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody User resources);
@@ -61,17 +61,17 @@ public interface SysUserAPI {
     ResponseEntity<ResultInfo<String>> center(@Validated(Update.class) @RequestBody User resources);
 
     @DeleteMapping("/api/sys/users")
-    ResponseEntity<ResultInfo<String>> delete(@RequestBody Set<Long> ids);
+    ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
     @PostMapping("/api/sys/users/updatePass")
-    ResponseEntity<ResultInfo<String>> updatePass(@RequestBody UserPassVo passVo) throws Exception;
+    ResultInfo<String> updatePass(@RequestBody UserPassVo passVo) throws Exception;
 
     @PostMapping("/api/sys/users/updateAvatar")
-    ResponseEntity<Map<String, String>> updateAvatar(@RequestParam MultipartFile avatar);
+    Map<String, String> updateAvatar(@RequestParam MultipartFile avatar);
 
     @PostMapping("/api/sys/users/updateEmail/{code}")
-    ResponseEntity<ResultInfo<String>> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception;
+    ResultInfo<String> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception;
 
     @GetMapping("/api/sys/users/name/{username}")
-    ResponseEntity<ResultInfo<UserInnerDto>> queryByName(@PathVariable String username);
+    UserInnerDto queryByName(@PathVariable String username);
 }

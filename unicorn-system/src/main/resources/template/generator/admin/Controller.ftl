@@ -44,7 +44,6 @@ public class ${className}Controller {
 
     private final I${className}Service ${changeClassName}Service;
 
-    @Log("导出数据")
     @Operation(summary = "导出数据")
     @GetMapping(value = "/download")
     public void download(HttpServletResponse response, ${className}QueryCriteria criteria) throws IOException {
@@ -52,17 +51,17 @@ public class ${className}Controller {
     }
 
     @GetMapping
-    @Log("查询${apiAlias}")
     @Operation(summary = "查询${apiAlias}")
-    public ResponseEntity<ResultInfo<Map<String, Object>>> query(${className}QueryCriteria criteria, Pageable pageable){
-        return new ResponseEntity<>(${changeClassName}Service.queryAll(criteria,pageable),HttpStatus.OK);
+    public Map<String, Object> query(${className}QueryCriteria criteria, Pageable pageable){
+        return ${changeClassName}Service.queryAll(criteria, pageable);
     }
 
     @PostMapping
     @Log("新增${apiAlias}")
     @Operation(summary = "新增${apiAlias}")
     public ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody ${className} resources){
-        return new ResponseEntity<>(${changeClassName}Service.create(resources),HttpStatus.CREATED);
+        ${changeClassName}Service.create(resources);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PutMapping
@@ -76,8 +75,8 @@ public class ${className}Controller {
     @Log("删除${apiAlias}")
     @Operation(summary = "删除${apiAlias}")
     @DeleteMapping
-    public ResponseEntity<ResultInfo<String>> delete(@RequestBody ${pkColumnType}[] ids) {
+    public ResultInfo<String> delete(@RequestBody ${pkColumnType}[] ids) {
         ${changeClassName}Service.deleteAll(ids);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResultInfo.success();
     }
 }
