@@ -90,7 +90,7 @@
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <druid.version>1.2.11</druid.version>
         <hikaricp.version>5.0.1</hikaricp.version>
-        <hutool.version>5.8.5</hutool.version>
+        <hutool.version>5.8.7</hutool.version>
         <fastutil.version>8.5.8</fastutil.version>
         <lombok.version>1.18.24</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
