@@ -21,6 +21,8 @@ import com.lwohvye.core.annotation.DataPermission;
 import com.lwohvye.core.annotation.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Id;
 import javax.persistence.criteria.*;
@@ -33,11 +35,13 @@ import java.util.*;
  */
 @Slf4j
 // @SuppressWarnings 抑制警告 https://www.lwohvye.com/2021/12/05/suppresswarnings%e6%b3%a8%e8%a7%a3%e7%94%a8%e6%b3%95/
-@SuppressWarnings({"unchecked", "rawtypes", "unused"})
+// @SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class QueryHelp {
 
     /**
      * 解析属性上的查询注解。贫瘠相应的查询
+     * 当前已经支持了简单多条件的连表查询，但无法支持复杂的 And, Or 组合查询，这种要么使用QueryDSL要么干脆使用Native SQL。
+     * 虽说通过Annotation & Reflect 也是可以支持复杂查询的，但既然已经有QueryDSL（虽然用的不多且好久没更新了），个人认为没必要重复造轮子，尤其是JPA跟其还是兼容的
      *
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象
@@ -54,49 +58,47 @@ public class QueryHelp {
         // 数据权限验证
         analyzeDataPermission(root, query, list);
         try {
-            var fields = getAllFields(query.getClass(), new ArrayList<>());
-            for (var field : fields) {
-//                field.canAccess(filed对应的查询器实例)
-                var accessible = field.canAccess(query);
-                // boolean accessible = field.isAccessible(); // 方法已过期，改用canAccess
-                // 设置对象的访问权限，保证对private的属性的访
-                // field.setAccessible(true); // 用下面这种方式
-                if (!field.trySetAccessible()) // 设置成功/或本就是true。会返回true
-                    continue; // 若设置失败，则跳过
-                Query q = field.getAnnotation(Query.class);
-                if (q != null) {
-                    var propName = q.propName();
-                    var joinName = q.joinName();
-                    var blurry = q.blurry();
-                    var attributeName = isBlank(propName) ? field.getName() : propName;
-                    var fieldType = field.getType();
-                    var val = field.get(query);
-                    if (Objects.isNull(val) || Objects.equals("", val)) {
-                        continue;
-                    }
-                    // 模糊多字段
-                    if (StringUtils.isNotBlank(blurry)) {
-                        var blurrys = blurry.split(",");
-                        var orPredicate = new ArrayList<Predicate>();
-                        for (String s : blurrys) {
-                            orPredicate.add(cb.like(root.get(s).as(String.class), "%" + val + "%"));
-                        }
-                        var p = new Predicate[orPredicate.size()];
-                        list.add(cb.or(orPredicate.toArray(p)));
-                        continue;
-                    }
-                    // 解析join类型
-                    var join = analyzeJoinType(root, q, joinName, val);
-                    // 解析查询类型
-                    analyzeQueryType(root, cb, list, q, attributeName, fieldType, val instanceof Comparable<?> cec ? cec.getClass() : null, val, join);
-                }
-                field.setAccessible(accessible); // 该回原来的属性
-            }
+            // 根据Field及上面的Annotation，拼接Query & Join
+            analyzeFieldQuery(root, query, cb, list);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        int size = list.size();
-        return cb.and(list.toArray(new Predicate[size]));
+        // 各Field的Condition通过And连接，这是比较常见的场景
+        return cb.and(list.toArray(new Predicate[0]));
+    }
+
+    private static <R, Q> void analyzeFieldQuery(Root<R> root, Q query, CriteriaBuilder cb, ArrayList<Predicate> list) throws IllegalAccessException {
+        for (var field : getAllFields(query.getClass(), new ArrayList<>())) {
+//                field.canAccess(filed对应的查询器实例)
+            var accessible = field.canAccess(query);
+            // boolean accessible = field.isAccessible(); // 方法已过期，改用canAccess
+            // 设置对象的访问权限，保证对private的属性的访
+            // field.setAccessible(true); // 用下面这种方式
+            if (!field.trySetAccessible()) // 设置成功/或本就是true。会返回true
+                continue; // 若设置失败，则跳过
+            Query q = field.getAnnotation(Query.class);
+            if (q != null) {
+                var blurry = q.blurry();
+                var val = field.get(query);
+                if (Objects.isNull(val) || Objects.equals("", val)) {
+                    continue;
+                }
+                // 模糊多字段
+                if (StringUtils.isNotBlank(blurry)) {
+                    var blurrys = blurry.split(",");
+                    var orPredicate = new ArrayList<Predicate>();
+                    for (String s : blurrys) {
+                        orPredicate.add(cb.like(root.get(s).as(String.class), "%" + val + "%"));
+                    }
+                    var p = new Predicate[orPredicate.size()];
+                    list.add(cb.or(orPredicate.toArray(p)));
+                    continue;
+                }
+                // 解析查询类型
+                analyzeQueryType(root, query, cb, list, field);
+            }
+            field.setAccessible(accessible); // 该回原来的属性
+        }
     }
 
     /**
@@ -127,15 +129,15 @@ public class QueryHelp {
     /**
      * 解析joinType
      *
-     * @param root     /
-     * @param q        /
-     * @param joinName /
-     * @param val      /
+     * @param root /
+     * @param q    /
+     * @param val  /
      * @return javax.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
-    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, String joinName, Object val) {
+    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, Object val) {
         Join<R, ?> join = null;
+        var joinName = q.joinName();
         if (StringUtils.isNotBlank(joinName)) {
             // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
             // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
@@ -176,50 +178,51 @@ public class QueryHelp {
     /**
      * 解析query.type()。抽取主要为了方便调用
      *
-     * @param root          /
-     * @param cb            /
-     * @param list          /
-     * @param q             /
-     * @param attributeName /
-     * @param fieldType     /
-     * @param cecType       这个参数只是为了解决几个警告，因为fieldType不一定extends Comparable，所以加了这个。实际环境下可移除该属性
-     * @param val           /
-     * @param join          /
+     * @param root  /
+     * @param query /
+     * @param cb    /
+     * @param list  /
+     * @param field /
      * @date 2021/6/24 10:52 上午
      */
     // ? extends E:接收E类型或者E的子类型。
     // ? super E:接收E类型或者E的父类型 https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
-    private static <R, T, C extends Comparable<? super C>> void analyzeQueryType(Root<R> root,
-                                                                                 CriteriaBuilder cb,
-                                                                                 ArrayList<Predicate> list,
-                                                                                 Query q, String attributeName,
-                                                                                 Class<T> fieldType, Class<C> cecType, Object val,
-                                                                                 Join<R, ?> join) {
+    private static <R, Q> void analyzeQueryType(Root<R> root,
+                                                Q query,
+                                                CriteriaBuilder cb,
+                                                ArrayList<Predicate> list,
+                                                Field field) throws IllegalAccessException {
+        Query q = field.getAnnotation(Query.class);
+        var attributeName = defineAttrName(field, q);
+        var val = field.get(query);
+        var fieldType = field.getType();
+        var comparableFieldType = castComparableFieldType(val);
+        var join = analyzeJoinType(root, q, val);
+
         // switch 的 -> 语法也只是语法糖
         switch (q.type()) {
             case EQUAL -> list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
             case NOT_EQUAL -> list.add(cb.notEqual(getExpression(attributeName, join, root), val));
             case GREATER_THAN ->
-                // var cecType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
+                // var comparableFieldType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
                 // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
                 //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
                 //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
-                //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
-                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
-            case LESS_THAN -> list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
-            case LESS_THAN_NQ -> list.add(cb.lessThan(getExpression(attributeName, join, root).as(cecType), cecType.cast(val)));
+                //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
+                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(val)));
+            case LESS_THAN -> list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(val)));
+            case LESS_THAN_NQ -> list.add(cb.lessThan(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(val)));
             case INNER_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
             case LEFT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val));
             case RIGHT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
             case LIKE_STR -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
             case IN_INNER_LIKE -> {
-                if (val instanceof List objList) {
+                if (val instanceof List<?> objList) {
 //                                构建数组
                     var predicates = new Predicate[objList.size()];
                     for (int i = 0; i < objList.size(); i++) {
                         var obj = objList.get(i);
-                        predicates[i] = cb.like(getExpression(attributeName, join, root)
-                                .as(String.class), "%" + obj.toString() + "%");
+                        predicates[i] = cb.like(getExpression(attributeName, join, root).as(String.class), "%" + obj.toString() + "%");
                     }
 //                                设置or查询
                     list.add(cb.or(predicates));
@@ -237,9 +240,9 @@ public class QueryHelp {
                 }
             }
             case BETWEEN -> {
-                if (val instanceof List col && col.size() == 2 && col.get(0) instanceof Comparable start && col.get(1) instanceof Comparable end) {
-                    var eleType = (Class<? extends Comparable>) col.get(0).getClass();
-                    list.add(cb.between(getExpression(attributeName, join, root).as(eleType), start, end));
+                if (val instanceof List<?> col && col.size() == 2 && col.get(0) instanceof Comparable<?> start && col.get(1) instanceof Comparable<?> end) {
+                    var eleType = castComparableFieldType(start);
+                    list.add(cb.between(getExpression(attributeName, join, root).as(eleType), eleType.cast(start), eleType.cast(end)));
                 }
             }
             case NOT_NULL -> list.add(cb.isNotNull(getExpression(attributeName, join, root)));
@@ -304,7 +307,7 @@ public class QueryHelp {
                         var fieldInValType = fieldInVal.getType();
                         if (Objects.nonNull(queryAnnotation)) {
                             var queryType = queryAnnotation.type();
-                            var queryAttrName = isBlank(queryAnnotation.propName()) ? fieldInVal.getName() : queryAnnotation.propName();
+                            var queryAttrName = defineAttrName(fieldInVal, queryAnnotation);
                             predicate = switch (queryType) {
                                 case EQUAL -> cb.equal(getExpression(queryAttrName, join, root).as(fieldInValType), fieldValue);
                                 case NOT_EQUAL -> cb.notEqual(getExpression(queryAttrName, join, root), fieldValue);
@@ -351,7 +354,7 @@ public class QueryHelp {
         }
     }
 
-    private static <T, R> Expression<T> getExpression(String attributeName, Join<R, ?> join, Root<R> root) {
+    private static <R> Expression<?> getExpression(String attributeName, Join<R, ?> join, Root<R> root) {
         // 处理的维度是field维度的，每个field初始化一个join，若join有值，证明该field是join的实体中的，所以要从join中取，即join.get()。
         if (Objects.nonNull(join)) {
             return join.get(attributeName);
@@ -359,19 +362,6 @@ public class QueryHelp {
             // 非join的，从root中取，root.get()。
             return root.get(attributeName);
         }
-    }
-
-    private static boolean isBlank(final CharSequence cs) {
-        int strLen;
-        if (cs == null || (strLen = cs.length()) == 0) {
-            return true;
-        }
-        for (int i = 0; i < strLen; i++) {
-            if (!Character.isWhitespace(cs.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public static <T> List<Field> getAllFields(Class<T> clazz, List<Field> fields) {
@@ -382,6 +372,54 @@ public class QueryHelp {
         }
         return fields;
     }
+
+    @NotNull
+    private static String defineAttrName(Field field, Query q) {
+        var propName = q.propName();
+        return StringUtils.isNotBlank(propName) ? propName : field.getName();
+    }
+
+    /**
+     * 构建一个Comparable Type 的 fieldType，跟fieldType一样或者为null（这里返回null是因为如果不是Comparable，那些比较类的Query是无法invoke的）
+     * 这个参数只是为了解决几个警告，因为fieldType不一定extends Comparable，所以加了这个，来限定需要能够比较才行。
+     * 因为cb.lessThan,greaterThan,between的返回值 <Y extends Comparable<? super Y>>， 入参 （Expression<? extends Y> var1, Y var2, Y var3），含义:类型 Y 必须实现 Comparable 接口，并且这个接口的类型是 Y 或 Y 的任一父类
+     * https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
+     *
+     * @param val /
+     * @return java.lang.Class
+     * @date 2022/9/17 5:21 PM
+     */
+    @Nullable
+    // private static <C> Class<? extends Comparable<? super C>> castComparableFieldType(Object val) 因为C 未指定，所以实际上是Object，? super Object只能是Object，所以干脆就用Object了
+    // 2022/9/17 总感觉这里是不对的，`? extends Comparable<Object>` 和 `? extends Comparable<? super Y>` 的含义是不一样的，
+    //  Any Class implements Comparable<Object> 与 Any Class implements Comparable & the type of this interface is Y or Y's parent，but 这当前业务中，Y是没办法被define的
+    //  明明应该用后者，但前者这种编译能通过，运行也不报错，但总感觉哪里不对，泛型还需进一步的学习(显然跟泛型擦除有关, 因为采用了类型擦除，泛型类型只在静态类型检查时期存在，在这之后，程序中所有的泛型类型都会被擦除，并替换为它们的非泛型上界)
+    //  疑问是 String implements Comparable<String>, Timestamp extends Date (Date implements Comparable<Date>) 与 XXX implements Comparable<Object> 区别与相似之处
+    // 2022/9/18 结合字节码，Comparable<T> 中的 compareTo方法，依旧是compareTo(Object obj)，这样上面的疑问便解决了:他们实际上是一样的，只是内部有的有转型
+    /*
+    // class version 62.0 (62)
+    // access flags 0x601
+    // signature <T:Ljava/lang/Object;>Ljava/lang/Object;
+    // declaration: java/lang/Comparable<T>
+    public abstract interface java/lang/Comparable {
+
+    // compiled from: Comparable.java
+
+    // access flags 0x401
+    // signature (TT;)I
+    // declaration: int compareTo(T)
+    public abstract compareTo(Ljava/lang/Object;)I
+    }
+     */
+    private static Class<? extends Comparable<Object>> castComparableFieldType(Object val) {
+        return val instanceof Comparable<?> cec ? (Class<? extends Comparable<Object>>) cec.getClass() : null;
+    }
+
+    /* 在此记录几种行不通的方案，以防后续忘记再次做重复的尝试
+    private static <Y extends Comparable<? super Y>> Class<? extends Y> castComparableFieldType(Object val) {} // 基于调用的方式，build时可能报错，并且这个Y感觉没办法define
+    private static <Y extends Comparable<? super Y>> Class<? extends Y> castComparableFieldType(Object val, Class<Y> yClass) {} // 当前业务中yClass是没法define的，且还有泛型上的限制，最重要的，如果yClass明了，这方法没调用的必要了
+    private static <Y> Class<Y extends Comparable<? super Y>> castComparableFieldType(Object val) {} // 直接语法错误 Unexpected bound
+    */
 
     // 2021/11/6 使用JPA 2.1 引入的 CriteriaUpdate 和 CriteriaDelete 进行批量更新/删除。不是很实用，期待后续的使用场景
     public static <R, Q> void criteria4Update(Root<R> root, Q query, CriteriaBuilder cb) {

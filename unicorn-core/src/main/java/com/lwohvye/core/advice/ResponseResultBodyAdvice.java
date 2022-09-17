@@ -20,7 +20,6 @@ import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.ThrowableUtil;
 import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.core.MethodParameter;
@@ -99,7 +98,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
         return ResultInfo.success(body);
     }
 
-// region 统一异常处理，后续参考 ApiGlobalExceptionHandler进行重构
+// region 统一异常处理
 
     /**
      * 提供对标准Spring MVC异常的处理

@@ -18,6 +18,9 @@ package com.lwohvye.starter.modules.strategy;
 
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.sys.modules.system.strategy.ExtraUserTypeStrategy;
+import java.util.Collections;
+
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +30,7 @@ import java.util.List;
 @UserTypeHandlerAnno(typeName = "FIVE")
 public class YNWUserTypeStrategy extends ExtraUserTypeStrategy {
     @Override
-    public List<GrantedAuthority> grantedAuth(Long userId) {
-        return null;
+    public @NotNull List<GrantedAuthority> grantedAuth(@NotNull Long userId) {
+        return Collections.emptyList();
     }
 }

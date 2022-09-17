@@ -13,26 +13,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye
+package com.lwohvye;
 
-import com.lwohvye.core.annotation.rest.AnonymousGetMapping
-import com.lwohvye.core.utils.SpringContextHolder
-import io.swagger.v3.oas.annotations.Hidden
-import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.context.annotation.Bean
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
-import org.springframework.retry.annotation.EnableRetry
-import org.springframework.scheduling.annotation.EnableAsync
-import org.springframework.transaction.annotation.EnableTransactionManagement
-import org.springframework.web.bind.annotation.RestController
+import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
+import com.lwohvye.core.utils.SpringContextHolder;
+import io.swagger.v3.oas.annotations.Hidden;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * App启动入口
- *
- * @author Zheng Jie
- * @date 2018/11/15 9:20:19
  */
 @EnableAsync // 开启异步
 @RestController
@@ -48,20 +45,16 @@ import org.springframework.web.bind.annotation.RestController
 // @EnableWebMvc
 // @EnableWebSecurity
 // @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class AppRun {
 
-open class AppRun {
-
-    companion object {
-        /**
-         * Spring Boot入口
-         *
-         * @param args /
-         * @date 2021/11/23 9:43 上午
-         */
-        @JvmStatic
-        fun main(args: Array<String>) {
-            SpringApplication.run(AppRun::class.java, *args)
-        }
+    /**
+     * Spring Boot入口
+     *
+     * @param args /
+     * @date 2021/11/23 9:43 上午
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(AppRun.class, args);
     }
 
     /**
@@ -70,8 +63,8 @@ open class AppRun {
      * @date 2021/11/23 9:42 上午
      */
     @Bean
-    open fun springContextHolder(): SpringContextHolder {
-        return SpringContextHolder()
+    public SpringContextHolder springContextHolder() {
+        return new SpringContextHolder();
     }
 
     /**
@@ -80,7 +73,7 @@ open class AppRun {
      * @return /
      */
     @AnonymousGetMapping("/")
-    fun index(): String {
-        return "Backend service started successfully"
+    public String index() {
+        return "Backend service started successfully";
     }
 }

@@ -36,6 +36,7 @@
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <caffeine.version>3.1.1</caffeine.version>
+        <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <kotlin.version>1.7.10</kotlin.version>
     </properties>
     <!--这个意义不大-->
@@ -123,6 +124,11 @@
             <artifactId>kotlin-test</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-kotlin</artifactId>
+            <version>${springdoc.openapi.version}</version>
         </dependency>
     </dependencies>
 
