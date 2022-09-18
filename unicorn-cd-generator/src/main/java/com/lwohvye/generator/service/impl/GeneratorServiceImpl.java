@@ -25,9 +25,9 @@ import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.generator.repository.ColumnInfoRepository;
 import com.lwohvye.generator.utils.GenUtil;
 import com.lwohvye.generator.service.IGeneratorService;
-import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +88,7 @@ public class GeneratorServiceImpl implements IGeneratorService {
         Query queryCount = em.createNativeQuery(countSql);
         queryCount.setParameter("table", StringUtils.isNotBlank(name) ? ("%" + name + "%") : "%%");
         Object totalElements = queryCount.getSingleResult();
-        return PageUtil.toPage(tableInfos, totalElements);
+        return PageUtils.toPage(tableInfos, totalElements);
     }
 
     @Override
@@ -195,7 +195,7 @@ public class GeneratorServiceImpl implements IGeneratorService {
             File file = new File(GenUtil.download(columns, genConfig));
             String zipPath = file.getPath() + ".zip";
             ZipUtil.zip(file.getPath(), zipPath);
-            FileUtil.downloadFile(request, response, new File(zipPath), true);
+            FileUtils.downloadFile(request, response, new File(zipPath), true);
         } catch (IOException e) {
             throw new BadRequestException("打包失败");
         }

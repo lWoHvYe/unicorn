@@ -23,10 +23,10 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-import static com.lwohvye.core.utils.FileUtil.*;
+import static com.lwohvye.core.utils.FileUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileUtilTest {
+public class FileUtilsTest {
 
     @Test
     public void testToFile() {

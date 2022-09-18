@@ -20,7 +20,7 @@ import com.lwohvye.generator.domain.ColumnInfo;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.generator.service.IGenConfigService;
 import com.lwohvye.generator.service.IGeneratorService;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,7 +64,7 @@ public class GeneratorController {
     public Map<String, Object> queryTables(@RequestParam(defaultValue = "") String name,
                                            @RequestParam(defaultValue = "0") Integer page,
                                            @RequestParam(defaultValue = "10") Integer size) {
-        int[] startEnd = PageUtil.transToStartEnd(page, size);
+        int[] startEnd = PageUtils.transToStartEnd(page, size);
         return generatorService.getTables(name, startEnd);
     }
 
@@ -73,7 +73,7 @@ public class GeneratorController {
     @GetMapping(value = "/columns")
     public Map<String, Object> queryColumns(@RequestParam String tableName) {
         List<ColumnInfo> columnInfos = generatorService.getColumns(tableName);
-        return PageUtil.toPage(columnInfos, columnInfos.size());
+        return PageUtils.toPage(columnInfos, columnInfos.size());
     }
 
     @Operation(summary = "保存字段数据")

@@ -21,10 +21,10 @@ import com.lwohvye.api.modules.mnt.service.dto.AppQueryCriteria;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.sys.modules.mnt.repository.AppRepository;
 import com.lwohvye.sys.modules.mnt.service.IAppService;
-import com.lwohvye.core.utils.FileUtil;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.FileUtils;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.QueryHelp;
-import com.lwohvye.core.utils.ValidationUtil;
+import com.lwohvye.core.utils.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -52,7 +52,7 @@ public class AppServiceImpl implements IAppService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(AppQueryCriteria criteria, Pageable pageable) {
         Page<App> page = appRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(app -> conversionService.convert(app, AppDto.class)));
+        return PageUtils.toPage(page.map(app -> conversionService.convert(app, AppDto.class)));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class AppServiceImpl implements IAppService {
     @Transactional(rollbackFor = Exception.class)
     public AppDto findById(Long id) {
         App app = appRepository.findById(id).orElseGet(App::new);
-        ValidationUtil.isNull(app.getId(), "App", "id", id);
+        ValidationUtils.isNull(app.getId(), "App", "id", id);
         return conversionService.convert(app, AppDto.class);
     }
 
@@ -82,7 +82,7 @@ public class AppServiceImpl implements IAppService {
     public void update(App resources) {
         verification(resources);
         App app = appRepository.findById(resources.getId()).orElseGet(App::new);
-        ValidationUtil.isNull(app.getId(), "App", "id", resources.getId());
+        ValidationUtils.isNull(app.getId(), "App", "id", resources.getId());
         app.copy(resources);
         appRepository.save(app);
     }
@@ -124,6 +124,6 @@ public class AppServiceImpl implements IAppService {
             map.put("创建日期", appDto.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 }

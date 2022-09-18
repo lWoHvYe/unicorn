@@ -24,7 +24,7 @@ import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.core.utils.json.JsonUtils;
 import com.lwohvye.core.utils.redis.RedisUtils;
-import com.lwohvye.core.utils.result.ResultUtil;
+import com.lwohvye.core.utils.result.ResultUtils;
 import lombok.SneakyThrows;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -78,7 +78,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 var lockedIp = ip + "||authLocked||";
                 // 当某ip多次登录失败导致用户锁定时，会同时锁定ip 15分钟
                 if (redisUtils.hasKey(lockedIp)) {
-                    ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, "频繁访问，请稍后再试");
+                    ResultUtils.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, "频繁访问，请稍后再试");
                     // return null即可返回，AbstractAuthenticationProcessingFilter将不再执行其他逻辑。后续走返回流程
                     return null;
                 }
@@ -93,7 +93,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 var verifyRes = captchaService.verification(captchaVO);
                 if (!verifyRes.isSuccess()) {
                     //验证码校验失败，返回信息告诉前端
-                    ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, verifyRes.getRepMsg());
+                    ResultUtils.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, verifyRes.getRepMsg());
                     return null;
                 }
 

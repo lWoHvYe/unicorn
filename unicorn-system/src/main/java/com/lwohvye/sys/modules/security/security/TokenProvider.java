@@ -22,7 +22,7 @@ import com.lwohvye.sys.modules.mnt.websocket.WebSocketServer;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.security.utils.SecuritySysUtil;
-import com.lwohvye.core.utils.DateUtil;
+import com.lwohvye.core.utils.DateUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -98,7 +98,7 @@ public class TokenProvider implements InitializingBean {
      */
     public String createToken(Authentication authentication) {
         var curDate = LocalDateTime.now();
-        final Date expirationDate = DateUtil.toDate(curDate.plusSeconds(properties.getTokenValidityInSeconds()));
+        final Date expirationDate = DateUtils.toDate(curDate.plusSeconds(properties.getTokenValidityInSeconds()));
         return jwtBuilder
                 // 加入ID确保生成的 Token 都不一致
                 .setId(IdUtil.simpleUUID())
@@ -112,7 +112,7 @@ public class TokenProvider implements InitializingBean {
                 // 所以请求携带的token中，比较主要的属性就是username。用户的具体信息，都是通过用户名称去方法中获取的。这样做使得在用户的角色权限等变更时，原token可继续使用，且权限已为最新的
                 .setSubject(authentication.getName())
                 // 设置颁发时间
-                .setIssuedAt(DateUtil.toDate(curDate))
+                .setIssuedAt(DateUtils.toDate(curDate))
                 // 设置过期时间，
                 .setExpiration(expirationDate)
                 .compact();
@@ -181,7 +181,7 @@ public class TokenProvider implements InitializingBean {
     public void noticeExpire5Token(String token) {
         var curDate = LocalDateTime.now();
         var claims = getClaims(token);
-        var expirationDate = DateUtil.toLocalDateTime(claims.getExpiration());
+        var expirationDate = DateUtils.toLocalDateTime(claims.getExpiration());
         if (curDate.plusSeconds(properties.getDetect()).isAfter(expirationDate)) {
             // 已通知过，跳过
             var rMapCache = redisson.getMapCache(SecuritySysUtil.getExpireNoticeKey(properties));

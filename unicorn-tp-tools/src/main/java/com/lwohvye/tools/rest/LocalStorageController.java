@@ -20,7 +20,7 @@ import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.tools.domain.LocalStorage;
 import com.lwohvye.tools.service.ILocalStorageService;
 import com.lwohvye.tools.service.dto.LocalStorageQueryCriteria;
-import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -70,8 +70,8 @@ public class LocalStorageController {
     @Operation(summary = "上传图片")
     public ResponseEntity<LocalStorage> upload(@RequestParam MultipartFile file) {
         // 判断文件是否为图片
-        String suffix = FileUtil.getExtensionName(file.getOriginalFilename());
-        if (!FileUtil.IMAGE.equals(FileUtil.getFileType(suffix))) {
+        String suffix = FileUtils.getExtensionName(file.getOriginalFilename());
+        if (!FileUtils.IMAGE.equals(FileUtils.getFileType(suffix))) {
             throw new BadRequestException("只能上传图片");
         }
         LocalStorage localStorage = localStorageService.create(null, file);

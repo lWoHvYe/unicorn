@@ -28,7 +28,7 @@ import com.lwohvye.sys.modules.system.service.IMenuService;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.sys.modules.system.service.mapstruct.MenuMapper;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,7 +93,7 @@ public class MenuController implements SysMenuAPI {
     @Override
     public Map<String, Object> query(MenuQueryCriteria criteria) throws Exception {
         List<MenuDto> menuDtoList = menuService.queryAll(criteria, true);
-        return PageUtil.toPage(menuDtoList, menuDtoList.size());
+        return PageUtils.toPage(menuDtoList, menuDtoList.size());
     }
 
     @Operation(summary = "查询菜单:根据ID获取同级与上级数据")

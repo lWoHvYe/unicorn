@@ -63,7 +63,7 @@ public class ResourceServiceImpl implements IResourceService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(ResourceQueryCriteria criteria, Pageable pageable) {
         Page<Resource> page = resourceRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(resource -> conversionService.convert(resource, ResourceDto.class)));
+        return PageUtils.toPage(page.map(resource -> conversionService.convert(resource, ResourceDto.class)));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class ResourceServiceImpl implements IResourceService {
     @Transactional
     public ResourceDto findById(Long resourceId) {
         Resource resource = resourceRepository.findById(resourceId).orElseGet(Resource::new);
-        ValidationUtil.isNull(resource.getResourceId(), "Resource", "resourceId", resourceId);
+        ValidationUtils.isNull(resource.getResourceId(), "Resource", "resourceId", resourceId);
         return conversionService.convert(resource, ResourceDto.class);
     }
 
@@ -105,7 +105,7 @@ public class ResourceServiceImpl implements IResourceService {
     @Transactional(rollbackFor = Exception.class)
     public void update(Resource resources) {
         Resource resource = resourceRepository.findById(resources.getResourceId()).orElseGet(Resource::new);
-        ValidationUtil.isNull(resource.getResourceId(), "Resource", "id", resources.getResourceId());
+        ValidationUtils.isNull(resource.getResourceId(), "Resource", "id", resources.getResourceId());
         resource.copy(resources);
         resourceRepository.save(resource);
     }
@@ -130,7 +130,7 @@ public class ResourceServiceImpl implements IResourceService {
             map.put("备注", resource.getRemark());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     @EventListener

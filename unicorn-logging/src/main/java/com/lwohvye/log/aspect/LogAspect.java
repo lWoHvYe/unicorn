@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.lwohvye.core.utils.RequestHolder;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.StringUtils;
-import com.lwohvye.core.utils.ThrowableUtil;
+import com.lwohvye.core.utils.ThrowableUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -86,7 +86,7 @@ public class LogAspect {
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
         Log log = new Log("ERROR", System.currentTimeMillis() - currentTime.get());
         currentTime.remove();
-        log.setExceptionDetail(ThrowableUtil.getStackTrace(e).getBytes());
+        log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
         HttpServletRequest request = RequestHolder.getHttpServletRequest();
         logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), (ProceedingJoinPoint) joinPoint, log);
     }

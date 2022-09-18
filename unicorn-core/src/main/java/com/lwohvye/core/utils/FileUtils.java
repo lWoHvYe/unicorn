@@ -16,6 +16,7 @@
 package com.lwohvye.core.utils;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
@@ -53,9 +54,9 @@ import java.util.Objects;
  * @author Zheng Jie
  * @date 2018-12-27
  */
-public class FileUtil extends cn.hutool.core.io.FileUtil {
+public class FileUtils extends FileUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
     /**
      * 系统临时目录
@@ -181,8 +182,8 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            CloseUtil.close(os);
-            CloseUtil.close(ins);
+            CloseUtils.close(os);
+            CloseUtils.close(ins);
         }
         return file;
     }
@@ -331,7 +332,7 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
             log.error(e.getMessage(), e);
             return null;
         } finally {
-            CloseUtil.close(in);
+            CloseUtils.close(in);
         }
         return b;
     }

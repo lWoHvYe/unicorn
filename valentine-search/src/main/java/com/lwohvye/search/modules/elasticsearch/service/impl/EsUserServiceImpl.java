@@ -21,7 +21,7 @@ import com.lwohvye.search.modules.elasticsearch.domain.EsUser;
 import com.lwohvye.search.modules.elasticsearch.repository.EsUserRepository;
 import com.lwohvye.search.modules.elasticsearch.service.IEsUserService;
 import com.lwohvye.search.modules.mongodb.repository.MongoDBUserRepository;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -59,7 +59,7 @@ public class EsUserServiceImpl implements IEsUserService {
         var searchHits = elasticsearchRestTemplate.search(searchQuery, EsUser.class);
         return searchHits.getTotalHits() <= 0L ?
                 esUserRepository.findAll()
-                : PageUtil.toPage(searchHits.stream().map(SearchHit::getContent).toList(), searchHits.getTotalHits());
+                : PageUtils.toPage(searchHits.stream().map(SearchHit::getContent).toList(), searchHits.getTotalHits());
     }
 
     @Override

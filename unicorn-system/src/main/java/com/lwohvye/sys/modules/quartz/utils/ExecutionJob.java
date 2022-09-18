@@ -23,7 +23,7 @@ import com.lwohvye.sys.modules.quartz.service.IQuartzJobService;
 import com.lwohvye.core.utils.MailAdapter;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.StringUtils;
-import com.lwohvye.core.utils.ThrowableUtil;
+import com.lwohvye.core.utils.ThrowableUtils;
 import com.lwohvye.core.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
@@ -91,7 +91,7 @@ public class ExecutionJob extends QuartzJobBean {
             quartzLog.setTime(times);
             // 任务状态 0：成功 1：失败
             quartzLog.setIsSuccess(false);
-            quartzLog.setExceptionDetail(ThrowableUtil.getStackTrace(e));
+            quartzLog.setExceptionDetail(ThrowableUtils.getStackTrace(e));
             // 任务如果失败了则暂停
             if (quartzJob.getPauseAfterFailure() != null && quartzJob.getPauseAfterFailure()) {
                 quartzJob.setIsPause(false);
@@ -103,7 +103,7 @@ public class ExecutionJob extends QuartzJobBean {
                 var to = quartzJob.getEmail();
                 var subject = "定时任务【" + quartzJob.getJobName() + "】执行失败，请尽快处理！";
                 var templateName = "email/taskAlarm.ftl";
-                Map<String, Object> paramsMap = Map.of("task", quartzJob, "msg", ThrowableUtil.getStackTrace(e)); // 这里用var类型推断，会是Map<String, Serializable>
+                Map<String, Object> paramsMap = Map.of("task", quartzJob, "msg", ThrowableUtils.getStackTrace(e)); // 这里用var类型推断，会是Map<String, Serializable>
                 var res = MailAdapter.sendTemplatedMail(to, subject, templateName, paramsMap);
                 log.error("Task Error，Name {} || Reason {} || NoticeRes {} ", quartzJob.getJobName(), e.getMessage(), res);
             }

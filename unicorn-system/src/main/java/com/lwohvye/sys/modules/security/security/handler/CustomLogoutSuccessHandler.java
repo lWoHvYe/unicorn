@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.security.handler;
 
-import com.lwohvye.core.utils.result.ResultUtil;
+import com.lwohvye.core.utils.result.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -39,7 +39,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
             // authentication = SecurityContextHolder.getContext().getAuthentication();
             log.warn(" van：oh,boy why you're runaway ");
         }
-        ResultUtil.resultJson(response, HttpServletResponse.SC_OK, "退出成功");
+        ResultUtils.resultJson(response, HttpServletResponse.SC_OK, "退出成功");
     }
 
 }

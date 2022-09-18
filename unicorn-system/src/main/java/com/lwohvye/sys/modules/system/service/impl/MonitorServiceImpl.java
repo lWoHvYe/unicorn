@@ -19,7 +19,7 @@ import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateUtil;
 import com.lwohvye.sys.modules.system.service.IMonitorService;
 import com.lwohvye.core.constant.ElAdminConstant;
-import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtils;
 import com.lwohvye.core.utils.StringUtils;
 import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
@@ -90,9 +90,9 @@ public class MonitorServiceImpl implements IMonitorService {
             }
         }
         long used = total - available;
-        diskInfo.put("total", total > 0 ? FileUtil.getSize(total) : "?");
-        diskInfo.put("available", FileUtil.getSize(available));
-        diskInfo.put("used", FileUtil.getSize(used));
+        diskInfo.put("total", total > 0 ? FileUtils.getSize(total) : "?");
+        diskInfo.put("available", FileUtils.getSize(available));
+        diskInfo.put("used", FileUtils.getSize(used));
         if (total != 0) {
             diskInfo.put("usageRate", df.format(used / (double) total * 100));
         } else {

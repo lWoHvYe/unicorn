@@ -20,7 +20,7 @@ import com.lwohvye.api.modules.mnt.domain.DeployHistory;
 import com.lwohvye.api.modules.mnt.service.dto.DeployQueryCriteria;
 import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.annotation.log.OprLog;
-import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
 import com.lwohvye.sys.modules.mnt.service.IDeployService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,7 +51,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class DeployController {
 
-    private final String fileSavePath = FileUtil.getTmpDirPath() + File.separator;
+    private final String fileSavePath = FileUtils.getTmpDirPath() + File.separator;
     private final IDeployService deployService;
 
 
@@ -102,7 +102,7 @@ public class DeployController {
         if (file != null) {
             fileName = file.getOriginalFilename();
             File deployFile = new File(fileSavePath + fileName);
-            FileUtil.del(deployFile);
+            FileUtils.del(deployFile);
             file.transferTo(deployFile);
             //文件下一步要根据文件名字来
             deployService.deploy(fileSavePath + fileName, id);

@@ -18,7 +18,7 @@ package com.lwohvye.tools.service.impl;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
 import com.lwohvye.tools.service.IAliyunOSSService;
-import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +87,7 @@ public class AliyunOSSServiceImpl implements IAliyunOSSService {
         final long partSize = 1 * 1024 * 1024L;   //1 MB。
 
 // 填写本地文件的完整路径。如果未指定本地路径，则默认从示例程序所属项目对应本地路径中上传文件。
-        final File sampleFile = FileUtil.toFile(file);
+        final File sampleFile = FileUtils.toFile(file);
         long fileLength = sampleFile.length();
         int partCount = (int) (fileLength / partSize);
         if (fileLength % partSize != 0) {

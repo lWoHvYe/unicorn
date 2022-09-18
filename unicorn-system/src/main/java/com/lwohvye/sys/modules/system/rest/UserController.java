@@ -34,7 +34,7 @@ import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.RsaUtils;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.SpringContextHolder;
@@ -110,7 +110,7 @@ public class UserController implements SysUserAPI {
             criteria.getDeptIds().addAll(dataScopes);
             return userService.queryAll(criteria, pageable);
         }
-        return PageUtil.toPage(null, 0);
+        return PageUtils.toPage(null, 0);
     }
 
     @OprLog("新增用户")

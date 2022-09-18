@@ -55,13 +55,13 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
-        return PageUtil.toPage(quartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
+        return PageUtils.toPage(quartzJobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAllLog(JobQueryCriteria criteria, Pageable pageable) {
-        return PageUtil.toPage(quartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
+        return PageUtils.toPage(quartzLogRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable));
     }
 
     @Override
@@ -80,7 +80,7 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
     @Transactional(rollbackFor = Exception.class)
     public QuartzJob findById(Long id) {
         QuartzJob quartzJob = quartzJobRepository.findById(id).orElseGet(QuartzJob::new);
-        ValidationUtil.isNull(quartzJob.getId(), "QuartzJob", "id", id);
+        ValidationUtils.isNull(quartzJob.getId(), "QuartzJob", "id", id);
         return quartzJob;
     }
 
@@ -187,7 +187,7 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
             map.put("创建日期", quartzJob.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     @Override
@@ -206,6 +206,6 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
             map.put("创建日期", quartzLog.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 }

@@ -32,7 +32,7 @@ import com.lwohvye.sys.modules.system.service.IResourceService;
 import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.core.utils.json.JsonUtils;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.core.utils.result.ResultUtil;
+import com.lwohvye.core.utils.result.ResultUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -217,7 +217,7 @@ public class SpringSecurityConfig {
             // 返回 token 与 用户信息
             var authInfo = Map.of("id_token", properties.getTokenStartWith() + token, "user", jwtUserDto);
             // 这里需要进行响应
-            ResultUtil.resultJson(response, HttpServletResponse.SC_OK, JsonUtils.toJSONString(authInfo));
+            ResultUtils.resultJson(response, HttpServletResponse.SC_OK, JsonUtils.toJSONString(authInfo));
         };
     }
 
@@ -250,7 +250,7 @@ public class SpringSecurityConfig {
             }
             // 返回错误信息。用下面的sendError会被EntryPoint拦截并覆盖。
 //            response.sendError(HttpServletResponse.SC_BAD_REQUEST, authenticationException.getMessage());
-            ResultUtil.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, authenticationException.getMessage());
+            ResultUtils.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, authenticationException.getMessage());
         };
     }
 

@@ -20,9 +20,9 @@ import com.lwohvye.api.modules.system.service.dto.DictDetailDto;
 import com.lwohvye.api.modules.system.service.dto.DictDetailQueryCriteria;
 import com.lwohvye.sys.modules.system.repository.DictDetailRepository;
 import com.lwohvye.sys.modules.system.service.IDictDetailService;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.QueryHelp;
-import com.lwohvye.core.utils.ValidationUtil;
+import com.lwohvye.core.utils.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -56,7 +56,7 @@ public class DictDetailServiceImpl implements IDictDetailService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictDetailQueryCriteria criteria, Pageable pageable) {
         Page<DictDetail> page = dictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)));
+        return PageUtils.toPage(page.map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class DictDetailServiceImpl implements IDictDetailService {
     @Transactional(rollbackFor = Exception.class)
     public void update(DictDetail resources) {
         DictDetail dictDetail = dictDetailRepository.findById(resources.getId()).orElseGet(DictDetail::new);
-        ValidationUtil.isNull(dictDetail.getId(), "DictDetail", "id", resources.getId());
+        ValidationUtils.isNull(dictDetail.getId(), "DictDetail", "id", resources.getId());
         resources.setId(dictDetail.getId());
         dictDetailRepository.save(resources);
     }

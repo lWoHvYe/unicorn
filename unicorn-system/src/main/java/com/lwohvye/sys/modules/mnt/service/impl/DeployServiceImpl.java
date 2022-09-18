@@ -74,7 +74,7 @@ public class DeployServiceImpl implements IDeployService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DeployQueryCriteria criteria, Pageable pageable) {
         Page<Deploy> page = deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(deploy -> conversionService.convert(deploy, DeployDto.class)));
+        return PageUtils.toPage(page.map(deploy -> conversionService.convert(deploy, DeployDto.class)));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class DeployServiceImpl implements IDeployService {
     @Transactional(rollbackFor = Exception.class)
     public DeployDto findById(Long id) {
         Deploy deploy = deployRepository.findById(id).orElseGet(Deploy::new);
-        ValidationUtil.isNull(deploy.getId(), "Deploy", "id", id);
+        ValidationUtils.isNull(deploy.getId(), "Deploy", "id", id);
         return conversionService.convert(deploy, DeployDto.class);
     }
 
@@ -102,7 +102,7 @@ public class DeployServiceImpl implements IDeployService {
     @Transactional(rollbackFor = Exception.class)
     public void update(Deploy resources) {
         Deploy deploy = deployRepository.findById(resources.getId()).orElseGet(Deploy::new);
-        ValidationUtil.isNull(deploy.getId(), "Deploy", "id", resources.getId());
+        ValidationUtils.isNull(deploy.getId(), "Deploy", "id", resources.getId());
         deploy.copy(resources);
         deployRepository.save(deploy);
     }
@@ -435,6 +435,6 @@ public class DeployServiceImpl implements IDeployService {
             map.put("部署日期", deployDto.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 }

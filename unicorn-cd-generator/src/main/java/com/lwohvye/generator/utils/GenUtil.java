@@ -19,7 +19,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.template.*;
 import com.lwohvye.generator.domain.ColumnInfo;
 import com.lwohvye.generator.domain.GenConfig;
-import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtils;
 import com.lwohvye.core.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
@@ -31,7 +31,7 @@ import java.io.Writer;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.lwohvye.core.utils.FileUtil.SYS_TEM_DIR;
+import static com.lwohvye.core.utils.FileUtils.SYS_TEM_DIR;
 
 /**
  * 代码生成
@@ -121,7 +121,7 @@ public class GenUtil {
             assert filePath != null;
             File file = new File(filePath);
             // 如果非覆盖生成
-            if (!genConfig.getCover() && FileUtil.exist(file)) {
+            if (!genConfig.getCover() && FileUtils.exist(file)) {
                 continue;
             }
             // 生成代码
@@ -138,7 +138,7 @@ public class GenUtil {
             assert filePath != null;
             File file = new File(filePath);
             // 如果非覆盖生成
-            if (!genConfig.getCover() && FileUtil.exist(file)) {
+            if (!genConfig.getCover() && FileUtils.exist(file)) {
                 continue;
             }
             // 生成代码
@@ -161,7 +161,7 @@ public class GenUtil {
             File file = new File(filePath);
 
             // 如果非覆盖生成
-            if (!genConfig.getCover() && FileUtil.exist(file)) {
+            if (!genConfig.getCover() && FileUtils.exist(file)) {
                 continue;
             }
             // 生成代码
@@ -179,7 +179,7 @@ public class GenUtil {
                 File file = new File(filePath);
 
                 // 如果非覆盖生成
-                if (!genConfig.getCover() && FileUtil.exist(file)) {
+                if (!genConfig.getCover() && FileUtils.exist(file)) {
                     continue;
                 }
                 // 生成代码
@@ -415,7 +415,7 @@ public class GenUtil {
         // 生成目标文件
         Writer writer = null;
         try {
-            FileUtil.touch(file);
+            FileUtils.touch(file);
             writer = new FileWriter(file);
             template.render(map, writer);
         } catch (TemplateException | IOException e) {

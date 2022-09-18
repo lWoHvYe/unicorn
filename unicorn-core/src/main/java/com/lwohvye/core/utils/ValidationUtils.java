@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
  * @author Zheng Jie
  * @date 2018-11-23
  */
-public class ValidationUtil{
+public class ValidationUtils {
 
     /**
      * 验证空

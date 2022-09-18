@@ -67,9 +67,40 @@ public class QueryHelp {
         return cb.and(list.toArray(new Predicate[0]));
     }
 
+    /**
+     * 数据权限验证
+     *
+     * @param root  /
+     * @param query /
+     * @param list  /
+     * @date 2021/11/7 4:36 下午
+     */
+    private static <R, Q> void analyzeDataPermission(Root<R> root, Q query, ArrayList<Predicate> list) {
+        DataPermission permission = query.getClass().getAnnotation(DataPermission.class);
+        if (permission != null) {
+            // 获取数据权限
+            var dataScopes = SecurityUtils.getCurrentUserDataScope();
+            if (CollUtil.isNotEmpty(dataScopes) && StringUtils.isNotBlank(permission.fieldName())) {
+                if (StringUtils.isNotBlank(permission.joinName())) {
+                    // 因为首先处理这部分，不必担心join重复。这里用var的化，join的类型会是Join<Object, Object>
+                    Join<R, ?> join = root.join(permission.joinName(), JoinType.LEFT);
+                    list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
+                } else {
+                    list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
+                }
+            }
+        }
+    }
+
     private static <R, Q> void analyzeFieldQuery(Root<R> root, Q query, CriteriaBuilder cb, ArrayList<Predicate> list) throws IllegalAccessException {
-        for (var field : getAllFields(query.getClass(), new ArrayList<>())) {
-//                field.canAccess(filed对应的查询器实例)
+        for (var field : ReflectUtil.getFields(query.getClass())) {
+            // AccessibleObject 类是 Field、Method 和 Constructor 对象的基类。它提供了将反射的对象标记为在使用时取消默认 Java 语言访问控制检查的能力。
+            // 对于公共成员、默认（打包）访问成员、受保护成员和私有成员，在分别使用 Field、Method 或 Constructor 对象来设置或获得字段、调用方法，或者创建和初始化类的新实例的时候，会执行访问检查。
+            // 在反射对象中设置 accessible 标志允许具有足够特权的复杂应用程序（比如 Java Object Serialization 或其他持久性机制）以某种通常禁止使用的方式来操作对象，
+            // 需注意flag=true：指示反射的对象在使用时应该取消 Java 语言访问检查。flag=false：指示反射的对象应该实施 Java 语言访问检查。
+            // 所以setAccessible只是启用和禁用访问安全检查的开关,并不是为true就能访问，为false就不能访问
+            // ⚠️ Reflect获取的都是副本Duplicate，对其的Modifier理论上不会影响其他地方获取的结果，但有的框架或工具会对Reflect做Cache，所以建议在Use后Reset Accessible
+            // field.canAccess(filed对应的查询器实例)
             var accessible = field.canAccess(query);
             // boolean accessible = field.isAccessible(); // 方法已过期，改用canAccess
             // 设置对象的访问权限，保证对private的属性的访
@@ -102,31 +133,6 @@ public class QueryHelp {
     }
 
     /**
-     * 数据权限验证
-     *
-     * @param root  /
-     * @param query /
-     * @param list  /
-     * @date 2021/11/7 4:36 下午
-     */
-    private static <R, Q> void analyzeDataPermission(Root<R> root, Q query, ArrayList<Predicate> list) {
-        DataPermission permission = query.getClass().getAnnotation(DataPermission.class);
-        if (permission != null) {
-            // 获取数据权限
-            var dataScopes = SecurityUtils.getCurrentUserDataScope();
-            if (CollUtil.isNotEmpty(dataScopes) && StringUtils.isNotBlank(permission.fieldName())) {
-                if (StringUtils.isNotBlank(permission.joinName())) {
-                    // 因为首先处理这部分，不必担心join重复。这里用var的化，join的类型会是Join<Object, Object>
-                    Join<R, ?> join = root.join(permission.joinName(), JoinType.LEFT);
-                    list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
-                } else {
-                    list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
-                }
-            }
-        }
-    }
-
-    /**
      * 解析joinType
      *
      * @param root /
@@ -135,41 +141,42 @@ public class QueryHelp {
      * @return javax.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
+    @Nullable
     private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, Object val) {
         Join<R, ?> join = null;
         var joinName = q.joinName();
-        if (StringUtils.isNotBlank(joinName)) {
-            // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
-            // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
-            // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
-            var joinNames = joinName.split(">");
+        if (StringUtils.isBlank(joinName))
+            return null;
+        // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
+        // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
+        // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
+        var joinNames = joinName.split(">");
 
-            for (var entity : joinNames) {
-                // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
-                // 业务中应该没有需要对同一张table多次join，甚至joinType还不同的情形。这里是不支持此类场景的
-                checkJoin:
-                {
-                    if (Objects.isNull(join)) {
+        for (var entity : joinNames) {
+            // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
+            // 业务中应该没有需要对同一张table多次join，甚至joinType还不同的情形。这里是不支持此类场景的
+            checkJoin:
+            {
+                if (Objects.isNull(join)) {
 //                    var rJoin = existJoinNames.get(entity); 同上
-                        for (var rJoin : root.getJoins()) {
-                            // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
-                            if (Objects.equals(rJoin.getAttribute().getName(), entity)) {
-                                join = rJoin;
-                                break checkJoin;
-                            }
+                    for (var rJoin : root.getJoins()) {
+                        // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
+                        if (Objects.equals(rJoin.getAttribute().getName(), entity)) {
+                            join = rJoin;
+                            break checkJoin;
                         }
                     }
-                    // Switch Expressions。这个只是一个sweets 语法糖
-                    var stubJoin = Objects.nonNull(join) && Objects.nonNull(val);
-                    join = switch (q.join()) {
-                        case LEFT:
-                            yield stubJoin ? join.join(entity, JoinType.LEFT) : root.join(entity, JoinType.LEFT);
-                        case RIGHT:
-                            yield stubJoin ? join.join(entity, JoinType.RIGHT) : root.join(entity, JoinType.RIGHT);
-                        case INNER:
-                            yield stubJoin ? join.join(entity, JoinType.INNER) : root.join(entity, JoinType.INNER);
-                    };
                 }
+                // Switch Expressions。这个只是一个sweets 语法糖
+                var stubJoin = Objects.nonNull(join) && Objects.nonNull(val);
+                join = switch (q.join()) {
+                    case LEFT:
+                        yield stubJoin ? join.join(entity, JoinType.LEFT) : root.join(entity, JoinType.LEFT);
+                    case RIGHT:
+                        yield stubJoin ? join.join(entity, JoinType.RIGHT) : root.join(entity, JoinType.RIGHT);
+                    case INNER:
+                        yield stubJoin ? join.join(entity, JoinType.INNER) : root.join(entity, JoinType.INNER);
+                };
             }
         }
         return join;
@@ -209,9 +216,12 @@ public class QueryHelp {
                 //pt1：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(fieldType), ele));  fieldType未声明为Comparable的子类，不得行
                 //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
                 //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
-                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(val)));
-            case LESS_THAN -> list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(val)));
-            case LESS_THAN_NQ -> list.add(cb.lessThan(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(val)));
+                    list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType),
+                            Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
+            case LESS_THAN -> list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType),
+                    Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
+            case LESS_THAN_NQ -> list.add(cb.lessThan(getExpression(attributeName, join, root).as(comparableFieldType),
+                    Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
             case INNER_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
             case LEFT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val));
             case RIGHT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
@@ -242,7 +252,8 @@ public class QueryHelp {
             case BETWEEN -> {
                 if (val instanceof List<?> col && col.size() == 2 && col.get(0) instanceof Comparable<?> start && col.get(1) instanceof Comparable<?> end) {
                     var eleType = castComparableFieldType(start);
-                    list.add(cb.between(getExpression(attributeName, join, root).as(eleType), eleType.cast(start), eleType.cast(end)));
+                    list.add(cb.between(getExpression(attributeName, join, root).as(eleType),
+                            Objects.requireNonNull(eleType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(start), eleType.cast(end)));
                 }
             }
             case NOT_NULL -> list.add(cb.isNotNull(getExpression(attributeName, join, root)));
@@ -362,15 +373,6 @@ public class QueryHelp {
             // 非join的，从root中取，root.get()。
             return root.get(attributeName);
         }
-    }
-
-    public static <T> List<Field> getAllFields(Class<T> clazz, List<Field> fields) {
-        if (clazz != null) {
-            // getDeclaredFields返回该类的全部域，包括私有域，但不包括超类的域，所以要递归调用
-            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            getAllFields(clazz.getSuperclass(), fields);
-        }
-        return fields;
     }
 
     @NotNull

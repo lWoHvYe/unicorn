@@ -26,7 +26,7 @@ import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.api.modules.system.service.dto.DeptDto;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,7 +64,7 @@ public class DeptController implements SysDeptAPI {
     @Override
     public Map<String, Object> query(DeptQueryCriteria criteria) throws Exception {
         List<DeptDto> deptDtos = deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, true);
-        return PageUtil.toPage(deptDtos, deptDtos.size());
+        return PageUtils.toPage(deptDtos, deptDtos.size());
     }
 
     @Operation(summary = "查询部门:根据ID获取同级与上级数据")

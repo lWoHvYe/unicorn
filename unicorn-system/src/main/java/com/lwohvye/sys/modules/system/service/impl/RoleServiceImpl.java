@@ -94,7 +94,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(RoleQueryCriteria criteria, Pageable pageable) {
         Page<Role> page = roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(role -> conversionService.convert(role, RoleDto.class)));
+        return PageUtils.toPage(page.map(role -> conversionService.convert(role, RoleDto.class)));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     public RoleDto findById(long id) {
         Role role = roleRepository.findById(id).orElseGet(Role::new);
-        ValidationUtil.isNull(role.getId(), "Role", "id", id);
+        ValidationUtils.isNull(role.getId(), "Role", "id", id);
         return conversionService.convert(role, RoleDto.class);
     }
 
@@ -113,7 +113,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public void create(Role resources) {
         if (roleRepository.findByName(resources.getName()) != null) {
-            throw new EntityExistsException(StringUtils.generateExcMsg(Role.class, "username", resources.getName(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Role.class, "username", resources.getName(), "existed"));
         }
         roleRepository.save(resources);
     }
@@ -123,12 +123,12 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public void update(Role resources) {
         Role role = roleRepository.findById(resources.getId()).orElseGet(Role::new);
-        ValidationUtil.isNull(role.getId(), "Role", "id", resources.getId());
+        ValidationUtils.isNull(role.getId(), "Role", "id", resources.getId());
 
         Role role1 = roleRepository.findByName(resources.getName());
 
         if (role1 != null && !role1.getId().equals(role.getId())) {
-            throw new EntityExistsException(StringUtils.generateExcMsg(Role.class, "username", resources.getName(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Role.class, "username", resources.getName(), "existed"));
         }
         role.setName(resources.getName());
         role.setDescription(resources.getDescription());
@@ -212,7 +212,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
             map.put("创建日期", role.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     @Override

@@ -341,10 +341,4 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         String regx = "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
         return str.matches(regx);
     }
-    // region Throwable Msg Gen
-
-    public static String generateExcMsg(Class<?> entity, String fieldName, String fieldVal, String intro) {
-        return String.format(" %s with %s-> %s is %s ", capitalize(entity.getSimpleName()), fieldName, fieldVal, intro);
-    }
-    // endregion
 }

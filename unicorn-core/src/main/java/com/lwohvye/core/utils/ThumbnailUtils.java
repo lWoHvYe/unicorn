@@ -33,7 +33,7 @@ import java.io.OutputStream;
  * @date 2021/12/31 5:38 PM
  */
 @Slf4j
-public class ThumbnailUtil {
+public class ThumbnailUtils {
 
     /**
      * 压缩图片并返回新的路径。当下输出只有jpg格式。需注意，本工具的主要用途是调整图片尺寸、添加水印等，压缩有时达不到效果

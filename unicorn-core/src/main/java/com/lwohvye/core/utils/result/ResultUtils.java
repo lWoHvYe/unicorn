@@ -34,7 +34,7 @@ import java.util.*;
  * @date 2021/11/15 7:19 下午
  */
 @SuppressWarnings("unchecked")
-public class ResultUtil {
+public class ResultUtils {
 
 
     @SneakyThrows

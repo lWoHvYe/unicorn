@@ -15,6 +15,7 @@
  */
 package com.lwohvye.core.utils;
 
+import cn.hutool.core.util.PageUtil;
 import org.springframework.data.domain.Page;
 
 import java.util.*;
@@ -25,7 +26,7 @@ import java.util.*;
  * @author Zheng Jie
  * @date 2018-12-10
  */
-public class PageUtil extends cn.hutool.core.util.PageUtil {
+public class PageUtils extends PageUtil {
 
     /**
      * List 分页

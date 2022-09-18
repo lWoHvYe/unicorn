@@ -19,7 +19,7 @@ import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 import cn.hutool.core.util.StrUtil;
 import com.google.common.collect.Maps;
-import com.lwohvye.core.utils.FileUtil;
+import com.lwohvye.core.utils.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -67,7 +67,7 @@ public class ScpClientUtil {
             }
             var client = conn.createSCPClient();
             var scpInputStream = client.get(remoteFile);
-            FileUtil.writeFromStream(scpInputStream, localTargetDirectory);
+            FileUtils.writeFromStream(scpInputStream, localTargetDirectory);
         } catch (IOException ex) {
             Logger.getLogger(SCPClient.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

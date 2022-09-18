@@ -21,10 +21,10 @@ import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryDto;
 import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.sys.modules.mnt.repository.DeployHistoryRepository;
 import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
-import com.lwohvye.core.utils.FileUtil;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.FileUtils;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.QueryHelp;
-import com.lwohvye.core.utils.ValidationUtil;
+import com.lwohvye.core.utils.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -52,7 +52,7 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         Page<DeployHistory> page = deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(deployHistory -> conversionService.convert(deployHistory, DeployHistoryDto.class)));
+        return PageUtils.toPage(page.map(deployHistory -> conversionService.convert(deployHistory, DeployHistoryDto.class)));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
     @Transactional(rollbackFor = Exception.class)
     public DeployHistoryDto findById(String id) {
         DeployHistory deployhistory = deployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
-        ValidationUtil.isNull(deployhistory.getId(), "DeployHistory", "id", id);
+        ValidationUtils.isNull(deployhistory.getId(), "DeployHistory", "id", id);
         return conversionService.convert(deployhistory, DeployHistoryDto.class);
     }
 
@@ -97,6 +97,6 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
             map.put("部署人员", deployHistoryDto.getDeployUser());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 }

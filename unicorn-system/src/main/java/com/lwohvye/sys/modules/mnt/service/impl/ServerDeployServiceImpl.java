@@ -21,10 +21,10 @@ import com.lwohvye.api.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import com.lwohvye.sys.modules.mnt.repository.ServerDeployRepository;
 import com.lwohvye.sys.modules.mnt.service.IServerDeployService;
 import com.lwohvye.sys.modules.mnt.util.ExecuteShellUtil;
-import com.lwohvye.core.utils.FileUtil;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.FileUtils;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.QueryHelp;
-import com.lwohvye.core.utils.ValidationUtil;
+import com.lwohvye.core.utils.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -52,7 +52,7 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
         Page<ServerDeploy> page = serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(serverDeploy -> conversionService.convert(serverDeploy, ServerDeployDto.class)));
+        return PageUtils.toPage(page.map(serverDeploy -> conversionService.convert(serverDeploy, ServerDeployDto.class)));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     @Transactional(rollbackFor = Exception.class)
     public ServerDeployDto findById(Long id) {
         ServerDeploy server = serverDeployRepository.findById(id).orElseGet(ServerDeploy::new);
-        ValidationUtil.isNull(server.getId(), "ServerDeploy", "id", id);
+        ValidationUtils.isNull(server.getId(), "ServerDeploy", "id", id);
         return conversionService.convert(server, ServerDeployDto.class);
     }
 
@@ -102,7 +102,7 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     @Transactional(rollbackFor = Exception.class)
     public void update(ServerDeploy resources) {
         ServerDeploy serverDeploy = serverDeployRepository.findById(resources.getId()).orElseGet(ServerDeploy::new);
-        ValidationUtil.isNull(serverDeploy.getId(), "ServerDeploy", "id", resources.getId());
+        ValidationUtils.isNull(serverDeploy.getId(), "ServerDeploy", "id", resources.getId());
         serverDeploy.copy(resources);
         serverDeployRepository.save(serverDeploy);
     }
@@ -127,6 +127,6 @@ public class ServerDeployServiceImpl implements IServerDeployService {
             map.put("创建日期", deployDto.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 }

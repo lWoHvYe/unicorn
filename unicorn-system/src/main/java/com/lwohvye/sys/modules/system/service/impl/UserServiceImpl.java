@@ -115,7 +115,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(UserQueryCriteria criteria, Pageable pageable) {
         var page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(user -> conversionService.convert(user, UserDto.class))); // 这里使用toPage，在无符合条件的记录时，也有构筑结果并缓存，也算是一定程度上缓解缓存穿透
+        return PageUtils.toPage(page.map(user -> conversionService.convert(user, UserDto.class))); // 这里使用toPage，在无符合条件的记录时，也有构筑结果并缓存，也算是一定程度上缓解缓存穿透
     }
 
     @Override
@@ -139,7 +139,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public UserDto findById(long id) {
         User user = userRepository.findById(id).orElseGet(User::new);
-        ValidationUtil.isNull(user.getId(), "User", "id", id);
+        ValidationUtils.isNull(user.getId(), "User", "id", id);
         return conversionService.convert(user, UserDto.class);
     }
 
@@ -149,11 +149,11 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public void create(User resources) {
         if (userRepository.findByUsername(resources.getUsername()) != null)
-            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
         if (userRepository.findByEmail(resources.getEmail()) != null)
-            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
         if (userRepository.findByPhone(resources.getPhone()) != null)
-            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
         userRepository.save(resources);
     }
 
@@ -162,16 +162,16 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @CacheEvict(allEntries = true)
     public void update(User resources) throws Exception {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
-        ValidationUtil.isNull(user.getId(), "User", "id", resources.getId());
+        ValidationUtils.isNull(user.getId(), "User", "id", resources.getId());
         User user1 = userRepository.findByUsername(resources.getUsername());
         User user2 = userRepository.findByEmail(resources.getEmail());
         User user3 = userRepository.findByPhone(resources.getPhone());
         if (user1 != null && !user.getId().equals(user1.getId()))
-            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
         if (user2 != null && !user.getId().equals(user2.getId()))
-            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
         if (user3 != null && !user.getId().equals(user3.getId()))
-            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
 //        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
 //        不确定是否需要进行赋值。理论上传递的是引用。更改会影响到这方
 //        convertString4BlobUtil.convert(user);
@@ -203,7 +203,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         User user1 = userRepository.findByPhone(resources.getPhone());
         if (user1 != null && !user.getId().equals(user1.getId()))
-            throw new EntityExistsException(StringUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
         user.setNickName(resources.getNickName());
         user.setPhone(resources.getPhone());
         user.setGender(resources.getGender());
@@ -242,7 +242,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
             var upj = userRepository.findByUsername(userName, UserProj.class);
         }
         if (Objects.isNull(user))
-            throw new EntityNotFoundException(StringUtils.generateExcMsg(User.class, "name", userName, "NotExist"));
+            throw new EntityNotFoundException(ExceptionMsgUtils.generateExcMsg(User.class, "name", userName, "NotExist"));
         else
             return conversionService.convert(user, UserDto.class);
     }
@@ -253,7 +253,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
         // 方法内调用，Spring aop不会生效，所以若直接调 findByName(String username) 方法不会走缓存
         var user = userRepository.findByUsername(userName);
         if (Objects.isNull(user))
-            throw new EntityNotFoundException(StringUtils.generateExcMsg(User.class, "name", userName, "NotExist"));
+            throw new EntityNotFoundException(ExceptionMsgUtils.generateExcMsg(User.class, "name", userName, "NotExist"));
         else
             return conversionService.convert(user, UserInnerDto.class);
     }
@@ -271,21 +271,21 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @CacheEvict(allEntries = true)
     public Map<String, String> updateAvatar(MultipartFile multipartFile) {
         // 文件大小验证
-        FileUtil.checkSize(properties.getAvatarMaxSize(), multipartFile.getSize());
+        FileUtils.checkSize(properties.getAvatarMaxSize(), multipartFile.getSize());
         // 验证文件上传的格式
         String image = "gif jpg png jpeg";
-        String fileType = FileUtil.getExtensionName(multipartFile.getOriginalFilename());
+        String fileType = FileUtils.getExtensionName(multipartFile.getOriginalFilename());
         if (ObjectUtil.isNotNull(fileType) && !image.contains(fileType)) {
             throw new BadRequestException("文件格式错误！, 仅支持 " + image + " 格式");
         }
         User user = userRepository.findByUsername(SecurityUtils.getCurrentUsername());
         String oldPath = user.getAvatarPath();
-        File file = FileUtil.upload(multipartFile, properties.getOSPath().getAvatar());
+        File file = FileUtils.upload(multipartFile, properties.getOSPath().getAvatar());
         user.setAvatarPath(Objects.requireNonNull(file).getPath());
         user.setAvatarName(file.getName());
         userRepository.save(user);
         if (StringUtils.isNotBlank(oldPath)) {
-            FileUtil.del(oldPath);
+            FileUtils.del(oldPath);
         }
         @NotBlank String username = user.getUsername();
         flushCache(username);
@@ -328,7 +328,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
             map.put("创建日期", userDTO.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     /**

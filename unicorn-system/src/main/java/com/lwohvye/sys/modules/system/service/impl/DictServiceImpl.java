@@ -18,9 +18,9 @@ package com.lwohvye.sys.modules.system.service.impl;
 import com.lwohvye.api.modules.system.domain.Dict;
 import com.lwohvye.api.modules.system.service.dto.DictDto;
 import com.lwohvye.api.modules.system.service.dto.DictQueryCriteria;
-import com.lwohvye.core.utils.PageUtil;
+import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.QueryHelp;
-import com.lwohvye.core.utils.ValidationUtil;
+import com.lwohvye.core.utils.ValidationUtils;
 import com.lwohvye.sys.modules.system.repository.DictRepository;
 import com.lwohvye.sys.modules.system.service.IDictService;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +55,7 @@ public class DictServiceImpl implements IDictService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(DictQueryCriteria criteria, Pageable pageable) {
         Page<Dict> page = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(dict -> conversionService.convert(dict, DictDto.class)));
+        return PageUtils.toPage(page.map(dict -> conversionService.convert(dict, DictDto.class)));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class DictServiceImpl implements IDictService {
     @Transactional(rollbackFor = Exception.class)
     public void update(Dict resources) {
         Dict dict = dictRepository.findById(resources.getId()).orElseGet(Dict::new);
-        ValidationUtil.isNull(dict.getId(), "Dict", "id", resources.getId());
+        ValidationUtils.isNull(dict.getId(), "Dict", "id", resources.getId());
 //        名称及描述允许置空
         dict.setName(resources.getName());
         dict.setDescription(resources.getDescription());

@@ -26,7 +26,7 @@ import java.net.URLEncoder;
  * @author Zheng Jie
  * 翻译工具类
  */
-public class TranslatorUtil {
+public class TranslatorUtils {
 
     public static String translate(String word){
         try {

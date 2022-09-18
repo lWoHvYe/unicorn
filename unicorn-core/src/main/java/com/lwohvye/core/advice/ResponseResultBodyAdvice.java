@@ -17,7 +17,7 @@ package com.lwohvye.core.advice;
 
 import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.utils.ThrowableUtil;
+import com.lwohvye.core.utils.ThrowableUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -108,7 +108,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ResultInfo<?>> handleException(Exception ex, WebRequest request) {
-        log.error(ThrowableUtil.getStackTrace(ex));
+        log.error(ThrowableUtils.getStackTrace(ex));
         ResultInfo<?> body = ResultInfo.failed(ex.getMessage());
         var headers = new HttpHeaders();
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -130,7 +130,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
             , IllegalArgumentException.class // Assert相关
     })
     public final ResponseEntity<ResultInfo<?>> handleServletException(RuntimeException ex, WebRequest request) {
-        log.error(ThrowableUtil.getStackTrace(ex));
+        log.error(ThrowableUtils.getStackTrace(ex));
         var body = ResultInfo.failed(ex.getMessage());
         var headers = new HttpHeaders();
         var status = HttpStatus.BAD_REQUEST;
@@ -146,7 +146,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public final ResponseEntity<ResultInfo<?>> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
-        log.error(ThrowableUtil.getStackTrace(ex));
+        log.error(ThrowableUtils.getStackTrace(ex));
         var body = ResultInfo.forbidden(ex.getMessage());
         var headers = new HttpHeaders();
         var status = HttpStatus.FORBIDDEN;
@@ -161,7 +161,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public final ResponseEntity<ResultInfo<?>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, WebRequest request) {
-        log.error(ThrowableUtil.getStackTrace(ex));
+        log.error(ThrowableUtils.getStackTrace(ex));
         var body = ResultInfo.methodNotAllowed(ex.getMessage());
         var headers = new HttpHeaders();
         var status = HttpStatus.METHOD_NOT_ALLOWED;
@@ -176,7 +176,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public final ResponseEntity<ResultInfo<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
-        log.error(ThrowableUtil.getStackTrace(ex));
+        log.error(ThrowableUtils.getStackTrace(ex));
         var str = Objects.requireNonNull(ex.getBindingResult().getAllErrors().get(0).getCodes())[1].split("\\.");
         var message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         if ("不能为空".equals(message)) {
@@ -197,7 +197,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public final ResponseEntity<ResultInfo<?>> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
-        log.error(ThrowableUtil.getStackTrace(ex));
+        log.error(ThrowableUtils.getStackTrace(ex));
         var body = ResultInfo.methodNotAllowed(ex.getMessage());
         var headers = new HttpHeaders();
         var status = HttpStatus.BAD_REQUEST;

@@ -15,23 +15,34 @@
  */
 package com.lwohvye.core.utils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.Closeable;
 
 /**
- * 异常工具 2019-01-06
+ * 用于关闭各种连接，缺啥补啥
+ *
  * @author Zheng Jie
- */
-public class ThrowableUtil {
+ * @website https://el-admin.vip
+ * @date 2021-03-05
+ **/
+public class CloseUtils {
 
-    /**
-     * 获取堆栈信息
-     */
-    public static String getStackTrace(Throwable throwable){
-        StringWriter sw = new StringWriter();
-        try (PrintWriter pw = new PrintWriter(sw)) {
-            throwable.printStackTrace(pw);
-            return sw.toString();
+    public static void close(Closeable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // 静默关闭
+            }
+        }
+    }
+
+    public static void close(AutoCloseable closeable) {
+        if (null != closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // 静默关闭
+            }
         }
     }
 }

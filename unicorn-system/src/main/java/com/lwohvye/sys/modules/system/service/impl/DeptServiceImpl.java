@@ -110,7 +110,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public DeptDto findById(Long id) {
         Dept dept = deptRepository.findById(id).orElseGet(Dept::new);
-        ValidationUtil.isNull(dept.getId(), "Dept", "id", id);
+        ValidationUtils.isNull(dept.getId(), "Dept", "id", id);
         return conversionService.convert(dept, DeptDto.class);
     }
 
@@ -152,7 +152,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
             throw new BadRequestException("上级不能为自己");
         }
         Dept dept = deptRepository.findById(resources.getId()).orElseGet(Dept::new);
-        ValidationUtil.isNull(dept.getId(), "Dept", "id", resources.getId());
+        ValidationUtils.isNull(dept.getId(), "Dept", "id", resources.getId());
         resources.setId(dept.getId());
         deptRepository.save(resources);
         // 更新父节点中子节点数目
@@ -184,7 +184,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
             map.put("创建日期", deptDTO.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     @Override

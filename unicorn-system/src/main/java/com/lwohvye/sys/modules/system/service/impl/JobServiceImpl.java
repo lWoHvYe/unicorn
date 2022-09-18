@@ -57,7 +57,7 @@ public class JobServiceImpl implements IJobService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(JobQueryCriteria criteria, Pageable pageable) {
         Page<Job> page = jobRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(job -> conversionService.convert(job, JobDto.class)));
+        return PageUtils.toPage(page.map(job -> conversionService.convert(job, JobDto.class)));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class JobServiceImpl implements IJobService {
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     public JobDto findById(Long id) {
         Job job = jobRepository.findById(id).orElseGet(Job::new);
-        ValidationUtil.isNull(job.getId(), "Job", "id", id);
+        ValidationUtils.isNull(job.getId(), "Job", "id", id);
         return conversionService.convert(job, JobDto.class);
     }
 
@@ -82,7 +82,7 @@ public class JobServiceImpl implements IJobService {
     public void create(Job resources) {
         Job job = jobRepository.findByName(resources.getName());
         if (job != null) {
-            throw new EntityExistsException(StringUtils.generateExcMsg(Job.class, "name", resources.getName(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Job.class, "name", resources.getName(), "existed"));
         }
         jobRepository.save(resources);
     }
@@ -95,9 +95,9 @@ public class JobServiceImpl implements IJobService {
         Job job = jobRepository.findById(resources.getId()).orElseGet(Job::new);
         Job old = jobRepository.findByName(resources.getName());
         if (old != null && !old.getId().equals(resources.getId())) {
-            throw new EntityExistsException(StringUtils.generateExcMsg(Job.class, "name", resources.getName(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Job.class, "name", resources.getName(), "existed"));
         }
-        ValidationUtil.isNull(job.getId(), "Job", "id", resources.getId());
+        ValidationUtils.isNull(job.getId(), "Job", "id", resources.getId());
         resources.setId(job.getId());
         jobRepository.save(resources);
     }
@@ -119,7 +119,7 @@ public class JobServiceImpl implements IJobService {
             map.put("创建日期", jobDTO.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     @Override

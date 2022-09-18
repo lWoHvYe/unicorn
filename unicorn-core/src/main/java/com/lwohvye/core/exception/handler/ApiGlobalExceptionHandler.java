@@ -16,7 +16,7 @@
 package com.lwohvye.core.exception.handler;
 
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.utils.ThrowableUtil;
+import com.lwohvye.core.utils.ThrowableUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -62,7 +62,7 @@ public class ApiGlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ResultInfo> handleException(Throwable e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -82,7 +82,7 @@ public class ApiGlobalExceptionHandler {
             , IllegalArgumentException.class // Assert相关
     })
     public ResponseEntity<ResultInfo> handleServletException(RuntimeException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return buildResponseEntity(ResultInfo.failed(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
@@ -95,7 +95,7 @@ public class ApiGlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ResultInfo> handleAccessDeniedException(AccessDeniedException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return buildResponseEntity(ResultInfo.forbidden(e.getMessage()), HttpStatus.FORBIDDEN);
     }
 
@@ -108,7 +108,7 @@ public class ApiGlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ResultInfo> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return buildResponseEntity(ResultInfo.methodNotAllowed(e.getMessage()), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -121,7 +121,7 @@ public class ApiGlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResultInfo> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         String[] str = Objects.requireNonNull(e.getBindingResult().getAllErrors().get(0).getCodes())[1].split("\\.");
         String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         if ("不能为空".equals(message)) {
@@ -140,7 +140,7 @@ public class ApiGlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ResultInfo> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-        log.error(ThrowableUtil.getStackTrace(e));
+        log.error(ThrowableUtils.getStackTrace(e));
         return buildResponseEntity(ResultInfo.methodNotAllowed(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 

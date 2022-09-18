@@ -29,7 +29,7 @@ import java.util.Date;
  *
  * @author liangming.deng
  */
-public class JsonDateFormatFull extends JsonSerializer<Date> {
+public class JsonDateFormatFulls extends JsonSerializer<Date> {
 
     /**
      * Jackson支持日期字符串格式。这部分应该可以直接在配置文件里配置
@@ -37,9 +37,9 @@ public class JsonDateFormatFull extends JsonSerializer<Date> {
      * "EEE, dd MMM yyyy HH:mm:ss zzz" "yyyy-MM-dd"
      */
     @Override
-    public void serialize(Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Date value, JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String formattedDate = formatter.format(value);
-        jgen.writeString(formattedDate);
+        jsonGen.writeString(formattedDate);
     }
 }

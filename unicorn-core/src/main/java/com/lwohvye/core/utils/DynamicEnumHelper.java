@@ -273,6 +273,7 @@ public class DynamicEnumHelper {
         field.trySetAccessible();
         field.set(object, newFieldValue);
         // 另，field本身是一个副本，我们修改的Modifier和Accessible都是针对该副本的，若在此处再次获取个fieldNew，其Modifier之类的还是原来的。这一点需记住
+        // 但有的框架中对Reflect做了Cache以提高效率，这样以来Reflect可能拿到的就是之前的副本了，所以accessible最好在使用完后重制一下
         // var fieldAfterModifier = object.getClass().getDeclaredField(fieldName); // 如果原来是final的话，这里还是final的
     }
 

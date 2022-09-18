@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.domain.vo.MenuMetaVo;
 import com.lwohvye.api.modules.system.domain.vo.MenuVo;
@@ -49,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityExistsException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -75,11 +75,10 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @Cacheable
     @Transactional(rollbackFor = Exception.class)
     public List<MenuDto> queryAll(MenuQueryCriteria criteria, Boolean isQuery) throws Exception {
-        Sort sort = Sort.by(Sort.Direction.ASC, "menuSort");
+        var sort = Sort.by(Sort.Direction.ASC, "menuSort");
         if (Boolean.TRUE.equals(isQuery)) {
             criteria.setPidIsNull(true);
-            List<Field> fields = QueryHelp.getAllFields(criteria.getClass(), new ArrayList<>());
-            for (Field field : fields) {
+            for (var field : ReflectUtil.getFields(criteria.getClass())) {
                 if ("pidIsNull".equals(field.getName()))
                     continue;
                 //设置对象的访问权限，保证对private的属性的访问
@@ -99,7 +98,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     public MenuDto findById(long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
-        ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
+        ValidationUtils.isNull(menu.getId(), "Menu", "id", id);
         return conversionService.convert(menu, MenuDto.class);
     }
 
@@ -123,10 +122,10 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public void create(Menu resources) {
         if (menuRepository.findByTitle(resources.getTitle()) != null)
-            throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "title", resources.getTitle(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Menu.class, "title", resources.getTitle(), "existed"));
 
         if (StringUtils.isNotBlank(resources.getComponentName()) && menuRepository.findByComponentName(resources.getComponentName()) != null)
-            throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "componentName", resources.getComponentName(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Menu.class, "componentName", resources.getComponentName(), "existed"));
 
         if (resources.getPid().equals(0L))
             resources.setPid(null);
@@ -150,7 +149,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         if (resources.getId().equals(resources.getPid()))
             throw new BadRequestException("上级不能为自己");
         Menu menu = menuRepository.findById(resources.getId()).orElseGet(Menu::new);
-        ValidationUtil.isNull(menu.getId(), "Permission", "id", resources.getId());
+        ValidationUtils.isNull(menu.getId(), "Permission", "id", resources.getId());
 
         if (Boolean.TRUE.equals(resources.getIFrame())) {
             String http = "http://", https = "https://";
@@ -160,7 +159,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         Menu menu1 = menuRepository.findByTitle(resources.getTitle());
 
         if (menu1 != null && !menu1.getId().equals(menu.getId()))
-            throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "title", resources.getTitle(), "existed"));
+            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Menu.class, "title", resources.getTitle(), "existed"));
 
         if (resources.getPid().equals(0L))
             resources.setPid(null);
@@ -172,7 +171,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         if (StringUtils.isNotBlank(resources.getComponentName())) {
             menu1 = menuRepository.findByComponentName(resources.getComponentName());
             if (menu1 != null && !menu1.getId().equals(menu.getId()))
-                throw new EntityExistsException(StringUtils.generateExcMsg(Menu.class, "componentName", resources.getComponentName(), "existed"));
+                throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(Menu.class, "componentName", resources.getComponentName(), "existed"));
         }
         menu.setTitle(resources.getTitle()).setComponent(resources.getComponent()).setPath(resources.getPath()).setIcon(resources.getIcon())
                 .setIFrame(resources.getIFrame()).setPid(resources.getPid()).setMenuSort(resources.getMenuSort()).setCache(resources.getCache())
@@ -406,7 +405,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class)
     public Menu findOne(Long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
-        ValidationUtil.isNull(menu.getId(), "Menu", "id", id);
+        ValidationUtils.isNull(menu.getId(), "Menu", "id", id);
         return menu;
     }
 
@@ -423,7 +422,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
             map.put("创建日期", menuDTO.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     private void updateSubCnt(Long menuId) {

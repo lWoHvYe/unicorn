@@ -57,7 +57,7 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAll(LocalStorageQueryCriteria criteria, Pageable pageable) {
         Page<LocalStorage> page = localStorageRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
-        return PageUtil.toPage(page.map(localStorage -> conversionService.convert(localStorage, LocalStorageDto.class)));
+        return PageUtils.toPage(page.map(localStorage -> conversionService.convert(localStorage, LocalStorageDto.class)));
     }
 
     @Override
@@ -71,33 +71,33 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
     @Transactional(rollbackFor = Exception.class)
     public LocalStorageDto findById(Long id) {
         LocalStorage localStorage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);
-        ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", id);
+        ValidationUtils.isNull(localStorage.getId(), "LocalStorage", "id", id);
         return conversionService.convert(localStorage, LocalStorageDto.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public LocalStorage create(String name, MultipartFile multipartFile) {
-        FileUtil.checkSize(properties.getMaxSize(), multipartFile.getSize());
-        String suffix = FileUtil.getExtensionName(multipartFile.getOriginalFilename());
-        String type = FileUtil.getFileType(suffix);
-        File file = FileUtil.upload(multipartFile, properties.getOSPath().getPath() + type + File.separator);
+        FileUtils.checkSize(properties.getMaxSize(), multipartFile.getSize());
+        String suffix = FileUtils.getExtensionName(multipartFile.getOriginalFilename());
+        String type = FileUtils.getFileType(suffix);
+        File file = FileUtils.upload(multipartFile, properties.getOSPath().getPath() + type + File.separator);
         if (ObjectUtil.isNull(file)) {
             throw new BadRequestException("上传失败");
         }
         try {
-            name = StringUtils.isBlank(name) ? FileUtil.getFileNameNoEx(multipartFile.getOriginalFilename()) : name;
+            name = StringUtils.isBlank(name) ? FileUtils.getFileNameNoEx(multipartFile.getOriginalFilename()) : name;
             LocalStorage localStorage = new LocalStorage(
                     file.getName(),
                     name,
                     suffix,
                     file.getPath(),
                     type,
-                    FileUtil.getSize(multipartFile.getSize())
+                    FileUtils.getSize(multipartFile.getSize())
             );
             return localStorageRepository.save(localStorage);
         } catch (Exception e) {
-            FileUtil.del(file);
+            FileUtils.del(file);
             throw e;
         }
     }
@@ -106,7 +106,7 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
     @Transactional(rollbackFor = Exception.class)
     public void update(LocalStorage resources) {
         LocalStorage localStorage = localStorageRepository.findById(resources.getId()).orElseGet(LocalStorage::new);
-        ValidationUtil.isNull(localStorage.getId(), "LocalStorage", "id", resources.getId());
+        ValidationUtils.isNull(localStorage.getId(), "LocalStorage", "id", resources.getId());
         localStorage.copy(resources);
         localStorageRepository.save(localStorage);
     }
@@ -116,7 +116,7 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
     public void deleteAll(Long[] ids) {
         for (Long id : ids) {
             LocalStorage storage = localStorageRepository.findById(id).orElseGet(LocalStorage::new);
-            FileUtil.del(storage.getPath());
+            FileUtils.del(storage.getPath());
             localStorageRepository.delete(storage);
         }
     }
@@ -134,6 +134,6 @@ public class LocalStorageServiceImpl implements ILocalStorageService {
             map.put("创建日期", localStorageDTO.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 }

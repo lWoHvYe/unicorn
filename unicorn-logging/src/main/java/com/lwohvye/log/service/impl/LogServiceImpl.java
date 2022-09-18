@@ -61,9 +61,9 @@ public class LogServiceImpl implements ILogService {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         String status = "ERROR";
         if (status.equals(criteria.getLogType())) {
-            return PageUtil.toPage(page.map(errInfo -> conversionService.convert(errInfo, LogErrorDTO.class)));
+            return PageUtils.toPage(page.map(errInfo -> conversionService.convert(errInfo, LogErrorDTO.class)));
         }
-        return PageUtil.toPage(page);
+        return PageUtils.toPage(page);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class LogServiceImpl implements ILogService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
         Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
-        return PageUtil.toPage(page.map(logInfo -> conversionService.convert(logInfo, LogSmallDTO.class)));
+        return PageUtils.toPage(page.map(logInfo -> conversionService.convert(logInfo, LogSmallDTO.class)));
     }
 
     /**
@@ -151,7 +151,7 @@ public class LogServiceImpl implements ILogService {
     @Transactional(rollbackFor = Exception.class)
     public Dict findByErrDetail(Long id) {
         Log log = logRepository.findById(id).orElseGet(Log::new);
-        ValidationUtil.isNull(log.getId(), "Log", "id", id);
+        ValidationUtils.isNull(log.getId(), "Log", "id", id);
         byte[] details = log.getExceptionDetail();
         return Dict.create().set("exception", new String(ObjectUtil.isNotNull(details) ? details : "".getBytes()));
     }
@@ -171,7 +171,7 @@ public class LogServiceImpl implements ILogService {
             map.put("创建日期", log.getCreateTime());
             list.add(map);
         }
-        FileUtil.downloadExcel(list, response);
+        FileUtils.downloadExcel(list, response);
     }
 
     @Override
