@@ -35,8 +35,10 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/3/19 2:37 PM
  */
 @Component
-@ConditionalOnMissingBean(SimpleMQProducerService.class) // 子类除了自身，还包含在父类的类型之中。采用这种方式，可以实现有子类时只注入子类的bean，无子类时再注入父类的bean
-public class SimpleMQProducerService {
+// @ConditionalOnMissingBean 会识别到 参数中的类 的继承树，当容器中存在 该类 或 该类的子类 的类型时，@ConditionalOnMissingBean 返回false ，使得 @ConditionalOnMissingBean 标注的类 不执行。
+// @ConditionalOnMissingBean(SimpleMQProducerService.class) // 但这玩意不能标注自身，似乎默认规则是先把Component标注的Bean放入一个Cache中，然后matchCondition(根据Cache中的内容)，不满足再从Cache中移除
+@ConditionalOnMissingBean(ExtensionProducerService.class) // One way to salve this problem is to define a subClass for extension
+public sealed class SimpleMQProducerService permits ExtensionProducerService {
 
     @Autowired
     protected AmqpTemplate amqpTemplate;

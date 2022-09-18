@@ -16,10 +16,10 @@
 package com.lwohvye.sys.modules.rabbitmq.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import com.lwohvye.core.utils.json.JsonUtils;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.core.utils.rabbitmq.SimpleMQProducerService;
+import com.lwohvye.core.utils.rabbitmq.ExtensionProducerService;
+import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 // 发消息时指定了 交换机和路由键。 所以可以把发消息 和 队列的绑定分开，发消息方定义交换机、消费方定义队列 及队列与交换机、路由键的绑定。提高灵活性。
 @Component
 @Slf4j
-public class RabbitMQProducerService extends SimpleMQProducerService {
+public class RabbitMQProducerService extends ExtensionProducerService {
 
     /**
      * 发送消息
