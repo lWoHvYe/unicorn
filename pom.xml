@@ -104,7 +104,7 @@
         <redisson.version>3.17.6</redisson.version>
         <guava.version>31.1-jre</guava.version>
         <caffeine.version>3.1.1</caffeine.version>
-        <poi.version>5.2.2</poi.version>
+        <poi.version>5.2.3</poi.version>
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>7.5.0</yauaa.version>
         <ip2region.version>2.7.2</ip2region.version>
