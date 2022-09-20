@@ -85,7 +85,7 @@
         <!--<maven.compiler.target>17</maven.compiler.target>-->
         <!--Starting JDK 9, release can be used to do the things what source and target can do
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>19</maven.compiler.release>
         <log4jdbc.version>1.18</log4jdbc.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <hikaricp.version>5.0.1</hikaricp.version>
