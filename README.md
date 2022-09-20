@@ -226,3 +226,11 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
   refreshToken
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，推测是Spring Boot的 ClassLoader不支持Jigsaw）
 - swarm化，可以参考[why-swarm (施工中)](https://github.com/WHY-lWoHvYe/why-swarm)
+
+#### TODO
+
+- 使用ShardingSphere 读写分离，负载均衡算法可以选择ROUND_ROBIN 或 TRANSACTION_ROUND_ROBIN,前者事务内全部走primary，
+  理论上这种方式更好(复制延迟、同步时机,update中的select最好走primary)，
+  但为了解决懒加载no-session的问题， 很多复杂查询都加了事务注解，这样如果用第一种，主库的压力会比较大，而第二种会有上面提到的问题,
+  后续再看看吧(寻求其他no-session的解决方案,第二种配合强制路由).
+  补充：同一事务内，在Update之后Select，似乎走的是Primary，如果这样的话，用第二种似乎就可以了

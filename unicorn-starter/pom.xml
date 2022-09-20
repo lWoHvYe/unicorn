@@ -38,7 +38,7 @@
         <javassist.version>3.29.0-GA</javassist.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <caffeine.version>3.1.1</caffeine.version>
-        <shardingsphere.version>4.1.1</shardingsphere.version>
+        <shardingsphere.version>5.2.0</shardingsphere.version>
         <kotlin.version>1.7.10</kotlin.version>
     </properties>
 
@@ -153,18 +153,8 @@
                 <!--分库分表中间件-->
                 <dependency>
                     <groupId>org.apache.shardingsphere</groupId>
-                    <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
+                    <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
                     <version>${shardingsphere.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <artifactId>guava</artifactId>
-                            <groupId>com.google.guava</groupId>
-                        </exclusion>
-                        <exclusion>
-                            <artifactId>error_prone_annotations</artifactId>
-                            <groupId>com.google.errorprone</groupId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
             </dependencies>
             <build>
