@@ -31,8 +31,8 @@
 
     <properties>
         <java.version>19</java.version>
-        <project.core.version>3.2.0-SNAPSHOT</project.core.version>
-        <maven.compiler.release>17</maven.compiler.release>
+        <project.core.version>3.x-SNAPSHOT</project.core.version>
+        <maven.compiler.release>19</maven.compiler.release>
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <javassist.version>3.29.0-GA</javassist.version>
