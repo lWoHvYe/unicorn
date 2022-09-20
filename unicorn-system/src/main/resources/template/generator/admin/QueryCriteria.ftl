@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 import java.util.List;
 </#if>
 <#if queryColumns??>
-import com.lwohvye.annotation.Query;
+import com.lwohvye.core.annotation.Query;
 </#if>
 
 /**

@@ -30,7 +30,7 @@
     <name>Valentine P2P</name>
 
     <properties>
-        <java.version>18</java.version>
+        <java.version>19</java.version>
         <unicorn.core.version>3.2.0-SNAPSHOT</unicorn.core.version>
         <maven.compiler.release>18</maven.compiler.release>
         <mapstruct.version>1.5.2.Final</mapstruct.version>

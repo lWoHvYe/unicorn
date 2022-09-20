@@ -16,7 +16,7 @@
 package ${package}.service;
 
 import ${package}.domain.${className};
-import com.lwohvye.base.BaseService;
+import com.lwohvye.core.base.BaseService;
 import ${package}.service.dto.${className}Dto;
 import ${package}.service.dto.${className}QueryCriteria;
 import org.springframework.data.domain.Pageable;

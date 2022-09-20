@@ -30,7 +30,7 @@
     <name>Common Starter</name>
 
     <properties>
-        <java.version>18</java.version>
+        <java.version>19</java.version>
         <project.core.version>3.2.0-SNAPSHOT</project.core.version>
         <maven.compiler.release>17</maven.compiler.release>
         <lombok.version>1.18.24</lombok.version>

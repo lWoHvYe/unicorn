@@ -25,8 +25,6 @@ import com.lwohvye.exception.EntityExistException;
         </#if>
     </#list>
 </#if>
-import com.lwohvye.utils.ValidationUtil;
-import com.lwohvye.utils.FileUtil;
 import lombok.RequiredArgsConstructor;
 import ${package}.repository.${className}Repository;
 import ${package}.service.I${className}Service;
@@ -47,8 +45,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.lwohvye.utils.PageUtil;
-import com.lwohvye.utils.QueryHelp;
+import com.lwohvye.core.utils.*;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;

@@ -76,7 +76,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--开发版本-->
-        <java.version>18</java.version>
+        <java.version>19</java.version>
         <project.core.version>3.2.0-SNAPSHOT</project.core.version>
         <!--支持Java 18，问题不在这，这里不升级也没啥问题，用release就可以了-->
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>

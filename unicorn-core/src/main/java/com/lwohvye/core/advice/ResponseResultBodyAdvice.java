@@ -37,12 +37,14 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import org.springframework.web.util.WebUtils;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolationException;
 import java.lang.annotation.Annotation;
 import java.util.Objects;
 
@@ -169,7 +171,20 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     /**
+     * {@code @PathVariable} 和 {@code @RequestParam} 参数校验不通过时抛出的异常处理
+     */
+    @ExceptionHandler({ConstraintViolationException.class})
+    public final ResponseEntity<ResultInfo<?>> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
+        log.error(ThrowableUtils.getStackTrace(ex));
+        var body = ResultInfo.validateFailed(ex.getMessage());
+        var headers = new HttpHeaders();
+        var status = HttpStatus.BAD_REQUEST;
+        return this.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    /**
      * 处理请求参数不正确的异常 HttpRequestMethodNotSupportedException
+     * {@code @RequestBody} 参数校验不通过时抛出的异常处理
      *
      * @param ex /
      * @return ResponseEntity
@@ -216,7 +231,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     protected ResponseEntity<ResultInfo<?>> handleExceptionInternal(Exception ex, ResultInfo<?> body, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
         if (HttpStatus.INTERNAL_SERVER_ERROR.equals(status)) {
-            request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex, WebRequest.SCOPE_REQUEST);
+            request.setAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE, ex, RequestAttributes.SCOPE_REQUEST);
         }
         return new ResponseEntity<>(body, headers, status);
     }
