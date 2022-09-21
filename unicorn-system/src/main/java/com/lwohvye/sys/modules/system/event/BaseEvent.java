@@ -47,7 +47,7 @@ public abstract class BaseEvent<T> extends ApplicationEvent {
         this.eventData = eventData;
     }
 
-    @SneakyThrows // 这个注解，本质是try-catch后再throw。引入try-catch后，必然会变慢的。没有在构造中设置id属性是考虑到有的可能没这属性
+    @SneakyThrows // 这个注解，本质是try-catch后再throw。好像有说法是引入try-catch并不会影响性能。没有在构造中设置id属性是考虑到有的可能没这属性
     public Long getDataId() {
         // 这个findGetter就是获取属性，不是找getter方法，别搞混了。这里需要用privateLookupIn
         // return (Long) MethodHandles.lookup().findGetter(eventData.getClass(), "id", Long.class).invoke(eventData);

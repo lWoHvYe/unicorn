@@ -91,7 +91,7 @@
         <hikaricp.version>5.0.1</hikaricp.version>
         <hutool.version>5.8.5</hutool.version>
         <fastutil.version>8.5.8</fastutil.version>
-        <lombok.version>1.18.24</lombok.version>
+        <lombok.version>1.18.25</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
         <mapstruct.version>1.5.2.Final</mapstruct.version>
@@ -444,9 +444,10 @@
                     <!--https://docs.spring.io/spring-boot/docs/2.4.4/reference/html/appendix-configuration-metadata.html#configuration-metadata-annotation-processor-->
                     <!--<proc>none</proc>-->
                     <!--https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html-->
-                    <!--<compilerArgs>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
                         <arg>-Xlint:unchecked</arg>
-                    </compilerArgs>-->
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
