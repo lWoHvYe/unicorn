@@ -6,6 +6,7 @@ module lwohvye.unicorn.system {
     requires transitive java.management;
     requires transitive java.annotation;
     requires transitive java.scripting;
+    requires jdk.incubator.concurrent;
     requires transitive spring.context.support;
     requires transitive spring.expression;
     requires transitive spring.webmvc;

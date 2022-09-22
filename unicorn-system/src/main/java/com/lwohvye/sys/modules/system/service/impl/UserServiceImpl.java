@@ -148,13 +148,21 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(User resources) {
-        if (userRepository.findByUsername(resources.getUsername()) != null)
+        // 个人认为，对IO密集型的业务，比如SearchDB，可以用Virtual Threads来优化
+        ConcurrencyUtils.structuredExecute(null, o -> userRepository.save(resources), () -> {
+            if (Objects.isNull(userRepository.findByUsername(resources.getUsername())))
+                return true;
             throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
-        if (userRepository.findByEmail(resources.getEmail()) != null)
+        }, () -> {
+            if (Objects.isNull(userRepository.findByEmail(resources.getEmail())))
+                return true;
             throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
-        if (userRepository.findByPhone(resources.getPhone()) != null)
+        }, () -> {
+            if (Objects.isNull(userRepository.findByPhone(resources.getPhone())))
+                return true;
             throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
-        userRepository.save(resources);
+        });
+
     }
 
     @Override
@@ -163,19 +171,37 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     public void update(User resources) throws Exception {
         User user = userRepository.findById(resources.getId()).orElseGet(User::new);
         ValidationUtils.isNull(user.getId(), "User", "id", resources.getId());
-        User user1 = userRepository.findByUsername(resources.getUsername());
-        User user2 = userRepository.findByEmail(resources.getEmail());
-        User user3 = userRepository.findByPhone(resources.getPhone());
-        if (user1 != null && !user.getId().equals(user1.getId()))
-            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
-        if (user2 != null && !user.getId().equals(user2.getId()))
-            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
-        if (user3 != null && !user.getId().equals(user3.getId()))
-            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
+        ConcurrencyUtils.structuredExecute(null, o -> {
+            updateUserParams(resources, user);
+            userRepository.save(user);
+
+            // 发布用户更新事件
+            publishUserEvent(resources);
+            // 清除本地缓存
+            flushCache(user.getUsername());
+        }, () -> {
+            User user1 = userRepository.findByUsername(resources.getUsername());
+            if (user1 != null && !user.getId().equals(user1.getId()))
+                throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "username", resources.getUsername(), "existed"));
+            return true;
+        }, () -> {
+            User user2 = userRepository.findByEmail(resources.getEmail());
+            if (user2 != null && !user.getId().equals(user2.getId()))
+                throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "email", resources.getEmail(), "existed"));
+            return true;
+        }, () -> {
+            User user3 = userRepository.findByPhone(resources.getPhone());
+            if (user3 != null && !user.getId().equals(user3.getId()))
+                throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
+            return true;
+        });
 //        var convertString4BlobUtil = new ConvertString4BlobUtil<User>();
 //        不确定是否需要进行赋值。理论上传递的是引用。更改会影响到这方
 //        convertString4BlobUtil.convert(user);
 
+    }
+
+    private static void updateUserParams(User resources, User user) {
         user.setUsername(resources.getUsername());
         user.setEmail(resources.getEmail());
         user.setEnabled(resources.getEnabled());
@@ -188,26 +214,28 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
         var description = resources.getDescription();
         if (StrUtil.isNotEmpty(description))
             user.setDescription(description);
-        userRepository.save(user);
-
-        // 发布用户更新事件
-        publishUserEvent(resources);
-        // 清除本地缓存
-        flushCache(user.getUsername());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(allEntries = true)
     public void updateCenter(User resources) {
-        User user = userRepository.findById(resources.getId()).orElseGet(User::new);
-        User user1 = userRepository.findByPhone(resources.getPhone());
-        if (user1 != null && !user.getId().equals(user1.getId()))
-            throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
-        user.setNickName(resources.getNickName());
-        user.setPhone(resources.getPhone());
-        user.setGender(resources.getGender());
-        userRepository.save(user);
+        ConcurrencyUtils.structuredExecute(users -> {
+                    var user1 = users.get(0);
+                    var user2 = users.get(1);
+                    // 两个都存在，且id不相同，则为已存在
+                    if (Objects.nonNull(user1) && Objects.nonNull(user2) && !Objects.equals(((User) user1).getId(), ((User) user2).getId()))
+                        throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
+                    return Objects.nonNull(user1) ? user1 : user2;
+                }, obj -> {
+                    var user = (User) obj;
+                    user.setNickName(resources.getNickName());
+                    user.setPhone(resources.getPhone());
+                    user.setGender(resources.getGender());
+                    userRepository.save(user);
+                },
+                () -> userRepository.findById(resources.getId()).orElseGet(User::new),
+                () -> userRepository.findByPhone(resources.getPhone()));
     }
 
     @Override
