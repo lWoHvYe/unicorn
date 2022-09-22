@@ -12,6 +12,7 @@ module lwohvye.unicorn.system {
     requires spring.websocket;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
+    requires transitive bizlog.sdk;
     requires transitive captcha;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
@@ -30,6 +31,9 @@ module lwohvye.unicorn.system {
 
     exports com.lwohvye.sys.common.annotation;
     exports com.lwohvye.sys.common.condition to spring.beans;
+    exports com.lwohvye.sys.modules.infrastructure.constants;
+    exports com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.beans;
+    exports com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.beans;
     exports com.lwohvye.sys.modules.mnt.repository to spring.beans;
     exports com.lwohvye.sys.modules.mnt.rest to spring.beans, spring.web;
     exports com.lwohvye.sys.modules.mnt.service;
@@ -42,6 +46,7 @@ module lwohvye.unicorn.system {
     exports com.lwohvye.sys.modules.quartz.task to spring.beans;
     exports com.lwohvye.sys.modules.quartz.utils to spring.beans;
     exports com.lwohvye.sys.modules.rabbitmq.service; // 这个要export to spring.beans和unnamed module。消费者应该都是这样的
+    exports com.lwohvye.sys.modules.rabbitmq.config;
     exports com.lwohvye.sys.modules.security.service;
     exports com.lwohvye.sys.modules.security.service.dto;
     exports com.lwohvye.sys.modules.security.security;
@@ -67,6 +72,8 @@ module lwohvye.unicorn.system {
     opens com.lwohvye.sys.common.orm;
     opens com.lwohvye.sys.common.thread;
     opens com.lwohvye.sys.common.web;
+    opens com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.core;
+    opens com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.core;
     opens com.lwohvye.sys.modules.mnt.repository to spring.core;
     opens com.lwohvye.sys.modules.mnt.rest to spring.core;
     opens com.lwohvye.sys.modules.mnt.service.mapstruct;

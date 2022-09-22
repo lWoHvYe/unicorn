@@ -7,8 +7,8 @@ module lwohvye.unicorn.core {
     requires transitive java.sql;
     requires transitive java.persistence;
     requires transitive java.validation;
-    requires transitive jdk.incubator.concurrent;
-    requires transitive jdk.incubator.vector;
+    requires jdk.incubator.concurrent;
+    requires jdk.incubator.vector;
     requires transitive jdk.unsupported;
     requires transitive spring.amqp;
     requires transitive spring.core;

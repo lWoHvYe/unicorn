@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.lwohvye.log.rabbitmq;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.log.service.local.MultiLogService;
-import com.lwohvye.core.utils.MailAdapter;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
+import com.lwohvye.log.service.local.MultiLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -28,13 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.Map;
-
-@Component
 @Slf4j
-// 监听日志Save相关队列的消息。可以取配置文件中属性
-@RabbitListener(queues = "${auth.log.queue-name:auth.log.queue}")
-public class RabbitMQAuthMsgConsumerService extends YRabbitAbstractConsumer {
+@Component
+public class RabbitBusinessMsgConsumerService extends YRabbitAbstractConsumer {
 
     @Autowired
     private MultiLogService multiLogService;
@@ -44,27 +40,18 @@ public class RabbitMQAuthMsgConsumerService extends YRabbitAbstractConsumer {
         super.redissonClient = redissonClient;
     }
 
-    // 消费者本身是顺序消费的，且可以避免线程安全问题，有考虑过引入异步，但就无法保证顺序性了，还要解决线程安全问题。等有合适的场景了再做尝试
+    /**
+     * 用来消费业务日志，格式比较统一，这里配合新引入的日志框架使用
+     */
     @RabbitHandler
-    public void handle(String amqpMsgEntityStr) {
-        baseConsumer(amqpMsgEntityStr, "authSave", null, msgEntity -> {
+    @RabbitListener(queues = "${business.log.queue-name:business.log.queue}")
+    public void handle(String messageStr) {
+        baseConsumer(messageStr, null, null, msgEntity -> {
             var extraData = msgEntity.getExtraData();
             if (StringUtils.hasText(extraData))
-                ReflectUtil.invoke(multiLogService, extraData, msgEntity.getMsgData());
+                ReflectUtil.invoke(multiLogService, extraData, msgEntity.getMsgType(), msgEntity.getMsgData(), "Typical Business Operate");
             return null;
-        }, errMsg -> {
-            // reConsumeMsg(this::handle, amqpMsgEntityStr);
-            var to = "";
-            var subject = "Consume Msg Error" + this.getClass().getSimpleName();
-            var templateName = "email/noticeEmail.ftl";
-            var res = MailAdapter.sendTemplatedMail(to, subject, templateName, Map.of("errMsg", errMsg));
-            log.error(" Consume Msg Error, Reason: {} || Msg detail: {} || NoticeRes {} ", errMsg, amqpMsgEntityStr, res);
-        });
-    }
-
-    @RabbitHandler
-    public void handleMsg(byte[] bytes) {
-        handle(new String(bytes));
+        }, errMsg -> log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", errMsg, messageStr));
     }
 
     @Override
@@ -77,4 +64,3 @@ public class RabbitMQAuthMsgConsumerService extends YRabbitAbstractConsumer {
 
     }
 }
-

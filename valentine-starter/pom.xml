@@ -32,7 +32,7 @@
     <properties>
         <java.version>19</java.version>
         <unicorn.core.version>3.x-SNAPSHOT</unicorn.core.version>
-        <maven.compiler.release>19</maven.compiler.release>
+        <maven.compiler.release>18</maven.compiler.release>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <caffeine.version>3.1.1</caffeine.version>
@@ -290,9 +290,9 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+<!--                    <compilerArgs>-->
+<!--                        <arg>&#45;&#45;enable-preview</arg>-->
+<!--                    </compilerArgs>-->
                 </configuration>
             </plugin>
             <!-- jar包内剔除所有配置文件 -->

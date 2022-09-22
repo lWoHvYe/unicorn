@@ -244,7 +244,7 @@ public class SpringSecurityConfig {
                     infoMap.put("username", username);
                     infoMap.put("lockedIp", lockedIp);
                     var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(JsonUtils.toJSONString(infoMap)).setExtraData("solveAuthFailed");
-                    //  发送消息
+                    //  发送消息，因为在Consumer侧限制了MsgType，所以Success与Failure虽然配置差不多，但只有正确的Consumer会成功消费，其他的会ignore
                     rabbitMQProducerService.sendMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
                 }
             }

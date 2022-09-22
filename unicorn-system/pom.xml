@@ -35,6 +35,7 @@
         <!-- oshi监控需要指定jna版本, 问题详见 https://github.com/oshi/oshi/issues/1040 -->
         <jna.version>5.9.0</jna.version>
         <oshi.version>6.2.2</oshi.version>
+        <bizlog.version>3.0.1</bizlog.version>
         <jol.version>0.16</jol.version>
     </properties>
 
@@ -148,6 +149,12 @@
             <groupId>org.openjdk.jol</groupId>
             <artifactId>jol-core</artifactId>
             <version>${jol.version}</version>
+        </dependency>
+        <!--个性化日志-->
+        <dependency>
+            <groupId>io.github.mouzt</groupId>
+            <artifactId>bizlog-sdk</artifactId>
+            <version>${bizlog.version}</version>
         </dependency>
     </dependencies>
 

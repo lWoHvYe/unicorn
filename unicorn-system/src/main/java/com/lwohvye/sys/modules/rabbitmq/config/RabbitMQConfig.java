@@ -47,7 +47,10 @@ public class RabbitMQConfig {
 
     public static final String DATA_COMMON_DELAY_ROUTE_KEY = "data.common.delay";
 
+    // 认证日志
     public static final String AUTH_LOCAL_ROUTE_KEY = "auth.local";
+
+    public static final String BUSINESS_LOG_ROUTE_KEY = "business.log";
 
     public static final String SP_SYNC_ROUTE_KEY = "sp.sync.x0x"; // 对应topic   sp.sync.*
     // endregion
@@ -60,6 +63,8 @@ public class RabbitMQConfig {
     public static final String DATA_COMMON_DELAY_QUEUE = "data.common.delay.queue";
 
     public static final String AUTH_LOG_QUEUE = "auth.log.queue";
+
+    public static final String BUSINESS_LOG_QUEUE = "business.log.queue";
 
 
     // endregion
@@ -237,7 +242,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(spSyncQueue).to(topicDelayExchange).with("sp.sync.*").noargs();
     }
 
-
+    // region 认证相关log
     @Bean
     public Queue authLogQueue() {
         return QueueBuilder.durable(AUTH_LOG_QUEUE).build();
@@ -250,6 +255,23 @@ public class RabbitMQConfig {
                 .to(dataSyncDirect)
                 .with(AUTH_LOCAL_ROUTE_KEY);
     }
+    // endregion
+
+    // region 业务相关log
+
+    @Bean
+    public Queue businessLogQueue() {
+        return QueueBuilder.durable(BUSINESS_LOG_QUEUE).build();
+    }
+
+    @Bean
+    public Binding businessLogBinding(DirectExchange dataSyncDirect, Queue businessLogQueue) {
+        return BindingBuilder
+                .bind(businessLogQueue)
+                .to(dataSyncDirect)
+                .with(BUSINESS_LOG_ROUTE_KEY);
+    }
+    // endregion
 
     // region 消费失败后，重试一定次数，之后转发到死信队列中
 
