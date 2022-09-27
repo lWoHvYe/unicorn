@@ -22,6 +22,7 @@ import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -58,6 +59,7 @@ import java.util.Objects;
 @Slf4j
 // @ConditionalOnClass(name = "org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice") // 这种比较适合目标类在上层，无法直接引用的情况，毕竟类名有些长
 @ConditionalOnClass(ResponseBodyAdvice.class) // 这个跟上面那种是等价的，Conditional系列不会报ClassNotFound的Exception。这个配置用于实现当exclude WebMVC使用 WebFlux时，不会init该Bean，也不会报错
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // 在Spring为Web服务时生效
 @ControllerAdvice // 这里用@RestControllerAdvice与@ControllerAdvice好像没区别，本质也是处理链，这只是上面的一环
 public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
 

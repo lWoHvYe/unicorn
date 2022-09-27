@@ -44,11 +44,11 @@ import java.util.Objects;
  * Created by cy on 2021/01/08.
  */
 @Deprecated(since = "3.2.0", forRemoval = true)
-@RestControllerAdvice
+@RestControllerAdvice // keep in mind that, in WebFlux, you cannot use a @ControllerAdvice to handle exceptions that occur before a handler is chosen. 这个只针对ExceptionControl
 // 使用Order使其先于GlobalExceptionHandler执行，这里把优先级设置为了最高。原统一异常处理可移除
 @Order(Ordered.HIGHEST_PRECEDENCE) // 移除GlobalExceptionHandler后，可能需要调整下Order
 @Slf4j
-@ConditionalOnWebApplication // 在Spring为Web服务时生效
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // 在Spring为Web服务时生效
 @ConditionalOnMissingBean(ApiGlobalExceptionHandler.class) // 这样配置的直接结果就是该bean不会初始化了，从而所有的异常处理都在另一个（ResponseResultBodyAdvice）中进行了
 // @ConditionalOnMissingBean(name = "apiGlobalExceptionHandler") // 这个也不行的，记忆已经模糊了，当初为何要配置这个？？
 public class ApiGlobalExceptionHandler {
