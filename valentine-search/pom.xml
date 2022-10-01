@@ -38,6 +38,7 @@
         <caffeine.version>3.1.1</caffeine.version>
         <querydsl.version>5.0.0</querydsl.version>
         <blaze-persistence.version>1.6.6</blaze-persistence.version>
+        <auto-service.version>1.0.1</auto-service.version>
         <kotlin.version>1.7.10</kotlin.version>
     </properties>
 
@@ -115,6 +116,12 @@
             <artifactId>blaze-persistence-integration-hibernate-5.6</artifactId>
             <version>${blaze-persistence.version}</version>
             <scope>runtime</scope>
+        </dependency>
+        <!--   (Code Gen) Auto Service for java.util.ServiceLoader  https://github.com/google/auto/tree/master/service  -->
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+            <version>${auto-service.version}</version>
         </dependency>
         <!--    netflix    -->
         <dependency>
@@ -350,6 +357,12 @@
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
+                        </path>
+                        <!-- FileGen in META-INF/services -->
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto-service.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

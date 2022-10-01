@@ -16,6 +16,7 @@
 
 package com.lwohvye.search.modules.mongodb.service.impl;
 
+import com.google.auto.service.AutoService;
 import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
 import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AutoService(IMongoDBUserService.class)
 public class MongoDBUserServiceIOCImpl implements IMongoDBUserService {
     // TODO: 2021/4/20 无论使用构造还是Autowired。注入都无值。当前通过在容器初始化后，调用doInit()来进行注入
 //    使用SPI机制的优势就是接口与实现的解耦，但是它也有部分限制。通过ServiceLoader延迟加载实现算是实现了延迟加载，

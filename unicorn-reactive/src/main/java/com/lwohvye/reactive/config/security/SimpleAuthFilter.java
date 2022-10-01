@@ -26,7 +26,6 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 @RequiredArgsConstructor
 public class SimpleAuthFilter implements WebFilter {
@@ -35,18 +34,16 @@ public class SimpleAuthFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return Mono.just(exchange.getRequest()).publishOn(Schedulers.boundedElastic())
-                .flatMap(request -> {
-                    var gwuNames = request.getHeaders().get("GWUName");
-                    if (!CollectionUtils.isEmpty(gwuNames)) {
-                        var username = gwuNames.get(0);
-                        userDetailsService.findByUsername(username).subscribe(userDetails -> {
-                            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                            SecurityContextHolder.getContext().setAuthentication(authentication);
-                        }).dispose();
-                    }
-                    // 继续下一个过滤器链的调用
-                    return chain.filter(exchange);
-                });
+        // TODO: 2022/9/30 待完善
+        var request = exchange.getRequest();
+        var gwuNames = request.getHeaders().get("GWUName");
+        if (!CollectionUtils.isEmpty(gwuNames)) {
+            var username = gwuNames.get(0);
+            var userDetails = userDetailsService.findByUsername(username).block();
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        // 继续下一个过滤器链的调用
+        return chain.filter(exchange);
     }
 }

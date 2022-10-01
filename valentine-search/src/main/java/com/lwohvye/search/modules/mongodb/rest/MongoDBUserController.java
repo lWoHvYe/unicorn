@@ -52,7 +52,7 @@ public class MongoDBUserController {
     private void doInit() {
         log.warn("进入Controller层方法：{}", this.getClass().getSimpleName());
         if (ObjectUtil.isNull(mongoDBUserService)) {
-//            SPI的两种方式：Java ServiceLoader和Spring SpringFactoriesLoader。当前都无法注入属性。待解决
+//            SPI的两种方式：Java ServiceLoader和Spring SpringFactoriesLoader。当前都无法自动注入属性。
             if (RandomUtil.randomBoolean()) {
                 var mongoDBUserServices = ServiceLoader.load(IMongoDBUserService.class);
 //        有值，且大小唯一
