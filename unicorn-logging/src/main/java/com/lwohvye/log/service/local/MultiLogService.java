@@ -22,13 +22,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthLogService {
+public class MultiLogService {
     //    -------------------记录鉴权信息-----------------------------
     @Autowired
     private ILogService logService;
 
-    public void saveAuthorizeLog(String record) {
-        var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(record);
+    public void saveAuthorizeLog(String msgData) {
+        var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(msgData);
         logService.save(log);
+    }
+
+    public void saveMultiLog(String msgType, String msgData, String desc) {
+        logService.save(new Log().setLogType(msgType).setParams(msgData).setDescription(desc));
     }
 }

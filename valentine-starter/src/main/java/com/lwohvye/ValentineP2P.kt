@@ -19,7 +19,10 @@ import com.lwohvye.core.annotation.RespResultBody
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
 import com.lwohvye.core.utils.SpringContextHolder
 import com.lwohvye.core.utils.result.ResultInfo
+import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType
 import com.lwohvye.sys.common.annotation.ApiVersion
+import com.mzt.logapi.starter.annotation.EnableLogRecord
+import com.mzt.logapi.starter.annotation.LogRecord
 import io.swagger.v3.oas.annotations.Hidden
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -50,6 +53,7 @@ import org.springframework.web.bind.annotation.RestController
 @EnableJpaAuditing(auditorAwareRef = "auditorAware") // 开启Jpa审计
 @EnableRetry //开启重试机制
 @EnableConfigurationProperties //开启 @ConfigurationProperties 注解
+@EnableLogRecord(tenant = "com.unicorn.valentineP2P")
 // 以下注解在其他类上有配置
 // @EnableCaching
 // @EnableOpenApi
@@ -104,6 +108,11 @@ open class ValentineP2P {
     }
 
 
+    @LogRecord(
+        fail = "执行失败，失败原因：「{{#_errorMsg}}」",
+        success = "收到请求{{#version}},执行结果:{{#_ret}}",
+        type = LogRecordType.PORTAL, bizNo = "20220920"
+    ) // 虽然启动时扫描到了，但调用时没生效，怀疑缺少某些配置
     @RespResultBody
     @ApiVersion(3) // 指定从v3开始
     @AnonymousGetMapping("/valentine/{version}/p2p", "/valentine/{version}/default") // @RequestMapping的path是支持多个的
