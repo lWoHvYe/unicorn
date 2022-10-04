@@ -16,23 +16,23 @@
 package com.lwohvye.sys.modules.quartz.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.sys.common.thread.ThreadPoolExecutorUtil;
 import com.lwohvye.api.modules.quartz.domain.QuartzJob;
 import com.lwohvye.api.modules.quartz.domain.QuartzLog;
-import com.lwohvye.sys.modules.quartz.service.IQuartzJobService;
 import com.lwohvye.core.utils.MailAdapter;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.core.utils.ThrowableUtils;
 import com.lwohvye.core.utils.redis.RedisUtils;
+import com.lwohvye.sys.modules.quartz.service.IQuartzJobService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 参考人人开源，https://gitee.com/renrenio/renren-security
@@ -47,7 +47,8 @@ public class ExecutionJob extends QuartzJobBean {
     /**
      * 该处仅供参考
      */
-    private static final ThreadPoolExecutor EXECUTOR = ThreadPoolExecutorUtil.getPoll();
+    private static final ExecutorService VIRTUAL_EXECUTOR =
+            Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("Virtual-Job").factory());
 
     @Override
     public void executeInternal(JobExecutionContext context) {
@@ -68,7 +69,7 @@ public class ExecutionJob extends QuartzJobBean {
         try {
             // 执行任务
             QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
-            Future<?> future = EXECUTOR.submit(task);
+            Future<?> future = VIRTUAL_EXECUTOR.submit(task);
             future.get();
             long times = System.currentTimeMillis() - startTime;
             quartzLog.setTime(times);
