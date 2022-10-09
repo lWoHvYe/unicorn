@@ -89,8 +89,8 @@
         <log4jdbc.version>1.18</log4jdbc.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
         <hikaricp.version>5.0.1</hikaricp.version>
-        <hutool.version>5.8.5</hutool.version>
-        <fastutil.version>8.5.8</fastutil.version>
+        <hutool.version>5.8.8</hutool.version>
+        <fastutil.version>8.5.9</fastutil.version>
         <lombok.version>1.18.25</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
@@ -99,14 +99,14 @@
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.2</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
-        <logback.version>1.4.0</logback.version>
-        <redisson.version>3.17.6</redisson.version>
+        <logback.version>1.4.3</logback.version>
+        <redisson.version>3.17.7</redisson.version>
         <guava.version>31.1-jre</guava.version>
         <caffeine.version>3.1.1</caffeine.version>
         <poi.version>5.2.2</poi.version>
         <xerces.version>2.12.2</xerces.version>
-        <yauaa.version>7.5.0</yauaa.version>
-        <ip2region.version>2.7.2</ip2region.version>
+        <yauaa.version>7.6.0</yauaa.version>
+        <ip2region.version>2.7.4</ip2region.version>
         <thumbnailator.version>0.4.17</thumbnailator.version>
         <argLine>
             -Dfile.encoding=UTF-8

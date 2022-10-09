@@ -37,7 +37,7 @@
         <hikaricp.version>5.0.1</hikaricp.version>
         <caffeine.version>3.1.1</caffeine.version>
         <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
-        <kotlin.version>1.7.10</kotlin.version>
+        <kotlin.version>1.7.20</kotlin.version>
     </properties>
     <!--这个意义不大-->
     <dependencyManagement>

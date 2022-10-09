@@ -35,11 +35,12 @@ import java.util.function.Function;
 @Slf4j
 public abstract class YRabbitAbstractConsumer {
 
-    // 使用线程池，做资源隔离。考虑到服务器配置，因为会有多个独立的线程池，这里根据需要调小一些
+    // 使用线程池，做资源隔离。这里从19开始使用Virtual Threads（不再是一个用后归还的pool）。这个是类变量(static)，所有子类(实例)共享
+    // As for Virtual Threads We create it, run it and then forget it. So this pool is just used for creating Threads.
     static ExecutorService simVirtualExecutor;
 
     static {
-        // 兼容Old API
+        // 兼容Old API，这里name支持 name + start的模式，start会自动递增，但考虑着虚拟线程会很多，且没必要加上start作区分
         var virtualFactory = Thread.ofVirtual().name("Virtual-Rabbit").factory();
         simVirtualExecutor = Executors.newThreadPerTaskExecutor(virtualFactory);
     }
@@ -127,7 +128,7 @@ public abstract class YRabbitAbstractConsumer {
     public abstract void baseBeforeMessageConsumer(AmqpMsgEntity msgEntity);
 
     /**
-     * 暂停2s后，重新消费，只会重复一次
+     * 暂停2s后，重新消费，只会重复一次，经验证，这个不会造成block
      *
      * @param consumer 消费逻辑
      * @param message  消费对象

@@ -69,7 +69,7 @@ public class ExecutionJob extends QuartzJobBean {
         try {
             // 执行任务
             QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
-            Future<?> future = VIRTUAL_EXECUTOR.submit(task);
+            Future<?> future = VIRTUAL_EXECUTOR.submit(task); // 这里好像没什么用途（只是统计下执行用时的样子），因为标记了Async，这里由async-pool执行
             future.get();
             long times = System.currentTimeMillis() - startTime;
             quartzLog.setTime(times);
