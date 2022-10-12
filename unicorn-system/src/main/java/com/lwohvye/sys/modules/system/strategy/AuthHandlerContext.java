@@ -97,4 +97,39 @@ public class AuthHandlerContext {
         return clazz;
     }
 
+    public void switchPatternMatchingTest(AUserTypeStrategy userTypeStrategy) {
+        switch (userTypeStrategy) { // Since Java 19，这个不是纯粹的语法糖，可以看看编译的class
+            case AdminUserTypeStrategy __ -> System.out.println(__.getSysName()); // _ 是可以做变量名(的一部分)的，虽然好像不推荐
+            case DevUserTypeStrategy __ -> System.out.println("dev");
+            case NormalUserTypeStrategy norm -> System.out.println(norm.getSysName());
+            case ExtraUserTypeStrategy ignored -> System.out.println("ext");
+        }
+    }
+
+    /*public void switchPatternMatchingTest(AUserTypeStrategy userTypeStrategy) {
+        Objects.requireNonNull(userTypeStrategy);
+        byte var3 = 0;
+        switch (userTypeStrategy.typeSwitch<invokedynamic>(userTypeStrategy, var3)) {
+            case 0:
+                AdminUserTypeStrategy __ = (AdminUserTypeStrategy)userTypeStrategy;
+                System.out.println(__.getSysName());
+                break;
+            case 1:
+                DevUserTypeStrategy __ = (DevUserTypeStrategy)userTypeStrategy;
+                System.out.println("dev");
+                break;
+            case 2:
+                NormalUserTypeStrategy norm = (NormalUserTypeStrategy)userTypeStrategy;
+                System.out.println(norm.getSysName());
+                break;
+            case 3:
+                ExtraUserTypeStrategy ignored = (ExtraUserTypeStrategy)userTypeStrategy;
+                System.out.println("ext");
+                break;
+            default:
+                throw new MatchException((String)null, (Throwable)null);
+        }
+
+    }*/
+
 }
