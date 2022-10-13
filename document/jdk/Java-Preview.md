@@ -36,14 +36,17 @@
     - Because fibers are scheduled by Java schedulers, they need not be GC roots, as at any given time a fiber is either runnable, in which case a reference to
       it is held by its scheduler, or blocked, in which case a reference to it is held by the object on which it is blocked (e.g. a lock or an IO queue), so
       that it can be unblocked. （Fiber相关的，只有在结束运行后，被GC掉）
-    - Loom有两种实现方式，一种是抽取公共父类，与Thread平级。另一种是作为Thread的一部分。每一种都有优缺点。既然最终的实现叫Virtual Thread，且将其相关加入到Thread的API中，显然用的第二种方式(In the current prototype, virtual threads
+    - Loom有两种实现方式，一种是抽取公共父类，与Thread平级。另一种是作为Thread的一部分。每一种都有优缺点。既然最终的实现叫Virtual
+      Thread，且将其相关加入到Thread的API中，显然用的第二种方式(In the current prototype, virtual threads
       are implemented by the java.lang.Thread API.)
     - The current prototype implements the mount/dismount operations by copying stack frames from the continuation stack – stored on the Java heap as two Java
       arrays, an Object array for the references on the stack and a primitive array for primitive values and metadata. Copying a frame from the thread stack (
       which we also call the vertical stack, or the v-stack) to the continuation stack (also, the horizontal stack, or the h-stack) is called freezing it, while
       copying a frame from the h-stack to the v-stack is called thawing. The prototype also optionally thaws just a small portion of the h-stack when mounting
-      using an approach called lazy copy; see the JVMLS 2018 talk as well as the section on performance for more detail.（针对线程的Stack，采用的方式是yield时，copy stack,
+      using an approach called lazy copy; see the JVMLS 2018 talk as well as the section on performance for more detail.（针对线程的Stack，采用的方式是yield时，copy
+      stack,
       stored on the Java heap）
+- [Virtual Threads in Spring 6.x](https://spring.io/blog/2022/10/11/embracing-virtual-threads)
 
 #### Foreign Function & Memory API
 
