@@ -24,10 +24,9 @@ import cn.hutool.poi.excel.BigExcelWriter;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.lwohvye.core.exception.BadRequestException;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,9 +53,8 @@ import java.util.Objects;
  * @author Zheng Jie
  * @date 2018-12-27
  */
+@Slf4j
 public class FileUtils extends FileUtil {
-
-    private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
     /**
      * 系统临时目录
@@ -104,16 +102,16 @@ public class FileUtils extends FileUtil {
         String fileName = multipartFile.getOriginalFilename();
         // 获取文件后缀
         String prefix = "." + getExtensionName(fileName);
-        File file = null;
+        File dest = null;
         try {
             // 用uuid作为文件名，防止生成的临时文件重复
-            file = new File(SYS_TEM_DIR + IdUtil.simpleUUID() + prefix);
+            dest = new File(SYS_TEM_DIR + IdUtil.simpleUUID() + prefix);
             // MultipartFile to File
-            multipartFile.transferTo(file);
+            multipartFile.transferTo(dest);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
-        return file;
+        return dest;
     }
 
     /**
@@ -166,36 +164,26 @@ public class FileUtils extends FileUtil {
      * inputStream 转 File
      */
     static File inputStreamToFile(InputStream ins, String name) {
-        File file = new File(SYS_TEM_DIR + name);
-        if (file.exists()) {
-            return file;
-        }
-        OutputStream os = null;
         try {
-            os = new FileOutputStream(file);
-            int bytesRead;
-            int len = 8192;
-            byte[] buffer = new byte[len];
-            while ((bytesRead = ins.read(buffer, 0, len)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
+            var path = Path.of(SYS_TEM_DIR + name);
+            Files.copy(ins, path);
+            return path.toFile();
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         } finally {
-            CloseUtils.close(os);
             CloseUtils.close(ins);
         }
-        return file;
     }
 
     /**
      * 将文件名解析成文件的上传路径
      */
-    public static File upload(MultipartFile file, String filePath) {
+    public static File upload(MultipartFile multipartFile, String filePath) {
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmssS");
-        String name = getFileNameNoEx(file.getOriginalFilename());
-        String suffix = getExtensionName(file.getOriginalFilename());
+        String name = getFileNameNoEx(multipartFile.getOriginalFilename());
+        String suffix = getExtensionName(multipartFile.getOriginalFilename());
         String nowStr = "-" + format.format(date);
         try {
             String fileName = name + nowStr + "." + suffix;
@@ -203,13 +191,11 @@ public class FileUtils extends FileUtil {
             // getCanonicalFile 可解析正确各种路径
             File dest = new File(path).getCanonicalFile();
             // 检测是否存在目录
-            if (!dest.getParentFile().exists()) {
-                if (!dest.getParentFile().mkdirs()) {
-                    System.out.println("was not successful.");
-                }
+            if (!dest.getParentFile().exists() && !dest.getParentFile().mkdirs()) {
+                log.warn("upload was not successful.");
             }
             // 文件写入
-            file.transferTo(dest);
+            multipartFile.transferTo(dest);
             return dest;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -320,19 +306,11 @@ public class FileUtils extends FileUtil {
     private static byte[] getByte(File file) {
         // 得到文件长度
         byte[] b = new byte[(int) file.length()];
-        InputStream in = null;
-        try {
-            in = new FileInputStream(file);
-            try {
-                System.out.println(in.read(b));
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        } catch (Exception e) {
+        try (var in = new FileInputStream(file)) {
+            in.read(b);
+        } catch (IOException e) {
             log.error(e.getMessage(), e);
-            return null;
-        } finally {
-            CloseUtils.close(in);
+            return new byte[0];
         }
         return b;
     }

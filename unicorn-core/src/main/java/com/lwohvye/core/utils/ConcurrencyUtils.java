@@ -28,9 +28,11 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class ConcurrencyUtils {
+public final class ConcurrencyUtils {
 
     /**
+     * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
+     *
      * @param composeResult consume the task res
      * @param eventual      finally execute, consume the res of  composeResult
      * @param tasks         tasks wtd

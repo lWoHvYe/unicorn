@@ -413,6 +413,7 @@ public class QueryHelp {
     public abstract compareTo(Ljava/lang/Object;)I
     }
      */
+    @SuppressWarnings("unchecked")
     private static Class<? extends Comparable<Object>> castComparableFieldType(Object val) {
         return val instanceof Comparable<?> cec ? (Class<? extends Comparable<Object>>) cec.getClass() : null;
     }
