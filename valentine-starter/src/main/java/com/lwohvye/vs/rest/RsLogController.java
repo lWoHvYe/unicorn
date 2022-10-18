@@ -22,11 +22,32 @@ import com.lwohvye.core.utils.result.ResultInfo;
 import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType;
 import com.lwohvye.sys.common.annotation.ApiVersion;
 import com.mzt.logapi.starter.annotation.LogRecord;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 public class RsLogController {
+    // #{…} 主要用于加载外部属性文件中的值
+    // ${…} 用于执行SpEl表达式，并将内容赋值给属性
+    // #{…} 和${…} 可以混合使用，但是必须#{}外面，${}在里面
+    @Value("${local.rs.str}")
+    private String simStr;
+
+    @Value("#{${local.rs.a-map}}")
+    private Map<String, String> aMap;
+
+    @Value("#{'${local.rs.aList}'.split(',')}") // 根据这个，可以支持不同的分隔符
+    private List<String> aList;
+
+    @Value("${local.rs.iList}")
+    private List<Integer> iList;
+
+    @Value("${local.rs.iList}")
+    private Integer[] ints;
 
     @LogRecord(
             fail = "执行失败，失败原因：「{{#_errorMsg}}」",

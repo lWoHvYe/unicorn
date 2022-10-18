@@ -87,7 +87,7 @@
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
         <maven.compiler.release>19</maven.compiler.release>
         <log4jdbc.version>1.18</log4jdbc.version>
-        <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
+        <springdoc.openapi.version>1.6.12</springdoc.openapi.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <hutool.version>5.8.8</hutool.version>
         <fastutil.version>8.5.9</fastutil.version>
@@ -105,7 +105,7 @@
         <caffeine.version>3.1.1</caffeine.version>
         <poi.version>5.2.2</poi.version>
         <xerces.version>2.12.2</xerces.version>
-        <yauaa.version>7.6.0</yauaa.version>
+        <yauaa.version>7.7.0</yauaa.version>
         <ip2region.version>2.7.4</ip2region.version>
         <thumbnailator.version>0.4.17</thumbnailator.version>
         <argLine>
