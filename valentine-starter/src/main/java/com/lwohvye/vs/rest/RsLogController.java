@@ -37,7 +37,7 @@ public class RsLogController {
     @Value("${local.rs.str}")
     private String simStr;
 
-    @Value("#{${local.rs.a-map}}")
+    @Value("#{${local.rs.a-map}}") // 这种配置，似乎只支持yaml格式，properties格式好像不支持
     private Map<String, String> aMap;
 
     @Value("#{'${local.rs.aList}'.split(',')}") // 根据这个，可以支持不同的分隔符
