@@ -65,6 +65,7 @@ local:
     sim-auth: true
   rs:
     str: string
+    # 当使用properties来配置时，不要带最外层的引号""，{k1: 'v1', k2: 'v2'}，注意value要用引号括起来，key没要求，单双引号都可以
     a-map: "{k1: 'v1', k2: 'v2'}"
     aList: l1,l2,l3
     iList: 1,2,3
