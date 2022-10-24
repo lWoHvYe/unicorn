@@ -34,6 +34,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -194,10 +196,10 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public final ResponseEntity<ResultInfo<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
         log.error(ThrowableUtils.getStackTrace(ex));
-        var str = Objects.requireNonNull(ex.getBindingResult().getAllErrors().get(0).getCodes())[1].split("\\.");
-        var message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        if ("不能为空".equals(message)) {
-            message = str[1] + ":" + message;
+        ObjectError objectError = ex.getBindingResult().getAllErrors().get(0);
+        String message = objectError.getDefaultMessage();
+        if (objectError instanceof FieldError error) {
+            message = error.getField() + ": " + message;
         }
         var body = ResultInfo.validateFailed(message);
         var headers = new HttpHeaders();

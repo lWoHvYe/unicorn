@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.4</version>
+        <version>2.7.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -36,8 +36,8 @@
         <mapstruct.version>1.5.2.Final</mapstruct.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <caffeine.version>3.1.1</caffeine.version>
-        <springdoc.openapi.version>1.6.11</springdoc.openapi.version>
-        <kotlin.version>1.7.10</kotlin.version>
+        <springdoc.openapi.version>1.6.12</springdoc.openapi.version>
+        <kotlin.version>1.7.20</kotlin.version>
     </properties>
     <!--这个意义不大-->
     <dependencyManagement>

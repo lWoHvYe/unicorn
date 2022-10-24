@@ -14,21 +14,23 @@
  *    limitations under the License.
  */
 
-package com.lwohvye
+package com.lwohvye;
 
-import com.lwohvye.core.utils.SpringContextHolder
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
-import org.springframework.context.annotation.Bean
+import com.lwohvye.core.utils.SpringContextHolder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-class ValentineReactStarterApplication
+public class UnicornNativeApplication {
 
-fun main(args: Array<String>) {
-    runApplication<ValentineReactStarterApplication>(*args)
-}
+	public static void main(String[] args) {
+		SpringApplication.run(UnicornNativeApplication.class, args);
+	}
 
-@Bean
-fun springContextHolder(): SpringContextHolder {
-    return SpringContextHolder()
+	@Bean
+	public SpringContextHolder springContextHolder() {
+		return new SpringContextHolder();
+	}
+
 }
