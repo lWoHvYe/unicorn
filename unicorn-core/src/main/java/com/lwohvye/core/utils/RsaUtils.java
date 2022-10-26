@@ -18,10 +18,14 @@ package com.lwohvye.core.utils;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -91,89 +95,89 @@ public class RsaUtils {
     /**
      * 公钥解密
      *
-     * @param publicKeyText 公钥
-     * @param text          待解密的信息
+     * @param publicKeyText   公钥
+     * @param sourceBase64RSA 待解密的信息
      * @return /
      * @throws Exception /
      */
-    public static String decryptByPublicKey(String publicKeyText, String text) throws Exception {
-        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(Base64.decodeBase64(publicKeyText));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+    public static String decryptByPublicKey(String publicKeyText, String sourceBase64RSA) throws Exception {
+        var x509EncodedKeySpec = new X509EncodedKeySpec(Base64.decodeBase64(publicKeyText));
+        var keyFactory = KeyFactory.getInstance("RSA");
+        var publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
+        var cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, publicKey);
-        byte[] result = doLongerCipherFinal(Cipher.DECRYPT_MODE, cipher, Base64.decodeBase64(text));
-        return new String(result);
+        var result = cipher.doFinal(Base64.decodeBase64(sourceBase64RSA));
+        return new String(result, StandardCharsets.UTF_8);
     }
 
     /**
      * 私钥加密
      *
      * @param privateKeyText 私钥
-     * @param text           待加密的信息
+     * @param data           待加密的信息
      * @return /
      * @throws Exception /
      */
-    public static String encryptByPrivateKey(String privateKeyText, String text) throws Exception {
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKeyText));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+    public static String encryptByPrivateKey(String privateKeyText, String data) throws Exception {
+        var pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKeyText));
+        var keyFactory = KeyFactory.getInstance("RSA");
+        var privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
+        var cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-        byte[] result = doLongerCipherFinal(Cipher.ENCRYPT_MODE, cipher, text.getBytes());
+        var result = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
         return Base64.encodeBase64String(result);
     }
 
     /**
      * 私钥解密
      *
-     * @param privateKeyText 私钥
-     * @param text           待解密的文本
+     * @param privateKeyText  私钥
+     * @param sourceBase64RSA 待解密的文本
      * @return /
      * @throws Exception /
      */
-    public static String decryptByPrivateKey(String privateKeyText, String text) throws Exception {
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpec5 = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKeyText));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec5);
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+    public static String decryptByPrivateKey(String privateKeyText, String sourceBase64RSA) throws Exception {
+        var pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKeyText));
+        var keyFactory = KeyFactory.getInstance("RSA");
+        var privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
+        var cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
-        byte[] result = doLongerCipherFinal(Cipher.DECRYPT_MODE, cipher, Base64.decodeBase64(text));
-        return new String(result);
+        var result = cipher.doFinal(Base64.decodeBase64(sourceBase64RSA));
+        return new String(result, StandardCharsets.UTF_8);
     }
 
     /**
      * 公钥加密
      *
      * @param publicKeyText 公钥
-     * @param text          待加密的文本
+     * @param data          待加密的文本
      * @return /
      */
-    public static String encryptByPublicKey(String publicKeyText, String text) throws Exception {
-        X509EncodedKeySpec x509EncodedKeySpec2 = new X509EncodedKeySpec(Base64.decodeBase64(publicKeyText));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec2);
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+    public static String encryptByPublicKey(String publicKeyText, String data) throws Exception {
+        var x509EncodedKeySpec = new X509EncodedKeySpec(Base64.decodeBase64(publicKeyText));
+        var keyFactory = KeyFactory.getInstance("RSA");
+        var publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
+        var cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-        byte[] result = doLongerCipherFinal(Cipher.ENCRYPT_MODE, cipher, text.getBytes());
+        var result = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
         return Base64.encodeBase64String(result);
     }
 
     private static byte[] doLongerCipherFinal(int opMode, Cipher cipher, byte[] source) throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        if (opMode == Cipher.DECRYPT_MODE) {
-            out.write(cipher.doFinal(source));
-        } else {
-            int offset = 0;
-            int totalSize = source.length;
-            while (totalSize - offset > 0) {
-                int size = Math.min(cipher.getOutputSize(0) - 11, totalSize - offset);
-                out.write(cipher.doFinal(source, offset, size));
-                offset += size;
+        try (var out = new ByteArrayOutputStream()) {
+            if (opMode == Cipher.DECRYPT_MODE) {
+                out.write(cipher.doFinal(source));
+            } else {
+                int offset = 0;
+                int totalSize = source.length;
+                while (totalSize - offset > 0) {
+                    int size = Math.min(cipher.getOutputSize(0) - 11, totalSize - offset);
+                    out.write(cipher.doFinal(source, offset, size));
+                    offset += size;
+                }
             }
+            return out.toByteArray();
         }
-        out.close();
-        return out.toByteArray();
     }
 
     /**
@@ -183,16 +187,40 @@ public class RsaUtils {
      * @throws NoSuchAlgorithmException /
      */
     public static RsaKeyPair generateKeyPair() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        var keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-        RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
-        RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
-        String publicKeyString = Base64.encodeBase64String(rsaPublicKey.getEncoded());
-        String privateKeyString = Base64.encodeBase64String(rsaPrivateKey.getEncoded());
+        var keyPair = keyPairGenerator.generateKeyPair();
+        var rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
+        var rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
+        var publicKeyString = Base64.encodeBase64String(rsaPublicKey.getEncoded());
+        var privateKeyString = Base64.encodeBase64String(rsaPrivateKey.getEncoded());
         return new RsaKeyPair(publicKeyString, privateKeyString);
     }
 
+    // region OAEP
+    // java.security.InvalidKeyException: OAEP cannot be used to sign or verify signatures, so it just support encrypt by publicKey and decrypt by privateKey
+    public static String encrypt(String publicKeyText, String data) throws Exception {
+        var x509EncodedKeySpec = new X509EncodedKeySpec(Base64.decodeBase64(publicKeyText));
+        var keyFactory = KeyFactory.getInstance("RSA");
+        var publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
+        var cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
+        var oaepParams = new OAEPParameterSpec("SHA1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT);
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey, oaepParams);
+        var result = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        return Base64.encodeBase64String(result);
+    }
+
+    public static String decrypt(String privateKeyText, String sourceBase64RSA) throws Exception {
+        var pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKeyText));
+        var keyFactory = KeyFactory.getInstance("RSA");
+        var privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
+        var cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
+        var oaepParams = new OAEPParameterSpec("SHA1", "MGF1", new MGF1ParameterSpec("SHA-1"), PSource.PSpecified.DEFAULT);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepParams);
+        var result = cipher.doFinal(Base64.decodeBase64(sourceBase64RSA));
+        return new String(result, StandardCharsets.UTF_8);
+    }
+    // endregion
 
     /**
      * RSA密钥对对象
