@@ -27,6 +27,8 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @RequiredArgsConstructor
 public class SimpleAuthFilter implements WebFilter {
 
@@ -40,8 +42,10 @@ public class SimpleAuthFilter implements WebFilter {
         if (!CollectionUtils.isEmpty(gwuNames)) {
             var username = gwuNames.get(0);
             var userDetails = userDetailsService.findByUsername(username).block();
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (Objects.nonNull(userDetails)) {
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         // 继续下一个过滤器链的调用
         return chain.filter(exchange);
