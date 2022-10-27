@@ -61,26 +61,6 @@ spring:
 #  main:
 #    lazy-initialization: true
 
-task:
-  pool:
-    # 核心线程池大小
-    core-pool-size: 10
-    # 最大线程数
-    max-pool-size: 20
-    # 活跃时间
-    keep-alive-seconds: 60
-    # 队列容量
-    queue-capacity: 50
-    # 关闭时，等待所有任务完成再销毁
-    wait-for-tasks-to-complete: true
-    # 最大等待时间
-    await-termination-seconds: 60
-
-  #七牛云
-  #qiniu:
-  # 文件大小 /M
-#  max-size: 15
-
 #邮箱验证码有效时间/秒
 #code:
 #  expiration: 300
