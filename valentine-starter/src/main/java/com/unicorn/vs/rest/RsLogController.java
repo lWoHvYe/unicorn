@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.vs.rest;
+package com.unicorn.vs.rest;
 
 import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.core.utils.result.ResultInfo;
 import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType;
@@ -49,6 +50,7 @@ public class RsLogController {
     @Value("${local.rs.iList}")
     private Integer[] ints;
 
+    @OprLog("ooo")
     @LogRecord(
             fail = "执行失败，失败原因：「{{#_errorMsg}}」",
             success = "收到请求{{#version}},执行结果:{{#_ret}}",

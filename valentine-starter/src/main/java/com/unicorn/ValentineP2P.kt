@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye
+package com.unicorn
 
 import com.lwohvye.core.annotation.RespResultBody
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
@@ -50,7 +50,6 @@ import org.springframework.web.bind.annotation.RestController
 // 通过exclude SecurityAutoConfiguration可以屏蔽Spring Security的相关Control，这比定一个Config然后anyRequest().permitAll()要优雅，直接exclude AutoConfig，这是之前没有想到的方法，后续在别的地方应该还会用到
 //@SpringBootApplication(exclude = [SecurityAutoConfiguration::class]) // 对于默认的Config可以这样，但当已经定义了一个SecurityConfig时，通过这个是不行的，因为虽然exclude了AutoConfig，但有手动Register Bean；这种方式的可行性需进一步验证
 @EnableTransactionManagement // 开启事务
-@EnableJpaAuditing(auditorAwareRef = "auditorAware") // 开启Jpa审计
 @EnableRetry //开启重试机制
 @EnableConfigurationProperties //开启 @ConfigurationProperties 注解
 @EnableLogRecord(tenant = "com.unicorn.valentineP2P")
