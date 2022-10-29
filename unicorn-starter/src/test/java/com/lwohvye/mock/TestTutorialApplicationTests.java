@@ -31,11 +31,11 @@ import java.util.Arrays;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-public class TestTutorialApplicationTests {
-    @Mock
+@ExtendWith(MockitoExtension.class) // 这种不会start一个SpringBoot Container，粒度更细，针对在Start时会connect db, cache, mq这些，然后UT run 的 env 又没有的情景，可以用这种
+class TestTutorialApplicationTests {
+    @Mock //使用MockitoExtension时，使用Mock注解来mock bean
     DataService dataService;
-    @InjectMocks
+    @InjectMocks //非mock的bean用InjectMocks来Inject。算是用mock自己的那套体系
     SomeBusiness someBusiness;
 
     // @BeforeAll
@@ -44,7 +44,7 @@ public class TestTutorialApplicationTests {
     // @AfterEach
 
     @Test
-    public void testFetchAll() {
+    void testFetchAll() {
         // 定义当调用指定方法时的，Mock值 stub
         // 对于带参数的，可以用anyString()、anyInt()这些
         when(dataService.getAll(anyString())).thenReturn(Arrays.asList("1", "2", "3"));
@@ -60,7 +60,7 @@ public class TestTutorialApplicationTests {
             "three,3",
             "zero,0"
     })
-    public void testStatic(String s, Integer i) {
+    void testStatic(String s, Integer i) {
         System.out.println(StaticBS.pr(s) + i); // 原值Local
         try (var bsMockedStatic = Mockito.mockStatic(StaticBS.class)) { // 这个得关闭
             // 这里支持   when(StaticBS::pr) 和 when(() -> StaticBS.pr(s)) 两种方式

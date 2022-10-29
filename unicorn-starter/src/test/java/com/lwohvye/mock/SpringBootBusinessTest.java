@@ -27,16 +27,17 @@ import java.util.Arrays;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK) // 默认就是MOCK
-public class SpringBootBusinessTest {
-    @MockBean
-    DataService dataService;
+// https://www.lwohvye.com/2022/05/12/%e6%a8%a1%e6%8b%9f%e6%a1%86%e6%9e%b6mockito/
+@SpringBootTest // 默认就是MOCK
+class SpringBootBusinessTest {
+    @MockBean // 使用SpringExtension时，使用MockBean注解来mock bean，这个跟mock是在不同的project中的
+    DataService dataService; // Mock似乎是没有deep限制的，比如 UT -> A -> B,C -> D 完全可以对B以及对D进行Mock，这样UT有了更多的设计空间
     @Autowired
     SomeBusiness business;
 
     @Test
-    public void testSpringMock() {
-        when(dataService.getAll(anyString())).thenReturn(Arrays.asList("1", "2", "3"));
+    void testSpringMock() {
+        when(dataService.getAll(anyString())).thenReturn(Arrays.asList("1", "2", "3")); // 主体是对需要mock的operator先进行define （stub）。可以mock与remote API, 3rd-Sys, local的 interact
         Assertions.assertEquals(Arrays.asList("1", "2", "3"), business.fetchAllData(anyString()));
     }
 }
