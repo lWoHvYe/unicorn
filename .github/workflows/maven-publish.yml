@@ -24,10 +24,10 @@ jobs:
 #         min-versions-to-keep: 1
 
     - uses: actions/checkout@v3
-    - name: Set up JDK 18
+    - name: Set up JDK
       uses: actions/setup-java@v3.6.0
       with:
-        java-version: '18'
+        java-version: '19'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
