@@ -31,4 +31,3 @@ updates:
       - dependency-name: "com.github.oshi:oshi-core"
         versions: ["6.x"]
       - dependency-name: "nl.basjes.parse.useragent:yauaa"
-        versions: ["7.x"]
