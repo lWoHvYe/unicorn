@@ -33,6 +33,8 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -2011,14 +2013,14 @@ public class RedisUtils {
      */
     public boolean doLock(String lockKey, String value, Long expireTime) {
         // 开始时间
-        var start = System.currentTimeMillis();
+        var start = Instant.now();
         // 超时500ms，未成功返回失败
         var timeout = 500L;
         while (!lock(lockKey, value, expireTime)) {
             try {
 
                 // 超时返回失败
-                if (System.currentTimeMillis() - start >= timeout)
+                if (Duration.between(start, Instant.now()).toMillis() >= timeout)
                     return false;
 
                 // 视业务调整sleep时间
@@ -2026,6 +2028,7 @@ public class RedisUtils {
                 log.error("{}:等待获取锁中...", lockKey);
             } catch (InterruptedException e) {
                 log.error("等待锁出错，锁名称:{}，原因:{}", lockKey, e.getMessage());
+                Thread.currentThread().interrupt();
             }
         }
         // 到这里一般都是成功了
