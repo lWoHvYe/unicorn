@@ -29,6 +29,8 @@ import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,14 +66,14 @@ public class ExecutionJob extends QuartzJobBean {
         quartzLog.setBeanName(quartzJob.getBeanName());
         quartzLog.setMethodName(quartzJob.getMethodName());
         quartzLog.setParams(quartzJob.getParams());
-        long startTime = System.currentTimeMillis();
+        var startTime = Instant.now();
         quartzLog.setCronExpression(quartzJob.getCronExpression());
         try {
             // 执行任务
             QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
             Future<?> future = VIRTUAL_EXECUTOR.submit(task); // 这里好像没什么用途（只是统计下执行用时的样子），因为标记了Async，这里由async-pool执行
             future.get();
-            long times = System.currentTimeMillis() - startTime;
+            long times = Duration.between(startTime, Instant.now()).toMillis();
             quartzLog.setTime(times);
             if (StringUtils.isNotBlank(uuid)) {
                 redisUtils.set(uuid, true);
@@ -88,7 +90,7 @@ public class ExecutionJob extends QuartzJobBean {
             if (StringUtils.isNotBlank(uuid)) {
                 redisUtils.set(uuid, false);
             }
-            long times = System.currentTimeMillis() - startTime;
+            long times = Duration.between(startTime, Instant.now()).toMillis();
             quartzLog.setTime(times);
             // 任务状态 0：成功 1：失败
             quartzLog.setIsSuccess(false);

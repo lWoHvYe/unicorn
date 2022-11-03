@@ -118,7 +118,8 @@ public class LogServiceImpl implements ILogService {
     }
 
     /**
-     * 根据方法和传入的参数获取请求参数
+     * 根据方法和传入的参数获取请求参数.
+     * 虽然尴尬，但我们通过反射只能拿到方法签名和参数列表，签名中每个参数的具体含义是不知道的
      */
     private String getParameter(Method method, Object[] args) {
         var argList = new ArrayList<>();

@@ -17,6 +17,7 @@ package com.lwohvye.log.aspect;
 
 import com.lwohvye.log.domain.Log;
 import com.lwohvye.log.service.ILogService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.lwohvye.core.utils.RequestHolder;
 import com.lwohvye.core.utils.SecurityUtils;
@@ -31,23 +32,22 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
+import java.time.Instant;
 
 /**
  * @author Zheng Jie
  * @date 2018-11-24
  */
-@Component
-@Aspect
 @Slf4j
+@Aspect
+@Component
+@RequiredArgsConstructor
 public class LogAspect {
 
     private final ILogService logService;
 
-    ThreadLocal<Long> currentTime = new ThreadLocal<>();
-
-    public LogAspect(ILogService logService) {
-        this.logService = logService;
-    }
+    ThreadLocal<Instant> currentTime = new ThreadLocal<>();
 
     /**
      * 配置切入点
@@ -65,9 +65,9 @@ public class LogAspect {
     @Around("logPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         Object result;
-        currentTime.set(System.currentTimeMillis());
+        currentTime.set(Instant.now());
         result = joinPoint.proceed();
-        Log log = new Log("INFO", System.currentTimeMillis() - currentTime.get());
+        Log log = new Log("INFO", Duration.between(currentTime.get(), Instant.now()).toMillis());
         currentTime.remove();
         HttpServletRequest request = RequestHolder.getHttpServletRequest();
         // TODO: 2022/2/14 保持日志这块，有循环依赖导致的栈溢出问题，待解决
@@ -84,7 +84,7 @@ public class LogAspect {
      */
     @AfterThrowing(pointcut = "logPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
-        Log log = new Log("ERROR", System.currentTimeMillis() - currentTime.get());
+        Log log = new Log("ERROR", Duration.between(currentTime.get(), Instant.now()).toMillis());
         currentTime.remove();
         log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
         HttpServletRequest request = RequestHolder.getHttpServletRequest();
