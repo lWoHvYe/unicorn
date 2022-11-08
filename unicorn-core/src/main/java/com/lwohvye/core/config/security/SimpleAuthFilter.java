@@ -42,7 +42,6 @@ public class SimpleAuthFilter extends OncePerRequestFilter {
             var userDetails = userDetailsService.loadUserByUsername(str);
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
         }
         filterChain.doFilter(request, response);
     }

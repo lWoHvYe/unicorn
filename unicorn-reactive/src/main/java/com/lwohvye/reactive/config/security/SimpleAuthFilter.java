@@ -26,6 +26,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RequiredArgsConstructor
 public class SimpleAuthFilter implements WebFilter {
@@ -34,14 +35,20 @@ public class SimpleAuthFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        // TODO: 2022/9/30 待完善
+        // TODO: 2022/9/30 待完善。当前SecurityContextHolder中的属性用不了，推测是react下context有问题
+        // https://docs.spring.io/spring-security/reference/reactive/index.html
         var request = exchange.getRequest();
         var gwuNames = request.getHeaders().get("GWUName");
         if (!CollectionUtils.isEmpty(gwuNames)) {
-            var username = gwuNames.get(0);
-            var userDetails = userDetailsService.findByUsername(username).block();
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            var blockingWrapper = Mono.fromCallable(() -> {
+                var username = gwuNames.get(0);
+                return userDetailsService.findByUsername(username).block();/* make a remote synchronous call */
+            });
+            blockingWrapper = blockingWrapper.subscribeOn(Schedulers.boundedElastic());
+            blockingWrapper.subscribe(userDetails -> {
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            });
         }
         // 继续下一个过滤器链的调用
         return chain.filter(exchange);
