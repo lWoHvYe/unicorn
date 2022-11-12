@@ -89,13 +89,13 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         return new CorsFilter(source);
     }
 
-    // TODO: 2022/11/12 这个放这里，不会报异常，若确定需要就打开，否则remove https://stackoverflow.com/questions/58100353/no-servletcontext-set-when-initiating-resourcehandlermapping-bean
-    @Bean
-    @ConditionalOnExpression("false")
-    GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    // 2022/11/12 这个放这里，不会报异常（打开的情况下），因确定没啥用，故注释掉 https://stackoverflow.com/questions/58100353/no-servletcontext-set-when-initiating-resourcehandlermapping-bean    
+    //  @Bean
+    //  @ConditionalOnExpression("false")
+    //  GrantedAuthorityDefaults grantedAuthorityDefaults() {
         // 去除 ROLE_ 前缀
-        return new GrantedAuthorityDefaults("");
-    }
+    //      return new GrantedAuthorityDefaults("");
+    //  }
 
     /**
      * 通用拦截器排除设置，所有拦截器都会自动加springdoc-openapi相关的资源排除信息，不用在应用程序自身拦截器定义的地方去添加，算是良心解耦实现。
