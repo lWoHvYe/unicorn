@@ -16,6 +16,14 @@
 
 ---
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
+```
+11-12 update
+整合 SpringBoot 3.0.0-RC2 at branch `integrate-boot3.0-dev`
+- Completed: 初步整合及调试
+- TODO: Boot 3.0/Framework 6.0 Deprecated WT Upgrade (eg:SpringSecurity, DataRedis)
+- 部分3rd Component未Support，Redisson, Captche, ... (RedissonConnect init报错，使用RedisTemplete的操作无法使用，基于Annotation的Cache正常)
+
+```
 
 启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](unicorn-starter/src/main/resources)
 详见 [unicorn-starter](unicorn-starter) 模块。[启停脚本](script)。 You can find the minimum to run in [Valentine's Day](valentine-starter).
