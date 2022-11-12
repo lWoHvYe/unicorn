@@ -16,6 +16,10 @@
 package com.lwohvye.sys.modules.security.config;
 
 import com.lwohvye.core.config.security.SimpleSecurityConfig;
+import com.lwohvye.core.utils.StringUtils;
+import com.lwohvye.core.utils.json.JsonUtils;
+import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
+import com.lwohvye.core.utils.result.ResultUtils;
 import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
@@ -29,23 +33,20 @@ import com.lwohvye.sys.modules.security.security.handler.JwtAccessDeniedHandler;
 import com.lwohvye.sys.modules.security.security.handler.JwtAuthenticationEntryPoint;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IResourceService;
-import com.lwohvye.core.utils.StringUtils;
-import com.lwohvye.core.utils.json.JsonUtils;
-import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.core.utils.result.ResultUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -59,7 +60,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -69,18 +69,20 @@ import java.util.Objects;
  *
  * @author Zheng Jie,Hongyan Wang
  */
-@ConditionalOnExpression("!${local.sys.multi-security:false}") // 这里用了取反。非multi时开启。默认开启
-@ConditionalOnMissingBean(SimpleSecurityConfig.class) // 如果使用了简单配置，就不加载本配置了
+// TODO: 2022/11/12 Update to Security 6.0 -> https://docs.spring.io/spring-security/reference/5.8/migration.html
 // 添加该注解到@Configuration的类上，应用程序便可以使用自定义的WebSecurityConfigurer或拓展自WebSecurityConfigurerAdapter的配置类来装配Spring Security框架。
 // 在5.4开始引入新的配置方式 https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
 // Spring Security lambda DSL
 @EnableWebSecurity
 @RequiredArgsConstructor
-// 使用 @EnableGlobalMethodSecurity 注解来启用全局方法安全注解功能。该注解提供了三种不同的机制来实现同一种功能
+// 使用 @EnableGlobalMethodSecurity 注解来启用全局方法安全注解功能。该注解提供了三种不同的机制来实现同一种功能，3.0开始使用@EnbaleMethodSecurity替换
 // 包括prePostEnabled 、securedEnabled 和 jsr250Enabled 三种方式
 // 设置 prePostEnabled 为 true ，则开启了基于表达式的方法安全控制。通过表达式运算结果的布尔值来决定是否可以访问（true 开放， false 拒绝 ）
 // 设置 securedEnabled 为 true ，就开启了角色注解 @Secured ，该注解功能要简单的多，默认情况下只能基于角色（默认需要带前缀 ROLE_）集合来进行访问控制决策。
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true)
+@Configuration // spring boot 3.0开始要加上这个
+@ConditionalOnExpression("!${local.sys.multi-security:false}") // 这里用了取反。非multi时开启。默认开启
+@ConditionalOnMissingBean(SimpleSecurityConfig.class) // 如果使用了简单配置，就不加载本配置了
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SpringSecurityConfig {
 
@@ -95,26 +97,22 @@ public class SpringSecurityConfig {
     private final RabbitMQProducerService rabbitMQProducerService;
 
     @Bean
-    GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        // 去除 ROLE_ 前缀
-        return new GrantedAuthorityDefaults("");
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
         // 密码加密方式
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    SecurityFilterChain filterChainDefault(HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain filterChainDefault(HttpSecurity httpSecurity,
+                                           AuthenticationSuccessHandler successHandler,
+                                           AuthenticationFailureHandler failureHandler) throws Exception {
         return httpSecurity
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
                 // 一般来讲，为了防御CSRF攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。
                 .csrf().disable()
                 // 这样注册自定义的UsernamePasswordAuthenticationFilter
-                .apply(MyCustomDsl.customDsl(authenticationSuccessHandler(), authenticationFailureHandler()))
+                .apply(MyCustomDsl.customDsl(successHandler, failureHandler))
                 .and()
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 // 授权异常

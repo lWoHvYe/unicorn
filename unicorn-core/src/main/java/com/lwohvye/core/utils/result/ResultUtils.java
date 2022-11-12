@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;

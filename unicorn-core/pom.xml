@@ -187,12 +187,6 @@
             <artifactId>mapstruct-spring-extensions</artifactId>
         </dependency>
 
-        <!--   具体可以看看这个，https://jcp.org/en/jsr/detail?id=330     -->
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>

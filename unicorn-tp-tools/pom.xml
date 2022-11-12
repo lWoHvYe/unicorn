@@ -31,7 +31,7 @@
     <description>Tools and Third Party</description>
 
     <properties>
-        <mail.version>1.6.2</mail.version>
+        <mail.version>2.1.0</mail.version>
         <aliyun.oss.version>3.15.1</aliyun.oss.version>
         <aliyun.dysmsapi.version>2.0.10</aliyun.dysmsapi.version>
         <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
@@ -64,9 +64,9 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-            <version>${mail.version}</version>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>2.1.0</version>
         </dependency>
 
         <!--    对象存储计划改为阿里云OSS  -->
@@ -107,9 +107,5 @@
             <version>${bcprov.jdk15on.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-        </dependency>
     </dependencies>
 </project>

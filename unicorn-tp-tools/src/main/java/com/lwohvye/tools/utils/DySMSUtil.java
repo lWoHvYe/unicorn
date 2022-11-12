@@ -29,7 +29,7 @@ import com.lwohvye.core.config.AliCloudConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Slf4j
 public class DySMSUtil {

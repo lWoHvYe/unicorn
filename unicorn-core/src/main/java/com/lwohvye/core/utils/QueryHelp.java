@@ -24,8 +24,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.Id;
-import javax.persistence.criteria.*;
+import jakarta.persistence.Id;
+import jakarta.persistence.criteria.*;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -47,7 +47,7 @@ public class QueryHelp {
      * @param query Q 外部的criteria对象
      * @param cb    CriteriaBuilder工厂类，用于创建查询的criteriaQuery对象
      *              Predicate查询条件的拼接对应于where后面的添加表达式
-     * @return javax.persistence.criteria.Predicate
+     * @return jakarta.persistence.criteria.Predicate
      * @date 2021/3/31 11:57
      */
     public static <R, Q> Predicate getPredicate(Root<R> root, Q query, CriteriaBuilder cb) {
@@ -138,7 +138,7 @@ public class QueryHelp {
      * @param root /
      * @param q    /
      * @param val  /
-     * @return javax.persistence.criteria.Join
+     * @return jakarta.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
     @Nullable

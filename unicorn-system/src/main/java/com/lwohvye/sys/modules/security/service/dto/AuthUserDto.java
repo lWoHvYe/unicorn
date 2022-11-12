@@ -18,7 +18,7 @@ package com.lwohvye.sys.modules.security.service.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * @author Zheng Jie

@@ -27,7 +27,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        dialect: org.hibernate.dialect.MySQLDialect
         enable_lazy_no_trans: true
     open-in-view: true
     hibernate:

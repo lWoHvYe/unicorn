@@ -21,8 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,8 +38,9 @@ import org.springframework.security.web.SecurityFilterChain;
  * @date 2022/3/19 5:48 PM
  */
 @Slf4j
-@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
+@EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 @EnableWebSecurity
+@Configuration
 @ConditionalOnExpression("${local.sys.sim-auth:false}") // 基于配置，是否对所有请求放行。默认关闭
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // 指定Init Bean的Condition，需要是Servlet（比如WebMVC）
 public class SimpleSecurityConfig {
@@ -60,7 +62,7 @@ public class SimpleSecurityConfig {
                 // 不创建会话
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 // 放行所有请求
-                .authorizeRequests().anyRequest().permitAll().and()
+                .authorizeHttpRequests().anyRequest().permitAll().and()
                 .apply(securityConfigurerAdapter()).and()
                 .build();
     }

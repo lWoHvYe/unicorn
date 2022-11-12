@@ -22,8 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -38,8 +39,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
  * @date 2022/3/19 5:48 PM
  */
 @Slf4j
-@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
+@EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 @EnableWebFluxSecurity
+@Configuration
 @RequiredArgsConstructor
 @ConditionalOnExpression("${local.sys.sim-auth:false}") // 基于配置，是否对所有请求放行。默认关闭
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE) // 指定Init Bean的Condition，需要是Reactive（比如WebFlux）

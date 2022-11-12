@@ -19,8 +19,8 @@ import com.lwohvye.core.annotation.RespResultBody
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
 import com.lwohvye.core.utils.SpringContextHolder
 import com.lwohvye.core.utils.result.ResultInfo
-import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType
 import com.lwohvye.sys.common.annotation.ApiVersion
+import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType
 import com.mzt.logapi.starter.annotation.EnableLogRecord
 import com.mzt.logapi.starter.annotation.LogRecord
 import io.swagger.v3.oas.annotations.Hidden
@@ -28,7 +28,6 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.retry.annotation.EnableRetry

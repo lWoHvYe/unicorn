@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.boot.system.JavaVersion;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 @Component
 @Slf4j

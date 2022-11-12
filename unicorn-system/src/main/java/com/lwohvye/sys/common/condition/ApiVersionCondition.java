@@ -19,7 +19,7 @@ package com.lwohvye.sys.common.condition;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.regex.Pattern;
 
 /**

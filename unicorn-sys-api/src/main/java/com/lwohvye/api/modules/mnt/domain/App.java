@@ -22,47 +22,48 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author zhanghouying
+ * @date 2019-08-24
+ */
 @Entity
 @Getter
 @Setter
-@Table(name="mnt_app")
+@Table(name = "mnt_app")
 public class App extends BaseEntity implements Serializable {
 
     @Id
-	@Column(name = "app_id")
-	@Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "app_id")
+    @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-	@Schema(description = "名称" )
+    @Schema(description = "名称")
     private String name;
 
-	@Schema(description = "端口" )
-	private int port;
+    @Schema(description = "端口")
+    private int port;
 
-	@Schema(description = "上传路径" )
-	private String uploadPath;
+    @Schema(description = "上传路径")
+    private String uploadPath;
 
-	@Schema(description = "部署路径" )
-	private String deployPath;
+    @Schema(description = "部署路径")
+    private String deployPath;
 
-	@Schema(description = "备份路径" )
-	private String backupPath;
+    @Schema(description = "备份路径")
+    private String backupPath;
 
-	@Schema(description = "启动脚本" )
-	private String startScript;
+    @Schema(description = "启动脚本")
+    private String startScript;
 
-	@Schema(description = "部署脚本" )
-	private String deployScript;
+    @Schema(description = "部署脚本")
+    private String deployScript;
 
-    public void copy(App source){
-        BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
+    public void copy(App source) {
+        BeanUtil.copyProperties(source, this, CopyOptions.create().setIgnoreNullValue(true));
     }
 }

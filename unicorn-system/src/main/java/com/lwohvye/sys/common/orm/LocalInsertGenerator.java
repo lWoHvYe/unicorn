@@ -30,12 +30,12 @@ public class LocalInsertGenerator extends IdentityGenerator {
 
     @Override
     public Serializable generate(SharedSessionContractImplementor s, Object obj) throws HibernateException {
-        Serializable id = s.getEntityPersister(null, obj).getClassMetadata().getIdentifier(obj, s);
+        Serializable id = (Serializable) s.getEntityPersister(null, obj).getIdentifier(obj, s);
 
         if (id != null && Integer.parseInt(id.toString()) > 0) {
             return id;
         } else {
-            return super.generate(s, obj);
+            return (Serializable) super.generate(s, obj);
         }
     }
 }

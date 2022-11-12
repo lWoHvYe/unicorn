@@ -42,7 +42,7 @@ spring:
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        dialect: org.hibernate.dialect.MySQLDialect
         enable_lazy_no_trans: true
     #        指定表名解析。spring下可不加。会自动使用
     #        naming:
