@@ -20,13 +20,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lwohvye.core.config.FileProperties;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -89,7 +87,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         return new CorsFilter(source);
     }
 
-    // 2022/11/12 这个放这里，不会报异常（打开的情况下），因确定没啥用，故注释掉 https://stackoverflow.com/questions/58100353/no-servletcontext-set-when-initiating-resourcehandlermapping-bean    
+    // 2022/11/12 这个放这里，不会报异常（打开的情况下），因确定没啥用，故注释掉 https://stackoverflow.com/questions/58100353/no-servletcontext-set-when-initiating-resourcehandlermapping-bean
     //  @Bean
     //  @ConditionalOnExpression("false")
     //  GrantedAuthorityDefaults grantedAuthorityDefaults() {
