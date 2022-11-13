@@ -11,7 +11,7 @@ server:
 
 spring:
   application:
-    name: EL-Admin-Starter
+    name: Valentine-Starter
   freemarker:
     check-template-location: false
   profiles:

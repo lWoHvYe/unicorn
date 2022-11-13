@@ -87,7 +87,7 @@
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
         <maven.compiler.release>17</maven.compiler.release>
         <log4jdbc.version>1.18</log4jdbc.version>
-        <springdoc.openapi.version>1.6.12</springdoc.openapi.version>
+        <springdoc.openapi.version>2.0.0-RC1</springdoc.openapi.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <hutool.version>5.8.5</hutool.version>
         <fastutil.version>8.5.9</fastutil.version>
@@ -132,30 +132,7 @@
             <!-- Swagger UI 相关 -->
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc.openapi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-webflux-ui</artifactId>
-                <version>${springdoc.openapi.version}</version>
-            </dependency>
-            <!--    his dependency helps ignoring @AuthenticationPrincipal in case its used on REST Controllers    -->
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-security</artifactId>
-                <version>${springdoc.openapi.version}</version>
-            </dependency>
-            <!--    enable the support of spring Pageable Type    -->
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-data-rest</artifactId>
-                <version>${springdoc.openapi.version}</version>
-            </dependency>
-            <!--   enable javadoc support     -->
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-javadoc</artifactId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.openapi.version}</version>
             </dependency>
             <!--    swagger-core依赖该包，部分原因，需单独升级依赖版本    -->
