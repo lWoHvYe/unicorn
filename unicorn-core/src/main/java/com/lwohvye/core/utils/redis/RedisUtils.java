@@ -271,13 +271,14 @@ public class RedisUtils {
      * @return /
      */
     public List<String> scan(String pattern) {
-        ScanOptions options = ScanOptions.scanOptions().match(pattern).build();
-        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
-        RedisConnection rc = Objects.requireNonNull(factory).getConnection();
-        Cursor<byte[]> cursor = rc.scan(options);
+        var options = ScanOptions.scanOptions().match(pattern).build();
+        var factory = redisTemplate.getConnectionFactory();
+        var rc = Objects.requireNonNull(factory).getConnection();
         List<String> result = new ArrayList<>();
-        while (cursor.hasNext()) {
-            result.add(new String(cursor.next()));
+        try (var cursor = rc.keyCommands().scan(options)) {
+            while (cursor.hasNext()) {
+                result.add(new String(cursor.next()));
+            }
         }
         try {
             RedisConnectionUtils.releaseConnection(rc, factory);
@@ -306,24 +307,25 @@ public class RedisUtils {
      * @return /
      */
     public List<String> findKeysForPage(String patternKey, int page, int size) {
-        ScanOptions options = ScanOptions.scanOptions().match(patternKey).build();
-        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
-        RedisConnection rc = Objects.requireNonNull(factory).getConnection();
-        Cursor<byte[]> cursor = rc.scan(options);
+        var options = ScanOptions.scanOptions().match(patternKey).build();
+        var factory = redisTemplate.getConnectionFactory();
+        var rc = Objects.requireNonNull(factory).getConnection();
         List<String> result = new ArrayList<>(size);
-        int tmpIndex = 0;
-        int fromIndex = page * size;
-        int toIndex = page * size + size;
-        while (cursor.hasNext()) {
-            if (tmpIndex >= fromIndex && tmpIndex < toIndex) {
-                result.add(new String(cursor.next()));
-                tmpIndex++;
-                continue;
-            }
-            // 还未获取到满足条件的数据,继续
-            if (tmpIndex < toIndex) {
-                tmpIndex++;
-                cursor.next();
+        try (var cursor = rc.keyCommands().scan(options)) {
+            int tmpIndex = 0;
+            int fromIndex = page * size;
+            int toIndex = page * size + size;
+            while (cursor.hasNext()) {
+                if (tmpIndex >= fromIndex && tmpIndex < toIndex) {
+                    result.add(new String(cursor.next()));
+                    tmpIndex++;
+                    continue;
+                }
+                // 还未获取到满足条件的数据,继续
+                if (tmpIndex < toIndex) {
+                    tmpIndex++;
+                    cursor.next();
+                }
             }
         }
         try {
@@ -1956,16 +1958,16 @@ public class RedisUtils {
         // 利用lambda表达式
         return (Boolean) redisTemplate.execute((RedisCallback<Object>) redisConnection -> {
             long expireAt = System.currentTimeMillis() + lockExpire + 1;
-            Boolean acquire = redisConnection.setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
+            Boolean acquire = redisConnection.stringCommands().setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
             if (Boolean.TRUE.equals(acquire)) {
                 return true;
             } else {
-                byte[] value = redisConnection.get(lock.getBytes());
+                byte[] value = redisConnection.stringCommands().get(lock.getBytes());
                 if (Objects.nonNull(value) && value.length > 0) {
                     long expireTime = Long.parseLong(new String(value));
                     if (expireTime < System.currentTimeMillis()) {
                         // 如果锁已经过期
-                        byte[] oldValue = redisConnection.getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + lockExpire + 1).getBytes());
+                        byte[] oldValue = redisConnection.stringCommands().getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + lockExpire + 1).getBytes());
                         // 防止死锁
                         Assert.notNull(oldValue, "入参有误，原值不可为空");
                         return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();

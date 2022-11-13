@@ -23,14 +23,11 @@ import com.lwohvye.core.utils.result.ResultUtils;
 import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
-import com.lwohvye.sys.modules.security.security.CustomAccessDecisionManager;
+import com.lwohvye.sys.modules.security.security.CustomAuthorizationManager;
 import com.lwohvye.sys.modules.security.security.JwtAuthTokenConfigurer;
 import com.lwohvye.sys.modules.security.security.TokenProvider;
-import com.lwohvye.sys.modules.security.security.filter.CustomFilterInvocationSecurityMetadataSource;
-import com.lwohvye.sys.modules.security.security.handler.CustomLogoutHandler;
-import com.lwohvye.sys.modules.security.security.handler.CustomLogoutSuccessHandler;
-import com.lwohvye.sys.modules.security.security.handler.JwtAccessDeniedHandler;
-import com.lwohvye.sys.modules.security.security.handler.JwtAuthenticationEntryPoint;
+import com.lwohvye.sys.modules.security.security.filter.CustomInvocationSecurityMetadataSource;
+import com.lwohvye.sys.modules.security.security.handler.*;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IResourceService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,9 +38,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -53,8 +50,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -137,33 +133,15 @@ public class SpringSecurityConfig {
                 // session的创建策略，总是创建【ALWAYS】、需要时创建【IF_REQUIRED】、永不创建【STATELESS】 、永不创建但如有则使用【NEVER】
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                // 所有请求都需要认证
-                .anyRequest().authenticated().withObjectPostProcessor(filterSecurityInterceptorObjectPostProcessor())
-                .and().apply(securityConfigurerAdapter())
+                .authorizeHttpRequests(authorize ->
+                        // 所有请求都需要认证
+                        authorize.anyRequest().access(customAuthorizationManager()))
+                .apply(securityConfigurerAdapter())
                 .and().build();
     }
 
     private JwtAuthTokenConfigurer securityConfigurerAdapter() {
         return new JwtAuthTokenConfigurer(tokenProvider, userDetailsService);
-    }
-
-    // region   权限认证
-
-    /**
-     * 自定义 FilterSecurityInterceptor  ObjectPostProcessor 以替换默认配置达到动态权限的目的
-     *
-     * @return ObjectPostProcessor
-     */
-    private ObjectPostProcessor<FilterSecurityInterceptor> filterSecurityInterceptorObjectPostProcessor() {
-        return new ObjectPostProcessor<>() {
-            @Override
-            public <O extends FilterSecurityInterceptor> O postProcess(O object) {
-                object.setAccessDecisionManager(customAccessDecisionManager());
-                object.setSecurityMetadataSource(customFilterInvocationSecurityMetadataSource());
-                return object;
-            }
-        };
     }
 
     /**
@@ -172,18 +150,18 @@ public class SpringSecurityConfig {
      * @return CustomFilterInvocationSecurityMetadataSource
      */
     @Bean
-    public FilterInvocationSecurityMetadataSource customFilterInvocationSecurityMetadataSource() {
-        return new CustomFilterInvocationSecurityMetadataSource(applicationContext, resourceService);
+    public SecurityMetadataSource customInvocationSecurityMetadataSource() {
+        return new CustomInvocationSecurityMetadataSource(applicationContext, resourceService);
     }
 
     /**
-     * 访问决策器
+     * 鉴权
      *
      * @return affirmativeBased
      */
     @Bean
-    public AccessDecisionManager customAccessDecisionManager() {
-        return new CustomAccessDecisionManager();
+    public AuthorizationManager<RequestAuthorizationContext> customAuthorizationManager() {
+        return new CustomAuthorizationManager<>(customInvocationSecurityMetadataSource());
     }
 
     // endregion
