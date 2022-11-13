@@ -21,7 +21,7 @@
 整合 SpringBoot 3.0.0-RC2 at branch `integrate-boot3.0-dev`
 - Completed: 初步整合及调试
 - TODO: Boot 3.0/Framework 6.0 Deprecated WT Upgrade (eg:SpringSecurity, DataRedis)
-- 部分3rd Component未Support，Redisson, Captche, ... (RedissonConnect init报错，使用RedisTemplete的操作无法使用，基于Annotation的Cache正常)
+- 部分3rd Component未Support，Redisson, Captche(pre-build), Swagger... (RedissonConnect init报错，使用RedisTemplete的操作无法使用，基于Annotation的Cache正常)
 
 ```
 
