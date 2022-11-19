@@ -66,20 +66,6 @@
             <version>${unicorn.core.version}</version>
             <optional>true</optional>
         </dependency>
-        <!--   tools模块     -->
-        <!--<dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-tp-tools</artifactId>
-            <version>${unicorn.core.version}</version>
-            <optional>true</optional>
-        </dependency>-->
-        <!-- 代码生成模块 -->
-        <!--<dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-cd-generator</artifactId>
-            <version>${unicorn.core.version}</version>
-            <optional>true</optional>
-        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

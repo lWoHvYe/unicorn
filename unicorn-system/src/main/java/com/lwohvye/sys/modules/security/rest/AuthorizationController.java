@@ -323,7 +323,7 @@ public class AuthorizationController {
         bucket.set("str1");
         var obj = bucket.get();
 
-        bucket.trySet("str3");
+        bucket.setIfAbsent("str3");
         bucket.compareAndSet("str4", "str5"); // CAS
         bucket.getAndSet("str6");
         // endregion

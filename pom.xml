@@ -80,9 +80,6 @@
         <project.core.version>3.2.0-SNAPSHOT</project.core.version>
         <!--支持Java 18，问题不在这，这里不升级也没啥问题，用release就可以了-->
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <!--https://maven.apache.org/plugins/maven-compiler-plugin/-->
-        <!--<maven.compiler.source>17</maven.compiler.source>-->
-        <!--<maven.compiler.target>17</maven.compiler.target>-->
         <!--Starting JDK 9, release can be used to do the things what source and target can do
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
         <maven.compiler.release>17</maven.compiler.release>
@@ -100,7 +97,7 @@
         <logstash.version>7.2</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
         <logback.version>1.4.4</logback.version>
-        <redisson.version>3.18.0</redisson.version>
+        <redisson.version>3.18.1-SNAPSHOT</redisson.version>
         <guava.version>31.1-jre</guava.version>
         <caffeine.version>3.1.1</caffeine.version>
         <poi.version>5.2.2</poi.version>
@@ -141,24 +138,6 @@
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
-
-            <!-- druid数据源驱动 ; 注：使用shardingsphere时。这里不能用druid但spring-boot-starter -->
-            <!--<dependency>-->
-            <!--    <groupId>com.alibaba</groupId>-->
-            <!--    <artifactId>druid</artifactId>-->
-            <!--    <version>${druid.version}</version>-->
-            <!--    不兼容Jdk 11 及以上版本，移除依赖 https://github.com/alibaba/druid/issues/3060 -->
-            <!--       <exclusions>-->
-            <!--          <exclusion>-->
-            <!--             <artifactId>jconsole</artifactId>-->
-            <!--             <groupId>com.sun</groupId>-->
-            <!--          </exclusion>-->
-            <!--          <exclusion>-->
-            <!--             <artifactId>tools</artifactId>-->
-            <!--             <groupId>com.sun</groupId>-->
-            <!--          </exclusion>-->
-            <!--       </exclusions>-->
-            <!--</dependency>-->
 
             <!--工具包-->
             <dependency>
@@ -381,8 +360,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <!--<fork>true</fork>-->
-                    <!--for unmappable characters in classes-->
-                    <!-- <encoding>UTF-8</encoding>-->
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <!--for lombok annotations to resolve-->
@@ -441,35 +418,6 @@
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
-            <!--     Maven JDK9 Jigsaw。这个暂时并没有用到       -->
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jmod-plugin</artifactId>
-                <version>3.0.0-alpha-1</version>
-                <extensions>true</extensions>
-            </plugin>-->
-            <!--     Toolchains are ignored, 'javadocExecutable' parameter is set to。这个插件是用来配置maven run的jdk的，当前是通过其他方式配置了     -->
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-toolchains-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <?m2e ignore ?>
-                        <goals>
-                            <goal>toolchain</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <toolchains>
-                        <jdk>
-                            <version>17</version>
-                            <vendor>oracle</vendor>
-                        </jdk>
-                    </toolchains>
-                </configuration>
-            </plugin>-->
         </plugins>
     </build>
     <!-- (you only need this if you are using a milestone or snapshot version) -->
