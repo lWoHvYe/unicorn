@@ -32,8 +32,8 @@
 
     <properties>
         <mail.version>2.1.0</mail.version>
-        <aliyun.oss.version>3.15.1</aliyun.oss.version>
-        <aliyun.dysmsapi.version>2.0.10</aliyun.dysmsapi.version>
+        <aliyun.oss.version>3.15.2</aliyun.oss.version>
+        <aliyun.dysmsapi.version>2.0.22</aliyun.dysmsapi.version>
         <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     </properties>
 
