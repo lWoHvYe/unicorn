@@ -34,8 +34,6 @@
         <unicorn.core.version>3.2.0-SNAPSHOT</unicorn.core.version>
         <maven.compiler.release>18</maven.compiler.release>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <hikaricp.version>5.0.1</hikaricp.version>
-        <caffeine.version>3.1.1</caffeine.version>
         <kotlin.version>1.7.20</kotlin.version>
     </properties>
     <!--这个意义不大-->

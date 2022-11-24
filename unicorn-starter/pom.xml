@@ -36,8 +36,6 @@
         <lombok.version>1.18.24</lombok.version>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <javassist.version>3.29.2-GA</javassist.version>
-        <hikaricp.version>5.0.1</hikaricp.version>
-        <caffeine.version>3.1.1</caffeine.version>
         <shardingsphere.version>5.2.0</shardingsphere.version>
         <kotlin.version>1.7.20</kotlin.version>
     </properties>
