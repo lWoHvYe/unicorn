@@ -84,7 +84,7 @@
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
         <maven.compiler.release>17</maven.compiler.release>
         <log4jdbc.version>1.18</log4jdbc.version>
-        <springdoc.openapi.version>2.0.0-RC2</springdoc.openapi.version>
+        <springdoc.openapi.version>2.0.0</springdoc.openapi.version>
         <hutool.version>5.8.10</hutool.version>
         <fastutil.version>8.5.9</fastutil.version>
         <lombok.version>1.18.24</lombok.version>
@@ -383,7 +383,7 @@
                         <path>
                             <groupId>com.github.therapi</groupId>
                             <artifactId>therapi-runtime-javadoc-scribe</artifactId>
-                            <version>0.13.0</version>
+                            <version>0.15.0</version>
                         </path>
                     </annotationProcessorPaths>
                     <!--https://docs.spring.io/spring-boot/docs/2.4.4/reference/html/appendix-configuration-metadata.html#configuration-metadata-annotation-processor-->
