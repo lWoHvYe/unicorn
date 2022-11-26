@@ -9,8 +9,6 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/valentine-starter/pom.xml" />
-        <option value="$PROJECT_DIR$/valentine-search/pom.xml" />
-        <option value="$PROJECT_DIR$/unicorn-starter/pom.xml" />
       </list>
     </option>
   </component>
