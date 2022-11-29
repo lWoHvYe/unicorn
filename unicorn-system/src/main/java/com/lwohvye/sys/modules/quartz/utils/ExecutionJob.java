@@ -41,6 +41,7 @@ import java.util.concurrent.Future;
  *
  * @author /
  * @date 2019-01-07
+ * @see com.lwohvye.core.config.WebExecutorConfig asyncTaskExecutor()，use this pool for JobRunning
  */
 @Async
 @Slf4j

@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dev_3.x" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "dev_3.x" ]
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
     - name: Setup Java JDK
       uses: actions/setup-java@v3.6.0
       with:
-        java-version: '18'
+        java-version: '19'
         distribution: 'corretto'
         check-latest: true
 

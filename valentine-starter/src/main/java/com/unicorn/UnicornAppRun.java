@@ -21,6 +21,7 @@ import com.mzt.logapi.starter.annotation.EnableLogRecord;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.retry.annotation.EnableRetry;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAsync // 开启异步
 @RestController
 @Hidden
-@SpringBootApplication // 核心配置类
+@SpringBootApplication(exclude = {TaskExecutionAutoConfiguration.class}) // 核心配置类
 @EnableTransactionManagement // 开启事务
 @EnableRetry //开启重试机制
 @EnableConfigurationProperties //开启 @ConfigurationProperties 注解

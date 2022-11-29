@@ -19,6 +19,7 @@ package com.lwohvye.core.config;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 
@@ -28,14 +29,27 @@ import java.util.concurrent.Executors;
  * Running Spring Applications on Virtual Threads
  * <a href="https://spring.io/blog/2022/10/11/embracing-virtual-threads">embracing virtual threads</a>
  */
+@Configuration
 public class WebExecutorConfig {
 
+    /**
+     * async ThreadPool
+     *
+     * @return org.springframework.core.task.AsyncTaskExecutor
+     * @date 2022/11/29 12:54 PM
+     */
     @Bean(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME)
     public AsyncTaskExecutor asyncTaskExecutor() {
         var virtualFactory = Thread.ofVirtual().name("Virtual-Async").factory();
         return new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(virtualFactory));
     }
 
+    /**
+     * httpRequest ThreadPool, will do sync-db-query also
+     *
+     * @return org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer<?>
+     * @date 2022/11/29 12:53 PM
+     */
     @Bean
     public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
         var virtualFactory = Thread.ofVirtual().name("Virtual-WebServer").factory();

@@ -31,10 +31,10 @@ module lwohvye.unicorn.system {
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
     exports com.lwohvye.sys.common.annotation;
-    exports com.lwohvye.sys.common.condition to spring.beans;
+    exports com.lwohvye.sys.common.condition to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.infrastructure.constants;
-    exports com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.beans;
-    exports com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.beans;
+    exports com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.beans, spring.aop;
+    exports com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.mnt.repository to spring.beans;
     exports com.lwohvye.sys.modules.mnt.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.mnt.service;
@@ -44,8 +44,8 @@ module lwohvye.unicorn.system {
     exports com.lwohvye.sys.modules.quartz.repository; // 若要使用JRebel + XRebel，则需要exports to unnamed module
     exports com.lwohvye.sys.modules.quartz.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.quartz.service;
-    exports com.lwohvye.sys.modules.quartz.task to spring.beans;
-    exports com.lwohvye.sys.modules.quartz.utils to spring.beans;
+    exports com.lwohvye.sys.modules.quartz.task to spring.beans, spring.aop;
+    exports com.lwohvye.sys.modules.quartz.utils to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.rabbitmq.service; // 这个要export to spring.beans和unnamed module。消费者应该都是这样的
     exports com.lwohvye.sys.modules.rabbitmq.config;
     exports com.lwohvye.sys.modules.security.service;
@@ -71,7 +71,6 @@ module lwohvye.unicorn.system {
     opens com.lwohvye.sys.common.handler;
     opens com.lwohvye.sys.common.init;
     opens com.lwohvye.sys.common.orm;
-    opens com.lwohvye.sys.common.thread;
     opens com.lwohvye.sys.common.web;
     opens com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.core;
     opens com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.core;
