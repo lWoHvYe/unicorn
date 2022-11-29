@@ -24,6 +24,8 @@ import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType;
 import com.lwohvye.sys.common.annotation.ApiVersion;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,6 +52,30 @@ public class RsLogController {
     @Value("${local.rs.iList}")
     private Integer[] ints;
 
+    /**
+     * 访问首页提示
+     * 因为自定义了处理逻辑，所以下面这俩的RequestCondition是不一样的，所以能共存，且因为定义了优先新版本，所以在v1时走第一个，[v2+ 走第二个
+     * 但注意⚠️：这种path上带param是与定义的匿名访问注解AnonymousAccess不兼容的（不生效）
+     *
+     * @return /
+     * @see com.lwohvye.sys.common.handler.ApiVersionRequestMappingHandlerMapping
+     */
+    @RespResultBody
+    @ApiVersion
+    @AnonymousGetMapping("/valentine/{version}/p2p")
+    public String index(@PathVariable String version) {
+        return null;
+//        return "Backend service started successfully"
+    }
+
+    @RespResultBody
+    @ApiVersion(2)
+    @AnonymousGetMapping("/valentine/{version}/p2p")
+    public List<String> indexCCVer(@PathVariable String version) {
+        return List.of(String.format("CCVer %s Backend service started successfully", version));
+    }
+
+
     @OprLog("ooo")
     @LogRecord(
             fail = "执行失败，失败原因：「{{#_errorMsg}}」",
@@ -61,5 +87,14 @@ public class RsLogController {
     @AnonymousGetMapping(value = {"/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"}) // @RequestMapping的path是支持多个的
     public ResultInfo<String> indexVersion(@PathVariable String version) {
         return ResultInfo.success(String.format("Version %s Backend service started successfully", version));
+    }
+
+    /**
+     * 匹配采用的最佳适配，当传v4时，会匹配到这个方法
+     */
+    @RespResultBody
+    @AnonymousGetMapping("/valentine/v4/p2p")
+    public ResponseEntity<ResultInfo<String>> indexClVer() {
+        return new ResponseEntity<>(ResultInfo.success("ClVersion v4 Backend service started successfully"), HttpStatus.CREATED);
     }
 }

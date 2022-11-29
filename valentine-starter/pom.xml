@@ -30,11 +30,9 @@
     <name>Valentine P2P</name>
 
     <properties>
-        <java.version>19</java.version>
+        <java.version>17</java.version>
         <unicorn.core.version>3.3.0-SNAPSHOT</unicorn.core.version>
-        <maven.compiler.release>17</maven.compiler.release>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <kotlin.version>1.7.22</kotlin.version>
     </properties>
     <!--这个意义不大-->
     <dependencyManagement>
@@ -65,17 +63,10 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-tp-tools</artifactId>
-            <version>${unicorn.core.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -96,17 +87,6 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -134,12 +114,16 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-<!--                    <docker>-->
-<!--                        <host>tcp://10.211.55.140:2375</host>-->
-<!--                    </docker>-->
+                    <docker>
+                        <host>tcp://10.211.55.140:2375</host>
+                    </docker>
                     <image>
                         <env>
                             <BP_JVM_TYPE>JDK</BP_JVM_TYPE>
@@ -172,36 +156,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <source>src/main/java</source>
-                                <source>target/generated-sources/annotations</source>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <jvmTarget>${maven.compiler.release}</jvmTarget>
                 </configuration>
             </plugin>
             <plugin>
