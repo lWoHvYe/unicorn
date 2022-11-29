@@ -3,7 +3,7 @@
         // 抑制compile warn: requires transitive directive for an automatic module
 module lwohvye.unicorn.core {
     requires transitive java.compiler;
-    requires transitive jakarta.servlet;
+    requires transitive org.apache.tomcat.embed.core;
     requires transitive java.sql;
     requires transitive jakarta.persistence;
     requires transitive jakarta.validation;

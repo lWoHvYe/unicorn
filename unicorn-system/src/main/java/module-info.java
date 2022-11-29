@@ -21,7 +21,7 @@ module lwohvye.unicorn.system {
     requires easy.captcha;
     requires ganymed.ssh2;
     requires transitive io.netty.common;
-    requires transitive jakarta.websocket;
+    requires transitive org.apache.tomcat.embed.websocket;
     requires transitive jjwt.api;
     requires transitive jjwt.impl;
     requires jsch;
