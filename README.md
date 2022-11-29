@@ -92,7 +92,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### 项目简介
 
-一个基于最新的Java 17版本、 Spring Boot 2.7、 Jpa、 Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
+一个基于最新的Java 17版本、 Spring Boot 3.0、 Jpa、 Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
 
@@ -104,7 +104,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.7。
+- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 3.0。
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持数据字典，可方便地对一些状态进行管理
 - 高效率开发，代码生成器可一键生成前后端代码

@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version>
+        <version>3.0.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -34,10 +34,7 @@
         <unicorn.core.version>3.x-SNAPSHOT</unicorn.core.version>
         <maven.compiler.release>18</maven.compiler.release>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <hikaricp.version>5.0.1</hikaricp.version>
-        <caffeine.version>3.1.1</caffeine.version>
-        <springdoc.openapi.version>1.6.12</springdoc.openapi.version>
-        <kotlin.version>1.7.20</kotlin.version>
+        <kotlin.version>1.7.21</kotlin.version>
     </properties>
     <!--这个意义不大-->
     <dependencyManagement>
@@ -67,20 +64,6 @@
             <version>${unicorn.core.version}</version>
             <optional>true</optional>
         </dependency>
-        <!--   tools模块     -->
-        <!--<dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-tp-tools</artifactId>
-            <version>${unicorn.core.version}</version>
-            <optional>true</optional>
-        </dependency>-->
-        <!-- 代码生成模块 -->
-        <!--<dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-cd-generator</artifactId>
-            <version>${unicorn.core.version}</version>
-            <optional>true</optional>
-        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -108,27 +91,10 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-jdk8</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-coroutines-jdk9</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-kotlin</artifactId>
-            <version>${springdoc.openapi.version}</version>
         </dependency>
     </dependencies>
 

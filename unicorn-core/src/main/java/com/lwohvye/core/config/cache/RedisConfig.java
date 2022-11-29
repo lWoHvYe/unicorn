@@ -36,7 +36,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurerSupport;
+import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.KeyGenerator;
@@ -62,7 +62,7 @@ import java.util.HashMap;
 @EnableCaching
 @ConditionalOnClass(RedisOperations.class)
 @EnableConfigurationProperties(RedisProperties.class)
-public class RedisConfig extends CachingConfigurerSupport {
+public class RedisConfig implements CachingConfigurer {
 
     /**
      * 设置 redis 数据默认过期时间，默认2小时
@@ -124,7 +124,6 @@ public class RedisConfig extends CachingConfigurerSupport {
 
 
     private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
-        var jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         var objectMapper = new ObjectMapper();
         // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -161,8 +160,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         // 使用自定义的实现TypeSerializer和TypeDeserializer
         // 必须设置，否则无法将JSON转化为对象，会转化成Map类型。指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会抛出异常（使用NON_FINAL时）
         objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
-        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
-        return jackson2JsonRedisSerializer;
+        return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
     }
 
     /**

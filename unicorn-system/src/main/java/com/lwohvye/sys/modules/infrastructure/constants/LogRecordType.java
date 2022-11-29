@@ -16,15 +16,22 @@
 
 package com.lwohvye.sys.modules.infrastructure.constants;
 
+
 /**
  * @author muzhantong
  * create on 2020/4/30 10:56 上午
  */
 public class LogRecordType {
 
-    public static final String PORTAL = "PORTAL";
+    private LogRecordType() {
+        throw new IllegalStateException("Utility class");
+    }
 
-    public static final String SYS_ADMIN = "SYS_ADMIN";
+    public static final String PORTAL = "Portal";
 
-    public static final String FOUNDATIONAL = "FOUNDATIONAL";
+    public static final String SYS_ADMIN = "SysAdmin";
+
+    public static final String FOUNDATIONAL = "Foundational";
+
+    public static final String FUNCTIONAL = "Functional";
 }

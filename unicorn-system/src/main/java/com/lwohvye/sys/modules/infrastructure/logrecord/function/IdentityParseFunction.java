@@ -21,6 +21,8 @@ import com.mzt.logapi.service.IParseFunction;
 import org.springframework.stereotype.Component;
 
 /**
+ * ParseFunction Demo
+ *
  * @author muzhantong
  * create on 2022/1/3 2:43 下午
  */

@@ -22,51 +22,52 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
 /**
-* @author Zheng Jie
-* @date 2019-03-25
-*/
+ * @author Zheng Jie
+ * @date 2019-03-25
+ */
 @Entity
 @Getter
 @Setter
 @Accessors(chain = true)
-@Table(name="sys_dept")
+@Table(name = "sys_dept")
 public class Dept extends BaseEntity implements Serializable {
 
     @Id
     @Column(name = "dept_id")
     @NotNull(groups = Update.class)
-    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "depts")
-    @Schema(description = "角色" )
+    @Schema(description = "角色")
     private Set<Role> roles;
 
-    @Schema(description = "排序" )
+    @Schema(description = "排序")
     private Integer deptSort;
 
     @NotBlank
-    @Schema(description = "部门名称" )
+    @Schema(description = "部门名称")
     private String name;
 
     @NotNull
-    @Schema(description = "是否启用" )
+    @Schema(description = "是否启用")
     private Boolean enabled;
 
-    @Schema(description = "上级部门" )
+    @Schema(description = "上级部门")
     private Long pid;
 
-    @Schema(description = "子节点数目" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "子节点数目", accessMode = Schema.AccessMode.READ_ONLY)
     private Integer subCount = 0;
 
     @Override
@@ -79,7 +80,7 @@ public class Dept extends BaseEntity implements Serializable {
         }
         Dept dept = (Dept) o;
         return Objects.equals(id, dept.id) &&
-                Objects.equals(name, dept.name);
+               Objects.equals(name, dept.name);
     }
 
     @Override

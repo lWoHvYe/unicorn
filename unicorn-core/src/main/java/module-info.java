@@ -3,10 +3,10 @@
         // 抑制compile warn: requires transitive directive for an automatic module
 module lwohvye.unicorn.core {
     requires transitive java.compiler;
-    requires transitive java.servlet;
+    requires transitive jakarta.servlet;
     requires transitive java.sql;
-    requires transitive java.persistence;
-    requires transitive java.validation;
+    requires transitive jakarta.persistence;
+    requires transitive jakarta.validation;
     requires jdk.incubator.concurrent;
     requires jdk.incubator.vector;
     requires transitive jdk.unsupported;

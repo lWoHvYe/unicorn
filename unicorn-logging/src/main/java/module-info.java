@@ -7,7 +7,7 @@ module lwohvye.unicorn.logging {
     exports com.lwohvye.log.domain;
     exports com.lwohvye.log.rabbitmq;
     exports com.lwohvye.log.repository to spring.beans;
-    exports com.lwohvye.log.rest to spring.beans, spring.web;
+    exports com.lwohvye.log.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.log.service;
     exports com.lwohvye.log.service.dto;
     exports com.lwohvye.log.service.impl to spring.beans;

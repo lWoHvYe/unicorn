@@ -18,8 +18,8 @@ package com.lwohvye.search.modules.sp.domain;
 
 import com.blazebit.persistence.CTE;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @CTE
 @Entity

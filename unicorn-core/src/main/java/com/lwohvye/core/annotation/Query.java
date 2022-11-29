@@ -21,6 +21,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 查询注解，针对查询的main-table,
+ * field `propName` define the queryFieldName (can be a field in the joined entity, will use the filed name if null)
+ * field `type` define the queryType, equal,like,greater_than,less_than,...
+ * field `join` define the table-join-type, left,right,inner, tips: will use the fields defined in the @JoinTable/@JoinColum to do join
+ * field `joinName` define the joined-table-name in the main-entity (can't be null for join)
+ *
  * @author Zheng Jie, lWoHvYe
  * @date 2019-6-4 13:52:30
  */
@@ -28,19 +34,25 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Query {
 
-    // Dong ZhaoYang 2017/8/7 基本对象的属性名
+    /**
+     * 查询对象的属性名，可以是main-entity中的，也可以是joined-entity中的，为null时使用filedName
+     */
     String propName() default "";
 
-    // Dong ZhaoYang 2017/8/7 查询方式
+    /**
+     * 查询方式，默认equal
+     */
     Type type() default Type.EQUAL;
 
     /**
-     * 连接查询的属性名，如User类中的dept
+     * 连接查询的属性名，如User类中的dept，
+     * 支持嵌套，比如要根据Role中Menu的title来查User，可set该field为 roles>menus，并将propName set为title即可，这个可预见的有不少使用场景
+     * 连接查询中不可为null，使用@JoinTable/@JoinColum中配置的属性进行tableJoin
      */
     String joinName() default "";
 
     /**
-     * 默认左连接
+     * 连接类型，默认左连接
      */
     Join join() default Join.LEFT;
 
@@ -49,7 +61,9 @@ public @interface Query {
      */
     String blurry() default "";
 
-    // 库函数名
+    /**
+     * 库函数名，做库函数调用，注意其使用方式(要对调用结果做上层逻辑)
+     */
     String functionName() default "";
 
     enum Type {
@@ -91,8 +105,6 @@ public @interface Query {
         , EQUAL_IN_MULTI
         // why 这个看起来比上面的 EQUAL_IN_MULTI 要优雅一些，且需注意上面这个用的or查询，若对应列无索引会导致所有的索引失效（用 and 连接的其他条件也不走索引,另外有双端模糊不清楚影响情况），而这个因为用了库函数，该列的索引是失效的，所以看情况选择吧
         , FUNCTION_FIND_IN_SET
-        // why 原连接查询都是单条件的。针对业务，多条件连接查询，QueryCriteria中使用一个实体来承载属性
-        , @Deprecated(since = "3.1.0", forRemoval = true) EQUAL_IN_MULTI_JOIN //2022-07-28 这个的设计，主要是当初无法解决对同一个entity配置多个join就join多次的问题，当前已解决，所以deprecated该查询方式
         // why 2021/11/07 from_base64函数。当前函数只能对属性使用，不能对值使用
         // , FUNCTION_FROM_BASE64
         // why 2021/11/07 库函数，做相等查询

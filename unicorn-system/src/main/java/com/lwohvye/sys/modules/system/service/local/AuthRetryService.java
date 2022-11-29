@@ -17,12 +17,12 @@ package com.lwohvye.sys.modules.system.service.local;
 
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.remoting.RemoteAccessException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
 
@@ -56,7 +56,7 @@ public class AuthRetryService {
         RetryTemplate template = RetryTemplate.builder()
                 .maxAttempts(3)
                 .fixedBackoff(1000)
-                .retryOn(RemoteAccessException.class)
+                .retryOn(RestClientException.class)
                 .build();
 
         template.execute(ctx -> {

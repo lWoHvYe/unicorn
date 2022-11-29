@@ -28,3 +28,5 @@ updates:
       - dependency-name: "com.aliyun.oss:aliyun-sdk-oss"
       - dependency-name: "com.aliyun:dysmsapi20170525"
       - dependency-name: "net.dreamlu:mica-ip2region"
+      - dependency-name: "com.github.oshi:oshi-core"
+      - dependency-name: "nl.basjes.parse.useragent:yauaa"

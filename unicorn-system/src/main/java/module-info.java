@@ -4,7 +4,7 @@ module lwohvye.unicorn.system {
 
     requires transitive java.desktop;
     requires transitive java.management;
-    requires transitive java.annotation;
+    requires transitive jakarta.annotation;
     requires transitive java.scripting;
     requires jdk.incubator.concurrent;
     requires jdk.incubator.vector;
@@ -21,14 +21,13 @@ module lwohvye.unicorn.system {
     requires easy.captcha;
     requires ganymed.ssh2;
     requires transitive io.netty.common;
-    requires transitive jakarta.websocket.api;
+    requires transitive jakarta.websocket;
     requires transitive jjwt.api;
     requires transitive jjwt.impl;
     requires jsch;
     requires transitive org.apache.commons.io;
     requires transitive quartz;
 
-    // requires transitive jsr305; //这个里有内容与java.annotation包名重复了
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
     exports com.lwohvye.sys.common.annotation;
@@ -37,13 +36,13 @@ module lwohvye.unicorn.system {
     exports com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.beans;
     exports com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.beans;
     exports com.lwohvye.sys.modules.mnt.repository to spring.beans;
-    exports com.lwohvye.sys.modules.mnt.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.mnt.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.mnt.service;
     exports com.lwohvye.sys.modules.mnt.service.mapstruct;
     exports com.lwohvye.sys.modules.mnt.util;
     exports com.lwohvye.sys.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
     exports com.lwohvye.sys.modules.quartz.repository; // 若要使用JRebel + XRebel，则需要exports to unnamed module
-    exports com.lwohvye.sys.modules.quartz.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.quartz.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.quartz.service;
     exports com.lwohvye.sys.modules.quartz.task to spring.beans;
     exports com.lwohvye.sys.modules.quartz.utils to spring.beans;
@@ -54,14 +53,14 @@ module lwohvye.unicorn.system {
     exports com.lwohvye.sys.modules.security.security;
     exports com.lwohvye.sys.modules.security.security.filter;
     exports com.lwohvye.sys.modules.security.security.handler;
-    exports com.lwohvye.sys.modules.security.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.security.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.system.annotation;
     exports com.lwohvye.sys.modules.system.enums;
     exports com.lwohvye.sys.modules.system.strategy;
     exports com.lwohvye.sys.modules.system.event;
-    exports com.lwohvye.sys.modules.system.rest to spring.beans, spring.web;
+    exports com.lwohvye.sys.modules.system.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.system.service;
-    exports com.lwohvye.sys.modules.system.service.impl to spring.beans, spring.context, hutool.all;
+    exports com.lwohvye.sys.modules.system.service.impl to spring.beans, spring.context, spring.aop, hutool.all;
     exports com.lwohvye.sys.modules.system.service.version to spring.beans;
     exports com.lwohvye.sys.modules.system.service.local;
     exports com.lwohvye.sys.modules.system.service.mapstruct;

@@ -112,15 +112,9 @@
             <artifactId>log4jdbc-log4j2-jdbc4.1</artifactId>
         </dependency>
 
-        <!--    enable the support of spring Pageable Type    -->
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-data-rest</artifactId>
-        </dependency>
-        <!--   enable javadoc support     -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-javadoc</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
         <!--    swagger-core依赖该包，部分原因，需单独升级依赖版本    -->
         <dependency>
@@ -185,12 +179,6 @@
         <dependency>
             <groupId>org.mapstruct.extensions.spring</groupId>
             <artifactId>mapstruct-spring-extensions</artifactId>
-        </dependency>
-
-        <!--   具体可以看看这个，https://jcp.org/en/jsr/detail?id=330     -->
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
         </dependency>
 
         <dependency>

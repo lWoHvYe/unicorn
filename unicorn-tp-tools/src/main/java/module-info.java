@@ -9,7 +9,7 @@ module lwohvye.unicorn.tp_tools {
     exports com.lwohvye.tools.config to spring.beans, spring.context;
     exports com.lwohvye.tools.domain.vo;
     exports com.lwohvye.tools.repository to spring.beans;
-    exports com.lwohvye.tools.rest to spring.beans, spring.web;
+    exports com.lwohvye.tools.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.tools.service;
     exports com.lwohvye.tools.service.dto;
     exports com.lwohvye.tools.service.impl;

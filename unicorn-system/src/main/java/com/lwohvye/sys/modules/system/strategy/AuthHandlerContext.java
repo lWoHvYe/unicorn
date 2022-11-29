@@ -53,6 +53,8 @@ public class AuthHandlerContext {
 
     // BeanPostProcessor是在spring容器加载了bean的定义文件并且实例化bean之后执行的。BeanPostProcessor的执行顺序是在BeanFactoryPostProcessor之后。
     // 当使用BeanFactoryPostProcessor来注入属性时，这个后置处理是不会执行到的
+    // Because AOP auto-proxying is implemented as a BeanPostProcessor itself, neither BeanPostProcessor instances nor the beans they directly reference
+    // are eligible for auto-proxying and, thus, do not have aspects woven into them.
     // @PostConstruct
     // public void doInit() {
     // }

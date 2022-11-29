@@ -21,7 +21,7 @@ import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
