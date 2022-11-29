@@ -32,9 +32,8 @@
     <properties>
         <java.version>19</java.version>
         <unicorn.core.version>3.x-SNAPSHOT</unicorn.core.version>
-        <maven.compiler.release>18</maven.compiler.release>
+        <maven.compiler.release>19</maven.compiler.release>
         <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <kotlin.version>1.7.21</kotlin.version>
     </properties>
     <!--这个意义不大-->
     <dependencyManagement>
@@ -84,17 +83,6 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -185,36 +173,6 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <source>src/main/java</source>
-                                <source>target/generated-sources/annotations</source>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <jvmTarget>${maven.compiler.release}</jvmTarget>
-                </configuration>
-            </plugin>
-            <plugin>
                 <!-- 这里主要为lombok和mapstruct的配置。 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -256,9 +214,9 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
-<!--                    <compilerArgs>-->
-<!--                        <arg>&#45;&#45;enable-preview</arg>-->
-<!--                    </compilerArgs>-->
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <!-- jar包内剔除所有配置文件 -->
