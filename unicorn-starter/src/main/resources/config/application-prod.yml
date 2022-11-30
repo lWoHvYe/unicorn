@@ -186,7 +186,7 @@ springdoc:
 # ===== 自定义swagger配置 ===== #
 swagger:
   application-name: ${spring.application.name}
-  application-version: 3.2.0
+  application-version: 3.3.0
   application-description: 1101100_1010111_1101111_1001000_1110110_1011001_1100101
   try-host: http://localhost:${server.port}
 
