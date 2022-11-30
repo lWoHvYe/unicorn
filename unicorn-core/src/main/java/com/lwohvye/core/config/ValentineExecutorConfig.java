@@ -16,10 +16,10 @@
 
 package com.lwohvye.core.config;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 
@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
  * Running Spring Applications on Virtual Threads
  * <a href="https://spring.io/blog/2022/10/11/embracing-virtual-threads">embracing virtual threads</a>
  */
-@Configuration
+@AutoConfiguration
 public class ValentineExecutorConfig {
 
     /**

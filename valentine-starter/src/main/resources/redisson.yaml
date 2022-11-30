@@ -24,11 +24,11 @@ singleServerConfig:
   # 发布和订阅连接的最小空闲连接数
   subscriptionConnectionMinimumIdleSize: 2
   # 发布和订阅连接池大小
-  subscriptionConnectionPoolSize: 16
+  subscriptionConnectionPoolSize: 8
   # 最小空闲连接数
-  connectionMinimumIdleSize: 8
+  connectionMinimumIdleSize: 4
   # 连接池大小
-  connectionPoolSize: 16
+  connectionPoolSize: 8
   # 数据库编号
   database: 6
   # DNS监测时间间隔，单位：毫秒

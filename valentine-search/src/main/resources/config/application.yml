@@ -32,6 +32,9 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
+  autoconfigure:
+    # to use VT, should exclude this
+    exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
 
 #  # 全局懒加载。
 #  main:
