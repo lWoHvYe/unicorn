@@ -20,9 +20,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 
 /**
@@ -44,43 +45,43 @@ public class QuartzJob extends BaseEntity implements Serializable {
     private Long id;
 
     @Transient
-    @Schema(description = "用于子任务唯一标识" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "用于子任务唯一标识", accessMode = Schema.AccessMode.READ_ONLY)
     private String uuid;
 
-    @Schema(description = "定时器名称" )
+    @Schema(description = "定时器名称")
     private String jobName;
 
     @NotBlank
-    @Schema(description = "Bean名称" )
+    @Schema(description = "Bean名称")
     private String beanName;
 
     @NotBlank
-    @Schema(description = "方法名称" )
+    @Schema(description = "方法名称")
     private String methodName;
 
-    @Schema(description = "参数" )
+    @Schema(description = "参数")
     private String params;
 
     @NotBlank
-    @Schema(description = "cron表达式" )
+    @Schema(description = "cron表达式")
     private String cronExpression;
 
-    @Schema(description ="状态，暂时或启动")
+    @Schema(description = "状态，暂时或启动")
     private Boolean isPause = false;
 
-    @Schema(description = "负责人" )
+    @Schema(description = "负责人")
     private String personInCharge;
 
-    @Schema(description = "报警邮箱" )
+    @Schema(description = "报警邮箱")
     private String email;
 
-    @Schema(description = "子任务" )
+    @Schema(description = "子任务")
     private String subTask;
 
-    @Schema(description = "失败后暂停" )
+    @Schema(description = "失败后暂停")
     private Boolean pauseAfterFailure;
 
     @NotBlank
-    @Schema(description = "备注" )
+    @Schema(description = "备注")
     private String description;
 }

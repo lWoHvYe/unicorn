@@ -56,7 +56,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @date 2021/11/9 10:05 下午
      */
     @Override
-    @EntityGraph(value = "User-Details")
+    // @EntityGraph(value = "User-Details") // 11-26，这个加入意义不大，且对查询注解的Test造成mistake，故注释掉
     Page<User> findAll(@Nullable Specification<User> spec, Pageable pageable);
 
     @Override

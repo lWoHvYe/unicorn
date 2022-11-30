@@ -16,14 +16,6 @@
 
 ---
 本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
-```
-11-12 update
-整合 SpringBoot 3.0.0-RC2 at branch `integrate-boot3.0-dev`
-- Completed: 初步整合及调试
-- TODO: Boot 3.0/Framework 6.0 Deprecated WT Upgrade (eg:SpringSecurity, DataRedis)
-- 部分3rd Component未Support，Redisson, Captche(pre-build), Swagger... (RedissonConnect init报错，使用RedisTemplete的操作无法使用，基于Annotation的Cache正常)
-
-```
 
 启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](unicorn-starter/src/main/resources)
 详见 [unicorn-starter](unicorn-starter) 模块。[启停脚本](script)。 You can find the minimum to run in [Valentine's Day](valentine-starter).
@@ -100,7 +92,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### 项目简介
 
-一个基于最新的Java 17版本、 Spring Boot 2.7、 Jpa、 Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
+一个基于最新的Java 17版本、 Spring Boot 3.0、 Jpa、 Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
 
@@ -112,7 +104,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 2.7。
+- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 3.0。
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持数据字典，可方便地对一些状态进行管理
 - 高效率开发，代码生成器可一键生成前后端代码

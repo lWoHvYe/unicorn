@@ -20,10 +20,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,8 +40,9 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @ConditionalOnExpression("${local.sys.multi-security:false}")
 @Slf4j
-@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true, securedEnabled = true)
+@EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 @EnableWebSecurity
+@Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 // Spring Security 5.4开始，新的定义方式 https://github.com/spring-projects/spring-security/issues/8804
 public class CustomSpringBootWebSecurityConfiguration {
@@ -94,7 +96,7 @@ public class CustomSpringBootWebSecurityConfiguration {
         var context = http.getSharedObject(ApplicationContext.class);
         var daoAuthenticationProvider4Admin = context.getBean("daoAuthenticationProvider4Admin", AuthenticationProvider.class);
         // 根据需求自行定制。首个antMatcher指定了该配置生效的范围
-        return http.antMatcher("/admin/v2")
+        return http.securityMatcher("/admin/v2")
                 .authenticationProvider(daoAuthenticationProvider4Admin)
                 .sessionManagement(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
@@ -125,7 +127,7 @@ public class CustomSpringBootWebSecurityConfiguration {
         var context = http.getSharedObject(ApplicationContext.class);
         var daoAuthenticationProvider4App = context.getBean("daoAuthenticationProvider4App", AuthenticationProvider.class);
         // 根据需求自行定制。首个antMatcher指定了该配置生效的范围
-        return http.antMatcher("/app/v2")
+        return http.securityMatcher("/app/v2")
                 .authenticationProvider(daoAuthenticationProvider4App)
                 .sessionManagement(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())

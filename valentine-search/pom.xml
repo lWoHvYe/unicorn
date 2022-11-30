@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version>
+        <version>3.0.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -34,8 +34,7 @@
         <project.core.version>3.2.0-SNAPSHOT</project.core.version>
         <maven.compiler.release>17</maven.compiler.release>
         <lombok.version>1.18.24</lombok.version>
-        <mapstruct.version>1.5.2.Final</mapstruct.version>
-        <caffeine.version>3.1.1</caffeine.version>
+        <mapstruct.version>1.5.3.Final</mapstruct.version>
         <querydsl.version>5.0.0</querydsl.version>
         <blaze-persistence.version>1.6.6</blaze-persistence.version>
         <auto-service.version>1.0.1</auto-service.version>

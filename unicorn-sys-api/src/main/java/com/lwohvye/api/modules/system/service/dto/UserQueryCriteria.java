@@ -16,10 +16,9 @@
 package com.lwohvye.api.modules.system.service.dto;
 
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.api.modules.system.domain.Role;
+import com.lwohvye.core.annotation.Query;
 import com.lwohvye.core.utils.StringUtils;
 import lombok.Data;
-import com.lwohvye.core.annotation.Query;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -56,9 +55,16 @@ public class UserQueryCriteria implements Serializable {
     @Query(propName = "username", type = Query.Type.IN_INNER_LIKE)
     private List<String> usernames;
 
-    //    前端通过role.field传多个属性。在同一join里通过多条件过滤。针对long类型值为-1的，做is null查询。
-    @Query(propName = "role", type = Query.Type.EQUAL_IN_MULTI_JOIN, joinName = "roles")
-    private Role role;
+    // region multiQuery in single joinTable Test
+    @Query(propName = "code", type = Query.Type.INNER_LIKE, joinName = "roles")
+    private String roleCode;
+
+    @Query(propName = "level", type = Query.Type.GREATER_THAN, joinName = "roles")
+    private Long roleLevel;
+
+    @Query(propName = "enabled", type = Query.Type.GREATER_THAN, joinName = "roles>depts")
+    private Boolean roleDeptEnable;
+    // endregion
 
     // 库中使用Base64存储，做模糊查询（业务不建议。因为无法使用索引，效率很低，这里只是提供一种调用库函数的方式）
     @Query(type = Query.Type.FUNCTION_4_EQUAL, functionName = "from_base64")

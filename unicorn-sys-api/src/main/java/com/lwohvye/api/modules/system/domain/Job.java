@@ -21,40 +21,41 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
-* @author Zheng Jie
-* @date 2019-03-29
-*/
+ * @author Zheng Jie
+ * @date 2019-03-29
+ */
 @Entity
 @Getter
 @Setter
 @Accessors(chain = true)
-@Table(name="sys_job")
+@Table(name = "sys_job")
 public class Job extends BaseEntity implements Serializable {
 
     @Id
     @Column(name = "job_id")
     @NotNull(groups = Update.class)
-    @Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
-    @Schema(description = "岗位名称" )
+    @Schema(description = "岗位名称")
     private String name;
 
     @NotNull
-    @Schema(description = "岗位排序" )
+    @Schema(description = "岗位排序")
     private Long jobSort;
 
     @NotNull
-    @Schema(description = "是否启用" )
+    @Schema(description = "是否启用")
     private Boolean enabled;
 
     @Override

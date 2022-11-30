@@ -19,15 +19,16 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.core.annotation.DataPermission;
 import com.lwohvye.core.annotation.Query;
+import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.Id;
-import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Zheng Jie, lWoHvYe
@@ -47,7 +48,7 @@ public class QueryHelp {
      * @param query Q 外部的criteria对象
      * @param cb    CriteriaBuilder工厂类，用于创建查询的criteriaQuery对象
      *              Predicate查询条件的拼接对应于where后面的添加表达式
-     * @return javax.persistence.criteria.Predicate
+     * @return jakarta.persistence.criteria.Predicate
      * @date 2021/3/31 11:57
      */
     public static <R, Q> Predicate getPredicate(Root<R> root, Q query, CriteriaBuilder cb) {
@@ -138,7 +139,7 @@ public class QueryHelp {
      * @param root /
      * @param q    /
      * @param val  /
-     * @return javax.persistence.criteria.Join
+     * @return jakarta.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
     @Nullable
@@ -300,59 +301,6 @@ public class QueryHelp {
                 // select * from table where FIND_IN_SET('str', list); // 这种也可以
                 // 需注意，调用function后会产生结果，在外层要指定对结果的使用
                     list.add(cb.greaterThan(cb.function("FIND_IN_SET", Integer.class, cb.literal(val.toString()), getExpression(attributeName, join, root)), 0));
-            case EQUAL_IN_MULTI_JOIN -> {
-//                            该注解只针对Join查询。非join不处理
-                if (Objects.isNull(join))
-                    break;
-                var arrayList = new ArrayList<Predicate>();
-//                            val是一个实体。里面有多个属性。将其中非空的属性配置进去
-                for (Field fieldInVal : ReflectUtil.getFields(val.getClass())) {
-                    var fieldValue = ReflectUtil.getFieldValue(val, fieldInVal);
-                    if (ObjectUtils.isNotEmpty(fieldValue)) {
-                        Predicate predicate;
-//                                    Id注解，只会出现在主键上
-                        var idAnnotation = fieldInVal.getAnnotation(Id.class);
-//                                    In查询通过Query注解的propName指定映射的属性
-                        var queryAnnotation = fieldInVal.getAnnotation(Query.class);
-//                                    如果在实体属性上配置了Query注解，需解析Query注解，确定查询方式
-                        var fieldInValType = fieldInVal.getType();
-                        if (Objects.nonNull(queryAnnotation)) {
-                            var queryType = queryAnnotation.type();
-                            var queryAttrName = defineAttrName(fieldInVal, queryAnnotation);
-                            predicate = switch (queryType) {
-                                case EQUAL -> cb.equal(getExpression(queryAttrName, join, root).as(fieldInValType), fieldValue);
-                                case NOT_EQUAL -> cb.notEqual(getExpression(queryAttrName, join, root), fieldValue);
-                                case INNER_LIKE -> cb.like(getExpression(queryAttrName, join, root).as(String.class), "%" + fieldValue + "%");
-                                case IN -> getExpression(queryAttrName, join, root).in((Collection<?>) fieldValue);
-                                case NOT_IN -> cb.not(getExpression(queryAttrName, join, root).in((Collection<?>) fieldValue));
-                                default -> throw new RuntimeException("暂不支持该类型，请期待后续支持：" + queryType);
-                            };
-//                                    String类型使用Inner like
-                        } else if (fieldValue instanceof String str) {
-                            predicate = cb.like(getExpression(fieldInVal.getName(), join, root).as(String.class), "%" + str + "%");
-                            // 传-1L时。做is null查询。额外限制为当对应属性上有id注解的时候。
-                            // 2021/4/2 当使用IS NULL查询时，同join的其他查询条件会导致无结果。故先只让该is null查询生效。
-                            // 2021/4/6 经考虑，IS NULL类查询更建议使用其他的方式来完成。 EQUAL_IN_MULTI_JOIN注解主要用在多条件join上（不包括is null）
-                            // 针对与is null的需求，可以考虑视图。这种一般不需要太多张表。后续会探讨如何将join的相关筛选放在on 后面
-                            // 2021/11/07 解决了多join问题后，该注解的功能可由原配置多个join来实现。不再进行扩展
-                        } else if (fieldValue instanceof Long && Objects.equals(fieldValue, -1L) && Objects.nonNull(idAnnotation)) {
-                            predicate = cb.isNull(getExpression(fieldInVal.getName(), join, root).as(fieldInValType));
-                            // 下面这三行，主体是因为，若使用了isNull，则不能再设置该join实体的其他查询，所以跳出
-                            list.add(predicate);
-//                              安全起见。清空一下。避免在循环结束的list.add()那里，再被加进去
-                            arrayList.clear();
-                            break;
-                        } else {
-//                                    其他的走等于
-                            predicate = cb.equal(getExpression(fieldInVal.getName(), join, root).as(fieldInValType), fieldValue);
-                        }
-                        if (Objects.nonNull(predicate))
-                            arrayList.add(predicate);
-                    }
-                }
-                if (CollUtil.isNotEmpty(arrayList))
-                    list.add(cb.and(arrayList.toArray(new Predicate[0])));
-            }
 //            case FUNCTION_FROM_BASE64:
             // where (from_base64(user0_.description) like to_base64(user0_.description))。如何设置to_base64的参数为 fieldValue，是接下来的事情
             //    list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)), cb.function("to_base64", fieldType, getExpression(attributeName, join, root)))); // 多个是支持的

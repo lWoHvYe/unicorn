@@ -22,39 +22,40 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.Set;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author zhanghouying
+ * @date 2019-08-24
+ */
 @Entity
 @Getter
 @Setter
-@Table(name="mnt_deploy")
+@Table(name = "mnt_deploy")
 public class Deploy extends BaseEntity implements Serializable {
 
     @Id
-	@Column(name = "deploy_id")
-	@Schema(description = "ID" , accessMode = Schema.AccessMode.READ_ONLY)
+    @Column(name = "deploy_id")
+    @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-	@ManyToMany
-	@Schema(description = "服务器", accessMode = Schema.AccessMode.READ_ONLY)
-	@JoinTable(name = "mnt_deploy_server",
-			joinColumns = {@JoinColumn(name = "deploy_id",referencedColumnName = "deploy_id")},
-			inverseJoinColumns = {@JoinColumn(name = "server_id",referencedColumnName = "server_id")})
-	private Set<ServerDeploy> deploys;
+    @ManyToMany
+    @Schema(description = "服务器", accessMode = Schema.AccessMode.READ_ONLY)
+    @JoinTable(name = "mnt_deploy_server",
+            joinColumns = {@JoinColumn(name = "deploy_id", referencedColumnName = "deploy_id")},
+            inverseJoinColumns = {@JoinColumn(name = "server_id", referencedColumnName = "server_id")})
+    private Set<ServerDeploy> deploys;
 
-	@ManyToOne
+    @ManyToOne
     @JoinColumn(name = "app_id")
-	@Schema(description = "应用编号" )
+    @Schema(description = "应用编号")
     private App app;
 
-    public void copy(Deploy source){
-        BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
+    public void copy(Deploy source) {
+        BeanUtil.copyProperties(source, this, CopyOptions.create().setIgnoreNullValue(true));
     }
 }

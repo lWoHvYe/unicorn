@@ -16,10 +16,10 @@
 package com.lwohvye.api.modules.quartz.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 

@@ -25,9 +25,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.server.PathContainer;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
+import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.method.HandlerMethod;
@@ -38,7 +39,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,9 +52,10 @@ import java.util.stream.Stream;
  *
  * @author Hongyan Wang
  * @date 2021/11/27 2:45 下午
+ * @since 6.0 改由AuthorizationManager 调用，不再基于Filter
  */
 @RequiredArgsConstructor
-public class CustomFilterInvocationSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
+public final class CustomInvocationSecurityMetadataSource implements SecurityMetadataSource {
 
     PathMatcher antPathMatcher = new AntPathMatcher();  //用来实现ant风格的Url匹配
 
@@ -72,9 +75,9 @@ public class CustomFilterInvocationSecurityMetadataSource implements FilterInvoc
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
 
-        var fi = (FilterInvocation) object;
-        var url = fi.getRequestUrl(); // 获取当前请求的Url
-        var httpMethod = fi.getRequest().getMethod(); // 请求方法GET、POST、PUT、DELETE
+        var authorizationContext = (RequestAuthorizationContext) object;
+        var url = authorizationContext.getRequest().getRequestURI(); // 获取当前请求的Url
+        var httpMethod = authorizationContext.getRequest().getMethod(); // 请求方法GET、POST、PUT、DELETE
         List<ConfigAttribute> attributes;
         // Lookup your database (or other source) using this information and populate the
         // list of attributes

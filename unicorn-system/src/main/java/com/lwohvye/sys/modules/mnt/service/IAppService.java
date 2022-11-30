@@ -20,7 +20,7 @@ import com.lwohvye.api.modules.mnt.service.dto.AppDto;
 import com.lwohvye.api.modules.mnt.service.dto.AppQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

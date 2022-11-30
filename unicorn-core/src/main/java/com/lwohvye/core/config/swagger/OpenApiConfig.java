@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RedissonClient;
-import org.springdoc.core.customizers.OpenApiCustomiser;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -130,7 +130,7 @@ public class OpenApiConfig {
      * 添加全局的请求头参数
      */
     @Bean
-    public OpenApiCustomiser customerGlobalHeaderOpenApiCustomiser() {
+    public OpenApiCustomizer customerGlobalHeaderOpenApiCustomizer() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/SpInfo")));
     }
