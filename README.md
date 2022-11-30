@@ -62,7 +62,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### Maven引用方式 🎵
 
-最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
+最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/unicorn.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/unicorn)
 
 **可根据需要选择版本**
 
@@ -78,11 +78,11 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 ```
 
 ```xml
-<!--3.x系列版本为springdoc + 动态权限改造 + JPMS部分改造-->
+<!--3.x系列版本为 Spring Boot 3.0 + springdoc + 动态权限改造 + JPMS部分改造-->
 <dependency>
     <groupId>com.lwohvye</groupId>
-    <artifactId>eladmin</artifactId>
-    <version>3.1.0</version>
+    <artifactId>unicorn</artifactId>
+    <version>3.2.0</version>
     <type>pom</type>
 </dependency>
 
@@ -224,7 +224,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的
   refreshToken
-- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，推测是Spring Boot的 ClassLoader不支持Jigsaw）
+- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，推测是Spring Boot的 ClassLoader下全是Auto-Module）
 - swarm化，可以参考[why-swarm (施工中)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO
