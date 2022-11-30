@@ -15,7 +15,7 @@
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
 ---
-本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
+本分支将停留在17版本。另将在`dev_3.x`分支，尝试后续版本的JDK（主要是Virtual Thread），待21中VT GA后，会将其merge到main branch.
 
 启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](unicorn-starter/src/main/resources)
 详见 [unicorn-starter](unicorn-starter) 模块。[启停脚本](script)。 You can find the minimum to run in [Valentine's Day](valentine-starter).
