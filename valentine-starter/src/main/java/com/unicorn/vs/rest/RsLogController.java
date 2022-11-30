@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -85,7 +86,10 @@ public class RsLogController {
     @RespResultBody
     @ApiVersion(3) // 指定从v3开始
     @AnonymousGetMapping(value = {"/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"}) // @RequestMapping的path是支持多个的
-    public ResultInfo<String> indexVersion(@PathVariable String version) {
+    public ResultInfo<String> indexVersion(@PathVariable String version) throws InterruptedException {
+        Thread.sleep(Duration.ofSeconds(1L)); // 使用JMeter  500 * 80，使用VisualVM monitor，只增加十几个thread，整体用时81s，也说明了Fibers/Loom较传统Thread的不同之处，
+        // 随着压力及时间的增长，会逐渐有ForkJoinPool-1-worker-xx的Thread被Create（这部分Thread在free后，会wait一段时间再Terminate），不清楚具体的mechanism，已知的是一个OS Thread可以Manage很多的VisualThread
+        // 另Heap的Use增加了很多，这应该验证了在VT block时，会将stack放到Heap上
         return ResultInfo.success(String.format("Version %s Backend service started successfully", version));
     }
 

@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
  * <a href="https://spring.io/blog/2022/10/11/embracing-virtual-threads">embracing virtual threads</a>
  */
 @Configuration
-public class WebExecutorConfig {
+public class ValentineExecutorConfig {
 
     /**
      * async ThreadPool
