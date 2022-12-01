@@ -38,7 +38,7 @@
         <querydsl.version>5.0.0</querydsl.version>
         <blaze-persistence.version>1.6.6</blaze-persistence.version>
         <auto-service.version>1.0.1</auto-service.version>
-        <kotlin.version>1.7.20</kotlin.version>
+        <kotlin.version>1.7.22</kotlin.version>
     </properties>
 
     <dependencies>

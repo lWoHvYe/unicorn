@@ -18,7 +18,6 @@ package com.lwohvye.core.utils.result;
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.exception.handler.ApiGlobalExceptionHandler;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.domain.Page;
@@ -28,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * 通用返回对象。与统一异常处理。配套的统一异常处理{@link ApiGlobalExceptionHandler}类
+ * 通用返回对象。与统一异常处理。配套的统一异常处理{@link com.lwohvye.core.advice.ResponseResultBodyAdvice}类
  * Created by cy on 2021/01/08.
  */
 @Getter

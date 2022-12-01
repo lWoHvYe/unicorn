@@ -58,7 +58,6 @@ module lwohvye.unicorn.core {
     exports com.lwohvye.core.annotation;
     exports com.lwohvye.core.annotation.log;
     exports com.lwohvye.core.annotation.rest;
-    exports com.lwohvye.core.aop to spring.beans, spring.aop;
     exports com.lwohvye.core.aspect to spring.beans, spring.aop;
     exports com.lwohvye.core.base;
     exports com.lwohvye.core.config;
@@ -68,7 +67,6 @@ module lwohvye.unicorn.core {
     exports com.lwohvye.core.constant;
     exports com.lwohvye.core.context;
     exports com.lwohvye.core.exception;
-    exports com.lwohvye.core.exception.handler;
     exports com.lwohvye.core.utils;
     exports com.lwohvye.core.utils.enums;
     exports com.lwohvye.core.utils.json;

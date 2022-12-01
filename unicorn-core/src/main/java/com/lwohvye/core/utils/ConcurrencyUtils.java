@@ -25,10 +25,16 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class ConcurrencyUtils {
+
+    ConcurrencyUtils() {
+    }
+
+    static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
 
     /**
      * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
@@ -39,7 +45,9 @@ public final class ConcurrencyUtils {
      * @date 2022/9/22 8:26 PM
      */
     public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+        //  The default virtual thread factory can work without enable preview.
+        //  It uses reflection to allow this class be compiled in an incubator module without also enabling preview features.
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
             List<? extends Future<?>> futures = null;
             if (Objects.nonNull(tasks))
                 futures = Arrays.stream(tasks).map(scope::fork).toList();
