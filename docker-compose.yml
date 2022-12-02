@@ -5,6 +5,6 @@ services:
     restart: always
     container_name: valentine-day-8082
     ports:
-      - "8082:8082"
+      - "8082:8081"
     volumes:
       - /root/el_app/8082/log:/unicorn_app/log
