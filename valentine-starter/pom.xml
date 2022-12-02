@@ -115,36 +115,31 @@
     </profiles>
     <!-- 打包 -->
     <build>
-        <finalName>valentine-starter-${unicorn.core.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <docker>
+                        <host>tcp://10.211.55.140:2375</host>
+                    </docker>
+                    <image>
+                        <env>
+                            <BP_JVM_TYPE>JDK</BP_JVM_TYPE>
+                            <BP_JVM_VERSION>19</BP_JVM_VERSION>
+                            <!--下面这个是加了个空格，不然会与原有的参数直接连在一起，导致出错-->
+                            <BPE_DELIM_JAVA_TOOL_OPTIONS xml:space="preserve"> </BPE_DELIM_JAVA_TOOL_OPTIONS>
+                            <!-- 下面这个可以配置多个，每个一项单独配置，但单独配置 enable-preview被ignore了，所以按下面这种方式配了 -->
+                            <BPE_APPEND_JAVA_TOOL_OPTIONS>-XX:+UseZGC --enable-preview</BPE_APPEND_JAVA_TOOL_OPTIONS>
+                        </env>
+                    </image>
                     <excludes>
                         <exclude>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
-                    <includes>
-                        <!-- 不存在的include引用，相当于排除所有maven依赖jar，没有任何三方jar文件打入输出jar -->
-                        <include>
-                            <groupId>nothing</groupId>
-                            <artifactId>nothing</artifactId>
-                        </include>
-                    </includes>
-                    <layout>DIR</layout>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <!--这样打出的jar有两个，一个是没把sb相关打进去的.jar和一个打进去的exec.jar，如果是作为被引用的模块的话，可以这样配置-->
-                        <!--<configuration>
-                            <classifier>exec</classifier>
-                        </configuration>-->
-                    </execution>
-                </executions>
             </plugin>
             <!-- 跳过单元测试 -->
             <plugin>
@@ -153,31 +148,6 @@
                 <configuration>
                     <skipTests>true</skipTests>
                 </configuration>
-            </plugin>
-            <!-- 复制指定配置文件到指定目录 -->
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/resources/config</directory>
-                                    <includes>
-                                        <include>application.yml</include>
-                                        <include>application-${profiles.active}.yml</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${project.build.directory}/config</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <!-- 这里主要为lombok和mapstruct的配置。 -->
@@ -225,43 +195,6 @@
                         <arg>--enable-preview</arg>
                     </compilerArgs>
                 </configuration>
-            </plugin>
-            <!-- jar包内剔除所有配置文件 -->
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <!--   https://maven.apache.org/plugins/maven-jar-plugin/usage.html   -->
-                    <!--   https://maven.apache.org/shared/maven-archiver/examples/classpath.html   -->
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
-                    <!--不打入jar包的文件类型或者路径-->
-                    <!--<excludes>-->
-                    <!--    <exclude>config/**</exclude>-->
-                    <!--</excludes>-->
-                </configuration>
-            </plugin>
-            <!-- 拷贝项目所有依赖jar文件到构建lib目录下 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <excludeTransitive>false</excludeTransitive>
-                            <stripVersion>false</stripVersion>
-                            <silent>true</silent>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
