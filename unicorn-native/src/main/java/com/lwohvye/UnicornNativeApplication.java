@@ -24,9 +24,9 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class UnicornNativeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(UnicornNativeApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(UnicornNativeApplication.class, args);
+    }
 
 	@Bean
 	public SpringContextHolder springContextHolder() {
