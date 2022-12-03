@@ -140,6 +140,9 @@
             <artifactId>lombok</artifactId>
             <!--optional是Maven依赖jar时的一个选项，表示该依赖是可选的，项目之间依赖不传递。不设置optional（默认）或者optional是false，表示传递依赖。-->
             <!--<optional>true</optional>-->
+            <version>${lombok.version}</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/ex-lib/lombok-1.18.25.jar</systemPath>
         </dependency>
 
         <!-- excel工具 -->
