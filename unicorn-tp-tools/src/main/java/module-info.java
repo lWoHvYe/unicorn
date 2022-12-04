@@ -1,19 +1,18 @@
-@SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
+@SuppressWarnings({"requires-automatic"})
 module lwohvye.unicorn.tp_tools {
     requires transitive lwohvye.unicorn.core;
-    requires transitive aliyun.sdk.oss;
-    requires transitive dysmsapi20170525;
     requires spring.context.support;
-    requires tea.openapi;
+    requires software.amazon.awssdk.regions;
+    requires software.amazon.awssdk.services.s3;
+    requires software.amazon.awssdk.transfer.s3;
+    requires software.amazon.awssdk.auth;
 
     exports com.lwohvye.tools.config to spring.beans, spring.context;
     exports com.lwohvye.tools.domain.vo;
     exports com.lwohvye.tools.repository to spring.beans;
     exports com.lwohvye.tools.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.tools.service;
-    exports com.lwohvye.tools.service.dto;
     exports com.lwohvye.tools.service.impl;
-    exports com.lwohvye.tools.service.mapstruct;
     exports com.lwohvye.tools.utils;
 
     opens com.lwohvye.tools.config to spring.core;
@@ -22,6 +21,5 @@ module lwohvye.unicorn.tp_tools {
     opens com.lwohvye.tools.rest to spring.core;
     opens com.lwohvye.tools.service to spring.core;
     opens com.lwohvye.tools.service.impl to spring.core;
-    opens com.lwohvye.tools.service.mapstruct;
     opens com.lwohvye.tools.utils to spring.core;
 }

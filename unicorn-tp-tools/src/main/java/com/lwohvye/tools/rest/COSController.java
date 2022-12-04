@@ -16,7 +16,7 @@
 package com.lwohvye.tools.rest;
 
 import com.lwohvye.core.utils.result.ResultInfo;
-import com.lwohvye.tools.service.IAliyunOSSService;
+import com.lwohvye.tools.service.ICOSService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -34,23 +34,23 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/aliyunOSS")
-@Tag(name = "AliyunOSSController", description = "工具：对象存储OSS")
-public class AliyunOSSController {
+@RequestMapping("/api/awsCOS")
+@Tag(name = "AWSCOSController", description = "工具：对象存储COS")
+public class COSController {
 
-    private final IAliyunOSSService aliyunOSSService;
+    private final ICOSService cosService;
 
     @PostMapping
-    @Operation(summary = "分片上传")
-    public ResultInfo<String> multipartUpload(MultipartFile file) {
-        aliyunOSSService.multipartUploadFile(file);
+    @Operation(summary = "上传")
+    public ResultInfo<String> multipartUpload(MultipartFile file, String cosPath) {
+        cosService.upload(file, cosPath);
         return ResultInfo.success();
     }
 
     @GetMapping
-    @Operation(summary = "断点续传下载")
-    public ResultInfo<String> downloadFile(String ossUri, String downloadPath) {
-        aliyunOSSService.downloadFile(ossUri, downloadPath);
+    @Operation(summary = "下载")
+    public ResultInfo<String> downloadFile(String storePath, String cosPath) {
+        cosService.download(storePath, cosPath);
         return ResultInfo.success();
     }
 

@@ -44,12 +44,14 @@ spring:
     password: admin # rabbitmq的密码
 
   mail:
-    host: xxx.com #SMTP server host
-    username: xxx #login user
+    host: smtp.office365.com #SMTP server host
+    username: xxx@outlook.com #login user
     password: xxx #login password
     properties:
-      from: xxx@xxx.com #发件人（邮箱）
-      to-dev: xxx@oo.com #信息默认接收人（邮箱）
+      mail.smtp.auth: true
+      mail.smtp.timeout: 25000
+      mail.smtp.starttls.enable: true
+      to-dev: xxx@github.com #信息默认接收人（邮箱）
 
 #jwt
 jwt:
@@ -135,14 +137,10 @@ file:
 #  maxSize: 100
 #  avatarMaxSize: 5
 
-# oss配置
-alibaba:
-  cloud:
-    access-key: xx
-    secret-key: xx
-    oss:
-      endpoint: xxx
-      # 自定义属性 bucketName
-      bucket-name: xxx
-      # 自定义属性 filePath
-      file-path: xxx/xxx/
+# cos配置（配合3rd-tools）
+aws:
+  cos:
+    accessKeyId: accessKey
+    secretAccessKey: accessSecret
+    bucketName: S3BucketName
+    region: S3Region

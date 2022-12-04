@@ -122,12 +122,14 @@ spring:
           initial-interval: 5000ms
   ##### 邮箱配置
   mail:
-    host: xxx.com #SMTP server host
-    username: xxx #login user
+    host: smtp.office365.com #SMTP server host
+    username: xxx@outlook.com #login user
     password: xxx #login password
     properties:
-      from: xxx@xxx.com #发件人（邮箱）
-      to-dev: xxx@oo.com #信息默认接收人（邮箱）
+      mail.smtp.auth: true
+      mail.smtp.timeout: 25000
+      mail.smtp.starttls.enable: true
+      to-dev: xxx@github.com #信息默认接收人（邮箱）
 
   servlet:
     multipart:
@@ -219,15 +221,10 @@ file:
 #  maxSize: 100
 #  avatarMaxSize: 5
 
-
-# oss配置
-alibaba:
-  cloud:
-    access-key: xx
-    secret-key: xx
-    oss:
-      endpoint: xx
-      # 自定义属性 bucketName
-      bucket-name: xx
-      # 自定义属性 filePath
-      file-path: xx/xx/
+# cos配置（配合3rd-tools）
+aws:
+  cos:
+    accessKeyId: accessKey
+    secretAccessKey: accessSecret
+    bucketName: S3BucketName
+    region: S3Region
