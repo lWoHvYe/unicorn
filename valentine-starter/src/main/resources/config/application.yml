@@ -45,6 +45,7 @@ logging:
 local:
   sys:
     name: X0X
+    load-os: true
     # 相同服务的各实例会有不同的配置，从而使得一些事件能被各实例都消费一次，理论上有更好地解决方案
     sp-sync-queue: xs.sp-sync.queue
 #    sim-auth: true

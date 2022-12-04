@@ -31,19 +31,16 @@
     <description>Tools and Third Party</description>
 
     <properties>
-        <mail.version>2.1.0</mail.version>
-        <aliyun.oss.version>3.15.2</aliyun.oss.version>
-        <aliyun.dysmsapi.version>2.0.22</aliyun.dysmsapi.version>
-        <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
+        <aws.s3.version>2.18.28</aws.s3.version>
+        <bcprov.jdk18on.version>1.72</bcprov.jdk18on.version>
     </properties>
 
-    <!--  无人维护。其中依赖版本过老，考虑其他方式  -->
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.alibaba.cloud</groupId>
-                <artifactId>aliyun-spring-boot-dependencies</artifactId>
-                <version>1.0.0</version>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${aws.s3.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -63,48 +60,21 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
+
+        <!--   S3     -->
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/s3-transfer-manager -->
         <dependency>
-            <groupId>jakarta.mail</groupId>
-            <artifactId>jakarta.mail-api</artifactId>
-            <version>2.1.0</version>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3-transfer-manager</artifactId>
+            <version>${aws.s3.version}-PREVIEW</version>
         </dependency>
 
-        <!--    对象存储计划改为阿里云OSS  -->
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>aliyun-oss-spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>aliyun-sdk-oss</artifactId>
-                    <groupId>com.aliyun.oss</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.aliyun.oss</groupId>
-            <artifactId>aliyun-sdk-oss</artifactId>
-            <version>${aliyun.oss.version}</version>
-        </dependency>
-
-        <!--   阿里短信通道SMS     -->
-        <!-- https://mvnrepository.com/artifact/com.aliyun/dysmsapi20170525 -->
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>dysmsapi20170525</artifactId>
-            <version>${aliyun.dysmsapi.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpkix-jdk15on</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on -->
+        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on -->
         <!--    用于创建CSR(证书请求)、🔐请求    -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>${bcprov.jdk15on.version}</version>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bcprov.jdk18on.version}</version>
         </dependency>
 
     </dependencies>

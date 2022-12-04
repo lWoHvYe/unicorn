@@ -20,23 +20,24 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * @date 2021年09月05日 16:20
  */
-public interface IAliyunOSSService {
+public interface ICOSService {
 
     /**
      * 分片上传
      *
      * @param file
+     * @param cosPath
      * @date 2021/9/5 17:12
      */
-    void multipartUploadFile(MultipartFile file);
+    void upload(MultipartFile file,String cosPath);
 
     /**
      * 断点续传下载
      *
-     * @param ossUri       oss地址（无前缀）
-     * @param downloadPath (下载路径)
+     * @param storePath (存储路径)
+     * @param cosPath   cos地址（无前缀）
      * @date 2021/9/5 17:12
      */
-    void downloadFile(String ossUri, String downloadPath);
+    void download(String storePath, String cosPath);
 
 }

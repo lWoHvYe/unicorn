@@ -13,22 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.core.config;
+package com.lwohvye.tools.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
-public class AliCloudConfig {
-    public static String ACCESS_KEY_ID;
+@Getter
+@Setter
+@Configuration
+@PropertySource("classpath:cos-config.properties")
+@ConfigurationProperties(prefix = "aws.cos")
+public class AwsCOSProperties {
+    private String accessKeyId;
 
-    public static String ACCESS_KEY_SECRET;
+    private String secretAccessKey;
 
-    @Value("${alibaba.cloud.access-key:}")
-    public void setAccessKeyId(String accessKeyId) {
-        ACCESS_KEY_ID = accessKeyId;
-    }
+    private String bucketName;
 
-    @Value("${alibaba.cloud.secret-key:}")
-    public void setAccessKeySecret(String accessKeySecret) {
-        ACCESS_KEY_SECRET = accessKeySecret;
-    }
+    private String region;
 }

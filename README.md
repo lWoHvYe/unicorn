@@ -148,7 +148,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - `unicorn-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
-- `unicorn-tp-tools` 第三方工具模块，包含：邮件、OSS、SMS、本地存储，可视情况引入
+- `unicorn-tp-tools` 第三方工具模块，包含：邮件、S3，可视情况引入
 
 - `unicorn-cd-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
 

@@ -7,6 +7,9 @@ module lwohvye.unicorn.starter {
     requires org.apache.httpcomponents.httpclient;
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core.jvm;
+    // 如果使用3rd-tools，需要加入下面这两个，不清楚为何在tools中加没生效
+    requires jakarta.mail;
+    requires jakarta.activation;
 
     exports com.lwohvye.starter.config to spring.beans, spring.context, spring.boot;
     exports com.lwohvye.starter.modules.service to spring.aop;

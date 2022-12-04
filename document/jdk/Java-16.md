@@ -178,7 +178,7 @@ java -p mlib -Dloader.path=clib -m lwohvye.eladmin.starter
 
 - ~~在Idea的 Run/Debug Configurations中的VM options中，部分可能需要调一下~~
 - 直接启动报异常，是因为部分依赖无法module化（无法得到 module description，在编译时有相关警告
-  can't extract module name from xxx.jar: Provider class xxx not int module）
+  can't extract module name from xxx.jar: Provider class xxx not in module）
   ，[具体原因](https://stackoverflow.com/questions/54682417/unable-to-derive-module-descriptor-provider-class-x-not-in-module)
 
 ```

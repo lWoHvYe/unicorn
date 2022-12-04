@@ -16,12 +16,13 @@
 package com.lwohvye.tools.utils;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.lwohvye.tools.domain.vo.MailVo;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.StringUtils;
+import com.lwohvye.tools.domain.vo.MailVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +35,12 @@ import java.util.Objects;
 public class MailUtils {
 
     @Autowired
-    private JavaMailSenderImpl mailSender;
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String mailFromUser;
+    @Value("${spring.mail.properties.to-dev}")
+    private String mailToDev;
 
     public MailVo sendMail(MailVo mailVo) {
         try {
@@ -50,7 +56,7 @@ public class MailUtils {
     }
 
     public void sendMail(String to, String subject, String text) {
-        var mailVo = new MailVo().setTo(StringUtils.isBlank(to) ? getMailDefaultTo() : to).setSubject(subject).setText(text);
+        var mailVo = new MailVo().setTo(StringUtils.isBlank(to) ? mailToDev : to).setSubject(subject).setText(text);
         sendMail(mailVo);
     }
 
@@ -69,7 +75,8 @@ public class MailUtils {
     private void sendMimeMail(MailVo mailVo) {
         try {
             var messageHelper = new MimeMessageHelper(mailSender.createMimeMessage(), true);
-            mailVo.setFrom(getMailSendFrom());
+            if (StringUtils.isBlank(mailVo.getFrom()))
+                mailVo.setFrom(mailFromUser);
             messageHelper.setFrom(mailVo.getFrom());
             messageHelper.setTo(mailVo.getTo().split(","));
             messageHelper.setSubject(mailVo.getSubject());
@@ -78,7 +85,7 @@ public class MailUtils {
                 messageHelper.setCc(mailVo.getCc().split(","));
 
             if (StringUtils.isNotBlank(mailVo.getBcc()))
-                messageHelper.setCc(mailVo.getBcc().split(","));
+                messageHelper.setBcc(mailVo.getBcc().split(","));
 
             if (mailVo.getMultipartFiles() != null)
                 for (MultipartFile multipartFile : mailVo.getMultipartFiles())
@@ -95,13 +102,4 @@ public class MailUtils {
             throw new BadRequestException(e.getMessage());
         }
     }
-
-    public String getMailSendFrom() {
-        return mailSender.getJavaMailProperties().getProperty("from");
-    }
-
-    public String getMailDefaultTo() {
-        return mailSender.getJavaMailProperties().getProperty("to-dev");
-    }
-
 }
