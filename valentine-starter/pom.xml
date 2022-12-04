@@ -125,9 +125,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <docker>
-                        <host>tcp://10.211.55.140:2375</host>
-                    </docker>
+<!--                    <docker>-->
+<!--                        <host>tcp://10.211.55.140:2375</host>-->
+<!--                    </docker>-->
                     <image>
                         <env>
                             <BP_JVM_TYPE>JDK</BP_JVM_TYPE>
