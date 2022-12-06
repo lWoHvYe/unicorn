@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -60,7 +61,7 @@ public class ResourceServiceImpl implements IResourceService {
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(ResourceQueryCriteria criteria, Pageable pageable) {
         Page<Resource> page = resourceRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(resource -> conversionService.convert(resource, ResourceDto.class)));
@@ -74,7 +75,7 @@ public class ResourceServiceImpl implements IResourceService {
 
     @Override
     @Cacheable(key = " #root.target.getSysName() + 'allResources' ")
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<ResourceDto> queryAllRes() {
         // 序列化是一个数组，无法反序列化。序列化结果为：[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]
         // return resourceRepository.findAll().stream().map(resource -> conversionService.convert(resource, ResourceDto.class)).toList();
@@ -85,7 +86,7 @@ public class ResourceServiceImpl implements IResourceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public ResourceDto findById(Long resourceId) {
         Resource resource = resourceRepository.findById(resourceId).orElseGet(Resource::new);
         ValidationUtils.isNull(resource.getResourceId(), "Resource", "resourceId", resourceId);

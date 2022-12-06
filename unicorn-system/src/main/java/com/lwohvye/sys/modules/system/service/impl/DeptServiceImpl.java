@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -65,7 +66,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DeptDto> queryAll(Long currentUserId, DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "deptSort");
         String dataScopeType = SecurityUtils.getDataScopeType();
@@ -107,7 +108,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
 
     @Override
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public DeptDto findById(Long id) {
         Dept dept = deptRepository.findById(id).orElseGet(Dept::new);
         ValidationUtils.isNull(dept.getId(), "Dept", "id", id);
@@ -116,14 +117,14 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<Dept> findByPid(long pid) {
         return deptRepository.findByPid(pid);
     }
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Set<Dept> findByRoleId(Long id) {
         return deptRepository.findByRoleId(id);
     }
@@ -189,7 +190,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
 
     @Override
 //    此类List入参的不建议缓存
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Set<DeptDto> getDeleteDepts(List<Dept> menuList, Set<DeptDto> deptDtos) {
         for (Dept dept : menuList) {
             deptDtos.add(conversionService.convert(dept, DeptDto.class));
@@ -202,7 +203,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<Long> getDeptChildren(List<Dept> deptList) {
         var deptIds = deptList.stream().filter(Dept::getEnabled).map(Dept::getId).toList();
         if (deptIds.isEmpty())
@@ -214,7 +215,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DeptDto> getSuperior(DeptDto deptDto, List<Dept> depts) {
         if (deptDto.getPid() == null) {
             depts.addAll(deptRepository.findByPidIsNull());

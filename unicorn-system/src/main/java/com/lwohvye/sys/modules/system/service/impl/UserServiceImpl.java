@@ -54,6 +54,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -112,14 +113,14 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     }*/
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(UserQueryCriteria criteria, Pageable pageable) {
         var page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(user -> conversionService.convert(user, UserDto.class))); // 这里使用toPage，在无符合条件的记录时，也有构筑结果并缓存，也算是一定程度上缓解缓存穿透
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<UserDto> queryAll(UserQueryCriteria criteria) {
         return userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
                 .stream().map(user -> conversionService.convert(user, UserDto.class)).toList();
@@ -136,7 +137,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
 
     @Override
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public UserDto findById(long id) {
         User user = userRepository.findById(id).orElseGet(User::new);
         ValidationUtils.isNull(user.getId(), "User", "id", id);
@@ -261,7 +262,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     @Cacheable(key = " #root.target.getSysName() + 'userInfo:' + #p0")
     public UserDto findByName(String userName) {
         User user = userRepository.findByUsername(userName);
@@ -276,7 +277,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public UserInnerDto findInnerUserByName(String userName) {
         // 方法内调用，Spring aop不会生效，所以若直接调 findByName(String username) 方法不会走缓存
         var user = userRepository.findByUsername(userName);

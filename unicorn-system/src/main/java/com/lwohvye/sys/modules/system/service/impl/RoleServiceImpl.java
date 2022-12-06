@@ -50,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -75,7 +76,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
 
     @Override
     @Cacheable(key = " #root.target.getSysName() + 'all-roles'")
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
         // Unexpected token (START_OBJECT), expected VALUE_STRING: need JSON String that contains type id (for subtype of java.lang.Object)，放人redis的，不要是Stream.toList()，无法decoder
@@ -83,7 +84,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<RoleDto> queryAll(RoleQueryCriteria criteria) {
         return roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
                 .stream().map(role -> conversionService.convert(role, RoleDto.class)).toList();
@@ -91,14 +92,14 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(RoleQueryCriteria criteria, Pageable pageable) {
         Page<Role> page = roleRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(role -> conversionService.convert(role, RoleDto.class)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
 //    当使用root对象的属性作为key时，可以将“#root”省略，因为Spring默认使用的就是root对象的属性。
 //    需注意是 target.xxx 不带前面的 #
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
@@ -173,13 +174,13 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<RoleSmallDto> findByUserId(Long userId) {
         return new ArrayList<>(roleRepository.findByUserId(userId).stream().map(role -> conversionService.convert(role, RoleSmallDto.class)).toList());
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Integer findByRoles(Set<Role> roles) {
         if (roles.isEmpty()) {
             return Integer.MAX_VALUE;
@@ -192,7 +193,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<GrantedAuthority> grantedAuthorityGenHandler(Long userId, Boolean isAdmin) {
         // admin对应1，非admin对应0
         var userType = Boolean.TRUE.equals(isAdmin) ? 1 : 0;
@@ -223,7 +224,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<Role> findInMenuId(List<Long> menuIds) {
         return roleRepository.findInMenuId(menuIds);
     }

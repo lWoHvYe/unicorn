@@ -53,7 +53,7 @@ public class DictDetailServiceImpl implements IDictDetailService {
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(DictDetailQueryCriteria criteria, Pageable pageable) {
         Page<DictDetail> page = dictDetailRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)));
@@ -77,7 +77,7 @@ public class DictDetailServiceImpl implements IDictDetailService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     @Cacheable(key = " #root.target.getSysName() + 'name:' + #p0")
     public List<DictDetailDto> getDictByName(String name) {
         return new ArrayList<>(dictDetailRepository.findByDictName(name).stream().map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)).toList());

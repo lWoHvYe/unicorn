@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -71,21 +72,21 @@ public class DeployServiceImpl implements IDeployService {
 
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(DeployQueryCriteria criteria, Pageable pageable) {
         Page<Deploy> page = deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(deploy -> conversionService.convert(deploy, DeployDto.class)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DeployDto> queryAll(DeployQueryCriteria criteria) {
         return deployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
                 .stream().map(deploy -> conversionService.convert(deploy, DeployDto.class)).toList();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public DeployDto findById(Long id) {
         Deploy deploy = deployRepository.findById(id).orElseGet(Deploy::new);
         ValidationUtils.isNull(deploy.getId(), "Deploy", "id", id);

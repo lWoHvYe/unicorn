@@ -52,14 +52,14 @@ public class DictServiceImpl implements IDictService {
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(DictQueryCriteria criteria, Pageable pageable) {
         Page<Dict> page = dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(dict -> conversionService.convert(dict, DictDto.class)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DictDto> queryAll(DictQueryCriteria criteria) {
         return dictRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
                 .stream().map(dict -> conversionService.convert(dict, DictDto.class)).toList();

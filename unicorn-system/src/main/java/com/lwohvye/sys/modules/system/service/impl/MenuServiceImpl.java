@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -73,7 +74,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<MenuDto> queryAll(MenuQueryCriteria criteria, Boolean isQuery) throws Exception {
         var sort = Sort.by(Sort.Direction.ASC, "menuSort");
         if (Boolean.TRUE.equals(isQuery)) {
@@ -94,7 +95,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
     public MenuDto findById(long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
@@ -109,7 +110,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
      * @return /
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<MenuDto> findByUser(Long currentUserId) {
         List<RoleSmallDto> roles = roleService.findByUserId(currentUserId);
         Set<Long> roleIds = roles.stream().map(RoleSmallDto::getId).collect(Collectors.toSet());
@@ -186,7 +187,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Set<Menu> getChildMenus(List<Menu> menuList, Set<Menu> menuSet) {
         for (Menu menu : menuList) {
             menuSet.add(menu);
@@ -213,7 +214,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<MenuDto> getMenus(Long pid) {
         List<Menu> menus;
         if (pid != null && !pid.equals(0L))
@@ -225,7 +226,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<MenuDto> getSuperior(MenuDto menuDto, List<Menu> menus) {
         if (menuDto.getPid() == null) {
             menus.addAll(menuRepository.findByPidIsNull());
@@ -388,7 +389,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @SneakyThrows
     @Override
     @Cacheable(key = " target.getSysName() + 'menu4user:' + #p0")
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<MenuVo> buildWebMenus(Long uid) {
         CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
                 .thenApply(this::buildTree)
@@ -402,7 +403,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
 
     @Override
     @Cacheable
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Menu findOne(Long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtils.isNull(menu.getId(), "Menu", "id", id);

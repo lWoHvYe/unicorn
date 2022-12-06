@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -49,21 +50,21 @@ public class DeployHistoryServiceImpl implements IDeployHistoryService {
     private final ConversionService conversionService;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(DeployHistoryQueryCriteria criteria, Pageable pageable) {
         Page<DeployHistory> page = deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(deployHistory -> conversionService.convert(deployHistory, DeployHistoryDto.class)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DeployHistoryDto> queryAll(DeployHistoryQueryCriteria criteria) {
         return deployHistoryRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
                 .stream().map(deployHistory -> conversionService.convert(deployHistory, DeployHistoryDto.class)).toList();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public DeployHistoryDto findById(String id) {
         DeployHistory deployhistory = deployHistoryRepository.findById(id).orElseGet(DeployHistory::new);
         ValidationUtils.isNull(deployhistory.getId(), "DeployHistory", "id", id);

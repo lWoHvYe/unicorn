@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -49,21 +50,21 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     private final ConversionService conversionService;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Map<String, Object> queryAll(ServerDeployQueryCriteria criteria, Pageable pageable) {
         Page<ServerDeploy> page = serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), pageable);
         return PageUtils.toPage(page.map(serverDeploy -> conversionService.convert(serverDeploy, ServerDeployDto.class)));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<ServerDeployDto> queryAll(ServerDeployQueryCriteria criteria) {
         return serverDeployRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder))
                 .stream().map(serverDeploy -> conversionService.convert(serverDeploy, ServerDeployDto.class)).toList();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public ServerDeployDto findById(Long id) {
         ServerDeploy server = serverDeployRepository.findById(id).orElseGet(ServerDeploy::new);
         ValidationUtils.isNull(server.getId(), "ServerDeploy", "id", id);
@@ -71,7 +72,7 @@ public class ServerDeployServiceImpl implements IServerDeployService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, readOnly = true)
     public ServerDeployDto findByIp(String ip) {
         ServerDeploy deploy = serverDeployRepository.findByIp(ip);
         return conversionService.convert(deploy, ServerDeployDto.class);
