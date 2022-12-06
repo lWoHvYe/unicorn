@@ -31,7 +31,7 @@
     <description>Tools and Third Party</description>
 
     <properties>
-        <aws.s3.version>2.18.28</aws.s3.version>
+        <aws.s3.version>2.18.31-PREVIEW</aws.s3.version>
         <bcprov.jdk18on.version>1.72</bcprov.jdk18on.version>
     </properties>
 
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3-transfer-manager</artifactId>
-            <version>${aws.s3.version}-PREVIEW</version>
+            <version>${aws.s3.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on -->
