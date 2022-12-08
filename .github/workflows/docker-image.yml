@@ -26,6 +26,9 @@ jobs:
           java-version: '19'
           distribution: 'corretto'
           check-latest: true
+        # add custom dependency to env
+      - name: Extra Custom Env
+        run: mvn install:install-file -DgroupId=org.projectlombok -DartifactId=lombok -Dversion=1.18.25 -Dpackaging=jar -Dfile=ex-lib/lombok.1.18.25.jar
 
       - name: Build Core
         run: mvn -B install --file pom.xml
