@@ -86,7 +86,7 @@ jobs:
 
         # add custom dependency to env
     - name: Extra Custom Env
-      run: mvn install:install-file -DgroupId=org.projectlombok -DartifactId=lombok -Dversion=1.18.25 -Dpackaging=jar -Dfile=ex-lib/lombok.1.18.25.jar
+      run: mvn install:install-file -DgroupId=org.projectlombok -DartifactId=lombok -Dversion=1.18.25 -Dpackaging=jar -Dfile=ex-lib/lombok-1.18.25.jar
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
