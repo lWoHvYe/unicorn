@@ -30,3 +30,4 @@ updates:
       - dependency-name: "net.dreamlu:mica-ip2region"
       - dependency-name: "com.github.oshi:oshi-core"
       - dependency-name: "nl.basjes.parse.useragent:yauaa"
+      - dependency-name: "software.amazon.awssdk:s3-transfer-manager"
