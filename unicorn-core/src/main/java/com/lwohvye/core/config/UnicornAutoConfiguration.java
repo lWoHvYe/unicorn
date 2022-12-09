@@ -22,10 +22,13 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+// using proxy-target-class="true" on <tx:annotation-driven/>, <aop:aspectj-autoproxy/>, or <aop:config/> elements forces the use of CGLIB proxies for all three of them.
+// 这个可以在多处定义，但如果scan的bean重复的话，好像没啥问题
 @ComponentScan("com.lwohvye") // 通过配置这个，启动类的路径不再限制为com.lwohvye or higher
 @EnableAspectJAutoProxy // 当启动类不再higher path时，aop会失效，需要显示通过该注解开启
-@EnableJpaRepositories(basePackages = {"com.lwohvye.sys.modules.*.repository","com.lwohvye.*.repository"})
-@EntityScan(basePackages = {"com.lwohvye.api.modules.*.domain","com.lwohvye.*.domain"})
+// 注意，下面这俩支持在多处定义，但各定义scan的bean不能重复
+@EnableJpaRepositories(basePackages = {"com.lwohvye.sys.modules.*.repository", "com.lwohvye.*.repository"})
+@EntityScan(basePackages = {"com.lwohvye.api.modules.*.domain", "com.lwohvye.*.domain"})
 @EnableJpaAuditing(auditorAwareRef = "auditorAware") // 开启Jpa审计
 // @EnableAutoConfiguration // A circular @Import has been detected:
 public class UnicornAutoConfiguration {

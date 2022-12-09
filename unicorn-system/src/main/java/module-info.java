@@ -100,6 +100,4 @@ module lwohvye.unicorn.system {
 
     // 这几个Resource也要open，简单而言，未open的部分是无法被外界访问的。
     opens template.email;
-    opens template.generator.admin;
-    opens template.generator.front;
 }

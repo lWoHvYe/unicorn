@@ -14,4 +14,7 @@ module lwohvye.unicorn.cd_generator {
     opens com.lwohvye.generator.repository to spring.core;
     opens com.lwohvye.generator.rest to spring.core;
     opens com.lwohvye.generator.service.impl to spring.core;
+
+    opens template.generator.admin;
+    opens template.generator.front;
 }

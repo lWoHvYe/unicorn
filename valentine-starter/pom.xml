@@ -69,6 +69,11 @@
             <artifactId>unicorn-tp-tools</artifactId>
             <version>${unicorn.core.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.lwohvye</groupId>
+            <artifactId>unicorn-cd-generator</artifactId>
+            <version>${unicorn.core.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
