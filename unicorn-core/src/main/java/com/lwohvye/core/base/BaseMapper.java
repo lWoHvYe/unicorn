@@ -16,13 +16,11 @@
 package com.lwohvye.core.base;
 
 import com.lwohvye.core.context.CycleAvoidingMappingContext;
-import com.lwohvye.core.utils.json.JsonUtils;
 import org.mapstruct.Context;
 import org.mapstruct.InheritInverseConfiguration;
 import org.springframework.core.convert.converter.Converter;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Zheng Jie
@@ -74,25 +72,4 @@ public interface BaseMapper<D, E> extends Converter<E, D> {
      * @return /
      */
     List<D> toDto(List<E> entityList, @Context CycleAvoidingMappingContext context);
-
-    // 为了方便，可能在配置@Mapper时，使用uses，这时方法就不知道要用那个mapper里的了。这里加了name,除非显示使用qualifiedByName，否则不会使用，
-    // 但针对当前问题中不能使用qualifiedByName,因为这些mapper中都有这方法，又回到源点来，建议在对应但Mapper中Override一下。
-    // 若在项目中不用uses相互引用mapper，可以把@Named移除掉，在有需要时会自动使用
-    // https://mapstruct.org/documentation/stable/reference/html/#selection-based-on-qualifiers
-    // 通用的Map/List与Json-String互转的方法。当入是A出是B时，会自动调用相关的规则，这里配置会作为默认的转换规则。欲使用其他的，可使用@Mapping(target="",expression="java(method...)")
-    default Map convertString2JsonMap(String in) {
-        return JsonUtils.toMap(in);
-    }
-
-    default List convertString2JsonList(String in) {
-        return JsonUtils.toList(in);
-    }
-
-    default String convertMap2String(Map in) {
-        return JsonUtils.toJSONString(in);
-    }
-
-    default String convertList2String(List in) {
-        return JsonUtils.toJSONString(in);
-    }
 }
