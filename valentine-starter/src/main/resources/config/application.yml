@@ -48,7 +48,7 @@ local:
     load-os: true
     # 相同服务的各实例会有不同的配置，从而使得一些事件能被各实例都消费一次，理论上有更好地解决方案
     sp-sync-queue: xs.sp-sync.queue
-#    sim-auth: true
+    #    sim-auth: true
   rs:
     str: string
     # 当使用properties来配置时，不要带最外层的引号""，{k1: 'v1', k2: 'v2'}，注意value要用引号括起来，key没要求，单双引号都可以

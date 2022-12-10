@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.config;
+package com.lwohvye.sys.common.config;
 
 import com.lwohvye.sys.modules.system.enums.UserTypeEnum;
 import com.lwohvye.core.utils.DynamicEnumHelper;
@@ -26,19 +26,24 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 得益于之前的study,可以scan特定的properties并将其加入到UserTypeEnum中
+ * 这样client不再局限于既有的几种userType，可以在extend strategy的同时，自由添加custom userType
+ *
+ * @date 2022/12/10 8:46 AM
+ */
 @Configuration
 @ConfigurationProperties(prefix = "local.sys.extra-ut")
-public class ExtraUTConfig {
-    private static List<EUTo> list;
+public class UserTypeModifier {
+    private static List<UserType> userTypes;
 
-    public static List<EUTo> getList() {
-        return list;
+    public static List<UserType> getUserTypes() {
+        return userTypes;
     }
 
-    public void setList(List<EUTo> list) {
-        ExtraUTConfig.list = list;
-// TODO: 2022/5/1 除非把这部分下沉，否则想不到一个好的切入点来执行这个，当前想到的就是预留钩子给子类
-        if (Objects.nonNull(list))
+    public void setUserTypes(List<UserType> extraTypes) {
+        UserTypeModifier.userTypes = extraTypes;
+        if (Objects.nonNull(extraTypes))
             refreshUserTypeEnum();
     }
 
@@ -47,15 +52,16 @@ public class ExtraUTConfig {
      *
      * @date 2022/5/1 1:22 PM
      */
-    public void refreshUserTypeEnum() {
-        for (var euTo : list) {
-            DynamicEnumHelper.addEnum(UserTypeEnum.class, euTo.getName(), new Class[]{Integer.class, String.class}, new Object[]{euTo.getType(), euTo.getDesc()});
+    void refreshUserTypeEnum() {
+        for (var userType : userTypes) {
+            DynamicEnumHelper.addEnum(UserTypeEnum.class, userType.getName(),
+                    new Class[]{Integer.class, String.class}, new Object[]{userType.getType(), userType.getDesc()});
         }
     }
 
     @Getter
     @Setter
-    public static class EUTo { // inner class may be static
+    static class UserType { // inner class may be static
         private String name;
         private Integer type;
         private String desc;
