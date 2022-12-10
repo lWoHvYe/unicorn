@@ -15,18 +15,18 @@
  */
 package com.lwohvye.sys.modules.system.strategy;
 
+import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.sys.modules.system.enums.UserTypeEnum;
-import com.lwohvye.core.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 策略模式上下文（环境类），给外部调用，该类的注入可由相关的HandlerProcessor实现（Has Deprecated），当前改为通过initStrategyMap()来实现Init @ Inject
@@ -68,14 +68,30 @@ public class AuthHandlerContext {
         var tCollection = SpringContextHolder.getBeansOfType(AUserTypeStrategy.class).values();
         for (var t : tCollection) {
             var userTypeHandlerAnno = t.getClass().getAnnotation(UserTypeHandlerAnno.class);
-            if (Objects.equals(userTypeHandlerAnno.value(), UserTypeEnum.EXTRA)) {
-                var typeName = userTypeHandlerAnno.typeName();
-                if (StringUtils.hasText(typeName)) {
-                    strategyMap.put(UserTypeEnum.valueOf(typeName).getType(), t);
-                }
-            } else {
-                strategyMap.put(userTypeHandlerAnno.value().getType(), t);
+            if (ObjectUtils.isEmpty(userTypeHandlerAnno)) {
+                log.warn(" {} 类的 @UserTypeHandlerAnno 注解没有写入值 ", t.getClass().getSimpleName());
+                continue;
             }
+            final var typeName = userTypeHandlerAnno.typeName();
+            final var userType = userTypeHandlerAnno.value();
+            switch (t) {
+                // 每种类型可以有独立的逻辑。另外这里提供了一个扩展点，就是可以覆盖已有的userType的实现，只需要建立extra的subClass并指定typeName就行了
+                case ExtraUserTypeStrategy extraStrategy when StringUtils.hasText(typeName) ->
+                        strategyMap.put(UserTypeEnum.valueOf(typeName).getType(), extraStrategy);
+                case AdminUserTypeStrategy adminStrategy -> strategyMap.put(userType.getType(), adminStrategy);
+                case DevUserTypeStrategy devStrategy -> strategyMap.put(userType.getType(), devStrategy);
+                case NormalUserTypeStrategy normalStrategy -> strategyMap.put(userType.getType(), normalStrategy);
+                default -> throw new IllegalStateException("Unexpected value: " + t);
+            }
+            // 下面这种更灵活了，当type是extra时拿typeName，别的都是直接放进去，上面还限定下类型，但引入sealed-class后，没啥区别了
+//            if (Objects.equals(userTypeHandlerAnno.value(), UserTypeEnum.EXTRA)) {
+//                var typeName = userTypeHandlerAnno.typeName();
+//                if (StringUtils.hasText(typeName)) {
+//                    strategyMap.put(UserTypeEnum.valueOf(typeName).getType(), t);
+//                }
+//            } else {
+//                strategyMap.put(userTypeHandlerAnno.value().getType(), t);
+//            }
         }
     }
 
@@ -100,38 +116,51 @@ public class AuthHandlerContext {
     }
 
     public void switchPatternMatchingTest(AUserTypeStrategy userTypeStrategy) {
-        switch (userTypeStrategy) { // Since Java 19，这个不是纯粹的语法糖，可以看看编译的class
-            case AdminUserTypeStrategy __ -> System.out.println(__.getSysName()); // _ 是可以做变量名(的一部分)的，虽然好像不推荐
-            case DevUserTypeStrategy __ -> System.out.println("dev");
+        switch (userTypeStrategy) { // Since Java 19，这个不是纯粹的语法糖，可以看看编译的class，这个when就很灵性，虽然是颗🍬
+            case AdminUserTypeStrategy aut when aut.getSysName().isBlank() ->
+                    System.out.println(aut.getSysName()); // _ 是可以做变量名(的一部分)的，虽然好像不推荐
+            case DevUserTypeStrategy ignored -> System.out.println("dev");
             case NormalUserTypeStrategy norm -> System.out.println(norm.getSysName());
             case ExtraUserTypeStrategy ignored -> System.out.println("ext");
+            default -> throw new IllegalStateException("Unexpected value: " + userTypeStrategy);
         }
     }
 
-    /*public void switchPatternMatchingTest(AUserTypeStrategy userTypeStrategy) {
+    /*
+    public void switchPatternMatchingTest(AUserTypeStrategy userTypeStrategy) {
         Objects.requireNonNull(userTypeStrategy);
+        AUserTypeStrategy var2 = userTypeStrategy;
         byte var3 = 0;
-        switch (userTypeStrategy.typeSwitch<invokedynamic>(userTypeStrategy, var3)) {
-            case 0:
-                AdminUserTypeStrategy __ = (AdminUserTypeStrategy)userTypeStrategy;
-                System.out.println(__.getSysName());
-                break;
-            case 1:
-                DevUserTypeStrategy __ = (DevUserTypeStrategy)userTypeStrategy;
-                System.out.println("dev");
-                break;
-            case 2:
-                NormalUserTypeStrategy norm = (NormalUserTypeStrategy)userTypeStrategy;
-                System.out.println(norm.getSysName());
-                break;
-            case 3:
-                ExtraUserTypeStrategy ignored = (ExtraUserTypeStrategy)userTypeStrategy;
-                System.out.println("ext");
-                break;
-            default:
-                throw new MatchException((String)null, (Throwable)null);
-        }
 
+        while(true) {
+            switch (var2.typeSwitch<invokedynamic>(var2, var3)) {
+                case 0:
+                    AdminUserTypeStrategy aut = (AdminUserTypeStrategy)var2;
+                    if (!aut.getSysName().isBlank()) {
+                        var3 = 1;
+                        continue;
+                    }
+
+                    System.out.println(aut.getSysName());
+                    break;
+                case 1:
+                    DevUserTypeStrategy ignored = (DevUserTypeStrategy)var2;
+                    System.out.println("dev");
+                    break;
+                case 2:
+                    NormalUserTypeStrategy norm = (NormalUserTypeStrategy)var2;
+                    System.out.println(norm.getSysName());
+                    break;
+                case 3:
+                    ExtraUserTypeStrategy ignored = (ExtraUserTypeStrategy)var2;
+                    System.out.println("ext");
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + String.valueOf(userTypeStrategy));
+            }
+
+            return;
+        }
     }*/
 
 }

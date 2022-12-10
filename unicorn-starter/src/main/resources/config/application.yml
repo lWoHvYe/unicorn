@@ -95,6 +95,6 @@ local:
     init-bf: false
     #   这里试试数组类的，也可以参考file那边整成实体
     extra-ut:
-      list:
+      user-types:
         - { name: 'FOUR',type: 4, desc: '猜猜我是谁' }
         - { name: 'FIVE',type: 5, desc: 'you know who' }
