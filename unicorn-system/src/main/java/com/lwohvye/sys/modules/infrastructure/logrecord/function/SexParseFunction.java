@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.infrastructure.logrecord.function;
 
 import com.mzt.logapi.service.IParseFunction;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -29,6 +30,7 @@ import java.util.Objects;
  **/
 @Slf4j
 @Component
+@ConditionalOnClass(IParseFunction.class)
 public class SexParseFunction implements IParseFunction {
 
     @Override

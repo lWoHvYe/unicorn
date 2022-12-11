@@ -187,7 +187,7 @@ public class TokenProvider implements InitializingBean {
             var rMapCache = redisson.getMapCache(SecuritySysUtil.getExpireNoticeKey(properties));
             // RMapCache，可以对单key设置过期时间
             // 使用fastPutIfAbsent。当key不存在时，设置值。成功设置时返回true
-            var putResult = rMapCache.fastPutIfAbsent(token, LocalDateTime.now().toString(), properties.getDetect(), TimeUnit.MILLISECONDS);
+            var putResult = rMapCache.fastPutIfAbsent(token, LocalDateTime.now().toString(), properties.getDetect(), TimeUnit.SECONDS);
             if (Boolean.TRUE.equals(putResult)) {
                 try {
                     // 提醒

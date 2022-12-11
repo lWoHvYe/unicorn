@@ -25,11 +25,8 @@ import com.lwohvye.core.config.LocalCoreConfig;
 import com.lwohvye.core.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -42,14 +39,12 @@ import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -64,34 +59,10 @@ import java.util.HashMap;
 @EnableConfigurationProperties(RedisProperties.class)
 public class RedisConfig implements CachingConfigurer {
 
-    /**
-     * 设置 redis 数据默认过期时间，默认2小时
-     * 设置@Cacheable 序列化方式
-     */
-    // @Bean
-    // public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-    //     var stringRedisSerializer = new StringRedisSerializer();
-    //     Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
-    //     var configuration = RedisCacheConfiguration.defaultCacheConfig()
-    //             // key序列化
-    //             .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(stringRedisSerializer))
-    //             // value序列化
-    //             .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
-    //             .entryTtl(Duration.ofHours(2)).disableCachingNullValues();
-    //     return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(configuration).build();
-    // }
-
-    // 默认读的json格式，yaml需要这样额外配置
-    @Bean(destroyMethod = "shutdown")
-    RedissonClient redisson(@Value("classpath:/redisson.yaml") Resource configFile) throws IOException {
-        Config config = Config.fromYAML(configFile.getInputStream());
-        return Redisson.create(config);
-    }
-
     // 这个是替换原来的RedisCacheManager的。通过该CacheManager，使用Cacheable 注解，缓存数据会被放在一个RMap 中，搞清楚这点后，可以比较精准的清除一些key
     @Bean
     CacheManager redissonCacheManager(RedissonClient redissonClient) {
-        return new RedissonSpringCacheManager(redissonClient, "classpath:/cache-config.yaml");
+        return new RedissonSpringCacheManager(redissonClient, "classpath:cache-config.yaml");
     }
 
     /**

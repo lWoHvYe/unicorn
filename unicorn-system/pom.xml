@@ -137,6 +137,7 @@
             <groupId>io.github.mouzt</groupId>
             <artifactId>bizlog-sdk</artifactId>
             <version>${bizlog.version}</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
