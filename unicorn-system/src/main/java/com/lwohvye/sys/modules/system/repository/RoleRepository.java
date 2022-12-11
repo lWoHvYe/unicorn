@@ -46,8 +46,8 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
     // If a fetch graph is used, only the attributes specified by the entity graph will be treated as FetchType.EAGER. All other attributes will be lazy.
     // If a load graph is used, all attributes that are not specified by the entity graph will keep their default fetch type.
     @Override
-    // FETCH和LOAD这这里没有区别好像
-    @EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
+    // FETCH和LOAD这这里没有区别好像，这个会影响分页
+    //@EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
     Page<Role> findAll(Specification<Role> spec, Pageable pageable);
 
     // https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#jpa.entity-graph
