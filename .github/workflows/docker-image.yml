@@ -31,6 +31,8 @@ jobs:
         run: mvn -B install --file pom.xml
       # - name: Build Valentine's Day
       #   run: mvn -B package --file valentine-starter/pom.xml
+      - name: Switch to unnamed module
+        run: rm -rf valentine-starter/src/main/java/module-info.java
       - name: Build GraalVM Native image
         run: mvn -B spring-boot:build-image --file valentine-starter/pom.xml -P prod,native
 
