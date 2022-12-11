@@ -31,8 +31,8 @@ jobs:
         run: mvn -B install --file pom.xml
       # - name: Build Valentine's Day
       #   run: mvn -B package --file valentine-starter/pom.xml
-      - name: Build the Docker image
-        run: $ mvn -B spring-boot:build-image --file valentine-starter/pom.xml
+      - name: Build GraalVM Native image
+        run: mvn -B spring-boot:build-image --file valentine-starter/pom.xml -P prod,native
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
       - name: Update dependency graph
