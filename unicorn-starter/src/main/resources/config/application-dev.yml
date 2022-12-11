@@ -1,8 +1,8 @@
 #配置数据源
 spring:
   datasource:
-    driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
     username: ${DB_USER:root}
     password: ${DB_PWD:root}
 
@@ -37,7 +37,25 @@ spring:
     #    timeout: 2000 # 连接或读取超时时长（毫秒）
     #    database: 0
     redisson:
-      file: classpath:redisson.yaml
+      config: |
+        singleServerConfig:
+          idleConnectionTimeout: 10000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+          password: redis-psd
+          subscriptionsPerConnection: 5
+          clientName: null
+          address: redis://10.211.55.140:6379
+          subscriptionConnectionMinimumIdleSize: 2
+          subscriptionConnectionPoolSize: 16
+          connectionMinimumIdleSize: 8
+          connectionPoolSize: 16
+          database: 6
+          dnsMonitoringInterval: 5000
+        codec: !<org.redisson.codec.JsonJacksonCodec> { }
+        "transportMode": "NIO"
 
   ##### RabbitMQ ####
   rabbitmq:
