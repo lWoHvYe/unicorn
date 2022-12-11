@@ -32,6 +32,7 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
+    show-sql: true
 
 #密码加密传输，前端公钥加密，后端私钥解密
 rsa:
