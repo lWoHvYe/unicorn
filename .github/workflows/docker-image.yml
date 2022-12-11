@@ -32,4 +32,4 @@ jobs:
       # - name: Build Valentine's Day
       #   run: mvn -B package --file valentine-starter/pom.xml
       - name: Build GraalVM Native image
-        run: $ mvn -B spring-boot:build-image --file valentine-starter/pom.xml -P prod,native
+        run: $ mvn -B spring-boot:build-image --file valentine-starter/pom.xml -P dev
