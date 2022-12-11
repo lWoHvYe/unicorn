@@ -33,29 +33,24 @@ spring:
     #详细版的redisson配置可参考：https://github.com/redisson/redisson/tree/master/redisson-spring-boot-starter
     redisson:
       config: |
-        {
-          "singleServerConfig": {
-            "idleConnectionTimeout": 10000,
-            "connectTimeout": 10000,
-            "timeout": 3000,
-            "retryAttempts": 3,
-            "retryInterval": 1500,
-            "password": "redis-psd",
-            "subscriptionsPerConnection": 5,
-            "clientName": null,
-            "address": "redis://10.211.55.140:6379",
-            "subscriptionConnectionMinimumIdleSize": 2,
-            "subscriptionConnectionPoolSize": 16,
-            "connectionMinimumIdleSize": 8,
-            "connectionPoolSize": 16,
-            "database": 6,
-            "dnsMonitoringInterval": 5000
-          },
-          "codec": {
-            "class": "org.redisson.codec.JsonJacksonCodec"
-          },
-          "transportMode": "NIO"
-        }
+        singleServerConfig:
+          idleConnectionTimeout: 10000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+          password: redis-psd
+          subscriptionsPerConnection: 5
+          clientName: null
+          address: redis://10.211.55.140:6379
+          subscriptionConnectionMinimumIdleSize: 2
+          subscriptionConnectionPoolSize: 16
+          connectionMinimumIdleSize: 8
+          connectionPoolSize: 16
+          database: 6
+          dnsMonitoringInterval: 5000
+        codec: !<org.redisson.codec.JsonJacksonCodec> { }
+        "transportMode": "NIO"
 
   ##### RabbitMQ ####
   rabbitmq:
