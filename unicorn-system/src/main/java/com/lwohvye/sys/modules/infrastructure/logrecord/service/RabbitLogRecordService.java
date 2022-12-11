@@ -24,6 +24,7 @@ import com.mzt.logapi.beans.LogRecord;
 import com.mzt.logapi.service.ILogRecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -31,6 +32,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@ConditionalOnClass(ILogRecordService.class)
 @RequiredArgsConstructor
 public class RabbitLogRecordService implements ILogRecordService {
 

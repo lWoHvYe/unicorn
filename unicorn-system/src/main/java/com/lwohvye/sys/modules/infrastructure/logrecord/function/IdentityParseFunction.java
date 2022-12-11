@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.infrastructure.logrecord.function;
 
 
 import com.mzt.logapi.service.IParseFunction;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  * create on 2022/1/3 2:43 下午
  */
 @Component
+@ConditionalOnClass(IParseFunction.class)
 public class IdentityParseFunction implements IParseFunction {
 
     @Override
