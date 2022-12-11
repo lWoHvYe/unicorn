@@ -31,7 +31,7 @@ jobs:
         run: mvn -B install --file pom.xml
       # - name: Build Valentine's Day
       #   run: mvn -B package --file valentine-starter/pom.xml
-      - name: Build Docker image
+      - name: Build the Docker image
         run: $ mvn -B spring-boot:build-image --file valentine-starter/pom.xml
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
