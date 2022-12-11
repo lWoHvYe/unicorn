@@ -45,10 +45,10 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
     // An entity graph can be used as a fetch or a load graph.
     // If a fetch graph is used, only the attributes specified by the entity graph will be treated as FetchType.EAGER. All other attributes will be lazy.
     // If a load graph is used, all attributes that are not specified by the entity graph will keep their default fetch type.
-    @Override
-    // FETCH和LOAD这这里没有区别好像
-    @EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
-    Page<Role> findAll(Specification<Role> spec, Pageable pageable);
+    //@Override
+    // FETCH和LOAD这这里没有区别好像。这个会影响分页，有分页的不要用这个。并且这个跟查询注解一起用可能也有啥问题
+    //@EntityGraph(value = "Role-Details", type = EntityGraph.EntityGraphType.FETCH)
+    //Page<Role> findAll(Specification<Role> spec, Pageable pageable);
 
     // https://docs.spring.io/spring-data/jpa/docs/2.5.6/reference/html/#jpa.entity-graph
     @Override
@@ -77,7 +77,7 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "SELECT r.* FROM sys_role r, sys_users_roles u WHERE " +
-                   "r.role_id = u.role_id AND u.user_id = ?1", nativeQuery = true)
+            "r.role_id = u.role_id AND u.user_id = ?1", nativeQuery = true)
     List<Role> findByUserId(Long userId);
 
     /**
@@ -96,7 +96,7 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "select count(1) from sys_role r, sys_roles_depts d where " +
-                   "r.role_id = d.role_id and d.dept_id in ?1", nativeQuery = true)
+            "r.role_id = d.role_id and d.dept_id in ?1", nativeQuery = true)
     int countByDepts(Set<Long> deptIds);
 
     /**
@@ -118,6 +118,6 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "SELECT r.* FROM sys_role r, sys_roles_menus m WHERE " +
-                   "r.role_id = m.role_id AND m.menu_id in ?1", nativeQuery = true)
+            "r.role_id = m.role_id AND m.menu_id in ?1", nativeQuery = true)
     List<Role> findInMenuId(List<Long> menuIds);
 }

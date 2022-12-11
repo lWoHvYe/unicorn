@@ -24,7 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
-import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.Date;
@@ -55,10 +54,9 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @return org.springframework.data.domain.Page
      * @date 2021/11/9 10:05 下午
      */
-    @Override
+    //@Override
     // @EntityGraph(value = "User-Details") // 11-26，这个加入意义不大，且对查询注解的Test造成mistake，故注释掉
-    Page<User> findAll(@Nullable Specification<User> spec, Pageable pageable);
-
+    //Page<User> findAll(@Nullable Specification<User> spec, Pageable pageable);
     @Override
     @EntityGraph(attributePaths = {"roles", "jobs", "dept"})
     <S extends User> Page<S> findAll(Example<S> example, Pageable pageable);
@@ -119,7 +117,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "SELECT u.* FROM sys_user u, sys_users_roles r WHERE" +
-                   " u.user_id = r.user_id AND r.role_id = ?1", nativeQuery = true)
+            " u.user_id = r.user_id AND r.role_id = ?1", nativeQuery = true)
     List<User> findByRoleId(Long roleId);
 
     /**
@@ -129,7 +127,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "SELECT u.* FROM sys_user u, sys_users_roles r, sys_roles_depts d WHERE " +
-                   "u.user_id = r.user_id AND r.role_id = d.role_id AND d.dept_id = ?1 group by u.user_id", nativeQuery = true)
+            "u.user_id = r.user_id AND r.role_id = d.role_id AND d.dept_id = ?1 group by u.user_id", nativeQuery = true)
     List<User> findByRoleDeptId(Long deptId);
 
     /**
@@ -139,7 +137,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "SELECT u.* FROM sys_user u, sys_users_roles ur, sys_roles_menus rm WHERE\n" +
-                   "u.user_id = ur.user_id AND ur.role_id = rm.role_id AND rm.menu_id = ?1 group by u.user_id", nativeQuery = true)
+            "u.user_id = ur.user_id AND ur.role_id = rm.role_id AND rm.menu_id = ?1 group by u.user_id", nativeQuery = true)
     List<User> findByMenuId(Long id);
 
     /**
@@ -189,7 +187,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @return /
      */
     @Query(value = "SELECT count(1) FROM sys_user u, sys_users_roles r WHERE " +
-                   "u.user_id = r.user_id AND r.role_id in ?1", nativeQuery = true)
+            "u.user_id = r.user_id AND r.role_id in ?1", nativeQuery = true)
     int countByRoles(Collection<Long> ids);
 
     Boolean existsByRolesIn(Collection<Role> roles);
