@@ -100,6 +100,7 @@
         <dependency>
             <groupId>com.lwohvye.captcha</groupId>
             <artifactId>captcha-spring-boot-starter</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- linux的管理 -->

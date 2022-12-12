@@ -16,6 +16,7 @@
 
 package com.lwohvye.sys.modules.security.config;
 
+import com.lwohvye.sys.modules.security.security.filter.CustomAuthenticationCaptchaFilter;
 import com.lwohvye.sys.modules.security.security.filter.CustomAuthenticationFilter;
 import com.lwohvye.core.utils.SpringContextHolder;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,14 @@ public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurit
     public void configure(HttpSecurity http) {
         // SharedObject是Spring Security提供的一个非常好用的功能，如果需要在不同的地方需要对一个对象重复使用就可以将它注册为SharedObject，甚至直接注入Spring IoC像下面这样获取就可以了。
         var authenticationManager = http.getSharedObject(AuthenticationManager.class);
-        var customAuthenticationFilter = new CustomAuthenticationFilter();
+        // while the CaptchaService not exist, will verify without captcha
+        var useCaptcha = true;
+        try {
+            Class.forName("com.anji.captcha.service.CaptchaService");
+        } catch (ClassNotFoundException e) {
+            useCaptcha = false;
+        }
+        var customAuthenticationFilter = useCaptcha ? new CustomAuthenticationCaptchaFilter() : new CustomAuthenticationFilter();
 
         customAuthenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler);
         customAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler);

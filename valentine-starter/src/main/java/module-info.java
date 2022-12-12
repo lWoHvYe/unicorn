@@ -7,6 +7,8 @@ module lwohvye.valentine.starter {
     // 如果使用3rd-tools，需要加入下面这两个，不清楚为何在tools中加没生效。mail works well under unnamed module
 //    requires jakarta.mail;
 //    requires jakarta.activation;
+//    requires bizlog.sdk;
+//    requires captcha;
 
     exports com.unicorn.vs.rest to spring.beans, spring.aop, spring.web;
 
