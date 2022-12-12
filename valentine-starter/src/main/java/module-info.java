@@ -4,6 +4,7 @@ module lwohvye.valentine.starter {
     requires lwohvye.unicorn.core;
     requires lombok;
 //    requires bizlog.sdk;
+//    requires captcha;
 
     exports com.unicorn.vs.rest to spring.beans, spring.aop, spring.web;
 

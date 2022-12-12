@@ -15,8 +15,6 @@
  */
 package com.lwohvye.sys.modules.security.security.filter;
 
-import com.anji.captcha.model.vo.CaptchaVO;
-import com.anji.captcha.service.CaptchaService;
 import com.lwohvye.core.config.RsaProperties;
 import com.lwohvye.sys.modules.security.service.dto.AuthUserDto;
 import com.lwohvye.core.utils.RsaUtils;
@@ -35,6 +33,7 @@ import org.springframework.util.Assert;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.InputStream;
 import java.util.Objects;
 
@@ -45,17 +44,10 @@ import java.util.Objects;
  */
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private RedisUtils redisUtils;
-    private CaptchaService captchaService;
-
-    // @PostConstruct
-    // public void doInit() {
-    //     SpringContextHolder.addCallBacks(this::doRegister);
-    // }
+    protected RedisUtils redisUtils;
 
     public void doRegister() {
         if (Objects.isNull(redisUtils)) redisUtils = SpringContextHolder.getBean(RedisUtils.class);
-        if (Objects.isNull(captchaService)) captchaService = SpringContextHolder.getBean(CaptchaService.class);
     }
 
     @Override
@@ -86,16 +78,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 var password = authUser.getPassword();
                 password = StringUtils.isNotBlank(password) ? RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, password) : "";
 
-                // 前端回传二次验证参数
-                var captchaVO = new CaptchaVO();
-                captchaVO.setCaptchaVerification(authUser.getCaptchaVerification());
-                // 对参数进行验证
-                var verifyRes = captchaService.verification(captchaVO);
-                if (!verifyRes.isSuccess()) {
-                    //验证码校验失败，返回信息告诉前端
-                    ResultUtils.resultJson(response, HttpServletResponse.SC_BAD_REQUEST, verifyRes.getRepMsg());
-                    return null;
-                }
+                if (extraVerifyFailed(response, authUser)) return null;
 
                 authRequest = new UsernamePasswordAuthenticationToken(username, password);
 
@@ -127,5 +110,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         else {
             return super.attemptAuthentication(request, response);
         }
+    }
+
+    protected boolean extraVerifyFailed(HttpServletResponse response, AuthUserDto authUser) {
+        return false;
     }
 }

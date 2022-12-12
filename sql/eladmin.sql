@@ -574,6 +574,7 @@ INSERT INTO `sys_resource` VALUES (16, 'druid', '/druid/**', NULL, 1, NULL, NULL
 INSERT INTO `sys_resource` VALUES (17, 'options', '/**', 'OPTIONS', 1, NULL, NULL);
 INSERT INTO `sys_resource` VALUES (18, 'webSocket', '/webSocket/**', NULL, 1, NULL, 'WebSocket相关');
 INSERT INTO `sys_resource` VALUES (19, '匿名标记', '/api/anonymous/**', NULL, 1, NULL, '通一匿名标记');
+INSERT INTO `sys_resource` VALUES (20, '资源不存在', '/error', NULL, 1, NULL, '接口等不存在');
 COMMIT;
 
 -- ----------------------------
@@ -810,6 +811,7 @@ INSERT INTO `sys_roles_resources` VALUES (16, 16);
 INSERT INTO `sys_roles_resources` VALUES (16, 17);
 INSERT INTO `sys_roles_resources` VALUES (16, 18);
 INSERT INTO `sys_roles_resources` VALUES (16, 19);
+INSERT INTO `sys_roles_resources` VALUES (16, 20);
 COMMIT;
 
 -- ----------------------------
