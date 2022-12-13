@@ -32,7 +32,7 @@ module lwohvye.unicorn.core {
     requires transitive com.fasterxml.jackson.annotation;
     requires transitive com.fasterxml.jackson.databind;
     requires transitive com.github.benmanes.caffeine;
-    requires transitive hutool.all;
+    requires transitive cn.hutool;
     requires transitive io.swagger.v3.oas.models;
     requires transitive io.swagger.v3.oas.annotations;
     requires transitive lombok;
@@ -47,11 +47,11 @@ module lwohvye.unicorn.core {
     requires transitive org.hibernate.validator;
     requires transitive org.jetbrains.annotations;
     requires transitive org.mapstruct;
-    requires transitive mapstruct.spring.extensions;
+    requires transitive org.mapstruct.extensions.spring;
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
-    requires transitive redisson;
-    requires thumbnailator;
+    requires transitive org.redisson;
+    requires net.coobird.thumbnailator;
 
     exports com.lwohvye.core.advice;
     exports com.lwohvye.core.annotation;
