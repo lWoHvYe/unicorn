@@ -15,9 +15,9 @@ dependencies {
     api(project(':unicorn-core')) {
         exclude(group: 'org.springframework', module: 'spring-webmvc')
     }
-    api('org.springframework.boot:spring-boot-starter-webflux')
-    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-    annotationProcessor("org.mapstruct:mapstruct-processor:${mapstructVersion}")
+    api 'org.springframework.boot:spring-boot-starter-webflux'
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }
 
 description = '系统核心模块(WebFlux)'

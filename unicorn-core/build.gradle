@@ -16,42 +16,43 @@ plugins {
 //}
 
 dependencies {
-    api(enforcedPlatform(SpringBootPlugin.BOM_COORDINATES))
-    api('org.springframework.boot:spring-boot-starter-data-jpa')
+    api enforcedPlatform(SpringBootPlugin.BOM_COORDINATES)
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
     api('org.springframework.boot:spring-boot-starter-web') {
         // 括号里是Groovy的语法，定义map
         exclude(group: 'org.springframework.boot', module: "spring-boot-starter-tomcat")
     }
-    api('org.springframework.boot:spring-boot-starter-undertow')
-    api('org.springframework.boot:spring-boot-starter-security')
-    api('org.springframework.boot:spring-boot-starter-amqp')
-    api('org.springframework.boot:spring-boot-starter-cache')
-    api('org.springframework.boot:spring-boot-starter-data-redis')
-    api('org.springframework.boot:spring-boot-configuration-processor')
-    api("org.redisson:redisson-spring-boot-starter:${redissonVersion}")
-    api('org.apache.commons:commons-pool2:2.11.1')
-    api('org.apache.commons:commons-lang3:3.12.0')
-    implementation "com.lwohvye.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:${log4jdbcVersion}"
-    api("org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}")
-    api("cn.hutool:hutool-all:${hutoolVersion}")
-    api('net.dreamlu:mica-ip2region:2.7.2')
-    api('org.apache.poi:poi:5.2.2')
-    api('org.apache.poi:poi-ooxml:5.2.2')
-    implementation 'xerces:xercesImpl:2.12.2'
-    api("org.mapstruct:mapstruct:${mapstructVersion}")
-    api("org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringVersion}")
-    api('org.hibernate.validator:hibernate-validator:8.0.0.Final')
-    implementation 'it.unimi.dsi:fastutil:8.5.8'
-    api('nl.basjes.parse.useragent:yauaa:7.5.0')
-    api('com.github.ben-manes.caffeine:caffeine:3.1.2')
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
-    api("net.coobird:thumbnailator:${thumbnailatorVersion}")
-    api('org.jetbrains:annotations:23.0.0')
+    api 'org.springframework.boot:spring-boot-starter-undertow'
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api 'org.springframework.boot:spring-boot-starter-amqp'
+    api 'org.springframework.boot:spring-boot-starter-cache'
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+    api 'org.springframework.boot:spring-boot-configuration-processor'
+    api "org.redisson:redisson-spring-boot-starter:$redissonVersion"
+    api 'org.apache.commons:commons-pool2'
+    api 'org.apache.commons:commons-lang3'
+    implementation "com.lwohvye.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:$log4jdbcVersion"
+    api "org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion"
+    api "cn.hutool:hutool-all:$hutoolVersion"
+    api "net.dreamlu:mica-ip2region:$ip2regionVersion"
+    api "org.apache.poi:poi:$poiVersion"
+    api "org.apache.poi:poi-ooxml:$poiVersion"
+    implementation "xerces:xercesImpl:$xercesVersion"
+    api "org.mapstruct:mapstruct:$mapstructVersion"
+    api "org.mapstruct.extensions.spring:mapstruct-spring-extensions:$mapstructSpringVersion"
+    api 'org.hibernate.validator:hibernate-validator'
+    implementation "it.unimi.dsi:fastutil:$fastutilVersion"
+    api "nl.basjes.parse.useragent:yauaa:$yauaaVersion"
+    api 'com.github.ben-manes.caffeine:caffeine'
+    implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
+    api "net.coobird:thumbnailator:$thumbnailatorVersion"
+    api 'org.jetbrains:annotations:23.0.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    compileOnlyApi("org.projectlombok:lombok:${lombokVersion}")
-    compileOnlyApi("org.mapstruct:mapstruct-processor:${mapstructVersion}")
-    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-    annotationProcessor("org.mapstruct:mapstruct-processor:${mapstructVersion}")
+    compileOnlyApi "org.projectlombok:lombok:${lombokVersion}"
+    compileOnlyApi "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 }
 
 description = '系统核心模块'

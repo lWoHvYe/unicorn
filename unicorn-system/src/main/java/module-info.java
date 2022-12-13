@@ -100,5 +100,5 @@ module lwohvye.unicorn.system {
     opens com.lwohvye.sys.modules.system.repository to spring.core;
 
     // 这几个Resource也要open，简单而言，未open的部分是无法被外界访问的。
-    opens template.email;
+//    opens template.email;
 }
