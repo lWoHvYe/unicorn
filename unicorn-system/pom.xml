@@ -32,10 +32,6 @@
 
     <properties>
         <jjwt.version>0.11.5</jjwt.version>
-        <!-- oshi监控需要指定jna版本, 问题详见 https://github.com/oshi/oshi/issues/1040 -->
-        <jna.version>5.9.0</jna.version>
-        <oshi.version>6.3.2</oshi.version>
-        <bizlog.version>3.0.3</bizlog.version>
         <jol.version>0.16</jol.version>
     </properties>
 
@@ -52,8 +48,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
-
-        <!-- Swagger UI 相关 -->
 
         <!--Spring boot 测试-->
         <dependency>
@@ -119,8 +113,8 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>${oshi.version}</version>
         </dependency>
+
         <!-- logstash -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -132,12 +126,13 @@
             <groupId>org.openjdk.jol</groupId>
             <artifactId>jol-core</artifactId>
             <version>${jol.version}</version>
+            <optional>true</optional>
         </dependency>
+
         <!--个性化日志-->
         <dependency>
             <groupId>io.github.mouzt</groupId>
             <artifactId>bizlog-sdk</artifactId>
-            <version>${bizlog.version}</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

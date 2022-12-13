@@ -43,7 +43,6 @@ module lwohvye.unicorn.core {
     requires transitive org.apache.poi.poi;
     requires transitive org.apache.poi.ooxml;
     requires transitive org.aspectj.weaver;
-    requires transitive com.google.common;
     requires transitive org.hibernate.orm.core;
     requires transitive org.hibernate.validator;
     requires transitive org.jetbrains.annotations;

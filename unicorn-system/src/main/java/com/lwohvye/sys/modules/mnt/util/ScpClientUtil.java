@@ -18,7 +18,6 @@ package com.lwohvye.sys.modules.mnt.util;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SCPClient;
 import cn.hutool.core.util.StrUtil;
-import com.google.common.collect.Maps;
 import com.lwohvye.core.utils.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -26,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +43,7 @@ public class ScpClientUtil {
     private String username;
     private String password;
 
-    private static Map<String, ScpClientUtil> instance = Maps.newHashMap();
+    private static Map<String, ScpClientUtil> instance = new HashMap<>();
 
     public static synchronized ScpClientUtil getInstance(String ip, int port, String username, String password) {
         instance.computeIfAbsent(ip, cip -> instance.put(cip, new ScpClientUtil(cip, port, username, password)));

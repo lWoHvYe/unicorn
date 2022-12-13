@@ -49,7 +49,7 @@
         <connection>scm:git:git://github.com/lWoHvYe/eladmin.git</connection>
         <developerConnection>scm:git:ssh://github.com/lWoHvYe/eladmin.git</developerConnection>
         <url>https://github.com/lWoHvYe/eladmin/tree/main</url>
-        <tag>unicorn-v3.2.0</tag>
+        <tag>unicorn-v3.3.0</tag>
     </scm>
 
     <modules>
@@ -84,26 +84,27 @@
         <!--Starting JDK 9, release can be used to do the things what source and target can do
         https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-release.html-->
         <maven.compiler.release>19</maven.compiler.release>
-        <log4jdbc.version>1.18</log4jdbc.version>
-        <springdoc.openapi.version>2.0.0</springdoc.openapi.version>
-        <hutool.version>5.8.10</hutool.version>
-        <fastutil.version>8.5.9</fastutil.version>
-        <lombok.version>1.18.25</lombok.version>
+        <bizlog.version>3.0.3</bizlog.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
-        <!--mapstruct也要用新版本才行-->
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <mapstruct.spring.version>0.1.2</mapstruct.spring.version>
+        <fastutil.version>8.5.9</fastutil.version>
+        <hutool.version>5.8.10</hutool.version>
+        <ip2region.version>2.7.6</ip2region.version>
+        <log4jdbc.version>1.18</log4jdbc.version>
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.2</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
         <logback.version>1.4.5</logback.version>
-        <redisson.version>3.18.1</redisson.version>
-        <guava.version>31.1-jre</guava.version>
+        <lombok.version>1.18.25</lombok.version>
+        <!--mapstruct也要用新版本才行-->
+        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <mapstruct.spring.version>0.1.2</mapstruct.spring.version>
+        <oshi.version>6.3.2</oshi.version>
         <poi.version>5.2.2</poi.version>
+        <redisson.version>3.18.1</redisson.version>
+        <springdoc.openapi.version>2.0.0</springdoc.openapi.version>
+        <thumbnailator.version>0.4.18</thumbnailator.version>
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>7.9.0</yauaa.version>
-        <ip2region.version>2.7.6</ip2region.version>
-        <thumbnailator.version>0.4.18</thumbnailator.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
@@ -130,12 +131,6 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.openapi.version}</version>
-            </dependency>
-            <!--    swagger-core依赖该包，部分原因，需单独升级依赖版本    -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
             </dependency>
 
             <!--工具包-->
@@ -199,6 +194,20 @@
                 <groupId>com.lwohvye.captcha</groupId>
                 <artifactId>captcha-spring-boot-starter</artifactId>
                 <version>2.0.0</version>
+            </dependency>
+
+            <!--个性化日志-->
+            <dependency>
+                <groupId>io.github.mouzt</groupId>
+                <artifactId>bizlog-sdk</artifactId>
+                <version>${bizlog.version}</version>
+            </dependency>
+
+            <!-- 获取系统信息 -->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
             </dependency>
 
             <!-- 解析客户端操作系统、浏览器信息 Yauaa: Yet Another UserAgent Analyzer -->

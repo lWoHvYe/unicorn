@@ -15,11 +15,11 @@
  */
 package com.lwohvye.core.aspect;
 
-import com.google.common.collect.ImmutableList;
 import com.lwohvye.core.annotation.Limit;
-import com.lwohvye.core.utils.RequestHolder;
 import com.lwohvye.core.exception.BadRequestException;
+import com.lwohvye.core.utils.RequestHolder;
 import com.lwohvye.core.utils.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -31,8 +31,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
-import jakarta.servlet.http.HttpServletRequest;
+
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author /
@@ -68,7 +69,7 @@ public class LimitAspect {
             }
         }
 
-        ImmutableList<Object> keys = ImmutableList.of(StringUtils.join(limit.prefix(), "_", key, "_", request.getRequestURI().replaceAll("/","_")));
+        List<Object> keys = List.of(StringUtils.join(limit.prefix(), "_", key, "_", request.getRequestURI().replaceAll("/","_")));
 
         String luaScript = buildLuaScript();
         RedisScript<Number> redisScript = new DefaultRedisScript<>(luaScript, Number.class);
