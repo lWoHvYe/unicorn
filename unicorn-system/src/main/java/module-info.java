@@ -100,6 +100,6 @@ module lwohvye.unicorn.system {
     opens com.lwohvye.sys.modules.system.strategy to spring.core;
     opens com.lwohvye.sys.modules.system.repository to spring.core;
 
-    // 这几个Resource也要open，简单而言，未open的部分是无法被外界访问的。
+    // maven需要opens resources，而gradle不需要
 //    opens template.email;
 }
