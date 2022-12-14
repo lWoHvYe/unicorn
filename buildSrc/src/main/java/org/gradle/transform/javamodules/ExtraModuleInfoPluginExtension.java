@@ -22,6 +22,7 @@ import org.gradle.api.Action;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A data class to collect all the module information we want to add.
@@ -33,21 +34,24 @@ public class ExtraModuleInfoPluginExtension {
     private final Map<String, ModuleInfo> moduleInfo = new HashMap<>();
     private final Map<String, String> automaticModules = new HashMap<>();
 
+    private final Map<String, Boolean> overrideModuleInfos = new HashMap<>();
+
     /**
      * Add full module information for a given Jar file.
      */
-    public void module(String jarName, String moduleName, String moduleVersion) {
-        module(jarName, moduleName, moduleVersion, null);
+    public void module(String jarName, String moduleName, String moduleVersion, Boolean overrideModuleInfo) {
+        module(jarName, moduleName, moduleVersion, overrideModuleInfo, null);
     }
 
     /**
      * Add full module information, including exported packages and dependencies, for a given Jar file.
      */
-    public void module(String jarName, String moduleName, String moduleVersion, @Nullable Action<? super ModuleInfo> conf) {
+    public void module(String jarName, String moduleName, String moduleVersion, Boolean overrideModuleInfo, @Nullable Action<? super ModuleInfo> conf) {
         var curModuleInfo = new ModuleInfo(moduleName, moduleVersion);
-        if (conf != null) {
+        if (Objects.nonNull(conf))
             conf.execute(curModuleInfo);
-        }
+        if (Objects.nonNull(overrideModuleInfo))
+            overrideModuleInfos.put(jarName, overrideModuleInfo);
         moduleInfo.put(jarName, curModuleInfo);
     }
 
@@ -64,5 +68,9 @@ public class ExtraModuleInfoPluginExtension {
 
     protected Map<String, String> getAutomaticModules() {
         return automaticModules;
+    }
+
+    protected Map<String, Boolean> getOverrideModuleInfos() {
+        return overrideModuleInfos;
     }
 }

@@ -2,7 +2,7 @@
 module lwohvye.unicorn.tp_tools {
     requires transitive lwohvye.unicorn.core;
     requires spring.context.support;
-    requires transitive jakarta.mail;
+    requires jakarta.mail;
     requires software.amazon.awssdk.regions;
     requires software.amazon.awssdk.services.s3;
     requires software.amazon.awssdk.transfer.s3;

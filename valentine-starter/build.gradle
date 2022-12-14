@@ -30,6 +30,9 @@ extraJavaModuleInfo {
     automaticModule("redisson-${redissonVersion}.jar", 'org.redisson')
     automaticModule("spring-retry-${springretryVersion}.jar", 'spring.retry')
     automaticModule("thumbnailator-${thumbnailatorVersion}.jar", 'net.coobird.thumbnailator')
+    module('jakarta.mail-1.0.0.jar', 'jakarta.mail', '1.0.0', true) {
+        uses('jakarta.mail.util.StreamProvider')
+    }
 }
 
 tasks.named('test') {

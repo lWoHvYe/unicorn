@@ -18,7 +18,7 @@ repositories {
 }
 
 group = 'com.lwohvye'
-version = '3.2.0-SNAPSHOT'
+version = '4.0.0-SNAPSHOT'
 java.sourceCompatibility = JavaVersion.VERSION_19
 
 java {

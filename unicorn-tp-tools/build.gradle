@@ -27,8 +27,7 @@ extraJavaModuleInfo {
     automaticModule("mapstruct-spring-extensions-${mapstructSpringVersion}.jar", 'org.mapstruct.extensions.spring')
     automaticModule("redisson-${redissonVersion}.jar", 'org.redisson')
     automaticModule("thumbnailator-${thumbnailatorVersion}.jar", 'net.coobird.thumbnailator')
-    // todo 未达到预期效果，待调整，首先需要找到debug的方法
-    module('jakarta.mail-1.0.0.jar', 'jakarta.mail', '1.0.0') {
+    module('jakarta.mail-1.0.0.jar', 'jakarta.mail', '1.0.0', true) {
         uses('jakarta.mail.util.StreamProvider')
     }
 }

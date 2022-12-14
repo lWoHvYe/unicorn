@@ -41,6 +41,12 @@ public class ExtraModuleInfoPlugin implements Plugin<Project> {
         var artifactType = Attribute.of("artifactType", String.class);
         var javaModule = Attribute.of("javaModule", Boolean.class);
 
+        // 下面几种是输出log的方式
+//        var logger = project.getLogger();
+//        logger.warn(" currentProject is {} ", project.getName());
+//        System.out.println("normal msg");
+//        System.err.println("error msg");
+
         // compile and runtime classpath express that they only accept modules by requesting the javaModule=true attribute
         project.getConfigurations().matching(this::isResolvingJavaPluginConfiguration).all(
                 c -> c.getAttributes().attribute(javaModule, true));
@@ -50,9 +56,10 @@ public class ExtraModuleInfoPlugin implements Plugin<Project> {
 
         // register the transform for Jars and "javaModule=false -> javaModule=true"; the plugin extension object fills the input parameter
         project.getDependencies().registerTransform(ExtraModuleInfoTransform.class, t -> {
-            t.parameters(p -> {
-                p.setModuleInfo(extension.getModuleInfo());
-                p.setAutomaticModules(extension.getAutomaticModules());
+            t.parameters(parameter -> {
+                parameter.setModuleInfo(extension.getModuleInfo());
+                parameter.setAutomaticModules(extension.getAutomaticModules());
+                parameter.setOverrideModuleInfos(extension.getOverrideModuleInfos());
             });
             t.getFrom().attribute(artifactType, "jar").attribute(javaModule, false);
             t.getTo().attribute(artifactType, "jar").attribute(javaModule, true);
