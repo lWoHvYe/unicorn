@@ -27,3 +27,11 @@ tasks.withType(Checkstyle).configureEach {
         html.stylesheet resources.text.fromFile('config/xsl/checkstyle-custom.xsl')
     }
 }
+
+tasks.named("bootBuildImage") {
+    environment = [
+            "BP_JVM_VERSION"              : "19",
+            "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
+            "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
+    ]
+}
