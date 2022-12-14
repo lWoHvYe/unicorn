@@ -19,7 +19,7 @@ repositories {
 
 group = 'com.lwohvye'
 version = '3.2.0-SNAPSHOT'
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_19
 
 java {
     withSourcesJar()
@@ -35,4 +35,5 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.compilerArgs += '--enable-preview'
 }

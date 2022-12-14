@@ -9,9 +9,7 @@ plugins {
 
 dependencies {
     api project(':unicorn-sys-api')
-    api('org.springframework.boot:spring-boot-starter-websocket') {
-        exclude(group: 'org.springframework.boot', module: "spring-boot-starter-tomcat")
-    }
+    api('org.springframework.boot:spring-boot-starter-websocket')
     api "io.jsonwebtoken:jjwt-api:$jjwtVersion"
     api "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
     api "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"

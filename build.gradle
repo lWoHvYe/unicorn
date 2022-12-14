@@ -13,7 +13,7 @@ ext.sharedManifest = manifest {
 } as DefaultManifest
 
 ext { // 这个定义是可以传递的
-    lombokVersion = "1.18.24"
+    lombokVersion = "1.18.25"
 }
 
 subprojects {

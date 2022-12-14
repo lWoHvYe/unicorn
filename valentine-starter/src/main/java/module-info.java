@@ -3,10 +3,10 @@ module lwohvye.valentine.starter {
     requires lwohvye.unicorn.system;
     requires lwohvye.unicorn.core;
     requires lombok;
-    requires bizlog.sdk;
+    requires com.mzt.logapi;
     // 如果使用3rd-tools，需要加入下面这两个，不清楚为何在tools中加没生效。mail works well under unnamed module
-//    requires jakarta.mail;
-//    requires jakarta.activation;
+    requires jakarta.mail;
+    requires jakarta.activation;
 //    requires bizlog.sdk;
 //    requires captcha;
 

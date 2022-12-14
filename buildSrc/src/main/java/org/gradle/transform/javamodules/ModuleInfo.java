@@ -17,26 +17,32 @@
 package org.gradle.transform.javamodules;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Data class to hold the information that should be added as module-info.class to an existing Jar file.
+ * <p>
+ * 这里的 exports, opens 都是支持 to 的，只是当下没这个需求
  */
 public class ModuleInfo implements Serializable {
     private String moduleName;
     private String moduleVersion;
-    private List<String> exports = new ArrayList<>();
+    private List<Tuple2<String, String[]>> exports = new ArrayList<>();
     private List<String> requires = new ArrayList<>();
     private List<String> requiresTransitive = new ArrayList<>();
+
+    private List<Tuple2<String, String[]>> opens = new ArrayList<>();
+    private List<String> uses = new ArrayList<>();
+
+    private List<Tuple2<String, String[]>> provides = new ArrayList<>();
 
     ModuleInfo(String moduleName, String moduleVersion) {
         this.moduleName = moduleName;
         this.moduleVersion = moduleVersion;
     }
 
-    public void exports(String exports) {
-        this.exports.add(exports);
+    public void exports(String exports, String... to) {
+        this.exports.add(Tuple2.of(exports, to));
     }
 
     public void requires(String requires) {
@@ -47,6 +53,18 @@ public class ModuleInfo implements Serializable {
         this.requiresTransitive.add(requiresTransitive);
     }
 
+    public void opens(String opens, String... to) {
+        this.opens.add(Tuple2.of(opens, to));
+    }
+
+    public void uses(String uses) {
+        this.uses.add(uses);
+    }
+
+    public void provides(String provides, String... with) {
+        this.provides.add(Tuple2.of(provides, with));
+    }
+
     public String getModuleName() {
         return moduleName;
     }
@@ -55,7 +73,7 @@ public class ModuleInfo implements Serializable {
         return moduleVersion;
     }
 
-    protected List<String> getExports() {
+    protected List<Tuple2<String, String[]>> getExports() {
         return exports;
     }
 
@@ -65,5 +83,31 @@ public class ModuleInfo implements Serializable {
 
     protected List<String> getRequiresTransitive() {
         return requiresTransitive;
+    }
+
+    protected List<Tuple2<String, String[]>> getOpens() {
+        return opens;
+    }
+
+    protected List<String> getUses() {
+        return uses;
+    }
+
+    protected List<Tuple2<String, String[]>> getProvides() {
+        return provides;
+    }
+
+    @Override
+    public String toString() {
+        return "ModuleInfo{" +
+                "moduleName='" + moduleName + '\'' +
+                ", moduleVersion='" + moduleVersion + '\'' +
+                ", exports=" + exports +
+                ", requires=" + requires +
+                ", requiresTransitive=" + requiresTransitive +
+                ", opens=" + opens +
+                ", uses=" + uses +
+                ", provides=" + provides +
+                '}';
     }
 }

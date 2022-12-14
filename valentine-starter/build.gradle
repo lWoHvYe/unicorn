@@ -7,9 +7,11 @@ plugins {
 dependencies {
     implementation project(':unicorn-system')
     implementation project(':unicorn-logging')
+    implementation project(':unicorn-tp-tools')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnlyApi "org.projectlombok:lombok:${lombokVersion}"
     compileOnlyApi "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    implementation "io.github.mouzt:bizlog-sdk:$bizlogVersion"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }

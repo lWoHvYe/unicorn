@@ -24,13 +24,17 @@ import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Input;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.ModuleVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
-import java.util.jar.*;
+import java.util.Objects;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
+import java.util.jar.JarOutputStream;
 import java.util.regex.Pattern;
 
 /**
@@ -74,14 +78,20 @@ public abstract class ExtraModuleInfoTransform implements TransformAction<ExtraM
         var originalJarName = originalJar.getName();
 
         if (isModule(originalJar)) {
+            // 已经有module-info.java了，原样输出
             outputs.file(originalJar);
         } else if (moduleInfo.containsKey(originalJarName)) {
+            // 没有module-info.java，但在配置中，通过module()配置的，添加module-info.java文件
+            // moduleInfo是所有通过module()配置的配置，是个map (key: jarName, value: 相关配置)
             addModuleDescriptor(originalJar, getModuleJar(outputs, originalJar), moduleInfo.get(originalJarName));
         } else if (isAutoModule(originalJar)) {
+            // 是AutoModule也原样输出
             outputs.file(originalJar);
         } else if (automaticModules.containsKey(originalJarName)) {
+            // 不是AutoModule，添加Automatic-Module-Name到MANIFEST.MF .这里只是add-field
             addAutomaticModuleName(originalJar, getModuleJar(outputs, originalJar), automaticModules.get(originalJarName));
         } else {
+            // 其他的都原样输出
             outputs.file(originalJar); // ignored no-module
 
             // throw new RuntimeException("Not a module and no mapping defined: " + originalJarName);
@@ -127,10 +137,10 @@ public abstract class ExtraModuleInfoTransform implements TransformAction<ExtraM
     }
 
     private static void addAutomaticModuleName(File originalJar, File moduleJar, String moduleName) {
-        try (JarInputStream inputStream = new JarInputStream(new FileInputStream(originalJar))) {
-            Manifest manifest = inputStream.getManifest();
+        try (var inputStream = new JarInputStream(new FileInputStream(originalJar))) {
+            var manifest = inputStream.getManifest();
             manifest.getMainAttributes().put(new Attributes.Name("Automatic-Module-Name"), moduleName);
-            try (JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(moduleJar), inputStream.getManifest())) {
+            try (var outputStream = new JarOutputStream(new FileOutputStream(moduleJar), inputStream.getManifest())) {
                 copyEntries(inputStream, outputStream);
             }
         } catch (IOException e) {
@@ -139,8 +149,8 @@ public abstract class ExtraModuleInfoTransform implements TransformAction<ExtraM
     }
 
     private static void addModuleDescriptor(File originalJar, File moduleJar, ModuleInfo moduleInfo) {
-        try (JarInputStream inputStream = new JarInputStream(new FileInputStream(originalJar))) {
-            try (JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(moduleJar), inputStream.getManifest())) {
+        try (var inputStream = new JarInputStream(new FileInputStream(originalJar))) {
+            try (var outputStream = new JarOutputStream(new FileOutputStream(moduleJar), inputStream.getManifest())) {
                 copyEntries(inputStream, outputStream);
                 outputStream.putNextEntry(new JarEntry("module-info.class"));
                 outputStream.write(addModuleInfo(moduleInfo));
@@ -152,7 +162,7 @@ public abstract class ExtraModuleInfoTransform implements TransformAction<ExtraM
     }
 
     private static void copyEntries(JarInputStream inputStream, JarOutputStream outputStream) throws IOException {
-        JarEntry jarEntry = inputStream.getNextJarEntry();
+        var jarEntry = inputStream.getNextJarEntry();
         while (jarEntry != null) {
             outputStream.putNextEntry(jarEntry);
             outputStream.write(inputStream.readAllBytes());
@@ -162,21 +172,38 @@ public abstract class ExtraModuleInfoTransform implements TransformAction<ExtraM
     }
 
     private static byte[] addModuleInfo(ModuleInfo moduleInfo) {
-        ClassWriter classWriter = new ClassWriter(0);
+
+        var classWriter = new ClassWriter(0);
         classWriter.visit(Opcodes.V9, Opcodes.ACC_MODULE, "module-info", null, null, null);
-        ModuleVisitor moduleVisitor = classWriter.visitModule(moduleInfo.getModuleName(), Opcodes.ACC_OPEN, moduleInfo.getModuleVersion());
-        for (String packageName : moduleInfo.getExports()) {
-            moduleVisitor.visitExport(packageName.replace('.', '/'), 0);
+        var moduleVisitor = classWriter.visitModule(moduleInfo.getModuleName(), Opcodes.ACC_OPEN, moduleInfo.getModuleVersion());
+        for (var export : moduleInfo.getExports()) {
+            moduleVisitor.visitExport(getInternalName(export.t1), 0, export.t2);
         }
         moduleVisitor.visitRequire("java.base", 0, null);
-        for (String requireName : moduleInfo.getRequires()) {
+        for (var requireName : moduleInfo.getRequires()) {
             moduleVisitor.visitRequire(requireName, 0, null);
         }
-        for (String requireName : moduleInfo.getRequiresTransitive()) {
+        for (var requireName : moduleInfo.getRequiresTransitive()) {
             moduleVisitor.visitRequire(requireName, Opcodes.ACC_TRANSITIVE, null);
+        }
+        for (var open : moduleInfo.getOpens()) {
+            moduleVisitor.visitOpen(getInternalName(open.t1), 0, open.t2);
+        }
+        for (var use : moduleInfo.getUses()) {
+            moduleVisitor.visitUse(getInternalName(use));
+        }
+        for (var provide : moduleInfo.getProvides()) {
+            var with = provide.t2;
+            if (Objects.nonNull(with))
+                with = Arrays.stream(with).map(ExtraModuleInfoTransform::getInternalName).toArray(String[]::new);
+            moduleVisitor.visitProvide(getInternalName(provide.t1), with);
         }
         moduleVisitor.visitEnd();
         classWriter.visitEnd();
         return classWriter.toByteArray();
+    }
+
+    static String getInternalName(String originalName) {
+        return originalName.replace('.', '/');
     }
 }

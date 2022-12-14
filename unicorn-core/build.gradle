@@ -18,11 +18,7 @@ plugins {
 dependencies {
     api enforcedPlatform(SpringBootPlugin.BOM_COORDINATES)
     api 'org.springframework.boot:spring-boot-starter-data-jpa'
-    api('org.springframework.boot:spring-boot-starter-web') {
-        // 括号里是Groovy的语法，定义map
-        exclude(group: 'org.springframework.boot', module: "spring-boot-starter-tomcat")
-    }
-    api 'org.springframework.boot:spring-boot-starter-undertow'
+    api 'org.springframework.boot:spring-boot-starter-web'
     api 'org.springframework.boot:spring-boot-starter-security'
     api 'org.springframework.boot:spring-boot-starter-amqp'
     api 'org.springframework.boot:spring-boot-starter-cache'
