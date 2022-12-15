@@ -17,7 +17,6 @@ package com.unicorn;
 
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.core.utils.SpringContextHolder;
-import com.mzt.logapi.starter.annotation.EnableLogRecord;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableTransactionManagement // 开启事务
 @EnableRetry //开启重试机制
 @EnableConfigurationProperties //开启 @ConfigurationProperties 注解
-@EnableLogRecord(tenant = "com.unicorn.valentineP2P")
+//@EnableLogRecord(tenant = "com.unicorn.valentineP2P")
 public class UnicornAppRun {
 
     /**

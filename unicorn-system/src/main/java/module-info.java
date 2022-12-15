@@ -14,7 +14,6 @@ module lwohvye.unicorn.system {
     requires spring.websocket;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
-    requires cn.hutool;
     requires com.mzt.logapi;
     requires captcha;
     requires com.fasterxml.jackson.datatype.jsr310;

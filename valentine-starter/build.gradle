@@ -14,6 +14,11 @@ dependencies {
     implementation "io.github.mouzt:bizlog-sdk:$bizlogVersion"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    implementation(project(':unicorn-system')) {
+        capabilities {
+            requireCapability('com.lwohvye:unicorn-system-captcha')
+        }
+    }
 }
 
 extraJavaModuleInfo {

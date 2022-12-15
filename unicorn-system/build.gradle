@@ -7,6 +7,18 @@ plugins {
     id 'extra-java-module-info'
 }
 
+description = '权限管理模块'
+
+java {
+    withJavadocJar()
+    registerFeature('captcha') {
+        usingSourceSet(sourceSets.main)
+    }
+    registerFeature('businessLog') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
 dependencies {
     api project(':unicorn-sys-api')
     api('org.springframework.boot:spring-boot-starter-websocket')
@@ -15,22 +27,16 @@ dependencies {
     api "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
     api "org.quartz-scheduler:quartz:$quartzVersion"
     api "com.github.whvcse:easy-captcha:$easyCaptchaVersion"
-    implementation "com.lwohvye.captcha:captcha-spring-boot-starter:$captchaVersion"
+    captchaImplementation "com.lwohvye.captcha:captcha-spring-boot-starter:$captchaVersion"
     api "ch.ethz.ganymed:ganymed-ssh2:262"
     api 'com.jcraft:jsch:0.1.55'
     api "com.github.oshi:oshi-core:$oshiCoreVersion"
     api "ch.qos.logback:logback-access:$logbackVersion"
     api 'org.openjdk.jol:jol-core:0.16'
-    implementation "io.github.mouzt:bizlog-sdk:$bizlogVersion"
+    businessLogImplementation "io.github.mouzt:bizlog-sdk:$bizlogVersion"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
-}
-
-description = '权限管理模块'
-
-java {
-    withJavadocJar()
 }
 
 extraJavaModuleInfo {
