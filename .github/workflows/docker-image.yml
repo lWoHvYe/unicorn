@@ -32,9 +32,6 @@ jobs:
       - name: Extra Custom Env
         run: mvn install:install-file -DgroupId=org.projectlombok -DartifactId=lombok -Dversion=1.18.25 -Dpackaging=jar -Dfile=ex-lib/lombok-1.18.25.jar
 
-      - name: Try zoomInto workDir
-        run: cd valentine-starter
-
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:

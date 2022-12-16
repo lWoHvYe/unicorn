@@ -2,7 +2,8 @@ import org.gradle.api.java.archives.internal.DefaultManifest
 
 plugins {
     id 'com.lwohvye.java-conventions'
-    id 'org.springframework.boot' // 主要是定义了这个，不晓得在子模块定义为啥会报错
+    id 'org.springframework.boot' // 主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
+    // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
 }
 
 ext.sharedManifest = manifest {
@@ -26,4 +27,17 @@ tasks.withType(Checkstyle).configureEach {
         html.required = true
         html.stylesheet resources.text.fromFile('config/xsl/checkstyle-custom.xsl')
     }
+}
+
+tasks.named("bootJar") {
+    // 主要是解决build issue，应该有别的解决方法
+    mainClass = 'com.unicorn.UnicornAppRun'
+}
+
+tasks.named("bootBuildImage") {
+    environment = [
+            "BP_JVM_VERSION"              : "19",
+            "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
+            "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
+    ]
 }
