@@ -23,6 +23,22 @@ java {
     withJavadocJar()
 }
 
+jar {
+    enabled = true // separates boot jar from normal jar
+    manifest {
+        from sharedManifest
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+                "Automatic-Module-Name": "lwohvye." + project.name.replace("-", ".")
+        )
+    }
+    into("META-INF/maven/$project.group/$project.name") {
+        from { generatePomFileForMavenPublication }
+        rename ".*", "pom.xml"
+    }
+}
+
 extraJavaModuleInfo {
     automaticModule("hutool-all-${hutoolVersion}.jar", 'cn.hutool')
     automaticModule("mapstruct-spring-extensions-${mapstructSpringVersion}.jar", 'org.mapstruct.extensions.spring')

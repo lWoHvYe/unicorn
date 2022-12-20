@@ -7,10 +7,12 @@ plugins {
 }
 
 ext.sharedManifest = manifest {
-    attributes("Developer": "lWoHvYe",
-            "Created-By": "Gradle",
-            "Built-By": "IntelliJ IDEA",
-            "Build-Jdk-Spec": JavaVersion.VERSION_19)
+    attributes(
+            'Developer': 'lWoHvYe',
+            'Created-By': 'Gradle',
+            'Built-By': System.properties['user.name'],
+            'Build-Jdk-Spec': "${System.properties['java.version']}"
+    )
 } as DefaultManifest
 
 ext { // 这个定义是可以传递的
@@ -19,6 +21,13 @@ ext { // 这个定义是可以传递的
 
 subprojects {
     dependencies {}
+    tasks.withType(Javadoc).every {
+        enable = false
+    }
+}
+
+tasks.named("bootJar") {
+    mainClass = ''
 }
 
 tasks.withType(Checkstyle).configureEach {

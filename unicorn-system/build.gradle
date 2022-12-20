@@ -7,18 +7,6 @@ plugins {
     id 'extra-java-module-info'
 }
 
-description = '权限管理模块'
-
-java {
-    withJavadocJar()
-    registerFeature('captcha') {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature('businessLog') {
-        usingSourceSet(sourceSets.main)
-    }
-}
-
 dependencies {
     api project(':unicorn-sys-api')
     api('org.springframework.boot:spring-boot-starter-websocket')
@@ -37,6 +25,34 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+}
+
+description = '权限管理模块'
+
+java {
+    withJavadocJar()
+    registerFeature('captcha') {
+        usingSourceSet(sourceSets.main)
+    }
+    registerFeature('businessLog') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
+jar {
+    enabled = true // separates boot jar from normal jar
+    manifest {
+        from sharedManifest
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+                "Automatic-Module-Name": "lwohvye." + project.name.replace("-", ".")
+        )
+    }
+    into("META-INF/maven/$project.group/$project.name") {
+        from { generatePomFileForMavenPublication }
+        rename ".*", "pom.xml"
+    }
 }
 
 extraJavaModuleInfo {
