@@ -4,7 +4,7 @@ plugins {
     id 'com.lwohvye.java-conventions'
     id 'org.springframework.boot' // 主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
-    id 'signing'
+//    id 'signing'
 }
 
 ext.sharedManifest = manifest {
@@ -52,7 +52,7 @@ java {
     withSourcesJar()
 }
 
-publishing {
+/*publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId = 'unicorn'
@@ -114,7 +114,7 @@ publishing {
 
 signing {
     sign publishing.publications.mavenJava
-}
+}*/
 
 javadoc {
     if (JavaVersion.current().isJava9Compatible()) {
