@@ -4,6 +4,7 @@ plugins {
     id 'com.lwohvye.java-conventions'
     id 'org.springframework.boot' // 主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
+    id 'signing'
 }
 
 ext.sharedManifest = manifest {
@@ -38,15 +39,85 @@ tasks.withType(Checkstyle).configureEach {
     }
 }
 
-tasks.named("bootJar") {
-    // 主要是解决build issue，应该有别的解决方法
-    mainClass = 'com.unicorn.UnicornAppRun'
-}
-
 tasks.named("bootBuildImage") {
     environment = [
             "BP_JVM_VERSION"              : "19",
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'unicorn'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Valentine Unicorn'
+                packaging = 'pom'
+                // optionally artifactId can be defined here
+                description = 'A Spring Boot Project With Jpa JWT Security and so on'
+                url = 'https://github.com/WHY-lWoHvYe/valentine-p2p.git'
+                properties = [
+                        myProp          : "value",
+                        "prop.with.dots": "anotherValue"
+                ]
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'lWoHvYe'
+                        name = '王红岩(lWoHvYe)'
+                        email = 'lWoHvYe@outlook.com'
+                        url = 'https://www.lwohvye.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/WHY-lWoHvYe/valentine-p2p.git'
+                    developerConnection = 'scm:git:ssh://github.com/WHY-lWoHvYe/valentine-p2p.git'
+                    url = 'https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main'
+                    tag = 'unicorn-v3.3.0'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }

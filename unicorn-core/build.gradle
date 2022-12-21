@@ -36,7 +36,6 @@ dependencies {
     api "org.mapstruct:mapstruct:$mapstructVersion"
     api "org.mapstruct.extensions.spring:mapstruct-spring-extensions:$mapstructSpringVersion"
     api 'org.hibernate.validator:hibernate-validator'
-    implementation "it.unimi.dsi:fastutil:$fastutilVersion"
     api "nl.basjes.parse.useragent:yauaa:$yauaaVersion"
     api 'com.github.ben-manes.caffeine:caffeine'
     implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
