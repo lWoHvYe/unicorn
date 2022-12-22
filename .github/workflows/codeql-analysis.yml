@@ -74,6 +74,11 @@ jobs:
         # Workaround to pass job status to post job step. This variable is not intended for manual setting
         #job-status: # optional, default is ${{ job.status }}
 
+    - name: Set Env
+      env:
+        ossrhUsername: ${{ secrets.OssrhUsername }}
+        ossrhPassword: ${{ secrets.OssrhPassword }}
+
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
