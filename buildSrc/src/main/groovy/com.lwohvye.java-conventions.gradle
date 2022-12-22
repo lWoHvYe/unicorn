@@ -10,6 +10,9 @@ plugins {
 repositories {
     mavenLocal()
     mavenCentral()
+    flatDir {
+        dirs "$rootProject.projectDir/ex-lib"
+    }
 /*
     maven {
         url = uri('https://repo.maven.apache.org/maven2/')
