@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 
 /**
- * Timestamp&String。使用方式为加入到Mapper的uses中
+ * transform Timestamp to String。使用方式为加入到Mapper的uses中
  * 此类方法，mapstruct自动选择的依据是入参和出参，在方法内要保持唯一
  *
  * @date 2021/4/13 5:07 下午

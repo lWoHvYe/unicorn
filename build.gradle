@@ -4,7 +4,7 @@ plugins {
     id 'com.lwohvye.java-conventions'
     id 'org.springframework.boot' // 主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
-//    id 'signing'
+    id 'signing'
 }
 
 ext.sharedManifest = manifest {
@@ -22,8 +22,30 @@ ext { // 这个定义是可以传递的
 
 subprojects {
     dependencies {}
-    tasks.withType(Javadoc).every {
-        enable = false
+    tasks.withType(Javadoc).tap {
+        configureEach {
+            failOnError(false)
+            options.addStringOption('Xdoclint:none', '-quiet')
+            options.addStringOption('encoding', 'UTF-8')
+            options.addStringOption('charSet', 'UTF-8')
+            // Add support for custom tag
+            options.addStringOption('tag', 'date:a:Init Date:')
+            options.addStringOption('tag', 'author:a:Major Contributor:')
+        }
+    }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                versionMapping {
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -52,7 +74,7 @@ java {
     withSourcesJar()
 }
 
-/*publishing {
+publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId = 'unicorn'
@@ -72,8 +94,9 @@ java {
                 description = 'A Spring Boot Project With Jpa JWT Security and so on'
                 url = 'https://github.com/WHY-lWoHvYe/valentine-p2p.git'
                 properties = [
-                        myProp          : "value",
-                        "prop.with.dots": "anotherValue"
+                        myProp                : "chaste unicorn",
+                        "spring-boot.version" : "3.0.0",
+                        "project.core.version": "4.0.0"
                 ]
                 licenses {
                     license {
@@ -100,6 +123,7 @@ java {
     }
     repositories {
         maven {
+            name = "OSSRH"
             // change URLs to point to your repos, e.g. http://my.org/repo
             def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
@@ -114,7 +138,7 @@ java {
 
 signing {
     sign publishing.publications.mavenJava
-}*/
+}
 
 javadoc {
     if (JavaVersion.current().isJava9Compatible()) {

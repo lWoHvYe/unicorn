@@ -5,6 +5,7 @@
 plugins {
     id 'com.lwohvye.java-conventions'
     id 'extra-java-module-info' // apply my own plugin written in buildSrc
+    id 'signing'
 }
 
 ext {

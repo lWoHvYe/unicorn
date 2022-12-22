@@ -5,6 +5,7 @@
 plugins {
     id 'com.lwohvye.java-conventions'
     id 'extra-java-module-info'
+    id 'signing'
 }
 
 description = '权限管理模块'
