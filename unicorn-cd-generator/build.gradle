@@ -8,15 +8,6 @@ plugins {
     id 'signing'
 }
 
-dependencies {
-    api project(':unicorn-core')
-    api 'org.springframework.boot:spring-boot-starter-freemarker'
-    implementation "org.apache.commons:commons-configuration2:${commonsConfigurationVersion}"
-    implementation "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-}
-
 description = '代码生成模块'
 
 java {
@@ -37,6 +28,35 @@ jar {
         from { generatePomFileForMavenPublication }
         rename ".*", "pom.xml"
     }
+}
+
+publishing {
+    publications {
+        mavenJavaCodeGen(MavenPublication) {
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJavaCodeGen
+}
+
+dependencies {
+    api project(':unicorn-core')
+    api 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation "org.apache.commons:commons-configuration2:${commonsConfigurationVersion}"
+    implementation "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }
 
 extraJavaModuleInfo {

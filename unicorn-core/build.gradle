@@ -42,6 +42,26 @@ jar {
     }
 }
 
+publishing {
+    publications {
+        mavenJavaCore(MavenPublication) {
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJavaCore
+}
+
 dependencies {
     api platform(SpringBootPlugin.BOM_COORDINATES)
     api 'org.springframework.boot:spring-boot-starter-data-jpa'

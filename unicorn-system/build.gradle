@@ -36,6 +36,26 @@ jar {
     }
 }
 
+publishing {
+    publications {
+        mavenJavaSysAdmin(MavenPublication) {
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJavaSysAdmin
+}
+
 dependencies {
     api project(':unicorn-sys-api')
     api('org.springframework.boot:spring-boot-starter-websocket')

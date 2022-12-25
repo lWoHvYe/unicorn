@@ -8,12 +8,6 @@ plugins {
     id 'signing'
 }
 
-dependencies {
-    api project(':unicorn-core')
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-}
-
 description = '权限基础模块'
 
 java {
@@ -34,6 +28,32 @@ jar {
         from { generatePomFileForMavenPublication }
         rename ".*", "pom.xml"
     }
+}
+
+publishing {
+    publications {
+        mavenJavaSysApi(MavenPublication) {
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJavaSysApi
+}
+
+dependencies {
+    api project(':unicorn-core')
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }
 
 extraJavaModuleInfo {

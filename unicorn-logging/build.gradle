@@ -8,12 +8,6 @@ plugins {
     id 'signing'
 }
 
-dependencies {
-    api project(':unicorn-core')
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-}
-
 description = '日志收集模块'
 
 java {
@@ -34,6 +28,32 @@ jar {
         from { generatePomFileForMavenPublication }
         rename ".*", "pom.xml"
     }
+}
+
+publishing {
+    publications {
+        mavenJavaLog(MavenPublication) {
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJavaLog
+}
+
+dependencies {
+    api project(':unicorn-core')
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }
 
 extraJavaModuleInfo {
