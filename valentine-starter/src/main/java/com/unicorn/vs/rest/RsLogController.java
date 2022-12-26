@@ -23,6 +23,8 @@ import com.lwohvye.core.utils.result.ResultInfo;
 import com.lwohvye.sys.common.annotation.ApiVersion;
 import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType;
 import com.mzt.logapi.starter.annotation.LogRecord;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 public class RsLogController {
     // #{…} 主要用于加载外部属性文件中的值
@@ -52,6 +55,11 @@ public class RsLogController {
 
     @Value("${local.rs.iList}")
     private Integer[] ints;
+
+    @PostConstruct
+    public void who() {
+        log.warn(" The module of Cur-Starter is {} ", this.getClass().getModule());
+    }
 
     /**
      * 访问首页提示
@@ -85,7 +93,8 @@ public class RsLogController {
     )
     @RespResultBody
     @ApiVersion(3) // 指定从v3开始
-    @AnonymousGetMapping(value = {"/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"}) // @RequestMapping的path是支持多个的
+    @AnonymousGetMapping(value = {"/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"})
+    // @RequestMapping的path是支持多个的
     public ResultInfo<String> indexVersion(@PathVariable String version) throws InterruptedException {
         Thread.sleep(Duration.ofSeconds(1L)); // 使用JMeter  500 * 80，使用VisualVM monitor，只增加十几个thread，整体用时81s，也说明了Fibers/Loom较传统Thread的不同之处，
         // 随着压力及时间的增长，会逐渐有ForkJoinPool-1-worker-xx的Thread被Create（这部分Thread在free后，会wait一段时间再Terminate），不清楚具体的mechanism，已知的是一个OS Thread可以Manage很多的VisualThread
