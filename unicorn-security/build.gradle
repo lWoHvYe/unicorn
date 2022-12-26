@@ -70,7 +70,8 @@ dependencies {
     api "com.github.oshi:oshi-core:$oshiCoreVersion"
     api "ch.qos.logback:logback-access:$logbackVersion"
     api 'org.openjdk.jol:jol-core:0.16'
-    businessLogImplementation "io.github.mouzt:bizlog-sdk:$bizlogVersion"
+    // It seems that xxxImplementation will work on runtimeClasspath for the customers while xxxApi compileClasspath
+    businessLogApi "io.github.mouzt:bizlog-sdk:$bizlogVersion"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"

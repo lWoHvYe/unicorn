@@ -8,7 +8,7 @@ module lwohvye.valentine.starter {
     requires jakarta.mail;
     requires jakarta.activation;
     requires spring.retry;
-//    requires com.mzt.logapi;
+    requires com.mzt.logapi;
 //    requires captcha;
 
     exports com.unicorn.vs.rest to spring.beans, spring.aop, spring.web;
