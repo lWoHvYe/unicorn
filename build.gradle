@@ -30,6 +30,8 @@ ext.sharedManifest = manifest {
 
 ext { // 这个定义是可以传递的
     lombokVersion = "1.18.25"
+    ossrhUsername = System.getenv('OSSRH_USERNAME') ?: ossrhUsername ?: ''
+    ossrhPassword = System.getenv('OSSRH_PASSWORD') ?: ossrhPassword ?: ''
 }
 
 subprojects {
@@ -127,8 +129,8 @@ publishing {
             def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = System.getenv('OSSRH_USERNAME') ?: System.getProperty('ossrhUsername') ?: ''
-                password = System.getenv('OSSRH_PASSWORD') ?: System.getenv('ossrhPassword') ?: ''
+                username = ossrhUsername
+                password = ossrhPassword
             }
         }
     }
