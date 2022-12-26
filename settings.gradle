@@ -10,9 +10,9 @@ pluginManagement({
 rootProject.name = 'valentine-p2p'
 include(':unicorn-core')
 include(':unicorn-reactive')
-include(':unicorn-cd-generator')
+include(':unicorn-code-gen')
 include(':unicorn-logging')
 include(':unicorn-tp-tools')
 include(':unicorn-sys-api')
-include(':unicorn-system')
+include(':unicorn-security')
 include(':valentine-starter')

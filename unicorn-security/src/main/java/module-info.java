@@ -1,6 +1,6 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
-module lwohvye.unicorn.system {
-    requires transitive lwohvye.unicorn.sys_api;
+module lwohvye.unicorn.security {
+    requires transitive lwohvye.unicorn.sys.api;
 
     requires transitive java.desktop;
     requires transitive java.management;

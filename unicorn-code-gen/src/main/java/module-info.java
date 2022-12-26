@@ -1,5 +1,5 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
-module lwohvye.unicorn.cd_generator {
+module lwohvye.unicorn.code.gen {
     requires transitive lwohvye.unicorn.core;
     requires org.apache.commons.configuration2;
 

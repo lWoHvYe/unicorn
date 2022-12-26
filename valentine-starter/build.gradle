@@ -5,18 +5,23 @@ plugins {
 }
 
 dependencies {
-    implementation project(':unicorn-system')
+    implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
     implementation project(':unicorn-tp-tools')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnlyApi "org.projectlombok:lombok:${lombokVersion}"
     compileOnlyApi "org.mapstruct:mapstruct-processor:$mapstructVersion"
-    implementation "io.github.mouzt:bizlog-sdk:$bizlogVersion"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    implementation(project(':unicorn-system')) {
+    implementation(project(':unicorn-security')) {
         capabilities {
-            requireCapability('com.lwohvye:unicorn-system-captcha')
+            requireCapability('com.lwohvye:unicorn-security-captcha')
+        }
+    }
+    implementation(project(':unicorn-security')) {
+        capabilities {
+            // 这里只支撑横线，不支持驼峰
+            requireCapability('com.lwohvye:unicorn-security-business-log')
         }
     }
 }

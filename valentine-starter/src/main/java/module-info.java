@@ -1,8 +1,8 @@
 @SuppressWarnings({"requires-automatic"})
 module lwohvye.valentine.starter {
-    requires lwohvye.unicorn.system;
+    requires lwohvye.unicorn.security;
     requires lwohvye.unicorn.core;
-    requires lwohvye.unicorn.tp_tools;
+    requires lwohvye.unicorn.tp.tools;
     requires lombok;
     // 如果使用3rd-tools，需要加入下面这两个，不清楚为何在tools中加没生效。mail works well under unnamed module
     requires jakarta.mail;

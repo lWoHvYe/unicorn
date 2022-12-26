@@ -38,7 +38,7 @@ jar {
 
 publishing {
     publications {
-        mavenJavaSysAdmin(MavenPublication) {
+        mavenJavaSecurity(MavenPublication) {
             from components.java
             versionMapping {
                 usage('java-api') {
@@ -53,7 +53,7 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJavaSysAdmin
+    sign publishing.publications.mavenJavaSecurity
 }
 
 dependencies {
