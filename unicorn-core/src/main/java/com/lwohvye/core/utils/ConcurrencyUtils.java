@@ -58,7 +58,8 @@ public final class ConcurrencyUtils {
             // Here, both forks have succeeded, so compose their results
             Object results = null;
             if (Objects.nonNull(composeResult))
-                results = composeResult.apply(Objects.nonNull(futures) ? futures.stream().map(Future::resultNow).toList() : Collections.emptyList());
+                results = composeResult.apply(Objects.nonNull(futures) ?
+                        futures.stream().map(Future::resultNow).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
         } catch (ExecutionException e) {
