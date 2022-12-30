@@ -5,10 +5,15 @@ buildscript {
         mavenCentral()
         //Needed only for SNAPSHOT versions
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        // Should in hierarchy
+        maven {
+            name "extra-repo"
+            url "$rootProject.projectDir/ex-lib"
+        }
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
-        classpath "org.gradlex:extra-java-module-info:1.1"
+        classpath "org.gradlex:extra-java-module-info:1.1.1"
     }
 }
 
