@@ -144,13 +144,13 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - `unicorn-sys-api` Sys Module基础实体及API，方便服务拆分
 
-- `unicorn-system` 系统权限模块，包含权限配置管理等。
+- `unicorn-security` 系统权限模块，包含权限配置管理等。
 
 - `unicorn-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
 
 - `unicorn-tp-tools` 第三方工具模块，包含：邮件、S3，可视情况引入
 
-- `unicorn-cd-generator` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
+- `unicorn-code-gen` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
 
 - `unicorn-starter` 启动类，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离），枚举类动态扩展的简单demo
 
@@ -173,7 +173,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
     - annotation 为模块自定义注解
     - modules 基础实体及接口定义
     - utils 通用工具类扩展
-- unicorn-system 系统核心模块
+- unicorn-security 系统核心模块
 	- common 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
 	    - init 容器启动后的钩子call back
 	    - orm jpa-entity的部分配置，eg: Table Mapping
@@ -187,7 +187,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - unicorn-starter 系统启动入口。相关示例
 - unicorn-logging 系统日志模块
 - unicorn-tp-tools 系统第三方工具模块
-- unicorn-cd-generator 系统代码生成模块
+- unicorn-code-gen 系统代码生成模块
 ```
 
 #### 运行环境

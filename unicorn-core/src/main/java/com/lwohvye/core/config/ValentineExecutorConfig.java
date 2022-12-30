@@ -47,7 +47,7 @@ public class ValentineExecutorConfig {
     /**
      * httpRequest ThreadPool, will do sync-db-query also
      *
-     * @return org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer<?>
+     * @return org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer
      * @date 2022/11/29 12:53 PM
      */
     @Bean

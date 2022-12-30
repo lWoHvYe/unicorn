@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * DateTime&String
+ * transform DateTime to String
  *
  * @author Hongyan Wang
  * @date 2021/4/13 5:06 下午

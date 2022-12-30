@@ -20,19 +20,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Java JDK
+      - name: Set up JDK
         uses: actions/setup-java@v3.9.0
         with:
           java-version: '19'
           distribution: 'corretto'
           check-latest: true
-        # add custom dependency to env
-      - name: Extra Custom Env
-        run: mvn install:install-file -DgroupId=org.projectlombok -DartifactId=lombok -Dversion=1.18.25 -Dpackaging=jar -Dfile=ex-lib/lombok-1.18.25.jar
+          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: Build Core
-        run: mvn -B install --file pom.xml
-      # - name: Build Valentine's Day
-      #   run: mvn -B package --file valentine-starter/pom.xml
-      - name: Build the Docker image
-        run: mvn -B spring-boot:build-image --file valentine-starter/pom.xml
+      - name: Build with Gradle
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        uses: gradle/gradle-build-action@3fbe033aaae657f011f88f29be9e65ed26bd29ef
+        with:
+          arguments: bootBuildImage
+

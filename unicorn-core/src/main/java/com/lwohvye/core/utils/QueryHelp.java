@@ -42,7 +42,7 @@ public class QueryHelp {
     /**
      * 解析属性上的查询注解。贫瘠相应的查询
      * 当前已经支持了简单多条件的连表查询，但无法支持复杂的 And, Or 组合查询，这种要么使用QueryDSL要么干脆使用Native SQL。
-     * 虽说通过Annotation & Reflect 也是可以支持复杂查询的，但既然已经有QueryDSL（虽然用的不多且好久没更新了），个人认为没必要重复造轮子，尤其是JPA跟其还是兼容的
+     * 虽说通过整合Annotation和Reflect 也是可以支持复杂查询的，但既然已经有QueryDSL（虽然用的不多且好久没更新了），个人认为没必要重复造轮子，尤其是JPA跟其还是兼容的
      *
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象
@@ -219,14 +219,17 @@ public class QueryHelp {
                 //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
                     list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType),
                             Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
-            case LESS_THAN -> list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType),
-                    Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
+            case LESS_THAN ->
+                    list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType),
+                            Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
             case LESS_THAN_NQ -> list.add(cb.lessThan(getExpression(attributeName, join, root).as(comparableFieldType),
                     Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
-            case INNER_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
+            case INNER_LIKE ->
+                    list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
             case LEFT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val));
             case RIGHT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
-            case LIKE_STR -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
+            case LIKE_STR ->
+                    list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
             case IN_INNER_LIKE -> {
                 if (val instanceof List<?> objList) {
 //                                构建数组
@@ -307,7 +310,8 @@ public class QueryHelp {
             // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
 //                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%")); // 这种把调用函数硬编码了
 //                break; 后续移除
-            case FUNCTION_4_EQUAL -> list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), val));
+            case FUNCTION_4_EQUAL ->
+                    list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), val));
             default -> {
             }
         }
