@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.gradlex.extra-java-module-info</groupId>
+  <artifactId>org.gradlex.extra-java-module-info.gradle.plugin</artifactId>
+  <version>1.1</version>
+  <packaging>pom</packaging>
+  <name>Extra Java Module Info Gradle Plugin</name>
+  <description>Add module information to legacy Java libraries.</description>
+  <url>https://github.com/gradlex-org/extra-java-module-info</url>
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>jjohannes</id>
+      <name>Jendrik Johannes</name>
+      <email>jendrik@gradlex.org</email>
+    </developer>
+  </developers>
+  <scm>
+    <url>https://github.com/gradlex-org/extra-java-module-info</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>org.gradlex</groupId>
+      <artifactId>extra-java-module-info</artifactId>
+      <version>1.1</version>
+    </dependency>
+  </dependencies>
+</project>

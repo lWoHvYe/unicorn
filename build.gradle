@@ -8,6 +8,7 @@ buildscript {
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath "org.gradlex:extra-java-module-info:1.1"
     }
 }
 

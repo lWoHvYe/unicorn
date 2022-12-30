@@ -4,7 +4,7 @@
 
 plugins {
     id 'com.lwohvye.java-conventions'
-    id 'extra-java-module-info'
+    id 'org.gradlex.extra-java-module-info'
     id 'signing'
 }
 
@@ -78,7 +78,7 @@ extraJavaModuleInfo {
     automaticModule("mapstruct-spring-extensions-${mapstructSpringVersion}.jar", 'org.mapstruct.extensions.spring')
     automaticModule("redisson-${redissonVersion}.jar", 'org.redisson')
     automaticModule("thumbnailator-${thumbnailatorVersion}.jar", 'net.coobird.thumbnailator')
-    module('jakarta.mail-1.0.0.jar', 'jakarta.mail', '1.0.0', true) {
+    module('jakarta.mail-1.0.0.jar', 'jakarta.mail', '1.0.0') {
         uses('jakarta.mail.util.StreamProvider')
     }
 }

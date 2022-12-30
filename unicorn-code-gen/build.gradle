@@ -4,7 +4,7 @@
 
 plugins {
     id 'com.lwohvye.java-conventions'
-    id 'extra-java-module-info'
+    id 'org.gradlex.extra-java-module-info'
     id 'signing'
 }
 

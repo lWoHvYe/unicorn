@@ -5,7 +5,8 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
     id 'com.lwohvye.java-conventions'
-    id 'extra-java-module-info' // apply my own plugin written in buildSrc
+//    id 'extra-java-module-info' // apply my own plugin written in buildSrc
+    id 'org.gradlex.extra-java-module-info'
     id 'signing'
 //    id 'org.springframework.boot'
 }
