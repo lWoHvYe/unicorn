@@ -73,8 +73,8 @@ dependencies {
 }
 
 extraJavaModuleInfo {
-    automaticModule("hutool-all-${hutoolVersion}.jar", 'cn.hutool')
-    automaticModule("mapstruct-spring-extensions-${mapstructSpringVersion}.jar", 'org.mapstruct.extensions.spring')
-    automaticModule("redisson-${redissonVersion}.jar", 'org.redisson')
-    automaticModule("thumbnailator-${thumbnailatorVersion}.jar", 'net.coobird.thumbnailator')
+    automaticModule("cn.hutool:hutool-all", 'cn.hutool')
+    automaticModule("org.mapstruct.extensions.spring:mapstruct-spring-extensions", 'org.mapstruct.extensions.spring')
+    automaticModule("org.redisson:redisson", 'org.redisson')
+    automaticModule("net.coobird:thumbnailator", 'net.coobird.thumbnailator')
 }

@@ -27,20 +27,20 @@ dependencies {
 }
 
 extraJavaModuleInfo {
-    automaticModule("bizlog-sdk-${bizlogVersion}.jar", 'com.mzt.logapi')
-    automaticModule("easy-captcha-${easyCaptchaVersion}.jar", 'com.wf.captcha')
-    automaticModule("ganymed-ssh2-262.jar", 'ch.ethz.ssh2')
-    automaticModule("hutool-all-${hutoolVersion}.jar", 'cn.hutool')
-    automaticModule("jjwt-api-${jjwtVersion}.jar", 'io.jsonwebtoken.api')
-    automaticModule("jjwt-impl-${jjwtVersion}.jar", 'io.jsonwebtoken.impl')
-    automaticModule("jjwt-jackson-${jjwtVersion}.jar", 'io.jsonwebtoken.jackson')
-    automaticModule("jsch-0.1.55.jar", 'com.jcraft.jsch')
-    automaticModule("mapstruct-spring-extensions-${mapstructSpringVersion}.jar", 'org.mapstruct.extensions.spring')
-    automaticModule("quartz-${quartzVersion}.jar", 'org.quartz')
-    automaticModule("redisson-${redissonVersion}.jar", 'org.redisson')
-    automaticModule("spring-retry-${springretryVersion}.jar", 'spring.retry')
-    automaticModule("thumbnailator-${thumbnailatorVersion}.jar", 'net.coobird.thumbnailator')
-    module('jakarta.mail-1.0.0.jar', 'jakarta.mail', '1.0.0') {
+    automaticModule("io.github.mouzt:bizlog-sdk", 'com.mzt.logapi')
+    automaticModule("com.github.whvcse:easy-captcha", 'com.wf.captcha')
+    automaticModule("ch.ethz.ganymed:ganymed-ssh2", 'ch.ethz.ssh2')
+    automaticModule("cn.hutool:hutool-all", 'cn.hutool')
+    automaticModule("io.jsonwebtoken:jjwt-api", 'io.jsonwebtoken.api')
+    automaticModule("io.jsonwebtoken:jjwt-impl", 'io.jsonwebtoken.impl')
+    automaticModule("io.jsonwebtoken:jjwt-jackson", 'io.jsonwebtoken.jackson')
+    automaticModule("com.jcraft:jsch", 'com.jcraft.jsch')
+    automaticModule("org.mapstruct.extensions.spring:mapstruct-spring-extensions", 'org.mapstruct.extensions.spring')
+    automaticModule("org.quartz-scheduler:quartz", 'org.quartz')
+    automaticModule("org.redisson:redisson", 'org.redisson')
+    automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
+    automaticModule("net.coobird:thumbnailator", 'net.coobird.thumbnailator')
+    module('org.eclipse.angus:jakarta.mail', 'jakarta.mail', '1.0.0') {
         uses('jakarta.mail.util.StreamProvider')
     }
 }
