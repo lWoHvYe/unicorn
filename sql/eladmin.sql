@@ -950,6 +950,22 @@ COMMIT;
 DROP VIEW IF EXISTS `sys_menu_view`;
 CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `sys_menu_view` AS select `sys_menu`.`menu_id` AS `menu_id`,`sys_menu`.`title` AS `title`,`sys_menu`.`name` AS `name`,`sys_menu`.`type` AS `type`,`sys_menu`.`pid` AS `pid`,`sys_roles_menus`.`role_id` AS `role_id` from (`sys_menu` join `sys_roles_menus`) where (`sys_menu`.`menu_id` = `sys_roles_menus`.`menu_id`);
 
+/*
+ *    Copyright (c) 2023.  lWoHvYe(Hongyan Wang)
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 -- ----------------------------
 -- View structure for sys_role_view
 -- ----------------------------

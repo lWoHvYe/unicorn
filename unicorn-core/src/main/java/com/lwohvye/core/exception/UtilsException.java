@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.designpatterns.state;
+package com.lwohvye.core.exception;
 
-// 任务状态抽象接口
-public interface State {
-    // 默认实现，不做任何处理
-    default void update(Task task, ActionType actionType) {
-        // do nothing
-    }
+public class UtilsException extends RuntimeException {
+
+	public UtilsException(String message) {
+		super(message);
+	}
+
 }

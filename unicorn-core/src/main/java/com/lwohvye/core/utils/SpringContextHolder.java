@@ -15,15 +15,19 @@
  */
 package com.lwohvye.core.utils;
 
+import com.lwohvye.core.exception.UtilsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.env.Environment;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -44,17 +48,32 @@ import java.util.jar.JarFile;
  *
  * @author Jie, Super Idol lv, Super Idol peng
  * @date 2019-01-07
+ * @see cn.hutool.extra.spring.SpringUtil
  */
 @Slf4j
 @SuppressWarnings("unused")
-public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
+public class SpringContextHolder implements BeanFactoryPostProcessor, ApplicationContextAware, DisposableBean {
 
-    //    Spring应用上下文环境
-    private static ApplicationContext applicationContext = null;
+    /**
+     * "@PostConstruct"注解标记的类中，由于ApplicationContext还未加载，导致空指针<br>
+     * 因此实现BeanFactoryPostProcessor注入ConfigurableListableBeanFactory实现bean的操作
+     */
+    private static ConfigurableListableBeanFactory beanFactory;
+    /**
+     * Spring应用上下文环境
+     */
+    private static ApplicationContext applicationContext;
     private static DefaultListableBeanFactory defaultListableBeanFactory = null;
     private static final List<CallBack> CALL_BACKS = new ArrayList<>();
     private static boolean addCallback = true;
 
+    @SuppressWarnings("NullableProblems")
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        SpringContextHolder.beanFactory = beanFactory;
+    }
+
+    @SuppressWarnings("NullableProblems")
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         if (!Objects.isNull(SpringContextHolder.applicationContext))
@@ -72,8 +91,43 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
         defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
     }
 
+    /**
+     * 获取{@link ApplicationContext}
+     *
+     * @return {@link ApplicationContext}
+     */
     public static ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    /**
+     * 获取{@link ListableBeanFactory}，可能为{@link ConfigurableListableBeanFactory} 或 {@link ApplicationContextAware}
+     *
+     * @return {@link ListableBeanFactory}
+     * @since 4.0.0
+     */
+    public static ListableBeanFactory getBeanFactory() {
+        assertContextInjected();
+        return Objects.isNull(beanFactory) ? applicationContext : beanFactory;
+    }
+
+    /**
+     * 获取{@link ConfigurableListableBeanFactory}
+     *
+     * @return {@link ConfigurableListableBeanFactory}
+     * @throws UtilsException 当上下文非ConfigurableListableBeanFactory抛出异常
+     * @since 4.0.0
+     */
+    public static ConfigurableListableBeanFactory getConfigurableBeanFactory() throws UtilsException {
+        final ConfigurableListableBeanFactory factory;
+        if (Objects.nonNull(beanFactory)) {
+            factory = beanFactory;
+        } else if (applicationContext instanceof ConfigurableApplicationContext configurableApplicationContext) {
+            factory = configurableApplicationContext.getBeanFactory();
+        } else {
+            throw new UtilsException("No ConfigurableListableBeanFactory from context!");
+        }
+        return factory;
     }
 
     @Override
@@ -102,16 +156,14 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      */
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String beanName) {
-        assertContextInjected();
-        return (T) applicationContext.getBean(beanName);
+        return (T) getBeanFactory().getBean(beanName);
     }
 
     /**
      * 从静态变量applicationContext中取得Bean, 自动转型为所赋值对象的类型.
      */
     public static <T> T getBean(Class<T> requiredType) {
-        assertContextInjected();
-        return applicationContext.getBean(requiredType);
+        return getBeanFactory().getBean(requiredType);
     }
 
     /**
@@ -119,15 +171,15 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      */
     public static <T> T getBean(String beanName, Class<T> clazz) {
         if (StringUtils.isBlank(beanName)) {
-            return applicationContext.getBean(clazz);
+            return getBeanFactory().getBean(clazz);
         } else {
-            return applicationContext.getBean(beanName, clazz);
+            return getBeanFactory().getBean(beanName, clazz);
         }
     }
 
     public static Object getBean(String beanName, String className) throws ClassNotFoundException {
-        Class<?> clz = Class.forName(className);
-        return applicationContext.getBean(beanName, clz);
+        var clz = Class.forName(className);
+        return getBeanFactory().getBean(beanName, clz);
     }
 
     /**
@@ -138,7 +190,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * @date 2021/11/23 11:48 上午
      */
     public static <T> Map<String, T> getBeansOfType(Class<T> clazz) {
-        return applicationContext.getBeansOfType(clazz);
+        return getBeanFactory().getBeansOfType(clazz);
     }
 
     /**
@@ -149,7 +201,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * @date 2021/11/23 9:33 上午
      */
     public static boolean containsBean(String beanName) {
-        return applicationContext.containsBean(beanName);
+        return getBeanFactory().containsBean(beanName);
     }
 
     /**
@@ -160,7 +212,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * @date 2021/11/23 9:34 上午
      */
     public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
-        return applicationContext.isSingleton(name);
+        return getBeanFactory().isSingleton(name);
     }
 
     /**
@@ -171,11 +223,11 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      * @date 2021/11/23 9:35 上午
      */
     public static Class<?> getType(String beanName) throws NoSuchBeanDefinitionException {
-        return applicationContext.getType(beanName);
+        return getBeanFactory().getType(beanName);
     }
 
     public static String[] getAliases(String name) throws NoSuchBeanDefinitionException {
-        return applicationContext.getAliases(name);
+        return getBeanFactory().getAliases(name);
     }
 
     /**
@@ -188,8 +240,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
      */
     public static <T> T getProperties(String property, T defaultValue, Class<T> requiredType) {
         T result = defaultValue;
+        if (Objects.isNull(applicationContext))
+            return result;
         try {
-            result = getBean(Environment.class).getProperty(property, requiredType);
+            result = applicationContext.getEnvironment().getProperty(property, requiredType);
         } catch (Exception ignored) {
             // 名为ignored 的变量即为忽略
         }
@@ -218,10 +272,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     }
 
     /**
-     * 检查ApplicationContext不为空.
+     * 检查ApplicationContext/ConfigurableListableBeanFactory不为空.
      */
     private static void assertContextInjected() {
-        if (Objects.isNull(applicationContext))
+        if (Objects.isNull(applicationContext) && Objects.isNull(beanFactory))
             throw new IllegalStateException("applicationContext属性未注入, 请在applicationContext.xml中定义SpringContextHolder或在SpringBoot启动类中注册SpringContextHolder.");
     }
 
@@ -231,6 +285,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     private static void clearHolder() {
         log.debug("清除SpringContextHolder中的ApplicationContext: {}", applicationContext);
         applicationContext = null;
+        beanFactory = null;
     }
 
     // region 加载jar中的class并将bean注入/移出Spring容器
