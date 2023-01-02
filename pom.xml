@@ -103,7 +103,7 @@
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>7.9.0</yauaa.version>
         <ip2region.version>2.7.6</ip2region.version>
-        <thumbnailator.version>0.4.18</thumbnailator.version>
+        <thumbnailator.version>0.4.19</thumbnailator.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
