@@ -35,7 +35,7 @@
         <!-- oshi监控需要指定jna版本, 问题详见 https://github.com/oshi/oshi/issues/1040 -->
         <jna.version>5.9.0</jna.version>
         <oshi.version>6.3.2</oshi.version>
-        <bizlog.version>3.0.3</bizlog.version>
+        <bizlog.version>3.0.4</bizlog.version>
         <jol.version>0.16</jol.version>
     </properties>
 
