@@ -22,6 +22,7 @@ plugins {
     id 'org.springframework.boot' // 主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
     id 'signing'
+    id 'org.graalvm.buildtools.native' version '0.9.18'
     id 'io.codearte.nexus-staging' version '0.30.0'
 }
 

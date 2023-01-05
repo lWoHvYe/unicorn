@@ -15,14 +15,17 @@
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
 ---
-本分支将停留在17版本，待22年底Spring 6.x Release后，试着整合。另将在`dev_3.x`分支，尝试后续版本的JDK
+本分支将停留在17版本。另将在`dev_3.x`分支，尝试后续版本的JDK（主要是Virtual Thread），待21中VT GA后，会将其merge到main branch.
 
-启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java) 和配置文件 [resources](unicorn-starter/src/main/resources)
-详见 [unicorn-starter](unicorn-starter) 模块。[启停脚本](script)。 You can find the minimum to run in [Valentine's Day](valentine-starter).
+启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
+和配置文件 [resources](unicorn-starter/src/main/resources)详见 [unicorn-starter](unicorn-starter) 模块。[启停脚本](script)。 
+You can find the minimum to run in [Valentine's Day](valentine-starter).
 ~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](unicorn-starter/src/main/java/module-info.java)
-删除，以非module化运行，模块化打包部署暂未找到支持外置配置及依赖的方式~~，模块化package已完成，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
+删除，以非module化运行，模块化打包部署暂未找到支持外置配置及依赖的方式~~
+，模块化package已完成，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
 
-**Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396) [JEP 403](https://openjdk.java.net/jeps/403) ，需在启动时添加相关参数开启包访问。较简单的是添加
+**Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396)
+[JEP 403](https://openjdk.java.net/jeps/403)，需在启动时添加相关参数开启包访问。较简单的是添加
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS/Jigsaw）。
 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
@@ -47,14 +50,14 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar unicorn-starter-3.1.0.jar >nohup.out 2>&1 &
 ```
 
-| key                | 目的                                                         |
-| ------------------ | ------------------------------------------------------------ |
-| loader.path        | lib包加载路径                                                |
+| key                | 目的                                                                                                                                                           |
+|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| loader.path        | lib包加载路径                                                                                                                                                     |
 | loader.home        | 用于解析loader.path中的相对路径。 例如，给定loader.path = lib，则$ {loader.home} / lib是类路径位置（以及该目录中的所有jar文件）。 此属性还用于查找loader.properties文件，如以下示例/ opt / app所示。它默认为$ {user.dir}。 |
-| loader.args        | main方法的默认参数（以空格分隔）                             |
-| loader.main        | 要启动的主类的名称（例如com.app.Application）                |
-| loader.config.name | 属性文件的路径（例如，classpath：loader.properties）。 默认为loader.properties。 |
-| loader.system      | 布尔值标志，指示应将所有属性添加到系统属性。 默认为false。   |
+| loader.args        | main方法的默认参数（以空格分隔）                                                                                                                                           |
+| loader.main        | 要启动的主类的名称（例如com.app.Application）                                                                                                                             |
+| loader.config.name | 属性文件的路径（例如，classpath：loader.properties）。 默认为loader.properties。                                                                                               |
+| loader.system      | 布尔值标志，指示应将所有属性添加到系统属性。 默认为false。                                                                                                                             |
 
 参考：[executable-jar.launching](https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching)
 
@@ -81,8 +84,8 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 <!--3.x系列版本为springdoc + 动态权限改造 + JPMS部分改造-->
 <dependency>
     <groupId>com.lwohvye</groupId>
-    <artifactId>eladmin</artifactId>
-    <version>3.1.0</version>
+    <artifactId>unicorn</artifactId>
+    <version>3.2.0</version>
     <type>pom</type>
 </dependency>
 
@@ -92,15 +95,16 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### 项目简介
 
-一个基于最新的Java 17版本、 Spring Boot 3.0、 Jpa、 Spring Security、Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
+一个基于最新的Java 17版本、 Spring Boot 3.0、 Jpa、 Spring Security、
+Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
 
-|     |   后端源码  |   前端源码  |
-|---  |--- | --- |
-|  原项目-github   |  https://github.com/elunez/eladmin   |  https://github.com/elunez/eladmin-web   |
-|  原项目-码云   |  https://gitee.com/elunez/eladmin   |  https://gitee.com/elunez/eladmin-web   |
-|  github   |   https://github.com/lWoHvYe/eladmin |    https://github.com/lWoHvYe/eladmin-web |
+|            | 后端源码                               | 前端源码                                   |
+|------------|------------------------------------|----------------------------------------|
+| 原项目-github | https://github.com/elunez/eladmin  | https://github.com/elunez/eladmin-web  |
+| 原项目-码云     | https://gitee.com/elunez/eladmin   | https://gitee.com/elunez/eladmin-web   |
+| github     | https://github.com/lWoHvYe/eladmin | https://github.com/lWoHvYe/eladmin-web |
 
 #### 主要特性
 
@@ -117,7 +121,8 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
-- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，除了传统To B业务，还可用于To C业务
+- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，
+  除了传统To B业务，还可用于To C业务
 
 #### 系统功能
 
@@ -222,9 +227,10 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 - dev_3.0 Springdoc相关。Web侧跟进（无限delay）
 - ASM字节码增强
-- 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的 accessToken， 另一个只作为刷新 accessToken 用的
-  refreshToken
-- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，推测是Spring Boot的 ClassLoader不支持Jigsaw）
+- 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的
+  accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
+- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
+  推测是Spring Boot的 ClassLoader下全是Auto-Module）
 - swarm化，可以参考[why-swarm (施工中)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO

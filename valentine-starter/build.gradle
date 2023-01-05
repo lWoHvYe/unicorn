@@ -2,6 +2,7 @@ plugins {
     id 'com.lwohvye.java-conventions'
     id 'org.gradlex.extra-java-module-info'
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
+    id 'org.graalvm.buildtools.native' version '0.9.18'
 }
 
 dependencies {
