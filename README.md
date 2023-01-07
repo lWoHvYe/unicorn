@@ -65,7 +65,7 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 #### Maven引用方式 🎵
 
-最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/eladmin.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/eladmin)
+最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/unicorn.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/unicorn)
 
 **可根据需要选择版本**
 
