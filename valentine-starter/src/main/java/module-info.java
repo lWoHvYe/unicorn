@@ -9,6 +9,7 @@ module lwohvye.valentine.starter {
     requires jakarta.activation;
     requires spring.retry;
     requires com.mzt.logapi;
+    requires kotlin.stdlib;
 //    requires captcha;
 
     exports com.unicorn.vs.rest to spring.beans, spring.aop, spring.web;

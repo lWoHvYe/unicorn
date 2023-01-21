@@ -2,13 +2,17 @@ plugins {
     id 'com.lwohvye.java-conventions'
     id 'org.gradlex.extra-java-module-info'
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
-    id 'org.graalvm.buildtools.native' version '0.9.18'
+    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
 }
 
 dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
     implementation project(':unicorn-tp-tools')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinxCoroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:$kotlinxCoroutinesVersion"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnlyApi "org.projectlombok:lombok:${lombokVersion}"
     compileOnlyApi "org.mapstruct:mapstruct-processor:$mapstructVersion"
@@ -41,6 +45,11 @@ extraJavaModuleInfo {
     automaticModule("org.redisson:redisson", 'org.redisson')
     automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
     automaticModule("net.coobird:thumbnailator", 'net.coobird.thumbnailator')
+    automaticModule("org.jetbrains.kotlinx", 'kotlinx-coroutines-core')
+    automaticModule("org.jetbrains.kotlinx", 'kotlinx-coroutines-core-jvm')
+    automaticModule("org.jetbrains.kotlinx", 'kotlinx-coroutines-jdk8')
+    automaticModule("org.jetbrains.kotlinx", 'kotlinx-coroutines-jdk9')
+    automaticModule("org.jetbrains.kotlinx", 'kotlinx-coroutines-reactive')
     module('org.eclipse.angus:jakarta.mail', 'jakarta.mail', '1.0.0') {
         uses('jakarta.mail.util.StreamProvider')
     }
@@ -56,4 +65,15 @@ tasks.named("bootBuildImage") {
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "19"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "19"
+    }
 }
