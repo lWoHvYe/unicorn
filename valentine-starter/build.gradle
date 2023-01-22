@@ -32,7 +32,7 @@ dependencies {
 }
 
 extraJavaModuleInfo {
-    failOnMissingModuleInfo.set(false)
+//    failOnMissingModuleInfo.set(false)
     automaticModule("io.github.mouzt:bizlog-sdk", 'com.mzt.logapi')
     automaticModule("com.github.whvcse:easy-captcha", 'com.wf.captcha')
     automaticModule("ch.ethz.ganymed:ganymed-ssh2", 'ch.ethz.ssh2')

@@ -15,6 +15,7 @@
  */
 package com.unicorn.strategy
 
+import com.lwohvye.core.utils.ConcurrencyUtils
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno
 import com.lwohvye.sys.modules.system.strategy.ExtraUserTypeStrategy
 import kotlinx.coroutines.*
@@ -32,24 +33,32 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
         // kotlinx.coroutines将在1.7版本支持JPMS。当前报错 `module kotlin.stdlib does not read module kotlinx.coroutines.core.jvm`
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2237
         // https://github.com/Kotlin/kotlinx.coroutines/pull/3297
-        // 使用launch{}函数 启动一个协程
-        GlobalScope.launch {
-            runBlocking { // 在 runBlocking {} 包装中使用 delay，它启动了一个协程并等待直到它结束
-                delay(1000)
+        //  Coroutines can perfectly benefit from Loom: A Coroutine always relies on a thread for its execution.
+        //  This Thread can also be a VirtualThread. The advantage of having a VirtualThread executing a Coroutine is that all IO operations,
+        //  concurrency locks etc. will behave in a non-blocking fashion, wasting no resources.
+        ConcurrencyUtils.structuredExecute(
+            null, null,
+            {
+                // 使用launch{}函数 启动一个协程
+                GlobalScope.launch {
+                    runBlocking { // 在 runBlocking {} 包装中使用 delay，它启动了一个协程并等待直到它结束
+                        delay(1000)
+                    }
+                    println("Hello")
+                }
+            }, {
+                val result = GlobalScope.async {
+                    workload(16) // 调用函数
+                }
+                runBlocking {
+                    println(result.await())
+                }
             }
-            println("Hello")
-        }
+        )
 
         Thread.sleep(2000) // 等待 2 秒钟
         println("Stop")
         //_____________
-
-        val result = GlobalScope.async {
-            workload(16) // 调用函数
-        }
-        runBlocking {
-            println(result.await())
-        }
 
         return emptyList()
     }
