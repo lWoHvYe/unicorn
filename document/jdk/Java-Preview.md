@@ -96,3 +96,6 @@
 - [JEP 437: Structured Concurrency (Second Incubator)](https://openjdk.org/jeps/437)
 - 多线程相关的，诸如 ExecutorService and Future 这些，实际上跟Virtual Threads也有些相关。主体感觉在Virtual
   Threads提出后，又出现了不少相关的新东西
+
+#### Valhalla
+- [Valhalla](https://openjdk.org/projects/valhalla/)

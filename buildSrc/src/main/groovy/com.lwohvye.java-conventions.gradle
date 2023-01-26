@@ -24,14 +24,27 @@ group = 'com.lwohvye'
 version = '4.0.0-SNAPSHOT'
 java.sourceCompatibility = JavaVersion.VERSION_19
 
+ext {
+    ossrhUsername = System.getenv('OSSRH_USERNAME') ?: ossrhUsername ?: ''
+    ossrhPassword = System.getenv('OSSRH_PASSWORD') ?: ossrhPassword ?: ''
+}
+
 java {
     withSourcesJar()
 }
 
 publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
+    repositories {
+        maven {
+            name = "OSSRH"
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
         }
     }
 }

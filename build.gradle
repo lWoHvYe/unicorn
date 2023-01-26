@@ -13,7 +13,7 @@ buildscript {
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
-        classpath "org.gradlex:extra-java-module-info:1.1.1"
+        classpath "org.gradlex:extra-java-module-info:1.2.1"
     }
 }
 
@@ -36,8 +36,6 @@ ext.sharedManifest = manifest {
 
 ext { // 这个定义是可以传递的
     lombokVersion = "1.18.25"
-    ossrhUsername = System.getenv('OSSRH_USERNAME') ?: ossrhUsername ?: ''
-    ossrhPassword = System.getenv('OSSRH_PASSWORD') ?: ossrhPassword ?: ''
 }
 
 subprojects {
@@ -65,14 +63,6 @@ tasks.withType(Checkstyle).configureEach {
         html.required = true
         html.stylesheet resources.text.fromFile('config/xsl/checkstyle-custom.xsl')
     }
-}
-
-tasks.named("bootBuildImage") {
-    environment = [
-            "BP_JVM_VERSION"              : "19",
-            "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
-            "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
-    ]
 }
 
 java {
@@ -124,19 +114,6 @@ publishing {
                     url = 'https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main'
                     tag = 'unicorn-v4.0.0-SNAPSHOT'
                 }
-            }
-        }
-    }
-    repositories {
-        maven {
-            name = "OSSRH"
-            // change URLs to point to your repos, e.g. http://my.org/repo
-            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username = ossrhUsername
-                password = ossrhPassword
             }
         }
     }
