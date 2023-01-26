@@ -36,8 +36,6 @@ ext.sharedManifest = manifest {
 
 ext { // 这个定义是可以传递的
     lombokVersion = "1.18.25"
-    ossrhUsername = System.getenv('OSSRH_USERNAME') ?: ossrhUsername ?: ''
-    ossrhPassword = System.getenv('OSSRH_PASSWORD') ?: ossrhPassword ?: ''
 }
 
 subprojects {
