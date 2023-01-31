@@ -61,6 +61,7 @@ dependencies {
 }
 
 extraJavaModuleInfo {
+    failOnMissingModuleInfo.set(false)
     automaticModule("cn.hutool:hutool-all", 'cn.hutool')
     automaticModule("org.mapstruct.extensions.spring:mapstruct-spring-extensions", 'org.mapstruct.extensions.spring')
     automaticModule("org.redisson:redisson", 'org.redisson')
