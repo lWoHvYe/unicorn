@@ -100,6 +100,7 @@ dependencies {
 
 // TODO: 2022/9/1 这个无法传递，就很不好
 extraJavaModuleInfo {
+    failOnMissingModuleInfo.set(false)
     // This does not have to be a complete description (e.g. here 'org.apache.commons.collections' does not export anything here).
     // It only needs to be good enough to work in the context of this application we are building.
 /*    module('commons-beanutils-1.9.4.jar', 'org.apache.commons.beanutils', '1.9.4') {
