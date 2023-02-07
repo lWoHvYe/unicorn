@@ -22,10 +22,13 @@ import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.core.utils.result.ResultInfo;
 import com.lwohvye.sys.common.annotation.ApiVersion;
 import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType;
+import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext;
 import com.mzt.logapi.starter.annotation.LogRecord;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,6 +64,11 @@ public class RsLogController {
         log.warn(" The module of Cur-Starter is {} ", this.getClass().getModule());
     }
 
+    @Lazy
+    @Autowired
+    private AuthHandlerContext authHandlerContext;
+
+
     /**
      * 访问首页提示
      * 因为自定义了处理逻辑，所以下面这俩的RequestCondition是不一样的，所以能共存，且因为定义了优先新版本，所以在v1时走第一个，[v2+ 走第二个
@@ -73,6 +81,10 @@ public class RsLogController {
     @ApiVersion
     @AnonymousGetMapping("/valentine/{version}/p2p")
     public String index(@PathVariable String version) {
+
+        var instance = authHandlerContext.getInstance(4);
+        instance.grantedAuth(2022L);
+
         return null;
 //        return "Backend service started successfully"
     }
