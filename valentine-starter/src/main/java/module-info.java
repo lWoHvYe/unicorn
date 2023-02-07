@@ -11,6 +11,7 @@ module lwohvye.valentine.starter {
     requires com.mzt.logapi;
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core.jvm;
+    requires org.apache.logging.log4j;
 //    requires captcha;
 
     exports com.unicorn.vs.rest to spring.beans, spring.aop, spring.web;
