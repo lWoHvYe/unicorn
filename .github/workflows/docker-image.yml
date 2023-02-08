@@ -21,10 +21,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Set up JDK
-        uses: actions/setup-java@v3.9.0
+        uses: actions/setup-java@v3
         with:
           java-version: '19'
-          distribution: 'corretto'
+          distribution: 'temurin'
           check-latest: true
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
