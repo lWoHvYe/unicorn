@@ -86,7 +86,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <log4jdbc.version>1.18</log4jdbc.version>
         <springdoc.openapi.version>2.0.2</springdoc.openapi.version>
-        <hutool.version>5.8.10</hutool.version>
+        <hutool.version>5.8.11</hutool.version>
         <fastutil.version>8.5.11</fastutil.version>
         <lombok.version>1.18.24</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
