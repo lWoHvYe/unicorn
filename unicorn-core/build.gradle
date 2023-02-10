@@ -84,7 +84,6 @@ dependencies {
     api "org.mapstruct:mapstruct:$mapstructVersion"
 //    mapstruct-spring-extensions seems unused
     api "org.mapstruct.extensions.spring:mapstruct-spring-annotations:${mapstructSpringExtensionsVersion}"
-    annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
     api 'org.hibernate.validator:hibernate-validator'
     api "nl.basjes.parse.useragent:yauaa:$yauaaVersion"
     api 'com.github.ben-manes.caffeine:caffeine'
@@ -98,6 +97,7 @@ dependencies {
     log4jdbcRuntimeOnly "com.lwohvye.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:$log4jdbcVersion"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+    annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
 }
 
 // TODO: 2022/9/1 这个无法传递，就很不好
