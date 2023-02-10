@@ -82,7 +82,9 @@ dependencies {
     api "org.apache.poi:poi-ooxml:$poiVersion"
     implementation "xerces:xercesImpl:$xercesVersion"
     api "org.mapstruct:mapstruct:$mapstructVersion"
-    api "org.mapstruct.extensions.spring:mapstruct-spring-extensions:$mapstructSpringVersion"
+//    mapstruct-spring-extensions seems unused
+    api "org.mapstruct.extensions.spring:mapstruct-spring-annotations:${mapstructSpringExtensionsVersion}"
+    annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
     api 'org.hibernate.validator:hibernate-validator'
     api "nl.basjes.parse.useragent:yauaa:$yauaaVersion"
     api 'com.github.ben-manes.caffeine:caffeine'
@@ -116,7 +118,6 @@ extraJavaModuleInfo {
     module('commons-collections-3.2.2.jar', 'org.apache.commons.collections', '3.2.2')
     automaticModule('commons-logging-1.2.jar', 'org.apache.commons.logging')*/
     automaticModule("cn.hutool:hutool-all", 'cn.hutool')
-    automaticModule("org.mapstruct.extensions.spring:mapstruct-spring-extensions", 'org.mapstruct.extensions.spring')
     automaticModule("org.redisson:redisson", 'org.redisson')
     automaticModule("net.coobird:thumbnailator", 'net.coobird.thumbnailator')
 }

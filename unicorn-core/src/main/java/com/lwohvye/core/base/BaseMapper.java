@@ -47,6 +47,7 @@ public interface BaseMapper<D, E> extends Converter<E, D> {
     /**
      * Entity转DTO，由Spring的Converter替换。这个只能单向转换，当都是这个方向时，用这个可以减少Mapper的注入
      * @see https://mapstruct.org/news/2022-02-07-mapstruct-spring-extensions-0-1-1-released/
+     * but mapstruct-spring-extensions seems unused, things works well just with spring converter
      *
      * @param entity /
      * @return /

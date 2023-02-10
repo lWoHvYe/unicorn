@@ -87,7 +87,6 @@ extraJavaModuleInfo {
     automaticModule("io.jsonwebtoken:jjwt-impl", 'io.jsonwebtoken.impl')
     automaticModule("io.jsonwebtoken:jjwt-jackson", 'io.jsonwebtoken.jackson')
     automaticModule("com.jcraft:jsch", 'com.jcraft.jsch')
-    automaticModule("org.mapstruct.extensions.spring:mapstruct-spring-extensions", 'org.mapstruct.extensions.spring')
     automaticModule("org.quartz-scheduler:quartz", 'org.quartz')
     automaticModule("org.redisson:redisson", 'org.redisson')
     automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
