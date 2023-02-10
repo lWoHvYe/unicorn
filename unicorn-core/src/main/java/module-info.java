@@ -48,7 +48,6 @@ module lwohvye.unicorn.core {
     requires transitive org.hibernate.validator;
     requires transitive org.jetbrains.annotations;
     requires transitive org.mapstruct;
-    requires transitive org.mapstruct.extensions.spring;
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
     requires transitive org.redisson;
