@@ -8,7 +8,7 @@ module lwohvye.valentine.starter {
     requires jakarta.mail;
     requires jakarta.activation;
     requires spring.retry;
-    requires com.mzt.logapi;
+    requires bizlog.sdk;
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core.jvm;
     requires org.apache.logging.log4j;
