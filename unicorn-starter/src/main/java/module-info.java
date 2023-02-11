@@ -1,8 +1,8 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.unicorn.starter {
     requires lwohvye.unicorn.system;
-    requires lwohvye.unicorn.tp_tools;
-    requires lwohvye.unicorn.cd_generator;
+    requires lwohvye.unicorn.tp.tools;
+    requires lwohvye.unicorn.code.gen;
     requires org.apache.httpcomponents.httpcore;
     requires org.apache.httpcomponents.httpclient;
     requires kotlin.stdlib;

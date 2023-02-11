@@ -66,7 +66,7 @@ dependencies {
 
 extraJavaModuleInfo {
     failOnMissingModuleInfo.set(false)
-    automaticModule("cn.hutool:hutool-all", 'cn.hutool')
-    automaticModule("org.redisson:redisson", 'org.redisson')
-    automaticModule("net.coobird:thumbnailator", 'net.coobird.thumbnailator')
+    automaticModule("cn.hutool:hutool-all", 'hutool.all')
+    automaticModule("org.redisson:redisson", 'redisson')
+    automaticModule("net.coobird:thumbnailator", 'thumbnailator')
 }

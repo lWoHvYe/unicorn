@@ -14,19 +14,19 @@ module lwohvye.unicorn.security {
     requires spring.websocket;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
-    requires com.mzt.logapi;
+    requires bizlog.sdk;
     requires captcha;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
-    requires com.wf.captcha;
-    requires ch.ethz.ssh2;
+    requires easy.captcha;
+    requires ganymed.ssh2;
     requires transitive io.netty.common;
     requires transitive org.apache.tomcat.embed.websocket;
-    requires transitive io.jsonwebtoken.api;
-    requires transitive io.jsonwebtoken.impl;
-    requires com.jcraft.jsch;
+    requires transitive jjwt.api;
+    requires transitive jjwt.impl;
+    requires jsch;
     requires transitive org.apache.commons.io;
-    requires transitive org.quartz;
+    requires transitive quartz;
 
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
@@ -60,7 +60,7 @@ module lwohvye.unicorn.security {
     exports com.lwohvye.sys.modules.system.event;
     exports com.lwohvye.sys.modules.system.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.system.service;
-    exports com.lwohvye.sys.modules.system.service.impl to spring.beans, spring.context, spring.aop, cn.hutool;
+    exports com.lwohvye.sys.modules.system.service.impl to spring.beans, spring.context, spring.aop, hutool.all;
     exports com.lwohvye.sys.modules.system.service.version to spring.beans;
     exports com.lwohvye.sys.modules.system.service.local;
     exports com.lwohvye.sys.modules.system.service.mapstruct;
