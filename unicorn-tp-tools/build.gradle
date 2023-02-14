@@ -42,6 +42,30 @@ publishing {
                     fromResolutionResult()
                 }
             }
+            pom {
+                name = 'Unicorn 3rd Tools'
+                description = 'Tools and Third Party Integration'
+                url = 'https://github.com/WHY-lWoHvYe/valentine-p2p.git'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'lWoHvYe'
+                        name = '王红岩(lWoHvYe)'
+                        email = 'lWoHvYe@outlook.com'
+                        url = 'https://www.lwohvye.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/WHY-lWoHvYe/valentine-p2p.git'
+                    developerConnection = 'scm:git:ssh://github.com/WHY-lWoHvYe/valentine-p2p.git'
+                    url = 'https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main'
+                }
+            }
         }
     }
 }
