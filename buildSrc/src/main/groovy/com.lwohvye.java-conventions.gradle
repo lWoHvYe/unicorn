@@ -8,7 +8,6 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     flatDir {
         dirs "$rootProject.projectDir/ex-lib"
@@ -23,11 +22,6 @@ repositories {
 group = 'com.lwohvye'
 version = '4.0.0-alpha'
 java.sourceCompatibility = JavaVersion.VERSION_19
-
-ext {
-    ossrhUsername = System.getenv('OSSRH_USERNAME') ?: ossrhUsername ?: ''
-    ossrhPassword = System.getenv('OSSRH_PASSWORD') ?: ossrhPassword ?: ''
-}
 
 java {
     withSourcesJar()

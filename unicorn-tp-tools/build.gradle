@@ -71,7 +71,10 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJava3rdTool
+    required { !version.endsWith("-SNAPSHOT") }
+    publishing.publications.configureEach {
+        sign it
+    }
 }
 
 dependencies {

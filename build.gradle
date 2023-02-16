@@ -45,6 +45,8 @@ subprojects {
             options.addStringOption('Xdoclint:none', '-quiet')
             options.addStringOption('encoding', 'UTF-8')
             options.addStringOption('charSet', 'UTF-8')
+            options.addBooleanOption('-enable-preview', true)
+            options.addStringOption('-release', '19')
             // Add support for custom tag
             options.addStringOption('tag', 'date:a:Init Date:')
             options.addStringOption('tag', 'author:a:Major Contributor:')
@@ -119,7 +121,10 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    required { !version.endsWith("-SNAPSHOT") }
+    publishing.publications.configureEach {
+        sign it
+    }
 }
 
 javadoc {
@@ -133,8 +138,8 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username = ossrhUsername // defaults to project.properties["myNexusUsername"]
-            password = ossrhPassword // defaults to project.properties["myNexusPassword"]
+            username.set(System.getenv('OSSRH_USERNAME') ?: providers.systemProperty("ossrhUsername").orElse("").forUseAtConfigurationTime())
+            password.set(System.getenv('OSSRH_PASSWORD') ?: providers.systemProperty("ossrhPassword").orElse("").forUseAtConfigurationTime())
         }
     }
 }
