@@ -77,7 +77,10 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJavaSecurity
+    required { !version.endsWith("-SNAPSHOT") }
+    publishing.publications.configureEach {
+        sign it
+    }
 }
 
 dependencies {

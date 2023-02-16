@@ -40,7 +40,7 @@ public interface IResourceService extends BaseService {
      *
      * @param criteria 条件
      * @param pageable 分页参数
-     * @return Map<String, Object>
+     * @return Map
      */
     Map<String, Object> queryAll(ResourceQueryCriteria criteria, Pageable pageable);
 
@@ -48,7 +48,7 @@ public interface IResourceService extends BaseService {
      * 查询所有数据不分页
      *
      * @param criteria 条件参数
-     * @return List<ResourceDto>
+     * @return List
      */
     List<ResourceDto> queryAll(ResourceQueryCriteria criteria);
 

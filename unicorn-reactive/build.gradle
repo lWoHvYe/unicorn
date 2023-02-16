@@ -75,7 +75,10 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJavaReact
+    required { !version.endsWith("-SNAPSHOT") }
+    publishing.publications.configureEach {
+        sign it
+    }
 }
 
 dependencies {

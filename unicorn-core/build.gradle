@@ -84,7 +84,10 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJavaCore
+    required { !version.endsWith("-SNAPSHOT") }
+    publishing.publications.configureEach {
+        sign it
+    }
 }
 
 dependencies {
@@ -114,6 +117,7 @@ dependencies {
     implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
     api "net.coobird:thumbnailator:$thumbnailatorVersion"
     api 'org.jetbrains:annotations:23.0.0'
+    api 'io.vavr:vavr:0.10.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnlyApi "org.projectlombok:lombok:${lombokVersion}"
     compileOnlyApi "org.mapstruct:mapstruct-processor:$mapstructVersion"
