@@ -30,7 +30,7 @@ import java.util.Objects;
  * <a href="https://blog.csdn.net/weixin_39255905/article/details/110391515">...</a>
  * 自定义匹配的处理器
  * 这里用了JDK 18的一个特性：JEP 413:	Code Snippets in Java API Documentation
- * {@snippet
+ * {@snippet :
  *
  *    @ApiVersion
  *    @GetMapping("/{version}/test1") // 这种在`ApiVersion`中不指定version的，适合各个版本，因为默认值是1所以是 [1+
@@ -38,14 +38,12 @@ import java.util.Objects;
  *    public String test1(){
  * 		return "test 1";
  *    }
- * <p>
  *    @ApiVersion
  *    @GetMapping("/{ver}/test2") // 这里的占位符不只限`version`
  *    @ResponseBody
  *    public String test2(){
  * 		return "test 2";
  *    }
- * <p>
  *    @ApiVersion(3)
  *    @GetMapping("/{version}/test3") // 这种指定了version的，表示的从这个版本开始 [3+
  *    @ResponseBody
