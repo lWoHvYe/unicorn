@@ -5,6 +5,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
 }
 
 repositories {
@@ -25,6 +26,13 @@ java.sourceCompatibility = JavaVersion.VERSION_19
 
 java {
     withSourcesJar()
+}
+
+signing {
+    required { !version.endsWith("-SNAPSHOT") }
+    publishing.publications.configureEach {
+        sign it
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

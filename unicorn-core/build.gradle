@@ -7,7 +7,6 @@ plugins {
     id 'com.lwohvye.java-conventions'
 //    id 'extra-java-module-info' // apply my own plugin written in buildSrc
     id 'org.gradlex.extra-java-module-info'
-    id 'signing'
 //    id 'org.springframework.boot'
 }
 
@@ -80,13 +79,6 @@ publishing {
                 }
             }
         }
-    }
-}
-
-signing {
-    required { !version.endsWith("-SNAPSHOT") }
-    publishing.publications.configureEach {
-        sign it
     }
 }
 

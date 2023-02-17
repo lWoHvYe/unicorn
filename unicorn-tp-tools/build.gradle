@@ -5,7 +5,6 @@
 plugins {
     id 'com.lwohvye.java-conventions'
     id 'org.gradlex.extra-java-module-info'
-    id 'signing'
 }
 
 description = '3rd工具模块'
@@ -67,13 +66,6 @@ publishing {
                 }
             }
         }
-    }
-}
-
-signing {
-    required { !version.endsWith("-SNAPSHOT") }
-    publishing.publications.configureEach {
-        sign it
     }
 }
 
