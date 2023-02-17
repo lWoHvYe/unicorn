@@ -5,7 +5,6 @@
 plugins {
     id 'com.lwohvye.java-conventions'
     id 'org.gradlex.extra-java-module-info'
-    id 'signing'
 }
 
 description = '权限管理模块'
@@ -73,13 +72,6 @@ publishing {
                 }
             }
         }
-    }
-}
-
-signing {
-    required { !version.endsWith("-SNAPSHOT") }
-    publishing.publications.configureEach {
-        sign it
     }
 }
 

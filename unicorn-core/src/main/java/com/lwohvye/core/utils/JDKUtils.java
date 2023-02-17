@@ -16,11 +16,17 @@
 
 package com.lwohvye.core.utils;
 
-import java.lang.invoke.*;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 
 import static java.lang.invoke.MethodType.methodType;
 
@@ -49,6 +55,7 @@ public class JDKUtils {
     public static final boolean BIG_ENDIAN;
 
     public static final boolean UNSAFE_SUPPORT;
+    public static final boolean VECTOR_SUPPORT;
 
     // GraalVM not support
     // Android not support
@@ -135,6 +142,24 @@ public class JDKUtils {
             FIELD_STRING_VALUE = null;
             FIELD_STRING_VALUE_OFFSET = -1;
         }
+
+        var vector_support = false;
+        try {
+            if (JVM_VERSION >= 17) {
+                // the following is a way to get inputArgs
+                var factorClass = Class.forName("java.lang.management.ManagementFactory");
+                var runtimeMXBeanClass = Class.forName("java.lang.management.RuntimeMXBean");
+                var getRuntimeMXBean = factorClass.getMethod("getRuntimeMXBean");
+                var runtimeMXBean = getRuntimeMXBean.invoke(null);
+                var getInputArguments = runtimeMXBeanClass.getMethod("getInputArguments");
+                var inputArguments = (List<String>) getInputArguments.invoke(runtimeMXBean);
+//                vector_support = inputArguments.contains("--add-modules=jdk.incubator.vector");
+                vector_support = true;
+            }
+        } catch (Throwable ignored) {
+            initErrorLast = ignored;
+        }
+        VECTOR_SUPPORT = vector_support;
 
         boolean unsafeSupport;
         unsafeSupport = ((Predicate) o -> {
