@@ -94,7 +94,7 @@
         <mapstruct.version>1.5.3.Final</mapstruct.version>
         <mapstruct.spring.version>1.0.0</mapstruct.spring.version>
         <!--logstash有所依赖，需要使用management统一管理依赖-->
-        <logstash.version>7.2</logstash.version>
+        <logstash.version>7.3</logstash.version>
         <!--  LDAP（Lightweight Directory Access Protocol轻量目录访问协议） logback也来了 https://logback.qos.ch/news.html     -->
         <logback.version>1.4.5</logback.version>
         <redisson.version>3.19.2</redisson.version>
