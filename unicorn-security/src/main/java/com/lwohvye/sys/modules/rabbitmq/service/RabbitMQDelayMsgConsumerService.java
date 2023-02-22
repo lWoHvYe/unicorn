@@ -73,9 +73,6 @@ public class RabbitMQDelayMsgConsumerService extends YRabbitAbstractConsumer {
                     var mt = MethodType.methodType(void.class, new Class[]{String.class});
                     var methodHandle = lookup.findVirtual(authMQService.getClass(), extraData, mt);
                     methodHandle.invoke(authMQService, msgEntity.getMsgData());
-//                    methodHandle.invoke(authMQService, new Object[]{msgEntity.getMsgData()}); // Cannot cast [Ljava.lang.Object; to java.lang.String
-//                    methodHandle.invoke(new Object[]{authMQService, msgEntity.getMsgData()}); // cannot convert MethodHandle(AuthMQService,String)void to (Object[])void
-                    // 至此，便明白了，虽然方法入参是可变参数，但传多个参数跟传一个数组近去处理方面是不一样的，暂不清楚原因
                 } catch (Throwable e) {
                     throw new UtilsException(e.getMessage());
                 }
