@@ -15,12 +15,12 @@
  */
 package com.lwohvye.sys.modules.rabbitmq.service;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
-import com.lwohvye.sys.modules.system.service.local.AuthMQService;
+import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.utils.MailAdapter;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
+import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
+import com.lwohvye.sys.modules.system.service.local.AuthMQService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Map;
 
 @Component
@@ -54,6 +56,8 @@ public class RabbitMQDelayMsgConsumerService extends YRabbitAbstractConsumer {
     @Autowired
     private AuthMQService authMQService;
 
+    private final MethodHandles.Lookup lookup = MethodHandles.lookup();
+
     @Autowired
     public void setRedissonClient(RedissonClient redissonClient) {
         super.redissonClient = redissonClient;
@@ -64,8 +68,18 @@ public class RabbitMQDelayMsgConsumerService extends YRabbitAbstractConsumer {
     public void handle(String amqpMsgEntityStr) {
         baseConsumer(amqpMsgEntityStr, "auth", null, msgEntity -> {
             var extraData = msgEntity.getExtraData();
-            if (StringUtils.hasText(extraData))
-                ReflectUtil.invoke(authMQService, extraData, msgEntity.getMsgData());
+            if (StringUtils.hasText(extraData)) {
+                try {
+                    var mt = MethodType.methodType(void.class, new Class[]{String.class});
+                    var methodHandle = lookup.findVirtual(authMQService.getClass(), extraData, mt);
+                    methodHandle.invoke(authMQService, msgEntity.getMsgData());
+//                    methodHandle.invoke(authMQService, new Object[]{msgEntity.getMsgData()}); // Cannot cast [Ljava.lang.Object; to java.lang.String
+//                    methodHandle.invoke(new Object[]{authMQService, msgEntity.getMsgData()}); // cannot convert MethodHandle(AuthMQService,String)void to (Object[])void
+                    // 至此，便明白了，虽然方法入参是可变参数，但传多个参数跟传一个数组近去处理方面是不一样的，暂不清楚原因
+                } catch (Throwable e) {
+                    throw new UtilsException(e.getMessage());
+                }
+            }
             return null;
         }, errMsg -> {
             // reConsumeMsg(this::handle, amqpMsgEntityStr);

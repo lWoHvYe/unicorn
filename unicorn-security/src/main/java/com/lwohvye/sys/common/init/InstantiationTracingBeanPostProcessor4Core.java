@@ -15,10 +15,10 @@
  */
 package com.lwohvye.sys.common.init;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.sys.modules.system.strategy.NormalUserTypeStrategy;
-import com.lwohvye.sys.modules.system.service.ITerminalService;
+import com.lwohvye.core.utils.JDKUtils;
 import com.lwohvye.core.utils.SpringContextHolder;
+import com.lwohvye.sys.modules.system.service.ITerminalService;
+import com.lwohvye.sys.modules.system.strategy.NormalUserTypeStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationListener;
@@ -46,7 +46,7 @@ public class InstantiationTracingBeanPostProcessor4Core implements ApplicationLi
         if (event.getApplicationContext().getParent() == null) {//root application context 没有parent，再执行这个.
             //需要执行的逻辑代码，当spring容器初始化完成后就会执行该方法。这种可以参考观察者模式改造中的方式，先addCallBacks，启动后会自动执行，这里用来保留另一种方式。
             var userTypeHandler = SpringContextHolder.getBean(NormalUserTypeStrategy.class);
-            ReflectUtil.invoke(userTypeHandler, "doInit");
+            JDKUtils.invokeMethod(userTypeHandler, "doInit", void.class);
 
             var terminalClazz = ITerminalService.class;
             try {

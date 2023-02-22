@@ -6,12 +6,12 @@
 package com.lwohvye.core.context;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.lwohvye.core.utils.JDKUtils;
 import lombok.SneakyThrows;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.Context;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.TargetType;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
@@ -39,28 +39,28 @@ public class CycleAvoidingMappingContext {
 
     @BeforeMapping
     public <T> T getMappedInstance(Object source, @TargetType Class<T> targetType) {
-        var obj = knownInstances.get(source);
+        var originalObj = knownInstances.get(source);
         // 判断类型
-        if (targetType.isInstance(obj))
+        if (targetType.isInstance(originalObj))
             // 是该类型进行转换
-            return targetType.cast(obj);
+            return targetType.cast(originalObj);
         else
             // 不是该类型时，一般是small类型，需要做source -> T的显示转换(非强转)
-            return genT(targetType, obj);
+            return genT(targetType, originalObj);
     }
 
     /**
      * smallDto中的属性，必须为原始侧的子集
      *
-     * @param targetType Class for smallDto
-     * @param obj        原始侧Dto
+     * @param targetType  Class for smallDto
+     * @param originalObj 原始侧Dto
      * @return T         smallDto的实例
      * @date 2021/11/10 12:38 上午
      */
     @SneakyThrows
-    private <T> T genT(Class<T> targetType, Object obj) {
+    private <T> T genT(Class<T> targetType, Object originalObj) {
         // obj为null时，直接返回
-        if (Objects.isNull(obj))
+        if (Objects.isNull(originalObj))
             return null;
 
         // var t = ReflectUtil.newInstance(targetType);
@@ -69,15 +69,16 @@ public class CycleAvoidingMappingContext {
         // targetType.getDeclaredFields() 可以获取本类中的所有域，不包括从超类继承的
         // 所以还是使用ReflectUtil.getFields(targetType)，获取全部的域，包括从超类继承的
         for (Field field : ReflectUtil.getFields(targetType)) {
+            JDKUtils.copyFieldVal(originalObj, t, field);
             // 获取不到属性会报错哦。并且需注意，从obj取时，要使用fieldName，因为field是t中的属性
-            var oField = ReflectionUtils.findField(obj.getClass(), field.getName());
-            if (Objects.nonNull(oField) && oField.trySetAccessible() && field.trySetAccessible())
-                field.set(t, oField.get(obj));
+//            var oField = ReflectionUtils.findField(orginalClass, field.getName());
+//            if (Objects.nonNull(oField) && oField.trySetAccessible() && field.trySetAccessible())
+//                field.set(t, oField.get(originalObj));
             // 下面的反射，底层还是 field.get()获取属性、field.set()设置属性
-            // ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(obj, field.getName()));
+            // ReflectUtil.setFieldValue(t, field, ReflectUtil.getFieldValue(originalObj, field.getName()));
         }
         // 不是该类型，通过先转成Json，再转成另一实体实现。这种不一致的一般是用xxxSmallDTO时。这是不使用反射时，另一种处理方式
-        // return JsonUtils.toJavaObject(obj, targetType);
+        // return JsonUtils.toJavaObject(originalObj, targetType);
         return t;
     }
 
