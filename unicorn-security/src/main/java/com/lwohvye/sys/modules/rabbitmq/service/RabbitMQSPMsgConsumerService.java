@@ -16,11 +16,11 @@
 
 package com.lwohvye.sys.modules.rabbitmq.service;
 
-import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.core.config.LocalCoreConfig;
-import com.lwohvye.sys.modules.security.service.UserLocalCache;
+import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
+import com.lwohvye.sys.modules.security.service.UserLocalCache;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.core.Message;
@@ -30,12 +30,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 @Component
 @Slf4j
 public class RabbitMQSPMsgConsumerService extends YRabbitAbstractConsumer {
 
     private UserLocalCache userLocalCache;
 
+    private final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
     @Autowired // Spring循环依赖问题，可以通过将构造注入改为setter注入的方式解决（三个Map）。也可以使用@Lazy注解。还有些别的解决方式
     // 这里只是做一个记录。UserCacheClean并未构成循环依赖
@@ -57,7 +61,13 @@ public class RabbitMQSPMsgConsumerService extends YRabbitAbstractConsumer {
             var extraData = msgEntity.getExtraData();
             if (StringUtils.hasText(extraData))
                 // 这里的逻辑比较简单，首先内部已经做了忽略本实例产生的消息的逻辑。视情况可能还要做：有时需要忽略本集群产生的事件，有时需要向内部传递调用方为MQ消费者从而视情况不进行事件的扩散（虽然一般都是来自消费者的调用不做数据及事件的同步）
-                ReflectUtil.invoke(userLocalCache, extraData, msgEntity.getMsgData(), false);
+                try {
+                    var mt = MethodType.methodType(void.class, String.class, Boolean.class);
+                    var methodHandle = lookup.findVirtual(userLocalCache.getClass(), extraData, mt);
+                    methodHandle.invoke(userLocalCache, msgEntity.getMsgData(), false);
+                } catch (Throwable e) {
+                    throw new UtilsException(e.getMessage());
+                }
             return null;
         }, s -> {
             // 先移除消费过的标志，再主动重新消费一下。考虑了一下，这种cancel还是交给子类，否则要额外传个Consumer进去了

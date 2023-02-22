@@ -108,7 +108,7 @@ dependencies {
     api 'com.github.ben-manes.caffeine:caffeine'
     implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
     api "net.coobird:thumbnailator:$thumbnailatorVersion"
-    api 'org.jetbrains:annotations:23.0.0'
+    api 'org.jetbrains:annotations:24.0.0'
     api 'io.vavr:vavr:0.10.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnlyApi "org.projectlombok:lombok:${lombokVersion}"

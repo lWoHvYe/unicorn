@@ -16,7 +16,7 @@
 
 package com.lwohvye.log.rabbitmq;
 
-import cn.hutool.core.util.ReflectUtil;
+import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
 import com.lwohvye.log.service.local.MultiLogService;
@@ -28,12 +28,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+
 @Slf4j
 @Component
 public class RabbitBusinessMsgConsumerService extends YRabbitAbstractConsumer {
 
     @Autowired
     private MultiLogService multiLogService;
+
+    private final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
     @Autowired
     public void setRedissonClient(RedissonClient redissonClient) {
@@ -48,8 +53,15 @@ public class RabbitBusinessMsgConsumerService extends YRabbitAbstractConsumer {
     public void handle(String messageStr) {
         baseConsumer(messageStr, null, null, msgEntity -> {
             var extraData = msgEntity.getExtraData();
-            if (StringUtils.hasText(extraData))
-                ReflectUtil.invoke(multiLogService, extraData, msgEntity.getMsgType(), msgEntity.getMsgData(), "Typical Business Operate");
+            if (StringUtils.hasText(extraData)) {
+                try {
+                    var mt = MethodType.methodType(void.class, String.class, String.class, String.class);
+                    var methodHandle = lookup.findVirtual(multiLogService.getClass(), extraData, mt);
+                    methodHandle.invoke(multiLogService, msgEntity.getMsgType(), msgEntity.getMsgData(), "Typical Business Operate");
+                } catch (Throwable e) {
+                    throw new UtilsException(e.getMessage());
+                }
+            }
             return null;
         }, errMsg -> log.error(" Consume Msg Error, Reason: {} || Msg detail: {} ", errMsg, messageStr));
     }

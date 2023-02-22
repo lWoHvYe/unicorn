@@ -16,11 +16,15 @@
 
 package com.lwohvye.core.utils;
 
+import com.lwohvye.core.exception.UtilsException;
+
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
@@ -327,7 +331,7 @@ public class JDKUtils {
 
     /**
      * JDK 8开始支持Lambda，为了方便将一个Method映射为一个Lambda Function，避免反射开销。
-     * java.invoke.LambdaMetafactory 可以实现这一功能，但这个也受限于可见性的限制，也就是说不能调用私有方法。
+     * java.invoke.LambdaMetaFactory 可以实现这一功能，但这个也受限于可见性的限制，也就是说不能调用私有方法。
      * 有一个技巧，结合Unsafe，可以在不同版本的JDK都能构造一个Trusted MethodHandles.Lookup来绕开可见性的限制，调用任何JDK内部方法。
      *
      * @param objectClass
@@ -369,6 +373,63 @@ public class JDKUtils {
         }
 
         return IMPL_LOOKUP.in(objectClass);
+    }
+
+    /**
+     * 属性拷贝，但使用其他lookup时存在导致♻️依赖的隐患(使用IMPL_LOOKUP后解决)，在这点上不如Field.set/get，
+     * 且在 field.trySetAccessible()后，跳过了accessCheck，未必效率就低很多
+     *
+     * @param originalObj originalInstance
+     * @param t           targetInstance
+     * @param field       field to operate
+     * @date 2023/2/22 9:16 AM
+     */
+    public static <T> void copyFieldVal(Object originalObj, T t, Field field) throws IllegalAccessException, NoSuchFieldException {
+        var targetVarHandle = IMPL_LOOKUP.unreflectVarHandle(field);
+        var originalVarHandle = IMPL_LOOKUP.findVarHandle(originalObj.getClass(), field.getName(), field.getType());
+        targetVarHandle.set(t, originalVarHandle.get(originalObj));
+    }
+
+    /**
+     * 只支持简单无参调用，invoke
+     *
+     * @date 2023/2/22 1:21 PM
+     */
+    public static <T> T invokeMethod(Object obj, String methodName, Class<?> rType) {
+        var mt = MethodType.methodType(rType);
+        try {
+            var methodHandle = IMPL_LOOKUP.findVirtual(obj.getClass(), methodName, mt);
+            var result = methodHandle.invoke(obj);
+            return (T) result;
+        } catch (Throwable e) {
+            throw new UtilsException("invoke error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * MethodType的pTypes需要与目标方法签名一致（不支持向上/向下转型，比如用Integer去获取入参为Number的方法是不允许的，同样用Number去获取入参为Integer的方法也不行。这个还能理解），
+     * rtype需要与目标方法的返回值一致（不允许向上/向下转型。不允许向下很容易理解，为何要不允许向上转型，有点不理解）。以上并不是下面问题的原因
+     * 该方法的使用场景很有限，因为虽然invoke的入参是可变参数，但本方法入参中的可变参数会被转成数组，把数组传给invoke与本方法的原入参是不一样的 (原来会是包含各种类型的可变参数，转换后变成单纯的Object[])，也就导致了与直接调用存在差异
+     * 这种感觉主要是底层的解析逻辑，当考虑做为中间层传递这种可变参数时，⚠️可能会出现问题
+     *
+     * @param obj        callInstance
+     * @param methodName invokeMethodName
+     * @param rType      returnType
+     * @param params     args
+     * @return T
+     * @date 2023/2/22 11:00 AM
+     */
+    @Deprecated(forRemoval = true)
+    public static <T> T invokeMethod(Object obj, String methodName, Class<?> rType, Object... params) {
+        var pTypes = Arrays.stream(params).map(Object::getClass).toArray(Class<?>[]::new);
+        var mt = MethodType.methodType(rType, pTypes);
+        try {
+            var methodHandle = IMPL_LOOKUP.findVirtual(obj.getClass(), methodName, mt);
+            var result = params.length != 0 ? methodHandle.invoke(obj, params) : methodHandle.invoke(obj);
+            return (T) result;
+        } catch (Throwable e) {
+            throw new UtilsException("invoke error: " + e.getMessage());
+        }
     }
 
     // region access field
