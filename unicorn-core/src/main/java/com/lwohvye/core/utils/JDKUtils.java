@@ -331,7 +331,7 @@ public class JDKUtils {
 
     /**
      * JDK 8开始支持Lambda，为了方便将一个Method映射为一个Lambda Function，避免反射开销。
-     * java.invoke.LambdaMetaFactory 可以实现这一功能，但这个也受限于可见性的限制，也就是说不能调用私有方法。
+     * java.invoke.LambdaMetafactory 可以实现这一功能，但这个也受限于可见性的限制，也就是说不能调用私有方法。
      * 有一个技巧，结合Unsafe，可以在不同版本的JDK都能构造一个Trusted MethodHandles.Lookup来绕开可见性的限制，调用任何JDK内部方法。
      *
      * @param objectClass
