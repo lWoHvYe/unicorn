@@ -20,6 +20,8 @@ import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.function.Function;
 
@@ -51,7 +53,7 @@ class LambdaMetaTest {
 
 
     @Test
-    void testInvoke() throws Throwable { // 复用前291ms，函数复用后38ms
+    void testInvoke() throws Throwable { // 复用前291ms，函数复用后54ms
         MultiFunction fun = Function::apply;
         var lookup = MethodHandles.lookup();
         var runFun = lookup.findVirtual(MultiFunction.class, "runFun", MethodType.methodType(Integer.class, Function.class, String.class));
@@ -59,7 +61,7 @@ class LambdaMetaTest {
         Function<String, Integer> innerFun = Integer::valueOf; // 虽然直接不行，但可以封装成Function，然后就可以了
         var list = new ArrayList<Integer>(100000);
         for (int i = 0; i < 100000; i++) {
-            list.add(handleInvoke(runFun, fun, innerFun, "3"));
+            list.add(handleInvoke(runFun, fun, innerFun, "" + i));
         }
         System.out.println(list.size());
     }
@@ -69,7 +71,7 @@ class LambdaMetaTest {
     }
 
     @Test
-    void testLambda() throws Throwable { // 复用前4s191ms，函数复用后28ms
+    void testLambda() throws Throwable { // 复用前4s191ms，函数复用后45ms
         var lookup = MethodHandles.lookup();
         var multiFunction = (MultiFunction) LambdaMetafactory.metafactory(
                 lookup,
@@ -81,12 +83,29 @@ class LambdaMetaTest {
         ).getTarget().invokeExact(); // 这部分复用，就会快很多
         var list = new ArrayList<Integer>(100000);
         for (int i = 0; i < 100000; i++) {
-            list.add(lambdaMeta(multiFunction, "4"));
+            list.add(lambdaMeta(multiFunction, "" + i));
         }
         System.out.println(list.size());
     }
 
     Integer lambdaMeta(MultiFunction multiFunction, String str) {
         return multiFunction.runFun(Integer::valueOf, str);
+    }
+
+    @Test
+    void testReflect() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException { // 88ms
+        MultiFunction fun = Function::apply;
+        Function<String, Integer> innerFun = Integer::valueOf; // 虽然直接不行，但可以封装成Function，然后就可以了
+        var runFun = MultiFunction.class.getDeclaredMethod("runFun", Function.class, String.class);
+        runFun.trySetAccessible(); // 执行这个后，invoke时会略去checkAccess，耗时从88ms -> 60ms，也算是一个技巧
+        var list = new ArrayList<Integer>(100000);
+        for (int i = 0; i < 100000; i++) {
+            list.add(reflectInvoke(runFun, fun, innerFun, "" + i));
+        }
+        System.out.println(list.size());
+    }
+
+    Integer reflectInvoke(Method runFun, MultiFunction fun, Function<String, Integer> innerFun, String str) throws IllegalAccessException, InvocationTargetException {
+        return (Integer) runFun.invoke(fun, innerFun, str);
     }
 }
