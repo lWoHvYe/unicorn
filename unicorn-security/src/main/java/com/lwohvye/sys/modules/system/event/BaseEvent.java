@@ -16,14 +16,11 @@
 
 package com.lwohvye.sys.modules.system.event;
 
-import com.lwohvye.core.utils.JDKUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.context.ApplicationEvent;
 
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodType;
-import java.util.function.ToLongFunction;
+import java.lang.invoke.MethodHandles;
 
 /**
  * <a href="https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#spring-core">Doc Page</a>
@@ -57,12 +54,12 @@ public abstract class BaseEvent<T> extends ApplicationEvent {
         var aClass = eventData.getClass();
         // 有定义public的getter的话，可以用这个
         // return (Long) MethodHandles.lookup().findVirtual(aClass, "getId", MethodType.methodType(Long.class)).invoke(eventData); // 1.7的方式
-        // return (Long) MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVarHandle(aClass, "id", Long.class).get(eventData); // 1.9的方式
-        // 使用LambdaMetafactory，这个比上面的复杂多了。算是lambda函数映射的一个使用
+         return (Long) MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVarHandle(aClass, "id", Long.class).get(eventData); // 1.9的方式
+        // 使用LambdaMetafactory，这个比上面的复杂多了。算是lambda函数映射的一个使用，这个需要函数复用才能有优势，不然会比findVirtual慢很多
         /*ToLongFunction<T> function = T::getId;
         var id = function.applyAsLong(eventData);*/
         // 这个跟👆这个是等价的，但此次上面这个是无法编译的，👇这个就没问题，这很容易理解
-        var lookup = JDKUtils.trustedLookup(aClass);
+        /*var lookup = JDKUtils.trustedLookup(aClass);
         var callSite = LambdaMetafactory.metafactory(
                 lookup,
                 "applyAsLong",
@@ -71,6 +68,6 @@ public abstract class BaseEvent<T> extends ApplicationEvent {
                 lookup.findVirtual(aClass, "getId", MethodType.methodType(Long.class)), // 这里必须是Long，long是不行的
                 MethodType.methodType(long.class, aClass)); // 这里long和Long都可以
         var function = (ToLongFunction<T>) callSite.getTarget().invokeExact();
-        return function.applyAsLong(eventData);
+        return function.applyAsLong(eventData);*/
     }
 }
