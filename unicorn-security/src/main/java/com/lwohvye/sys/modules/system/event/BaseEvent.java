@@ -54,7 +54,7 @@ public abstract class BaseEvent<T> extends ApplicationEvent {
         var aClass = eventData.getClass();
         // 有定义public的getter的话，可以用这个
         // return (Long) MethodHandles.lookup().findVirtual(aClass, "getId", MethodType.methodType(Long.class)).invoke(eventData); // 1.7的方式
-         return (Long) MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVarHandle(aClass, "id", Long.class).get(eventData); // 1.9的方式
+        return (Long) MethodHandles.privateLookupIn(aClass, MethodHandles.lookup()).findVarHandle(aClass, "id", Long.class).get(eventData); // 1.9的方式
         // 使用LambdaMetafactory，这个比上面的复杂多了。算是lambda函数映射的一个使用，这个需要函数复用才能有优势，不然会比findVirtual慢很多
         /*ToLongFunction<T> function = T::getId;
         var id = function.applyAsLong(eventData);*/
