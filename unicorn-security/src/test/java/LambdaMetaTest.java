@@ -23,7 +23,7 @@ import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-class Tst {
+class LambdaMetaTest {
 
     @Test
     void testLambdaParams() throws Throwable {
@@ -51,7 +51,7 @@ class Tst {
 
 
     @Test
-    void test1() throws Throwable { // 复用前291ms，函数复用后38ms
+    void testInvoke() throws Throwable { // 复用前291ms，函数复用后38ms
         MultiFunction fun = Function::apply;
         var lookup = MethodHandles.lookup();
         var runFun = lookup.findVirtual(MultiFunction.class, "runFun", MethodType.methodType(Integer.class, Function.class, String.class));
@@ -59,17 +59,17 @@ class Tst {
         Function<String, Integer> innerFun = Integer::valueOf; // 虽然直接不行，但可以封装成Function，然后就可以了
         var list = new ArrayList<Integer>(100000);
         for (int i = 0; i < 100000; i++) {
-            list.add(m1(runFun, fun, innerFun, "3"));
+            list.add(handleInvoke(runFun, fun, innerFun, "3"));
         }
         System.out.println(list.size());
     }
 
-    Integer m1(MethodHandle runFun, MultiFunction fun, Function innerFun, String str) throws Throwable {
+    Integer handleInvoke(MethodHandle runFun, MultiFunction fun, Function innerFun, String str) throws Throwable {
         return (Integer) runFun.invoke(fun, innerFun, str); // 所以findVirtual也可以应对参数包含lambda的method
     }
 
     @Test
-    void test2() throws Throwable { // 复用前4s191ms，函数复用后28ms
+    void testLambda() throws Throwable { // 复用前4s191ms，函数复用后28ms
         var lookup = MethodHandles.lookup();
         var multiFunction = (MultiFunction) LambdaMetafactory.metafactory(
                 lookup,
@@ -81,12 +81,12 @@ class Tst {
         ).getTarget().invokeExact(); // 这部分复用，就会快很多
         var list = new ArrayList<Integer>(100000);
         for (int i = 0; i < 100000; i++) {
-            list.add(m2(multiFunction, "4"));
+            list.add(lambdaMeta(multiFunction, "4"));
         }
         System.out.println(list.size());
     }
 
-    Integer m2(MultiFunction multiFunction, String str) {
+    Integer lambdaMeta(MultiFunction multiFunction, String str) {
         return multiFunction.runFun(Integer::valueOf, str);
     }
 }
