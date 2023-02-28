@@ -1,4 +1,4 @@
-pachage com.lwohvye.core.config
+package com.lwohvye.core.config;
 
 import org.springframework.beans.factory.aot.BeanRegistrationExcludeFilter;
 import org.springframework.beans.factory.support.RegisteredBean;
