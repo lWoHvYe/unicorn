@@ -70,7 +70,7 @@
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk18on -->
-        <!--    用于创建CSR(证书请求)、🔐请求    -->
+        <!--    用于创建CSR(证书请求)、加密请求    -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
