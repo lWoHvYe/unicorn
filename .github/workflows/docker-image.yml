@@ -23,8 +23,8 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v3.10.0
         with:
-          java-version: '18'
-          distribution: 'corretto'
+          java-version: '19'
+          distribution: 'oracle'
           check-latest: true
 
       - name: Build Core
@@ -35,6 +35,8 @@ jobs:
         run: rm -rf valentine-starter/src/main/java/module-info.java
       - name: Build GraalVM Native image
         run: mvn -B spring-boot:build-image --file valentine-starter/pom.xml -P prod,native
+      - name: Build Unicorn-Starter
+        run: mvn -B package --file unicorn-starter/pom.xml -P prod
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
 #      - name: Update dependency graph

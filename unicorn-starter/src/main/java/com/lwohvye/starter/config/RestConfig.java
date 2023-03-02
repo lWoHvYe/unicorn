@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 package com.lwohvye.starter.config;
 
 import com.lwohvye.starter.modules.handler.SimRestErrorHandler;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,7 +53,9 @@ public class RestConfig {
             throw new RuntimeException(e);
         }
         var sslSocketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-        var httpClient = HttpClients.custom().setSSLSocketFactory(sslSocketFactory).build();
+        var connMgr = PoolingHttpClientConnectionManagerBuilder.create().setSSLSocketFactory(sslSocketFactory).build();
+        var httpClient = HttpClients.custom().setConnectionManager(connMgr).build();
+
         var requestFactory = new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
 
