@@ -44,7 +44,6 @@ extraJavaModuleInfo {
     automaticModule("org.quartz-scheduler:quartz", 'quartz')
     automaticModule("org.redisson:redisson", 'redisson')
     automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
-    automaticModule("net.coobird:thumbnailator", 'thumbnailator')
     automaticModule("org.jetbrains.kotlin:kotlin-stdlib-common", 'kotlin.stdlib.common')
     automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-core", 'kotlinx.coroutines.core')
     automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", 'kotlinx.coroutines.core.jvm')

@@ -88,7 +88,7 @@ dependencies {
     api 'com.jcraft:jsch:0.1.55'
     api "com.github.oshi:oshi-core:$oshiCoreVersion"
     api "ch.qos.logback:logback-access:$logbackVersion"
-    api 'org.openjdk.jol:jol-core:0.16'
+    api 'org.openjdk.jol:jol-core:0.17'
     // It seems that xxxImplementation will work on runtimeClasspath for the customers while xxxApi compileClasspath
     businessLogApi "io.github.mouzt:bizlog-sdk:$bizlogVersion"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -110,5 +110,4 @@ extraJavaModuleInfo {
     automaticModule("org.quartz-scheduler:quartz", 'quartz')
     automaticModule("org.redisson:redisson", 'redisson')
     automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
-    automaticModule("net.coobird:thumbnailator", 'thumbnailator')
 }

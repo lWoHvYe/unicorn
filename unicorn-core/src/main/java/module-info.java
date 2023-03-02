@@ -51,7 +51,7 @@ module lwohvye.unicorn.core {
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
     requires transitive redisson;
-    requires thumbnailator;
+    requires net.coobird.thumbnailator;
 
     exports com.lwohvye.core.advice;
     exports com.lwohvye.core.annotation;
