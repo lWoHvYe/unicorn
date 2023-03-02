@@ -127,7 +127,6 @@ extraJavaModuleInfo {
     // It only needs to be good enough to work in the context of this application we are building.
     automaticModule("cn.hutool:hutool-all", 'hutool.all')
     automaticModule("org.redisson:redisson", 'redisson')
-    automaticModule("net.coobird:thumbnailator", 'thumbnailator')
 }
 
 tasks.named('compileJava') {

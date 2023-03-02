@@ -87,5 +87,4 @@ extraJavaModuleInfo {
     failOnMissingModuleInfo.set(false)
     automaticModule("cn.hutool:hutool-all", 'hutool.all')
     automaticModule("org.redisson:redisson", 'redisson')
-    automaticModule("net.coobird:thumbnailator", 'thumbnailator')
 }
