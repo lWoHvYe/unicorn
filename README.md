@@ -207,7 +207,9 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
 
 #### 特别鸣谢
 
-- 感谢 [JetBrains](https://www.jetbrains.com/) 提供的非商业开源软件开发授权
+- [![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://jb.gg/OpenSourceSupport) 
+
+- 感谢 [JetBrains](https://www.jetbrains.com/) 提供的非商业开源软件开发授权。
 
 - 感谢 [PanJiaChen](https://github.com/PanJiaChen/vue-element-admin) 大佬提供的前端模板
 
