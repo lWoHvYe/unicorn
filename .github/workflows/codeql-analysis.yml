@@ -110,8 +110,6 @@ jobs:
           CLI_PLATFORM: "GitHub"
         with:
           arguments: publishToMavenLocal
-      - name: Build Unicorn-Starter
-        run: mvn -B package --file unicorn-starter/pom.xml -P jigsaw
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
