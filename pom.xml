@@ -86,7 +86,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <log4jdbc.version>1.18</log4jdbc.version>
         <springdoc.openapi.version>2.0.2</springdoc.openapi.version>
-        <hutool.version>5.8.12</hutool.version>
+        <hutool.version>5.8.13</hutool.version>
         <fastutil.version>8.5.11</fastutil.version>
         <lombok.version>1.18.26</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
@@ -103,7 +103,7 @@
         <xerces.version>2.12.2</xerces.version>
         <yauaa.version>7.9.0</yauaa.version>
         <ip2region.version>2.7.6</ip2region.version>
-        <thumbnailator.version>0.4.18</thumbnailator.version>
+        <thumbnailator.version>0.4.19</thumbnailator.version>
         <argLine>
             -Dfile.encoding=UTF-8
         </argLine>
