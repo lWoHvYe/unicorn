@@ -39,7 +39,8 @@ jobs:
       - name: Publish to GitHub Packages
         uses: gradle/gradle-build-action@6095a76664413da4c8c134ee32e8a8ae900f0f1f
         with:
-          arguments: publish
+          arguments: publishAllPublicationsToGitHubPackagesRepository
         env:
           USERNAME: ${{ github.actor }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLI_PLATFORM: "GitHub"

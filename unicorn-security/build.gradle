@@ -102,7 +102,6 @@ extraJavaModuleInfo {
     automaticModule("io.github.mouzt:bizlog-sdk", 'bizlog.sdk')
     automaticModule("com.github.whvcse:easy-captcha", 'easy.captcha')
     automaticModule("ch.ethz.ganymed:ganymed-ssh2", 'ganymed.ssh2')
-    automaticModule("cn.hutool:hutool-all", 'hutool.all')
     automaticModule("io.jsonwebtoken:jjwt-api", 'jjwt.api')
     automaticModule("io.jsonwebtoken:jjwt-impl", 'jjwt.impl')
     automaticModule("io.jsonwebtoken:jjwt-jackson", 'jjwt.jackson')
