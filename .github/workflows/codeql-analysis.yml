@@ -107,8 +107,7 @@ jobs:
       - name: Publish 2 MavenLocal
         uses: gradle/gradle-build-action@6095a76664413da4c8c134ee32e8a8ae900f0f1f
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          CLI_PLATFORM: "GitHub"
         with:
           arguments: publishToMavenLocal
       - name: Build Unicorn-Starter

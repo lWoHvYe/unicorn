@@ -29,7 +29,7 @@ java {
 }
 
 signing {
-    required { !version.endsWith("-SNAPSHOT") }
+    required { !version.endsWith("-SNAPSHOT") && !(System.getenv("CLI_PLATFORM") ?: "").equalsIgnoreCase("GitHub") }
     publishing.publications.configureEach {
         sign it
     }
