@@ -98,5 +98,12 @@
 - 多线程相关的，诸如 ExecutorService and Future 这些，实际上跟Virtual Threads也有些相关。主体感觉在Virtual
   Threads提出后，又出现了不少相关的新东西
 
+#### Scoped Values (Incubator)
+
+- Introduce scoped values, which enable the sharing of immutable data within and across threads. They are preferred to
+  thread-local variables, especially when using large numbers of virtual threads
+- [JEP 429: Scoped Values (Incubator)](https://openjdk.org/jeps/429)
+
 #### Valhalla
+
 - [Valhalla](https://openjdk.org/projects/valhalla/)
