@@ -37,7 +37,12 @@ ext { // 这个定义是可以传递的
 }
 
 subprojects {
+
+    apply plugin: "com.lwohvye.java-conventions"
+    apply plugin: "org.gradlex.extra-java-module-info"
+
     dependencies {}
+
     tasks.withType(Javadoc).tap {
         configureEach {
             failOnError(false)
@@ -49,6 +54,29 @@ subprojects {
             // Add support for custom tag
             options.addStringOption('tag', 'date:a:Init Date:')
             options.addStringOption('tag', 'author:a:Major Contributor:')
+        }
+    }
+
+    extraJavaModuleInfo {
+        failOnMissingModuleInfo.set(false)
+        automaticModule("io.github.mouzt:bizlog-sdk", 'bizlog.sdk')
+        automaticModule("com.github.whvcse:easy-captcha", 'easy.captcha')
+        automaticModule("ch.ethz.ganymed:ganymed-ssh2", 'ganymed.ssh2')
+        automaticModule("io.jsonwebtoken:jjwt-api", 'jjwt.api')
+        automaticModule("io.jsonwebtoken:jjwt-impl", 'jjwt.impl')
+        automaticModule("io.jsonwebtoken:jjwt-jackson", 'jjwt.jackson')
+        automaticModule("com.jcraft:jsch", 'jsch')
+        automaticModule("org.quartz-scheduler:quartz", 'quartz')
+        automaticModule("org.redisson:redisson", 'redisson')
+        automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
+        automaticModule("org.jetbrains.kotlin:kotlin-stdlib-common", 'kotlin.stdlib.common')
+        automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-core", 'kotlinx.coroutines.core')
+        automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", 'kotlinx.coroutines.core.jvm')
+        automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", 'kotlinx.coroutines.jdk8')
+        automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9", 'kotlinx.coroutines.jdk9')
+        automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-reactive", 'kotlinx.coroutines.reactive')
+        module('org.eclipse.angus:jakarta.mail', 'jakarta.mail', '1.0.0') {
+            uses('jakarta.mail.util.StreamProvider')
         }
     }
 }

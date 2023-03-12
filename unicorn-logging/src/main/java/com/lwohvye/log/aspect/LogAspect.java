@@ -32,11 +32,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.time.Duration;
 import java.time.Instant;
-
-import jdk.incubator.concurrent.ScopedValue;
 
 /**
  * @author Zheng Jie
@@ -50,7 +47,7 @@ public class LogAspect {
 
     private final ILogService logService;
 
-    static final ScopedValue<Instant> SCOPED_VALUE = ScopedValue.newInstance();
+    ThreadLocal<Instant> currentTime = new ThreadLocal<>();
 
     /**
      * 配置切入点
@@ -67,20 +64,16 @@ public class LogAspect {
      */
     @Around("logPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        return ScopedValue.where(SCOPED_VALUE, Instant.now()).call(() -> {
-            Object result;
-            try {
-                result = joinPoint.proceed();
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
-            Log log = new Log("INFO", Duration.between(SCOPED_VALUE.get(), Instant.now()).toMillis());
-            HttpServletRequest request = RequestHolder.getHttpServletRequest();
-            // TODO: 2022/2/14 保持日志这块，有循环依赖导致的栈溢出问题，待解决
-            // TODO: 2022/2/28 栈溢出应该有别的条件。人员状态的修改，未出现该问题
-            logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), joinPoint, log);
-            return result;
-        });
+        Object result;
+        currentTime.set(Instant.now());
+        result = joinPoint.proceed();
+        Log log = new Log("INFO", Duration.between(currentTime.get(), Instant.now()).toMillis());
+        currentTime.remove();
+        HttpServletRequest request = RequestHolder.getHttpServletRequest();
+        // TODO: 2022/2/14 保持日志这块，有循环依赖导致的栈溢出问题，待解决
+        // TODO: 2022/2/28 栈溢出应该有别的条件。人员状态的修改，未出现该问题
+        logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), joinPoint, log);
+        return result;
     }
 
     /**
@@ -91,8 +84,8 @@ public class LogAspect {
      */
     @AfterThrowing(pointcut = "logPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
-        if (!SCOPED_VALUE.isBound()) return;
-        Log log = new Log("ERROR", Duration.between(SCOPED_VALUE.get(), Instant.now()).toMillis());
+        Log log = new Log("ERROR", Duration.between(currentTime.get(), Instant.now()).toMillis());
+        currentTime.remove();
         log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
         HttpServletRequest request = RequestHolder.getHttpServletRequest();
         logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), (ProceedingJoinPoint) joinPoint, log);

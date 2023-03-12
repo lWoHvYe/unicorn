@@ -1,6 +1,4 @@
 plugins {
-    id 'com.lwohvye.java-conventions'
-    id 'org.gradlex.extra-java-module-info'
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
     id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
 }
@@ -13,6 +11,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinxCoroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:$kotlinxCoroutinesVersion"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnlyApi "org.projectlombok:lombok:${lombokVersion}"
     compileOnlyApi "org.mapstruct:mapstruct-processor:$mapstructVersion"
@@ -28,29 +27,6 @@ dependencies {
             // 这里只支撑横线，不支持驼峰
             requireCapability('com.lwohvye:unicorn-security-business-log')
         }
-    }
-}
-
-extraJavaModuleInfo {
-    failOnMissingModuleInfo.set(false)
-    automaticModule("io.github.mouzt:bizlog-sdk", 'bizlog.sdk')
-    automaticModule("com.github.whvcse:easy-captcha", 'easy.captcha')
-    automaticModule("ch.ethz.ganymed:ganymed-ssh2", 'ganymed.ssh2')
-    automaticModule("io.jsonwebtoken:jjwt-api", 'jjwt.api')
-    automaticModule("io.jsonwebtoken:jjwt-impl", 'jjwt.impl')
-    automaticModule("io.jsonwebtoken:jjwt-jackson", 'jjwt.jackson')
-    automaticModule("com.jcraft:jsch", 'jsch')
-    automaticModule("org.quartz-scheduler:quartz", 'quartz')
-    automaticModule("org.redisson:redisson", 'redisson')
-    automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
-    automaticModule("org.jetbrains.kotlin:kotlin-stdlib-common", 'kotlin.stdlib.common')
-    automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-core", 'kotlinx.coroutines.core')
-    automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", 'kotlinx.coroutines.core.jvm')
-    automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", 'kotlinx.coroutines.jdk8')
-    automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9", 'kotlinx.coroutines.jdk9')
-    automaticModule("org.jetbrains.kotlinx:kotlinx-coroutines-reactive", 'kotlinx.coroutines.reactive')
-    module('org.eclipse.angus:jakarta.mail', 'jakarta.mail', '1.0.0') {
-        uses('jakarta.mail.util.StreamProvider')
     }
 }
 

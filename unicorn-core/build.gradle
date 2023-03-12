@@ -3,13 +3,6 @@
  */
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
-plugins {
-    id 'com.lwohvye.java-conventions'
-//    id 'extra-java-module-info' // apply my own plugin written in buildSrc
-    id 'org.gradlex.extra-java-module-info'
-//    id 'org.springframework.boot'
-}
-
 //configurations {
 //    compileOnly {
 //        extendsFrom annotationProcessor
@@ -118,14 +111,6 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
     annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
-}
-
-// TODO: 2022/9/1 这个无法传递，就很不好
-extraJavaModuleInfo {
-    failOnMissingModuleInfo.set(false)
-    // This does not have to be a complete description (e.g. here 'org.apache.commons.collections' does not export anything here).
-    // It only needs to be good enough to work in the context of this application we are building.
-    automaticModule("org.redisson:redisson", 'redisson')
 }
 
 tasks.named('compileJava') {
