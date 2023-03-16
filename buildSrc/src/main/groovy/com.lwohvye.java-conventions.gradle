@@ -42,7 +42,8 @@ publishing {
 }
 
 signing {
-    required { !version.endsWith("-SNAPSHOT") && System.getenv("CI") != null }
+    //    The "CI" environment variable is set by GitHub Actions
+    required { !version.endsWith("-SNAPSHOT") && System.getenv("CI") == null }
     publishing.publications.configureEach {
         sign it
     }
