@@ -33,6 +33,7 @@ ext.sharedManifest = manifest {
 } as DefaultManifest
 
 ext { // 这个定义是可以传递的
+    asmVersion = '9.4' // 这里单双引号都可以
     lombokVersion = "1.18.26"
 }
 
@@ -41,7 +42,9 @@ subprojects {
     apply plugin: "com.lwohvye.java-conventions"
     apply plugin: "org.gradlex.extra-java-module-info"
 
-    dependencies {}
+    dependencies {
+        implementation "org.ow2.asm:asm:${asmVersion}" // 这里必须双引号
+    }
 
     tasks.withType(Javadoc).tap {
         configureEach {

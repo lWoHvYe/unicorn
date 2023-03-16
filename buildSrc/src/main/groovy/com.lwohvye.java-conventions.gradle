@@ -42,7 +42,7 @@ publishing {
 }
 
 signing {
-    required { !version.endsWith("-SNAPSHOT") && !(System.getenv("CLI_PLATFORM") ?: "").equalsIgnoreCase("GitHub") }
+    required { !version.endsWith("-SNAPSHOT") && System.getenv("CI") != null }
     publishing.publications.configureEach {
         sign it
     }
