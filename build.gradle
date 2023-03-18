@@ -53,7 +53,7 @@ subprojects {
             options.addStringOption('encoding', 'UTF-8')
             options.addStringOption('charSet', 'UTF-8')
             options.addBooleanOption('-enable-preview', true)
-            options.addStringOption('-release', '19')
+            options.addStringOption('-release', '20')
             // Add support for custom tag
             options.addStringOption('tag', 'date:a:Init Date:')
             options.addStringOption('tag', 'author:a:Major Contributor:')

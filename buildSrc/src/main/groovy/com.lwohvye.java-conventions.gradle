@@ -21,7 +21,7 @@ repositories {
 }
 
 group = 'com.lwohvye'
-version = '4.0.0-gamma'
+version = '4.0.0-delta'
 java.sourceCompatibility = JavaVersion.VERSION_20
 
 java {

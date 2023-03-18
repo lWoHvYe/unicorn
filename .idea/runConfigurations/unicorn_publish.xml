@@ -10,7 +10,8 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="publish" />
+          <option value="clean" />
+          <option value="publishAllPublicationsToSonatypeRepository" />
           <option value="closeAndReleaseSonatypeStagingRepository" />
         </list>
       </option>
