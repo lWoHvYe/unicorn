@@ -35,7 +35,7 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
 
         println("Start")
 
-        // kotlinx.coroutines将在1.7版本支持JPMS。当前报错 `module kotlin.stdlib does not read module kotlinx.coroutines.core.jvm`
+        // kotlinx.coroutines将在1.7版本支持JPMS，但在1.7.0-Beta。若以DeBug模式启动，依旧报错 `module kotlin.stdlib does not read module kotlinx.coroutines.core`，Normal run正常
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2237
         // https://github.com/Kotlin/kotlinx.coroutines/pull/3297
         //  Coroutines can perfectly benefit from Loom: A Coroutine always relies on a thread for its execution.
