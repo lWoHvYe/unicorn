@@ -42,13 +42,11 @@ tasks.named("bootBuildImage") {
     ]
 }
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "19"
+kotlin {
+    sourceSets.configureEach {
+        languageSettings {
+            languageVersion = "2.0"
+        }
     }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "19"
-    }
+    jvmToolchain(19)
 }

@@ -21,8 +21,8 @@ repositories {
 }
 
 group = 'com.lwohvye'
-version = '4.0.0-beta'
-java.sourceCompatibility = JavaVersion.VERSION_19
+version = '4.0.0-gamma'
+java.sourceCompatibility = JavaVersion.VERSION_20
 
 java {
     withSourcesJar()
