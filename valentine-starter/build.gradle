@@ -48,5 +48,5 @@ kotlin {
             languageVersion = "2.0"
         }
     }
-    jvmToolchain(19)
+    jvmToolchain(20)
 }
