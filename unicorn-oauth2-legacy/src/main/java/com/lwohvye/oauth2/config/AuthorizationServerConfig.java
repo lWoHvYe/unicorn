@@ -69,7 +69,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .withClient("client_id")//客户端ID
                 .secret(passwordEncoder.encode("lwohvye.com"))//秘钥
                 .accessTokenValiditySeconds(60) // jwt令牌有效期限
-                .refreshTokenValiditySeconds(36000) // refreshToke 有效期限
+                .refreshTokenValiditySeconds(3600) // refreshToke 有效期限
                 .redirectUris("http://localhost:8080", "https://www.bilibili.com")//重定向到的地址
                 .scopes("all", "rw", "ro")//授权范围
                 .authorizedGrantTypes("authorization_code", "password", "refresh_token")
