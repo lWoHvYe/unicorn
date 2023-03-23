@@ -10,7 +10,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.springframework.security.oauth2</groupId>
-	<artifactId>spring-security-oauth2-parent</artifactId>
+	<artifactId>unicorn-oauth2-dis</artifactId>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
