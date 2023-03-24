@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package sample;
+package sample.web;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * @author Daniel Garnier-Moiroux
+ * @author Steve Riesenberg
+ * @since 0.2.3
  */
-@SpringBootApplication
-public class CustomConsentAuthorizationServerApplication {
+@Controller
+public class LoginController {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CustomConsentAuthorizationServerApplication.class, args);
+	@GetMapping("/login")
+	public String login() {
+		return "login";
 	}
 
 }

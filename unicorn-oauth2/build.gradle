@@ -1,6 +1,6 @@
 
 group = "org.springframework.security"
-description = "Spring Authorization Server"
+description = "Spring Authorization Server OAuth2.0"
 
 if (hasProperty("buildScan")) {
 	buildScan {

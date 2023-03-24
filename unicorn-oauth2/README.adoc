@@ -1,4 +1,4 @@
-= Samples
+= https://github.com/spring-projects/spring-authorization-server/tree/main/samples[Samples]
 
 [[messages-sample]]
 == Messages Sample

@@ -17,7 +17,7 @@ dependencyResolutionManagement {
 	}
 }
 
-rootProject.name = "spring-authorization-server"
+rootProject.name = "unicorn-oauth2"
 
 
 def buildFiles = fileTree(rootDir) {
