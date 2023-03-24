@@ -16,6 +16,7 @@ spring:
     oauth2:
       client:
         registration:
+          # 下面这些client的配置，会自动config，在代码中根据client-name选用，这里其client-id必须是在auth-server做了register的
           messaging-client-oidc:
             provider: spring
             client-id: messaging-client
@@ -30,6 +31,7 @@ spring:
             client-secret: secret
             authorization-grant-type: authorization_code
             redirect-uri: "http://127.0.0.1:8080/authorized"
+            # 这里是要申请的scope，只能该client在auth-server register时，明确的scope的子集
             scope: message.read,message.write
             client-name: messaging-client-authorization-code
           messaging-client-client-credentials:

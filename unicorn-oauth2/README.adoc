@@ -135,3 +135,11 @@ Alternatively, you can set the following environment variables in the Spring Boo
 * Run Resource Server -> `./gradlew -b samples/messages-resource/samples-messages-resource.gradle bootRun`
 * Run Client -> `./gradlew -b samples/messages-client/samples-messages-client.gradle bootRun`
 * Go to `http://127.0.0.1:8080`
+
+
+OAuth Code
+
+* 只需一次confirm，不要被sample中的行为误解了，第一次拿了code后，再点击又重新拿了一次，只是apply的scope变了
+* Auth URL: http://localhost:9000/oauth2/authorize
+* Access Token URL: http://localhost:9000/oauth2/token
+* Callback URL: http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc
