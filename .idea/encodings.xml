@@ -8,11 +8,11 @@
     <file url="file://$PROJECT_DIR$/unicorn-core/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/unicorn-logging/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/unicorn-native/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/unicorn-oauth2-dis/auth-server/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/unicorn-oauth2-dis/client-app/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/unicorn-oauth2-dis/resource-server/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/unicorn-oauth2-dis/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/unicorn-oauth2-dis/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/unicorn-oauth2-legacy/auth-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/unicorn-oauth2-legacy/client-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/unicorn-oauth2-legacy/resource-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/unicorn-oauth2-legacy/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/unicorn-oauth2-legacy/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/unicorn-reactive/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/unicorn-security/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/unicorn-starter/src/main/java" charset="UTF-8" />

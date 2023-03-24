@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.oauth2.config;
+package org.springframework.security.oauth.samples.config;
 
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -32,7 +32,7 @@ public class JwtTokenEnhancer implements TokenEnhancer {
         //自定义的内容存到map中
         Map<String, Object> map = new HashMap<>();
         map.put("city", "CN");
-        map.put("like", "Game");
+        map.put("region", "SH");
         //下转型
         if (accessToken instanceof DefaultOAuth2AccessToken) {
             var defaultOAuth2AccessToken = (DefaultOAuth2AccessToken) accessToken;

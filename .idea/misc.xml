@@ -10,7 +10,7 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/unicorn-oauth2-dis/pom.xml" />
+        <option value="$PROJECT_DIR$/unicorn-oauth2-legacy/pom.xml" />
       </list>
     </option>
   </component>

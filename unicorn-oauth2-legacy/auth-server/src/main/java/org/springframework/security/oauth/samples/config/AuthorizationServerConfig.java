@@ -24,29 +24,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.RsaSigner;
-import org.springframework.security.jwt.crypto.sign.RsaVerifier;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.common.util.JsonParser;
-import org.springframework.security.oauth2.common.util.JsonParserFactory;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler;
 import org.springframework.security.oauth2.provider.approval.InMemoryApprovalStore;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * @author Joe Grandja
@@ -63,6 +56,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
+    @Autowired
+    private JwtTokenEnhancer tokenEnhancer;
+
+    @Autowired
+    private TokenStore tokenStore;
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -81,12 +82,20 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        // 创建TokenEnhancerChain实例
+        var tokenEnhancerChain = new TokenEnhancerChain();
+        var enhancerList = new ArrayList<TokenEnhancer>();
+        // 配置jtv内容增强器
+        enhancerList.add(tokenEnhancer);
+        enhancerList.add(jwtAccessTokenConverter);
+        tokenEnhancerChain.setTokenEnhancers(enhancerList);
+
         endpoints
                 .authenticationManager(this.authenticationManager)
                 .userDetailsService(userDetailsService)
-                .tokenStore(tokenStore())
+                .tokenStore(tokenStore)
                 .userApprovalHandler(userApprovalHandler())
-                .accessTokenConverter(accessTokenConverter());
+                .tokenEnhancer(tokenEnhancerChain);
     }
 
     @Bean
@@ -96,39 +105,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         userApprovalHandler.setClientDetailsService(this.clientDetailsService);
         userApprovalHandler.setRequestFactory(new DefaultOAuth2RequestFactory(this.clientDetailsService));
         return userApprovalHandler;
-    }
-
-    @Bean
-    public TokenStore tokenStore() {
-        JwtTokenStore tokenStore = new JwtTokenStore(accessTokenConverter());
-        tokenStore.setApprovalStore(approvalStore());
-        return tokenStore;
-    }
-
-    @Bean
-    public JwtAccessTokenConverter accessTokenConverter() {
-        final RsaSigner signer = new RsaSigner(KeyConfig.getSignerKey());
-
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter() {
-            private JsonParser objectMapper = JsonParserFactory.create();
-
-            @Override
-            protected String encode(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-                String content;
-                try {
-                    content = this.objectMapper.formatMap(getAccessTokenConverter().convertAccessToken(accessToken, authentication));
-                } catch (Exception ex) {
-                    throw new IllegalStateException("Cannot convert access token to JSON", ex);
-                }
-                Map<String, String> headers = new HashMap<>();
-                headers.put("kid", KeyConfig.VERIFIER_KEY_ID);
-                String token = JwtHelper.encode(content, signer, headers).getEncoded();
-                return token;
-            }
-        };
-        converter.setSigner(signer);
-        converter.setVerifier(new RsaVerifier(KeyConfig.getVerifierKey()));
-        return converter;
     }
 
     @Bean
