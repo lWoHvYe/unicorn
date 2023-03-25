@@ -64,6 +64,7 @@ public class AuthorizationServerConfig {
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+				// The OpenID Connect 1.0 Client Registration endpoint is disabled by default because many deployments do not require dynamic client registration.
 				.oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
 
 		// @formatter:off
@@ -71,6 +72,7 @@ public class AuthorizationServerConfig {
 			.exceptionHandling(exceptions ->
 				exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
 			)
+			// Resource server support that allows User Info requests to be authenticated with access tokens
 			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
 		// @formatter:on
 		return http.build();
@@ -81,9 +83,9 @@ public class AuthorizationServerConfig {
 	public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("messaging-client")
-				.clientSecret("{noop}secret")
+				.clientSecret("{noop}secret") // {noop} represents the PasswordEncoder id for Spring Security’s NoOpPasswordEncoder.
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE) // 这个有accessToken和refreshToken
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
@@ -121,6 +123,8 @@ public class AuthorizationServerConfig {
 		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
 	}
 
+	// OAuth2AuthorizationServerConfiguration.jwtDecoder(JWKSource<SecurityContext>) is a convenience (static) utility method that can be used to register a JwtDecoder @Bean, 
+	// which is REQUIRED for the OpenID Connect 1.0 UserInfo endpoint and the OpenID Connect 1.0 Client Registration endpoint.
 	@Bean
 	public JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
 		return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
