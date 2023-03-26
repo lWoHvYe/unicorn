@@ -1,10 +1,25 @@
+import org.gradle.api.JavaVersion
 
 group = "org.springframework.security"
 description = "Spring Authorization Server OAuth2.0"
 
+subprojects {
+
+    apply {
+        plugin("java")
+    }
+
+    sourceCompatibility = JavaVersion.VERSION_19
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.compilerArgs += '--enable-preview'
+    }
+}
+
 if (hasProperty("buildScan")) {
-	buildScan {
-		termsOfServiceUrl = "https://gradle.com/terms-of-service"
-		termsOfServiceAgree = "yes"
-	}
+    buildScan {
+        termsOfServiceUrl = "https://gradle.com/terms-of-service"
+        termsOfServiceAgree = "yes"
+    }
 }

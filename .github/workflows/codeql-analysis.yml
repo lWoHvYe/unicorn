@@ -109,5 +109,8 @@ jobs:
         with:
           arguments: publishToMavenLocal
 
+      - name: Build OAuth2.0 Module
+        run: gradlew -p unicorn-oauth2 build
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
