@@ -105,12 +105,15 @@ jobs:
       #   make bootstrap
       #   make release
       - name: Publish 2 MavenLocal
-        uses: gradle/gradle-build-action@6095a76664413da4c8c134ee32e8a8ae900f0f1f
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: publishToMavenLocal
 
       - name: Build OAuth2.0 Module
-        run: gradlew -p unicorn-oauth2 build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+          build-root-directory: unicorn-oauth2 
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
