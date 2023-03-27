@@ -66,6 +66,4 @@ publishing {
 
 dependencies {
     api project(':unicorn-core')
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }

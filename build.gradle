@@ -33,8 +33,8 @@ ext.sharedManifest = manifest {
 } as DefaultManifest
 
 ext { // 这个定义是可以传递的
-    asmVersion = '9.4' // 这里单双引号都可以
-    lombokVersion = "1.18.26"
+    asmVersion = '9.5' // 这里单双引号都可以
+    lombokVersion = "1.18.29"
 }
 
 subprojects {
@@ -44,6 +44,9 @@ subprojects {
 
     dependencies {
         implementation "org.ow2.asm:asm:${asmVersion}" // 这里必须双引号
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+        annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
     }
 
     tasks.withType(Javadoc).tap {

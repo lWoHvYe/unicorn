@@ -69,6 +69,4 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation "org.apache.commons:commons-configuration2:${commonsConfigurationVersion}"
     implementation "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 }

@@ -108,9 +108,6 @@ dependencies {
     compileOnlyApi "org.mapstruct:mapstruct-processor:$mapstructVersion"
     runtimeOnly 'com.mysql:mysql-connector-j'
     log4jdbcRuntimeOnly "com.lwohvye.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:$log4jdbcVersion"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
-    annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
 }
 
 tasks.named('compileJava') {

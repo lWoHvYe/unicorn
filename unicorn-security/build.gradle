@@ -87,7 +87,4 @@ dependencies {
     // It seems that xxxImplementation will work on runtimeClasspath for the customers while xxxApi compileClasspath
     businessLogApi "io.github.mouzt:bizlog-sdk:$bizlogVersion"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
-    annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"
 }
