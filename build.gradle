@@ -42,8 +42,16 @@ subprojects {
     apply plugin: "com.lwohvye.java-conventions"
     apply plugin: "org.gradlex.extra-java-module-info"
 
+    java {
+        registerFeature('coreComp') {
+            usingSourceSet(sourceSets.main)
+        }
+    }
+
     dependencies {
         implementation "org.ow2.asm:asm:${asmVersion}" // 这里必须双引号
+        coreCompCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        coreCompCompileOnly "org.mapstruct:mapstruct-processor:$mapstructVersion"
         annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
         annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
         annotationProcessor "org.mapstruct.extensions.spring:mapstruct-spring-extensions:${mapstructSpringExtensionsVersion}"

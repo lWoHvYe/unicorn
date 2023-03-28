@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.quartz.repository;
 
-import com.lwohvye.api.modules.quartz.domain.QuartzLog;
+import com.lwohvye.sys.modules.quartz.domain.QuartzLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

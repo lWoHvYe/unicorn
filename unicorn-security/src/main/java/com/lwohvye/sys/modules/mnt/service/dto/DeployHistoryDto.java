@@ -13,27 +13,46 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.api.modules.quartz.service.dto;
+package com.lwohvye.sys.modules.mnt.service.dto;
 
-import com.lwohvye.core.annotation.Query;
 import lombok.Data;
-
+import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
- * @author Zheng Jie
- * @date 2019-6-4 10:33:02
- */
+* @author zhanghouying
+* @date 2019-08-24
+*/
 @Data
-public class JobQueryCriteria {
+public class DeployHistoryDto implements Serializable {
 
-    @Query(type = Query.Type.INNER_LIKE)
-    private String jobName;
+	/**
+	 * 编号
+	 */
+    private String id;
 
-    @Query
-    private Boolean isSuccess;
+	/**
+	 * 应用名称
+	 */
+    private String appName;
 
-    @Query(type = Query.Type.BETWEEN)
-    private List<Timestamp> createTime;
+	/**
+	 * 部署IP
+	 */
+    private String ip;
+
+	/**
+	 * 部署时间
+	 */
+	private Timestamp deployDate;
+
+	/**
+	 * 部署人员
+	 */
+	private String deployUser;
+
+	/**
+	 * 部署编号
+	 */
+	private Long deployId;
 }

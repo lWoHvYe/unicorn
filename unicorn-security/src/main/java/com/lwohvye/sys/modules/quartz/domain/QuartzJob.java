@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.api.modules.quartz.domain;
+package com.lwohvye.sys.modules.quartz.domain;
 
 import com.lwohvye.core.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;

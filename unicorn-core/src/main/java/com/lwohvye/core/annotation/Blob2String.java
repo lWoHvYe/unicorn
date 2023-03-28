@@ -13,24 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.api.utils;
+package com.lwohvye.core.annotation;
 
-import com.lwohvye.api.annotation.Blob2String;
-import com.lwohvye.core.utils.StringUtils;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Qualifier;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 需注意要与使用方在同一模块内。原因未知
- * 已知是，当放在common模块中时，在system模块使用会报找不到方法的错误
+ * 针对String取blob类型乱码问题
  *
  * @author Hongyan Wang
- * @date 2021/4/1 0:05
+ * @date 2021/3/15 8:16 下午
  */
-@Component
-public class ConvertBlob2StringUtil {
-
-    @Blob2String
-    public String convert(String in) {
-        return StringUtils.convertToString(in);
-    }
+@Qualifier
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.SOURCE)
+public @interface Blob2String {
 }

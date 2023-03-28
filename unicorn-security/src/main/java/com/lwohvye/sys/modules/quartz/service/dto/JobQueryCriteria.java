@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.api.modules.mnt.service.dto;
+package com.lwohvye.sys.modules.quartz.service.dto;
 
 import com.lwohvye.core.annotation.Query;
 import lombok.Data;
@@ -22,18 +22,18 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
-* @author zhanghouying
-* @date 2019-08-24
-*/
+ * @author Zheng Jie
+ * @date 2019-6-4 10:33:02
+ */
 @Data
-public class AppQueryCriteria{
+public class JobQueryCriteria {
 
-	/**
-	 * 模糊
-	 */
     @Query(type = Query.Type.INNER_LIKE)
-    private String name;
+    private String jobName;
 
-	@Query(type = Query.Type.BETWEEN)
-	private List<Timestamp> createTime;
+    @Query
+    private Boolean isSuccess;
+
+    @Query(type = Query.Type.BETWEEN)
+    private List<Timestamp> createTime;
 }

@@ -13,46 +13,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.api.modules.mnt.service.dto;
+package com.lwohvye.sys.modules.mnt.service.dto;
 
+import com.lwohvye.core.annotation.Query;
 import lombok.Data;
-import java.io.Serializable;
+
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
 * @author zhanghouying
 * @date 2019-08-24
 */
 @Data
-public class DeployHistoryDto implements Serializable {
+public class ServerDeployQueryCriteria{
 
 	/**
-	 * 编号
+	 * 模糊
 	 */
-    private String id;
+	@Query(blurry = "name,ip,account")
+    private String blurry;
 
-	/**
-	 * 应用名称
-	 */
-    private String appName;
-
-	/**
-	 * 部署IP
-	 */
-    private String ip;
-
-	/**
-	 * 部署时间
-	 */
-	private Timestamp deployDate;
-
-	/**
-	 * 部署人员
-	 */
-	private String deployUser;
-
-	/**
-	 * 部署编号
-	 */
-	private Long deployId;
+	@Query(type = Query.Type.BETWEEN)
+	private List<Timestamp> createTime;
 }

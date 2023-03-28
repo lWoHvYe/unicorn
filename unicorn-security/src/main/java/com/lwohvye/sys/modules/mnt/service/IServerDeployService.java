@@ -15,9 +15,9 @@
  */
 package com.lwohvye.sys.modules.mnt.service;
 
-import com.lwohvye.api.modules.mnt.domain.ServerDeploy;
-import com.lwohvye.api.modules.mnt.service.dto.ServerDeployDto;
-import com.lwohvye.api.modules.mnt.service.dto.ServerDeployQueryCriteria;
+import com.lwohvye.sys.modules.mnt.domain.ServerDeploy;
+import com.lwohvye.sys.modules.mnt.service.dto.ServerDeployDto;
+import com.lwohvye.sys.modules.mnt.service.dto.ServerDeployQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import jakarta.servlet.http.HttpServletResponse;

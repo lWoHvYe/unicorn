@@ -17,7 +17,7 @@ package com.lwohvye.sys.modules.mnt.rest;
 
 import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.annotation.log.OprLog;
-import com.lwohvye.api.modules.mnt.service.dto.DeployHistoryQueryCriteria;
+import com.lwohvye.sys.modules.mnt.service.dto.DeployHistoryQueryCriteria;
 import com.lwohvye.sys.modules.mnt.service.IDeployHistoryService;
 import com.lwohvye.core.utils.result.ResultInfo;
 import io.swagger.v3.oas.annotations.Operation;

@@ -15,9 +15,9 @@
  */
 package com.lwohvye.sys.modules.mnt.service.impl;
 
-import com.lwohvye.api.modules.mnt.domain.App;
-import com.lwohvye.api.modules.mnt.service.dto.AppDto;
-import com.lwohvye.api.modules.mnt.service.dto.AppQueryCriteria;
+import com.lwohvye.sys.modules.mnt.domain.App;
+import com.lwohvye.sys.modules.mnt.service.dto.AppDto;
+import com.lwohvye.sys.modules.mnt.service.dto.AppQueryCriteria;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.sys.modules.mnt.repository.AppRepository;
 import com.lwohvye.sys.modules.mnt.service.IAppService;

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.mnt.repository;
 
-import com.lwohvye.api.modules.mnt.domain.DeployHistory;
+import com.lwohvye.sys.modules.mnt.domain.DeployHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
