@@ -21,10 +21,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
@@ -47,33 +43,6 @@ public class DefaultSecurityConfig {
                 )
                 .formLogin(withDefaults());
         return http.build();
-    }
-    // @formatter:on
-
-    // @formatter:off
-    @Bean
-    UserDetailsService users() {
-        UserDetails namUser = User.withDefaultPasswordEncoder()
-                .username("nam")
-                .password("password")
-                .roles("USER")
-                .build();
-        var adminUser = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
-                .roles("ADMIN")
-                .build();
-        var resourceUser = User.withDefaultPasswordEncoder()
-                .username("resources")
-                .password("resources")
-                .roles("USER", "RESOURCE")
-                .build();
-        var bonusUser = User.withDefaultPasswordEncoder()
-                .username("bonus")
-                .password("red")
-                .roles("NAN")
-                .build();
-        return new InMemoryUserDetailsManager(namUser, adminUser, resourceUser, bonusUser);
     }
     // @formatter:on
 
