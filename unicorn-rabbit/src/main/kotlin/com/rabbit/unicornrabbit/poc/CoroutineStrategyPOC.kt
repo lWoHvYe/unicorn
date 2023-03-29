@@ -13,14 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.unicorn.strategy
+package com.rabbit.unicornrabbit.poc
 
-import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno
-import com.lwohvye.sys.modules.system.strategy.ExtraUserTypeStrategy
+import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.*
 import org.apache.logging.log4j.LogManager.getLogger
 import org.jetbrains.annotations.BlockingExecutor
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.concurrent.Executors
 import kotlin.time.ExperimentalTime
@@ -28,10 +26,21 @@ import kotlin.time.measureTime
 
 
 @Component
-@UserTypeHandlerAnno(typeName = "FOUR")
-class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
+class CoroutineStrategyPOC {
+
+    @PostConstruct
+    fun doTest() {
+        grantedAuth(4)
+        println("navigate into loop")
+        for (i in 0..10) {
+            loomCarrier()
+            coroutinesDirect()
+            println("loop $i")
+        }
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
-    override fun grantedAuth(userId: Long): List<GrantedAuthority> {
+    fun grantedAuth(userId: Int): List<String> {
 
         println("Start")
 
@@ -59,8 +68,8 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
             println(result.await())
         }
 
-        vtCarrier()
-        xCoroutine()
+        loomCarrier()
+        coroutinesDirect()
         //_____________
 
         return emptyList()
@@ -77,15 +86,15 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
     val Dispatchers.LOOM: @BlockingExecutor CoroutineDispatcher
         get() = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
 
-    // use Loom. This will need some time to warm up, overhead. 22s for 100_000
+    // use Loom. This will need some time to warm up, overhead. 7s for 1_000_000, Debug Mode 17s for 100_000，比coroutines慢了太多了
     @OptIn(ExperimentalTime::class)
-    fun vtCarrier() = runBlocking {
+    fun loomCarrier() = runBlocking {
 
         val log = getLogger()
 
         measureTime {
             supervisorScope {
-                repeat(100_000) {
+                repeat(1_000_000) {
                     launch(Dispatchers.LOOM) {
                         Thread.sleep(1000)
                     }
@@ -97,15 +106,15 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
 
     }
 
-    // use Kotlinx Coroutines. While this is ballpark. 10s for 100_000
+    // use Kotlinx Coroutines. While this is ballpark. 4.5s for 1_000_000, Debug Mode 5.2s for 100_000
     @OptIn(ExperimentalTime::class)
-    fun xCoroutine() = runBlocking {
+    fun coroutinesDirect() = runBlocking {
 
         val log = getLogger()
 
         measureTime {
             supervisorScope {
-                repeat(100_000) {
+                repeat(1_000_000) {
                     launch {
                         delay(1000)
                     }

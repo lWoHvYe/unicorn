@@ -21,5 +21,5 @@ package com.lwohvye.sys.modules.system.strategy;
  *
  * @date 2022/5/1 2:44 PM
  */
-public abstract non-sealed class ExtraUserTypeStrategy implements AUserTypeStrategy {
+public non-sealed interface ExtraUserTypeStrategy extends AUserTypeStrategy {
 }

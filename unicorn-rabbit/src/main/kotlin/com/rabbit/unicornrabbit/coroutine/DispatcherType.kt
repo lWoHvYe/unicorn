@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.unicorn.coroutine
+package com.rabbit.unicornrabbit.coroutine
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
