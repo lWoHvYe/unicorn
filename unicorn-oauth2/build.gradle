@@ -9,11 +9,11 @@ subprojects {
         plugin("java")
     }
 
-    sourceCompatibility = JavaVersion.VERSION_20
+    sourceCompatibility = JavaVersion.VERSION_17
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        options.compilerArgs += '--enable-preview'
+//        options.compilerArgs += '--enable-preview'
     }
 }
 

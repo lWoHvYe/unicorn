@@ -1,0 +1,28 @@
+plugins {
+    id "org.springframework.boot" version "${springBootVersion}"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+}
+
+group = project.rootProject.group
+version = project.rootProject.version
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+ext {
+    gatewayVersion = '4.0.4'
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+    implementation "org.springframework.cloud:spring-cloud-starter-gateway:$gatewayVersion"
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
+//    implementation "io.projectreactor.netty:reactor-netty"
+//    implementation "org.webjars:webjars-locator-core"
+//    implementation "org.webjars:bootstrap:3.4.1"
+//    implementation "org.webjars:jquery:3.4.1"
+}

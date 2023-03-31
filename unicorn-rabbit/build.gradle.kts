@@ -37,6 +37,11 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    options.compilerArgs.plusAssign("--enable-preview")
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }

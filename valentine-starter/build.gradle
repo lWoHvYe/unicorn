@@ -25,9 +25,9 @@ dependencies {
         }
     }
 }
-
-tasks.named('test') {
+tasks.withType(Test).configureEach {
     useJUnitPlatform()
+    jvmArgs += "--enable-preview"
 }
 
 tasks.named("bootBuildImage") {
