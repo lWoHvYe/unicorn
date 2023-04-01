@@ -39,9 +39,11 @@ public class SecurityConfig {
     @Bean
     SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         http
-                .authorizeExchange(authorize ->
-                        authorize
-                .anyExchange().authenticated())
+                .csrf().disable()
+                .authorizeExchange(authorize -> authorize
+                        .pathMatchers("/","/public/**","/res/**").permitAll()
+                        .anyExchange().authenticated()
+                )
                 .oauth2Login(withDefaults())
                 .formLogin(withDefaults())
                 .oauth2Client(withDefaults());
@@ -50,7 +52,7 @@ public class SecurityConfig {
     // @formatter:on
 
     @Bean
-    public ReactiveUserDetailsService users() {
+    public ReactiveUserDetailsService userDetailsService() {
         UserDetails user = User.withDefaultPasswordEncoder()
                 .username("normal")
                 .password("password")

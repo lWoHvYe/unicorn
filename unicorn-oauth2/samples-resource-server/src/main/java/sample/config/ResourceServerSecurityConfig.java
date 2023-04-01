@@ -31,8 +31,9 @@ public class ResourceServerSecurityConfig {
     @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
+                .csrf().disable()
                 .authorizeExchange()
-                .pathMatchers("/messages/**").hasAuthority("SCOPE_message.read")
+                .pathMatchers("/messages").hasAuthority("SCOPE_message.read")
                 .pathMatchers(HttpMethod.GET, "/resource").hasAuthority("SCOPE_resource.read")
                 .pathMatchers(HttpMethod.POST, "/resource").hasAuthority("SCOPE_resource.write")
                 .anyExchange().authenticated()

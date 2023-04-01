@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SamplesResourceController {
 
     @GetMapping("/messages")
-    public String[] getMessages() {
+    public String[] getMessages(@AuthenticationPrincipal Jwt jwt) {
         return new String[]{"Resources Server 8090", "Message 1", "Message 2", "Message 3"};
     }
 

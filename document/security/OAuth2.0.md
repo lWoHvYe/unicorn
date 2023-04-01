@@ -11,6 +11,7 @@
 - [Authorization Server Official Doc](https://docs.spring.io/spring-authorization-server/docs/current/reference/html/)
 - [spring-authorization-server](https://github.com/spring-projects/spring-authorization-server)
 - [Official Samples](https://github.com/spring-projects/spring-authorization-server/tree/main/samples)
+- [Official Samples](https://github.com/spring-projects/spring-security-samples)
 
 ## Tips
 
