@@ -17,10 +17,12 @@ package sample.web;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -30,7 +32,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.concurrent.ExecutionException;
 
 import static org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId;
-import static org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient;
 
 
 /**
@@ -50,21 +51,11 @@ public class AuthorizationController {
 
     @GetMapping(value = "/authorize", params = "grant_type=authorization_code")
     public String authorizationCodeGrant(Model model,
-                                         @RegisteredOAuth2AuthorizedClient("messaging-client-authorization-code")
-                                         OAuth2AuthorizedClient authorizedClient) throws ExecutionException, InterruptedException {
-
-        try {
-            String[] messages = this.webClient
-                    .get()
-                    .uri(this.messagesBaseUri)
-                    .attributes(oauth2AuthorizedClient(authorizedClient))
-                    .retrieve()
-                    .bodyToMono(String[].class)
-                    .toFuture().get();
-            model.addAttribute("messages", messages);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+                                         @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+                                         @AuthenticationPrincipal OAuth2User oauth2User) {
+        model.addAttribute("userName", oauth2User.getName());
+        model.addAttribute("clientName", authorizedClient.getClientRegistration().getClientName());
+        model.addAttribute("userAttributes", oauth2User.getAttributes());
 
         return "index";
     }

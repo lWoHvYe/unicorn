@@ -47,6 +47,36 @@
                     </table>
                 </div>
             </div>
+            <div th:if="${userName}" class="panel-footer">
+                <h4>UserName:</h4>
+                <table class="table table-condensed">
+                    <tbody>
+                    <tr class="row">
+                        <td th:text="${userName}">userName</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${clientName}" class="panel-footer">
+                <h4>ClientName:</h4>
+                <table class="table table-condensed">
+                    <tbody>
+                    <tr class="row">
+                        <td th:text="${clientName}">clientName</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${userAttributes}" class="panel-footer">
+                <h4>UserAttributes:</h4>
+                <table class="table table-condensed">
+                    <tbody>
+                    <tr class="row" th:each="userAttribute : ${userAttributes}">
+                        <td th:text="${userAttribute}">userAttribute</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <script src="/webjars/jquery/jquery.min.js" th:src="@{/webjars/jquery/jquery.min.js}"></script>
         <script src="/webjars/bootstrap/js/bootstrap.min.js" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
