@@ -33,7 +33,6 @@ import com.lwohvye.sys.modules.system.event.RoleEvent;
 import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.repository.UserRepository;
 import com.lwohvye.sys.modules.system.service.IUserService;
-import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
@@ -48,6 +47,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.persistence.EntityExistsException;
