@@ -40,6 +40,8 @@ public class ResourceServerSecurityConfig {
                 .pathMatchers("/messages").hasAuthority("SCOPE_message.read")
                 .pathMatchers(HttpMethod.GET, "/resource").hasAuthority("SCOPE_resource.read")
                 .pathMatchers(HttpMethod.POST, "/resource").hasAuthority("SCOPE_resource.write")
+                .pathMatchers(HttpMethod.PUT, "/resource").hasAuthority("SCOPE_resource.write")
+                .pathMatchers(HttpMethod.DELETE, "/resource").hasAuthority("SCOPE_resource.write")
                 .anyExchange().authenticated()
                 .and()
                 .oauth2ResourceServer()

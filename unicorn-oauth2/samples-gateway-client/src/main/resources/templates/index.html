@@ -57,6 +57,16 @@
                     </tbody>
                 </table>
             </div>
+            <div th:if="${principalName}" class="panel-footer">
+                <h4>PrincipalName:</h4>
+                <table class="table table-condensed">
+                    <tbody>
+                    <tr class="row">
+                        <td th:text="${principalName}">principalName</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
             <div th:if="${clientName}" class="panel-footer">
                 <h4>ClientName:</h4>
                 <table class="table table-condensed">
@@ -73,6 +83,26 @@
                     <tbody>
                     <tr class="row" th:each="userAttribute : ${userAttributes}">
                         <td th:text="${userAttribute}">userAttribute</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${accessToken}" class="panel-footer">
+                <h4>AccessToken:</h4>
+                <table class="table table-condensed">
+                    <tbody>
+                    <tr class="row">
+                        <td th:text="${accessToken}">accessToken</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${refreshToken}" class="panel-footer">
+                <h4>RefreshToken:</h4>
+                <table class="table table-condensed">
+                    <tbody>
+                    <tr class="row">
+                        <td th:text="${refreshToken}">refreshToken</td>
                     </tr>
                     </tbody>
                 </table>

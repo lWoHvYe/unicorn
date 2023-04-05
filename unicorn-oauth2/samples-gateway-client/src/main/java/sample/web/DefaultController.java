@@ -23,6 +23,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.Objects;
+
 /**
  * @author Joe Grandja
  * @since 0.0.1
@@ -34,9 +36,12 @@ public class DefaultController {
     public String index(Model model,
                         @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
                         @AuthenticationPrincipal OAuth2User oauth2User) {
-        model.addAttribute("userName", oauth2User.getName());
         model.addAttribute("clientName", authorizedClient.getClientRegistration().getClientName());
+        model.addAttribute("principalName", authorizedClient.getPrincipalName());
+        model.addAttribute("accessToken", authorizedClient.getAccessToken().getTokenValue());
+        model.addAttribute("refreshToken", Objects.requireNonNull(authorizedClient.getRefreshToken()).getTokenValue());
         model.addAttribute("userAttributes", oauth2User.getAttributes());
+
         return "index";
     }
 

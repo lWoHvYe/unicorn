@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Joe Grandja
@@ -29,17 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class SamplesResourceController {
 
     @GetMapping("/messages")
-    public String[] getMessages(@AuthenticationPrincipal Jwt jwt) {
-        return new String[]{"Resources Server 8090", "Message 1", "Message 2", "Message 3"};
+    public Flux<String> getMessages(@AuthenticationPrincipal Jwt jwt) {
+        return Flux.just("Resources-Server-8090", jwt.getSubject(), "Message-1", "Message-2", "Message-3");
     }
 
     @GetMapping("/resource")
-    public String retrieveResource(@AuthenticationPrincipal Jwt jwt) {
-        return String.format("Resource accessed by %s (sub)", jwt.getSubject());
+    public Mono<String> retrieveResource(@AuthenticationPrincipal Jwt jwt) {
+        return Mono.just(String.format("Resource accessed by %s (sub)", jwt.getSubject()));
     }
 
     @PostMapping("/resource")
-    public String createResource(@AuthenticationPrincipal Jwt jwt) {
-        return String.format("Resource accessed by %s (sub) create successful", jwt.getSubject());
+    public Mono<String> createResource(@AuthenticationPrincipal Jwt jwt) {
+        return Mono.just(String.format("Resource accessed by %s (sub) create successful", jwt.getSubject()));
     }
 }
