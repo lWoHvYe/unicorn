@@ -53,3 +53,7 @@
     - 获取JWT签名（signature key）并且可选的动态的注册客户端应用
     - 基于日期签名来本地验证JWT id_token，或者将id_token发给后端backend进行验证
     - 根据id_token通过UserInfo Endpoint获取用户信息，根据access_token获取用户其他资源信息
+
+- 当访问client时，其会自己维护SecurityContext，并自动refresh
+- 但作为GateWay时，有些不一样，理论上是需要Call传Token的，那么相关维护都要那端了
+- 并且经过Authority也有问题，只验证了Token是否validate，而没verify其scope

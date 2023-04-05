@@ -83,7 +83,7 @@ public class AuthorizationServerConfig {
     // @formatter:off
     @Bean
     public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
-        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+        var registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("messaging-client")
                 .clientSecret("{noop}secret") // {noop} represents the PasswordEncoder id for Spring Security’s NoOpPasswordEncoder.
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
@@ -102,9 +102,24 @@ public class AuthorizationServerConfig {
                 .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
                 .build();
 
+        var registeredGateWayClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("login-client")
+                .clientSecret("{noop}login-secret") // {noop} represents the PasswordEncoder id for Spring Security’s NoOpPasswordEncoder.
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE) // 这个有accessToken和refreshToken
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri("http://127.0.0.1:8080/login/oauth2/code/login-client")
+                .scope(OidcScopes.OPENID)
+                .scope(OidcScopes.PROFILE)
+                .scope(OidcScopes.EMAIL)
+                .scope("resource.read")
+                .scope("resource.write")
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+                .build();
+
         // Save registered client in db as if in-memory
-        JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
+        var registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
         registeredClientRepository.save(registeredClient);
+        registeredClientRepository.save(registeredGateWayClient);
 
         return registeredClientRepository;
     }

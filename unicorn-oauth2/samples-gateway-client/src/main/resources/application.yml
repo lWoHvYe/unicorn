@@ -41,6 +41,14 @@ spring:
             authorization-grant-type: client_credentials
             scope: message.read,message.write
             client-name: messaging-client-client-credentials
+          login-client:
+            provider: spring
+            client-id: login-client
+            client-secret: login-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "http://127.0.0.1:8080/login/oauth2/code/{registrationId}"
+            scope: openid,profile,email,resource.read
+            client-name: gateway-login-client
         provider:
           spring:
             issuer-uri: http://localhost:9000
