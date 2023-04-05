@@ -13,12 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.rabbit.unicornrabbit.poc
+package com.unicorn.strategy
 
-import jakarta.annotation.PostConstruct
+import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno
+import com.lwohvye.sys.modules.system.strategy.ExtraUserTypeStrategy
 import kotlinx.coroutines.*
 import org.apache.logging.log4j.LogManager.getLogger
 import org.jetbrains.annotations.BlockingExecutor
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.concurrent.Executors
 import kotlin.time.ExperimentalTime
@@ -26,21 +28,10 @@ import kotlin.time.measureTime
 
 
 @Component
-class CoroutineStrategyPOC {
-
-    @PostConstruct
-    fun doTest() {
-        grantedAuth(4)
-        println("navigate into loop")
-        for (i in 0..10) {
-            loomCarrier()
-            coroutinesDirect()
-            println("loop $i")
-        }
-    }
-
+@UserTypeHandlerAnno(typeName = "FOUR")
+class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     @OptIn(DelicateCoroutinesApi::class)
-    fun grantedAuth(userId: Int): List<String> {
+    override fun grantedAuth(userId: Long): List<GrantedAuthority> {
 
         println("Start")
 
@@ -94,7 +85,7 @@ class CoroutineStrategyPOC {
 
         measureTime {
             supervisorScope {
-                repeat(1_000_000) {
+                repeat(100_000) {
                     launch(Dispatchers.LOOM) {
                         Thread.sleep(1000)
                     }
@@ -114,7 +105,7 @@ class CoroutineStrategyPOC {
 
         measureTime {
             supervisorScope {
-                repeat(1_000_000) {
+                repeat(100_000) {
                     launch {
                         delay(1000)
                     }

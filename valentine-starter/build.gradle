@@ -1,17 +1,17 @@
 plugins {
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
-//    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
+    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
 }
 
 dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
     implementation project(':unicorn-tp-tools')
-//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinxCoroutinesVersion"
-//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:$kotlinxCoroutinesVersion"
-//    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinxCoroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:$kotlinxCoroutinesVersion"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation(project(':unicorn-security')) {
         capabilities {
@@ -38,11 +38,12 @@ tasks.named("bootBuildImage") {
     ]
 }
 
-//kotlin {
-//    sourceSets.configureEach {
-//        languageSettings {
-//            languageVersion = "2.0"
-//        }
-//    }
-//    jvmToolchain(20)
-//}
+kotlin {
+    sourceSets.configureEach {
+        languageSettings {
+            languageVersion = "2.0"
+            apiVersion = "2.0"
+        }
+    }
+    jvmToolchain(20)
+}
