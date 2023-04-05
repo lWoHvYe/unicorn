@@ -15,8 +15,10 @@
  */
 package sample;
 
+import com.lwohvye.core.utils.SpringContextHolder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 /**
  * @author Joe Grandja
@@ -29,4 +31,8 @@ public class SamplesResourceApplication {
 		SpringApplication.run(SamplesResourceApplication.class, args);
 	}
 
+	@Bean
+	public SpringContextHolder springContextHolder() {
+		return new SpringContextHolder();
+	}
 }
