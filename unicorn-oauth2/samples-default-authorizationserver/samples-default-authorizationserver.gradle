@@ -1,17 +1,7 @@
-plugins {
-    id "org.springframework.boot" version "${springBootVersion}"
-    id "io.spring.dependency-management" version "1.1.0"
-}
-
-group = project.rootProject.group
-version = project.rootProject.version
-
-repositories {
-    mavenCentral()
-    maven { url "https://repo.spring.io/milestone" }
-}
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 dependencies {
+    api platform(SpringBootPlugin.BOM_COORDINATES)
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.springframework.boot:spring-boot-starter-security"
