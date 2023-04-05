@@ -16,16 +16,20 @@
 package sample.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * @author Joe Grandja
  * @since 0.0.1
  */
 @EnableWebFluxSecurity
+@Configuration(proxyBeanMethods = false)
 public class ResourceServerSecurityConfig {
 
     @Bean
@@ -39,7 +43,7 @@ public class ResourceServerSecurityConfig {
                 .anyExchange().authenticated()
                 .and()
                 .oauth2ResourceServer()
-                .jwt();
+                .jwt(withDefaults());
         return http.build();
     }
 }

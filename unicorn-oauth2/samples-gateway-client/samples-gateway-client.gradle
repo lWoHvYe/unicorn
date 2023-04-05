@@ -5,7 +5,7 @@ ext {
 }
 
 dependencies {
-    api platform(SpringBootPlugin.BOM_COORDINATES)
+    implementation platform(SpringBootPlugin.BOM_COORDINATES)
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.cloud:spring-cloud-starter-gateway:$gatewayVersion"

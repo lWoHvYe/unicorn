@@ -56,4 +56,3 @@
 
 - 当访问client时，其会自己维护SecurityContext，并自动refresh
 - 但作为GateWay时，有些不一样，理论上是需要Call传Token的，那么相关维护都要那端了
-- 并且经过Authority也有问题，只验证了Token是否validate，而没verify其scope

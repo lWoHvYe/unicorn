@@ -37,7 +37,7 @@ public class LocalCoreConfig {
 
     public static Boolean IP_LOCAL;
 
-    @Value("${ip.local-parsing}")
+    @Value("${ip.local-parsing:false}")
     public void setIpLocal(Boolean ipLocal) {
         IP_LOCAL = ipLocal;
     }
