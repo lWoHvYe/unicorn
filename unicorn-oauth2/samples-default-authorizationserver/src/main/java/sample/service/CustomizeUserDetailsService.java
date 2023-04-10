@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sample.repo.CustomizeUserInfoRepository;
 
 @Service
@@ -32,13 +33,17 @@ public class CustomizeUserDetailsService implements UserDetailsService {
     private CustomizeUserInfoRepository customizeUserInfoRepository;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var customizeUser = customizeUserInfoRepository.findByUsername(username);
 
-        return User.withDefaultPasswordEncoder()
+        return User.builder()
                 .username(customizeUser.getUsername())
                 .password(customizeUser.getPassword())
-                .roles(customizeUser.getRoles().toArray(new String[0]))
+                .roles(customizeUser.getCustomizeRoles().stream()
+                        .map(customizeRole -> customizeRole.getCode().toUpperCase())
+                        .toArray(String[]::new))
+                .disabled(!customizeUser.getEnabled())
                 .build();
     }
 }

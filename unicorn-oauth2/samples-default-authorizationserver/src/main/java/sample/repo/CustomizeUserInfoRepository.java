@@ -16,37 +16,12 @@
 
 package sample.repo;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import sample.pojo.CustomizeUser;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import sample.domain.CustomizeUser;
 
 @Repository
-public class CustomizeUserInfoRepository {
+public interface CustomizeUserInfoRepository extends JpaRepository<CustomizeUser,Long> {
 
-    private final Map<String, CustomizeUser> memUserInfo = new HashMap<>();
-
-    public CustomizeUserInfoRepository() {
-        this.memUserInfo.put("admin", createUser("admin"));
-        this.memUserInfo.put("bonus", createUser("bonus"));
-    }
-
-    public CustomizeUser findByUsername(String username) {
-        return this.memUserInfo.get(username);
-    }
-
-    private static CustomizeUser createUser(String username) {
-        var user = new CustomizeUser();
-        user.setUsername(username);
-        user.setNickname("idol");
-        user.setGender("female");
-        user.setPassword("password");
-        user.setProfile("https://github.com/" + username);
-        user.setEmail(username + "@gmail.com");
-        user.setPhoneNumber("+1 (604) 555-1234;ext=5678");
-        user.setRoles(List.of("admin".equals(username) ? "ADMIN" : "USER", "RES", "DIVIDEND"));
-        return user;
-    }
+    CustomizeUser findByUsername(String username);
 }
