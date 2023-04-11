@@ -44,10 +44,26 @@ import java.util.List;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // 在Spring为Web服务时生效
 public class LimitAspect {
 
-    private final RedisTemplate<Object,Object> redisTemplate;
+    private final RedisTemplate<Object, Object> redisTemplate;
     private static final Logger logger = LoggerFactory.getLogger(LimitAspect.class);
 
-    public LimitAspect(RedisTemplate<Object,Object> redisTemplate) {
+    /**
+     * 限流脚本
+     */
+    private static final String RATIO_LIMIT_lUA_SCRIPT = """
+            local c
+            c = redis.call('get',KEYS[1])
+            if c and tonumber(c) > tonumber(ARGV[1]) then
+            return c;
+            end
+            c = redis.call('incr',KEYS[1])
+            if tonumber(c) == 1 then
+            redis.call('expire',KEYS[1],ARGV[2])
+            end
+            return c;
+            """;
+
+    public LimitAspect(RedisTemplate<Object, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
@@ -71,10 +87,9 @@ public class LimitAspect {
             }
         }
 
-        List<Object> keys = List.of(StringUtils.join(limit.prefix(), "_", key, "_", request.getRequestURI().replaceAll("/","_")));
+        List<Object> keys = List.of(StringUtils.join(limit.prefix(), "_", key, "_", request.getRequestURI().replaceAll("/", "_")));
 
-        String luaScript = buildLuaScript();
-        RedisScript<Number> redisScript = new DefaultRedisScript<>(luaScript, Number.class);
+        RedisScript<Number> redisScript = new DefaultRedisScript<>(RATIO_LIMIT_lUA_SCRIPT, Number.class);
         Number count = redisTemplate.execute(redisScript, keys, limit.count(), limit.period());
         if (null != count && count.intValue() <= limit.count()) {
             logger.info("第{}次访问key为 {}，描述为 [{}] 的接口", count, keys, limit.name());
@@ -84,19 +99,4 @@ public class LimitAspect {
         }
     }
 
-    /**
-     * 限流脚本
-     */
-    private String buildLuaScript() {
-        return "local c" +
-                "\nc = redis.call('get',KEYS[1])" +
-                "\nif c and tonumber(c) > tonumber(ARGV[1]) then" +
-                "\nreturn c;" +
-                "\nend" +
-                "\nc = redis.call('incr',KEYS[1])" +
-                "\nif tonumber(c) == 1 then" +
-                "\nredis.call('expire',KEYS[1],ARGV[2])" +
-                "\nend" +
-                "\nreturn c;";
-    }
 }

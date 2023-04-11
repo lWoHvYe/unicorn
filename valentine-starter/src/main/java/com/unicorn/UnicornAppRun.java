@@ -57,7 +57,7 @@ public class UnicornAppRun {
      * @date 2021/11/23 9:42 上午
      */
     @Bean
-    public SpringContextHolder springContextHolder() {
+    public static SpringContextHolder springContextHolder() {
         return new SpringContextHolder();
     }
 
