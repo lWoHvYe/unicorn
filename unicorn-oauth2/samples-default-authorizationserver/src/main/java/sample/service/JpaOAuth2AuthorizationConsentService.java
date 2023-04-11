@@ -20,6 +20,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,6 +37,7 @@ import sample.domain.AuthorizationConsent;
 import sample.repo.AuthorizationConsentRepository;
 
 @Component
+@CacheConfig(cacheNames = "oauth2-authorize-consent")
 public class JpaOAuth2AuthorizationConsentService implements OAuth2AuthorizationConsentService {
     private final AuthorizationConsentRepository authorizationConsentRepository;
     private final RegisteredClientRepository registeredClientRepository;
@@ -46,12 +50,14 @@ public class JpaOAuth2AuthorizationConsentService implements OAuth2Authorization
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     public void save(OAuth2AuthorizationConsent authorizationConsent) {
         Assert.notNull(authorizationConsent, "authorizationConsent cannot be null");
         this.authorizationConsentRepository.save(toEntity(authorizationConsent));
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     public void remove(OAuth2AuthorizationConsent authorizationConsent) {
         Assert.notNull(authorizationConsent, "authorizationConsent cannot be null");
         this.authorizationConsentRepository.deleteByRegisteredClientIdAndPrincipalName(
@@ -59,6 +65,7 @@ public class JpaOAuth2AuthorizationConsentService implements OAuth2Authorization
     }
 
     @Override
+    @Cacheable
     public OAuth2AuthorizationConsent findById(String registeredClientId, String principalName) {
         Assert.hasText(registeredClientId, "registeredClientId cannot be empty");
         Assert.hasText(principalName, "principalName cannot be empty");

@@ -25,6 +25,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -40,6 +43,7 @@ import sample.domain.Client;
 import sample.repo.ClientRepository;
 
 @Component
+@CacheConfig(cacheNames = "oauth2-registered-client")
 public class JpaRegisteredClientRepository implements RegisteredClientRepository {
     private final ClientRepository clientRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -55,18 +59,21 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     public void save(RegisteredClient registeredClient) {
         Assert.notNull(registeredClient, "registeredClient cannot be null");
         this.clientRepository.save(toEntity(registeredClient));
     }
 
     @Override
+    @Cacheable
     public RegisteredClient findById(String id) {
         Assert.hasText(id, "id cannot be empty");
         return this.clientRepository.findById(id).map(this::toObject).orElse(null);
     }
 
     @Override
+    @Cacheable
     public RegisteredClient findByClientId(String clientId) {
         Assert.hasText(clientId, "clientId cannot be empty");
         return this.clientRepository.findByClientId(clientId).map(this::toObject).orElse(null);

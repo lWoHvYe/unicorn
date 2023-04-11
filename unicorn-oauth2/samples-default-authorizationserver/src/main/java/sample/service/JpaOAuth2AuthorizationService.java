@@ -26,6 +26,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -48,6 +51,7 @@ import sample.domain.Authorization;
 import sample.repo.AuthorizationRepository;
 
 @Component
+@CacheConfig(cacheNames = "oauth2-authorize")
 public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService {
     private final AuthorizationRepository authorizationRepository;
     private final RegisteredClientRepository registeredClientRepository;
@@ -66,24 +70,28 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     public void save(OAuth2Authorization authorization) {
         Assert.notNull(authorization, "authorization cannot be null");
         this.authorizationRepository.save(toEntity(authorization));
     }
 
     @Override
+    @CacheEvict(allEntries = true)
     public void remove(OAuth2Authorization authorization) {
         Assert.notNull(authorization, "authorization cannot be null");
         this.authorizationRepository.deleteById(authorization.getId());
     }
 
     @Override
+    @Cacheable
     public OAuth2Authorization findById(String id) {
         Assert.hasText(id, "id cannot be empty");
         return this.authorizationRepository.findById(id).map(this::toObject).orElse(null);
     }
 
     @Override
+    @Cacheable
     public OAuth2Authorization findByToken(String token, OAuth2TokenType tokenType) {
         Assert.hasText(token, "token cannot be empty");
 

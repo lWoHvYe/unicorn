@@ -32,3 +32,13 @@ spring:
       maximum-pool-size: 10
       pool-name: Resource-Server
       connection-test-query: SELECT 1
+
+  # cache配置
+  cache:
+    type: redis
+  # redis配置
+  data:
+    redis:
+      url: redis://redis-psd@10.211.55.140:6379
+      timeout: 2000
+      database: 4
