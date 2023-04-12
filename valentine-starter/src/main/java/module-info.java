@@ -1,6 +1,6 @@
 @SuppressWarnings({"requires-automatic"})
 module lwohvye.valentine.starter {
-    requires lwohvye.unicorn.system;
+    requires lwohvye.unicorn.security;
     requires lwohvye.unicorn.core;
     requires lombok;
 //    requires bizlog.sdk;

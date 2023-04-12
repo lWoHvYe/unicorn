@@ -33,6 +33,9 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+  autoconfigure:
+    # to use VT, should exclude this
+    exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
 
 #密码加密传输，前端公钥加密，后端私钥解密
 rsa:
