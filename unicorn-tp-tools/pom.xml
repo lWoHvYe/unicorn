@@ -32,7 +32,7 @@
 
     <properties>
         <aws.s3.version>2.18.28</aws.s3.version>
-        <bcprov.jdk18on.version>1.72</bcprov.jdk18on.version>
+        <bcprov.jdk18on.version>1.73</bcprov.jdk18on.version>
     </properties>
 
     <dependencyManagement>
