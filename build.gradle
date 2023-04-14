@@ -18,7 +18,8 @@ buildscript {
 
 plugins {
     id 'com.lwohvye.java-conventions'
-    id 'org.springframework.boot' // 主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
+    //主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
+    id("org.springframework.boot") version "${springBootVersion}" apply false
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
     id 'io.github.gradle-nexus.publish-plugin' version '1.2.0'
 }
@@ -90,10 +91,6 @@ subprojects {
         automaticModule("org.apache.commons:commons-math3", 'commons.math3')
         automaticModule("com.zaxxer:SparseBitSet", 'SparseBitSet')
     }
-}
-
-tasks.named("bootJar") {
-    mainClass = ''
 }
 
 tasks.withType(Checkstyle).configureEach {

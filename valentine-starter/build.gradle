@@ -30,6 +30,12 @@ tasks.withType(Test).configureEach {
     jvmArgs += "--enable-preview"
 }
 
+tasks.named("bootRun") {
+    jvmArgs += "-XX:+UseZGC"
+    jvmArgs += "--enable-preview"
+    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
+}
+
 tasks.named("bootBuildImage") {
     environment = [
             "BP_JVM_VERSION"              : "20",
