@@ -15,10 +15,10 @@
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
 ---
-本分支将停留在17版本。另将在`dev_3.x`分支，尝试后续版本的JDK（主要是Virtual Thread），待21中VT GA后，会将其merge到main branch.
 
 启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
-和配置文件 [resources](unicorn-starter/src/main/resources)详见 [unicorn-starter](unicorn-starter) 模块。[启停脚本](script)。 
+和配置文件 [resources](unicorn-starter/src/main/resources)详见 [unicorn-starter](unicorn-starter)
+模块。[启停脚本](script)。
 You can find the minimum to run in [Valentine's Day](valentine-starter).
 ~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](unicorn-starter/src/main/java/module-info.java)
 删除，以非module化运行，模块化打包部署暂未找到支持外置配置及依赖的方式~~
@@ -31,8 +31,7 @@ You can find the minimum to run in [Valentine's Day](valentine-starter).
 
 后台运行jar（开启远程调试端口5005）。2>&1 表示在同一个文件中同时捕获 System.err和
 System.out（有一个箭头的表示以覆盖的方式重定向，而有两个箭头的表示以追加的方式重定向。如果需要将标准输出以及标准错误输出同时重定向到一个文件，需要将某个输出转换为另一个输出，例如
-2>&1
-表示将标准错误输出转换为标准输出）。
+2>&1 表示将标准错误输出转换为标准输出）。
 
 ```shell
 nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar unicorn-starter-3.0.0.jar >nohup.out 2>&1 &
@@ -42,12 +41,12 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=
 
 ```shell
 #2.x版本启动示例
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
+nohup java -Dloader.path=lib -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
 ```
 
 ```shell
 #3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
-nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar unicorn-starter-3.1.0.jar >nohup.out 2>&1 &
+nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.1.0.jar >nohup.out 2>&1 &
 ```
 
 | key                | 目的                                                                                                                                                           |
@@ -91,12 +90,31 @@ nohup java -XX:+UseZGC -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,add
 
 ```
 
+Gradle
+
+```groovy
+
+implementation 'com.lwohvye:unicorn-security:4.0.0-delta'
+
+implementation("com.lwohvye:unicorn-security:4.0.0-delta") {
+    capabilities {
+        requireCapability('com.lwohvye:unicorn-security-captcha')
+    }
+}
+implementation("com.lwohvye:unicorn-security:4.0.0-delta") {
+    capabilities {
+        // 这里只支撑横线，不支持驼峰
+        requireCapability('com.lwohvye:unicorn-security-business-log')
+    }
+}
+```
+
 ---
 
 #### 项目简介
 
-一个基于最新的Java 17版本、 Spring Boot 3.0、 Jpa、 Spring Security、
-Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
+一个基于最新的Java 20 版本、 Spring Boot 3.0、 Jpa、 Spring Security、 Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。
+在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
 
@@ -108,7 +126,7 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 17、Spring Boot 3.0。
+- 使用最新技术栈，社区资源丰富，基于Java 20、Spring Boot 3.0。(Support Virtual Threads/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持数据字典，可方便地对一些状态进行管理
 - 高效率开发，代码生成器可一键生成前后端代码
@@ -145,8 +163,6 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
 
 - `unicorn-core` 系统的核心模块，各种工具类，公共配置存在该模块
 
-- `unicorn-reactive` core模块默认基于MVC，因为Gateway是基于WebFlux的，以此进行适配
-
 - `unicorn-sys-api` Sys Module基础实体及API，方便服务拆分
 
 - `unicorn-security` 系统权限模块，包含权限配置管理等。
@@ -157,11 +173,9 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
 
 - `unicorn-code-gen` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
 
-- `unicorn-starter` 启动类，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离），枚举类动态扩展的简单demo
+- `unicorn-starter` 启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离），枚举类动态扩展的简单demo
 
-- `valentine-search` 通过mongodb进行最基础的检索，整合elasticsearch，SPI相关demo
-
-- `valentine-starter` 启动配置示例，最小环境依赖启动
+- `valentine-starter` 启动配置示例(Gradle)，最小环境依赖启动
 
 #### 详细结构
 
@@ -197,7 +211,7 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
 
 #### 运行环境
 
-- Java 17 基础运行环境
+- Java 20 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
 - Redis 6.0 缓存
 - RabbitMQ 发布-订阅（解耦、异步）
@@ -207,7 +221,7 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
 
 #### 特别鸣谢
 
-- [![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://jb.gg/OpenSourceSupport) 
+- [![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://jb.gg/OpenSourceSupport)
 
 - 感谢 [JetBrains](https://www.jetbrains.com/) 提供的非商业开源软件开发授权。
 
@@ -230,7 +244,7 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
 - dev_3.0 Springdoc相关。Web侧跟进（无限delay）
 - ASM字节码增强
 - 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的
-  accessToken， 另一个只作为刷新 accessToken 用的 refreshToken
+  accessToken， 另一个只作为刷新 accessToken 用的 refreshToken，OAuth2.0已支持
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
   推测是Spring Boot的 ClassLoader下全是Auto-Module）
 - swarm化，可以参考[why-swarm (施工中)](https://github.com/WHY-lWoHvYe/why-swarm)
@@ -242,3 +256,5 @@ Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。在各模�
   但为了解决懒加载no-session的问题， 很多复杂查询都加了事务注解，这样如果用第一种，主库的压力会比较大，而第二种会有上面提到的问题,
   后续再看看吧(寻求其他no-session的解决方案,第二种配合强制路由).
   补充：同一事务内，在Update之后Select，似乎走的是Primary，如果这样的话，用第二种似乎就可以了
+- OAuth 2.0
+- Loom + Kotlin Coroutines

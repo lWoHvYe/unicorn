@@ -17,8 +17,8 @@
 
 echo "stop SpringBoot Application"
 # shellcheck disable=SC2009
-ps -ef | grep unicorn-starter-3.0.3.jar | grep -v grep | awk '{print $2}' | xargs kill -15
-#pid=$(ps -ef | grep unicorn-starter-3.0.3.jar | grep -v grep | awk '{print $2}')
+ps -ef | grep valentine-starter.jar | grep -v grep | awk '{print $2}' | xargs kill -15
+#pid=$(ps -ef | grep valentine-starter.jar | grep -v grep | awk '{print $2}')
 #echo "旧应用进程id：$pid"
 #if [ -n "$pid" ]
 #then

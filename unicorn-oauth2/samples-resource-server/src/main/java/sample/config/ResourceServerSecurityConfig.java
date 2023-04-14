@@ -37,6 +37,7 @@ public class ResourceServerSecurityConfig {
         http
                 .csrf().disable()
                 .authorizeExchange()
+                // TODO: 2023/4/10 在res-server db中，有res-scope的关系表，在启动时加载并配置下面的matcher一次，也可尝试@RefreshScope
                 .pathMatchers("/messages").hasAuthority("SCOPE_message.read")
                 .pathMatchers(HttpMethod.GET, "/resource").hasAuthority("SCOPE_resource.read")
                 .pathMatchers(HttpMethod.POST, "/resource").hasAuthority("SCOPE_resource.write")
