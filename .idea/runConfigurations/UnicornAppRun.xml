@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="UnicornAppRun" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="valentine-starter" />
+    <module name="valentine-p2p.valentine-starter.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.unicorn.UnicornAppRun" />
     <option name="VM_PARAMETERS" value="--enable-preview -XX:+UseZGC" />
     <method v="2">
