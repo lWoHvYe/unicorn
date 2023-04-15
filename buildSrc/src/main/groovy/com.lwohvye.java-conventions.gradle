@@ -21,7 +21,7 @@ repositories {
 }
 
 group = 'com.lwohvye'
-version = '4.0.0-epsilon'
+version = '4.0.0-zeta'
 java.sourceCompatibility = JavaVersion.VERSION_20
 
 java {
