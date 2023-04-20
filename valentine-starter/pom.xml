@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.3</version>
+        <version>3.0.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -31,8 +31,8 @@
 
     <properties>
         <java.version>20</java.version>
-        <unicorn.core.version>4.0.0-delta</unicorn.core.version>
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <unicorn.core.version>4.0.0-epsilon</unicorn.core.version>
+        <mapstruct.version>1.5.4.Final</mapstruct.version>
     </properties>
     <!--这个意义不大-->
     <dependencyManagement>

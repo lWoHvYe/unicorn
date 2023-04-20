@@ -23,7 +23,7 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v3.10.0
         with:
-          java-version: '19'
+          java-version: '20'
           distribution: 'oracle'
           check-latest: true
 
