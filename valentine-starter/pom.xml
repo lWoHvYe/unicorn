@@ -160,6 +160,7 @@
                             <artifactId>spring-boot-configuration-processor</artifactId>
                         </exclude>
                     </excludes>
+                    <jvmArguments>--enable-preview --add-modules=jdk.incubator.concurrent</jvmArguments>
                 </configuration>
             </plugin>
             <!-- 跳过单元测试 -->
