@@ -134,6 +134,7 @@ public class JsonUtils {
         return null;
     }
 
+    // 这里的TypeReference和Gson中的TypeToken，都是为了解决Java的类型擦除问题
     public static <T> T toJavaObject(String value, TypeReference<T> valueTypeRef) {
         try {
             return objectMapper.readValue(value, valueTypeRef);

@@ -16,6 +16,7 @@
 
 package com.lwohvye.core.utils;
 
+import com.lwohvye.core.exception.UtilsException;
 import jdk.incubator.concurrent.StructuredTaskScope;
 
 import java.util.Arrays;
@@ -65,7 +66,7 @@ public final class ConcurrencyUtils {
         } catch (ExecutionException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
-            throw new RuntimeException(e);
+            throw new UtilsException(e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

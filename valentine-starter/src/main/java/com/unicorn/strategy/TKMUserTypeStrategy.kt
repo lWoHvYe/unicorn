@@ -47,6 +47,7 @@ sealed class TKMUserTypeStrategy : ExtraUserTypeStrategy {
         // 具体而言就是：
         // 1.GlobalScope.launch { ... }: 创建了一个协程并启动，GlobalScope 是一个全局范围，表示该协程的生命周期与整个应用程序的生命周期相同。
         // { .. } 中定义的是launch函数的block参数，更确叫 launch函数的调用体。 实际上也就是 `suspend CoroutineScope.() -> Unit` 中的 CoroutinesScope.() -> Unit 这个lambda表达式
+        // 参数拥有默认值后，变为可选参数
         GlobalScope.launch {
             // 2.runBlocking { ... }: 用于等待协程内部的代码执行完毕后再执行后面的代码。在这个例子中，使用了 delay 函数模拟一个耗时操作，它会暂停协程的执行一段时间，这里是 1000 毫秒（1 秒）。
             runBlocking {
@@ -70,6 +71,10 @@ sealed class TKMUserTypeStrategy : ExtraUserTypeStrategy {
         /*runBlocking(EmptyCoroutineContext, {
             println("async result is ${result.await()}")
         })*/
+        // 对于存在可变参数的，可通过 参数名 = xxx 对特定参数赋值
+        /*runBlocking(block = {
+            println("async result is ${result.await()}")
+        })*/
 
         loomCarrier()
         coroutinesDirect()
@@ -79,7 +84,8 @@ sealed class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     }
 
     // 这段代码是一个Kotlin协程中的挂起函数（Suspending Function），使用了suspend关键字修饰。
-    // 协程中的挂起函数使用suspend关键字修饰，这意味着当调用该函数时，它会暂停当前协程而不会阻塞当前线程，从而实现异步执行。
+    // 协程中的挂起函数使用suspend关键字修饰，这意味着当调用该函数时，它会暂停当前协程（所以调用代码后的部分不会执行）而不会阻塞当前线程，从而实现异步执行。
+    // 方法只有一行时，可以用 = 代替 { ... }
     suspend fun workload(n: Int): Int { // 使用suspend修饰
         delay(1000)
         return n + 2
