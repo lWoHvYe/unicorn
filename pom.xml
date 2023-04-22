@@ -91,7 +91,7 @@
         <lombok.version>1.18.26</lombok.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
         <!--mapstruct也要用新版本才行-->
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
+        <mapstruct.version>1.5.4.Final</mapstruct.version>
         <mapstruct.spring.version>1.0.0</mapstruct.spring.version>
         <!--logstash有所依赖，需要使用management统一管理依赖-->
         <logstash.version>7.3</logstash.version>
