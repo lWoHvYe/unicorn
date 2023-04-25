@@ -62,9 +62,11 @@ nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.1.0.jar >nohup.o
 
 ---
 
-#### Maven引用方式 🎵
+#### 引用方式 🎵
 
 最新版本为: [![Maven Central](https://img.shields.io/maven-central/v/com.lwohvye/unicorn.svg?logo=github&style=flat)](https://mvnrepository.com/artifact/com.lwohvye/unicorn)
+
+##### Maven
 
 **可根据需要选择版本**
 
@@ -90,18 +92,22 @@ nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.1.0.jar >nohup.o
 
 ```
 
-Gradle
+##### Gradle
 
 ```groovy
 
-implementation 'com.lwohvye:unicorn-security:4.0.0-delta'
+ext { // 这个定义是可以传递的
+    unicornVersion = '4.0.0-epsilon'
+}
 
-implementation("com.lwohvye:unicorn-security:4.0.0-delta") {
+implementation "com.lwohvye:unicorn-security:$unicornVersion"
+
+implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     capabilities {
         requireCapability('com.lwohvye:unicorn-security-captcha')
     }
 }
-implementation("com.lwohvye:unicorn-security:4.0.0-delta") {
+implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     capabilities {
         // 这里只支撑横线，不支持驼峰
         requireCapability('com.lwohvye:unicorn-security-business-log')

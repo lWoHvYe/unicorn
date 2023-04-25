@@ -28,12 +28,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.nio.file.*;
@@ -182,7 +184,7 @@ public class FileUtils extends FileUtil {
     public static File upload(MultipartFile multipartFile, String filePath) {
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmssS");
-        String name = getFileNameNoEx(multipartFile.getOriginalFilename());
+        String name = getFileNameNoEx(verifyFilename(multipartFile.getOriginalFilename()));
         String suffix = getExtensionName(multipartFile.getOriginalFilename());
         String nowStr = "-" + format.format(date);
         try {
@@ -201,6 +203,38 @@ public class FileUtils extends FileUtil {
             log.error(e.getMessage(), e);
         }
         return null;
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param request  /
+     * @param response /
+     * @param file     /
+     */
+    public static void downloadFile(HttpServletRequest request, HttpServletResponse response, File file, boolean deleteOnExit) {
+        response.setCharacterEncoding(request.getCharacterEncoding());
+        response.setContentType("application/octet-stream");
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+            response.setHeader("Content-Disposition", "attachment; filename=" + file.getName());
+            IOUtils.copy(fis, response.getOutputStream());
+            response.flushBuffer();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                    if (deleteOnExit) {
+                        file.deleteOnExit();
+                    }
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
     }
 
     /**
@@ -315,6 +349,10 @@ public class FileUtils extends FileUtil {
         return b;
     }
 
+    public static String getMd5(File file) {
+        return getMd5(getByte(file));
+    }
+
     private static String getMd5(byte[] bytes) {
         // 16进制字符
         char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -338,39 +376,44 @@ public class FileUtils extends FileUtil {
     }
 
     /**
-     * 下载文件
+     * 验证并过滤非法的文件名
      *
-     * @param request  /
-     * @param response /
-     * @param file     /
+     * @param fileName 文件名
+     * @return 文件名
      */
-    public static void downloadFile(HttpServletRequest request, HttpServletResponse response, File file, boolean deleteOnExit) {
-        response.setCharacterEncoding(request.getCharacterEncoding());
-        response.setContentType("application/octet-stream");
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            response.setHeader("Content-Disposition", "attachment; filename=" + file.getName());
-            IOUtils.copy(fis, response.getOutputStream());
-            response.flushBuffer();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                    if (deleteOnExit) {
-                        file.deleteOnExit();
-                    }
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
-    }
+    @Nullable
+    public static String verifyFilename(String fileName) {
+        if (Objects.isNull(fileName))
+            return fileName;
+        // 过滤掉特殊字符
+        fileName = fileName.replaceAll("[\\\\/:*?\"<>|~\\s]", "");
 
-    public static String getMd5(File file) {
-        return getMd5(getByte(file));
+        // 去掉文件名开头和结尾的空格和点
+        fileName = fileName.trim().replaceAll("^[. ]+|[. ]+$", "");
+
+        // 不允许文件名超过255（在Mac和Linux中）或260（在Windows中）个字符
+        int maxFileNameLength = 255;
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            maxFileNameLength = 260;
+        }
+        if (fileName.length() > maxFileNameLength) {
+            fileName = fileName.substring(0, maxFileNameLength);
+        }
+
+        // 过滤掉控制字符
+        fileName = fileName.replaceAll("[\\p{Cntrl}]", "");
+
+        // 过滤掉 ".." 路径
+        fileName = fileName.replaceAll("\\.{2,}", "");
+
+        // 去掉文件名开头的 ".."
+        fileName = fileName.replaceAll("^\\.+/", "");
+
+        // 保留文件名中最后一个 "." 字符，过滤掉其他 "."
+        fileName = fileName.replaceAll("^(.*)(\\.[^.]*)$", "$1").replaceAll("\\.", "") +
+                fileName.replaceAll("^(.*)(\\.[^.]*)$", "$2");
+
+        return fileName;
     }
 
     /**
