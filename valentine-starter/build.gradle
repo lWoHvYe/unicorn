@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
     id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
     // Apply GraalVM Native Image plugin
-    id 'org.graalvm.buildtools.native' version '0.9.21'
+//    id 'org.graalvm.buildtools.native' version '0.9.21'
 }
 
 dependencies {

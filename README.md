@@ -195,9 +195,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - exception 项目统一异常的处理
     - utils 系统通用工具类
 - unicorn-sys-api 基础实体及DTO
-    - annotation 为模块自定义注解
     - modules 基础实体及接口定义
-    - utils 通用工具类扩展
 - unicorn-security 系统核心模块
 	- common 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
 	    - init 容器启动后的钩子call back
