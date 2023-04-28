@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.config;
+package com.unicorn.config;
 
-import com.lwohvye.starter.modules.handler.SimRestErrorHandler;
+import com.unicorn.handler.SimRestErrorHandler;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;

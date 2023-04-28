@@ -65,7 +65,7 @@ import java.util.Objects;
  *
  * @author Zheng Jie,Hongyan Wang
  */
-// TODO: 2022/11/12 Update to Security 6.0 -> https://docs.spring.io/spring-security/reference/5.8/migration.html
+// Update to Security 6.0 -> https://docs.spring.io/spring-security/reference/5.8/migration.html
 // 添加该注解到@Configuration的类上，应用程序便可以使用自定义的WebSecurityConfigurer或拓展自WebSecurityConfigurerAdapter的配置类来装配Spring Security框架。
 // 在5.4开始引入新的配置方式 https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
 // Spring Security lambda DSL

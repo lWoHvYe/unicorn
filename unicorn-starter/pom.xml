@@ -30,14 +30,14 @@
     <name>Common Starter</name>
 
     <properties>
-        <java.version>19</java.version>
-        <project.core.version>4.0.0-beta</project.core.version>
-        <maven.compiler.release>19</maven.compiler.release>
+        <java.version>20</java.version>
+        <project.core.version>4.0.0-epsilon</project.core.version>
+        <maven.compiler.release>20</maven.compiler.release>
         <lombok.version>1.18.26</lombok.version>
         <mapstruct.version>1.5.4.Final</mapstruct.version>
         <javassist.version>3.29.2-GA</javassist.version>
         <shardingsphere.version>5.2.0</shardingsphere.version>
-        <kotlin.version>1.8.10</kotlin.version>
+        <kotlin.version>1.8.20</kotlin.version>
     </properties>
 
     <dependencies>

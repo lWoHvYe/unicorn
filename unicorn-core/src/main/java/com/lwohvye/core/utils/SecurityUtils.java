@@ -38,7 +38,6 @@ import java.util.List;
  */
 @Slf4j
 public class SecurityUtils {
-// TODO: 2022/3/19 当前部分逻辑是需要获取当前用户信息的。swarm后，应该要由网关侧传个id进来，有时间做下兼容处理（根据环境参数选择从SecurityContextHolder获取还是从Dao中获取）
 
     /**
      * 获取当前登录的用户

@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.handler;
+package com.unicorn.handler;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
@@ -27,7 +28,7 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 public class SimRestErrorHandler extends DefaultResponseErrorHandler {
 
     @Override
-    public void handleError(ClientHttpResponse response) {
+    public void handleError(@NotNull ClientHttpResponse response) {
         // 这样空复写可以做到，从 Response 获取 HttpStatus 和 body 中的报错信息 而不抛出异常
     }
 }

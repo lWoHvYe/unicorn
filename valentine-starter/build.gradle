@@ -9,6 +9,7 @@ dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
     implementation project(':unicorn-tp-tools')
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinxCoroutinesVersion"

@@ -12,12 +12,16 @@ module lwohvye.valentine.starter {
     requires kotlin.stdlib;
     requires kotlinx.coroutines.core;
     requires org.apache.logging.log4j;
+    requires org.apache.httpcomponents.core5.httpcore5;
+    requires org.apache.httpcomponents.client5.httpclient5;
 //    requires captcha;
 
+    exports com.unicorn.config;
     exports com.unicorn.vs.rest to spring.beans, spring.aop, spring.web;
 
     // maven需要opens resources，而gradle不需要
 //    opens config;
     opens com.unicorn;
+    opens com.unicorn.config to spring.core;
     opens com.unicorn.vs.rest to spring.core;
 }
