@@ -37,12 +37,15 @@ public class ResourceServerSecurityConfig {
         http
                 .csrf().disable()
                 .authorizeExchange()
-                // TODO: 2023/4/10 在res-server db中，有res-scope的关系表，在启动时加载并配置下面的matcher一次，也可尝试@RefreshScope
+                // 需要特定authority
                 .pathMatchers("/messages").hasAuthority("SCOPE_message.read")
                 .pathMatchers(HttpMethod.GET, "/resource").hasAuthority("SCOPE_resource.read")
                 .pathMatchers(HttpMethod.POST, "/resource").hasAuthority("SCOPE_resource.write")
                 .pathMatchers(HttpMethod.PUT, "/resource").hasAuthority("SCOPE_resource.write")
                 .pathMatchers(HttpMethod.DELETE, "/resource").hasAuthority("SCOPE_resource.write")
+                // 可匿名访问，业务中会有业务逻辑相关的control
+                .pathMatchers("/explore/**").permitAll()
+                // 需要登陆才可访问，这个一般是主体
                 .anyExchange().authenticated()
                 .and()
                 .oauth2ResourceServer()

@@ -17,6 +17,10 @@ def buildFiles = fileTree(rootDir) {
     def excludes = gradle.startParameter.projectProperties.get("excludeProjects")?.split(",")
     include "**/*.gradle", "**/*.gradle.kts"
     exclude "build", "**/gradle", "settings.gradle", "buildSrc", "/build.gradle", ".*", "out"
+    // 可以这样exclude指定的module
+    def kotlinVersion = gradle.properties.getOrDefault("kotlinVersion", "1.8.20").toString()
+    if (kotlinVersion.matches("^1\\.8\\.2[0-9]+\$")) // current version is not support Java 20
+        exclude "valentine-starter"
     if (excludes) {
         exclude excludes
     }
