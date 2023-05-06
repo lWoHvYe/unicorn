@@ -97,14 +97,14 @@
   enhancing observability.
 - [JEP 428: Structured Concurrency (Incubator)](https://openjdk.java.net/jeps/428)
 - [JEP 437: Structured Concurrency (Second Incubator)](https://openjdk.org/jeps/437)
-- 多线程相关的，诸如 ExecutorService and Future 这些，实际上跟Virtual Threads也有些相关。主体感觉在Virtual
-  Threads提出后，又出现了不少相关的新东西
+- [JEP draft: Structured Concurrency (Preview)](https://openjdk.org/jeps/8306641)
 
 #### Scoped Values (Incubator)
 
 - Introduce scoped values, which enable the sharing of immutable data within and across threads. They are preferred to
   thread-local variables, especially when using large numbers of virtual threads
 - [JEP 429: Scoped Values (Incubator)](https://openjdk.org/jeps/429)
+- [JEP 446: Scoped Values (Preview)](https://openjdk.org/jeps/446)
 
 #### Valhalla
 

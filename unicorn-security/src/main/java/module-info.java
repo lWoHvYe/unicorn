@@ -7,7 +7,6 @@ module lwohvye.unicorn.security {
     requires transitive jakarta.annotation;
     requires transitive java.scripting;
     requires jdk.incubator.concurrent;
-    requires jdk.incubator.vector;
     requires transitive spring.context.support;
     requires transitive spring.expression;
     requires transitive spring.webmvc;
