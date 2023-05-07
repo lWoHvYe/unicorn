@@ -73,18 +73,18 @@ publishing {
 dependencies {
     api project(':unicorn-sys-api')
     api('org.springframework.boot:spring-boot-starter-websocket')
-    api "io.jsonwebtoken:jjwt-api:$jjwtVersion"
-    api "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
-    api "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
-    api "org.quartz-scheduler:quartz:$quartzVersion"
-    api "com.github.whvcse:easy-captcha:$easyCaptchaVersion"
-    captchaImplementation "com.lwohvye.captcha:captcha-spring-boot-starter:$captchaVersion"
+    api libs.jjwt.api
+    api libs.jjwt.impl
+    api libs.jjwt.jackson
+    api libs.quartz
+    api libs.easy.captcha
+    captchaImplementation libs.captcha
     api "ch.ethz.ganymed:ganymed-ssh2:262"
     api 'com.jcraft:jsch:0.1.55'
-    api "com.github.oshi:oshi-core:$oshiCoreVersion"
-    api "ch.qos.logback:logback-access:$logbackVersion"
+    api libs.oshi.core
+    api libs.logback.access
     api 'org.openjdk.jol:jol-core:0.17'
     // It seems that xxxImplementation will work on runtimeClasspath for the customers while xxxApi compileClasspath
-    businessLogApi "io.github.mouzt:bizlog-sdk:$bizlogVersion"
+    businessLogApi libs.bizlog
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

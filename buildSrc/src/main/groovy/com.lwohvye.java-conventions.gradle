@@ -8,18 +8,6 @@ plugins {
     id 'signing'
 }
 
-repositories {
-    mavenCentral()
-    flatDir {
-        dirs "$rootProject.projectDir/ex-lib"
-    }
-/*
-    maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
-    }
-*/
-}
-
 group = 'com.lwohvye'
 version = '4.0.0-zeta'
 java.sourceCompatibility = JavaVersion.VERSION_20

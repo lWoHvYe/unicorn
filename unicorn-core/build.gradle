@@ -84,28 +84,28 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-cache'
     api 'org.springframework.boot:spring-boot-starter-data-redis'
     api 'org.springframework.boot:spring-boot-configuration-processor'
-    api "org.redisson:redisson-spring-boot-starter:$redissonVersion"
+    api libs.redisson
     api 'org.apache.commons:commons-pool2'
     api 'org.apache.commons:commons-lang3'
-    api "org.springdoc:springdoc-openapi-starter-webmvc-ui:$springdocVersion"
-    api "cn.hutool:hutool-all:$hutoolVersion"
-    api "net.dreamlu:mica-ip2region:$ip2regionVersion"
-    api "org.apache.poi:poi:$poiVersion"
-    api "org.apache.poi:poi-ooxml:$poiVersion"
-    implementation "xerces:xercesImpl:$xercesVersion"
-    api "org.mapstruct:mapstruct:$mapstructVersion"
+    api libs.springdoc.webmvc.ui
+    api libs.hutool
+    api libs.ip2region
+    api libs.poi
+    api libs.poi.ooxml
+    implementation libs.xerces
+    api libs.mapstruct
 //    mapstruct-spring-extensions seems unused
-    api "org.mapstruct.extensions.spring:mapstruct-spring-annotations:${mapstructSpringExtensionsVersion}"
+    api libs.mapstruct.spring.annotations
     api 'org.hibernate.validator:hibernate-validator'
-    api "nl.basjes.parse.useragent:yauaa:$yauaaVersion"
+    api libs.yauaa
     api 'com.github.ben-manes.caffeine:caffeine'
-    implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
-    api "net.coobird:thumbnailator:$thumbnailatorVersion"
+    implementation libs.logback.encoder
+    api libs.thumbnailator
     api 'org.jetbrains:annotations:24.0.0'
     api 'io.vavr:vavr:0.10.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'com.mysql:mysql-connector-j'
-    log4jdbcRuntimeOnly "com.lwohvye.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:$log4jdbcVersion"
+    log4jdbcRuntimeOnly libs.log4jdbc
 }
 
 tasks.named('compileJava') {

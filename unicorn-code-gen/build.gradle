@@ -67,6 +67,6 @@ publishing {
 dependencies {
     api project(':unicorn-core')
     api 'org.springframework.boot:spring-boot-starter-freemarker'
-    implementation "org.apache.commons:commons-configuration2:${commonsConfigurationVersion}"
-    implementation "commons-beanutils:commons-beanutils:${commonsBeanutilsVersion}"
+    implementation libs.commons.configuration
+    implementation libs.commons.beanutils
 }

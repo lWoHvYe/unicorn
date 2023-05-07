@@ -1,6 +1,6 @@
 plugins {
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
-    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
+    alias(libs.plugins.kotlin.jvm)
     // Apply GraalVM Native Image plugin
 //    id 'org.graalvm.buildtools.native' version '0.9.21'
 }
@@ -11,9 +11,7 @@ dependencies {
     implementation project(':unicorn-tp-tools')
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinxCoroutinesVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:$kotlinxCoroutinesVersion"
+    implementation libs.bundles.coroutines
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation(project(':unicorn-security')) {
