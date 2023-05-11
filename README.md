@@ -18,11 +18,8 @@
 
 启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
 和配置文件 [resources](unicorn-starter/src/main/resources)详见 [unicorn-starter](unicorn-starter)
-模块。[启停脚本](script)。
-You can find the minimum to run in [Valentine's Day](valentine-starter).
-~~注：模块化当前只支持研发模式，要打包部署需要将[module-info.java](unicorn-starter/src/main/java/module-info.java)
-删除，以非module化运行，模块化打包部署暂未找到支持外置配置及依赖的方式~~
-，模块化package已完成，只是无法从Jar中剔除配置，外置配置也是支持的，根据加载规则，外置的配置项会覆盖内置的
+模块。[启停脚本](script)。当前使用gradle build，module化还是有问题，需要把start中的module-info.java移除，以unnamed module
+run，使用maven build就正常
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396)
 [JEP 403](https://openjdk.java.net/jeps/403)，需在启动时添加相关参数开启包访问。较简单的是添加
@@ -34,32 +31,20 @@ System.out（有一个箭头的表示以覆盖的方式重定向，而有两个�
 2>&1 表示将标准错误输出转换为标准输出）。
 
 ```shell
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar unicorn-starter-3.0.0.jar >nohup.out 2>&1 &
+nohup java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar unicorn-starter-3.2.0.jar >nohup.out 2>&1 &
 ```
 
 若外置依赖启动参数需添加，``-Dloader.path=lib``引入依赖。外置依赖可以大大减少jar包的体积。方便后续更新部署
 
 ```shell
 #2.x版本启动示例
-nohup java -Dloader.path=lib -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -Dloader.path=lib -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
 ```
 
 ```shell
 #3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
-nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.1.0.jar >nohup.out 2>&1 &
+nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.2.0.jar >nohup.out 2>&1 &
 ```
-
-| key                | 目的                                                                                                                                                           |
-|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| loader.path        | lib包加载路径                                                                                                                                                     |
-| loader.home        | 用于解析loader.path中的相对路径。 例如，给定loader.path = lib，则$ {loader.home} / lib是类路径位置（以及该目录中的所有jar文件）。 此属性还用于查找loader.properties文件，如以下示例/ opt / app所示。它默认为$ {user.dir}。 |
-| loader.args        | main方法的默认参数（以空格分隔）                                                                                                                                           |
-| loader.main        | 要启动的主类的名称（例如com.app.Application）                                                                                                                             |
-| loader.config.name | 属性文件的路径（例如，classpath：loader.properties）。 默认为loader.properties。                                                                                               |
-| loader.system      | 布尔值标志，指示应将所有属性添加到系统属性。 默认为false。                                                                                                                             |
-
-参考：[executable-jar.launching](https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar.launching)
-
 ---
 
 #### 引用方式 🎵
@@ -102,11 +87,13 @@ ext { // 这个定义是可以传递的
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
 
+// 引入滑动captcha
 implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     capabilities {
         requireCapability('com.lwohvye:unicorn-security-captcha')
     }
 }
+// 引入custom-log
 implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     capabilities {
         // 这里只支撑横线，不支持驼峰
@@ -140,13 +127,11 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - 自定义权限注解与匿名接口注解，可快速对接口拦截与放行
 - 对一些常用前端组件封装：表格数据请求、数据字典等
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
-- 提供服务器性能监控功能
-- 支持运维管理，可方便地对远程服务器的应用进行部署与管理
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
 - 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，
-  除了传统To B业务，还可用于To C业务
+  除了传统To B业务，还可用于To C业务（see [OAuth2.0 part](unicorn-oauth2) ）
 
 #### 系统功能
 
@@ -157,11 +142,9 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - 岗位管理：配置各个部门的职位
 - 字典管理：可维护常用一些固定的数据，如：状态，性别等
 - 系统日志：记录用户操作日志与异常日志，方便开发人员定位排错
-- SQL监控：采用druid 监控数据库访问性能，默认用户名admin，密码admin
 - 定时任务：整合Quartz做定时任务，加入任务日志，任务运行情况一目了然
 - 代码生成：高灵活度生成前后端代码，减少大量重复的工作任务（逆向有很多方案，这种基于template的有一定的灵活性）
 - 邮件工具：配合富文本，发送html格式的邮件
-- 服务监控：监控服务器的负载情况
 
 #### 项目结构
 
@@ -177,11 +160,11 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - `unicorn-tp-tools` 第三方工具模块，包含：邮件、S3，可视情况引入
 
-- `unicorn-code-gen` 系统的代码生成模块，代码生成的模板在 system 模块中。这部分待优化，亦非必须模块
+- `unicorn-code-gen` 系统的代码生成模块。这部分待优化，亦非必须模块
 
-- `unicorn-starter` 启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离），枚举类动态扩展的简单demo
+- `unicorn-starter` 启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离）
 
-- `valentine-starter` 启动配置示例(Gradle)，最小环境依赖启动
+- `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin
 
 #### 详细结构
 
@@ -200,9 +183,9 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 	- common 配置跨域、静态资源、数据权限、DB Insert主键、实体表映射、系统完成入口
 	    - init 容器启动后的钩子call back
 	    - orm jpa-entity的部分配置，eg: Table Mapping
-	    - thread 线程池相关
 	    - web corsFilter configurer and so on
 	- modules 系统相关模块(登录授权、消息队列、系统监控、定时任务、运维管理等)
+	    - infrastructure business log相关
 	    - quartz 定时任务
 	    - rabbitmq 消息队列相关
 	    - security 权限控制
@@ -245,13 +228,9 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### Feature list
 
-- dev_3.0 Springdoc相关。Web侧跟进（无限delay）
-- ASM字节码增强
-- 授权(Authorization)模块-颁发及刷新Token （accessToken & refreshToken）Jwt Token 都是成对出现的，一个为平常请求携带的
-  accessToken， 另一个只作为刷新 accessToken 用的 refreshToken，OAuth2.0已支持
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
   推测是Spring Boot的 ClassLoader下全是Auto-Module）
-- swarm化，可以参考[why-swarm (施工中)](https://github.com/WHY-lWoHvYe/why-swarm)
+- swarm化，可以参考[why-swarm (已停工，后续计划接入OAuth2.0)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO
 
@@ -260,5 +239,5 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
   但为了解决懒加载no-session的问题， 很多复杂查询都加了事务注解，这样如果用第一种，主库的压力会比较大，而第二种会有上面提到的问题,
   后续再看看吧(寻求其他no-session的解决方案,第二种配合强制路由).
   补充：同一事务内，在Update之后Select，似乎走的是Primary，如果这样的话，用第二种似乎就可以了
-- OAuth 2.0
+- OAuth 2.0 (_In Progress_)
 - Loom + Kotlin Coroutines
