@@ -18,8 +18,7 @@
 
 启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
 和配置文件 [resources](unicorn-starter/src/main/resources)详见 [unicorn-starter](unicorn-starter)
-模块。[启停脚本](script)。当前使用gradle build，module化还是有问题，需要把start中的module-info.java移除，以unnamed module
-run，使用maven build就正常
+模块。[启停脚本](script)。
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396)
 [JEP 403](https://openjdk.java.net/jeps/403)，需在启动时添加相关参数开启包访问。较简单的是添加

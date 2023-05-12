@@ -97,7 +97,7 @@
   enhancing observability.
 - [JEP 428: Structured Concurrency (Incubator)](https://openjdk.java.net/jeps/428)
 - [JEP 437: Structured Concurrency (Second Incubator)](https://openjdk.org/jeps/437)
-- [JEP draft: Structured Concurrency (Preview)](https://openjdk.org/jeps/8306641)
+- [JEP 453: Structured Concurrency (Preview)](https://openjdk.org/jeps/453)
 
 #### Scoped Values (Incubator)
 
