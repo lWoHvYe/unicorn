@@ -1,12 +1,12 @@
 plugins {
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
-    alias(libs.plugins.kotlin.jvm)
+//    alias(libs.plugins.kotlin.jvm)
     // Apply GraalVM Native Image plugin
 //    id 'org.graalvm.buildtools.native' version '0.9.21'
 }
 
 ext {
-    kotlinEnable = true
+    kotlinEnable = false
 }
 
 dependencies {
