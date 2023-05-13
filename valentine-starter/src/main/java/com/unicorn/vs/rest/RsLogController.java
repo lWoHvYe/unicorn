@@ -79,8 +79,8 @@ public class RsLogController {
      */
     @RespResultBody
     @ApiVersion
-    @AnonymousGetMapping("/valentine/{version}/p2p")
-    public String index(@PathVariable String version) {
+    @AnonymousGetMapping({"/valentine/v1/p2p", "/valentine/{version}/p2p"})
+    public String index(@PathVariable(required = false) String version) {
 
         var instance = authHandlerContext.getInstance(4);
         instance.grantedAuth(2022L);

@@ -5,14 +5,20 @@ plugins {
 //    id 'org.graalvm.buildtools.native' version '0.9.21'
 }
 
+ext {
+    kotlinEnable = true
+}
+
 dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
     implementation project(':unicorn-tp-tools')
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation libs.bundles.coroutines
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    if (kotlinEnable) {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        implementation libs.bundles.coroutines
+        implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    }
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation(project(':unicorn-security')) {
         capabilities {
@@ -45,12 +51,14 @@ tasks.named("bootBuildImage") {
     ]
 }
 
-kotlin {
-    sourceSets.configureEach {
-        languageSettings {
-            languageVersion = "2.0"
-            apiVersion = "2.0"
+if (kotlinEnable) {
+    kotlin {
+        sourceSets.configureEach {
+            languageSettings {
+                languageVersion = "2.0"
+                apiVersion = "2.0"
+            }
         }
+        jvmToolchain(20)
     }
-    jvmToolchain(20)
 }

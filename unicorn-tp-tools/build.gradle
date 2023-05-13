@@ -69,5 +69,4 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation 'software.amazon.awssdk:s3-transfer-manager:2.18.28-PREVIEW'
-    implementation 'org.bouncycastle:bcpkix-jdk18on:1.72'
 }

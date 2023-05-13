@@ -50,6 +50,8 @@ module lwohvye.unicorn.core {
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
     requires transitive redisson;
+    requires transitive org.bouncycastle.pkix;
+    requires transitive org.bouncycastle.provider;
     requires net.coobird.thumbnailator;
 
     exports com.lwohvye.core.advice;
