@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,18 +20,25 @@ import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.core.utils.result.ResultInfo;
-//import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType;
 import com.lwohvye.sys.common.annotation.ApiVersion;
-//import com.mzt.logapi.starter.annotation.LogRecord;
+import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType;
+import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext;
+import com.mzt.logapi.starter.annotation.LogRecord;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 public class RsLogController {
     // #{…} 主要用于加载外部属性文件中的值
@@ -52,6 +59,16 @@ public class RsLogController {
     @Value("${local.rs.iList}")
     private Integer[] ints;
 
+    @PostConstruct
+    public void who() {
+        log.warn(" The module of Cur-Starter is {} ", this.getClass().getModule());
+    }
+
+    @Lazy
+    @Autowired
+    private AuthHandlerContext authHandlerContext;
+
+
     /**
      * 访问首页提示
      * 因为自定义了处理逻辑，所以下面这俩的RequestCondition是不一样的，所以能共存，且因为定义了优先新版本，所以在v1时走第一个，[v2+ 走第二个
@@ -62,8 +79,12 @@ public class RsLogController {
      */
     @RespResultBody
     @ApiVersion
-    @AnonymousGetMapping("/valentine/{version}/p2p")
-    public String index(@PathVariable String version) {
+    @AnonymousGetMapping({"/valentine/v1/p2p", "/valentine/{version}/p2p"})
+    public String index(@PathVariable(required = false) String version) {
+
+        var instance = authHandlerContext.getInstance(4);
+        instance.grantedAuth(2022L);
+
         return null;
 //        return "Backend service started successfully"
     }
@@ -77,15 +98,19 @@ public class RsLogController {
 
 
     @OprLog("ooo")
-//    @LogRecord(
-//            fail = "执行失败，失败原因：「{{#_errorMsg}}」",
-//            success = "收到请求{{#version}},执行结果:{{#_ret}}",
-//            type = LogRecordType.PORTAL, bizNo = "20220920"
-//    )
+    @LogRecord(
+            fail = "执行失败，失败原因：「{{#_errorMsg}}」",
+            success = "收到请求{{#version}},执行结果:{{#_ret}}",
+            type = LogRecordType.PORTAL, bizNo = "20220920"
+    )
     @RespResultBody
     @ApiVersion(3) // 指定从v3开始
-    @AnonymousGetMapping(value = {"/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"}) // @RequestMapping的path是支持多个的
-    public ResultInfo<String> indexVersion(@PathVariable String version) {
+    @AnonymousGetMapping(value = {"/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"})
+    // @RequestMapping的path是支持多个的
+    public ResultInfo<String> indexVersion(@PathVariable String version) throws InterruptedException {
+        Thread.sleep(Duration.ofSeconds(1L)); // 使用JMeter  500 * 80，使用VisualVM monitor，只增加十几个thread，整体用时81s，也说明了Fibers/Loom较传统Thread的不同之处，
+        // 随着压力及时间的增长，会逐渐有ForkJoinPool-1-worker-xx的Thread被Create（这部分Thread在free后，会wait一段时间再Terminate），不清楚具体的mechanism，已知的是一个OS Thread可以Manage很多的VisualThread
+        // 另Heap的Use增加了很多，这应该验证了在VT block时，会将stack放到Heap上
         return ResultInfo.success(String.format("Version %s Backend service started successfully", version));
     }
 

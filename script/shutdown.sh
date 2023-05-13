@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+#    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 echo "stop SpringBoot Application"
 # shellcheck disable=SC2009
-ps -ef | grep unicorn-starter-3.0.3.jar | grep -v grep | awk '{print $2}' | xargs kill -15
-#pid=$(ps -ef | grep unicorn-starter-3.0.3.jar | grep -v grep | awk '{print $2}')
+ps -ef | grep valentine-starter.jar | grep -v grep | awk '{print $2}' | xargs kill -15
+#pid=$(ps -ef | grep valentine-starter.jar | grep -v grep | awk '{print $2}')
 #echo "旧应用进程id：$pid"
 #if [ -n "$pid" ]
 #then

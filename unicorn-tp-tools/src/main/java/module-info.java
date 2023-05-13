@@ -1,13 +1,14 @@
 @SuppressWarnings({"requires-automatic"})
-module lwohvye.unicorn.tp_tools {
+module lwohvye.unicorn.tp.tools {
     requires transitive lwohvye.unicorn.core;
     requires spring.context.support;
+    requires jakarta.mail;
     requires software.amazon.awssdk.regions;
     requires software.amazon.awssdk.services.s3;
     requires software.amazon.awssdk.transfer.s3;
     requires software.amazon.awssdk.auth;
 
-    exports com.lwohvye.tools.config to spring.beans, spring.context;
+    exports com.lwohvye.tools.config to spring.beans, spring.context, spring.boot;
     exports com.lwohvye.tools.domain.vo;
     exports com.lwohvye.tools.repository to spring.beans;
     exports com.lwohvye.tools.rest to spring.beans, spring.aop, spring.web;

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -134,6 +134,7 @@ public class JsonUtils {
         return null;
     }
 
+    // 这里的TypeReference和Gson中的TypeToken，都是为了解决Java的类型擦除问题
     public static <T> T toJavaObject(String value, TypeReference<T> valueTypeRef) {
         try {
             return objectMapper.readValue(value, valueTypeRef);

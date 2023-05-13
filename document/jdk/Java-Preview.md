@@ -2,6 +2,7 @@
 
 - [JEP 425: Virtual Threads](https://openjdk.java.net/jeps/425)
 - [JEP 436: Virtual Threads (Second Preview)](https://openjdk.org/jeps/436)
+- [JEP 444: Virtual Threads](https://openjdk.org/jeps/444)  She is coming🎉
 - [Project Loom](https://wiki.openjdk.java.net/display/loom)
 - [Project Loom: Fibers and Continuations for the Java Virtual Machine](http://cr.openjdk.java.net/~rpressler/loom/Loom-Proposal.html)
 - 2020-04-28更新，`JEP 425:Virtual Threads (Preview)` 在Java 19 Preview， review ends: 2022/05/05
@@ -74,6 +75,13 @@
 - [Virtual Threads in Spring 6.x](https://spring.io/blog/2022/10/11/embracing-virtual-threads)
 - [Blog-Understanding Java's Project Loom](https://www.marcobehler.com/guides/java-project-loom?mkt_tok=NDI2LVFWRC0xMTQAAAGIcjkwHcDNBFot5rdRdBEUuF6VoChWteoULzKapDGmwmAvhMcx0grhQ0louho-dN1ckoHsIo1dWoRkkUbuaEtY9jNg8gRmb1XxVmmNrLmADNkSKVgN)
 - [IntelliJ IDEA Conf 2022 | Project Loom: Revolution in Concurrency or Obscure Implementation Detail?](https://www.youtube.com/watch?v=0DUlUzqr09I)
+- [Running Kotlin Coroutines on Project Loom](https://kt.academy/article/dispatcher-loom)
+- [Tomcat with Loom (should locally build the loom jar )](https://spring.io/blog/2023/02/27/web-applications-and-project-loom?mkt_tok=NDI2LVFWRC0xMTQAAAGK9IKUrvA5qPotLOlh0dIohY3BM22va8RgaRGjQrGjOA2nq-KFHPGLQbA-l0bWR1G8MTFMRMZ1HebqVsWjpzbl8BYqKtfBIVjYXQc_P8C0kf2Ytomu)
+
+通过JProfiler可以查看Thread的情况，这一点不得不说收费的就是不一样。VisualVM和jconsole都看不到类型信息。
+可以看的基本的main Thread，及19后听到的CarrierThreads和VirtualThreads
+
+![](../images/Threads%20wtb%20.png)
 
 #### Foreign Function & Memory API
 
@@ -89,5 +97,15 @@
   enhancing observability.
 - [JEP 428: Structured Concurrency (Incubator)](https://openjdk.java.net/jeps/428)
 - [JEP 437: Structured Concurrency (Second Incubator)](https://openjdk.org/jeps/437)
-- 多线程相关的，诸如 ExecutorService and Future 这些，实际上跟Virtual Threads也有些相关。主体感觉在Virtual
-  Threads提出后，又出现了不少相关的新东西
+- [JEP 453: Structured Concurrency (Preview)](https://openjdk.org/jeps/453)
+
+#### Scoped Values (Incubator)
+
+- Introduce scoped values, which enable the sharing of immutable data within and across threads. They are preferred to
+  thread-local variables, especially when using large numbers of virtual threads
+- [JEP 429: Scoped Values (Incubator)](https://openjdk.org/jeps/429)
+- [JEP 446: Scoped Values (Preview)](https://openjdk.org/jeps/446)
+
+#### Valhalla
+
+- [Valhalla](https://openjdk.org/projects/valhalla/)

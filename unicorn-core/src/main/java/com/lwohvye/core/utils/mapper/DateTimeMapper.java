@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * DateTime&String
+ * transform DateTime to String
  *
  * @author Hongyan Wang
  * @date 2021/4/13 5:06 下午

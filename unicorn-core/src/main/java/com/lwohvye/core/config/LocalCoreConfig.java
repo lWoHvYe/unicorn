@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class LocalCoreConfig {
 
     public static Boolean IP_LOCAL;
 
-    @Value("${ip.local-parsing}")
+    @Value("${ip.local-parsing:false}")
     public void setIpLocal(Boolean ipLocal) {
         IP_LOCAL = ipLocal;
     }

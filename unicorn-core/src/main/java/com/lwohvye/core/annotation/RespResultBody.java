@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 
 /**
  * 通用返回注解
- * 当ReturnType = ResponseEntity<ResultInfo<T>> && HttpStatus = OK 时，改为 T + @RespResultBody
+ * 当ReturnType = ResponseEntity 且 HttpStatus = OK 时，改为 T + @RespResultBody
  * 当 HttpStatus = OK 时，可略去ResponseEntity这一层
  * 当 HttpStatus != OK 时，使用@RespResultBody可略去body中对ResultInfo.success(T) 的调用，只保留T
  *

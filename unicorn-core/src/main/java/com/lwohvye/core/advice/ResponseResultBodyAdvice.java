@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ import org.springframework.web.util.WebUtils;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+
 import java.lang.annotation.Annotation;
 import java.util.Objects;
 
@@ -79,7 +80,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      * 当类或者方法使用了 @ResponseResultBody 就会调用这个方法，尽量不要直接返回String，别的应该都可以
      * 针对status是200的可以只返回body，否则可以返回ResponseEntity，这里只改body部分，所以都支持
      */
-    // TODO: 2022/9/11 如方法所言，这里设置的是Body，所以是无法改变ResponseStatus的（虽然一般不用管），另外针对String类型的处理还有些问题
+    // 如方法所言，这里设置的是Body，所以是无法改变ResponseStatus的（虽然一般不用管），另外针对String类型的处理还有些问题
     @Override
     public Object beforeBodyWrite(@Nullable Object body,
                                   MethodParameter returnType,

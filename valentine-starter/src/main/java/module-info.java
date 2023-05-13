@@ -2,13 +2,26 @@
 module lwohvye.valentine.starter {
     requires lwohvye.unicorn.security;
     requires lwohvye.unicorn.core;
+    requires lwohvye.unicorn.tp.tools;
     requires lombok;
+    // 如果使用3rd-tools，需要加入下面这两个，不清楚为何在tools中加没生效。mail works well under unnamed module
+    requires jakarta.mail;
+    requires jakarta.activation;
+    requires spring.retry;
     requires bizlog.sdk;
+//    requires kotlin.stdlib;
+//    requires kotlinx.coroutines.core;
+    requires org.apache.logging.log4j;
+    requires org.apache.httpcomponents.core5.httpcore5;
+    requires org.apache.httpcomponents.client5.httpclient5;
 //    requires captcha;
 
+    exports com.unicorn.config;
     exports com.unicorn.vs.rest to spring.beans, spring.aop, spring.web;
 
-    opens config; // 注意，resources目录下的子目标并没有被open，所以需要单独open，或者直接open整个module
+    // maven需要opens resources，而gradle不需要
+//    opens config;
     opens com.unicorn;
+    opens com.unicorn.config to spring.core;
     opens com.unicorn.vs.rest to spring.core;
 }

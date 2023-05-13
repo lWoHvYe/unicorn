@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+#    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-export JAVA_HOME=/usr/java/jdk-17
+export JAVA_HOME=/usr/java/jdk-20
 echo ${JAVA_HOME}
 # ''单引号原样输出。""双引号可调用变量输出
 echo '切换到工作目录'
@@ -24,5 +24,5 @@ cd /opt/app
 echo '授权当前用户'
 chmod 555 ./*.jar
 echo '执行....'
-nohup ${JAVA_HOME}/bin/java -Xms250m -Xmx500m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -Dloader.path=lib -jar unicorn-starter-2.7.2.jar >elog.out 2>&1 &
+nohup ${JAVA_HOME}/bin/java -Xms500m -Xmx1024m --enable-preview --add-modules jdk.incubator.concurrent -XX:+UseZGC -jar valentine-starter.jar >elog.out 2>&1 &
 echo '启动成功'

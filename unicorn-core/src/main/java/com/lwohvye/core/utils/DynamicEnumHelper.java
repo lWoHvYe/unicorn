@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,10 +17,7 @@
 package com.lwohvye.core.utils;
 
 
-import sun.misc.Unsafe;
-
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -29,38 +26,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.lwohvye.core.utils.JDKUtils.IMPL_LOOKUP;
+import static com.lwohvye.core.utils.JDKUtils.setFailsafeFieldValue;
+
 /**
  * 动态修改枚举类。也包含了对static final Field的修改方法
+ * After Java 9, sun.reflect package was moved to jdk.internal.reflect and it requires extra operations to access.
+ * After Java 12, all members in java.lang.reflect.Field class were added to jdk.internal.reflect.Reflection#fieldFilterMap so that it was unable to access by using reflection.
+ * So the most reasonable way is to use java.lang.invoke.MethodHandles$Lookup#IMPL_LOOKUP to access each member after Java 8.
+ * See: <a href="https://stackoverflow.com/questions/61141836/change-static-final-field-in-java-12">...</a>
+ * How to rewrite a static final field in jdk12+
  *
  * @date 2022/4/30 4:50 PM
  */
 public class DynamicEnumHelper {
-    private static MethodHandles.Lookup implLookup = null;
-
-    static {
-        try {
-            /*
-             * After Java 9, sun.reflect package was moved to jdk.internal.reflect and it requires extra operations to access.
-             * After Java 12, all members in java.lang.reflect.Field class were added to jdk.internal.reflect.Reflection#fieldFilterMap so that it was unable to access by using reflection.
-             * So the most reasonable way is to use java.lang.invoke.MethodHandles$Lookup#IMPL_LOOKUP to access each member after Java 8.
-             * See: https://stackoverflow.com/questions/61141836/change-static-final-field-in-java-12
-             * How to rewrite a static final field in jdk12+
-             */
-            // 这里只能这样获取，通过Unsafe.getUnsafe()直接获取会抛出异常 if (!VM.isSystemDomainLoader(caller.getClassLoader()))
-            var unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-            unsafeField.trySetAccessible();
-            var unsafe = (Unsafe) unsafeField.get(null);
-
-            // IMPL_LOOKUP 是用来判断私有方法是否被信任的标识，用来控制访问权限的.默认是false
-            var implLookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
-            // implLookupField.trySetAccessible();
-            // 当前这里只能通过Unsafe来获取，后续再试试其他的获取方式，比如被注释的通过反射获取的，既然有人这样写，理论上是可行的，只是某些条件不满足
-            implLookup =
-                    // (MethodHandles.Lookup) implLookupField.get(null); 这种方式获取不到，因为上面的trySetAccessible()会返回false表示设置失败，所以无法这样获取值
-                    (MethodHandles.Lookup) unsafe.getObject(unsafe.staticFieldBase(implLookupField), unsafe.staticFieldOffset(implLookupField));
-        } catch (Exception ignored) {
-        }
-    }
 
     private static <T extends Enum<?>> T makeEnum(Class<T> enumClass, String value, int ordinal, Class<?>[] additionalTypes, Object[] additionalValues) throws Throwable {
         var additionalParamsCount = additionalValues == null ? 0 : additionalValues.length;
@@ -83,7 +62,7 @@ public class DynamicEnumHelper {
         parameterTypes[0] = String.class;
         parameterTypes[1] = int.class;
         System.arraycopy(additionalParameterTypes, 0, parameterTypes, 2, additionalParameterTypes.length);
-        return implLookup.findConstructor(enumClass, MethodType.methodType(void.class, parameterTypes));
+        return IMPL_LOOKUP.findConstructor(enumClass, MethodType.methodType(void.class, parameterTypes));
     }
 
     private static void cleanEnumCache(Class<?> enumClass) throws Throwable {
@@ -101,21 +80,6 @@ public class DynamicEnumHelper {
         }
     }
 
-    /**
-     * 设置属性的值，可以设置 private static final的Field，后续看看都有哪些是Unsafe可以实现，但MethodHandle做不了的
-     *
-     * @param field  /
-     * @param target /
-     * @param value  /
-     * @date 2022/5/1 12:10 AM
-     */
-    public static void setFailsafeFieldValue(Field field, Object target, Object value) throws Throwable {
-        if (target != null) {
-            implLookup.findSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(target, value);
-        } else {
-            implLookup.findStaticSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(value);
-        }
-    }
 
     public static <T extends Enum<?>> T addEnum0(Class<T> enumType, String enumName, Class<?>[] paramTypes, Object... paramValues) {
         return addEnum(enumType, enumName, paramTypes, paramValues);
@@ -155,7 +119,7 @@ public class DynamicEnumHelper {
 
             for (var field : fields) {
                 if ((field.getModifiers() & flags) == flags && // 最内层的括号通过与运算做可见性判断
-                    field.getType().getName().replace('.', '/').equals(valueType)) //Apparently some JVMs return .'s and some don't..
+                        field.getType().getName().replace('.', '/').equals(valueType)) //Apparently some JVMs return .'s and some don't..
                 {
                     valuesField = field;
                     break;
@@ -204,46 +168,6 @@ public class DynamicEnumHelper {
         }
     }
 
-    public static void setField(Object obj, Object value, Field field) throws ReflectiveOperationException {
-        if (obj == null) {
-            setStaticField(field, value);
-        } else {
-            // 针对于非static的属性，即便是final的也可以通过下面的方式修改
-            implLookup.findVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).set(obj, value);
-            // implLookup.findSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(obj, value);
-            // unsafe.putObject(obj, unsafe.objectFieldOffset(field), value);
-        }
-    }
-
-    public static void setStaticField(Field field, Object value) throws ReflectiveOperationException {
-        try {
-            implLookup.ensureInitialized(field.getDeclaringClass());
-            // implLookup.findStaticVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).set(value); // 这种支持static但不支持final的，更细节的可以看findStaticVarHandle()上的注释
-            implLookup.findStaticSetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke(value); // 这种可以，虽然注释似乎意思是不支持final的样子：if access checking fails, or if the field is not static or is final
-            // Unsafe类的强大之处就在于，无视属性的访问限定，可以对其读取/修改。即便是static final的也一样
-            // unsafe.putObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field), value);
-        } catch (Throwable e) {
-            throw new ReflectiveOperationException(e);
-        }
-    }
-
-    public static <T> T getField(Object obj, Field field) throws ReflectiveOperationException {
-        if (obj == null) {
-            return getStaticField(field);
-        } else {
-            return (T) implLookup.findVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).get(obj);
-            // return (T) implLookup.findGetter(field.getDeclaringClass(),field.getName(),field.getType()).invoke(obj);
-            // return (T) unsafe.getObject(obj, unsafe.objectFieldOffset(field));
-        }
-    }
-
-    public static <T> T getStaticField(Field field) throws ReflectiveOperationException {
-        implLookup.ensureInitialized(field.getDeclaringClass());
-        return (T) implLookup.findStaticVarHandle(field.getDeclaringClass(), field.getName(), field.getType()).get();
-        // return (T) implLookup.findStaticGetter(field.getDeclaringClass(), field.getName(), field.getType()).invoke();
-        // return (T) unsafe.getObject(unsafe.staticFieldBase(field), unsafe.staticFieldOffset(field));
-
-    }
 
     // public static void main(String[] args) throws ReflectiveOperationException {
     //     System.out.println(Arrays.toString(CodeBiEnum.values()));

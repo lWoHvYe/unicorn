@@ -3,11 +3,13 @@
         // 抑制compile warn: requires transitive directive for an automatic module
 module lwohvye.unicorn.core {
     requires transitive java.compiler;
-    requires transitive jakarta.servlet;
+    requires java.desktop;
     requires transitive java.sql;
     requires transitive jakarta.persistence;
     requires transitive jakarta.validation;
+    requires jdk.incubator.concurrent;
     requires transitive jdk.unsupported;
+    requires transitive org.apache.tomcat.embed.core;
     requires transitive spring.amqp;
     requires transitive spring.core;
     requires transitive spring.beans;
@@ -41,22 +43,21 @@ module lwohvye.unicorn.core {
     requires transitive org.apache.poi.poi;
     requires transitive org.apache.poi.ooxml;
     requires transitive org.aspectj.weaver;
-    requires transitive com.google.common;
     requires transitive org.hibernate.orm.core;
     requires transitive org.hibernate.validator;
     requires transitive org.jetbrains.annotations;
     requires transitive org.mapstruct;
-    requires transitive mapstruct.spring.extensions;
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
     requires transitive redisson;
+    requires transitive org.bouncycastle.pkix;
+    requires transitive org.bouncycastle.provider;
     requires net.coobird.thumbnailator;
 
     exports com.lwohvye.core.advice;
     exports com.lwohvye.core.annotation;
     exports com.lwohvye.core.annotation.log;
     exports com.lwohvye.core.annotation.rest;
-    exports com.lwohvye.core.aop to spring.beans, spring.aop;
     exports com.lwohvye.core.aspect to spring.beans, spring.aop;
     exports com.lwohvye.core.base;
     exports com.lwohvye.core.config;
@@ -66,7 +67,6 @@ module lwohvye.unicorn.core {
     exports com.lwohvye.core.constant;
     exports com.lwohvye.core.context;
     exports com.lwohvye.core.exception;
-    exports com.lwohvye.core.exception.handler;
     exports com.lwohvye.core.utils;
     exports com.lwohvye.core.utils.enums;
     exports com.lwohvye.core.utils.json;

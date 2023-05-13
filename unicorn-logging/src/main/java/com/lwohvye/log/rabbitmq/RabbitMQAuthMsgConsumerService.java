@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package com.lwohvye.log.rabbitmq;
 
-import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.log.service.local.MultiLogService;
+import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.utils.MailAdapter;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
+import com.lwohvye.log.service.local.MultiLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.Map;
 
 @Component
@@ -39,6 +41,8 @@ public class RabbitMQAuthMsgConsumerService extends YRabbitAbstractConsumer {
     @Autowired
     private MultiLogService multiLogService;
 
+    private final MethodHandles.Lookup lookup = MethodHandles.lookup();
+
     @Autowired
     public void setRedissonClient(RedissonClient redissonClient) {
         super.redissonClient = redissonClient;
@@ -49,8 +53,15 @@ public class RabbitMQAuthMsgConsumerService extends YRabbitAbstractConsumer {
     public void handle(String amqpMsgEntityStr) {
         baseConsumer(amqpMsgEntityStr, "authSave", null, msgEntity -> {
             var extraData = msgEntity.getExtraData();
-            if (StringUtils.hasText(extraData))
-                ReflectUtil.invoke(multiLogService, extraData, msgEntity.getMsgData());
+            if (StringUtils.hasText(extraData)) {
+                try {
+                    var mt = MethodType.methodType(void.class, String.class);
+                    var methodHandle = lookup.findVirtual(multiLogService.getClass(), extraData, mt);
+                    methodHandle.invoke(multiLogService, msgEntity.getMsgData());
+                } catch (Throwable e) {
+                    throw new UtilsException(e.getMessage());
+                }
+            }
             return null;
         }, errMsg -> {
             // reConsumeMsg(this::handle, amqpMsgEntityStr);

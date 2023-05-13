@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableAspectJAutoProxy // 当启动类不再higher path时，aop会失效，需要显示通过该注解开启
 // 注意，下面这俩支持在多处定义，但各定义scan的bean不能重复
 @EnableJpaRepositories(basePackages = {"com.lwohvye.sys.modules.*.repository", "com.lwohvye.*.repository"})
-@EntityScan(basePackages = {"com.lwohvye.api.modules.*.domain", "com.lwohvye.*.domain"})
+@EntityScan(basePackages = {"com.lwohvye.api.modules.*.domain", "com.lwohvye.sys.modules.*.domain", "com.lwohvye.*.domain"})
 @EnableJpaAuditing(auditorAwareRef = "auditorAware") // 开启Jpa审计
 // @EnableAutoConfiguration // A circular @Import has been detected:
 public class UnicornAutoConfiguration {

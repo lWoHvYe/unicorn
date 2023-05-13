@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,21 +16,23 @@
 
 package com.lwohvye.core.config.security;
 
+import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Security依赖上浮比较困难，保留一种对所有请求放行的方式，用于不需要权限认证的环境（比如前面已经有网关做这些了）
@@ -42,12 +44,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Configuration
 @ConditionalOnExpression("${local.sys.sim-auth:false}") // 基于配置，是否对所有请求放行。默认关闭
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // 指定Init Bean的Condition，需要是Servlet（比如WebMVC）
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+// 指定Init Bean的Condition，需要是Servlet（比如WebMVC）
 public class SimpleSecurityConfig {
 
-    @Lazy
-    @Autowired
-    private UserDetailsService userDetailsService;
+    public static final boolean DRAW = RandomUtil.randomBoolean();
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -56,18 +57,32 @@ public class SimpleSecurityConfig {
     }
 
     @Bean
+    @ConditionalOnExpression("#{!T(com.lwohvye.core.config.security.SimpleSecurityConfig).DRAW}")
     SecurityFilterChain filterChainSimple(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf().disable()
                 // 不创建会话
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                // 放行所有请求
-                .authorizeHttpRequests().anyRequest().permitAll().and()
-                .apply(securityConfigurerAdapter()).and()
+                .addFilterAfter(new CustomizerX509Filter(), UsernamePasswordAuthenticationFilter.class)
+                // 放行请求
+                .authorizeHttpRequests()
+                .anyRequest().permitAll().and()
                 .build();
     }
 
-    private SimpleAuthConfigurer securityConfigurerAdapter() {
-        return new SimpleAuthConfigurer(userDetailsService);
+    @Bean
+    @ConditionalOnExpression("#{T(com.lwohvye.core.config.security.SimpleSecurityConfig).DRAW}")
+    SecurityFilterChain filterChainAuthSimple(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .csrf().disable()
+                // 不创建会话
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                // 放行部分请求
+                .authorizeHttpRequests()
+                .requestMatchers("/actuator/**").permitAll()
+                .anyRequest().authenticated().and()
+                .x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
+                .userDetailsService(username -> new User(username, "", AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"))).and()
+                .build();
     }
 }

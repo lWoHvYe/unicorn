@@ -1,0 +1,17 @@
+#
+#    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#  module化之后，需在module-info.java中进行配置，此种配置方式已被ignore，留在这里兼容非module的模式
+com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl

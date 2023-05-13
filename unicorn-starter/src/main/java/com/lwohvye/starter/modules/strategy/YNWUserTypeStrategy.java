@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import java.util.List;
 
 @Component
 @UserTypeHandlerAnno(typeName = "FIVE")
-public class YNWUserTypeStrategy extends ExtraUserTypeStrategy {
+public class YNWUserTypeStrategy implements ExtraUserTypeStrategy {
     @Override
     public @NotNull List<GrantedAuthority> grantedAuth(@NotNull Long userId) {
         return Collections.emptyList();

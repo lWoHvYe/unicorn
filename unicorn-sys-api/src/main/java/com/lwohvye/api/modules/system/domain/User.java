@@ -17,17 +17,19 @@ package com.lwohvye.api.modules.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lwohvye.api.annotation.String4Blob;
+import com.lwohvye.core.annotation.String4Blob;
 import com.lwohvye.core.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.GenericGenerator;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -59,9 +61,9 @@ public class User extends BaseEntity implements Serializable {
     @Column(name = "user_id")
     @NotNull(groups = Update.class)
     // 在jpa insert操作时，可以指定插入对主键id
-//    @GeneratedValue(strategy = GenerationType.AUTO, generator = "lid")
-//    @GenericGenerator(name = "lid", strategy = "com.lwohvye.sys.common.orm.LocalInsertGenerator")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "lid")
+    @GenericGenerator(name = "lid", strategy = "com.lwohvye.sys.common.orm.LocalInsertGenerator")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 

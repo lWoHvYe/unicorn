@@ -1,0 +1,64 @@
+plugins {
+    id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
+//    alias(libs.plugins.kotlin.jvm)
+    // Apply GraalVM Native Image plugin
+//    id 'org.graalvm.buildtools.native' version '0.9.21'
+}
+
+ext {
+    kotlinEnable = false
+}
+
+dependencies {
+    implementation project(':unicorn-security')
+    implementation project(':unicorn-logging')
+    implementation project(':unicorn-tp-tools')
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    if (kotlinEnable) {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        implementation libs.bundles.coroutines
+        implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    }
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation(project(':unicorn-security')) {
+        capabilities {
+            requireCapability('com.lwohvye:unicorn-security-captcha')
+        }
+    }
+    implementation(project(':unicorn-security')) {
+        capabilities {
+            // 这里只支撑横线，不支持驼峰
+            requireCapability('com.lwohvye:unicorn-security-business-log')
+        }
+    }
+}
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    jvmArgs += "--enable-preview"
+}
+
+tasks.named("bootRun") {
+    jvmArgs += "-XX:+UseZGC"
+    jvmArgs += "--enable-preview"
+    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
+}
+
+tasks.named("bootBuildImage") {
+    environment = [
+            "BP_JVM_VERSION"              : "20",
+            "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
+            "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
+    ]
+}
+
+if (kotlinEnable) {
+    kotlin {
+        sourceSets.configureEach {
+            languageSettings {
+                languageVersion = "2.0"
+                apiVersion = "2.0"
+            }
+        }
+        jvmToolchain(20)
+    }
+}

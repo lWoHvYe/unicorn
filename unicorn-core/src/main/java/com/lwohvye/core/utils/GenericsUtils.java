@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021-2022.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2021-2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 package com.lwohvye.core.utils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ public class GenericsUtils {
      */
     public static Class getSuperClassGenricType(Class clazz, int index) throws IndexOutOfBoundsException {
         // 返回表示此 Class 所表示的实体（类、接口、基本类型或 void）的直接超类的 Type。
+        // getGenericSuperclass(): Returns the Type representing the direct superclass of the entity (class, interface, primitive type or void) represented by this Class object.
         Type genType = clazz.getGenericSuperclass();
 
         if (genType instanceof ParameterizedType ptzType) {
@@ -70,6 +73,7 @@ public class GenericsUtils {
             System.out.print(" extends ");
             printType(sc, false);
         }
+        // getGenericInterfaces(): Returns the Types representing the interfaces directly implemented by the class or interface represented by this Class object.
         printTypes(cl.getGenericInterfaces(), " implements ", ", ", "", false);
         System.out.println();
     }
@@ -129,15 +133,48 @@ public class GenericsUtils {
     public static void main(String[] args) {
         ArrayList<String> arr = new ArrayList<>();
         var superClassGenricType = getSuperClassGenricType(arr.getClass()); // 无法获取
+        printClass(arr.getClass()); // class java.util.ArrayList<E> extends java.util.AbstractList<E> implements java.util.List<E>, java.util.RandomAccess, java.lang.Cloneable, java.io.Serializable
         var arr1 = new ArrayList<String>();
         var superClassGenricType1 = getSuperClassGenricType(arr1.getClass()); // 无法获取
+        printClass(arr1.getClass()); // class java.util.ArrayList<E> extends java.util.AbstractList<E> implements java.util.List<E>, java.util.RandomAccess, java.lang.Cloneable, java.io.Serializable
         List<String> arr2 = new ArrayList<>();
         var superClassGenricType2 = getSuperClassGenricType(arr2.getClass()); // 无法获取
-        var arr3 = new MyList();
+        printClass(arr2.getClass()); // class java.util.ArrayList<E> extends java.util.AbstractList<E> implements java.util.List<E>, java.util.RandomAccess, java.lang.Cloneable, java.io.Serializable
+        var arr3 = new MyList<>(3L);
         var superClassGenricType3 = getSuperClassGenricType(arr3.getClass()); // 可以获取
+        var t3 = arr3.getT(); // 编译时做了替换，t3的类型是能拿到的
+        printClass(arr3.getClass()); // 这里是拿不到T的类型的 // class com.lwohvye.core.utils.MyList<T> extends java.util.ArrayList<java.lang.String> implements java.lang.Comparable<java.lang.Integer>
+        var arr4 = new MyList<>(true);
+        var superClassGenricType4 = getSuperClassGenricType(arr4.getClass()); // 可以获取
+        var t4 = arr4.getT();
+        printClass(arr4.getClass()); // class com.lwohvye.core.utils.MyList<T> extends java.util.ArrayList<java.lang.String> implements java.lang.Comparable<java.lang.Integer>
     }
 }
 
-class MyList extends ArrayList<String> {
+class MyList<T> extends ArrayList<String> implements Comparable<Integer> {
 
+    private T t;
+
+    MyList(T t) {
+        this.t = t;
+    }
+
+    public T getT() {
+        return t;
+    }
+
+    @Override
+    public int compareTo(@NotNull Integer o) {
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
