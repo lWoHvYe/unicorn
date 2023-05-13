@@ -115,8 +115,8 @@ jobs:
 #          arguments: build
 #          build-root-directory: unicorn-oauth2
 
-      - name: Build Unicorn-Starter
-        run: mvn -B package --file unicorn-starter/pom.xml -P prod
+#      - name: Build Unicorn-Starter
+#        run: mvn -B package --file unicorn-starter/pom.xml -P jigsaw
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

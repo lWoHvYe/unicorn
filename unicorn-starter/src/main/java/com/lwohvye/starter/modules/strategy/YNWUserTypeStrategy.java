@@ -28,7 +28,7 @@ import java.util.List;
 
 @Component
 @UserTypeHandlerAnno(typeName = "FIVE")
-public class YNWUserTypeStrategy extends ExtraUserTypeStrategy {
+public class YNWUserTypeStrategy implements ExtraUserTypeStrategy {
     @Override
     public @NotNull List<GrantedAuthority> grantedAuth(@NotNull Long userId) {
         return Collections.emptyList();

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @UserTypeHandlerAnno(typeName = "FOUR")
-class TKMUserTypeStrategy : ExtraUserTypeStrategy() {
+sealed class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     @OptIn(DelicateCoroutinesApi::class)
     override fun grantedAuth(userId: Long): List<GrantedAuthority> {
 
