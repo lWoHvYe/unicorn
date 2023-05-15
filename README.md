@@ -9,7 +9,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/lWoHvYe/eladmin.svg?style=social&label=Fork)](https://github.com/lWoHvYe/eladmin)
 [![Dependency Review](https://github.com/lWoHvYe/eladmin/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/dependency-review.yml)
 [![CodeQL](https://github.com/lWoHvYe/eladmin/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/codeql-analysis.yml)
-[![Maven Package](https://github.com/lWoHvYe/eladmin/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/maven-publish.yml)
+[![Gradle Package](https://github.com/lWoHvYe/eladmin/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/gradle-publish.yml)
 </div>
 
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
