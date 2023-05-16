@@ -24,7 +24,7 @@ dependencyResolutionManagement {
         libs {
             // 启用versionCatalogs
             version('asm', '9.5') // 这里单双引号都可以
-            version('authorizationServer', '1.0.2')
+            version('authorizationServer', '1.1.0')
             version('bizlog', '3.0.3')
             version('captcha', '2.0.0')
             version('commonsBeanutils', '1.9.4')

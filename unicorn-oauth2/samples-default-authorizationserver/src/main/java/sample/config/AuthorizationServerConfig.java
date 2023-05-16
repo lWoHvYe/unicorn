@@ -58,7 +58,8 @@ public class AuthorizationServerConfig {
                         exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
                 )
                 // Resource server support that allows User Info requests to be authenticated with access tokens
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
+                .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer ->
+                        httpSecurityOAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults()));
         // @formatter:on
         return http.build();
     }

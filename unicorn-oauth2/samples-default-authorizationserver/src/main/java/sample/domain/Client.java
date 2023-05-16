@@ -39,6 +39,10 @@ public class Client {
     private String authorizationGrantTypes;
     @Column(length = 1000)
     private String redirectUris;
+
+    @Column(length = 1000)
+    private String postLogoutRedirectUris;
+
     @Column(length = 1000)
     private String scopes;
     @Column(length = 2000)
@@ -116,6 +120,14 @@ public class Client {
 
     public void setRedirectUris(String redirectUris) {
         this.redirectUris = redirectUris;
+    }
+
+    public String getPostLogoutRedirectUris() {
+        return postLogoutRedirectUris;
+    }
+
+    public void setPostLogoutRedirectUris(String postLogoutRedirectUris) {
+        this.postLogoutRedirectUris = postLogoutRedirectUris;
     }
 
     public String getScopes() {
