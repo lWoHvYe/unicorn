@@ -25,10 +25,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -60,13 +60,14 @@ public class SimpleSecurityConfig {
     @ConditionalOnExpression("#{!T(com.lwohvye.core.config.security.SimpleSecurityConfig).DRAW}")
     SecurityFilterChain filterChainSimple(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // 不创建会话
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAfter(new CustomizerX509Filter(), UsernamePasswordAuthenticationFilter.class)
                 // 放行请求
-                .authorizeHttpRequests()
-                .anyRequest().permitAll().and()
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .anyRequest().permitAll())
                 .build();
     }
 
@@ -74,15 +75,18 @@ public class SimpleSecurityConfig {
     @ConditionalOnExpression("#{T(com.lwohvye.core.config.security.SimpleSecurityConfig).DRAW}")
     SecurityFilterChain filterChainAuthSimple(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 // 不创建会话
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 放行部分请求
-                .authorizeHttpRequests()
-                .requestMatchers("/actuator/**").permitAll()
-                .anyRequest().authenticated().and()
-                .x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
-                .userDetailsService(username -> new User(username, "", AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"))).and()
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().authenticated())
+                .x509(httpSecurityX509Configurer -> httpSecurityX509Configurer
+                        .subjectPrincipalRegex("CN=(.*?)(?:,|$)")
+                        .userDetailsService(username ->
+                                new User(username, "", AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER"))))
                 .build();
     }
 }

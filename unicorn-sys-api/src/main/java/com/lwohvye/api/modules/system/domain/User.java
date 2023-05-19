@@ -59,11 +59,8 @@ public class User extends BaseEntity implements Serializable {
 
     @Id
     @Column(name = "user_id")
-    @NotNull(groups = Update.class)
-    // 在jpa insert操作时，可以指定插入对主键id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "lid")
-    @GenericGenerator(name = "lid", strategy = "com.lwohvye.sys.common.orm.LocalInsertGenerator")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = {Update.class})
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 

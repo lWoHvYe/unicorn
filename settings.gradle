@@ -14,7 +14,7 @@ plugins {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        mavenCentral()
+        gradlePluginPortal()
         flatDir {
             dirs "$rootProject.projectDir/ex-lib"
         }
@@ -52,7 +52,7 @@ dependencyResolutionManagement {
             version('yauaa', '7.15.0')
 
             plugin('spring-boot', 'org.springframework.boot').versionRef('springBoot')
-            plugin('kotlin-jvm','org.jetbrains.kotlin.jvm').versionRef('kotlin')
+            plugin('kotlin-jvm', 'org.jetbrains.kotlin.jvm').versionRef('kotlin')
 
             library('asm', 'org.ow2.asm', 'asm').versionRef('asm')
             library('authorization-server', 'org.springframework.security', 'spring-security-oauth2-authorization-server').versionRef('authorizationServer')

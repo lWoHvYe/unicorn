@@ -42,7 +42,7 @@ spring:
           password: redis-psd
           subscriptionsPerConnection: 5
           clientName: null
-          address: redis://10.211.55.140:6379
+          address: redis://10.211.55.145:6379
           subscriptionConnectionMinimumIdleSize: 2
           subscriptionConnectionPoolSize: 16
           connectionMinimumIdleSize: 8
@@ -55,8 +55,8 @@ spring:
   ##### RabbitMQ ####
   rabbitmq:
     #    RabbitMQ集群，通过addresses配置，多个以逗号分隔(优先取addresses，然后再取host)
-    addresses: 10.211.55.140:5672
-    virtual-host: /eladmin # rabbitmq的虚拟host
+    addresses: 10.211.55.145:5672
+    virtual-host: /unicorn # rabbitmq的虚拟host
     username: admin # rabbitmq的用户名
     password: admin # rabbitmq的密码
     ####开始消费最大重试次数，避免一直重复消费的问题

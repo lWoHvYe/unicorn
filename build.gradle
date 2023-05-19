@@ -79,9 +79,6 @@ subprojects {
         automaticModule("org.quartz-scheduler:quartz", 'quartz')
         automaticModule("org.redisson:redisson", 'redisson')
         automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
-        module('org.eclipse.angus:jakarta.mail', 'jakarta.mail', '1.0.0') {
-            uses('jakarta.mail.util.StreamProvider')
-        }
         // runtimeOnly
         automaticModule("org.apache.commons:commons-math3", 'commons.math3')
         automaticModule("com.zaxxer:SparseBitSet", 'SparseBitSet')

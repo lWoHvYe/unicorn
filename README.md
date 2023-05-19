@@ -44,6 +44,7 @@ nohup java --add-opens java.base/java.lang=ALL-UNNAMED -Dloader.path=lib -jar el
 #3.x版本开始，因为已完成JPMS改造，可移除启动参数中 --add-opens 部分
 nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.2.0.jar >nohup.out 2>&1 &
 ```
+
 ---
 
 #### 引用方式 🎵
@@ -199,6 +200,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - Java 20 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
+- 拓展使用分布式关系型数据库 [TiDB](https://docs.pingcap.com/zh/tidb/stable)
 - Redis 6.0 缓存
 - RabbitMQ 发布-订阅（解耦、异步）
 - ELK 日志系统，若不需要可调整logback-spring.xml中的配置
@@ -233,10 +235,5 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### TODO
 
-- 使用ShardingSphere 读写分离，负载均衡算法可以选择ROUND_ROBIN 或 TRANSACTION_ROUND_ROBIN,前者事务内全部走primary，
-  理论上这种方式更好(复制延迟、同步时机,update中的select最好走primary)，
-  但为了解决懒加载no-session的问题， 很多复杂查询都加了事务注解，这样如果用第一种，主库的压力会比较大，而第二种会有上面提到的问题,
-  后续再看看吧(寻求其他no-session的解决方案,第二种配合强制路由).
-  补充：同一事务内，在Update之后Select，似乎走的是Primary，如果这样的话，用第二种似乎就可以了
 - OAuth 2.0 (_In Progress_)
 - Loom + Kotlin Coroutines

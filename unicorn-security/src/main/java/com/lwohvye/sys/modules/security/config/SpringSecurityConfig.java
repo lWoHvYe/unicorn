@@ -44,6 +44,8 @@ import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -102,42 +104,36 @@ public class SpringSecurityConfig {
     SecurityFilterChain filterChainDefault(HttpSecurity httpSecurity,
                                            AuthenticationSuccessHandler successHandler,
                                            AuthenticationFailureHandler failureHandler) throws Exception {
-        return httpSecurity
+        // 这样注册自定义的UsernamePasswordAuthenticationFilter
+        httpSecurity.apply(MyCustomDsl.customDsl(successHandler, failureHandler));
+        httpSecurity.apply(securityConfigurerAdapter());
+        httpSecurity
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
                 // 一般来讲，为了防御CSRF攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。
-                .csrf().disable()
-                // 这样注册自定义的UsernamePasswordAuthenticationFilter
-                .apply(MyCustomDsl.customDsl(successHandler, failureHandler))
-                .and()
+                .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 // 授权异常
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationErrorHandler)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(authenticationErrorHandler)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 // 定义退出逻辑处理
-                .and()
-                .logout()
-                .logoutUrl("/auth/logout")
-                .addLogoutHandler(new CustomLogoutHandler(tokenProvider))
-                .logoutSuccessHandler(new CustomLogoutSuccessHandler())
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .addLogoutHandler(new CustomLogoutHandler(tokenProvider))
+                        .logoutSuccessHandler(new CustomLogoutSuccessHandler()))
                 // 防止iframe 造成跨域
-                .and()
-                .headers()
-                .frameOptions()
-                .disable()
+                .headers(headers ->
+                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 不创建会话
-                .and()
-                .sessionManagement()
                 // SessionManagementConfigurer
                 // session的创建策略，总是创建【ALWAYS】、需要时创建【IF_REQUIRED】、永不创建【STATELESS】 、永不创建但如有则使用【NEVER】
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize ->
                         // 所有请求都需要认证
-                        authorize.anyRequest().access(customAuthorizationManager()))
-                .apply(securityConfigurerAdapter())
-                .and().build();
+                        authorize.anyRequest().access(customAuthorizationManager()));
+        return httpSecurity.build();
     }
 
     private JwtAuthTokenConfigurer securityConfigurerAdapter() {

@@ -39,7 +39,7 @@ public class SecurityConfig {
     @Bean
     SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         http
-                .csrf().disable()
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/public/**").permitAll()
                         .anyExchange().authenticated()
