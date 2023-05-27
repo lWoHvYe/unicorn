@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -81,11 +82,11 @@ public class RsLogController {
     @ApiVersion
     @AnonymousGetMapping({"/valentine/v1/p2p", "/valentine/{version}/p2p"})
     public String index(@PathVariable(required = false) String version) {
-
+        var startTime = Instant.now();
         var instance = authHandlerContext.getInstance(4);
         instance.grantedAuth(2022L);
 
-        return null;
+        return Duration.between(Instant.now(), startTime).toString();
 //        return "Backend service started successfully"
     }
 

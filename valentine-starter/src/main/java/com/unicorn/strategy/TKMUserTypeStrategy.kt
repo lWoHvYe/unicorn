@@ -29,7 +29,8 @@ import kotlin.time.measureTime
 
 @Component
 @UserTypeHandlerAnno(typeName = "FOUR")
-sealed class TKMUserTypeStrategy : ExtraUserTypeStrategy {
+// 这里不能为 sealed!! 因为密封类是不能实例化的?
+class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     @OptIn(DelicateCoroutinesApi::class)
     override fun grantedAuth(userId: Long): List<GrantedAuthority> {
 
@@ -97,7 +98,7 @@ sealed class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     val Dispatchers.LOOM: @BlockingExecutor CoroutineDispatcher // 这里的Dispatchers.LOOM 是一个field，field可以有get/set方法
         get() = Executors.newVirtualThreadPerTaskExecutor().asCoroutineDispatcher()
 
-    // use Loom. This will need some time to warm up, overhead. 7s for 1_000_000, Debug Mode 17s for 100_000，比coroutines慢了太多了
+    // use Loom. This will need some time to warm up, overhead. 7s for 1_000_000, Debug Mode 17s for 100_000，比coroutines慢了太多了，normal run差距很小
     @OptIn(ExperimentalTime::class)
     fun loomCarrier() = runBlocking {
 
