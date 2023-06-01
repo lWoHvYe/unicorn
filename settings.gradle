@@ -52,7 +52,12 @@ dependencyResolutionManagement {
             version('yauaa', '7.15.0')
 
             plugin('spring-boot', 'org.springframework.boot').versionRef('springBoot')
+            // kotlin基础插件
             plugin('kotlin-jvm', 'org.jetbrains.kotlin.jvm').versionRef('kotlin')
+            // spring插件 可以给 一些spring注解的类 添加 open关键字 解决kotlin 默认final问题
+            plugin('kotlin-spring', 'org.jetbrains.kotlin.plugin.spring').versionRef('kotlin')
+            // jpa插件 主要可以给JPA的一些注解类添加 无参构造函数
+            plugin('kotlin-jpa', 'org.jetbrains.kotlin.plugin.jpa').versionRef('kotlin')
 
             library('asm', 'org.ow2.asm', 'asm').versionRef('asm')
             library('authorization-server', 'org.springframework.security', 'spring-security-oauth2-authorization-server').versionRef('authorizationServer')

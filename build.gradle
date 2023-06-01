@@ -2,7 +2,7 @@ import org.gradle.api.java.archives.internal.DefaultManifest
 
 buildscript {
     repositories {
-        mavenCentral()
+        gradlePluginPortal()
         //Needed only for SNAPSHOT versions
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         // Should in hierarchy

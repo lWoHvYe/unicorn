@@ -152,33 +152,30 @@ public class QueryHelp {
         // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
         // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
         var joinNames = joinName.split(">");
-
+        checkJoin:
         for (var entity : joinNames) {
             // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
             // 业务中应该没有需要对同一张table多次join，甚至joinType还不同的情形。这里是不支持此类场景的
-            checkJoin:
-            {
-                if (Objects.isNull(join)) {
+            if (Objects.isNull(join)) {
 //                    var rJoin = existJoinNames.get(entity); 同上
-                    for (var rJoin : root.getJoins()) {
-                        // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
-                        if (Objects.equals(rJoin.getAttribute().getName(), entity)) {
-                            join = rJoin;
-                            break checkJoin;
-                        }
+                for (var rJoin : root.getJoins()) {
+                    // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
+                    if (Objects.equals(rJoin.getAttribute().getName(), entity)) {
+                        join = rJoin;
+                        continue checkJoin;
                     }
                 }
-                // Switch Expressions。这个只是一个sweets 语法糖
-                var stubJoin = Objects.nonNull(join) && Objects.nonNull(val);
-                join = switch (q.join()) {
-                    case LEFT:
-                        yield stubJoin ? join.join(entity, JoinType.LEFT) : root.join(entity, JoinType.LEFT);
-                    case RIGHT:
-                        yield stubJoin ? join.join(entity, JoinType.RIGHT) : root.join(entity, JoinType.RIGHT);
-                    case INNER:
-                        yield stubJoin ? join.join(entity, JoinType.INNER) : root.join(entity, JoinType.INNER);
-                };
             }
+            // Switch Expressions。这个只是一个sweets 语法糖
+            var stubJoin = Objects.nonNull(join) && Objects.nonNull(val);
+            join = switch (q.join()) {
+                case LEFT:
+                    yield stubJoin ? join.join(entity, JoinType.LEFT) : root.join(entity, JoinType.LEFT);
+                case RIGHT:
+                    yield stubJoin ? join.join(entity, JoinType.RIGHT) : root.join(entity, JoinType.RIGHT);
+                case INNER:
+                    yield stubJoin ? join.join(entity, JoinType.INNER) : root.join(entity, JoinType.INNER);
+            };
         }
         return join;
     }

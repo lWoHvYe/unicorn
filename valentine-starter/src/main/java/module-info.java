@@ -10,6 +10,7 @@ module lwohvye.valentine.starter {
     requires spring.retry;
     requires bizlog.sdk;
     requires kotlin.stdlib;
+    requires kotlin.reflect;
     requires kotlinx.coroutines.core;
     requires org.apache.logging.log4j;
     requires org.apache.httpcomponents.core5.httpcore5;
