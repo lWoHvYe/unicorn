@@ -33,10 +33,12 @@ dependencies {
             requireCapability('com.lwohvye:unicorn-security-business-log')
         }
     }
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
     jvmArgs += "--enable-preview"
+    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("bootRun") {
