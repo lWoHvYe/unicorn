@@ -30,14 +30,14 @@ object QueryHelp {
      * @return jakarta.persistence.criteria.Predicate
      * @date 2021/3/31 11:57
      */
-    fun <R, Q> getPredicate(root: Root<R>, query: Q?, cb: CriteriaBuilder): Predicate {
+    fun getPredicate(root: Root<*>, query: Any?, cb: CriteriaBuilder): Predicate {
         val list = ArrayList<Predicate>()
         if (query == null) {
             return cb.and(*list.toTypedArray<Predicate>())
         }
         try {
             // 根据Field及上面的Annotation，拼接Query & Join
-            analyzeFieldQuery<R, Q>(root, query, cb, list)
+            analyzeFieldQuery(root, query, cb, list)
         } catch (e: Exception) {
             logger.error(e.message, e)
         }
@@ -46,13 +46,13 @@ object QueryHelp {
     }
 
     @Throws(IllegalAccessException::class)
-    private fun <R, Q> analyzeFieldQuery(root: Root<R>, query: Q, cb: CriteriaBuilder, list: ArrayList<Predicate>) {
-        for (kProperty1 in query!!::class.memberProperties) {
+    private fun analyzeFieldQuery(root: Root<*>, query: Any, cb: CriteriaBuilder, list: ArrayList<Predicate>) {
+        for (kProperty1 in query::class.memberProperties) {
             val accessible = kProperty1.isAccessible
             // boolean accessible = field.isAccessible(); // 方法已过期，改用canAccess
             // 设置对象的访问权限，保证对private的属性的访
             kProperty1.isAccessible = true
-            val q = kProperty1.findAnnotation<Query>()
+            val q = kProperty1.javaField?.getAnnotation(Query::class.java) // annotation需要先转成Java才能拿到，Kotlin拿不到。。。
             if (q != null) {
                 val blurry = q.blurry
                 val `val` = kProperty1.javaField?.get(query)
@@ -86,8 +86,8 @@ object QueryHelp {
      * @return jakarta.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
-    private fun <R> analyzeJoinType(root: Root<R>, q: Query?, `val`: Any?): Join<R, *>? {
-        var join: Join<R, *>? = null
+    private fun analyzeJoinType(root: Root<*>, q: Query?, `val`: Any?): Join<out Any, *>? {
+        var join: Join<out Any, *>? = null
         val joinName = q?.joinName
         if (StringUtils.isBlank(joinName)) return null
         // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
@@ -109,17 +109,17 @@ object QueryHelp {
             // Switch Expressions。这个只是一个sweets 语法糖
             val stubJoin = Objects.nonNull(join) && Objects.nonNull(`val`)
             join = when (q.join) {
-                Query.Join.LEFT -> if (stubJoin) join!!.join(entity, JoinType.LEFT) else root.join<R, Any>(
+                Query.Join.LEFT -> if (stubJoin) join!!.join(entity, JoinType.LEFT) else root.join<Any, Any>(
                     entity,
                     JoinType.LEFT
                 )
 
-                Query.Join.RIGHT -> if (stubJoin) join!!.join(entity, JoinType.RIGHT) else root.join<R, Any>(
+                Query.Join.RIGHT -> if (stubJoin) join!!.join(entity, JoinType.RIGHT) else root.join<Any, Any>(
                     entity,
                     JoinType.RIGHT
                 )
 
-                Query.Join.INNER -> if (stubJoin) join!!.join(entity, JoinType.INNER) else root.join<R, Any>(
+                Query.Join.INNER -> if (stubJoin) join!!.join(entity, JoinType.INNER) else root.join<Any, Any>(
                     entity,
                     JoinType.INNER
                 )
@@ -141,17 +141,17 @@ object QueryHelp {
     // ? extends E:接收E类型或者E的子类型。
     // ? super E:接收E类型或者E的父类型 https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
     @Throws(IllegalAccessException::class)
-    private fun <R, Q> analyzeQueryType(
-        root: Root<R>,
-        query: Q,
+    private fun analyzeQueryType(
+        root: Root<*>,
+        query: Any,
         cb: CriteriaBuilder,
         list: ArrayList<Predicate>,
-        kProperty1: KProperty1<out Q & Any, *>
+        kProperty1: KProperty1<out Any, *>
     ) {
-        val q = kProperty1.findAnnotation<Query>()
+        val q = kProperty1.javaField?.getAnnotation(Query::class.java)
         val attributeName = defineAttrName(kProperty1, q)
         val `val` = kProperty1.javaField?.get(query)
-        val fieldType = kProperty1.javaClass
+        val fieldType = kProperty1.javaField?.type // type需要JavaType，kProperty1.javaClass是KotlinType
         val comparableFieldType = castComparableFieldType(`val`)
         val join = analyzeJoinType(root, q, `val`)
         when (q!!.type) {
@@ -376,7 +376,7 @@ object QueryHelp {
         }
     }
 
-    private fun <R> getExpression(attributeName: String?, join: Join<R, *>?, root: Root<R>): Expression<*> {
+    private fun getExpression(attributeName: String?, join: Join<out Any, *>?, root: Root<*>): Expression<*> {
         // 处理的维度是field维度的，每个field初始化一个join，若join有值，证明该field是join的实体中的，所以要从join中取，即join.get()。
         return if (Objects.nonNull(join)) {
             join!!.get<Any>(attributeName)
