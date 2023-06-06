@@ -25,7 +25,7 @@ dependencyResolutionManagement {
             // 启用versionCatalogs
             version('asm', '9.5') // 这里单双引号都可以
             version('authorizationServer', '1.1.0')
-            version('bizlog', '3.0.3')
+            version('bizlog', '3.0.4')
             version('captcha', '2.0.0')
             version('commonsBeanutils', '1.9.4')
             version('commonsConfiguration', '2.9.0')
@@ -38,18 +38,18 @@ dependencyResolutionManagement {
             version('log4jdbc', '1.18')
             version('logback', '1.4.6')
             version('logstash', '7.3')
-            version('lombok', "1.18.29")
+            version('lombok', "1.18.28")
             version('mapstruct', '1.5.5.Final')
             version('mapstructSpring', '1.0.1')
-            version('oshiCore', '6.4.0')
+            version('oshiCore', '6.4.2')
             version('poi', '5.2.3')
             version('quartz', '2.3.2')
-            version('redisson', '3.21.0')
+            version('redisson', '3.22.0')
             version('springBoot', "$springBootVersion")
             version('springdoc', '2.1.0')
             version('thumbnailator', '0.4.19')
             version('xerces', '2.12.2')
-            version('yauaa', '7.15.0')
+            version('yauaa', '7.20.0')
 
             plugin('spring-boot', 'org.springframework.boot').versionRef('springBoot')
             // kotlin基础插件
