@@ -38,18 +38,16 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
     jvmArgs += "--enable-preview"
-    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("bootRun") {
     jvmArgs += "-XX:+UseZGC"
     jvmArgs += "--enable-preview"
-    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("bootBuildImage") {
     environment = [
-            "BP_JVM_VERSION"              : "20",
+            "BP_JVM_VERSION"              : "21",
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]

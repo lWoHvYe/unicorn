@@ -17,16 +17,12 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
-import jdk.incubator.concurrent.StructuredTaskScope;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -49,9 +45,9 @@ public final class ConcurrencyUtils {
         //  The default virtual thread factory can work without enable preview.
         //  It uses reflection to allow this class be compiled in an incubator module without also enabling preview features.
         try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            List<? extends Future<?>> futures = null;
+            List<? extends StructuredTaskScope.Subtask<?>> subtasks = null;
             if (Objects.nonNull(tasks))
-                futures = Arrays.stream(tasks).map(scope::fork).toList();
+                subtasks = Arrays.stream(tasks).map(scope::fork).toList();
 
             scope.join();           // Join both forks
             scope.throwIfFailed();  // ... and propagate errors
@@ -59,8 +55,8 @@ public final class ConcurrencyUtils {
             // Here, both forks have succeeded, so compose their results
             Object results = null;
             if (Objects.nonNull(composeResult))
-                results = composeResult.apply(Objects.nonNull(futures) ?
-                        futures.stream().map(Future::resultNow).toList() : Collections.emptyList());
+                results = composeResult.apply(Objects.nonNull(subtasks) ?
+                        subtasks.stream().map(StructuredTaskScope.Subtask::get).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
         } catch (ExecutionException e) {

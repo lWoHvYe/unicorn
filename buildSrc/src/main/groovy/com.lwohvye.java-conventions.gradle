@@ -10,7 +10,7 @@ plugins {
 
 group = 'com.lwohvye'
 version = '4.0.0-kappa'
-java.sourceCompatibility = JavaVersion.VERSION_20
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 java {
     withSourcesJar()
