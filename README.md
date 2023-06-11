@@ -82,7 +82,7 @@ nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.2.0.jar >nohup.o
 ```groovy
 
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.0.0-eta'
+    unicornVersion = '4.0.0-iota'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
@@ -106,7 +106,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 项目简介
 
-一个基于最新的Java 20 版本、 Spring Boot 3.0、 Jpa、 Spring Security、 Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。
+一个基于最新的Java 20 版本、 Spring Boot 3.1、 Jpa、 Spring Security、 Redis、ShardingSphere、RabbitMQ、Vue的前后端分离的系统。
 在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
@@ -119,7 +119,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 20、Spring Boot 3.0。(Support Virtual Threads/loom)
+- 使用最新技术栈，社区资源丰富，基于Java 20、Spring Boot 3.1。(Support Virtual Threads/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持数据字典，可方便地对一些状态进行管理
 - 高效率开发，代码生成器可一键生成前后端代码
@@ -128,6 +128,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - 对一些常用前端组件封装：表格数据请求、数据字典等
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对Mysql数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
+- 另有TiDB分布式关系型数据库 方案，优于自行分库分表。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
 - 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，
@@ -164,7 +165,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - `unicorn-starter` 启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离）
 
-- `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin
+- `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin，试用TiDB
 
 #### 详细结构
 
@@ -173,8 +174,10 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - annotation 为系统自定义注解
     - aspect 自定义注解的切面
     - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper
-    - config 自定义权限实现、redis配置、openApi配置、Rsa配置等
+    - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
         - security 权限控制，为swarm化，提供全局关闭Security功能
+        - UnicornAutoConfiguration: 自动化装配
+        - ValentineExecutorConfig: Running Spring Applications on Virtual Threads
     - exception 项目统一异常的处理
     - utils 系统通用工具类
 - unicorn-sys-api 基础实体及DTO
@@ -231,6 +234,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
   推测是Spring Boot的 ClassLoader下全是Auto-Module）
+- Resource管理页面，delay
 - swarm化，可以参考[why-swarm (已停工，后续计划接入OAuth2.0)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO

@@ -111,6 +111,8 @@ public class SpringSecurityConfig {
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
                 // 一般来讲，为了防御CSRF攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。
+                // .csrf(csrfConfigurer -> csrfConfigurer.requireCsrfProtectionMatcher(RegexRequestMatcher.regexMatcher("")))
+                // .csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers("/**"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 // 授权异常

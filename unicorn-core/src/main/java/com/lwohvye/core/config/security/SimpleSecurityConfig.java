@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -33,6 +32,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 /**
  * Spring Security依赖上浮比较困难，保留一种对所有请求放行的方式，用于不需要权限认证的环境（比如前面已经有网关做这些了）
@@ -60,7 +60,8 @@ public class SimpleSecurityConfig {
     @ConditionalOnExpression("#{!T(com.lwohvye.core.config.security.SimpleSecurityConfig).DRAW}")
     SecurityFilterChain filterChainSimple(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
+                // define csrf protect pattern, can bypass the sonar Security Hotspots in this way
+                .csrf(csrfConfigurer -> csrfConfigurer.requireCsrfProtectionMatcher(RegexRequestMatcher.regexMatcher("")))
                 // 不创建会话
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -75,7 +76,8 @@ public class SimpleSecurityConfig {
     @ConditionalOnExpression("#{T(com.lwohvye.core.config.security.SimpleSecurityConfig).DRAW}")
     SecurityFilterChain filterChainAuthSimple(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
+                // define csrf ignore pattern, can't bypass sonar Security Hotspots
+                .csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers("/**"))
                 // 不创建会话
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -2,12 +2,6 @@ server:
   port: 8081
   http2:
     enabled: true
-  undertow:
-    threads:
-      io: 6
-      worker: 48
-    buffer-size: 1024
-    direct-buffers: true
 
   #  server.http2.enabled=true
   # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
