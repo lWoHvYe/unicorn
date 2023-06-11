@@ -60,7 +60,7 @@ class RsLogController {
 
     @PostConstruct
     fun who() {
-        println(" The module of Cur-Starter is ${this.javaClass.module}")
+        println(" The module of Cur-Starter is ${javaClass.module}")
     }
 
     @Lazy

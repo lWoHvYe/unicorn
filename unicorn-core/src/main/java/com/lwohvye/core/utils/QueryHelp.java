@@ -111,8 +111,8 @@ public class QueryHelp {
             Query q = field.getAnnotation(Query.class);
             if (q != null) {
                 var blurry = q.blurry();
-                var val = field.get(query);
-                if (Objects.isNull(val) || Objects.equals("", val)) {
+                var value = field.get(query);
+                if (Objects.isNull(value) || Objects.equals("", value)) {
                     continue;
                 }
                 // 模糊多字段
@@ -120,7 +120,7 @@ public class QueryHelp {
                     var blurrys = blurry.split(",");
                     var orPredicate = new ArrayList<Predicate>();
                     for (String s : blurrys) {
-                        orPredicate.add(cb.like(root.get(s).as(String.class), "%" + val + "%"));
+                        orPredicate.add(cb.like(root.get(s).as(String.class), "%" + value + "%"));
                     }
                     var p = new Predicate[orPredicate.size()];
                     list.add(cb.or(orPredicate.toArray(p)));
@@ -136,14 +136,14 @@ public class QueryHelp {
     /**
      * 解析joinType
      *
-     * @param root /
-     * @param q    /
-     * @param val  /
+     * @param root  /
+     * @param q     /
+     * @param value /
      * @return jakarta.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
     @Nullable
-    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, Object val) {
+    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, Object value) {
         Join<R, ?> join = null;
         var joinName = q.joinName();
         if (StringUtils.isBlank(joinName))
@@ -167,7 +167,7 @@ public class QueryHelp {
                 }
             }
             // Switch Expressions。这个只是一个sweets 语法糖
-            var stubJoin = Objects.nonNull(join) && Objects.nonNull(val);
+            var stubJoin = Objects.nonNull(join) && Objects.nonNull(value);
             join = switch (q.join()) {
                 case LEFT:
                     yield stubJoin ? join.join(entity, JoinType.LEFT) : root.join(entity, JoinType.LEFT);
@@ -199,15 +199,15 @@ public class QueryHelp {
                                                 Field field) throws IllegalAccessException {
         Query q = field.getAnnotation(Query.class);
         var attributeName = defineAttrName(field, q);
-        var val = field.get(query);
+        var value = field.get(query);
         var fieldType = field.getType();
-        var comparableFieldType = castComparableFieldType(val);
-        var join = analyzeJoinType(root, q, val);
+        var comparableFieldType = castComparableFieldType(value);
+        var join = analyzeJoinType(root, q, value);
 
         // switch 的 -> 语法也只是语法糖
         switch (q.type()) {
-            case EQUAL -> list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
-            case NOT_EQUAL -> list.add(cb.notEqual(getExpression(attributeName, join, root), val));
+            case EQUAL -> list.add(cb.equal(getExpression(attributeName, join, root).as(fieldType), value));
+            case NOT_EQUAL -> list.add(cb.notEqual(getExpression(attributeName, join, root), value));
             case GREATER_THAN ->
                 // var comparableFieldType = (Class<? extends Comparable>) fieldType; // 最终试下来，这一步的强转是少不了的了。
                 // 需要的参数是这个样子的 (Expression<? extends Y> var1, Y var2)
@@ -215,20 +215,21 @@ public class QueryHelp {
                 //pt2：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(Comparable.class), ele));  Comparable无法转为Hibernate type，不得行
                 //pt3：list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType), comparableFieldType.cast(ele))); 当不采用C的方式定义时，这样也是不得行的
                     list.add(cb.greaterThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType),
-                            Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
+                            Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(value)));
             case LESS_THAN ->
                     list.add(cb.lessThanOrEqualTo(getExpression(attributeName, join, root).as(comparableFieldType),
-                            Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
+                            Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(value)));
             case LESS_THAN_NQ -> list.add(cb.lessThan(getExpression(attributeName, join, root).as(comparableFieldType),
-                    Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(val)));
+                    Objects.requireNonNull(comparableFieldType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(value)));
             case INNER_LIKE ->
-                    list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val + "%"));
-            case LEFT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + val));
-            case RIGHT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val + "%"));
+                    list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + value + "%"));
+            case LEFT_LIKE -> list.add(cb.like(getExpression(attributeName, join, root).as(String.class), "%" + value));
+            case RIGHT_LIKE ->
+                    list.add(cb.like(getExpression(attributeName, join, root).as(String.class), value + "%"));
             case LIKE_STR ->
-                    list.add(cb.like(getExpression(attributeName, join, root).as(String.class), val.toString()));
+                    list.add(cb.like(getExpression(attributeName, join, root).as(String.class), value.toString()));
             case IN_INNER_LIKE -> {
-                if (val instanceof List<?> objList) {
+                if (value instanceof List<?> objList) {
 //                                构建数组
                     var predicates = new Predicate[objList.size()];
                     for (int i = 0; i < objList.size(); i++) {
@@ -240,18 +241,18 @@ public class QueryHelp {
                 }
             }
             case IN -> {
-                if (val instanceof Collection<?> col && !col.isEmpty()) {
-                    // 这里不能用fieldType.cast(val)。因为in()方法的重载，会走进in(Object... var1)中，正常要进in(Collection<?> var1)
+                if (value instanceof Collection<?> col && !col.isEmpty()) {
+                    // 这里不能用fieldType.cast(value)。因为in()方法的重载，会走进in(Object... var1)中，正常要进in(Collection<?> var1)
                     list.add(getExpression(attributeName, join, root).in(col));
                 }
             }
             case NOT_IN -> {
-                if (val instanceof Collection<?> col && !col.isEmpty()) {
+                if (value instanceof Collection<?> col && !col.isEmpty()) {
                     list.add(cb.not(getExpression(attributeName, join, root).in(col)));
                 }
             }
             case BETWEEN -> {
-                if (val instanceof List<?> col && col.size() == 2 && col.get(0) instanceof Comparable<?> start && col.get(1) instanceof Comparable<?> end) {
+                if (value instanceof List<?> col && col.size() == 2 && col.get(0) instanceof Comparable<?> start && col.get(1) instanceof Comparable<?> end) {
                     var eleType = castComparableFieldType(start);
                     list.add(cb.between(getExpression(attributeName, join, root).as(eleType),
                             Objects.requireNonNull(eleType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName)).cast(start), eleType.cast(end)));
@@ -260,7 +261,7 @@ public class QueryHelp {
             case NOT_NULL -> list.add(cb.isNotNull(getExpression(attributeName, join, root)));
             case IS_NULL -> list.add(cb.isNull(getExpression(attributeName, join, root)));
             case IN_OR_ISNULL -> {
-                if (val instanceof Collection<?> col && !col.isEmpty()) {
+                if (value instanceof Collection<?> col && !col.isEmpty()) {
                     list.add(
 //                                        在集合中
                             cb.or(getExpression(attributeName, join, root).in(col)
@@ -271,19 +272,19 @@ public class QueryHelp {
                     );
                 }
             }
-            case IS_OR_NULL -> list.add((Long) val == -1L ?
+            case IS_OR_NULL -> list.add((Long) value == -1L ?
                     cb.isNull(getExpression(attributeName, join, root).as(fieldType)) :
-                    cb.equal(getExpression(attributeName, join, root).as(fieldType), val));
+                    cb.equal(getExpression(attributeName, join, root).as(fieldType), value));
             case EQUAL_IN_MULTI -> {
                 var predicates = new Predicate[4];
-//                            like val
-                predicates[0] = cb.like(getExpression(attributeName, join, root).as(String.class), val.toString());
-//                            like val,%
-                predicates[1] = cb.like(getExpression(attributeName, join, root).as(String.class), val + ",%");
-//                            like %,val,%
-                predicates[2] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val + ",%");
-//                            like %,val
-                predicates[3] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + val);
+//                            like value
+                predicates[0] = cb.like(getExpression(attributeName, join, root).as(String.class), value.toString());
+//                            like value,%
+                predicates[1] = cb.like(getExpression(attributeName, join, root).as(String.class), value + ",%");
+//                            like %,value,%
+                predicates[2] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + value + ",%");
+//                            like %,value
+                predicates[3] = cb.like(getExpression(attributeName, join, root).as(String.class), "%," + value);
 //                            设置查询
                 list.add(cb.or(predicates));
             }
@@ -300,15 +301,15 @@ public class QueryHelp {
                 // select * from table where xxx in ('abc','def','str'); // 这个可以，因为in 里面是常量
                 // select * from table where FIND_IN_SET('str', list); // 这种也可以
                 // 需注意，调用function后会产生结果，在外层要指定对结果的使用
-                    list.add(cb.greaterThan(cb.function("FIND_IN_SET", Integer.class, cb.literal(val.toString()), getExpression(attributeName, join, root)), 0));
+                    list.add(cb.greaterThan(cb.function("FIND_IN_SET", Integer.class, cb.literal(value.toString()), getExpression(attributeName, join, root)), 0));
 //            case FUNCTION_FROM_BASE64:
             // where (from_base64(user0_.description) like to_base64(user0_.description))。如何设置to_base64的参数为 fieldValue，是接下来的事情
             //    list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)), cb.function("to_base64", fieldType, getExpression(attributeName, join, root)))); // 多个是支持的
             // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
-//                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + val.toString() + "%")); // 这种把调用函数硬编码了
+//                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + value.toString() + "%")); // 这种把调用函数硬编码了
 //                break; 后续移除
             case FUNCTION_4_EQUAL ->
-                    list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), val));
+                    list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), value));
             default -> {
             }
         }
@@ -336,7 +337,7 @@ public class QueryHelp {
      * 因为cb.lessThan,greaterThan,between的返回值 <Y extends Comparable<? super Y>>， 入参 （Expression<? extends Y> var1, Y var2, Y var3），含义:类型 Y 必须实现 Comparable 接口，并且这个接口的类型是 Y 或 Y 的任一父类
      * https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
      *
-     * @param val /
+     * @param value /
      * @return java.lang.Class
      * @date 2022/9/17 5:21 PM
      */
@@ -363,8 +364,8 @@ public class QueryHelp {
     }
      */
     @SuppressWarnings("unchecked")
-    private static Class<? extends Comparable<Object>> castComparableFieldType(Object val) {
-        return val instanceof Comparable<?> cec ? (Class<? extends Comparable<Object>>) cec.getClass() : null;
+    private static Class<? extends Comparable<Object>> castComparableFieldType(Object value) {
+        return value instanceof Comparable<?> cec ? (Class<? extends Comparable<Object>>) cec.getClass() : null;
     }
 
     /* 在此记录几种行不通的方案，以防后续忘记再次做重复的尝试

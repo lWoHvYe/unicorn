@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022-2023.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2023.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,5 +14,23 @@
  *    limitations under the License.
  */
 
--- 删除免费图床表
-DROP TABLE tool_picture;
+package com.unicorn
+
+class KotlinLearning {
+
+    fun <T> singletonList(item: T): List<T> {
+        // ...
+        return listOf(item)
+    }
+
+    fun <T> T.basicToString(): String { // extension function，这个有点像Go的interface
+        // ...
+        return "String: ".plus(toString())
+    }
+
+    fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
+            where T : CharSequence,
+                  T : Comparable<T> {
+        return list.filter { it > threshold }.map { it.toString() }
+    }
+}
