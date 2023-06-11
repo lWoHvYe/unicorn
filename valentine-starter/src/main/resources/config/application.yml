@@ -2,12 +2,6 @@ server:
   port: 8081
   http2:
     enabled: true
-  undertow:
-    threads:
-      io: 6
-      worker: 48
-    buffer-size: 1024
-    direct-buffers: true
 
 spring:
   application:

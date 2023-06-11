@@ -16,7 +16,13 @@ class QueryHelpTest {
     @Test
     fun getPredicate() {
         val criteria = UserQueryCriteria()
-        criteria.setUsernameStr("a,b,c,d,e")
+        criteria.id = 1L
+        criteria.usernameStr = "a,b,c,d,e"
+        criteria.deptIds = setOf(1L, 2L, 3L)
+        criteria.blurry = "ABC"
+        criteria.roleCode = "Admin"
+        criteria.roleLevel = 2L
+        criteria.roleDeptEnable = true
         val repository = SpringContextHolder.getBean(UserRepository::class.java)
         val page: List<User> =
             repository.findAll { root: Root<User>?, _: CriteriaQuery<*>?, criteriaBuilder: CriteriaBuilder? ->
@@ -26,9 +32,16 @@ class QueryHelpTest {
                     criteriaBuilder!!
                 )
             }
-        println("-------")
+        println("Kotlin ------- ${page.size}")
         val criteria2 = com.lwohvye.api.modules.system.service.dto.UserQueryCriteria()
+
+        criteria2.id = 1L
         criteria2.usernameStr = "a,b,c,d,e"
+        criteria2.deptIds = setOf(1L, 2L, 3L)
+        criteria2.blurry = "ABC"
+        criteria2.roleCode = "Admin"
+        criteria2.roleLevel = 2L
+        criteria2.roleDeptEnable = true
         val page2: List<User> =
             repository.findAll { root: Root<User>?, _: CriteriaQuery<*>?, criteriaBuilder: CriteriaBuilder? ->
                 com.lwohvye.core.utils.QueryHelp.getPredicate(
@@ -37,5 +50,6 @@ class QueryHelpTest {
                     criteriaBuilder!!
                 )
             }
+        println("Java --------${page2.size}")
     }
 }

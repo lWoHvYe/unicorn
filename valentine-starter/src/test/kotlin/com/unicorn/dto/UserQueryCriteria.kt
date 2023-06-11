@@ -21,45 +21,23 @@ import com.unicorn.annotation.Query
 import java.io.Serializable
 import java.sql.Timestamp
 
-/**
- * @author Zheng Jie
- * @date 2018-11-23
- */
 class UserQueryCriteria : Serializable {
+
     @Query
-    private val id: Long? = 1L
+    var id: Long? = null
 
     @Query(propName = "id", type = Query.Type.IN, joinName = "dept")
-    private val deptIds: Set<Long> = setOf(1L, 2L, 3L)
+    var deptIds: Set<Long>? = null
 
     @Query(blurry = "email,username,nickName")
-    private val blurry: String? = "ABC"
+    var blurry: String? = null
 
     @Query
-    private val enabled: Boolean? = null
-    private val deptId: Long? = null
+    var enabled: Boolean? = null
+    var deptId: Long? = null
 
     @Query(type = Query.Type.BETWEEN)
-    private val createTime: List<Timestamp>? = null
-    private val usernameStr: String? = null
-
-    @Query(propName = "username", type = Query.Type.IN_INNER_LIKE)
-    private var usernames: List<String>? = null
-
-    // region multiQuery in single joinTable Test
-    @Query(propName = "code", type = Query.Type.INNER_LIKE, joinName = "roles")
-    private val roleCode: String? = "ADMIN"
-
-    @Query(propName = "level", type = Query.Type.GREATER_THAN, joinName = "roles")
-    private val roleLevel: Long? = 2L
-
-    @Query(propName = "enabled", type = Query.Type.GREATER_THAN, joinName = "roles>depts")
-    private val roleDeptEnable: Boolean? = true
-
-    // endregion
-    // 库中使用Base64存储，做模糊查询（业务不建议。因为无法使用索引，效率很低，这里只是提供一种调用库函数的方式）
-//    @Query(type = Query.Type.FUNCTION_4_EQUAL, functionName = "from_base64")
-//    private val description: String? = "Hello"
+    var createTime: List<Timestamp>? = null
 
     /**
      * 重写set方法。将前端传的逗号分割的username，转成字符集合，并设置到另一个字段中
@@ -67,7 +45,30 @@ class UserQueryCriteria : Serializable {
      * @param usernameStr
      * @date 2021/3/10 22:12
      */
-    fun setUsernameStr(usernameStr: String?) {
-        usernames = if (StrUtil.isNotEmpty(usernameStr)) StringUtils.parseStrToArrString(usernameStr) else null
-    }
+    var usernameStr: String? = null
+        set(value) {
+            usernames = if (StrUtil.isNotEmpty(value)) StringUtils.parseStrToArrString(usernameStr) else null
+        }
+
+    @Query(propName = "username", type = Query.Type.IN_INNER_LIKE)
+    private var usernames: List<String>? = null
+
+    // region multiQuery in single joinTable Test
+    @Query(propName = "code", type = Query.Type.INNER_LIKE, joinName = "roles")
+    var roleCode: String? = null
+
+    @Query(propName = "level", type = Query.Type.GREATER_THAN, joinName = "roles")
+    var roleLevel: Long? = null
+
+    @Query(propName = "enabled", type = Query.Type.GREATER_THAN, joinName = "roles>depts")
+    var roleDeptEnable: Boolean? = null
+
+    @Query(propName = "status", type = Query.Type.EQUAL, joinName = "roles>resources")
+    var roleResourceStatus: Int = 1
+
+    // endregion
+    // 库中使用Base64存储，做模糊查询（业务不建议。因为无法使用索引，效率很低，这里只是提供一种调用库函数的方式）
+//    @Query(type = Query.Type.FUNCTION_4_EQUAL, functionName = "from_base64")
+//    private val description: String? = "Hello"
+
 }
