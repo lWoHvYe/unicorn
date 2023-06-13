@@ -29,6 +29,7 @@ object QueryHelp {
      * @return jakarta.persistence.criteria.Predicate
      * @date 2021/3/31 11:57
      */
+    @JvmStatic // If you use this annotation, the compiler will generate both a static method in the enclosing class of the object and an instance method in the object itself.
     fun getPredicate(root: Root<*>, query: Any?, cb: CriteriaBuilder): Predicate {
         val list = ArrayList<Predicate>()
         if (query == null) {
