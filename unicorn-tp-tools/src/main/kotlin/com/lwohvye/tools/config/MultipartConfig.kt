@@ -13,43 +13,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.tools.config;
+package com.lwohvye.tools.config
 
-import org.springframework.boot.web.servlet.MultipartConfigFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import jakarta.servlet.MultipartConfigElement;
-import java.io.File;
+import jakarta.servlet.MultipartConfigElement
+import org.springframework.boot.web.servlet.MultipartConfigFactory
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import java.io.File
 
 /**
  * @date 2018-12-28
  * @author https://blog.csdn.net/llibin1024530411/article/details/79474953
  */
 @Configuration
-public class MultipartConfig {
-
+class MultipartConfig {
     /**
      * 文件上传临时路径
      * 若未配置临时路径，当上传大文件时会报错。
      * 配置该属性后，以下限制无效。大致原因是这个是tomcat的，配置临时目录后临时文件不放到tomcat中
-     spring:
-        servlet:
-            multipart:
-                file-size-threshold: 2KB
-                max-file-size: 100MB
-                max-request-size: 200MB
+     * spring:
+     * servlet:
+     * multipart:
+     * file-size-threshold: 2KB
+     * max-file-size: 100MB
+     * max-request-size: 200MB
      */
     @Bean
-    MultipartConfigElement multipartConfigElement() {
-        MultipartConfigFactory factory = new MultipartConfigFactory();
-        String location = System.getProperty("user.home") + "/.eladmin/file/tmp";
-        File tmpFile = new File(location);
-        if (!tmpFile.exists()) {
-            if (!tmpFile.mkdirs()) {
-                System.out.println("create was not successful.");
-            }
+    fun multipartConfigElement(): MultipartConfigElement {
+        val factory = MultipartConfigFactory()
+        val location = System.getProperty("user.home") + "/.eladmin/file/tmp"
+        val tmpFile = File(location)
+        if (!tmpFile.exists() && !tmpFile.mkdirs()) {
+            println("create was not successful.")
         }
-        factory.setLocation(location);
-        return factory.createMultipartConfig();
+        factory.setLocation(location)
+        return factory.createMultipartConfig()
     }
 }

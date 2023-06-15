@@ -13,15 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.tools.service;
+package com.lwohvye.tools.service
 
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartFile
 
 /**
  * @date 2021年09月05日 16:20
  */
-public interface ICOSService {
-
+interface ICOSService {
     /**
      * 分片上传
      *
@@ -29,7 +28,7 @@ public interface ICOSService {
      * @param cosPath
      * @date 2021/9/5 17:12
      */
-    void upload(MultipartFile file,String cosPath);
+    fun upload(file: MultipartFile, cosPath: String?)
 
     /**
      * 断点续传下载
@@ -38,6 +37,5 @@ public interface ICOSService {
      * @param cosPath   cos地址（无前缀）
      * @date 2021/9/5 17:12
      */
-    void download(String storePath, String cosPath);
-
+    fun download(storePath: String?, cosPath: String?)
 }

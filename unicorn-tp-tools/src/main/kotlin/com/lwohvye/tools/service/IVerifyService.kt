@@ -13,30 +13,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.tools.service;
+package com.lwohvye.tools.service
 
-import com.lwohvye.core.base.BaseService;
-import com.lwohvye.tools.domain.vo.EmailVo;
+import com.lwohvye.core.base.BaseService
+import com.lwohvye.tools.domain.vo.EmailVo
 
 /**
  * @author Zheng Jie
  * @date 2018-12-26
  */
-public interface IVerifyService extends BaseService {
-
+interface IVerifyService : BaseService {
     /**
      * 发送验证码
      * @param email /
      * @param key /
      * @return /
      */
-    EmailVo sendEmail(String email, String key);
-
+    fun sendEmail(email: String, key: String): EmailVo
 
     /**
      * 验证
      * @param code /
      * @param key /
      */
-    void validated(String key, String code);
+    fun validated(key: String?, code: String)
 }

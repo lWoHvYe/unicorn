@@ -13,14 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.tools.repository;
+package com.lwohvye.tools.domain.vo
 
-import com.lwohvye.tools.domain.EmailConfig;
-import org.springframework.data.jpa.repository.JpaRepository;
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
 
 /**
- * @author Zheng Jie
- * @date 2018-12-26
+ * 发送邮件时，接收参数的类
+ * @author 郑杰
+ * @date 2018/09/28 12:02:14
  */
-public interface EmailRepository extends JpaRepository<EmailConfig,Long> {
-}
+data class EmailVo(
+    var tos: @NotEmpty List<String>?,
+    var subject: @NotBlank String?,
+    var content: @NotBlank String?
+)

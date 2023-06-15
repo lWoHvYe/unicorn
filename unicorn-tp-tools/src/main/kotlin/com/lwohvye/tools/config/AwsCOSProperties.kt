@@ -13,25 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.lwohvye.tools.config;
+package com.lwohvye.tools.config
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.PropertySource
 
-@Getter
-@Setter
 @Configuration
 @PropertySource("classpath:cos-config.properties")
 @ConfigurationProperties(prefix = "aws.cos")
-public class AwsCOSProperties {
-    private String accessKeyId;
-
-    private String secretAccessKey;
-
-    private String bucketName;
-
-    private String region;
+class AwsCOSProperties {
+    var accessKeyId: String? = null
+    var secretAccessKey: String? = null
+    var bucketName: String? = null
+    var region: String? = null
 }

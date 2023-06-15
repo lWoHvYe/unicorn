@@ -13,19 +13,16 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.tools.service;
+package com.lwohvye.tools.service
 
-import com.lwohvye.tools.domain.vo.EmailVo;
-import com.lwohvye.tools.domain.EmailConfig;
-
-import java.util.List;
+import com.lwohvye.tools.domain.EmailConfig
+import com.lwohvye.tools.domain.vo.EmailVo
 
 /**
  * @author Zheng Jie
  * @date 2018-12-26
  */
-public interface IEmailService {
-
+interface IEmailService {
     /**
      * 更新邮件配置
      *
@@ -34,14 +31,15 @@ public interface IEmailService {
      * @return /
      * @throws Exception /
      */
-    EmailConfig config(EmailConfig emailConfig, EmailConfig old) throws Exception;
+    @Throws(Exception::class)
+    fun config(emailConfig: EmailConfig, old: EmailConfig?): EmailConfig
 
     /**
      * 查询配置
      *
      * @return EmailConfig 邮件配置
      */
-    EmailConfig find();
+    fun find(): EmailConfig?
 
     /**
      * 发送邮件
@@ -50,8 +48,6 @@ public interface IEmailService {
      * @param emailConfig 邮件配置
      * @throws Exception /
      */
-    void send(EmailVo emailVo, EmailConfig emailConfig);
-
-    void send(List<String> tos, String subject, String content);
-
+    fun send(emailVo: EmailVo?, emailConfig: EmailConfig?)
+    fun send(tos: List<String>?, subject: String?, content: String?)
 }
