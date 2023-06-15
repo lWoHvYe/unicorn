@@ -21,6 +21,7 @@ dependencies {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         implementation libs.bundles.coroutines
         implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+        testImplementation 'org.jetbrains.kotlin:kotlin-test'
     }
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation(project(':unicorn-security')) {
@@ -34,7 +35,6 @@ dependencies {
             requireCapability('com.lwohvye:unicorn-security-business-log')
         }
     }
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 tasks.withType(Test).configureEach {
     useJUnitPlatform()

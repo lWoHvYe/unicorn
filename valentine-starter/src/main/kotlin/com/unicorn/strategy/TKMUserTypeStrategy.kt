@@ -68,7 +68,31 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
         runBlocking {
             println("async result is ${result.await()}")
         }
-        // 抛去第一个参数的定义，下面这个与上面这个是等同的，只是因为 `Lambda argument should be moved out of parentheses` 所以把lambda移到了后面
+        // Trailing lambda and SAM conversion
+        //The findMessages() function calls the query() function of the JdbcTemplate class.
+        // The query() function takes two arguments: an SQL query as a String instance, and a callback that will map one object per row:
+        //
+        //db.query("...", RowMapper { ... } )
+        //
+        //
+        //The RowMapper interface declares only one method, so it is possible to implement it via lambda expression by omitting the name of the interface.
+        // The Kotlin compiler knows the interface that the lambda expression needs to be converted to because you use it as a parameter for the function call.
+        // This is known as SAM conversion in Kotlin:
+        //
+        //db.query("...", { ... } )
+        //
+        //
+        //After the SAM conversion, the query function ends up with two arguments: a String at the first position, and a lambda expression at the last position.
+        // According to the Kotlin convention, if the last parameter of a function is a function, then a lambda expression passed as the corresponding argument can be placed outside the parentheses.
+        // Such syntax is also known as trailing lambda:
+        //
+        //db.query("...") { ... }
+        //
+        //
+        // For a lambda with multiple parameters, you can use the underscore `_` character to replace the names of the parameters you don't use.
+        //
+        // 抛去第一个参数的定义，下面这个与上面这个是等同的，只是因为 `Lambda argument should be moved out of parentheses` 所以把lambda移到了后面, trailing lambda
+        // If the lambda is the only argument in that call, the parentheses can be omitted entirely:
         /*runBlocking(EmptyCoroutineContext, {
             println("async result is ${result.await()}")
         })*/

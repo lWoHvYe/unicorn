@@ -13,22 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.unicorn.handler
 
-package com.unicorn.handler;
-
-import org.jetbrains.annotations.NotNull;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.DefaultResponseErrorHandler;
+import org.springframework.http.client.ClientHttpResponse
+import org.springframework.web.client.DefaultResponseErrorHandler
 
 /**
  * RestTemplate异常处理，可以实现ResponseErrorHandler，也可以继承DefaultResponseErrorHandler
  *
  * @date 2022/6/11 8:12 PM
  */
-public class SimRestErrorHandler extends DefaultResponseErrorHandler {
-
-    @Override
-    public void handleError(@NotNull ClientHttpResponse response) {
+class SimRestErrorHandler : DefaultResponseErrorHandler() {
+    override fun handleError(response: ClientHttpResponse) {
         // 这样空复写可以做到，从 Response 获取 HttpStatus 和 body 中的报错信息 而不抛出异常
     }
 }
