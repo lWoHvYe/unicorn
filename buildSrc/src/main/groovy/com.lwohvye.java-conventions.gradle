@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.lwohvye'
-version = '4.0.0-kappa'
+version = '4.0.0-λ-lambda'
 java.sourceCompatibility = JavaVersion.VERSION_20
 
 java {
