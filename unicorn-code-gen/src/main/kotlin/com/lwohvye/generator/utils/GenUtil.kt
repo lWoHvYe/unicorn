@@ -20,6 +20,7 @@ import cn.hutool.extra.template.Template
 import cn.hutool.extra.template.TemplateConfig
 import cn.hutool.extra.template.TemplateException
 import cn.hutool.extra.template.TemplateUtil
+import com.lwohvye.core.exception.UtilsException
 import com.lwohvye.core.utils.FileUtils
 import com.lwohvye.core.utils.StringUtils
 import com.lwohvye.generator.domain.ColumnInfo
@@ -417,9 +418,9 @@ object GenUtil {
             writer = FileWriter(file)
             template.render(map, writer)
         } catch (e: TemplateException) {
-            throw RuntimeException(e)
+            throw UtilsException(e.message)
         } catch (e: IOException) {
-            throw RuntimeException(e)
+            throw UtilsException(e.message)
         } finally {
             assert(writer != null)
             writer!!.close()

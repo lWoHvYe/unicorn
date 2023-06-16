@@ -84,20 +84,7 @@ class EmailServiceImpl(val emailRepository: EmailRepository) : IEmailService {
         account.isStarttlsEnable = true
         val content = emailVo?.content
         // 发送
-        try {
-//            int size = emailVo.getTos().size();
-//            Mail.create(account)
-//                    .setTos(emailVo.getTos().toArray(new String[size]))
-//                    .setTitle(emailVo.getSubject())
-//                    .setContent(content)
-//                    .setHtml(true)
-//                    //关闭session
-//                    .setUseGlobalSession(false)
-//                    .send();
-            MailUtil.send(account, emailVo?.tos, emailVo?.subject, content, true)
-        } catch (e: Exception) {
-            throw BadRequestException(e.message)
-        }
+        MailUtil.send(account, emailVo?.tos, emailVo?.subject, content, true)
     }
 
     @Transactional(rollbackFor = [Exception::class], readOnly = true)
