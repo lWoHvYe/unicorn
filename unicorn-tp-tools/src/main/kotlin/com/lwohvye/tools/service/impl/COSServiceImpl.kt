@@ -31,20 +31,21 @@ import software.amazon.awssdk.transfer.s3.S3ClientConfiguration
 @Service
 class COSServiceImpl(val s3ClientConfiguration: S3ClientConfiguration, val cosProperties: AwsCOSProperties) :
     ICOSService {
-
-    private val logger: Logger = LoggerFactory.getLogger(ICOSService::class.java)
+    companion object {
+        private val log: Logger = LoggerFactory.getLogger(ICOSService::class.java)
+    }
 
     override fun upload(file: MultipartFile, cosPath: String?) {
         val sampleFile = FileUtils.toFile(file)
         val updateStatus =
             COSUtils.fileUpload(s3ClientConfiguration, cosProperties.bucketName, sampleFile.toPath(), cosPath)
-        logger.info("上传结果：{} ", updateStatus)
-        logger.info("源文件名称：{} || 文件地址：{} ", file.originalFilename, cosPath)
+        log.info("上传结果：{} ", updateStatus)
+        log.info("源文件名称：{} || 文件地址：{} ", file.originalFilename, cosPath)
     }
 
     override fun download(storePath: String?, cosPath: String?) {
         val downloadStatus = COSUtils.fileDownload(s3ClientConfiguration, cosProperties.bucketName, storePath, cosPath)
-        logger.info("下载结果: {} ", downloadStatus)
-        logger.info("下载成功，storePath：{} || cosPath: {}", storePath, cosPath)
+        log.info("下载结果: {} ", downloadStatus)
+        log.info("下载成功，storePath：{} || cosPath: {}", storePath, cosPath)
     }
 }

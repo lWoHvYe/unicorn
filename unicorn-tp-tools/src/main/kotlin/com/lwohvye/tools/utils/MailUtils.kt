@@ -29,8 +29,9 @@ import java.util.*
 
 @Component
 class MailUtils(val mailSender: JavaMailSender) {
-
-    private val logger: Logger = LoggerFactory.getLogger(MailUtils::class.java)
+    companion object {
+        private val log: Logger = LoggerFactory.getLogger(MailUtils::class.java)
+    }
 
     @Value("\${spring.mail.username}")
     private val mailFromUser: String? = null
@@ -43,7 +44,7 @@ class MailUtils(val mailSender: JavaMailSender) {
             sendMimeMail(mailVo)
             mailVo
         } catch (e: Exception) {
-            logger.error("发送邮件失败:", e)
+            log.error("发送邮件失败:", e)
             mailVo.status = "fail"
             mailVo.error = e.message
             mailVo
@@ -90,7 +91,7 @@ class MailUtils(val mailSender: JavaMailSender) {
             }
             mailSender.send(messageHelper.mimeMessage)
             mailVo.status = "ok"
-            logger.info("发送邮件成功：{}->{}", mailVo.from, mailVo.to)
+            log.info("发送邮件成功：{}->{}", mailVo.from, mailVo.to)
         } catch (e: Exception) {
             throw BadRequestException(e.message)
         }

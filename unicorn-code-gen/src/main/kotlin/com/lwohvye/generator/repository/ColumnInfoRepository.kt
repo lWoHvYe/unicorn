@@ -13,36 +13,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.generator.domain.vo;
+package com.lwohvye.generator.repository
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.lwohvye.generator.domain.ColumnInfo
+import org.springframework.data.jpa.repository.JpaRepository
 
 /**
- * 表的数据信息
  * @author Zheng Jie
- * @date 2019-01-02
+ * @date 2019-01-14
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class TableInfo {
-
-    /** 表名称 */
-    private Object tableName;
-
-    /** 创建日期 */
-    private Object createTime;
-
-    /** 数据库引擎 */
-    private Object engine;
-
-    /** 编码集 */
-    private Object coding;
-
-    /** 备注 */
-    private Object remark;
-
-
+interface ColumnInfoRepository : JpaRepository<ColumnInfo?, Long?> {
+    /**
+     * 查询表信息
+     * @param tableName 表格名
+     * @return 表信息
+     */
+    fun findByTableNameOrderByIdAsc(tableName: String?): List<ColumnInfo?>?
 }

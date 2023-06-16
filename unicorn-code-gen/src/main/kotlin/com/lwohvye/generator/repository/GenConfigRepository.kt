@@ -13,21 +13,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.generator.repository;
+package com.lwohvye.generator.repository
 
-import com.lwohvye.generator.domain.GenConfig;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.lwohvye.generator.domain.GenConfig
+import org.springframework.data.jpa.repository.JpaRepository
 
 /**
  * @author Zheng Jie
  * @date 2019-01-14
  */
-public interface GenConfigRepository extends JpaRepository<GenConfig,Long> {
-
+interface GenConfigRepository : JpaRepository<GenConfig?, Long?> {
     /**
      * 查询表配置
      * @param tableName 表名
      * @return /
      */
-    GenConfig findByTableName(String tableName);
+    fun findByTableName(tableName: String?): GenConfig?
 }

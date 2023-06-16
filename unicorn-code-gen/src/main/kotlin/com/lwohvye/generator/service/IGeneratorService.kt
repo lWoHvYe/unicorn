@@ -13,22 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.generator.service;
+package com.lwohvye.generator.service
 
-import com.lwohvye.generator.domain.ColumnInfo;
-import com.lwohvye.generator.domain.GenConfig;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
+import com.lwohvye.generator.domain.ColumnInfo
+import com.lwohvye.generator.domain.GenConfig
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 /**
  * @author Zheng Jie
  * @date 2019-01-02
  */
-public interface IGeneratorService {
-
+interface IGeneratorService {
     /**
      * 查询数据库元数据
      *
@@ -36,7 +32,7 @@ public interface IGeneratorService {
      * @param startEnd 分页参数
      * @return /
      */
-    Map<String, Object> getTables(String name, int[] startEnd);
+    fun getTables(name: String, startEnd: IntArray): Map<String?, Any?>?
 
     /**
      * 得到数据表的元数据
@@ -44,7 +40,7 @@ public interface IGeneratorService {
      * @param name 表名
      * @return /
      */
-    List<ColumnInfo> getColumns(String name);
+    fun getColumns(name: String?): List<ColumnInfo?>?
 
     /**
      * 同步表数据
@@ -52,21 +48,21 @@ public interface IGeneratorService {
      * @param columnInfos    /
      * @param columnInfoList /
      */
-    void sync(List<ColumnInfo> columnInfos, List<ColumnInfo> columnInfoList);
+    fun sync(columnInfos: List<ColumnInfo?>?, columnInfoList: List<ColumnInfo?>?)
 
     /**
      * 保持数据
      *
      * @param columnInfos /
      */
-    void save(List<ColumnInfo> columnInfos);
+    fun save(columnInfos: List<ColumnInfo?>)
 
     /**
      * 获取所有table
      *
      * @return /
      */
-    List getTables();
+    val tables: List<*>?
 
     /**
      * 代码生成
@@ -74,7 +70,7 @@ public interface IGeneratorService {
      * @param genConfig 配置信息
      * @param columns   字段信息
      */
-    void generator(GenConfig genConfig, List<ColumnInfo> columns);
+    fun generator(genConfig: GenConfig?, columns: List<ColumnInfo?>?)
 
     /**
      * 预览
@@ -83,7 +79,7 @@ public interface IGeneratorService {
      * @param columns   字段信息
      * @return /
      */
-    List<Map<String, Object>> preview(GenConfig genConfig, List<ColumnInfo> columns);
+    fun preview(genConfig: GenConfig?, columns: List<ColumnInfo?>?): List<Map<String, Any>>
 
     /**
      * 打包下载
@@ -93,7 +89,12 @@ public interface IGeneratorService {
      * @param request   /
      * @param response  /
      */
-    void download(GenConfig genConfig, List<ColumnInfo> columns, HttpServletRequest request, HttpServletResponse response);
+    fun download(
+        genConfig: GenConfig?,
+        columns: List<ColumnInfo?>?,
+        request: HttpServletRequest?,
+        response: HttpServletResponse?
+    )
 
     /**
      * 查询数据库的表字段数据数据
@@ -101,5 +102,5 @@ public interface IGeneratorService {
      * @param table /
      * @return /
      */
-    List<ColumnInfo> query(String table);
+    fun query(table: String?): List<ColumnInfo?>
 }

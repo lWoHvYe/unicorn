@@ -13,28 +13,24 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.generator.service;
-
-import com.lwohvye.generator.domain.GenConfig;
+package com.lwohvye.generator.domain.vo
 
 /**
+ * 表的数据信息
  * @author Zheng Jie
- * @date 2019-01-14
+ * @date 2019-01-02
  */
-public interface IGenConfigService {
+data class TableInfo(
+    val tableName: Any,
 
-    /**
-     * 查询表配置
-     * @param tableName 表名
-     * @return 表配置
-     */
-    GenConfig find(String tableName);
+    var createTime: Any?,
 
-    /**
-     * 更新表配置
-     * @param tableName 表名
-     * @param genConfig 表配置
-     * @return 表配置
-     */
-    GenConfig update(String tableName, GenConfig genConfig);
-}
+    /** 数据库引擎  */
+    var engine: Any?,
+
+    /** 编码集  */
+    var coding: Any?,
+
+    /** 备注  */
+    var remark: Any?
+)
