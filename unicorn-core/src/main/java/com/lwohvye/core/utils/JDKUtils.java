@@ -17,12 +17,14 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
@@ -430,6 +432,20 @@ public class JDKUtils {
         } catch (Throwable e) {
             throw new UtilsException("invoke error: " + e.getMessage());
         }
+    }
+
+    /**
+     * get method through reflect，可以用来获取private的方法，然后做UT
+     *
+     * @param targetClass    /
+     * @param methodName     /
+     * @param parameterTypes Signature-NotNull
+     * @return java.lang.reflect.Method
+     */
+    public static Method getAccessibleMethod(@NotNull Class<?> targetClass, @NotNull String methodName, @NotNull Class<?>... parameterTypes) throws NoSuchMethodException {
+        var method = targetClass.getDeclaredMethod(methodName, parameterTypes);
+        method.trySetAccessible();
+        return method;
     }
 
     // region access field

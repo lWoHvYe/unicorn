@@ -55,7 +55,7 @@ public class ResourceDto implements Serializable {
     /**
      * 状态 0-不可用 1-可用
      */
-    private Integer status;
+    private Boolean status;
 
     private List<String> roleCodes;
 
