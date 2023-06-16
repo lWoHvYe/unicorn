@@ -35,12 +35,8 @@ object QueryHelp {
         if (query == null) {
             return cb.and(*list.toTypedArray<Predicate>())
         }
-        try {
-            // 根据Field及上面的Annotation，拼接Query & Join
-            analyzeFieldQuery(root, query, cb, list)
-        } catch (e: Exception) {
-            logger.error(e.message, e)
-        }
+        // 根据Field及上面的Annotation，拼接Query & Join
+        analyzeFieldQuery(root, query, cb, list)
         // 各Field的Condition通过And连接，这是比较常见的场景
         return cb.and(*list.toTypedArray<Predicate>())
     }

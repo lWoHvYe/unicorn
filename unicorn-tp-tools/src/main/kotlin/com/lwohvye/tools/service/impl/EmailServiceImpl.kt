@@ -69,12 +69,8 @@ class EmailServiceImpl(val emailRepository: EmailRepository) : IEmailService {
         account.host = emailConfig.host
         account.port = emailConfig.port?.toInt()
         account.isAuth = true
-        try {
-            // 对称解密
-            account.pass = EncryptUtils.aesDecrypt(emailConfig.pass)
-        } catch (e: Exception) {
-            throw BadRequestException(e.message)
-        }
+        // 对称解密
+        account.pass = EncryptUtils.aesDecrypt(emailConfig.pass)
         //        部分邮箱 user和fromUser需一致
         account.from = " ${emailConfig.user} <${emailConfig.fromUser}>"
         // ssl方式发送-----不使用

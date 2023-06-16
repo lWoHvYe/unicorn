@@ -19,6 +19,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.core.annotation.DataPermission;
 import com.lwohvye.core.annotation.Query;
+import com.lwohvye.core.exception.UtilsException;
 import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +64,7 @@ public class QueryHelp {
             analyzeFieldQuery(root, query, cb, list);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            throw new UtilsException("Fail to analyze Query, error: " + e.getMessage());
         }
         // 各Field的Condition通过And连接，这是比较常见的场景
         return cb.and(list.toArray(new Predicate[0]));

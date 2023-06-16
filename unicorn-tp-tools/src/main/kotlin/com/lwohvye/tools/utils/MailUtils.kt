@@ -69,31 +69,27 @@ class MailUtils(val mailSender: JavaMailSender) {
     }
 
     private fun sendMimeMail(mailVo: MailVo) {
-        try {
-            val messageHelper = MimeMessageHelper(mailSender.createMimeMessage(), true)
-            if (StringUtils.isBlank(mailVo.from)) mailVo.from = mailFromUser
-            mailVo.from?.let { messageHelper.setFrom(it) }
-            mailVo.to?.split(",".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
-                ?.let { messageHelper.setTo(it) }
-            mailVo.subject?.let { messageHelper.setSubject(it) }
-            mailVo.text?.let { messageHelper.setText(it) }
-            if (StringUtils.isNotBlank(mailVo.cc)) mailVo.cc?.split(",".toRegex())?.dropLastWhile { it.isEmpty() }
-                ?.toTypedArray()
-                ?.let { messageHelper.setCc(it) }
-            if (StringUtils.isNotBlank(mailVo.bcc)) mailVo.bcc?.split(",".toRegex())?.dropLastWhile { it.isEmpty() }
-                ?.toTypedArray()?.let { messageHelper.setBcc(it) }
-            if (mailVo.multipartFiles != null)
-                for (multipartFile in mailVo.multipartFiles!!)
-                    messageHelper.addAttachment(Objects.requireNonNull(multipartFile.originalFilename), multipartFile)
-            if (ObjectUtil.isEmpty(mailVo.sentDate)) {
-                mailVo.sentDate = Date()
-                mailVo.sentDate?.let { messageHelper.setSentDate(it) }
-            }
-            mailSender.send(messageHelper.mimeMessage)
-            mailVo.status = "ok"
-            log.info("发送邮件成功：{}->{}", mailVo.from, mailVo.to)
-        } catch (e: Exception) {
-            throw BadRequestException(e.message)
+        val messageHelper = MimeMessageHelper(mailSender.createMimeMessage(), true)
+        if (StringUtils.isBlank(mailVo.from)) mailVo.from = mailFromUser
+        mailVo.from?.let { messageHelper.setFrom(it) }
+        mailVo.to?.split(",".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
+            ?.let { messageHelper.setTo(it) }
+        mailVo.subject?.let { messageHelper.setSubject(it) }
+        mailVo.text?.let { messageHelper.setText(it) }
+        if (StringUtils.isNotBlank(mailVo.cc)) mailVo.cc?.split(",".toRegex())?.dropLastWhile { it.isEmpty() }
+            ?.toTypedArray()
+            ?.let { messageHelper.setCc(it) }
+        if (StringUtils.isNotBlank(mailVo.bcc)) mailVo.bcc?.split(",".toRegex())?.dropLastWhile { it.isEmpty() }
+            ?.toTypedArray()?.let { messageHelper.setBcc(it) }
+        if (mailVo.multipartFiles != null)
+            for (multipartFile in mailVo.multipartFiles!!)
+                messageHelper.addAttachment(Objects.requireNonNull(multipartFile.originalFilename), multipartFile)
+        if (ObjectUtil.isEmpty(mailVo.sentDate)) {
+            mailVo.sentDate = Date()
+            mailVo.sentDate?.let { messageHelper.setSentDate(it) }
         }
+        mailSender.send(messageHelper.mimeMessage)
+        mailVo.status = "ok"
+        log.info("发送邮件成功：{}->{}", mailVo.from, mailVo.to)
     }
 }
