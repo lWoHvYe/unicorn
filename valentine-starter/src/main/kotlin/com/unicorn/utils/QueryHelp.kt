@@ -52,7 +52,7 @@ object QueryHelp {
             if (q != null) {
                 val blurry = q.blurry
                 val value = kProperty1.javaField?.get(query)
-                if (Objects.isNull(value) || "" == value) {
+                if (value == null || value == "") {
                     continue
                 }
                 // 模糊多字段
@@ -85,15 +85,15 @@ object QueryHelp {
     private fun analyzeJoinType(root: Root<*>, q: Query?, value: Any?): Join<out Any, *>? {
         var join: Join<out Any, *>? = null
         val joinName = q?.joinName
-        if (StringUtils.isBlank(joinName)) return null
+        if (joinName == null || joinName.trim() == "") return null
         // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
         // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
         // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
-        val joinNames = joinName?.split(">".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
-        checkJoin@ for (entity in joinNames!!) {
+        val joinNames = joinName.split(">".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        checkJoin@ for (entity in joinNames) {
             // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
             // 业务中应该没有需要对同一张table多次join，甚至joinType还不同的情形。这里是不支持此类场景的
-            if (Objects.isNull(join)) {
+            if (join == null) {
                 for (rJoin in root.joins) {
                     // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
                     if (Objects.equals(rJoin.attribute.name, entity)) {
@@ -103,7 +103,7 @@ object QueryHelp {
                 }
             }
             // Switch Expressions。这个只是一个sweets 语法糖
-            val stubJoin = Objects.nonNull(join) && Objects.nonNull(value)
+            val stubJoin = join != null && value != null
             join = when (q.join) {
                 Query.Join.LEFT -> if (stubJoin) join!!.join(entity, JoinType.LEFT) else root.join<Any, Any>(
                     entity,
@@ -146,9 +146,10 @@ object QueryHelp {
     ) {
         val q = kProperty1.javaField?.getAnnotation(Query::class.java)
         val attributeName = defineAttrName(kProperty1, q)
-        val value = kProperty1.javaField?.get(query)
+        // 经过上一级方法，这里的value一定是NoNull的
+        val value = kProperty1.javaField!!.get(query)
         val fieldType = kProperty1.javaField?.type // type需要JavaType，kProperty1.javaClass是KotlinType
-        val comparableFieldType = castComparableFieldType(value)
+        val comparableFieldType = value.castComparableFieldType()
         val join = analyzeJoinType(root, q, value)
         when (q!!.type) {
             Query.Type.EQUAL -> list.add(cb.equal(getExpression(attributeName, join, root).`as`(fieldType), value))
@@ -157,33 +158,21 @@ object QueryHelp {
                 list.add(
                     cb.greaterThanOrEqualTo(
                         getExpression(attributeName, join, root).`as`(comparableFieldType),
-                        Objects.requireNonNull(
-                            comparableFieldType,
-                            ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
-                        )!!
-                            .cast(value)
+                        value.castToComparable(attributeName, comparableFieldType)
                     )
                 )
 
             Query.Type.LESS_THAN -> list.add(
                 cb.lessThanOrEqualTo(
                     getExpression(attributeName, join, root).`as`(comparableFieldType),
-                    Objects.requireNonNull(
-                        comparableFieldType,
-                        ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
-                    )!!
-                        .cast(value)
+                    value.castToComparable(attributeName, comparableFieldType)
                 )
             )
 
             Query.Type.LESS_THAN_NQ -> list.add(
                 cb.lessThan(
                     getExpression(attributeName, join, root).`as`(comparableFieldType),
-                    Objects.requireNonNull(
-                        comparableFieldType,
-                        ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
-                    )!!
-                        .cast(value)
+                    value.castToComparable(attributeName, comparableFieldType)
                 )
             )
 
@@ -253,12 +242,12 @@ object QueryHelp {
                 if (value is List<*> && value.size == 2 && value[0] is Comparable<*> && value[1] is Comparable<*>) {
                     val start = value[0] as Comparable<*>
                     val end = value[1] as Comparable<*>
-                    val eleType = castComparableFieldType(start)
+                    val eleType = start.castComparableFieldType()
                     list.add(
                         cb.between(
                             getExpression(attributeName, join, root).`as`(eleType),
-                            Objects.requireNonNull(eleType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName))!!
-                                .cast(start), eleType!!.cast(end)
+                            start.castToComparable(attributeName, eleType),
+                            eleType!!.cast(end)
                         )
                     )
                 }
@@ -277,11 +266,7 @@ object QueryHelp {
                             ).`in`(value) //                                                或值为null
                             ,
                             cb.isNull(
-                                getExpression(
-                                    attributeName,
-                                    join,
-                                    root
-                                )
+                                getExpression(attributeName, join, root)
                             ) //                                                或值为空字符串
                             ,
                             cb.equal(
@@ -296,11 +281,7 @@ object QueryHelp {
 
             Query.Type.IS_OR_NULL -> list.add(
                 if (value as Long == -1L) cb.isNull(
-                    getExpression(
-                        attributeName,
-                        join,
-                        root
-                    ).`as`(fieldType)
+                    getExpression(attributeName, join, root).`as`(fieldType)
                 ) else cb.equal(
                     getExpression(attributeName, join, root).`as`(fieldType), value
                 )
@@ -372,19 +353,16 @@ object QueryHelp {
         }
     }
 
-    private fun getExpression(attributeName: String?, join: Join<out Any, *>?, root: Root<*>): Expression<*> {
+    private fun getExpression(attributeName: String, join: Join<out Any, *>?, root: Root<*>): Expression<*> =
         // 处理的维度是field维度的，每个field初始化一个join，若join有值，证明该field是join的实体中的，所以要从join中取，即join.get()。
-        return if (Objects.nonNull(join)) {
-            join!!.get<Any>(attributeName)
-        } else {
-            // 非join的，从root中取，root.get()。
-            root.get<Any>(attributeName)
-        }
-    }
+        join?.get<Any>(attributeName) ?:
+        // 非join的，从root中取，root.get()。
+        root.get<Any>(attributeName)
 
-    private fun defineAttrName(kProperty1: KProperty1<out Any, *>, q: Query?): String? {
+
+    private fun defineAttrName(kProperty1: KProperty1<out Any, *>, q: Query?): String {
         val propName = q?.propName
-        return if (StringUtils.isNotBlank(propName)) propName else kProperty1.name
+        return if (propName != null && propName.trim() != "") propName else kProperty1.name
     }
 
     /**
@@ -397,9 +375,22 @@ object QueryHelp {
      * @return java.lang.Class
      * @date 2022/9/17 5:21 PM
      */
-    private fun castComparableFieldType(value: Any?): Class<out Comparable<Any>>? {
-        return if (value is Comparable<*>)
-            @Suppress("UNCHECKED_CAST")
-            value::class.java as Class<out Comparable<Any?>?> else null
-    }
+    // Extension Functions
+    private fun Any.castComparableFieldType(): Class<out Comparable<Any>>? = if (this is Comparable<*>)
+        @Suppress("UNCHECKED_CAST")
+        this::class.java as Class<out Comparable<Any?>?> else null
+
+
+    private fun Any.castToComparable(
+        attributeName: String,
+        tClass: Class<out Comparable<Any>>?
+    ): Comparable<Any> =
+        Objects.requireNonNull(
+            tClass,
+            ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
+        )!!.cast(this)
+
+
+    private fun String?.isBlank(): Boolean = this == null || this.trim() == ""
+
 }

@@ -17,9 +17,12 @@ package com.unicorn.strategy
 
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno
 import com.lwohvye.sys.modules.system.strategy.ExtraUserTypeStrategy
+import com.unicorn.coroutine.DispatcherType
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.apache.logging.log4j.LogManager.getLogger
 import org.jetbrains.annotations.BlockingExecutor
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.concurrent.Executors
@@ -31,11 +34,67 @@ import kotlin.time.measureTime
 @UserTypeHandlerAnno(typeName = "FOUR")
 // 这里不能为 sealed!! 因为密封类是不能实例化的?
 class TKMUserTypeStrategy : ExtraUserTypeStrategy {
-    @OptIn(DelicateCoroutinesApi::class)
+
+    companion object {
+        private val log = LoggerFactory.getLogger(TKMUserTypeStrategy::class.java)
+    }
+
     override fun grantedAuth(userId: Long): List<GrantedAuthority> {
 
-        println("Start")
+        log.info("Start-0")
 
+        basicsCoroutinesCall()
+
+        callWithGlobalScope()
+
+        shareWithChannel()
+
+        loomCarrier()
+
+        coroutinesDirect()
+        //_____________
+
+        return emptyList()
+    }
+
+    private fun basicsCoroutinesCall() {
+        // 注意执行的顺序, runBlocking method blocks the current thread for waiting
+        runBlocking { // this: CoroutineScope
+            launch { // launch a new coroutine and continue
+                delay(1000L) // non-blocking delay for 1 second (default time unit is ms)
+                log.info("World!-1-1") // print after delay
+            }
+            log.info("Hello-1-0") // main coroutine continues while a previous one is delayed
+        }
+
+        log.info("runBlocking-1-2")
+
+        runBlocking {
+            // 而coroutineScope是coroutineScope just suspends, releasing the underlying thread for other usages
+            doHelloWorld()
+            log.info("coroutineScope-2-3")
+        }
+
+        runBlocking {
+            val explicitJob =
+                launch(DispatcherType.VIRTUAL.dispatcher) { // launch a new coroutine and keep a reference to its Job
+                    delay(1000L)
+                    log.info("World!-3-1")
+                }
+            log.info("Hello-3-0")
+            explicitJob.join() // wait until child coroutine completes
+            log.info("Job Done?: ${explicitJob.isCompleted}-3-2")
+
+            val explicitDeferred: Deferred<String> = async {
+                delay(1000L)
+                "Async Coroutine"
+            }
+            log.info("Hello ${explicitDeferred.await()}")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun callWithGlobalScope() {
         // kotlinx.coroutines将在1.7版本支持JPMS，但在1.7.0-Beta。若以DeBug模式启动，依旧报错 `module kotlin.stdlib does not read module kotlinx.coroutines.core`，Normal run正常
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2237
         // https://github.com/Kotlin/kotlinx.coroutines/pull/3297
@@ -53,20 +112,20 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
             // 2.runBlocking { ... }: 用于等待协程内部的代码执行完毕后再执行后面的代码。在这个例子中，使用了 delay 函数模拟一个耗时操作，它会暂停协程的执行一段时间，这里是 1000 毫秒（1 秒）。
             runBlocking {
                 delay(1000)
+                log.info("World-5")
             }
-            // 3.println("Hello"): 该代码会在 delay 函数执行完毕后被执行，打印 "Hello" 到控制台。
-            println("Hello")
+            // 3.log.info("Hello"): 该代码会在 delay 函数执行完毕后被执行，打印 "Hello" 到控制台。（先输出World再输出Hello），
+            log.info("Hello-6")
         }
 
-        Thread.sleep(2000) // 等待 2 秒钟
-        println("Stop")
+        log.info("Stop-4")
         //_____________
 
         val result = GlobalScope.async {
             workload(16) // 调用函数
         }
         runBlocking {
-            println("async result is ${result.await()}")
+            log.info("async result is ${result.await()}")
         }
         // Trailing lambda and SAM conversion
         //The findMessages() function calls the query() function of the JdbcTemplate class.
@@ -94,18 +153,45 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
         // 抛去第一个参数的定义，下面这个与上面这个是等同的，只是因为 `Lambda argument should be moved out of parentheses` 所以把lambda移到了后面, trailing lambda
         // If the lambda is the only argument in that call, the parentheses can be omitted entirely:
         /*runBlocking(EmptyCoroutineContext, {
-            println("async result is ${result.await()}")
+            log.info("async result is ${result.await()}")
         })*/
         // 对于存在可变参数的，可通过 参数名 = xxx 对特定参数赋值
         /*runBlocking(block = {
-            println("async result is ${result.await()}")
+            log.info("async result is ${result.await()}")
         })*/
+    }
 
-        loomCarrier()
-        coroutinesDirect()
-        //_____________
+    private fun shareWithChannel() = runBlocking {
 
-        return emptyList()
+        val bufferedChannel = Channel<Int>(4)
+        val todo = 20
+
+        for (i in 0 until todo) { // .. 含头尾， until 含头不含尾
+            launch {
+                bufferedChannel.send(i)
+                log.info("send element $i")
+            }
+        }
+
+        delay(2000L)
+
+        launch {
+            repeat(todo) {
+                log.info("$it receive ${bufferedChannel.receive()}")
+            }
+        }
+    }
+
+    suspend fun doHelloWorld() = coroutineScope {  // this: CoroutineScope
+        launch {
+            delay(2000L)
+            log.info("World!-2-2")
+        }
+        launch {
+            delay(1000L)
+            log.info("World!-2-1")
+        }
+        log.info("Hello-2-0")
     }
 
     // 这段代码是一个Kotlin协程中的挂起函数（Suspending Function），使用了suspend关键字修饰。
@@ -132,6 +218,7 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
             supervisorScope {
                 repeat(100_000) {
                     launch(Dispatchers.LOOM) {
+                        // 这里要用sleep才能用到Thread的function，若用delay可能会有所不同
                         Thread.sleep(1000)
                     }
                 }
