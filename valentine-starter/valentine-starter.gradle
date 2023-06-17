@@ -15,12 +15,13 @@ ext {
 dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
-    implementation project(':unicorn-tp-tools')
+    implementation project(':unicorn-tp-tools-kotlin')
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
     if (kotlinEnable) {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         implementation libs.bundles.coroutines
         implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+        testImplementation 'org.jetbrains.kotlin:kotlin-test'
     }
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation(project(':unicorn-security')) {
@@ -34,7 +35,6 @@ dependencies {
             requireCapability('com.lwohvye:unicorn-security-business-log')
         }
     }
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
@@ -61,7 +61,6 @@ if (kotlinEnable) {
         sourceSets.configureEach {
             languageSettings {
 //                languageVersion = "2.0" // kotlin.experimental.tryK2=true
-
                 apiVersion = "2.0"
             }
         }

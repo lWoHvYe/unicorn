@@ -339,7 +339,7 @@ CREATE TABLE `sys_dict`
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_dict`
-VALUES (1, 'user_status', '用户状态', NULL, NULL, '2019-10-27 20:31:36', NULL);
+VALUES (1, 'status', '状态', NULL, NULL, '2019-10-27 20:31:36', NULL);
 INSERT INTO `sys_dict`
 VALUES (4, 'dept_status', '部门状态', NULL, NULL, '2019-10-27 20:31:36', NULL);
 INSERT INTO `sys_dict`

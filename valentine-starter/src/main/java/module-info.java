@@ -15,12 +15,7 @@ module lwohvye.valentine.starter {
     requires org.apache.logging.log4j;
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.apache.httpcomponents.client5.httpclient5;
-//    requires captcha;
 
-    exports com.unicorn.config;
 
-    // maven需要opens resources，而gradle不需要
-//    opens config;
     opens com.unicorn;
-    opens com.unicorn.config to spring.core;
 }

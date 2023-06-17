@@ -16,6 +16,7 @@
 
 package com.lwohvye.core.utils;
 
+
 /**
  * @author: liaojinlong
  * @date: 2020/6/9 17:02
@@ -26,14 +27,11 @@ package com.lwohvye.core.utils;
  * 在SpringContextHolder 初始化后，进行回调使用
  */
 
-public interface CallBack {
-    /**
-     * 回调执行方法
-     */
-    void executor();
+public interface CallBack extends Runnable {
 
     /**
      * 本回调任务名称
+     *
      * @return /
      */
     default String getCallBackName() {

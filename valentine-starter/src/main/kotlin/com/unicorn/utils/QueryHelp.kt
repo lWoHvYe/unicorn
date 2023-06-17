@@ -29,17 +29,14 @@ object QueryHelp {
      * @return jakarta.persistence.criteria.Predicate
      * @date 2021/3/31 11:57
      */
+    @JvmStatic // If you use this annotation, the compiler will generate both a static method in the enclosing class of the object and an instance method in the object itself.
     fun getPredicate(root: Root<*>, query: Any?, cb: CriteriaBuilder): Predicate {
         val list = ArrayList<Predicate>()
         if (query == null) {
             return cb.and(*list.toTypedArray<Predicate>())
         }
-        try {
-            // 根据Field及上面的Annotation，拼接Query & Join
-            analyzeFieldQuery(root, query, cb, list)
-        } catch (e: Exception) {
-            logger.error(e.message, e)
-        }
+        // 根据Field及上面的Annotation，拼接Query & Join
+        analyzeFieldQuery(root, query, cb, list)
         // 各Field的Condition通过And连接，这是比较常见的场景
         return cb.and(*list.toTypedArray<Predicate>())
     }

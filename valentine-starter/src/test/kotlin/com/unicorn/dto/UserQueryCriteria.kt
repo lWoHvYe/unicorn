@@ -47,7 +47,7 @@ class UserQueryCriteria : Serializable {
      */
     var usernameStr: String? = null
         set(value) {
-            usernames = if (StrUtil.isNotEmpty(value)) StringUtils.parseStrToArrString(usernameStr) else null
+            usernames = if (StrUtil.isNotEmpty(value)) StringUtils.parseStrToArrString(value) else null
         }
 
     @Query(propName = "username", type = Query.Type.IN_INNER_LIKE)

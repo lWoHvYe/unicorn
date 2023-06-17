@@ -17,12 +17,15 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.List;
@@ -430,6 +433,21 @@ public class JDKUtils {
         } catch (Throwable e) {
             throw new UtilsException("invoke error: " + e.getMessage());
         }
+    }
+
+    /**
+     * get method through reflect，可以用来获取private的方法，然后做UT，
+     * 但注意在invoke时，若只有一个参数，且此次值为null，则不能直接传null，而应是 new Object[] { null }, 其他时候都可以用可变参数的形式invoke
+     *
+     * @param targetClass    /
+     * @param methodName     /
+     * @param parameterTypes Signature-NotNull
+     * @return java.lang.reflect.Method
+     */
+    public static Method getAccessibleMethod(@NotNull Class<?> targetClass, @NotNull String methodName, @Nullable Class<?>... parameterTypes) throws NoSuchMethodException {
+        var method = targetClass.getDeclaredMethod(methodName, parameterTypes);
+        method.trySetAccessible();
+        return method;
     }
 
     // region access field

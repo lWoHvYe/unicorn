@@ -73,7 +73,7 @@ public class Resource implements Serializable {
 
     @Column(name = "status")
     @Schema(description = "状态 0-不可用 1-可用")
-    private Integer status;
+    private Boolean status;
 
     @Column(name = "rest_name")
     @Schema(description = "所在类名")

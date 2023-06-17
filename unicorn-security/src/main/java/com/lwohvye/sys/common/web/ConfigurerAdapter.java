@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lwohvye.core.config.FileProperties;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -46,6 +47,7 @@ import java.util.List;
  * @date 2018-11-30
  */
 @Configuration
+@AllArgsConstructor
 // 在WebMvcAutoConfiguration类上标了一个如下注解：
 // @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 // 以上这行代码的意思就是当前IOC容器中没有WebMvcConfigurationSupport这个类的实例时自动配置类才会生效，这也就是在配置类上标注@EnableWebMvc会导致自动配置类WebMvcAutoConfiguration失效的原因。
@@ -56,11 +58,8 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     /**
      * 文件配置
      */
-    private final FileProperties properties;
-
-    public ConfigurerAdapter(FileProperties properties) {
-        this.properties = properties;
-    }
+    private final FileProperties fileProperties;
+    private final CorsProperties corsProperties;
 
     // 处理全局跨域
 
@@ -80,7 +79,8 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
         var source = new UrlBasedCorsConfigurationSource();
         var config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
+        corsProperties.getWhiteList().forEach(config::addAllowedOriginPattern);
+//        config.addAllowedOriginPattern("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
@@ -91,7 +91,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     //  @Bean
     //  @ConditionalOnExpression("false")
     //  GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        // 去除 ROLE_ 前缀
+    // 去除 ROLE_ 前缀
     //      return new GrantedAuthorityDefaults("");
     //  }
 
@@ -116,7 +116,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        var path = properties.getOSPath();
+        var path = fileProperties.getOSPath();
         var avatarUtl = "file:" + path.getAvatar().replace("\\", "/");
         var pathUtl = "file:" + path.getPath().replace("\\", "/");
         registry.addResourceHandler("/avatar/**").addResourceLocations(avatarUtl).setCachePeriod(0);
