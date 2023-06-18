@@ -5,15 +5,21 @@
  */
 
 job("BuildImg") {
-    container(displayName = "Run gradle build", image = "amazoncorretto:20-alpine") {
-
-        // env vars for build.gradle
-        env["OSSRH_USERNAME"] = "{{ project:ossrh_username }}"
-        env["OSSRH_PASSWORD"] = "{{ project:ossrh_password }}"
+    container(displayName = "Run gradle build", image = "openjdk:20-jdk") {
 
         kotlinScript { api ->
             // here can be your complex logic
-            api.gradlew("build")
+            api.gradlew("build -x test")
+        }
+    }
+
+    container(displayName = "Run gradle build", image = "amazoncorretto:20-alpine") {
+
+        kotlinScript { api ->
+            // here can be your complex logic
+            api.gradlew("build -x test")
         }
     }
 }
+
+
