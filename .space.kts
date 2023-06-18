@@ -4,12 +4,13 @@
  * For more info, see https://www.jetbrains.com/help/space/automation.html
  */
 
-job("BuildImg") {
+job("Assemble & BuildImage") {
     container(displayName = "Run gradle build", image = "eclipse-temurin:20-alpine") {
 
         kotlinScript { api ->
             // here can be your complex logic
-            api.gradlew("build", "--exclude-task test")
+            api.gradlew("assemble")
+            api.gradlew("bootBuildImage")
         }
     }
 
@@ -17,7 +18,7 @@ job("BuildImg") {
 
         kotlinScript { api ->
             // here can be your complex logic
-            api.gradlew("build", "--exclude-task test")
+            api.gradlew("classes")
         }
     }
 }
