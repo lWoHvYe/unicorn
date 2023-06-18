@@ -9,7 +9,7 @@ job("BuildImg") {
 
         kotlinScript { api ->
             // here can be your complex logic
-            api.gradlew("build -x test")
+            api.gradlew("build", "-x test")
         }
     }
 
@@ -17,7 +17,7 @@ job("BuildImg") {
 
         kotlinScript { api ->
             // here can be your complex logic
-            api.gradlew("build -x test")
+            api.gradlew("build", "-x test")
         }
     }
 }
