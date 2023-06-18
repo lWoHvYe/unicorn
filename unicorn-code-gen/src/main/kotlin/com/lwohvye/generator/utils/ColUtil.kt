@@ -20,7 +20,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder
 import org.apache.commons.configuration2.builder.fluent.Parameters
 import org.apache.commons.configuration2.ex.ConfigurationException
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 import java.io.File
 
 /**
@@ -30,7 +30,8 @@ import java.io.File
  * @date 2019-01-03
  */
 object ColUtil {
-    private val log = LoggerFactory.getLogger(ColUtil::class.java)
+
+    private val log = LogManager.getLogger()
 
     /**
      * 转换mysql数据类型为java数据类型
@@ -40,7 +41,7 @@ object ColUtil {
      */
     fun cloToJava(type: String?): String {
         val config: Configuration = config!!
-        return config.getString(type, "unknowType")
+        return config.getString(type, "unknownType")
     }
 
     private val config: PropertiesConfiguration?

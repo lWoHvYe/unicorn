@@ -31,8 +31,8 @@ jobs:
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.4.2
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+#        env:
+#          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+#          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
         with:
           arguments: bootBuildImage

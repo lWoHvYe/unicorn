@@ -14,23 +14,21 @@
  *    limitations under the License.
  */
 
-package com.unicorn
+package com.unicorn.learning
 
-class KotlinLearning {
 
-    fun <T> singletonList(item: T): List<T> {
-        // ...
-        return listOf(item)
-    }
+fun <T> singletonList(item: T): List<T> {
+    // ...
+    return listOf(item)
+}
 
-    fun <T> T.basicToString(): String { // extension function，这个有点像Go的interface
-        // ...
-        return "String: ".plus(toString())
-    }
+fun <T> T.basicToString(): String { // extension function，这个有点像Go的interface
+    // ...
+    return "String: ".plus(toString())
+}
 
-    fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
-            where T : CharSequence,
-                  T : Comparable<T> {
-        return list.filter { it > threshold }.map { it.toString() }
-    }
+fun <T> copyWhenGreater(list: List<T>, threshold: T): List<String>
+        where T : CharSequence,
+              T : Comparable<T> {
+    return list.filter { it > threshold }.map { it.toString() }
 }

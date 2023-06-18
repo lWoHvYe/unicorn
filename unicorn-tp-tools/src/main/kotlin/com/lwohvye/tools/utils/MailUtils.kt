@@ -19,8 +19,7 @@ import cn.hutool.core.util.ObjectUtil
 import com.lwohvye.core.exception.BadRequestException
 import com.lwohvye.core.utils.StringUtils
 import com.lwohvye.tools.domain.vo.MailVo
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
@@ -30,7 +29,7 @@ import java.util.*
 @Component
 class MailUtils(val mailSender: JavaMailSender) {
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(MailUtils::class.java)
+        private val log = LogManager.getLogger()
     }
 
     @Value("\${spring.mail.username}")

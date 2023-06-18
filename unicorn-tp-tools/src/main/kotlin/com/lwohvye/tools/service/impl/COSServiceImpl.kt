@@ -19,8 +19,7 @@ import com.lwohvye.core.utils.FileUtils
 import com.lwohvye.tools.config.AwsCOSProperties
 import com.lwohvye.tools.service.ICOSService
 import com.lwohvye.tools.utils.COSUtils
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.transfer.s3.S3ClientConfiguration
@@ -32,7 +31,7 @@ import software.amazon.awssdk.transfer.s3.S3ClientConfiguration
 class COSServiceImpl(val s3ClientConfiguration: S3ClientConfiguration, val cosProperties: AwsCOSProperties) :
     ICOSService {
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(ICOSService::class.java)
+        private val log = LogManager.getLogger()
     }
 
     override fun upload(file: MultipartFile, cosPath: String?) {

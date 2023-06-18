@@ -32,7 +32,7 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.slf4j.LoggerFactory
+import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.IOException
@@ -212,6 +212,6 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger(GeneratorServiceImpl::class.java)
+        private val log = LogManager.getLogger()
     }
 }

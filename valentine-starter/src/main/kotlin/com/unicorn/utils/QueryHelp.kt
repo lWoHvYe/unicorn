@@ -4,9 +4,7 @@ import com.lwohvye.core.utils.ExceptionMsgUtils
 import com.lwohvye.core.utils.StringUtils
 import com.unicorn.annotation.Query
 import jakarta.persistence.criteria.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
+import org.apache.logging.log4j.LogManager
 import java.util.*
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
@@ -15,7 +13,7 @@ import kotlin.reflect.jvm.javaField
 
 object QueryHelp {
 
-    private val logger: Logger = LoggerFactory.getLogger(QueryHelp::class.java)
+    private val log = LogManager.getLogger()
 
     /**
      * 解析属性上的查询注解。贫瘠相应的查询
@@ -33,6 +31,7 @@ object QueryHelp {
     fun getPredicate(root: Root<*>, query: Any?, cb: CriteriaBuilder): Predicate {
         val list = ArrayList<Predicate>()
         if (query == null) {
+            log.info("query is null! skipped")
             return cb.and(*list.toTypedArray<Predicate>())
         }
         // 根据Field及上面的Annotation，拼接Query & Join

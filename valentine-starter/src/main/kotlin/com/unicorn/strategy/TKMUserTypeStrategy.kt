@@ -22,7 +22,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.apache.logging.log4j.LogManager.getLogger
 import org.jetbrains.annotations.BlockingExecutor
-import org.slf4j.LoggerFactory
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.concurrent.Executors
@@ -36,7 +35,7 @@ import kotlin.time.measureTime
 class TKMUserTypeStrategy : ExtraUserTypeStrategy {
 
     companion object {
-        private val log = LoggerFactory.getLogger(TKMUserTypeStrategy::class.java)
+        private val log = getLogger()
     }
 
     override fun grantedAuth(userId: Long): List<GrantedAuthority> {
@@ -60,7 +59,7 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     private fun basicsCoroutinesCall() {
         // 注意执行的顺序, runBlocking method blocks the current thread for waiting
         runBlocking { // this: CoroutineScope
-            launch { // launch a new coroutine and continue
+            launch(DispatcherType.VIRTUAL.dispatcher + CoroutineName("basicsCoroutine")) { // launch a new coroutine and continue
                 delay(1000L) // non-blocking delay for 1 second (default time unit is ms)
                 log.info("World!-1-1") // print after delay
             }
@@ -164,10 +163,10 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     private fun shareWithChannel() = runBlocking {
 
         val bufferedChannel = Channel<Int>(4)
-        val todo = 20
+        val todo = 10
 
         for (i in 0 until todo) { // .. 含头尾， until 含头不含尾
-            launch {
+            launch(CoroutineName("Producer-Coroutine")) {
                 bufferedChannel.send(i)
                 log.info("send element $i")
             }
@@ -175,7 +174,7 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
 
         delay(2000L)
 
-        launch {
+        launch(CoroutineName("Consumer-Coroutine")) {
             repeat(todo) {
                 log.info("$it receive ${bufferedChannel.receive()}")
             }
@@ -183,13 +182,17 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     }
 
     suspend fun doHelloWorld() = coroutineScope {  // this: CoroutineScope
-        launch {
+        launch(CoroutineName("doHWCoroutine")) {
             delay(2000L)
             log.info("World!-2-2")
         }
         launch {
-            delay(1000L)
-            log.info("World!-2-1")
+            log.info("before switch to another Context-2-1-0")
+            // using the withContext function to change the context of a coroutine while still staying in the same coroutine,
+            withContext(Dispatchers.IO) {
+                delay(1000L)
+                log.info("after switch Context-2-1-1")
+            }
         }
         log.info("Hello-2-0")
     }
@@ -211,8 +214,6 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     // use Loom. This will need some time to warm up, overhead. 7s for 1_000_000, Debug Mode 17s for 100_000，比coroutines慢了太多了，normal run差距很小
     @OptIn(ExperimentalTime::class)
     fun loomCarrier() = runBlocking {
-
-        val log = getLogger()
 
         measureTime {
             supervisorScope {
@@ -236,7 +237,7 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     // fun coroutinesDirect() = runBlocking { ... }：这是一个 Kotlin 函数，名为 coroutinesDirect。它使用了协程框架，并在 runBlocking 块中执行了一些并发任务。
     fun coroutinesDirect() = runBlocking {
         // val log = getLogger()：这行代码声明了一个变量 log，它是一个日志记录器。这里使用了某个日志库的函数 getLogger()，获取一个日志记录器实例。
-        val log = getLogger()
+        // val log = getLogger()
         // measureTime { ... }.also(log::info)：这是一个计时操作，用来度量代码块的执行时间。它的返回值是执行时间，类型为 kotlin.time.Duration。.also(log::info) 表示执行计时操作的同时，将计时结果输出到日志中。
         measureTime {
             // supervisorScope { ... }：这是一个协程作用域，用于启动一组并发任务，并监控这些任务的执行情况。其中 repeat(100_000) 表示要执行 100,000 次下面的代码块。
