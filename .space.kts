@@ -9,7 +9,7 @@ job("BuildImg") {
 
         kotlinScript { api ->
             // here can be your complex logic
-            api.gradlew("build --exclude-task test")
+            api.gradlew("build", "--exclude-task test")
         }
     }
 
@@ -17,7 +17,7 @@ job("BuildImg") {
 
         kotlinScript { api ->
             // here can be your complex logic
-            api.gradlew("build --exclude-task test")
+            api.gradlew("build", "--exclude-task test")
         }
     }
 }
