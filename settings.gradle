@@ -33,7 +33,7 @@ dependencyResolutionManagement {
             version('hutool', '5.8.15')
             version('ip2region', '3.0.4')
             version('jjwt', '0.11.5')
-            version('kotlin', '1.9.0-Beta')
+            version('kotlin', "$kotlinVersion")
             version('kotlinxCoroutines', '1.7.0')
             version('log4jdbc', '1.18')
             version('logback', '1.4.6')
@@ -103,10 +103,8 @@ def buildFiles = fileTree(rootDir) {
     def excludes = gradle.startParameter.projectProperties.get("excludeProjects")?.split(",")
     include "**/*.gradle", "**/*.gradle.kts"
     exclude "build", "**/gradle", "settings.gradle", "buildSrc", "/build.gradle", ".*", "out"
-    // 可以这样exclude指定的module，在gradle.properties中定义的property拿不到
-    /*def kotlinVersion = gradle.properties.getOrDefault("kotlinVersion", "1.9.0").toString()
-    if (kotlinVersion.matches("^1\\.8\\.2[0-9]+\$")) // current version is not support Java 20
-        exclude "valentine-starter"*/
+    if ("$kotlinVersion".matches("^1\\.8\\.2[0-9]+\$")) // current version is not support Java 20
+        exclude "**/*-kotlin.gradle"
     if (excludes) {
         exclude excludes
     }
