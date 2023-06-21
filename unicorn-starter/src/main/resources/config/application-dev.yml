@@ -144,3 +144,9 @@ aws:
     secretAccessKey: accessSecret
     bucketName: S3BucketName
     region: S3Region
+web:
+  cors-config:
+    white-list:
+      - https://*.lwohvye.com
+      - https://xxx.com
+      - http://localhost:[*]

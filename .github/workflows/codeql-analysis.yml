@@ -112,15 +112,6 @@ jobs:
         with:
           arguments: publishToMavenLocal
 
-#      - name: Build OAuth2.0 Module
-#        uses: gradle/gradle-build-action@v2
-#        with:
-#          arguments: build
-#          build-root-directory: unicorn-oauth2
-
-#      - name: Build Unicorn-Starter
-#        run: mvn -B package --file unicorn-starter/pom.xml -P jigsaw
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
