@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="UnicornAppRun" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <module name="valentine-p2p.valentine-starter.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.unicorn.UnicornAppRun" />
+    <option name="VM_PARAMETERS" value="-XX:+UseZGC -Dkotlinx.coroutines.debug" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

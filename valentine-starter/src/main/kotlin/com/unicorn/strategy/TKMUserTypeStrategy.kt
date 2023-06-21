@@ -177,6 +177,7 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
         launch(CoroutineName("Consumer-Coroutine")) {
             repeat(todo) {
                 log.info("$it receive ${bufferedChannel.receive()}")
+                yield()
             }
         }
     }
