@@ -21,6 +21,8 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuil
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
 import org.apache.hc.core5.ssl.SSLContexts
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.ssl.SslBundles
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -49,6 +51,21 @@ class RestTemplateConfig {
     }
 
     @Bean
+    fun restSSLTemplate(
+        builder: RestTemplateBuilder,
+        sslBundles: SslBundles,
+        @Value("\${web.ssl.bundle-name}") bundleName: String
+    ): RestTemplate =
+        builder
+            .errorHandler(SimRestErrorHandler())
+            .setSslBundle(sslBundles.getBundle(bundleName))
+            .build()
+
+    // If you have Spring WebFlux on your classpath, you can also choose to use WebClient to call remote REST services
+//    private val webClient: WebClient? = null
+//    this.webClient = webClientBuilder.baseUrl("https://example.org").apply(ssl.fromBundle("mybundle")).build();
+
+    @Bean
     @Throws(NoSuchAlgorithmException::class, KeyStoreException::class, KeyManagementException::class)
     fun clientHttpRequestFactory(): HttpComponentsClientHttpRequestFactory {
         // Trust standard CA and those trusted by our custom strategy
@@ -66,7 +83,8 @@ class RestTemplateConfig {
         val requestFactory = HttpComponentsClientHttpRequestFactory()
         requestFactory.httpClient = httpClient
         return requestFactory
-    } /*
+    }
+    /*
     @Bean//配置负载均衡算法
     public IRule myRule() {
         //return new RoundRobinRule();
