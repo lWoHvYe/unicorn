@@ -82,7 +82,7 @@ nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.2.0.jar >nohup.o
 ```groovy
 
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.0.0-iota'
+    unicornVersion = '4.0.1-lambda'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"

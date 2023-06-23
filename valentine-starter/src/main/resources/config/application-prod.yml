@@ -97,25 +97,23 @@ spring:
       #  JKS（Java KeyStore）和 PEM（Privacy Enhanced Mail）是不同的密钥和证书格式。
       jks:
         my-jks-bundle:
-          key:
-            alias: "application"
           keystore:
-            location: "classpath:application.p12"
+            location: "classpath:crt/certificate.p12"
             password: "secret"
             type: "PKCS12"
           # When used to secure a client-side connection, a truststore is typically configured with a Java KeyStore containing the server certificate
           truststore:
-            location: "classpath:server.p12"
+            location: "classpath:crt/truststore.jks"
             password: "secret"
       # Configuring SSL With PEM-encoded Certificates
       pem:
         my-pem-bundle:
           keystore:
-            certificate: "classpath:application.crt"
-            private-key: "classpath:application.key"
+            certificate: "classpath:crt/certificate.crt"
+            private-key: "classpath:crt/private.key"
           # When used to secure an embedded web server, a truststore is typically configured with the server certificate
           truststore:
-            certificate: "classpath:server.crt"
+            certificate: "classpath:crt/certificate.crt"
 
 
 #jwt
