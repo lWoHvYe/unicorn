@@ -2,9 +2,9 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:10.211.55.145}:${DB_PORT:4000}/${DB_NAME:unicorn}
-    username: ${DB_USER:root}
-    password: ${DB_PWD:n0^9_MJUR1q+23VZ@7}
+    url: jdbc:mysql://${DB_HOST:10.211.55.145}:${DB_PORT:}/${DB_NAME:}
+    username: ${DB_USER:}
+    password: ${DB_PWD:}
 
     hikari:
       ############################################################
@@ -87,6 +87,35 @@ spring:
       max-file-size: 20MB #限制单个文件大小
       max-request-size: 50MB #限制请求总量
 
+  # ssl bundle: https://docs.spring.io/spring-boot/docs/3.1.0/reference/html/features.html#features.ssl
+  ssl:
+    bundle:
+      # Configuring SSL With Java KeyStore Files
+      # Keystore 和 Truststore 是在 Java 中使用的术语，用于表示存储密钥和证书的容器。
+      #  Keystore 用于存储自己的私钥和证书，而 Truststore 用于存储受信任的证书。
+      #  在 SSL/TLS 通信中，服务器需要配置其 Keystore 来包含私钥和证书，而客户端需要配置其 Truststore 来包含受信任的证书。
+      #  JKS（Java KeyStore）和 PEM（Privacy Enhanced Mail）是不同的密钥和证书格式。
+      jks:
+        my-jks-bundle:
+          keystore:
+            location: "classpath:crt/certificate.p12"
+            password: "secret"
+            type: "PKCS12"
+          # When used to secure a client-side connection, a truststore is typically configured with a Java KeyStore containing the server certificate
+          truststore:
+            location: "classpath:crt/truststore.jks"
+            password: "secret"
+      # Configuring SSL With PEM-encoded Certificates
+      pem:
+        my-pem-bundle:
+          keystore:
+            certificate: "classpath:crt/certificate.crt"
+            private-key: "classpath:crt/private.key"
+          # When used to secure an embedded web server, a truststore is typically configured with the server certificate
+          truststore:
+            certificate: "classpath:crt/certificate.crt"
+
+
 #jwt
 jwt:
   #  header: Authorization
@@ -164,3 +193,5 @@ web:
       - https://*.lwohvye.com
       - https://xxx.com
       - http://localhost:[*]
+  ssl:
+    bundle-name: my-jks-bundle
