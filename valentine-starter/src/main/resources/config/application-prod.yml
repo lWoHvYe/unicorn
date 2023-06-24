@@ -2,9 +2,9 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:10.211.55.145}:${DB_PORT:4000}/${DB_NAME:unicorn}
-    username: ${DB_USER:root}
-    password: ${DB_PWD:n0^9_MJUR1q+23VZ@7}
+    url: jdbc:mysql://${DB_HOST:10.211.55.145}:${DB_PORT:}/${DB_NAME:}
+    username: ${DB_USER:}
+    password: ${DB_PWD:}
 
     hikari:
       ############################################################

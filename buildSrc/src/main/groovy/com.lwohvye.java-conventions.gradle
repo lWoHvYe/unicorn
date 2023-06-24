@@ -44,4 +44,5 @@ signing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.compilerArgs += '--enable-preview'
+    options.compilerArgs += '-parameters'
 }
