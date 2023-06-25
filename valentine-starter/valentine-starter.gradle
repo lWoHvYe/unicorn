@@ -8,10 +8,6 @@ plugins {
     id 'org.graalvm.buildtools.native'
 }
 
-ext {
-    kotlinEnable = true
-}
-
 dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
@@ -57,19 +53,21 @@ tasks.named("bootBuildImage") {
     ]
 }
 
-tasks.named("processAot") {
-    jvmArgs += "--enable-preview"
-    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
-}
+if (graalvmEnable) {
+    tasks.named("processAot") {
+        jvmArgs += "--enable-preview"
+        jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
+    }
 
-tasks.named("nativeCompile") {
-    def options = nativeCompile.options.get().asCompileOptions()
-    options.buildArgs
-            .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
-                    ",ch.qos.logback.core.status.StatusBase" +
-                    ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
-                    ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
-    options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
+    tasks.named("nativeCompile") {
+        def options = nativeCompile.options.get().asCompileOptions()
+        options.buildArgs
+                .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
+                        ",ch.qos.logback.core.status.StatusBase" +
+                        ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
+                        ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
+        options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
+    }
 }
 
 if (kotlinEnable) {

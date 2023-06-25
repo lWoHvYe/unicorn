@@ -26,6 +26,11 @@ plugins {
     id 'org.graalvm.buildtools.native' version '0.9.23' apply false
 }
 
+ext {
+    kotlinEnable = true
+    graalvmEnable = true
+}
+
 ext.sharedManifest = manifest {
     attributes(
             'Developer': 'lWoHvYe',
