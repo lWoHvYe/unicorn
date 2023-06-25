@@ -50,7 +50,8 @@ tasks.named("bootRun") {
 
 tasks.named("bootBuildImage") {
     environment = [
-            "BP_JVM_VERSION"              : "20.0.1",
+            "BP_JVM_TYPE"                 : "JDK",
+            "BP_JVM_VERSION"              : "20",
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]
