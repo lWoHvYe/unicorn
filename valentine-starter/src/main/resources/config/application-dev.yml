@@ -44,9 +44,9 @@ spring:
           clientName: null
           address: redis://10.211.55.145:6379
           subscriptionConnectionMinimumIdleSize: 2
-          subscriptionConnectionPoolSize: 16
-          connectionMinimumIdleSize: 8
-          connectionPoolSize: 16
+          subscriptionConnectionPoolSize: 8
+          connectionMinimumIdleSize: 4
+          connectionPoolSize: 8
           database: 6
           dnsMonitoringInterval: 5000
         codec: !<org.redisson.codec.JsonJacksonCodec> { }

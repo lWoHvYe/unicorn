@@ -80,7 +80,6 @@ dependencies {
     api libs.easy.captcha
     captchaImplementation libs.captcha
     api libs.oshi.core
-    api libs.logback.access
     // It seems that xxxImplementation will work on runtimeClasspath for the customers while xxxApi compileClasspath
     businessLogApi libs.bizlog
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

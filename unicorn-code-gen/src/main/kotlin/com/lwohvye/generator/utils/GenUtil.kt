@@ -25,7 +25,6 @@ import com.lwohvye.core.utils.FileUtils
 import com.lwohvye.core.utils.StringUtils
 import com.lwohvye.generator.domain.ColumnInfo
 import com.lwohvye.generator.domain.GenConfig
-import lombok.extern.slf4j.Slf4j
 import org.springframework.util.ObjectUtils
 import java.io.File
 import java.io.FileWriter
