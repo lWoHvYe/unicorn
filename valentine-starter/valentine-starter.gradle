@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.jpa)
     alias(libs.plugins.kotlin.lombok)
     // Apply GraalVM Native Image plugin
-//    id 'org.graalvm.buildtools.native' version '0.9.21'
+    id 'org.graalvm.buildtools.native' version '0.9.23'
 }
 
 ext {
@@ -54,6 +54,15 @@ tasks.named("bootBuildImage") {
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]
+}
+
+tasks.named("nativeCompile") {
+    nativeCompile.options.get()
+            .asCompileOptions().buildArgs
+            .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
+                    ",ch.qos.logback.core.status.StatusBase" +
+                    ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
+                    ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
 }
 
 if (kotlinEnable) {

@@ -8,7 +8,7 @@
     </envs>
     <module name="valentine-p2p.valentine-starter.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.unicorn.UnicornAppRun" />
-    <option name="VM_PARAMETERS" value="-XX:+UseZGC -Dkotlinx.coroutines.debug" />
+    <option name="VM_PARAMETERS" value="-XX:+UseZGC -Dkotlinx.coroutines.debug -XX:+UnlockExperimentalVMOptions -XX:+UseJVMCICompiler" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
