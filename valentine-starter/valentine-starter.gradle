@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.jpa)
     alias(libs.plugins.kotlin.lombok)
     // Apply GraalVM Native Image plugin
-    id 'org.graalvm.buildtools.native' version '0.9.23'
+    id 'org.graalvm.buildtools.native'
 }
 
 ext {
@@ -54,6 +54,11 @@ tasks.named("bootBuildImage") {
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]
+}
+
+tasks.named("processAot") {
+    jvmArgs += "--enable-preview"
+    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("nativeCompile") {
