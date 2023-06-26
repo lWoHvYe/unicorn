@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.jpa)
     alias(libs.plugins.kotlin.lombok)
     // Apply GraalVM Native Image plugin
-    id 'org.graalvm.buildtools.native'
+//    id 'org.graalvm.buildtools.native'
 }
 
 dependencies {

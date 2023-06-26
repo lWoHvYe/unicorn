@@ -28,7 +28,7 @@ plugins {
 
 ext {
     kotlinEnable = true
-    graalvmEnable = true
+    graalvmEnable = false
 }
 
 ext.sharedManifest = manifest {
