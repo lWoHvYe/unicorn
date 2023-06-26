@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lwohvye.core.config.FileProperties;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -47,7 +47,6 @@ import java.util.List;
  * @date 2018-11-30
  */
 @Configuration
-@AllArgsConstructor
 // 在WebMvcAutoConfiguration类上标了一个如下注解：
 // @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 // 以上这行代码的意思就是当前IOC容器中没有WebMvcConfigurationSupport这个类的实例时自动配置类才会生效，这也就是在配置类上标注@EnableWebMvc会导致自动配置类WebMvcAutoConfiguration失效的原因。
@@ -58,8 +57,9 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     /**
      * 文件配置
      */
-    private final FileProperties fileProperties;
-    private final CorsProperties corsProperties;
+    @Autowired
+    private FileProperties fileProperties;
+
 
     // 处理全局跨域
 
@@ -75,7 +75,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
      * CorsRegistration	exposedHeaders	            否	Access-Control-Expose-Headers	    配置响应的头信息,在其中可以设置其他的头信息
      */
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsFilter corsFilter(CorsProperties corsProperties) {
         var source = new UrlBasedCorsConfigurationSource();
         var config = new CorsConfiguration();
         config.setAllowCredentials(true);

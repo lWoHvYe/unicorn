@@ -17,11 +17,10 @@ package com.lwohvye.sys.modules.security.security.filter;
 
 import com.lwohvye.core.annotation.AnonymousAccess;
 import com.lwohvye.core.constant.SecurityConstant;
+import com.lwohvye.core.utils.SpringContextHolder;
+import com.lwohvye.core.utils.enums.RequestMethodEnum;
 import com.lwohvye.sys.modules.security.config.SpringSecurityConfig;
 import com.lwohvye.sys.modules.system.service.IResourceService;
-import com.lwohvye.core.utils.enums.RequestMethodEnum;
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.server.PathContainer;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -39,8 +38,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
 
-import jakarta.annotation.PostConstruct;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,15 +51,18 @@ import java.util.stream.Stream;
  * @date 2021/11/27 2:45 下午
  * @since 6.0 改由AuthorizationManager 调用，不再基于Filter
  */
-@RequiredArgsConstructor
 public final class CustomInvocationSecurityMetadataSource implements SecurityMetadataSource {
 
     PathMatcher antPathMatcher = new AntPathMatcher();  //用来实现ant风格的Url匹配
 
-    private final ApplicationContext applicationContext;
     private final IResourceService resourceService;
 
     private Map<String, List<PathPattern>> anonymousPaths;
+
+    public CustomInvocationSecurityMetadataSource(IResourceService resourceService) {
+        this.resourceService = resourceService;
+        SpringContextHolder.addCallBacks(this::initAnonymousPaths);
+    }
 
 
     /**
@@ -101,9 +101,8 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
         return attributes;
     }
 
-    @PostConstruct
     public void initAnonymousPaths() {
-        RequestMappingHandlerMapping requestMappingHandlerMapping = (RequestMappingHandlerMapping) applicationContext.getBean("requestMappingHandlerMapping");
+        RequestMappingHandlerMapping requestMappingHandlerMapping = SpringContextHolder.getBean("requestMappingHandlerMapping");
         Map<RequestMappingInfo, HandlerMethod> handlerMethodMap = requestMappingHandlerMapping.getHandlerMethods();
         // 不能用instanceof，只能用isInstance()和cast()了
         var pathPatternsClass = PathPatternsRequestCondition.class;

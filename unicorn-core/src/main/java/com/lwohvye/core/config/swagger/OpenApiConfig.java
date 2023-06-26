@@ -27,12 +27,12 @@ import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RedissonClient;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringBootVersion;
@@ -65,10 +65,10 @@ import java.util.List;
 // @io.swagger.v3.oas.annotations.security.SecurityScheme(type = SecuritySchemeType.HTTP, name = "Authorization", scheme = "Bearer", in = SecuritySchemeIn.HEADER)
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 public class OpenApiConfig {
 
-    private final SwaggerProperties swaggerProperties;
+    @Autowired
+    private SwaggerProperties swaggerProperties;
 
     @Value("${jwt.header:Authorization}")
     private String tokenHeader;
