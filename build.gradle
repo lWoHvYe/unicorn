@@ -148,7 +148,7 @@ publishing {
                     connection = 'scm:git:git://github.com/WHY-lWoHvYe/valentine-p2p.git'
                     developerConnection = 'scm:git:ssh://github.com/WHY-lWoHvYe/valentine-p2p.git'
                     url = 'https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main'
-                    tag = "unicorn-v${version}-SNAPSHOT"
+                    tag = "unicorn-v${version}"
                 }
             }
         }
