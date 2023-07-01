@@ -19,6 +19,7 @@ object QueryHelp {
      * 解析属性上的查询注解。贫瘠相应的查询
      * 当前已经支持了简单多条件的连表查询，但无法支持复杂的 And, Or 组合查询，这种要么使用QueryDSL要么干脆使用Native SQL。
      * 虽说通过整合Annotation和Reflect 也是可以支持复杂查询的，但既然已经有QueryDSL（虽然用的不多且好久没更新了），个人认为没必要重复造轮子，尤其是JPA跟其还是兼容的
+     * 但现实情况不太乐观
      *
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象
@@ -209,7 +210,7 @@ object QueryHelp {
 
             Query.Type.IN_INNER_LIKE -> {
                 if (value is List<*>) {
-//                                构建数组
+                    // 构建数组
                     val predicates = arrayOfNulls<Predicate>(value.size)
                     for (i in value.indices) {
                         val obj: Any = value[i]!!
@@ -219,7 +220,7 @@ object QueryHelp {
                             ), "%$obj%"
                         )
                     }
-                    //                                设置or查询
+                    // 设置or查询
                     list.add(cb.or(*predicates))
                 }
             }
@@ -256,17 +257,17 @@ object QueryHelp {
             Query.Type.IS_NULL -> list.add(cb.isNull(getExpression(attributeName, join, root)))
             Query.Type.IN_OR_ISNULL -> {
                 if (value is Collection<*> && value.isNotEmpty()) {
-                    list.add( //                                        在集合中
+                    list.add( // 在集合中
                         cb.or(
                             getExpression(
                                 attributeName,
                                 join,
                                 root
-                            ).`in`(value) //                                                或值为null
+                            ).`in`(value) // 或值为null
                             ,
                             cb.isNull(
                                 getExpression(attributeName, join, root)
-                            ) //                                                或值为空字符串
+                            ) // 或值为空字符串
                             ,
                             cb.equal(
                                 getExpression(attributeName, join, root).`as`(
@@ -288,31 +289,31 @@ object QueryHelp {
 
             Query.Type.EQUAL_IN_MULTI -> {
                 val predicates = arrayOfNulls<Predicate>(4)
-                //                            like val
+                // like val
                 predicates[0] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
                     ), value.toString()
                 )
-                //                            like val,%
+                // like val,%
                 predicates[1] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
                     ), "$value,%"
                 )
-                //                            like %,val,%
+                // like %,val,%
                 predicates[2] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
                     ), "%,$value,%"
                 )
-                //                            like %,val
+                // like %,val
                 predicates[3] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
                     ), "%,$value"
                 )
-                //                            设置查询
+                // 设置查询
                 list.add(cb.or(*predicates))
             }
 
@@ -366,13 +367,10 @@ object QueryHelp {
 
     /**
      * 构建一个Comparable Type 的 fieldType，跟fieldType一样或者为null（这里返回null是因为如果不是Comparable，那些比较类的Query是无法invoke的）
-     * 这个参数只是为了解决几个警告，因为fieldType不一定extends Comparable，所以加了这个，来限定需要能够比较才行。
-     * 因为cb.lessThan,greaterThan,between的返回值 <Y extends Comparable></Y>>， 入参 （Expression var1, Y var2, Y var3），含义:类型 Y 必须实现 Comparable 接口，并且这个接口的类型是 Y 或 Y 的任一父类
      * https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
      *
-     * @param value /
      * @return java.lang.Class
-     * @date 2022/9/17 5:21 PM
+     * @date 2023/06/22 5:21 PM
      */
     // Extension Functions
     private fun Any.castComparableFieldType(): Class<out Comparable<Any>>? = if (this is Comparable<*>)
@@ -380,6 +378,7 @@ object QueryHelp {
         this::class.java as Class<out Comparable<Any?>?> else null
 
 
+    // Extension Functions
     private fun Any.castToComparable(
         attributeName: String,
         tClass: Class<out Comparable<Any>>?
