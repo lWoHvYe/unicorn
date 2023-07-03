@@ -83,7 +83,6 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-amqp'
     api 'org.springframework.boot:spring-boot-starter-cache'
     api 'org.springframework.boot:spring-boot-starter-data-redis'
-    api 'org.springframework.boot:spring-boot-configuration-processor'
     api libs.redisson
     api 'org.apache.commons:commons-pool2'
     api 'org.apache.commons:commons-lang3'

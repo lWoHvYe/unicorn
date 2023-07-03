@@ -25,7 +25,7 @@ dependencyResolutionManagement {
             // 启用versionCatalogs
             version('asm', '9.5') // 这里单双引号都可以
             version('authorizationServer', '1.1.0')
-            version('bizlog', '3.0.4')
+            version('bizlog', '3.0.6')
             version('captcha', '2.0.0')
             version('commonsBeanutils', '1.9.4')
             version('commonsConfiguration', '2.9.0')
@@ -45,7 +45,7 @@ dependencyResolutionManagement {
             version('redisson', '3.22.0')
             version('springBoot', "$springBootVersion")
             version('springdoc', '2.1.0')
-            version('thumbnailator', '0.4.19')
+            version('thumbnailator', '0.4.20')
             version('xerces', '2.12.2')
             version('yauaa', '7.20.0')
 

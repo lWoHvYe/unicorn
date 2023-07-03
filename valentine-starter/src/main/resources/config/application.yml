@@ -2,6 +2,8 @@ server:
   port: 8081
   http2:
     enabled: true
+  compression:
+    enabled: true
   # enable ssl web server use bundle: https://docs.spring.io/spring-boot/docs/3.1.0/reference/html/howto.html#howto.webserver.configure-ssl
   ssl:
     bundle: "my-pem-bundle"
