@@ -27,15 +27,17 @@ import com.lwohvye.sys.modules.security.security.CustomAuthorizationManager;
 import com.lwohvye.sys.modules.security.security.JwtAuthTokenConfigurer;
 import com.lwohvye.sys.modules.security.security.TokenProvider;
 import com.lwohvye.sys.modules.security.security.filter.CustomInvocationSecurityMetadataSource;
-import com.lwohvye.sys.modules.security.security.handler.*;
+import com.lwohvye.sys.modules.security.security.handler.CustomLogoutHandler;
+import com.lwohvye.sys.modules.security.security.handler.CustomLogoutSuccessHandler;
+import com.lwohvye.sys.modules.security.security.handler.JwtAccessDeniedHandler;
+import com.lwohvye.sys.modules.security.security.handler.JwtAuthenticationEntryPoint;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IResourceService;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.SecurityMetadataSource;
@@ -72,7 +74,6 @@ import java.util.Objects;
 // 在5.4开始引入新的配置方式 https://spring.io/blog/2022/02/21/spring-security-without-the-websecurityconfigureradapter
 // Spring Security lambda DSL
 @EnableWebSecurity
-@RequiredArgsConstructor
 // 使用 @EnableGlobalMethodSecurity 注解来启用全局方法安全注解功能。该注解提供了三种不同的机制来实现同一种功能，3.0开始使用@EnbaleMethodSecurity替换
 // 包括prePostEnabled 、securedEnabled 和 jsr250Enabled 三种方式
 // 设置 prePostEnabled 为 true ，则开启了基于表达式的方法安全控制。通过表达式运算结果的布尔值来决定是否可以访问（true 开放， false 拒绝 ）
@@ -84,15 +85,12 @@ import java.util.Objects;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SpringSecurityConfig {
 
-    private final SecurityProperties properties;
-    private final TokenProvider tokenProvider;
-    private final CorsFilter corsFilter;
-    private final JwtAuthenticationEntryPoint authenticationErrorHandler;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final ApplicationContext applicationContext;
-    private final UserDetailsService userDetailsService;
-    private final IResourceService resourceService;
-    private final RabbitMQProducerService rabbitMQProducerService;
+    @Autowired
+    private TokenProvider tokenProvider;
+    @Autowired
+    private UserDetailsService userDetailsService;
+    @Autowired
+    private RabbitMQProducerService rabbitMQProducerService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -103,7 +101,11 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain filterChainDefault(HttpSecurity httpSecurity,
                                            AuthenticationSuccessHandler successHandler,
-                                           AuthenticationFailureHandler failureHandler) throws Exception {
+                                           AuthenticationFailureHandler failureHandler,
+                                           JwtAuthenticationEntryPoint authenticationErrorHandler,
+                                           JwtAccessDeniedHandler jwtAccessDeniedHandler,
+                                           CorsFilter corsFilter,
+                                           AuthorizationManager<RequestAuthorizationContext> customAuthorizationManager) throws Exception {
         // 这样注册自定义的UsernamePasswordAuthenticationFilter
         httpSecurity.apply(MyCustomDsl.customDsl(successHandler, failureHandler));
         httpSecurity.apply(securityConfigurerAdapter());
@@ -111,6 +113,8 @@ public class SpringSecurityConfig {
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
                 // 一般来讲，为了防御CSRF攻击主要有三种策略：验证 HTTP Referer 字段；在请求地址中添加 token 并验证；在 HTTP 头中自定义属性并验证。
+                // .csrf(csrfConfigurer -> csrfConfigurer.requireCsrfProtectionMatcher(RegexRequestMatcher.regexMatcher("")))
+                // .csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers("/**"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 // 授权异常
@@ -132,7 +136,7 @@ public class SpringSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize ->
                         // 所有请求都需要认证
-                        authorize.anyRequest().access(customAuthorizationManager()));
+                        authorize.anyRequest().access(customAuthorizationManager));
         return httpSecurity.build();
     }
 
@@ -146,8 +150,8 @@ public class SpringSecurityConfig {
      * @return CustomFilterInvocationSecurityMetadataSource
      */
     @Bean
-    public SecurityMetadataSource customInvocationSecurityMetadataSource() {
-        return new CustomInvocationSecurityMetadataSource(applicationContext, resourceService);
+    public SecurityMetadataSource customInvocationSecurityMetadataSource(IResourceService resourceService) {
+        return new CustomInvocationSecurityMetadataSource(resourceService);
     }
 
     /**
@@ -156,8 +160,8 @@ public class SpringSecurityConfig {
      * @return affirmativeBased
      */
     @Bean
-    public AuthorizationManager<RequestAuthorizationContext> customAuthorizationManager() {
-        return new CustomAuthorizationManager<>(customInvocationSecurityMetadataSource());
+    public AuthorizationManager<RequestAuthorizationContext> customAuthorizationManager(SecurityMetadataSource customInvocationSecurityMetadataSource) {
+        return new CustomAuthorizationManager<>(customInvocationSecurityMetadataSource);
     }
 
     // endregion
@@ -170,7 +174,7 @@ public class SpringSecurityConfig {
      * @return the authentication success handler
      */
     @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+    public AuthenticationSuccessHandler authenticationSuccessHandler(SecurityProperties properties) {
         return (request, response, authentication) -> {
             if (response.isCommitted()) {
                 return;

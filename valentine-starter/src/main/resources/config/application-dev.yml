@@ -1,0 +1,197 @@
+#配置数据源
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:10.211.55.145}:${DB_PORT:}/${DB_NAME:}
+    username: ${DB_USER:}
+    password: ${DB_PWD:}
+
+    hikari:
+      ############################################################
+      # This property controls the default auto-commit behavior of connections returned from the pool. It is a boolean value. Default: true
+      auto-commit: true
+      # This property controls the maximum number of milliseconds that a client (that's you) will wait for a connection from the pool.Default: 30000 (30 seconds)
+      connection-timeout: 30000
+      # This property controls the maximum amount of time that a connection is allowed to sit idle in the pool.
+      # This setting only applies when minimumIdle is defined to be less than maximumPoolSize. Default: 600000 (10 minutes)
+      idle-timeout: 600000
+      # This property controls the maximum lifetime of a connection in the pool. An in-use connection will never be retired, only when it is closed will it then be removed.
+      # it should be several seconds shorter than any database or infrastructure imposed connection time limit，Default: 1800000 (30 minutes)（show variables like '%timeout%';） -->
+      max-lifetime: 28740000
+      # we recommend not setting this value and instead allowing HikariCP to act as a fixed size connection pool. Default: same as maximumPoolSize
+      # minimum-idle: 5
+      # When the pool reaches this size, and no idle connections are available, calls to getConnection() will block for up to connectionTimeout milliseconds before timing out. Please read about pool sizing. Default: 10
+      maximum-pool-size: 10
+      pool-name: ValentineCCP
+      connection-test-query: SELECT 1
+
+  # cache配置
+  cache:
+    type: redis
+  # redis配置
+  redis:
+    #详细版的redisson配置可参考：https://github.com/redisson/redisson/tree/master/redisson-spring-boot-starter
+    redisson:
+      config: |
+        singleServerConfig:
+          idleConnectionTimeout: 10000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+          password: redis-psd
+          subscriptionsPerConnection: 5
+          clientName: null
+          address: redis://10.211.55.145:6379
+          subscriptionConnectionMinimumIdleSize: 2
+          subscriptionConnectionPoolSize: 8
+          connectionMinimumIdleSize: 4
+          connectionPoolSize: 8
+          database: 6
+          dnsMonitoringInterval: 5000
+        codec: !<org.redisson.codec.JsonJacksonCodec> { }
+        "transportMode": "NIO"
+
+  ##### RabbitMQ ####
+  rabbitmq:
+    #    RabbitMQ集群，通过addresses配置，多个以逗号分隔(优先取addresses，然后再取host)
+    addresses: 10.211.55.145:5672
+    virtual-host: /unicorn # rabbitmq的虚拟host
+    username: admin # rabbitmq的用户名
+    password: admin # rabbitmq的密码
+    ####开始消费最大重试次数，避免一直重复消费的问题
+    listener:
+      simple:
+        concurrency: 1 # Minimum number of consumers.
+        max-concurrency: 20 # Maximum number of consumers.
+        prefetch: 50
+        default-requeue-rejected: true #意思是，消息被拒后（即未消费），重新（true）放入队列
+        retry:
+          enabled: true #是否开启消费者重试（为false时关闭消费者重试，这时消费端代码异常会一直重复收到消息）
+          max-attempts: 3 #最大重试次数
+          initial-interval: 5000ms
+
+  ##### 邮箱配置（配合3rd-tools模块使用）
+  mail:
+    host: smtp.office365.com #SMTP server host
+    username: xxx@outlook.com #login user
+    password: xxx #login password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.timeout: 25000
+      mail.smtp.starttls.enable: true
+      to-dev: xxx@github.com #信息默认接收人（邮箱）
+
+  servlet:
+    multipart:
+      max-file-size: 20MB #限制单个文件大小
+      max-request-size: 50MB #限制请求总量
+
+  # ssl bundle: https://docs.spring.io/spring-boot/docs/3.1.0/reference/html/features.html#features.ssl
+  ssl:
+    bundle:
+      # Configuring SSL With Java KeyStore Files
+      # Keystore 和 Truststore 是在 Java 中使用的术语，用于表示存储密钥和证书的容器。
+      #  Keystore 用于存储自己的私钥和证书，而 Truststore 用于存储受信任的证书。
+      #  在 SSL/TLS 通信中，服务器需要配置其 Keystore 来包含私钥和证书，而客户端需要配置其 Truststore 来包含受信任的证书。
+      #  JKS（Java KeyStore）和 PEM（Privacy Enhanced Mail）是不同的密钥和证书格式。
+      jks:
+        my-jks-bundle:
+          keystore:
+            location: "classpath:crt/certificate.p12"
+            password: "secret"
+            type: "PKCS12"
+          # When used to secure a client-side connection, a truststore is typically configured with a Java KeyStore containing the server certificate
+          truststore:
+            location: "classpath:crt/truststore.jks"
+            password: "secret"
+      # Configuring SSL With PEM-encoded Certificates
+      pem:
+        my-pem-bundle:
+          keystore:
+            certificate: "classpath:crt/certificate.crt"
+            private-key: "classpath:crt/private.key"
+          # When used to secure an embedded web server, a truststore is typically configured with the server certificate
+          truststore:
+            certificate: "classpath:crt/certificate.crt"
+
+
+#jwt
+jwt:
+  #  header: Authorization
+  # 令牌前缀
+  #  token-start-with: Bearer
+  # 必须使用最少88位的Base64对该令牌进行编码
+  base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI=
+  # 令牌过期时间 此处单位/秒 ，默认2小时，可在此网站生成 https://www.convertworld.com/zh-hans/time/milliseconds.html
+#  token-validity-in-seconds: 7200
+
+# IP 本地解析
+ip:
+  local-parsing: false
+
+# ===== SpringDoc配置 ===== #
+springdoc:
+  api-docs:
+    # enabled the /v3/api-docs endpoint
+    enabled: true
+
+# ===== 自定义swagger配置 ===== #
+swagger:
+  application-name: ${spring.application.name}
+  application-version: 3.3.0
+  application-description: 1101100_1010111_1101111_1001000_1110110_1011001_1100101
+  try-host: http://localhost:${server.port}
+
+# 滑动验证码
+aj:
+  captcha:
+    cache-type: redis
+
+# 文件存储路径
+file:
+  mac:
+    path: ~/file/
+    avatar: ~/avatar/
+  linux:
+    path: /home/eladmin/file/
+    avatar: /home/eladmin/avatar/
+  windows:
+    path: C:\eladmin\file\
+    avatar: C:\eladmin\avatar\
+  # 文件大小 /M
+  maxSize: 100
+  avatarMaxSize: 5
+
+server:
+  servlet:
+    session:
+      cookie:
+        # 是否对会话 cookie 使用 "HttpOnly"cookie default true
+        http-only: true
+        # 是否总是将会话 cookie 标记为安全 default false
+        secure: true
+        # SameSite属性可以让 Cookie 在跨站请求时不会被发送，从而阻止了跨站请求伪造攻击（CSRF）并可保护用户隐私。它有三个属性值
+        # - Strict 完全禁止第三方 Cookie，跨站点时，任何情况下都不会发送 Cookie。
+        # - Lax 允许部分第三方请求携带 Cookie。
+        # - None 无论是否跨站都会发送 Cookie。
+        # Chrome的SameSite默认值是Lax，而Safari的默认值是Strict
+        same-site: LAX
+
+# cos配置（配合3rd-tools）
+aws:
+  cos:
+    accessKeyId: accessKey
+    secretAccessKey: accessSecret
+    bucketName: S3BucketName
+    region: S3Region
+
+
+web:
+  cors-config:
+    white-list:
+      - https://*.lwohvye.com
+      - https://xxx.com
+      - http://localhost:[*]
+  ssl:
+    bundle-name: my-jks-bundle

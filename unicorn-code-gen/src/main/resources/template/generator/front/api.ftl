@@ -10,7 +10,7 @@ export function add(data) {
 
 export function del(ids) {
   return request({
-    url: 'api/${changeClassName}/',
+    url: 'api/${changeClassName}',
     method: 'delete',
     data: ids
   })

@@ -17,12 +17,10 @@ module lwohvye.unicorn.security {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
     requires easy.captcha;
-    requires ganymed.ssh2;
     requires transitive io.netty.common;
     requires transitive org.apache.tomcat.embed.websocket;
     requires transitive jjwt.api;
     requires transitive jjwt.impl;
-    requires jsch;
     requires transitive org.apache.commons.io;
     requires transitive quartz;
 
@@ -33,13 +31,6 @@ module lwohvye.unicorn.security {
     exports com.lwohvye.sys.modules.infrastructure.constants;
     exports com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.beans, spring.aop;
-    exports com.lwohvye.sys.modules.mnt.domain;
-    exports com.lwohvye.sys.modules.mnt.repository to spring.beans;
-    exports com.lwohvye.sys.modules.mnt.rest to spring.beans, spring.aop, spring.web;
-    exports com.lwohvye.sys.modules.mnt.service;
-    exports com.lwohvye.sys.modules.mnt.service.dto;
-    exports com.lwohvye.sys.modules.mnt.service.mapstruct;
-    exports com.lwohvye.sys.modules.mnt.util;
     exports com.lwohvye.sys.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
     exports com.lwohvye.sys.modules.quartz.domain;
     exports com.lwohvye.sys.modules.quartz.repository; // 若要使用JRebel + XRebel，则需要exports to unnamed module
@@ -76,12 +67,6 @@ module lwohvye.unicorn.security {
     opens com.lwohvye.sys.common.web;
     opens com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.core;
     opens com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.core;
-    opens com.lwohvye.sys.modules.mnt.domain;
-    opens com.lwohvye.sys.modules.mnt.repository to spring.core;
-    opens com.lwohvye.sys.modules.mnt.rest to spring.core;
-    opens com.lwohvye.sys.modules.mnt.service.dto;
-    opens com.lwohvye.sys.modules.mnt.service.mapstruct;
-    opens com.lwohvye.sys.modules.mnt.service.impl;
     opens com.lwohvye.sys.modules.mnt.websocket to spring.core;
     opens com.lwohvye.sys.modules.quartz.config;
     opens com.lwohvye.sys.modules.quartz.domain;
@@ -105,6 +90,4 @@ module lwohvye.unicorn.security {
     opens com.lwohvye.sys.modules.system.strategy to spring.core;
     opens com.lwohvye.sys.modules.system.repository to spring.core;
 
-    // maven需要opens resources，而gradle不需要
-//    opens template.email;
 }

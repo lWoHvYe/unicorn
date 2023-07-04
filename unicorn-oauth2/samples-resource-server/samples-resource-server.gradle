@@ -1,5 +1,3 @@
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
-
 dependencies {
     implementation(project(':unicorn-core')) {
         // 括号里是Groovy的语法，定义map

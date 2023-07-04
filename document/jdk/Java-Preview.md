@@ -1,4 +1,4 @@
-#### Project Loom（Preview in Java 19）
+#### Project Loom（Preview in Java 19, Java 20, Will GA in Java 21）
 
 - [JEP 425: Virtual Threads](https://openjdk.java.net/jeps/425)
 - [JEP 436: Virtual Threads (Second Preview)](https://openjdk.org/jeps/436)
@@ -89,7 +89,7 @@
 - [JEP 424: Foreign Function & Memory API](https://openjdk.java.net/jeps/424)
 - 主体是针对 JNI 及 Unsafe (accessing foreign memory) 这两块，提供了新的实现，跟Virtual Threads相关应该也有些关系
 
-#### Structured Concurrency (Incubator)
+#### Structured Concurrency (Preview)
 
 - Simplify multithreaded programming by introducing a library for structured concurrency. Structured concurrency treats
   multiple tasks running in different
@@ -99,7 +99,7 @@
 - [JEP 437: Structured Concurrency (Second Incubator)](https://openjdk.org/jeps/437)
 - [JEP 453: Structured Concurrency (Preview)](https://openjdk.org/jeps/453)
 
-#### Scoped Values (Incubator)
+#### Scoped Values (Preview)
 
 - Introduce scoped values, which enable the sharing of immutable data within and across threads. They are preferred to
   thread-local variables, especially when using large numbers of virtual threads

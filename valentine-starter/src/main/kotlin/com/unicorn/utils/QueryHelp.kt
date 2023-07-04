@@ -4,24 +4,22 @@ import com.lwohvye.core.utils.ExceptionMsgUtils
 import com.lwohvye.core.utils.StringUtils
 import com.unicorn.annotation.Query
 import jakarta.persistence.criteria.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
+import org.apache.logging.log4j.LogManager
 import java.util.*
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 
 object QueryHelp {
 
-    private val logger: Logger = LoggerFactory.getLogger(QueryHelp::class.java)
+    private val log = LogManager.getLogger()
 
     /**
      * 解析属性上的查询注解。贫瘠相应的查询
      * 当前已经支持了简单多条件的连表查询，但无法支持复杂的 And, Or 组合查询，这种要么使用QueryDSL要么干脆使用Native SQL。
      * 虽说通过整合Annotation和Reflect 也是可以支持复杂查询的，但既然已经有QueryDSL（虽然用的不多且好久没更新了），个人认为没必要重复造轮子，尤其是JPA跟其还是兼容的
+     * 但现实情况不太乐观
      *
      * @param root  Root根对象对应于from后面的表
      * @param query Q 外部的criteria对象
@@ -30,17 +28,15 @@ object QueryHelp {
      * @return jakarta.persistence.criteria.Predicate
      * @date 2021/3/31 11:57
      */
+    @JvmStatic // If you use this annotation, the compiler will generate both a static method in the enclosing class of the object and an instance method in the object itself.
     fun getPredicate(root: Root<*>, query: Any?, cb: CriteriaBuilder): Predicate {
         val list = ArrayList<Predicate>()
         if (query == null) {
+            log.info("query is null! skipped")
             return cb.and(*list.toTypedArray<Predicate>())
         }
-        try {
-            // 根据Field及上面的Annotation，拼接Query & Join
-            analyzeFieldQuery(root, query, cb, list)
-        } catch (e: Exception) {
-            logger.error(e.message, e)
-        }
+        // 根据Field及上面的Annotation，拼接Query & Join
+        analyzeFieldQuery(root, query, cb, list)
         // 各Field的Condition通过And连接，这是比较常见的场景
         return cb.and(*list.toTypedArray<Predicate>())
     }
@@ -55,8 +51,8 @@ object QueryHelp {
             val q = kProperty1.javaField?.getAnnotation(Query::class.java) // annotation需要先转成Java才能拿到，Kotlin拿不到。。。
             if (q != null) {
                 val blurry = q.blurry
-                val `val` = kProperty1.javaField?.get(query)
-                if (Objects.isNull(`val`) || "" == `val`) {
+                val value = kProperty1.javaField?.get(query)
+                if (value == null || value == "") {
                     continue
                 }
                 // 模糊多字段
@@ -64,7 +60,7 @@ object QueryHelp {
                     val blurrys = blurry.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     val orPredicate = ArrayList<Predicate>()
                     for (s in blurrys) {
-                        orPredicate.add(cb.like(root.get<Any>(s).`as`(String::class.java), "%$`val`%"))
+                        orPredicate.add(cb.like(root.get<Any>(s).`as`(String::class.java), "%$value%"))
                     }
                     val p = arrayOfNulls<Predicate>(orPredicate.size)
                     list.add(cb.or(*orPredicate.toArray(p)))
@@ -82,22 +78,22 @@ object QueryHelp {
      *
      * @param root /
      * @param q    /
-     * @param val  /
+     * @param value  /
      * @return jakarta.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
-    private fun analyzeJoinType(root: Root<*>, q: Query?, `val`: Any?): Join<out Any, *>? {
+    private fun analyzeJoinType(root: Root<*>, q: Query?, value: Any?): Join<out Any, *>? {
         var join: Join<out Any, *>? = null
         val joinName = q?.joinName
-        if (StringUtils.isBlank(joinName)) return null
+        if (joinName == null || joinName.trim() == "") return null
         // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
         // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
         // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
-        val joinNames = joinName?.split(">".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
-        checkJoin@ for (entity in joinNames!!) {
+        val joinNames = joinName.split(">".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        checkJoin@ for (entity in joinNames) {
             // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
             // 业务中应该没有需要对同一张table多次join，甚至joinType还不同的情形。这里是不支持此类场景的
-            if (Objects.isNull(join)) {
+            if (join == null) {
                 for (rJoin in root.joins) {
                     // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
                     if (Objects.equals(rJoin.attribute.name, entity)) {
@@ -107,7 +103,7 @@ object QueryHelp {
                 }
             }
             // Switch Expressions。这个只是一个sweets 语法糖
-            val stubJoin = Objects.nonNull(join) && Objects.nonNull(`val`)
+            val stubJoin = join != null && value != null
             join = when (q.join) {
                 Query.Join.LEFT -> if (stubJoin) join!!.join(entity, JoinType.LEFT) else root.join<Any, Any>(
                     entity,
@@ -150,44 +146,33 @@ object QueryHelp {
     ) {
         val q = kProperty1.javaField?.getAnnotation(Query::class.java)
         val attributeName = defineAttrName(kProperty1, q)
-        val `val` = kProperty1.javaField?.get(query)
+        // 经过上一级方法，这里的value一定是NoNull的
+        val value = kProperty1.javaField!!.get(query)
         val fieldType = kProperty1.javaField?.type // type需要JavaType，kProperty1.javaClass是KotlinType
-        val comparableFieldType = castComparableFieldType(`val`)
-        val join = analyzeJoinType(root, q, `val`)
+        val comparableFieldType = value.castComparableFieldType()
+        val join = analyzeJoinType(root, q, value)
         when (q!!.type) {
-            Query.Type.EQUAL -> list.add(cb.equal(getExpression(attributeName, join, root).`as`(fieldType), `val`))
-            Query.Type.NOT_EQUAL -> list.add(cb.notEqual(getExpression(attributeName, join, root), `val`))
+            Query.Type.EQUAL -> list.add(cb.equal(getExpression(attributeName, join, root).`as`(fieldType), value))
+            Query.Type.NOT_EQUAL -> list.add(cb.notEqual(getExpression(attributeName, join, root), value))
             Query.Type.GREATER_THAN ->
                 list.add(
                     cb.greaterThanOrEqualTo(
                         getExpression(attributeName, join, root).`as`(comparableFieldType),
-                        Objects.requireNonNull(
-                            comparableFieldType,
-                            ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
-                        )!!
-                            .cast(`val`)
+                        value.castToComparable(attributeName, comparableFieldType)
                     )
                 )
 
             Query.Type.LESS_THAN -> list.add(
                 cb.lessThanOrEqualTo(
                     getExpression(attributeName, join, root).`as`(comparableFieldType),
-                    Objects.requireNonNull(
-                        comparableFieldType,
-                        ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
-                    )!!
-                        .cast(`val`)
+                    value.castToComparable(attributeName, comparableFieldType)
                 )
             )
 
             Query.Type.LESS_THAN_NQ -> list.add(
                 cb.lessThan(
                     getExpression(attributeName, join, root).`as`(comparableFieldType),
-                    Objects.requireNonNull(
-                        comparableFieldType,
-                        ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
-                    )!!
-                        .cast(`val`)
+                    value.castToComparable(attributeName, comparableFieldType)
                 )
             )
 
@@ -195,7 +180,7 @@ object QueryHelp {
                 cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), "%$`val`%"
+                    ), "%$value%"
                 )
             )
 
@@ -203,7 +188,7 @@ object QueryHelp {
                 cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), "%$`val`"
+                    ), "%$value"
                 )
             )
 
@@ -211,7 +196,7 @@ object QueryHelp {
                 cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), "$`val`%"
+                    ), "$value%"
                 )
             )
 
@@ -219,50 +204,50 @@ object QueryHelp {
                 cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), `val`.toString()
+                    ), value.toString()
                 )
             )
 
             Query.Type.IN_INNER_LIKE -> {
-                if (`val` is List<*>) {
-//                                构建数组
-                    val predicates = arrayOfNulls<Predicate>(`val`.size)
-                    for (i in `val`.indices) {
-                        val obj: Any = `val`[i]!!
+                if (value is List<*>) {
+                    // 构建数组
+                    val predicates = arrayOfNulls<Predicate>(value.size)
+                    for (i in value.indices) {
+                        val obj: Any = value[i]!!
                         predicates[i] = cb.like(
                             getExpression(attributeName, join, root).`as`(
                                 String::class.java
                             ), "%$obj%"
                         )
                     }
-                    //                                设置or查询
+                    // 设置or查询
                     list.add(cb.or(*predicates))
                 }
             }
 
             Query.Type.IN -> {
-                if (`val` is Collection<*> && `val`.isNotEmpty()) {
+                if (value is Collection<*> && value.isNotEmpty()) {
                     // 这里不能用fieldType.cast(val)。因为in()方法的重载，会走进in(Object... var1)中，正常要进in(Collection<?> var1)
-                    list.add(getExpression(attributeName, join, root).`in`(`val`))
+                    list.add(getExpression(attributeName, join, root).`in`(value))
                 }
             }
 
             Query.Type.NOT_IN -> {
-                if (`val` is Collection<*> && `val`.isNotEmpty()) {
-                    list.add(cb.not(getExpression(attributeName, join, root).`in`(`val`)))
+                if (value is Collection<*> && value.isNotEmpty()) {
+                    list.add(cb.not(getExpression(attributeName, join, root).`in`(value)))
                 }
             }
 
             Query.Type.BETWEEN -> {
-                if (`val` is List<*> && `val`.size == 2 && `val`[0] is Comparable<*> && `val`[1] is Comparable<*>) {
-                    val start = `val`[0] as Comparable<*>
-                    val end = `val`[1] as Comparable<*>
-                    val eleType = castComparableFieldType(start)
+                if (value is List<*> && value.size == 2 && value[0] is Comparable<*> && value[1] is Comparable<*>) {
+                    val start = value[0] as Comparable<*>
+                    val end = value[1] as Comparable<*>
+                    val eleType = start.castComparableFieldType()
                     list.add(
                         cb.between(
                             getExpression(attributeName, join, root).`as`(eleType),
-                            Objects.requireNonNull(eleType, ExceptionMsgUtils.genUnComparableExcMsg(attributeName))!!
-                                .cast(start), eleType!!.cast(end)
+                            start.castToComparable(attributeName, eleType),
+                            eleType!!.cast(end)
                         )
                     )
                 }
@@ -271,22 +256,18 @@ object QueryHelp {
             Query.Type.NOT_NULL -> list.add(cb.isNotNull(getExpression(attributeName, join, root)))
             Query.Type.IS_NULL -> list.add(cb.isNull(getExpression(attributeName, join, root)))
             Query.Type.IN_OR_ISNULL -> {
-                if (`val` is Collection<*> && `val`.isNotEmpty()) {
-                    list.add( //                                        在集合中
+                if (value is Collection<*> && value.isNotEmpty()) {
+                    list.add( // 在集合中
                         cb.or(
                             getExpression(
                                 attributeName,
                                 join,
                                 root
-                            ).`in`(`val`) //                                                或值为null
+                            ).`in`(value) // 或值为null
                             ,
                             cb.isNull(
-                                getExpression(
-                                    attributeName,
-                                    join,
-                                    root
-                                )
-                            ) //                                                或值为空字符串
+                                getExpression(attributeName, join, root)
+                            ) // 或值为空字符串
                             ,
                             cb.equal(
                                 getExpression(attributeName, join, root).`as`(
@@ -299,44 +280,40 @@ object QueryHelp {
             }
 
             Query.Type.IS_OR_NULL -> list.add(
-                if (`val` as Long == -1L) cb.isNull(
-                    getExpression(
-                        attributeName,
-                        join,
-                        root
-                    ).`as`(fieldType)
+                if (value as Long == -1L) cb.isNull(
+                    getExpression(attributeName, join, root).`as`(fieldType)
                 ) else cb.equal(
-                    getExpression(attributeName, join, root).`as`(fieldType), `val`
+                    getExpression(attributeName, join, root).`as`(fieldType), value
                 )
             )
 
             Query.Type.EQUAL_IN_MULTI -> {
                 val predicates = arrayOfNulls<Predicate>(4)
-                //                            like val
+                // like val
                 predicates[0] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), `val`.toString()
+                    ), value.toString()
                 )
-                //                            like val,%
+                // like val,%
                 predicates[1] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), "$`val`,%"
+                    ), "$value,%"
                 )
-                //                            like %,val,%
+                // like %,val,%
                 predicates[2] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), "%,$`val`,%"
+                    ), "%,$value,%"
                 )
-                //                            like %,val
+                // like %,val
                 predicates[3] = cb.like(
                     getExpression(attributeName, join, root).`as`(
                         String::class.java
-                    ), "%,$`val`"
+                    ), "%,$value"
                 )
-                //                            设置查询
+                // 设置查询
                 list.add(cb.or(*predicates))
             }
 
@@ -357,7 +334,7 @@ object QueryHelp {
                         cb.function(
                             "FIND_IN_SET",
                             Int::class.java,
-                            cb.literal(`val`.toString()),
+                            cb.literal(value.toString()),
                             getExpression(attributeName, join, root)
                         ), 0
                     )
@@ -369,39 +346,49 @@ object QueryHelp {
                         q.functionName,
                         fieldType,
                         getExpression(attributeName, join, root)
-                    ), `val`
+                    ), value
                 )
             )
 
         }
     }
 
-    private fun getExpression(attributeName: String?, join: Join<out Any, *>?, root: Root<*>): Expression<*> {
+    private fun getExpression(attributeName: String, join: Join<out Any, *>?, root: Root<*>): Expression<*> =
         // 处理的维度是field维度的，每个field初始化一个join，若join有值，证明该field是join的实体中的，所以要从join中取，即join.get()。
-        return if (Objects.nonNull(join)) {
-            join!!.get<Any>(attributeName)
-        } else {
-            // 非join的，从root中取，root.get()。
-            root.get<Any>(attributeName)
-        }
-    }
+        join?.get<Any>(attributeName) ?:
+        // 非join的，从root中取，root.get()。
+        root.get<Any>(attributeName)
 
-    private fun defineAttrName(kProperty1: KProperty1<out Any, *>, q: Query?): String? {
+
+    private fun defineAttrName(kProperty1: KProperty1<out Any, *>, q: Query?): String {
         val propName = q?.propName
-        return if (StringUtils.isNotBlank(propName)) propName else kProperty1.name
+        return if (propName != null && propName.trim() != "") propName else kProperty1.name
     }
 
     /**
      * 构建一个Comparable Type 的 fieldType，跟fieldType一样或者为null（这里返回null是因为如果不是Comparable，那些比较类的Query是无法invoke的）
-     * 这个参数只是为了解决几个警告，因为fieldType不一定extends Comparable，所以加了这个，来限定需要能够比较才行。
-     * 因为cb.lessThan,greaterThan,between的返回值 <Y extends Comparable></Y>>， 入参 （Expression var1, Y var2, Y var3），含义:类型 Y 必须实现 Comparable 接口，并且这个接口的类型是 Y 或 Y 的任一父类
      * https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
      *
-     * @param val /
      * @return java.lang.Class
-     * @date 2022/9/17 5:21 PM
+     * @date 2023/06/22 5:21 PM
      */
-    private fun castComparableFieldType(`val`: Any?): Class<out Comparable<Any>>? {
-        return if (`val` is Comparable<*>) `val`.javaClass as Class<out Comparable<Any?>?> else null
-    }
+    // Extension Functions
+    private fun Any.castComparableFieldType(): Class<out Comparable<Any>>? = if (this is Comparable<*>)
+        @Suppress("UNCHECKED_CAST")
+        this::class.java as Class<out Comparable<Any?>?> else null
+
+
+    // Extension Functions
+    private fun Any.castToComparable(
+        attributeName: String,
+        tClass: Class<out Comparable<Any>>?
+    ): Comparable<Any> =
+        Objects.requireNonNull(
+            tClass,
+            ExceptionMsgUtils.genUnComparableExcMsg(attributeName)
+        )!!.cast(this)
+
+
+    private fun String?.isBlank(): Boolean = this == null || this.trim() == ""
+
 }

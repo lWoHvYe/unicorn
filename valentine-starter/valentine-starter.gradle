@@ -3,23 +3,21 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.kotlin.lombok)
     // Apply GraalVM Native Image plugin
-//    id 'org.graalvm.buildtools.native' version '0.9.21'
-}
-
-ext {
-    kotlinEnable = true
+//    id 'org.graalvm.buildtools.native'
 }
 
 dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
-    implementation project(':unicorn-tp-tools')
+    implementation project(':unicorn-tp-tools-kotlin')
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
     if (kotlinEnable) {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         implementation libs.bundles.coroutines
         implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+        testImplementation 'org.jetbrains.kotlin:kotlin-test'
     }
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation(project(':unicorn-security')) {
@@ -33,7 +31,6 @@ dependencies {
             requireCapability('com.lwohvye:unicorn-security-business-log')
         }
     }
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
@@ -47,10 +44,29 @@ tasks.named("bootRun") {
 
 tasks.named("bootBuildImage") {
     environment = [
+            "BP_JVM_TYPE"                 : "JDK",
             "BP_JVM_VERSION"              : "21",
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]
+}
+
+if (graalvmEnable) {
+    tasks.named("processAot") {
+        jvmArgs += "--enable-preview"
+        // jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
+    }
+
+    tasks.named("nativeCompile") {
+        def options = nativeCompile.options.get().asCompileOptions()
+        options.buildArgs
+                .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
+                        ",ch.qos.logback.core.status.StatusBase" +
+                        ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
+                        ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
+        options.jvmArgs.addAll("--enable-preview")
+        // options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
+    }
 }
 
 if (kotlinEnable) {
@@ -58,7 +74,6 @@ if (kotlinEnable) {
         sourceSets.configureEach {
             languageSettings {
 //                languageVersion = "2.0" // kotlin.experimental.tryK2=true
-
                 apiVersion = "2.0"
             }
         }

@@ -2,12 +2,12 @@ server:
   port: 8081
   http2:
     enabled: true
-  undertow:
-    threads:
-      io: 6
-      worker: 48
-    buffer-size: 1024
-    direct-buffers: true
+  compression:
+    enabled: true
+  # enable ssl web server use bundle: https://docs.spring.io/spring-boot/docs/3.1.0/reference/html/howto.html#howto.webserver.configure-ssl
+  ssl:
+    bundle: "my-pem-bundle"
+
 
 spring:
   application:
@@ -15,7 +15,7 @@ spring:
   freemarker:
     check-template-location: false
   profiles:
-    active: prod
+    active: dev
   jackson:
     time-zone: GMT+8
   data:
@@ -33,7 +33,7 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
   autoconfigure:
     # to use VT, should exclude this
     exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration

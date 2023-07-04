@@ -83,7 +83,6 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-amqp'
     api 'org.springframework.boot:spring-boot-starter-cache'
     api 'org.springframework.boot:spring-boot-starter-data-redis'
-    api 'org.springframework.boot:spring-boot-configuration-processor'
     api libs.redisson
     api 'org.apache.commons:commons-pool2'
     api 'org.apache.commons:commons-lang3'
@@ -103,7 +102,6 @@ dependencies {
     api 'org.bouncycastle:bcpkix-jdk18on:1.72'
     api libs.thumbnailator
     api 'org.jetbrains:annotations:24.0.1'
-    api 'io.vavr:vavr:0.10.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'com.mysql:mysql-connector-j'
     log4jdbcRuntimeOnly libs.log4jdbc

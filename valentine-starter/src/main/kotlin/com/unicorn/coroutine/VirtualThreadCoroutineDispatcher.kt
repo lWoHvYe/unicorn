@@ -18,14 +18,22 @@ package com.unicorn.coroutine
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Runnable
+import java.util.concurrent.ThreadFactory
 import kotlin.coroutines.CoroutineContext
 
 class VirtualThreadCoroutineDispatcher(val immediate: Boolean = false) : CoroutineDispatcher() {
+
+    companion object {
+        val factory: ThreadFactory = Thread.ofVirtual().name("Virtual-Dispatcher").factory()
+    }
 
     override fun isDispatchNeeded(context: CoroutineContext): Boolean =
         !(immediate && Thread.currentThread().isVirtual)
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
-        Thread.startVirtualThread(block)
+        // 下面三种方式都可以，Creates a virtual thread to execute a task and schedules it to execute，其中第一种的Thread没有name
+//        Thread.startVirtualThread(block)
+//        Thread.ofVirtual().name("Virtual-Dispatcher").start(block)
+        factory.newThread(block).start()
     }
 }

@@ -82,7 +82,7 @@ nohup java -XX:+UseZGC -Dloader.path=lib -jar unicorn-starter-3.2.0.jar >nohup.o
 ```groovy
 
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.0.0-iota'
+    unicornVersion = '4.0.1-lambda'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
@@ -234,6 +234,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
   推测是Spring Boot的 ClassLoader下全是Auto-Module）
+- Resource管理页面，delay
 - swarm化，可以参考[why-swarm (已停工，后续计划接入OAuth2.0)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO

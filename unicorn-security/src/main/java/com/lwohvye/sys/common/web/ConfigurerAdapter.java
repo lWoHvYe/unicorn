@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lwohvye.core.config.FileProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -56,11 +57,9 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     /**
      * 文件配置
      */
-    private final FileProperties properties;
+    @Autowired
+    private FileProperties fileProperties;
 
-    public ConfigurerAdapter(FileProperties properties) {
-        this.properties = properties;
-    }
 
     // 处理全局跨域
 
@@ -76,11 +75,12 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
      * CorsRegistration	exposedHeaders	            否	Access-Control-Expose-Headers	    配置响应的头信息,在其中可以设置其他的头信息
      */
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsFilter corsFilter(CorsProperties corsProperties) {
         var source = new UrlBasedCorsConfigurationSource();
         var config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
+        corsProperties.getWhiteList().forEach(config::addAllowedOriginPattern);
+//        config.addAllowedOriginPattern("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
@@ -91,7 +91,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
     //  @Bean
     //  @ConditionalOnExpression("false")
     //  GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        // 去除 ROLE_ 前缀
+    // 去除 ROLE_ 前缀
     //      return new GrantedAuthorityDefaults("");
     //  }
 
@@ -116,7 +116,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        var path = properties.getOSPath();
+        var path = fileProperties.getOSPath();
         var avatarUtl = "file:" + path.getAvatar().replace("\\", "/");
         var pathUtl = "file:" + path.getPath().replace("\\", "/");
         registry.addResourceHandler("/avatar/**").addResourceLocations(avatarUtl).setCachePeriod(0);

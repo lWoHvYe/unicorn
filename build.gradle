@@ -1,10 +1,9 @@
 import org.gradle.api.java.archives.internal.DefaultManifest
 
+// 这种是legacy的configuration，但针对未publish到maven central的，还是要这种方式才行(dependencies部分)
 buildscript {
     repositories {
         gradlePluginPortal()
-        //Needed only for SNAPSHOT versions
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         // Should in hierarchy
         maven {
             name "extra-repo"
@@ -12,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "org.gradlex:extra-java-module-info:1.4"
+        classpath "org.gradlex:extra-java-module-info:1.4.1"
     }
 }
 
@@ -20,8 +19,16 @@ plugins {
     id 'com.lwohvye.java-conventions'
     //主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
     alias(libs.plugins.spring.boot) apply false
+    // This plugin simplifies the use of Lombok in Gradle
+    id "io.freefair.lombok" version "8.1.0" apply false
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
     id 'io.github.gradle-nexus.publish-plugin' version '1.3.0'
+    id 'org.graalvm.buildtools.native' version '0.9.23' apply false
+}
+
+ext {
+    kotlinEnable = true
+    graalvmEnable = false
 }
 
 ext.sharedManifest = manifest {
@@ -37,6 +44,11 @@ subprojects {
 
     apply plugin: "com.lwohvye.java-conventions"
     apply plugin: "org.gradlex.extra-java-module-info"
+    apply plugin: "io.freefair.lombok"
+    // Setting a custom Lombok version when use plugin io.freefair.lombok
+    lombok {
+        version = "1.18.28"
+    }
 
     java {
         registerFeature('coreComp') {
@@ -46,9 +58,7 @@ subprojects {
 
     dependencies {
         implementation libs.asm
-        coreCompCompileOnly libs.lombok
         coreCompCompileOnly libs.mapstruct.processor
-        annotationProcessor libs.lombok
         annotationProcessor libs.mapstruct.processor
         annotationProcessor libs.mapstruct.spring
     }
@@ -71,11 +81,9 @@ subprojects {
         failOnMissingModuleInfo.set(false)
         automaticModule("io.github.mouzt:bizlog-sdk", 'bizlog.sdk')
         automaticModule("com.github.whvcse:easy-captcha", 'easy.captcha')
-        automaticModule("ch.ethz.ganymed:ganymed-ssh2", 'ganymed.ssh2')
         automaticModule("io.jsonwebtoken:jjwt-api", 'jjwt.api')
         automaticModule("io.jsonwebtoken:jjwt-impl", 'jjwt.impl')
         automaticModule("io.jsonwebtoken:jjwt-jackson", 'jjwt.jackson')
-        automaticModule("com.jcraft:jsch", 'jsch')
         automaticModule("org.quartz-scheduler:quartz", 'quartz')
         automaticModule("org.redisson:redisson", 'redisson')
         automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
@@ -140,7 +148,7 @@ publishing {
                     connection = 'scm:git:git://github.com/WHY-lWoHvYe/valentine-p2p.git'
                     developerConnection = 'scm:git:ssh://github.com/WHY-lWoHvYe/valentine-p2p.git'
                     url = 'https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main'
-                    tag = "unicorn-v${version}-SNAPSHOT"
+                    tag = "unicorn-v${version}"
                 }
             }
         }

@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -31,13 +31,13 @@
 
     <properties>
         <java.version>20</java.version>
-        <project.core.version>4.0.0-iota</project.core.version>
+        <project.core.version>4.0.1-mu</project.core.version>
         <maven.compiler.release>20</maven.compiler.release>
         <lombok.version>1.18.28</lombok.version>
         <mapstruct.version>1.5.4.Final</mapstruct.version>
         <javassist.version>3.29.2-GA</javassist.version>
         <shardingsphere.version>5.2.0</shardingsphere.version>
-        <kotlin.version>1.9.0-Beta</kotlin.version>
+        <kotlin.version>1.9.0-RC</kotlin.version>
     </properties>
 
     <dependencies>
@@ -56,13 +56,13 @@
         <!--   tools模块     -->
         <dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-tp-tools</artifactId>
+            <artifactId>unicorn-tp-tools-kotlin</artifactId>
             <version>${project.core.version}</version>
         </dependency>
         <!-- 代码生成模块 -->
         <dependency>
             <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-code-gen</artifactId>
+            <artifactId>unicorn-code-gen-kotlin</artifactId>
             <version>${project.core.version}</version>
         </dependency>
         <dependency>
@@ -88,20 +88,25 @@
             <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.javassist/javassist -->
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>${javassist.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+            <version>0.17</version>
+            <scope>provided</scope>
+        </dependency>
         <!--Mockito's inline mock maker supports static mocks based on the Instrumentation API.
         You can simply enable this mock mode, by placing the 'mockito-inline' artifact where you are currently using 'mockito-core'.
         Note that Mockito's inline mock maker is not supported on Android.-->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
         <!--   kotlin is optional     -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -165,12 +170,6 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
-                            <excludes>
-                                <exclude>
-                                    <groupId>org.springframework.boot</groupId>
-                                    <artifactId>spring-boot-configuration-processor</artifactId>
-                                </exclude>
-                            </excludes>
                             <includes>
                                 <!-- 不存在的include引用，相当于排除所有maven依赖jar，没有任何三方jar文件打入输出jar -->
                                 <include>
@@ -235,14 +234,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.springframework.boot</groupId>
-                            <artifactId>spring-boot-configuration-processor</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
                 <executions>
                     <execution>
                         <id>repackage</id>

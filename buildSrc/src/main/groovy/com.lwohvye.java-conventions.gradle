@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.lwohvye'
-version = '4.0.0-kappa'
+version = '4.0.1-mu'
 java.sourceCompatibility = JavaVersion.VERSION_21
 
 java {
@@ -22,6 +22,10 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/lWoHvYe/eladmin")
             credentials {
+                // uses the Elvis operator (if-not-null-else shorthand) ?:.
+                // If the expression to the left of ?: is not null, the Elvis operator returns it;
+                // otherwise, it returns the expression to the right.
+                // Note that the expression on the right-hand side is evaluated only if the left-hand side is null.
                 username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
                 password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
             }
@@ -40,4 +44,5 @@ signing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.compilerArgs += '--enable-preview'
+    options.compilerArgs += '-parameters'
 }

@@ -17,7 +17,9 @@ package com.unicorn.strategy
 
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno
 import com.lwohvye.sys.modules.system.strategy.ExtraUserTypeStrategy
+import com.unicorn.coroutine.DispatcherType
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.apache.logging.log4j.LogManager.getLogger
 import org.jetbrains.annotations.BlockingExecutor
 import org.springframework.security.core.GrantedAuthority
@@ -31,11 +33,67 @@ import kotlin.time.measureTime
 @UserTypeHandlerAnno(typeName = "FOUR")
 // 这里不能为 sealed!! 因为密封类是不能实例化的?
 class TKMUserTypeStrategy : ExtraUserTypeStrategy {
-    @OptIn(DelicateCoroutinesApi::class)
+
+    companion object {
+        private val log = getLogger()
+    }
+
     override fun grantedAuth(userId: Long): List<GrantedAuthority> {
 
-        println("Start")
+        log.info("Start-0")
 
+        basicsCoroutinesCall()
+
+        callWithGlobalScope()
+
+        shareWithChannel()
+
+        loomCarrier()
+
+        coroutinesDirect()
+        //_____________
+
+        return emptyList()
+    }
+
+    private fun basicsCoroutinesCall() {
+        // 注意执行的顺序, runBlocking method blocks the current thread for waiting
+        runBlocking { // this: CoroutineScope
+            launch(DispatcherType.VIRTUAL.dispatcher + CoroutineName("basicsCoroutine")) { // launch a new coroutine and continue
+                delay(1000L) // non-blocking delay for 1 second (default time unit is ms)
+                log.info("World!-1-1") // print after delay
+            }
+            log.info("Hello-1-0") // main coroutine continues while a previous one is delayed
+        }
+
+        log.info("runBlocking-1-2")
+
+        runBlocking {
+            // 而coroutineScope是coroutineScope just suspends, releasing the underlying thread for other usages
+            doHelloWorld()
+            log.info("coroutineScope-2-3")
+        }
+
+        runBlocking {
+            val explicitJob =
+                launch(DispatcherType.VIRTUAL.dispatcher) { // launch a new coroutine and keep a reference to its Job
+                    delay(1000L)
+                    log.info("World!-3-1")
+                }
+            log.info("Hello-3-0")
+            explicitJob.join() // wait until child coroutine completes
+            log.info("Job Done?: ${explicitJob.isCompleted}-3-2")
+
+            val explicitDeferred: Deferred<String> = async {
+                delay(1000L)
+                "Async Coroutine"
+            }
+            log.info("Hello ${explicitDeferred.await()}")
+        }
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun callWithGlobalScope() {
         // kotlinx.coroutines将在1.7版本支持JPMS，但在1.7.0-Beta。若以DeBug模式启动，依旧报错 `module kotlin.stdlib does not read module kotlinx.coroutines.core`，Normal run正常
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2237
         // https://github.com/Kotlin/kotlinx.coroutines/pull/3297
@@ -53,35 +111,91 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
             // 2.runBlocking { ... }: 用于等待协程内部的代码执行完毕后再执行后面的代码。在这个例子中，使用了 delay 函数模拟一个耗时操作，它会暂停协程的执行一段时间，这里是 1000 毫秒（1 秒）。
             runBlocking {
                 delay(1000)
+                log.info("World-5")
             }
-            // 3.println("Hello"): 该代码会在 delay 函数执行完毕后被执行，打印 "Hello" 到控制台。
-            println("Hello")
+            // 3.log.info("Hello"): 该代码会在 delay 函数执行完毕后被执行，打印 "Hello" 到控制台。（先输出World再输出Hello），
+            log.info("Hello-6")
         }
 
-        Thread.sleep(2000) // 等待 2 秒钟
-        println("Stop")
+        log.info("Stop-4")
         //_____________
 
         val result = GlobalScope.async {
             workload(16) // 调用函数
         }
         runBlocking {
-            println("async result is ${result.await()}")
+            log.info("async result is ${result.await()}")
         }
-        // 抛去第一个参数的定义，下面这个与上面这个是等同的，只是因为 `Lambda argument should be moved out of parentheses` 所以把lambda移到了后面
+        // Trailing lambda and SAM conversion
+        //The findMessages() function calls the query() function of the JdbcTemplate class.
+        // The query() function takes two arguments: an SQL query as a String instance, and a callback that will map one object per row:
+        //
+        //db.query("...", RowMapper { ... } )
+        //
+        //
+        //The RowMapper interface declares only one method, so it is possible to implement it via lambda expression by omitting the name of the interface.
+        // The Kotlin compiler knows the interface that the lambda expression needs to be converted to because you use it as a parameter for the function call.
+        // This is known as SAM conversion in Kotlin:
+        //
+        //db.query("...", { ... } )
+        //
+        //
+        //After the SAM conversion, the query function ends up with two arguments: a String at the first position, and a lambda expression at the last position.
+        // According to the Kotlin convention, if the last parameter of a function is a function, then a lambda expression passed as the corresponding argument can be placed outside the parentheses.
+        // Such syntax is also known as trailing lambda:
+        //
+        //db.query("...") { ... }
+        //
+        //
+        // For a lambda with multiple parameters, you can use the underscore `_` character to replace the names of the parameters you don't use.
+        //
+        // 抛去第一个参数的定义，下面这个与上面这个是等同的，只是因为 `Lambda argument should be moved out of parentheses` 所以把lambda移到了后面, trailing lambda
+        // If the lambda is the only argument in that call, the parentheses can be omitted entirely:
         /*runBlocking(EmptyCoroutineContext, {
-            println("async result is ${result.await()}")
+            log.info("async result is ${result.await()}")
         })*/
         // 对于存在可变参数的，可通过 参数名 = xxx 对特定参数赋值
         /*runBlocking(block = {
-            println("async result is ${result.await()}")
+            log.info("async result is ${result.await()}")
         })*/
+    }
 
-        loomCarrier()
-        coroutinesDirect()
-        //_____________
+    private fun shareWithChannel() = runBlocking {
 
-        return emptyList()
+        val bufferedChannel = Channel<Int>(4)
+        val todo = 10
+
+        for (i in 0 until todo) { // .. 含头尾， until 含头不含尾
+            launch(CoroutineName("Producer-Coroutine")) {
+                bufferedChannel.send(i)
+                log.info("send element $i")
+            }
+        }
+
+        delay(2000L)
+
+        launch(CoroutineName("Consumer-Coroutine")) {
+            repeat(todo) {
+                log.info("$it receive ${bufferedChannel.receive()}")
+                yield()
+            }
+        }
+    }
+
+    suspend fun doHelloWorld() = coroutineScope {  // this: CoroutineScope
+        launch(CoroutineName("doHWCoroutine")) {
+            delay(2000L)
+            log.info("World!-2-2")
+        }
+        launch {
+            log.info("before switch to another Context-2-1-0")
+            // using the withContext function to change the context of a coroutine while still staying in the same coroutine,
+            withContext(Dispatchers.IO) {
+                delay(1000L)
+                log.info("after switch Context-2-1-1")
+            }
+        }
+        log.info("Hello-2-0")
     }
 
     // 这段代码是一个Kotlin协程中的挂起函数（Suspending Function），使用了suspend关键字修饰。
@@ -102,12 +216,11 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     @OptIn(ExperimentalTime::class)
     fun loomCarrier() = runBlocking {
 
-        val log = getLogger()
-
         measureTime {
             supervisorScope {
                 repeat(100_000) {
                     launch(Dispatchers.LOOM) {
+                        // 这里要用sleep才能用到Thread的function，若用delay可能会有所不同
                         Thread.sleep(1000)
                     }
                 }
@@ -125,7 +238,7 @@ class TKMUserTypeStrategy : ExtraUserTypeStrategy {
     // fun coroutinesDirect() = runBlocking { ... }：这是一个 Kotlin 函数，名为 coroutinesDirect。它使用了协程框架，并在 runBlocking 块中执行了一些并发任务。
     fun coroutinesDirect() = runBlocking {
         // val log = getLogger()：这行代码声明了一个变量 log，它是一个日志记录器。这里使用了某个日志库的函数 getLogger()，获取一个日志记录器实例。
-        val log = getLogger()
+        // val log = getLogger()
         // measureTime { ... }.also(log::info)：这是一个计时操作，用来度量代码块的执行时间。它的返回值是执行时间，类型为 kotlin.time.Duration。.also(log::info) 表示执行计时操作的同时，将计时结果输出到日志中。
         measureTime {
             // supervisorScope { ... }：这是一个协程作用域，用于启动一组并发任务，并监控这些任务的执行情况。其中 repeat(100_000) 表示要执行 100,000 次下面的代码块。

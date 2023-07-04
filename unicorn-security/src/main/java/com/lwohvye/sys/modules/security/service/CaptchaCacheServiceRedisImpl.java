@@ -17,8 +17,11 @@
 package com.lwohvye.sys.modules.security.service;
 
 import com.anji.captcha.service.CaptchaCacheService;
+import com.lwohvye.core.base.BaseService;
+import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.redis.RedisUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Objects;
 
 /**
  * 对于分布式部署的应用，我们建议应用自己实现CaptchaCacheService，比如用Redis，参考service/spring-boot代码示例。
@@ -31,15 +34,23 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @Title: 使用redis缓存
  * @date 2020-05-12
  */
-public class CaptchaCacheServiceRedisImpl implements CaptchaCacheService {
+public class CaptchaCacheServiceRedisImpl implements CaptchaCacheService, BaseService {
+
+    private RedisUtils redisUtils;
+
+    public CaptchaCacheServiceRedisImpl() {
+        SpringContextHolder.addCallBacks(this::doInit);
+    }
+
+    @Override
+    public void doInit() {
+        if (Objects.isNull(redisUtils)) redisUtils = SpringContextHolder.getBean(RedisUtils.class);
+    }
 
     @Override
     public String type() {
         return "redis";
     }
-
-    @Autowired
-    private RedisUtils redisUtils;
 
     @Override
     public void set(String key, String value, long expiresInSeconds) {

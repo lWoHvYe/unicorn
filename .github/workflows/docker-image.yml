@@ -24,15 +24,23 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '20'
-          distribution: 'oracle'
+          distribution: 'temurin'
           check-latest: true
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2.4.2
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        uses: gradle/gradle-build-action@v2.5.1
         with:
           arguments: bootBuildImage
+
+      - name: Publish 2 MavenLocal
+        uses: gradle/gradle-build-action@v2.5.1
+        with:
+          arguments: publishToMavenLocal
+
+      - name: Remove module-info
+        run: rm -rf unicorn-starter/src/main/java/module-info.java
+
+      - name: Build Unicorn-Starter
+        run: mvn -B package --file unicorn-starter/pom.xml -P jigsaw

@@ -79,11 +79,7 @@ dependencies {
     api libs.quartz
     api libs.easy.captcha
     captchaImplementation libs.captcha
-    api "ch.ethz.ganymed:ganymed-ssh2:262"
-    api 'com.jcraft:jsch:0.1.55'
     api libs.oshi.core
-    api libs.logback.access
-    api 'org.openjdk.jol:jol-core:0.17'
     // It seems that xxxImplementation will work on runtimeClasspath for the customers while xxxApi compileClasspath
     businessLogApi libs.bizlog
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

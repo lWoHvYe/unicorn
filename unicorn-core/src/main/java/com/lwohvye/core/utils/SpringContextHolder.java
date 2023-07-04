@@ -81,8 +81,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
 
         SpringContextHolder.applicationContext = applicationContext;
         if (addCallback) {
-            for (var callBack : SpringContextHolder.CALL_BACKS)
-                callBack.executor();
+            ConcurrencyUtils.structuredExecute(null, CALL_BACKS.toArray(Runnable[]::new));
             // 执行完成后，记得情况释放掉引用，避免因为此处的引用导致该被GC时无法被GC
             CALL_BACKS.clear();
         }
@@ -147,7 +146,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
             SpringContextHolder.CALL_BACKS.add(callBack);
         } else {
             log.warn("CallBack：{} 容器已启动完毕，已无法添加！立即执行", callBack.getCallBackName());
-            callBack.executor();
+            callBack.run();
         }
     }
 

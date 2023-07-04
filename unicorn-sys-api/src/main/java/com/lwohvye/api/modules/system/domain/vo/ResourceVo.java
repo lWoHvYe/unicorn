@@ -42,7 +42,7 @@ public class ResourceVo {
     /**
      * 状态 0-不可用 1-可用
      */
-    private Integer status;
+    private Boolean status;
 
     @JsonIgnore
     @SneakyThrows

@@ -28,9 +28,6 @@ import java.util.function.Function;
 
 public final class ConcurrencyUtils {
 
-    ConcurrencyUtils() {
-    }
-
     static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
 
     /**
@@ -42,8 +39,6 @@ public final class ConcurrencyUtils {
      * @date 2022/9/22 8:26 PM
      */
     public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
-        //  The default virtual thread factory can work without enable preview.
-        //  It uses reflection to allow this class be compiled in an incubator module without also enabling preview features.
         try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
             List<? extends StructuredTaskScope.Subtask<?>> subtasks = null;
             if (Objects.nonNull(tasks))
@@ -59,6 +54,30 @@ public final class ConcurrencyUtils {
                         subtasks.stream().map(StructuredTaskScope.Subtask::get).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof RuntimeException re)
+                throw re;
+            throw new UtilsException(e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    // Returns a Callable object that, when called, runs the given task and returns null.
+    // var callable = Executors.callable(runnable) // Runnable 2 Callable
+    // A FutureTask can be used to wrap a Callable or Runnable object. Because FutureTask implements Runnable, a FutureTask can be submitted to an Executor for execution.
+    // var futureTask = new FutureTask<T>(Callable/Runnable) // Callable/Runnable 2 Runnable/Future
+    public static void structuredExecute(Runnable eventual, Runnable... tasks) {
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+            if (Objects.nonNull(tasks))
+                Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
+
+            scope.join();           // Join both forks
+            scope.throwIfFailed();  // ... and propagate errors
+
+            // Here, both forks have succeeded, so compose their results
+            if (Objects.nonNull(eventual))
+                eventual.run();
         } catch (ExecutionException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
