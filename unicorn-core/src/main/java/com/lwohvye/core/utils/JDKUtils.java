@@ -509,4 +509,17 @@ public class JDKUtils {
         }
     }
     // endregion
+
+    // region optional
+    // check if the give Jar is added as dependency
+    public static Boolean checkFuncEnable(String clazzName) {
+        try {
+            Class.forName(clazzName);
+        } catch (ReflectiveOperationException ignored) {
+            return false;
+        }
+        return true;
+    }
+
+    // endregion
 }
