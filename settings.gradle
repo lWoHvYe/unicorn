@@ -101,7 +101,7 @@ def buildFiles = fileTree(rootDir) {
     def excludes = gradle.startParameter.projectProperties.get("excludeProjects")?.split(",")
     include "**/*.gradle", "**/*.gradle.kts"
     exclude "build", "**/gradle", "settings.gradle", "buildSrc", "/build.gradle", ".*", "out"
-    if ("$kotlinVersion".matches("^1\\.8\\.2[0-9]+\$")) // current version is not support Java 20
+    if ("$kotlinVersion".matches("^1\\.[0-8]\\.\\d{1,2}\$|^0\\.\\d+\\.\\d+\$")) // current version is not support Java 20, 1.9.0 Support Java 20
         exclude "**/*-kotlin.gradle"
     if (excludes) {
         exclude excludes
