@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-export JAVA_HOME=/usr/java/jdk-20
+export JAVA_HOME=/usr/java/jdk-21
 echo ${JAVA_HOME}
 # ''单引号原样输出。""双引号可调用变量输出
 echo '切换到工作目录'

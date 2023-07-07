@@ -156,7 +156,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
         - security 权限控制，为swarm化，提供全局关闭Security功能
         - UnicornAutoConfiguration: 自动化装配
-        - ValentineExecutorConfig: Running Spring Applications on Virtual Threads
+        - ValentineExecutorConfig: Running Spring Applications on Virtual Threads Before Spring Boot 3.2
     - exception 项目自定义异常类
     - utils 系统通用工具类, json, rabbitmq, redis,...
         - QueryHelp 基于Annotation的JPA动态查询Specification

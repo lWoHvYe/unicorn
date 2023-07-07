@@ -17,7 +17,9 @@
 package com.lwohvye.core.config;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
+import org.springframework.boot.system.JavaVersion;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -30,6 +32,7 @@ import java.util.concurrent.Executors;
  * <a href="https://spring.io/blog/2022/10/11/embracing-virtual-threads">embracing virtual threads</a>
  */
 @AutoConfiguration
+@ConditionalOnJava(JavaVersion.NINETEEN)
 public class ValentineExecutorConfig {
 
     /**
@@ -51,6 +54,7 @@ public class ValentineExecutorConfig {
      * @date 2022/11/29 12:53 PM
      */
     @Bean
+    @ConditionalOnJava(value = JavaVersion.TWENTY_ONE, range = ConditionalOnJava.Range.OLDER_THAN)
     public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
         var virtualFactory = Thread.ofVirtual().name("Virtual-WebServer").factory();
         return protocolHandler -> protocolHandler.setExecutor(Executors.newThreadPerTaskExecutor(virtualFactory));
