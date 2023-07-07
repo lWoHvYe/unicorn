@@ -75,6 +75,7 @@ dependencies {
     api project(':unicorn-core')
     api 'org.springframework.boot:spring-boot-starter-mail'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation libs.bundles.coroutines
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'

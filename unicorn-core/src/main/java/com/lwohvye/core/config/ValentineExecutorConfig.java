@@ -16,8 +16,11 @@
 
 package com.lwohvye.core.config;
 
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
+import org.springframework.boot.system.JavaVersion;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -30,6 +33,7 @@ import java.util.concurrent.Executors;
  * <a href="https://spring.io/blog/2022/10/11/embracing-virtual-threads">embracing virtual threads</a>
  */
 @AutoConfiguration
+@ConditionalOnJava(JavaVersion.NINETEEN)
 public class ValentineExecutorConfig {
 
     /**
@@ -52,7 +56,9 @@ public class ValentineExecutorConfig {
      */
     @Bean
     public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
-        var virtualFactory = Thread.ofVirtual().name("Virtual-WebServer").factory();
-        return protocolHandler -> protocolHandler.setExecutor(Executors.newThreadPerTaskExecutor(virtualFactory));
+//        var virtualFactory = Thread.ofVirtual().name("Virtual-WebServer").factory();
+//        return protocolHandler -> protocolHandler.setExecutor(Executors.newThreadPerTaskExecutor(virtualFactory));
+//        counter can't be disabled, based on reflect
+        return protocolHandler -> protocolHandler.setExecutor(new VirtualThreadExecutor("Virtual-WebServer-"));
     }
 }

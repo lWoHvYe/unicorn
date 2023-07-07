@@ -44,7 +44,7 @@ public class AuthRetryService {
         RetryTemplate.builder()
                 // 固定延迟
                 .fixedBackoff(10)
-                .withinMillis(3000)
+                .withTimeout(3000)
                 .build();
 
         RetryTemplate.builder()
