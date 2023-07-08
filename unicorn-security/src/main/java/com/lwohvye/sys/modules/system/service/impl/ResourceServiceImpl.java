@@ -20,13 +20,17 @@ import com.lwohvye.api.modules.system.service.dto.ResourceDto;
 import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.core.utils.redis.RedisUtils;
+import com.lwohvye.sys.modules.system.event.ResEvent;
 import com.lwohvye.sys.modules.system.event.RoleEvent;
 import com.lwohvye.sys.modules.system.repository.ResourceRepository;
 import com.lwohvye.sys.modules.system.service.IResourceService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -52,12 +56,14 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "resource")
-public class ResourceServiceImpl implements IResourceService {
+public class ResourceServiceImpl implements IResourceService, ApplicationEventPublisherAware {
 
     private final ResourceRepository resourceRepository;
 
     private final ConversionService conversionService;
     private final RedisUtils redisUtils;
+
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     @Cacheable
@@ -98,6 +104,8 @@ public class ResourceServiceImpl implements IResourceService {
     @Transactional(rollbackFor = Exception.class)
     public ResourceDto create(Resource resources) {
         var save = resourceRepository.save(resources);
+        // publishEvent
+        publishResEvent(save);
         return conversionService.convert(save, ResourceDto.class);
     }
 
@@ -109,6 +117,7 @@ public class ResourceServiceImpl implements IResourceService {
         ValidationUtils.isNull(resource.getResourceId(), "Resource", "id", resources.getResourceId());
         resource.copy(resources);
         resourceRepository.save(resource);
+        publishResEvent(resource);
     }
 
     @Override
@@ -117,6 +126,7 @@ public class ResourceServiceImpl implements IResourceService {
         for (Long resourceId : ids) {
             resourceRepository.deleteById(resourceId);
         }
+        publishResEvent(null);
     }
 
     @Override
@@ -132,6 +142,15 @@ public class ResourceServiceImpl implements IResourceService {
             list.add(map);
         }
         FileUtils.downloadExcel(list, response);
+    }
+
+    @Override
+    public void setApplicationEventPublisher(@NotNull ApplicationEventPublisher applicationEventPublisher) {
+        eventPublisher = applicationEventPublisher;
+    }
+
+    public void publishResEvent(Resource res) {
+        eventPublisher.publishEvent(new ResEvent(this, res));
     }
 
     @EventListener

@@ -17,5 +17,4 @@ module lwohvye.valentine.starter {
     requires org.apache.httpcomponents.client5.httpclient5;
 
     opens com.unicorn;
-    opens com.unicorn.rest;
 }

@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.security.security.filter;
 import com.lwohvye.core.annotation.AnonymousAccess;
 import com.lwohvye.core.constant.SecurityConstant;
 import com.lwohvye.core.utils.SpringContextHolder;
+import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.core.utils.enums.RequestMethodEnum;
 import com.lwohvye.sys.modules.security.config.SpringSecurityConfig;
 import com.lwohvye.sys.modules.system.service.IResourceService;
@@ -83,8 +84,8 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
         // list of attributes
         var securityConfigStream = resourceService.queryAllRes().stream() //获取数据库中的所有资源信息，即本案例中的resource以及对应的role
                 .filter(resource -> antPathMatcher.match(resource.getPattern(), url) // URI匹配
-                                    && !resource.getRoleCodes().isEmpty() // 有关联角色（需要特定角色权限）
-                                    && (Objects.isNull(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), httpMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
+                        && !resource.getRoleCodes().isEmpty() // 有关联角色（需要特定角色权限）
+                        && (StringUtils.isBlank(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), httpMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
                 .flatMap(resource -> resource.getRoleCodes().stream()) // 用flatMap合并流
                 .distinct() // 排重。到这里，因为是角色级别的，理论上不会太多，排重与否影响不大
                 .map(role -> new SecurityConfig("ROLE_" + role.trim())); // 需注意，toList的结果是ImmutableCollections
@@ -97,7 +98,8 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
         var securityConfigs = Stream.concat(securityConfigStream, anonymousSecurityConfigStream).toList(); // 合并两股流
         if (!securityConfigs.isEmpty())
             attributes = new ArrayList<>(securityConfigs); // 构建返回
-        else attributes = Collections.singletonList(new SecurityConfig(SecurityConstant.ROLE_LOGIN)); //如果请求Url在资源表中不存在相应的模式，则该请求登陆后即可访问
+        else
+            attributes = Collections.singletonList(new SecurityConfig(SecurityConstant.ROLE_LOGIN)); //如果请求Url在资源表中不存在相应的模式，则该请求登陆后即可访问
         return attributes;
     }
 
