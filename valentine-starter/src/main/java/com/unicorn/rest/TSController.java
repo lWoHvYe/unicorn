@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.rest;
+package com.unicorn.rest;
 
-import com.lwohvye.starter.modules.service.ITSService;
-import lombok.RequiredArgsConstructor;
+import com.unicorn.service.ITSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,31 +25,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/anonymous/tsScope")
-@RequiredArgsConstructor
 public class TSController {
-    @Autowired
-    private ITSService ITSService;
 
+    @Autowired
+    private ITSService itsService;
 
     private String name;
-
 
     @GetMapping(value = "/{username}")
     public void userProfile(@PathVariable("username") String username) {
         name = username;
 
-        ITSService.setField(name);
+        itsService.setField(name);
 
         try {
             for (int i = 0; i < 10; i++) {
                 System.out.println(
-                        Thread.currentThread().getId()
-                        + "name:" + name
-                        + "--ts:"
-                        + ITSService.outIn());
+                        Thread.currentThread().threadId()
+                                + "name:" + name
+                                + "--ts:"
+                                + itsService.outIn());
                 Thread.sleep(2000);
             }
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 
