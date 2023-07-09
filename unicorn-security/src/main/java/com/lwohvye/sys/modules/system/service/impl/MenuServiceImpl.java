@@ -25,6 +25,8 @@ import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.core.base.SimplePOJO;
+import com.lwohvye.core.context.CycleAvoidingMappingContext;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.core.utils.redis.RedisUtils;
@@ -33,6 +35,7 @@ import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.repository.MenuRepository;
 import com.lwohvye.sys.modules.system.service.IMenuService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
+import com.lwohvye.sys.modules.system.service.mapstruct.MenuMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +67,7 @@ import java.util.stream.Collectors;
 @CacheConfig(cacheNames = "menu")
 public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherAware {
 
+    private final MenuMapper menuMapper;
     private final MenuRepository menuRepository;
 
     private final ConversionService conversionService;
@@ -187,8 +191,21 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public Set<Menu> getChildMenus(List<Menu> menuList, Set<Menu> menuSet) {
+    @Cacheable
+    @Transactional(rollbackFor = Exception.class)
+    public List<SimplePOJO> fetchMenuByPid(Long pid) {
+        var menuSet = new HashSet<Menu>();
+        var targetPMenu = findOne(pid);
+        menuSet.add(targetPMenu);
+
+        var menuList = fetchRootOrTargetMenus(pid);
+        getChildMenus(menuMapper.toEntity(menuList, new CycleAvoidingMappingContext()), menuSet);
+        return menuSet.stream()
+                .map(menu -> new SimplePOJO(menu.getId(), menu.getTitle(), null, menu.getPid()))
+                .toList();
+    }
+
+    private void getChildMenus(List<Menu> menuList, Set<Menu> menuSet) {
         for (Menu menu : menuList) {
             menuSet.add(menu);
             List<Menu> menus = menuRepository.findByPid(menu.getId());
@@ -196,14 +213,13 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
                 getChildMenus(menus, menuSet);
             }
         }
-        return menuSet;
     }
 
     @Override
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
-    public void delete(Set<Menu> menuSet) {
-        for (Menu menu : menuSet) {
+    public void batchDelete(Set<MenuDto> menuSet) {
+        for (var menu : menuSet) {
             // 清理缓存
             delCaches(menu.getId());
             roleService.untiedMenu(menu.getId());
@@ -215,7 +231,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
     @Override
     @Cacheable
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public List<MenuDto> getMenus(Long pid) {
+    public List<MenuDto> fetchRootOrTargetMenus(Long pid) {
         List<Menu> menus;
         if (pid != null && !pid.equals(0L))
             menus = menuRepository.findByPid(pid);

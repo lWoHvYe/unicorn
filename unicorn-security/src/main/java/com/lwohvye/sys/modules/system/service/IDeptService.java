@@ -21,6 +21,7 @@ import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,15 @@ public interface IDeptService extends BaseService {
     Set<DeptDto> getDeleteDepts(List<Dept> deptList, Set<DeptDto> deptDtos);
 
     /**
+     * fetch all subChild by Pid
+     *
+     * @param pid givenPid
+     * @return java.util.List<java.lang.Long>
+     * @date 2023/7/9 8:18 AM
+     */
+    List<Long> fetchDeptChildByPid(Long pid);
+
+    /**
      * 根据ID获取同级与上级数据
      *
      * @param deptDto /
@@ -122,14 +132,6 @@ public interface IDeptService extends BaseService {
      * @return /
      */
     Map<String, Object> buildTree(List<DeptDto> deptDtos);
-
-    /**
-     * 获取
-     *
-     * @param deptList
-     * @return
-     */
-    List<Long> getDeptChildren(List<Dept> deptList);
 
     /**
      * 验证是否被角色或用户关联

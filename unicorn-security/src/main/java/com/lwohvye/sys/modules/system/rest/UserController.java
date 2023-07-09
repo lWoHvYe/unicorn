@@ -17,31 +17,31 @@ package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.core.annotation.RespResultBody;
-import com.lwohvye.core.base.BaseEntity.Update;
-import com.lwohvye.core.config.RsaProperties;
-import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.api.modules.system.api.SysUserAPI;
-import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.vo.UserBaseVo;
 import com.lwohvye.api.modules.system.domain.vo.UserPassVo;
-import com.lwohvye.sys.modules.system.service.IDataService;
-import com.lwohvye.sys.modules.system.service.IDeptService;
-import com.lwohvye.sys.modules.system.service.IRoleService;
-import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.api.modules.system.service.dto.UserQueryCriteria;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
+import com.lwohvye.core.base.BaseEntity.Update;
+import com.lwohvye.core.config.RsaProperties;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.RsaUtils;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.enums.CodeEnum;
 import com.lwohvye.core.utils.result.ResultInfo;
+import com.lwohvye.sys.modules.system.service.IDataService;
+import com.lwohvye.sys.modules.system.service.IDeptService;
+import com.lwohvye.sys.modules.system.service.IRoleService;
+import com.lwohvye.sys.modules.system.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -54,7 +54,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -90,10 +89,8 @@ public class UserController implements SysUserAPI {
     public Map<String, Object> query(UserQueryCriteria criteria, Pageable pageable) {
         if (!ObjectUtils.isEmpty(criteria.getDeptId())) {
             criteria.getDeptIds().add(criteria.getDeptId());
-            // 先查找是否存在子节点
-            List<Dept> data = deptService.findByPid(criteria.getDeptId());
             // 然后把子节点的ID都加入到集合中
-            criteria.getDeptIds().addAll(deptService.getDeptChildren(data));
+            criteria.getDeptIds().addAll(deptService.fetchDeptChildByPid(criteria.getDeptId()));
         }
         // 数据权限
         var curUser = userService.findByName(SecurityUtils.getCurrentUsername());

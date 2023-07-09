@@ -17,7 +17,6 @@ package com.lwohvye.api.modules.system.service.dto;
 
 import com.lwohvye.core.annotation.Query;
 import lombok.Data;
-import com.lwohvye.core.annotation.DataPermission;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.List;
 * @date 2019-03-25
 */
 @Data
-@DataPermission(fieldName = "id")
 public class DeptQueryCriteria{
 
     @Query(type = Query.Type.INNER_LIKE)

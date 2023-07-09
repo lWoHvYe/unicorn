@@ -99,7 +99,7 @@ public class UserLocalCache {
 
         jwtUserDto = new JwtUserDto(
                 user,
-                dataService.getDeptIds(user.getId(), user.getDeptId()),
+                dataService.getDataScope(user.getId()),
                 roleService.grantedAuthorityGenHandler(user.getId(), user.getIsAdmin())
         );
         return jwtUserDto;

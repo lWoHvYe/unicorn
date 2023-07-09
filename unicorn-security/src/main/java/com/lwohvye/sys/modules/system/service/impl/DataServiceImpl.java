@@ -17,6 +17,7 @@ package com.lwohvye.sys.modules.system.service.impl;
 
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.sys.modules.system.event.RoleEvent;
 import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IDeptService;
@@ -79,6 +80,19 @@ public class DataServiceImpl implements IDataService {
         return new ArrayList<>(deptIds);
     }
 
+    @Override
+    @Cacheable(key = " #root.target.getSysName() + 'data_scope4user:' + #p0")
+    public String getDataScope(Long userId) {
+        var dataScopes = roleService.findByUserId(userId).stream().map(RoleSmallDto::getDataScope).toList();
+        if (dataScopes.contains(DataScopeEnum.ALL.getValue()))
+            return DataScopeEnum.ALL.getValue();
+        else if (dataScopes.contains(DataScopeEnum.CUSTOMIZE.getValue()))
+            return DataScopeEnum.CUSTOMIZE.getValue();
+        else if (dataScopes.contains(DataScopeEnum.THIS_LEVEL.getValue()))
+            return DataScopeEnum.THIS_LEVEL.getValue();
+        else return "";
+    }
+
     /**
      * 获取自定义的数据权限
      *
@@ -86,14 +100,11 @@ public class DataServiceImpl implements IDataService {
      * @param role    角色
      * @return 数据权限ID
      */
-    public Set<Long> getCustomize(Set<Long> deptIds, RoleSmallDto role) {
+    private Set<Long> getCustomize(Set<Long> deptIds, RoleSmallDto role) {
         Set<Dept> depts = deptService.findByRoleId(role.getId());
         for (Dept dept : depts) {
             deptIds.add(dept.getId());
-            List<Dept> deptChildren = deptService.findByPid(dept.getId());
-            if (deptChildren != null && !deptChildren.isEmpty()) {
-                deptIds.addAll(deptService.getDeptChildren(deptChildren));
-            }
+            deptIds.addAll(deptService.fetchDeptChildByPid(dept.getId()));
         }
         return deptIds;
     }
@@ -101,5 +112,12 @@ public class DataServiceImpl implements IDataService {
     @EventListener
     public void objUpdate(UserEvent userEvent) {
         redisUtils.delInRC(CacheKey.DATA_USER, userEvent.getDataId());
+        redisUtils.delInRC(CacheKey.DATA_SCOPE, userEvent.getDataId());
+    }
+
+    @EventListener
+    public void objUpdate(RoleEvent roleEvent) {
+        redisUtils.delInRC(CacheKey.DATA_USER, null);
+        redisUtils.delInRC(CacheKey.DATA_SCOPE, null);
     }
 }

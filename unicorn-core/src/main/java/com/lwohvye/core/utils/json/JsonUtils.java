@@ -15,6 +15,7 @@
  */
 package com.lwohvye.core.utils.json;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -251,6 +252,18 @@ public class JsonUtils {
     }
 
     // endregion
+
+    public static <T> T findPath(Object obj, String path, String subPath, Class<T> tClass) {
+        try {
+            var jsonString = toJSONString(obj);
+            var pathNode = objectMapper.readTree(jsonString).findPath(path);
+            if (StringUtils.isNotBlank(subPath))
+                pathNode = pathNode.path(subPath);
+            return objectMapper.convertValue(pathNode, tClass);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
 }
 
 

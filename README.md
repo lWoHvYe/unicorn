@@ -101,7 +101,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - 使用最新技术栈，社区资源丰富，基于Java 20、Spring Boot 3.1。(Support Virtual Threads/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
-- 支持接口级别的功能权限与数据权限，动态权限控制
+- 支持接口级别的功能权限，动态权限控制
 - 支持数据字典，可方便地对一些状态进行管理
 - 高效率开发，代码生成器可一键生成前后端代码
 - 对一些常用前端组件封装：表格数据请求、数据字典等

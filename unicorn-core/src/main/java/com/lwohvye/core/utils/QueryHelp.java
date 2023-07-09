@@ -15,9 +15,7 @@
  */
 package com.lwohvye.core.utils;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
-import com.lwohvye.core.annotation.DataPermission;
 import com.lwohvye.core.annotation.Query;
 import com.lwohvye.core.exception.UtilsException;
 import jakarta.persistence.criteria.*;
@@ -57,8 +55,6 @@ public class QueryHelp {
         if (query == null) {
             return cb.and(list.toArray(new Predicate[0]));
         }
-        // 数据权限验证
-        analyzeDataPermission(root, query, list);
         try {
             // 根据Field及上面的Annotation，拼接Query & Join
             analyzeFieldQuery(root, query, cb, list);
@@ -68,31 +64,6 @@ public class QueryHelp {
         }
         // 各Field的Condition通过And连接，这是比较常见的场景
         return cb.and(list.toArray(new Predicate[0]));
-    }
-
-    /**
-     * 数据权限验证
-     *
-     * @param root  /
-     * @param query /
-     * @param list  /
-     * @date 2021/11/7 4:36 下午
-     */
-    private static <R, Q> void analyzeDataPermission(Root<R> root, Q query, ArrayList<Predicate> list) {
-        DataPermission permission = query.getClass().getAnnotation(DataPermission.class);
-        if (permission != null) {
-            // 获取数据权限
-            var dataScopes = SecurityUtils.getCurrentUserDataScope();
-            if (CollUtil.isNotEmpty(dataScopes) && StringUtils.isNotBlank(permission.fieldName())) {
-                if (StringUtils.isNotBlank(permission.joinName())) {
-                    // 因为首先处理这部分，不必担心join重复。这里用var的化，join的类型会是Join<Object, Object>
-                    Join<R, ?> join = root.join(permission.joinName(), JoinType.LEFT);
-                    list.add(getExpression(permission.fieldName(), join, root).in(dataScopes));
-                } else {
-                    list.add(getExpression(permission.fieldName(), null, root).in(dataScopes));
-                }
-            }
-        }
     }
 
     private static <R, Q> void analyzeFieldQuery(Root<R> root, Q query, CriteriaBuilder cb, ArrayList<Predicate> list) throws IllegalAccessException {

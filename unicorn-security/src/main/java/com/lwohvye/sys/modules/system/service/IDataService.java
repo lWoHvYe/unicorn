@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * 数据权限服务类
+ *
  * @author Zheng Jie
  * @date 2020-05-07
  */
@@ -28,8 +29,12 @@ public interface IDataService extends BaseService {
 
     /**
      * 获取数据权限
+     *
      * @param userId /
      * @return /
      */
     List<Long> getDeptIds(Long userId, Long deptId);
+
+    String getDataScope(Long userId);
+
 }

@@ -16,5 +16,5 @@
 
 package com.lwohvye.core.base;
 
-public record SimplePOJO(Long id, String name, String code) {
+public record SimplePOJO(Long id, String name, String code, Long pid) {
 }

@@ -15,20 +15,15 @@
  */
 package com.lwohvye.core.utils;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.enums.DataScopeEnum;
+import com.lwohvye.core.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-
-import java.util.List;
 
 /**
  * 获取当前登录的用户
@@ -71,7 +66,7 @@ public class SecurityUtils {
      */
     public static Long getCurrentUserId() {
         UserDetails userDetails = getCurrentUser();
-        return new JSONObject(new JSONObject(userDetails).get("user")).get("id", Long.class);
+        return JsonUtils.findPath(userDetails, "user", "id", Long.class);
     }
 
     /**
@@ -79,10 +74,9 @@ public class SecurityUtils {
      *
      * @return /
      */
-    public static List<Long> getCurrentUserDataScope() {
+    public static String getCurrentUserDataScope() {
         UserDetails userDetails = getCurrentUser();
-        JSONArray array = JSONUtil.parseArray(new JSONObject(userDetails).get("dataScopes"));
-        return JSONUtil.toList(array, Long.class);
+        return JsonUtils.findPath(userDetails, "dataScope", null, String.class);
     }
 
     /**
@@ -91,9 +85,9 @@ public class SecurityUtils {
      * @return 级别
      */
     public static String getDataScopeType() {
-        List<Long> dataScopes = getCurrentUserDataScope();
-        if (CollUtil.isNotEmpty(dataScopes)) {
-            return "";
+        var dataScope = getCurrentUserDataScope();
+        if (StringUtils.isNotBlank(dataScope)) {
+            return dataScope;
         }
         return DataScopeEnum.ALL.getValue();
     }

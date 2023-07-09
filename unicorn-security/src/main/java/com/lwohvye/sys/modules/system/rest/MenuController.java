@@ -16,30 +16,32 @@
 package com.lwohvye.sys.modules.system.rest;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.lwohvye.core.annotation.RespResultBody;
-import com.lwohvye.core.annotation.log.OprLog;
-import com.lwohvye.api.modules.system.domain.vo.MenuVo;
-import com.lwohvye.core.base.BaseEntity.Update;
-import com.lwohvye.core.context.CycleAvoidingMappingContext;
-import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysMenuAPI;
 import com.lwohvye.api.modules.system.domain.Menu;
-import com.lwohvye.sys.modules.system.service.IMenuService;
+import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
-import com.lwohvye.sys.modules.system.service.mapstruct.MenuMapper;
+import com.lwohvye.core.annotation.RespResultBody;
+import com.lwohvye.core.annotation.log.OprLog;
+import com.lwohvye.core.base.BaseEntity.Update;
+import com.lwohvye.core.base.SimplePOJO;
+import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
+import com.lwohvye.sys.modules.system.service.IMenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,7 +57,6 @@ import java.util.stream.Collectors;
 public class MenuController implements SysMenuAPI {
 
     private final IMenuService menuService;
-    private final MenuMapper menuMapper;
     private static final String ENTITY_NAME = "menu";
 
     @Operation(summary = "导出菜单数据")
@@ -75,18 +76,14 @@ public class MenuController implements SysMenuAPI {
     @Operation(summary = "返回全部的菜单")
     @Override
     public List<MenuDto> query(@RequestParam Long pid) {
-        return menuService.getMenus(pid);
+        return menuService.fetchRootOrTargetMenus(pid);
     }
 
     @Operation(summary = "根据菜单ID返回所有子节点ID，包含自身ID")
     @Override
     public List<Long> child(@RequestParam Long id) {
-        Set<Menu> menuSet = new HashSet<>();
-        List<MenuDto> menuList = menuService.getMenus(id);
-        menuSet.add(menuService.findOne(id));
-        menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList, new CycleAvoidingMappingContext()), menuSet);
-        Set<Long> ids = menuSet.stream().map(Menu::getId).collect(Collectors.toSet());
-        return new ArrayList<>(ids);
+        var simpleMenus = menuService.fetchMenuByPid(id);
+        return simpleMenus.stream().map(SimplePOJO::id).distinct().collect(Collectors.toList());
     }
 
     @Operation(summary = "查询菜单")
@@ -107,7 +104,7 @@ public class MenuController implements SysMenuAPI {
             }
             return menuService.buildTree(new ArrayList<>(menuDtos));
         }
-        return menuService.getMenus(null);
+        return menuService.fetchRootOrTargetMenus(null);
     }
 
     @OprLog("新增菜单")
@@ -133,13 +130,17 @@ public class MenuController implements SysMenuAPI {
     @Operation(summary = "删除菜单")
     @Override
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
-        Set<Menu> menuSet = new HashSet<>();
-        for (Long id : ids) {
-            List<MenuDto> menuList = menuService.getMenus(id);
-            menuSet.add(menuService.findOne(id));
-            menuSet = menuService.getChildMenus(menuMapper.toEntity(menuList, new CycleAvoidingMappingContext()), menuSet);
-        }
-        menuService.delete(menuSet);
+        var menuSet = Optional.of(ids).orElseGet(Collections::emptySet)
+                .parallelStream().flatMap(id -> menuService.fetchMenuByPid(id).stream())
+                .distinct()
+                .map(simplePOJO -> {
+                    var menuDto = new MenuDto();
+                    menuDto.setId(simplePOJO.id());
+                    menuDto.setTitle(simplePOJO.name());
+                    menuDto.setPid(simplePOJO.pid());
+                    return menuDto;
+                }).collect(Collectors.toSet());
+        menuService.batchDelete(menuSet);
         return ResultInfo.success();
     }
 }
