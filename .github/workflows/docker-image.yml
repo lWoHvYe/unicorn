@@ -30,12 +30,12 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2.5.1
+        uses: gradle/gradle-build-action@v2.6.0
         with:
           arguments: bootBuildImage
 
       - name: Publish 2 MavenLocal
-        uses: gradle/gradle-build-action@v2.5.1
+        uses: gradle/gradle-build-action@v2.6.0
         with:
           arguments: publishToMavenLocal
 
