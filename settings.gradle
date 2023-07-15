@@ -47,7 +47,6 @@ dependencyResolutionManagement {
             version('springdoc', '2.1.0')
             version('thumbnailator', '0.4.20')
             version('xerces', '2.12.2')
-            version('yauaa', '7.20.0')
 
             plugin('spring-boot', 'org.springframework.boot').versionRef('springBoot')
             // kotlin基础插件
@@ -88,7 +87,6 @@ dependencyResolutionManagement {
             library('springdoc-webmvc-ui', 'org.springdoc', 'springdoc-openapi-starter-webmvc-ui').versionRef('springdoc')
             library('thumbnailator', 'net.coobird', 'thumbnailator').versionRef('thumbnailator')
             library('xerces', 'xerces', 'xercesImpl').versionRef('xerces')
-            library('yauaa', 'nl.basjes.parse.useragent', 'yauaa').versionRef('yauaa')
 
             bundle('coroutines', ['coroutines-core', 'coroutines-jdk8', 'coroutines-jdk9'])
         }

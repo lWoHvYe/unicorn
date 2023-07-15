@@ -88,8 +88,8 @@ subprojects {
         automaticModule("org.redisson:redisson", 'redisson')
         automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
         // runtimeOnly
-        automaticModule("org.apache.commons:commons-math3", 'commons.math3')
-        automaticModule("com.zaxxer:SparseBitSet", 'SparseBitSet')
+//        automaticModule("org.apache.commons:commons-math3", 'commons.math3')
+//        automaticModule("com.zaxxer:SparseBitSet", 'SparseBitSet')
     }
 }
 
