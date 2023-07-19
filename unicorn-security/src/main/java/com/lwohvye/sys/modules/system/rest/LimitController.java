@@ -29,18 +29,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 接口限流测试类
  */
 @RestController
-@RequestMapping("/api/limit")
+@RequestMapping("/api/anonymous/limit")
 @Tag(name = "LimitController", description = "系统：限流测试管理")
 public class LimitController {
 
     private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger();
 
     /**
-     * 测试限流注解，下面配置说明该接口 60秒内最多只能访问 10次，保存到redis的键名为 limit_test，
+     * 测试限流注解，下面配置说明该接口 60秒内最多只能访问 10次，
      */
     @AnonymousGetMapping
     @Operation(summary = "测试")
-    @Limit(key = "test", period = 60, count = 10, name = "testLimit", prefix = "limit")
+    @Limit(key = "test_rate_limit", period = 60, count = 10, name = "testLimit")
     public int test() {
         return ATOMIC_INTEGER.incrementAndGet();
     }

@@ -14,10 +14,16 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.starter.modules.service;
+package com.lwohvye.sys.modules.system.event;
 
-public interface ITSService {
+import com.lwohvye.api.modules.system.domain.Resource;
 
-    void setField(String tsName) ;
-    String outIn();
+public class ResEvent extends BaseEvent<Resource> {
+    /**
+     * @param source    最初触发该事件的对象
+     * @param eventData 该类型事件携带的信息
+     */
+    public ResEvent(Object source, Resource eventData) {
+        super(source, eventData);
+    }
 }

@@ -16,6 +16,7 @@
 
 package com.lwohvye.core.config;
 
+import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
@@ -56,7 +57,9 @@ public class ValentineExecutorConfig {
     @Bean
     @ConditionalOnJava(value = JavaVersion.TWENTY_ONE, range = ConditionalOnJava.Range.OLDER_THAN)
     public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
-        var virtualFactory = Thread.ofVirtual().name("Virtual-WebServer").factory();
-        return protocolHandler -> protocolHandler.setExecutor(Executors.newThreadPerTaskExecutor(virtualFactory));
+//        var virtualFactory = Thread.ofVirtual().name("Virtual-WebServer").factory();
+//        return protocolHandler -> protocolHandler.setExecutor(Executors.newThreadPerTaskExecutor(virtualFactory));
+//        counter can't be disabled, based on reflect
+        return protocolHandler -> protocolHandler.setExecutor(new VirtualThreadExecutor("Virtual-WebServer-"));
     }
 }

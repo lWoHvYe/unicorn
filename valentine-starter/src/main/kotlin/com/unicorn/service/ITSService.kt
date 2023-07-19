@@ -13,8 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.unicorn.service
 
-package com.lwohvye.core.base;
-
-public record SimplePOJO(Long id, String name, String code, Long pid) {
+interface ITSService {
+    fun setField(tsName: String?)
+    fun outIn(): String?
 }

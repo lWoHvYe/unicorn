@@ -38,6 +38,8 @@ public interface CacheKey {
      * 数据
      */
     Map<String, String> DATA_USER = Map.of(CACHE_NAME, "data", CACHE_KEY, LocalCoreConfig.SYS_NAME + "user:");
+    Map<String, String> DATA_SCOPE = Map.of(CACHE_NAME, "data", CACHE_KEY, LocalCoreConfig.SYS_NAME + "data_scope4user:");
+
     /**
      * 菜单
      */

@@ -36,7 +36,6 @@ module lwohvye.unicorn.core {
     requires transitive io.swagger.v3.oas.annotations;
     requires transitive lombok;
     requires mica.ip2region;
-    requires nl.basjes.parse.useragent;
     requires org.apache.commons.codec;
     requires org.apache.commons.lang3;
     requires transitive org.apache.poi.poi;

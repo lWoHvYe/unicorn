@@ -19,53 +19,32 @@ import com.lwohvye.core.annotation.Limit;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.RequestHolder;
 import com.lwohvye.core.utils.StringUtils;
-import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.redisson.api.RateIntervalUnit;
+import org.redisson.api.RateType;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
-import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * @author /
  */
 @Aspect
 @Component
+@RequiredArgsConstructor
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET) // 在Spring为Web服务时生效
 public class LimitAspect {
 
-    private final RedisTemplate<Object, Object> redisTemplate;
     private static final Logger logger = LoggerFactory.getLogger(LimitAspect.class);
 
-    /**
-     * 限流脚本
-     */
-    private static final String RATIO_LIMIT_lUA_SCRIPT = """
-            local c
-            c = redis.call('get',KEYS[1])
-            if c and tonumber(c) > tonumber(ARGV[1]) then
-            return c;
-            end
-            c = redis.call('incr',KEYS[1])
-            if tonumber(c) == 1 then
-            redis.call('expire',KEYS[1],ARGV[2])
-            end
-            return c;
-            """;
-
-    public LimitAspect(RedisTemplate<Object, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
+    private final RedissonClient redissonClient;
 
     @Pointcut("@annotation(com.lwohvye.core.annotation.Limit)")
     public void pointcut() {
@@ -73,13 +52,13 @@ public class LimitAspect {
 
     @Around("pointcut()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-        HttpServletRequest request = RequestHolder.getHttpServletRequest();
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Method signatureMethod = signature.getMethod();
+        var request = RequestHolder.getHttpServletRequest();
+        var signature = (MethodSignature) joinPoint.getSignature();
+        var signatureMethod = signature.getMethod();
         Limit limit = signatureMethod.getAnnotation(Limit.class);
-        LimitType limitType = limit.limitType();
-        String key = limit.key();
-        if (StringUtils.isEmpty(key)) {
+        var limitType = limit.limitType();
+        var key = limit.key();
+        if (StringUtils.isBlank(key)) {
             if (limitType == LimitType.IP) {
                 key = StringUtils.getIp(request);
             } else {
@@ -87,16 +66,14 @@ public class LimitAspect {
             }
         }
 
-        List<Object> keys = List.of(StringUtils.join(limit.prefix(), "_", key, "_", request.getRequestURI().replaceAll("/", "_")));
+        var rateLimiter = redissonClient.getRateLimiter(key);
 
-        RedisScript<Number> redisScript = new DefaultRedisScript<>(RATIO_LIMIT_lUA_SCRIPT, Number.class);
-        Number count = redisTemplate.execute(redisScript, keys, limit.count(), limit.period());
-        if (null != count && count.intValue() <= limit.count()) {
-            logger.info("第{}次访问key为 {}，描述为 [{}] 的接口", count, keys, limit.name());
+        rateLimiter.trySetRate(RateType.OVERALL, limit.count(), limit.period(), RateIntervalUnit.SECONDS);
+        if (rateLimiter.tryAcquire(1)) {
+            logger.info("key {}，availablePermits {}", limit.key(), rateLimiter.availablePermits());
             return joinPoint.proceed();
         } else {
-            throw new BadRequestException("访问次数受限制");
+            throw new BadRequestException(limit.name() + " -> 访问次数受限制");
         }
     }
-
 }

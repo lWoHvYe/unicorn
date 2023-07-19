@@ -843,6 +843,8 @@ INSERT INTO `sys_resource`
 VALUES (19, '匿名标记', '/api/anonymous/**', NULL, 1, NULL, '通一匿名标记');
 INSERT INTO `sys_resource`
 VALUES (20, '资源不存在', '/error', NULL, 1, NULL, '接口等不存在');
+INSERT INTO `sys_resource`
+VALUES (21, 'ico图标资源', '/**/*.ico', NULL, 1, NULL, '图标资源');
 COMMIT;
 
 -- ----------------------------
@@ -1258,6 +1260,8 @@ INSERT INTO `sys_roles_resources`
 VALUES (16, 19);
 INSERT INTO `sys_roles_resources`
 VALUES (16, 20);
+INSERT INTO `sys_roles_resources`
+VALUES (16, 21);
 COMMIT;
 
 -- ----------------------------

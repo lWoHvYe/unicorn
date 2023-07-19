@@ -18,18 +18,17 @@ package com.lwohvye.core.utils;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.http.useragent.UserAgentUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.lwohvye.core.config.LocalCoreConfig;
 import com.lwohvye.core.constant.ElAdminConstant;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.ip2region.core.Ip2regionSearcher;
 import net.dreamlu.mica.ip2region.core.IpInfo;
-import nl.basjes.parse.useragent.UserAgent;
-import nl.basjes.parse.useragent.UserAgentAnalyzer;
 import org.springframework.lang.NonNull;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -51,17 +50,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * 注入bean
      */
     private static final Ip2regionSearcher IP_SEARCHER = SpringContextHolder.getBean(Ip2regionSearcher.class);
-
-
-    // If you make the UserAgentAnalyzer a static member of a class then cleaning it up after use may be a problem.
-    // One case where this happens is in the context of something like Tomcat where a webapp is loaded and then unloaded.
-    // If the analyzer is a static member of your servlet then this unloading may retain a lot of the memory used for the internal data structures.
-    private static final UserAgentAnalyzer USER_AGENT_ANALYZER = UserAgentAnalyzer
-            .newBuilder()
-            .hideMatcherLoadStats()
-            .withCache(10000)
-            .withField(UserAgent.AGENT_NAME_VERSION)
-            .build();
 
     /**
      * 驼峰命名法工具
@@ -246,8 +234,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     public static String getBrowser(HttpServletRequest request) {
-        var userAgent = USER_AGENT_ANALYZER.parse(request.getHeader("User-Agent"));
-        return userAgent.get(UserAgent.AGENT_NAME_VERSION).getValue();
+        var ua = UserAgentUtil.parse(request.getHeader("User-Agent"));
+        return String.format("%s: %s-%s", ua.getPlatform(), ua.getBrowser(), ua.getVersion());
     }
 
     /**

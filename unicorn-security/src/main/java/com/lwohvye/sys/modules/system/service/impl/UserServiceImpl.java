@@ -259,6 +259,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     @CacheEvict(allEntries = true)
     public void delete(Set<Long> ids) {
         userRepository.deleteAllByIdIn(ids);
+        userLocalCache.cleanAll();
     }
 
     @Override

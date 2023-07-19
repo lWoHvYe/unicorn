@@ -21,7 +21,9 @@ import com.lwohvye.api.modules.system.domain.Menu;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 
+import com.lwohvye.core.base.SimplePOJO;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -66,12 +68,8 @@ public interface IMenuService extends BaseService {
 
     /**
      * 获取所有子节点，包含自身ID
-     *
-     * @param menuList /
-     * @param menuSet  /
-     * @return /
      */
-    Set<Menu> getChildMenus(List<Menu> menuList, Set<Menu> menuSet);
+    List<SimplePOJO> fetchMenuByPid(Long pid);
 
     /**
      * 构建菜单树
@@ -108,7 +106,7 @@ public interface IMenuService extends BaseService {
      *
      * @param menuSet /
      */
-    void delete(Set<Menu> menuSet);
+    void batchDelete(Set<MenuDto> menuSet);
 
     /**
      * 导出
@@ -125,7 +123,7 @@ public interface IMenuService extends BaseService {
      * @param pid /
      * @return /
      */
-    List<MenuDto> getMenus(Long pid);
+    List<MenuDto> fetchRootOrTargetMenus(Long pid);
 
     /**
      * 根据ID获取同级与上级数据

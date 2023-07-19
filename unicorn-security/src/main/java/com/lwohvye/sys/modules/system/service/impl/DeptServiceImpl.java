@@ -29,6 +29,7 @@ import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.sys.modules.system.service.mapstruct.DeptMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
@@ -40,8 +41,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.*;
@@ -203,8 +202,14 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public List<Long> getDeptChildren(List<Dept> deptList) {
+    @Cacheable
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> fetchDeptChildByPid(Long pid) {
+        var deptChildren = Optional.of(findByPid(pid)).orElseGet(Collections::emptyList);
+        return getDeptChildren(deptChildren);
+    }
+
+    private List<Long> getDeptChildren(List<Dept> deptList) {
         var deptIds = deptList.stream().filter(Dept::getEnabled).map(Dept::getId).toList();
         if (deptIds.isEmpty())
             return Collections.emptyList();

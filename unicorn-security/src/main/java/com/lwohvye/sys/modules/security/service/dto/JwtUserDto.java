@@ -38,7 +38,7 @@ public class JwtUserDto implements UserDetails {
 
     private final UserInnerDto user;
 
-    private final List<Long> dataScopes;
+    private final String dataScope;
 
     // 不做序列化，使用时进行转换
     @JsonIgnore
