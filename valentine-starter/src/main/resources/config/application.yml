@@ -38,9 +38,9 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
-  autoconfigure:
+  # autoconfigure:
     # to use VT for Async, should exclude this
-    exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+    # exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
 
 #密码加密传输，前端公钥加密，后端私钥解密
 rsa:

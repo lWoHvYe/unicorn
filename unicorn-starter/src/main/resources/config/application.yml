@@ -31,6 +31,9 @@ spring:
     redis:
       repositories:
         enabled: false
+  threads:
+    virtual:
+      enabled: true
 
   #配置 Jpa
   jpa:
@@ -44,9 +47,6 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
-  autoconfigure:
-    # to use VT, should exclude this
-    exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
 
   # 参考：https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.6-Release-Notes#pathpattern-based-path-matching-strategy-for-spring-mvc
   # The default strategy for matching request paths against registered Spring MVC handler mappings has changed from AntPathMatcher to PathPatternParser

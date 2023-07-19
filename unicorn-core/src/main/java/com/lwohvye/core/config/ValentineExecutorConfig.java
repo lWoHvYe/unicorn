@@ -43,6 +43,7 @@ public class ValentineExecutorConfig {
      * @date 2022/11/29 12:54 PM
      */
     @Bean(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME)
+    @ConditionalOnJava(value = JavaVersion.TWENTY_ONE, range = ConditionalOnJava.Range.OLDER_THAN)
     public AsyncTaskExecutor asyncTaskExecutor() {
         var virtualFactory = Thread.ofVirtual().name("Virtual-Async").factory();
         return new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(virtualFactory));
