@@ -17,6 +17,7 @@ package com.unicorn.rest
 
 import com.unicorn.service.ITSService
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -37,8 +38,10 @@ class TSController(val itsService: ITSService) {
         itsService.setField(name)
         runBlocking {
             repeat(5) {
-                println(" ${Thread.currentThread().threadId()} name: $name  --tsName: ${itsService.outIn()}")
-                delay(Duration.parse("1s"))
+                launch {
+                    delay(Duration.parse("${it}s"))
+                    println(" ${Thread.currentThread().threadId()} name: $name  --> tsName: ${itsService.outIn()}")
+                }
             }
         }
     }

@@ -49,7 +49,6 @@ public class ResourceController implements SysResourceAPI {
 
     private final IResourceService resourceService;
 
-    @OprLog("查询资源")
     @Operation(summary = "查询资源")
     @Override
     public Map<String, Object> query(ResourceQueryCriteria criteria, Pageable pageable) {
