@@ -18,6 +18,7 @@ package com.lwohvye.core.config;
 
 import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.system.JavaVersion;
@@ -34,6 +35,7 @@ import java.util.concurrent.Executors;
  */
 @AutoConfiguration
 @ConditionalOnJava(JavaVersion.NINETEEN)
+@ConditionalOnExpression("!${spring.threads.virtual.enabled:false}")
 public class ValentineExecutorConfig {
 
     /**
