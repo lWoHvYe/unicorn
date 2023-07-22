@@ -18,6 +18,7 @@ package com.lwohvye.core.config;
 
 import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.system.JavaVersion;
@@ -34,6 +35,7 @@ import java.util.concurrent.Executors;
  */
 @AutoConfiguration
 @ConditionalOnJava(JavaVersion.NINETEEN)
+@ConditionalOnExpression("!${spring.threads.virtual.enabled:false}")
 public class ValentineExecutorConfig {
 
     /**
@@ -43,7 +45,6 @@ public class ValentineExecutorConfig {
      * @date 2022/11/29 12:54 PM
      */
     @Bean(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME)
-    @ConditionalOnJava(value = JavaVersion.TWENTY_ONE, range = ConditionalOnJava.Range.OLDER_THAN)
     public AsyncTaskExecutor asyncTaskExecutor() {
         var virtualFactory = Thread.ofVirtual().name("Virtual-Async").factory();
         return new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(virtualFactory));
@@ -56,7 +57,6 @@ public class ValentineExecutorConfig {
      * @date 2022/11/29 12:53 PM
      */
     @Bean
-    @ConditionalOnJava(value = JavaVersion.TWENTY_ONE, range = ConditionalOnJava.Range.OLDER_THAN)
     public TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
 //        var virtualFactory = Thread.ofVirtual().name("Virtual-WebServer").factory();
 //        return protocolHandler -> protocolHandler.setExecutor(Executors.newThreadPerTaskExecutor(virtualFactory));
