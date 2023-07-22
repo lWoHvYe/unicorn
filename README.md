@@ -25,6 +25,8 @@
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS/Jigsaw）。
 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
+**Java 19**起，引入Virtual Threads/Project Loom，相关[详见](document/jdk/Java-Preview.md)
+
 ---
 
 #### 引用方式 🎵
@@ -33,23 +35,21 @@
 
 ##### Maven
 
-**可根据需要选择版本**
-
 ```xml
-        <project.core.version>4.2.0-omicron</project.core.version>
+    <project.core.version>4.2.0-omicron</project.core.version>
 
-        <!--    system模块    -->
-        <dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-security</artifactId>
-            <version>${project.core.version}</version>
-        </dependency>
-        <!--   logging模块     -->
-        <dependency>
-            <groupId>com.lwohvye</groupId>
-            <artifactId>unicorn-logging</artifactId>
-            <version>${project.core.version}</version>
-        </dependency>
+    <!--    system模块    -->
+    <dependency>
+        <groupId>com.lwohvye</groupId>
+        <artifactId>unicorn-security</artifactId>
+        <version>${project.core.version}</version>
+    </dependency>
+    <!--   logging模块     -->
+    <dependency>
+        <groupId>com.lwohvye</groupId>
+        <artifactId>unicorn-logging</artifactId>
+        <version>${project.core.version}</version>
+    </dependency>
 
 ```
 
@@ -103,7 +103,6 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - 对一些常用前端组件封装：表格数据请求、数据字典等
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对MySQL数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
-- 另有TiDB分布式关系型数据库 方案，优于自行分库分表，但为Commercial方案，所以还是更推荐ShardingSphere。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
 - 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，
@@ -140,7 +139,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - `unicorn-starter` 启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离）
 
-- `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin/Kotlinx，试用TiDB
+- `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin/Kotlinx
 
 #### 详细结构
 
@@ -183,7 +182,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 运行环境
 
-- Java 20 基础运行环境
+- Java 21 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
 - Redis 6.0 缓存
 - RabbitMQ 发布-订阅（解耦、异步）
@@ -215,7 +214,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - dev_4.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
   推测是Spring Boot的 ClassLoader下全是Auto-Module）
-- Resource管理页面(partly)，delay
+- Resource管理页面(partly，角色-资源管理)，delay
 - swarm化，可以参考[why-swarm (已停工，后续计划接入OAuth2.0)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO

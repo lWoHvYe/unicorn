@@ -44,8 +44,8 @@ public final class ConcurrencyUtils {
             if (Objects.nonNull(tasks))
                 subtasks = Arrays.stream(tasks).map(scope::fork).toList();
 
-            scope.join();           // Join both forks
-            scope.throwIfFailed();  // ... and propagate errors
+            scope.join()           // Join both forks
+                .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
             Object results = null;
@@ -72,8 +72,8 @@ public final class ConcurrencyUtils {
             if (Objects.nonNull(tasks))
                 Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
 
-            scope.join();           // Join both forks
-            scope.throwIfFailed();  // ... and propagate errors
+            scope.join()           // Join both forks
+                .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
             if (Objects.nonNull(eventual))
