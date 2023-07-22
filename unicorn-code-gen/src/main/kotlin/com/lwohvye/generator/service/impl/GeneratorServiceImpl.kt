@@ -95,31 +95,31 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
         return PageUtils.toPage(tableInfos, totalElements)
     }
 
-    override fun getColumns(tableName: String?): List<ColumnInfo?>? {
-        var columnInfos = columnInfoRepository.findByTableNameOrderByIdAsc(tableName)
+    override fun getColumns(name: String): List<ColumnInfo?>? {
+        var columnInfos = columnInfoRepository.findByTableNameOrderByIdAsc(name)
         return if (CollectionUtil.isNotEmpty(columnInfos)) {
             columnInfos
         } else {
-            columnInfos = query(tableName)
+            columnInfos = query(name)
             columnInfoRepository.saveAll(columnInfos)
         }
     }
 
-    override fun query(tableName: String?): List<ColumnInfo?> {
+    override fun query(table: String): List<ColumnInfo?> {
         // 使用预编译防止sql注入
         val sql = """
                select column_name, is_nullable, data_type, column_comment, column_key, extra from information_schema.columns 
                     where table_name = ? and table_schema = (select database()) order by ordinal_position
             """.trimIndent()
         val query = em.createNativeQuery(sql)
-        query.setParameter(1, tableName)
+        query.setParameter(1, table)
         val result = query.resultList
         val columnInfos: MutableList<ColumnInfo?> = ArrayList()
         for (obj in result) {
             val arr = obj as Array<Any>
             columnInfos.add(
                 ColumnInfo(
-                    tableName,
+                    table,
                     arr[0].toString(), "NO" == arr[1],
                     arr[2].toString(),
                     if (ObjectUtil.isNotNull(arr[3])) arr[3].toString() else null,

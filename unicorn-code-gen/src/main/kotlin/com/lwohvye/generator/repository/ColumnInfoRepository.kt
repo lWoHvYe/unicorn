@@ -28,5 +28,5 @@ interface ColumnInfoRepository : JpaRepository<ColumnInfo?, Long?> {
      * @param tableName 表格名
      * @return 表信息
      */
-    fun findByTableNameOrderByIdAsc(tableName: String?): List<ColumnInfo?>?
+    fun findByTableNameOrderByIdAsc(tableName: String): List<ColumnInfo?>?
 }

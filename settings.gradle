@@ -4,6 +4,12 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        maven {
+            url 'https://repo.spring.io/milestone'
+        }
+        maven {
+            url 'https://repo.spring.io/snapshot'
+        }
     }
 }
 
@@ -17,6 +23,12 @@ dependencyResolutionManagement {
         gradlePluginPortal()
         flatDir {
             dirs "$rootProject.projectDir/ex-lib"
+        }
+        maven {
+            url 'https://repo.spring.io/snapshot'
+        }
+        maven {
+            url 'https://repo.spring.io/milestone'
         }
     }
 

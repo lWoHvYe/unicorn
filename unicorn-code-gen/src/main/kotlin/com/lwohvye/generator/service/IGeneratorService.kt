@@ -40,7 +40,7 @@ interface IGeneratorService {
      * @param name 表名
      * @return /
      */
-    fun getColumns(name: String?): List<ColumnInfo?>?
+    fun getColumns(name: String): List<ColumnInfo?>?
 
     /**
      * 同步表数据
@@ -102,5 +102,5 @@ interface IGeneratorService {
      * @param table /
      * @return /
      */
-    fun query(table: String?): List<ColumnInfo?>
+    fun query(table: String): List<ColumnInfo?>
 }

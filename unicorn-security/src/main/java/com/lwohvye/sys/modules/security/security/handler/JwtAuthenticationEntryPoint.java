@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.Objects;
 
 /**
@@ -43,7 +44,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         // 当用户尝试访问安全的REST资源而不提供任何凭据时，将调用此方法发送401 响应
         if (!Objects.isNull(authException))
-            log.error(" authException {} || ip: {} ", authException.getMessage(), StringUtils.getIp(request));
+            log.error(" authException {} -> {} || ip: {} ", authException.getMessage(), request.getRequestURI(), StringUtils.getIp(request));
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UnAuthorized");
     }
 }
