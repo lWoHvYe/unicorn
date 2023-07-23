@@ -26,18 +26,23 @@ import java.lang.reflect.Field;
 @SuppressWarnings("unused")
 public class UnsafeUtils {
     public static final Unsafe UNSAFE;
+    public static final long ARRAY_BYTE_BASE_OFFSET;
 
     static {
         Unsafe unsafe = null;
+        var offset = -1;
         try {
             // 这里只能这样获取，通过Unsafe.getUnsafe()直接获取会抛出异常 if (!VM.isSystemDomainLoader(caller.getClassLoader()))
             var theUnsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+//            var theUnsafeField = Unsafe.class.getDeclaredFields()[0];
             theUnsafeField.trySetAccessible();
             unsafe = (Unsafe) theUnsafeField.get(null);
+            offset = Unsafe.ARRAY_BYTE_BASE_OFFSET;
         } catch (Exception ignored) {
             // ignored
         }
         UNSAFE = unsafe;
+        ARRAY_BYTE_BASE_OFFSET = offset;
     }
 
     public static Object getObject(Object o, long offset) {
