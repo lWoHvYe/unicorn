@@ -22,13 +22,14 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 //@SpringBootTest
@@ -61,5 +62,34 @@ class UnicornAppRunTest {
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(responseEntity.getBody()).thenReturn("");
 
+    }
+
+    //    stub相同方法的不同调用次数时的返回值
+    @Test
+    void MultiCallReturnMethodStubTest() {
+        var list = mock(List.class);
+        when(list.size()).thenReturn(1, 2, 3, 4);
+        assertEquals(1, list.size());
+        assertEquals(2, list.size());
+        assertEquals(3, list.size());
+        assertEquals(4, list.size());
+//      后续调用，最后的stub生效
+        assertEquals(4, list.size());
+        assertEquals(4, list.size());
+        assertEquals(4, list.size());
+        assertEquals(4, list.size());
+    }
+
+    //    调用mock对象由参数的方法时，需要根据参数来返回不同的返回值，需要thenAnswer来完成
+    @Test
+    void MultiCallArgMethodReturnStubTest() {
+        var list = mock(List.class);
+        when(list.get(anyInt())).thenAnswer(invocation -> {
+            Integer argument = invocation.getArgument(0);
+            return String.valueOf(argument * 10);
+        });
+
+        assertEquals("10", list.get(1));
+        assertEquals("990", list.get(99));
     }
 }
