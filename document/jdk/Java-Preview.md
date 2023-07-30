@@ -77,6 +77,7 @@
 - [IntelliJ IDEA Conf 2022 | Project Loom: Revolution in Concurrency or Obscure Implementation Detail?](https://www.youtube.com/watch?v=0DUlUzqr09I)
 - [Running Kotlin Coroutines on Project Loom](https://kt.academy/article/dispatcher-loom)
 - [Spring Boot 3.2 ships support for Virtual Threads](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2.0-M1-Release-Notes)
+- [Compatibility with virtual threads (OpenJDK's Project Loom)](https://github.com/spring-projects/spring-framework/issues/23443)
 
 通过JProfiler可以查看Thread的情况，这一点不得不说收费的就是不一样。VisualVM和jconsole都看不到类型信息。
 可以看的基本的main Thread，及19后听到的CarrierThreads和VirtualThreads
