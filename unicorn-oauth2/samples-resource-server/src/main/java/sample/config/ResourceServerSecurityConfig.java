@@ -38,11 +38,11 @@ public class ResourceServerSecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeHttpRequests -> authorizeHttpRequests
                         // 需要特定authority
-                        .pathMatchers("/messages").hasAuthority("SCOPE_message.read")
-                        .pathMatchers(HttpMethod.GET, "/resource").hasAuthority("SCOPE_resource.read")
-                        .pathMatchers(HttpMethod.POST, "/resource").hasAuthority("SCOPE_resource.write")
-                        .pathMatchers(HttpMethod.PUT, "/resource").hasAuthority("SCOPE_resource.write")
-                        .pathMatchers(HttpMethod.DELETE, "/resource").hasAuthority("SCOPE_resource.write")
+                        .pathMatchers("/api/messages").hasAuthority("SCOPE_message.read")
+                        .pathMatchers(HttpMethod.GET, "/api/resource").hasAuthority("SCOPE_resource.read")
+                        .pathMatchers(HttpMethod.POST, "/api/resource").hasAuthority("SCOPE_resource.write")
+                        .pathMatchers(HttpMethod.PUT, "/api/resource").hasAuthority("SCOPE_resource.write")
+                        .pathMatchers(HttpMethod.DELETE, "/api/resource").hasAuthority("SCOPE_resource.write")
                         // 可匿名访问，业务中会有业务逻辑相关的control
                         .pathMatchers("/explore/**").permitAll()
                         // 需要登陆才可访问，这个一般是主体

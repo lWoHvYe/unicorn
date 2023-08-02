@@ -33,7 +33,7 @@ public class NumberController {
     //
     //  在 SSE 中，每个数据项被包含在一个称为事件流（event stream）的数据流中。而每个数据项都以 "data:" 字段开头，然后是实际的数据内容。这样客户端就能够识别数据项，并根据 "data:" 字段来解析数据。
     // 使用 produces = MediaType.TEXT_EVENT_STREAM_VALUE 来指定响应的数据类型为 Server-Sent Events (SSE)，这样客户端可以以流的方式接收数据。
-    @GetMapping(value = "/numbers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/api/numbers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Integer> generateNumbers() {
         // 创建一个包含 1 到 10 的数字的 Flux
         Flux<Integer> numbers = Flux.range(1, 10);
@@ -43,7 +43,7 @@ public class NumberController {
     }
 
     // http://127.0.0.1:8080/res/concatNumbers
-    @GetMapping(value = "/concatNumbers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/api/concatNumbers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> generateConcatNumbers() {
         // 创建包含初始字符串 "starting" 的 Flux
         Flux<String> startingFlux = Flux.just("Starting");
