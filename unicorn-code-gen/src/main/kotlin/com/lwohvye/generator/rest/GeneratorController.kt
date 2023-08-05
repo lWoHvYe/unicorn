@@ -64,7 +64,7 @@ class GeneratorController(val generatorService: IGeneratorService, val genConfig
     @Operation(summary = "查询字段数据")
     @RespResultBody
     @GetMapping(value = ["/columns"])
-    fun queryColumns(@RequestParam tableName: String?): Map<String, Any> {
+    fun queryColumns(@RequestParam tableName: String): Map<String, Any> {
         val columnInfos = generatorService.getColumns(tableName)
         return PageUtils.toPage(columnInfos, columnInfos!!.size)
     }
@@ -81,7 +81,8 @@ class GeneratorController(val generatorService: IGeneratorService, val genConfig
     @PostMapping(value = ["sync"])
     fun sync(@RequestBody tables: List<String?>): ResponseEntity<ResultInfo<String>> {
         for (table in tables) {
-            generatorService.sync(generatorService.getColumns(table), generatorService.query(table))
+            generatorService.sync(table?.let { generatorService.getColumns(it) },
+                table?.let { generatorService.query(it) })
         }
         return ResponseEntity(HttpStatus.NO_CONTENT)
     }
@@ -90,28 +91,29 @@ class GeneratorController(val generatorService: IGeneratorService, val genConfig
     @RespResultBody
     @PostMapping(value = ["/{tableName}/{type}"])
     fun generator(
-        @PathVariable tableName: String?,
+        @PathVariable tableName: String,
         @PathVariable type: Int,
-        request: HttpServletRequest?,
-        response: HttpServletResponse?
+        request: HttpServletRequest,
+        response: HttpServletResponse
     ): List<Map<String, Any>> {
         if (java.lang.Boolean.FALSE == generatorEnabled && type == 0) {
             throw BadRequestException("此环境不允许生成代码，请选择预览或者下载查看！")
         }
+        val tableNamePlain = tableName.replace(Regex("\\."), "").replace("/", "")
         when (type) {
             0 -> generatorService.generator(
-                genConfigService.find(tableName),
-                generatorService.getColumns(tableName)
+                genConfigService.find(tableNamePlain),
+                generatorService.getColumns(tableNamePlain)
             )
 
             1 -> return generatorService.preview(
-                genConfigService.find(tableName),
-                generatorService.getColumns(tableName)
+                genConfigService.find(tableNamePlain),
+                generatorService.getColumns(tableNamePlain)
             )
 
             2 -> generatorService.download(
-                genConfigService.find(tableName),
-                generatorService.getColumns(tableName),
+                genConfigService.find(tableNamePlain),
+                generatorService.getColumns(tableNamePlain),
                 request,
                 response
             )

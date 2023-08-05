@@ -37,13 +37,13 @@ public abstract class YRabbitAbstractConsumer {
 
     // 使用线程池，做资源隔离。这里从19开始使用Virtual Threads（不再是一个用后归还的pool）。这个是类变量(static)，所有子类(实例)共享
     // As for Virtual Threads We create it, run it and then forget it. So this pool is just used for creating Threads.
-    static ExecutorService simVirtualExecutor;
-
-    static {
+//    static ExecutorService simVirtualExecutor;
+//
+//    static {
         // 兼容Old API，这里name支持 name + start的模式，start会自动递增，但考虑着虚拟线程会很多，且没必要加上start作区分
-        var virtualFactory = Thread.ofVirtual().name("Virtual-Rabbit").factory();
-        simVirtualExecutor = Executors.newThreadPerTaskExecutor(virtualFactory);
-    }
+//        var virtualFactory = Thread.ofVirtual().name("Virtual-Rabbit").factory();
+//        simVirtualExecutor = Executors.newThreadPerTaskExecutor(virtualFactory);
+//    }
 
     // 若用到该属性，子类需通过set注入
     protected RedissonClient redissonClient;
@@ -136,37 +136,39 @@ public abstract class YRabbitAbstractConsumer {
      */
     protected void reConsumeMsg(Consumer<Message> consumer, Message message) {
         // 线程池来执行，异步
-        simVirtualExecutor.execute(() -> {
-            // 打个标记，只会重消费一次，不然就无穷无尽了
-            var mask = "ReConsumed";
-            var header = message.getMessageProperties().getHeader(mask);
-            if (Objects.isNull(header)) {
-                message.getMessageProperties().setHeader(mask, "Ignored");
-                try {
-                    // 暂停2s后，再重新消费一次
-                    Thread.sleep(1500L);
-                    consumer.accept(message);
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
+        Thread.ofVirtual().name("Virtual-Rabbit")
+                .start(() -> {
+                    // 打个标记，只会重消费一次，不然就无穷无尽了
+                    var mask = "ReConsumed";
+                    var header = message.getMessageProperties().getHeader(mask);
+                    if (Objects.isNull(header)) {
+                        message.getMessageProperties().setHeader(mask, "Ignored");
+                        try {
+                            // 暂停2s后，再重新消费一次
+                            Thread.sleep(1500L);
+                            consumer.accept(message);
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
     }
 
     protected void reConsumeMsg(Consumer<String> consumer, String strMsg) {
-        simVirtualExecutor.execute(() -> {
-            var amqpMsgEntity = JsonUtils.toJavaObject(strMsg, AmqpMsgEntity.class);
-            if (!amqpMsgEntity.isConsumed()) {
-                amqpMsgEntity.setConsumed(true);
-                try {
-                    // 暂停2s后，再重新消费一次
-                    Thread.sleep(1500L);
-                    consumer.accept(JsonUtils.toJSONString(amqpMsgEntity));
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        });
+        Thread.ofVirtual().name("Virtual-Rabbit")
+                .start(() -> {
+                    var amqpMsgEntity = JsonUtils.toJavaObject(strMsg, AmqpMsgEntity.class);
+                    if (!amqpMsgEntity.isConsumed()) {
+                        amqpMsgEntity.setConsumed(true);
+                        try {
+                            // 暂停2s后，再重新消费一次
+                            Thread.sleep(1500L);
+                            consumer.accept(JsonUtils.toJSONString(amqpMsgEntity));
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                });
     }
 
     @SuppressWarnings("unchecked")
