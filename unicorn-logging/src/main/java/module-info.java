@@ -1,7 +1,6 @@
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module lwohvye.unicorn.logging {
 
-    requires jdk.incubator.concurrent;
     requires transitive lwohvye.unicorn.core;
     requires transitive spring.rabbit;
 

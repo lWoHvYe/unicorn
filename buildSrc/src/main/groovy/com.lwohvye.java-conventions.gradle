@@ -9,8 +9,8 @@ plugins {
 }
 
 group = 'com.lwohvye'
-version = '4.0.1-nu'
-java.sourceCompatibility = JavaVersion.VERSION_20
+version = '4.2.0-omicron'
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 java {
     withSourcesJar()
