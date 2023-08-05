@@ -33,7 +33,7 @@ spring:
       hibernate:
         # dialect: org.hibernate.dialect.MySQLDialect
         enable_lazy_no_trans: true
-    database-platform: org.hibernate.dialect.TiDBDialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     open-in-view: true
     hibernate:
       ddl-auto: none

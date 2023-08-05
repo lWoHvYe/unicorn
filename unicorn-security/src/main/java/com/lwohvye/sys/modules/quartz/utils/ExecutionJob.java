@@ -16,14 +16,14 @@
 package com.lwohvye.sys.modules.quartz.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.sys.modules.quartz.domain.QuartzJob;
-import com.lwohvye.sys.modules.quartz.domain.QuartzLog;
 import com.lwohvye.core.config.ValentineExecutorConfig;
 import com.lwohvye.core.utils.MailAdapter;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.core.utils.ThrowableUtils;
 import com.lwohvye.core.utils.redis.RedisUtils;
+import com.lwohvye.sys.modules.quartz.domain.QuartzJob;
+import com.lwohvye.sys.modules.quartz.domain.QuartzLog;
 import com.lwohvye.sys.modules.quartz.service.IQuartzJobService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
@@ -33,9 +33,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * 参考人人开源，https://gitee.com/renrenio/renren-security
@@ -47,12 +45,6 @@ import java.util.concurrent.Future;
 @Async
 @Slf4j
 public class ExecutionJob extends QuartzJobBean {
-
-    /**
-     * 该处仅供参考
-     */
-    private static final ExecutorService VIRTUAL_EXECUTOR =
-            Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("Virtual-Job").factory());
 
     @Override
     public void executeInternal(JobExecutionContext context) {
@@ -73,8 +65,9 @@ public class ExecutionJob extends QuartzJobBean {
         try {
             // 执行任务
             QuartzRunnable task = new QuartzRunnable(quartzJob.getBeanName(), quartzJob.getMethodName(), quartzJob.getParams());
-            Future<?> future = VIRTUAL_EXECUTOR.submit(task); // 这里好像没什么用途（只是统计下执行用时的样子），因为标记了Async，这里由async-pool执行
-            future.get();
+            var futureTask = new FutureTask<>(task);
+            Thread.ofVirtual().name("Virtual-Job").start(futureTask); // 这里好像没什么用途（只是统计下执行用时的样子），因为标记了Async，这里由async-pool执行
+            futureTask.get();
             long times = Duration.between(startTime, Instant.now()).toMillis();
             quartzLog.setTime(times);
             if (StringUtils.isNotBlank(uuid)) {
@@ -99,7 +92,7 @@ public class ExecutionJob extends QuartzJobBean {
             quartzLog.setExceptionDetail(ThrowableUtils.getStackTrace(e));
             // 任务如果失败了则暂停
             if (quartzJob.getPauseAfterFailure() != null && quartzJob.getPauseAfterFailure()) {
-                quartzJob.setIsPause(false);
+                quartzJob.setIsPause(true);
                 //更新状态
                 quartzJobService.updateIsPause(quartzJob);
             }

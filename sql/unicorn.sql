@@ -1,33 +1,17 @@
 /*
- *    Copyright (c) 2022.  lWoHvYe(Hongyan Wang)
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
-/*
  Navicat Premium Data Transfer
 
- Source Server         : 140-主库
+ Source Server         : 145-MySQL
  Source Server Type    : MySQL
- Source Server Version : 80027
- Source Host           : 10.211.55.140:3306
- Source Schema         : eladmin
+ Source Server Version : 80026
+ Source Host           : 10.211.55.145:3306
+ Source Schema         : unicorn
 
  Target Server Type    : MySQL
- Target Server Version : 80027
+ Target Server Version : 80026
  File Encoding         : 65001
 
- Date: 07/08/2022 09:36:43
+ Date: 03/08/2023 08:37:40
 */
 
 SET NAMES utf8mb4;
@@ -57,7 +41,8 @@ CREATE TABLE `code_column_config`
     KEY `idx_table_name` (`table_name`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 215
-  DEFAULT CHARSET = utf8mb3 COMMENT ='代码生成字段信息存储';
+  DEFAULT CHARSET = utf8mb3
+  ROW_FORMAT = COMPACT COMMENT ='代码生成字段信息存储';
 
 -- ----------------------------
 -- Records of code_column_config
@@ -134,8 +119,8 @@ CREATE TABLE `code_gen_config`
     PRIMARY KEY (`config_id`) USING BTREE,
     KEY `idx_table_name` (`table_name`(100)) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 7
-  DEFAULT CHARSET = utf8mb3 COMMENT ='代码生成器配置';
+  DEFAULT CHARSET = utf8mb3
+  ROW_FORMAT = COMPACT COMMENT ='代码生成器配置';
 
 -- ----------------------------
 -- Records of code_gen_config
@@ -144,123 +129,124 @@ BEGIN;
 COMMIT;
 
 -- ----------------------------
--- Table structure for mnt_app
+-- Table structure for oauth2_authorization
 -- ----------------------------
-DROP TABLE IF EXISTS `mnt_app`;
-CREATE TABLE `mnt_app`
+DROP TABLE IF EXISTS `oauth2_authorization`;
+CREATE TABLE `oauth2_authorization`
 (
-    `app_id`        bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `name`          varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT '应用名称',
-    `upload_path`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT '上传目录',
-    `deploy_path`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT '部署路径',
-    `backup_path`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT '备份路径',
-    `port`          int                                                      DEFAULT NULL COMMENT '应用端口',
-    `start_script`  varchar(4000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '启动脚本',
-    `deploy_script` varchar(4000) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '部署脚本',
-    `create_by`     varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT '创建者',
-    `update_by`     varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT '更新者',
-    `create_time`   datetime                                                 DEFAULT NULL COMMENT '创建日期',
-    `update_time`   datetime                                                 DEFAULT NULL COMMENT '更新时间',
-    PRIMARY KEY (`app_id`) USING BTREE
+    `id`                            varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `registered_client_id`          varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `principal_name`                varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `authorization_grant_type`      varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `authorized_scopes`             varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+    `attributes`                    blob,
+    `state`                         varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci      DEFAULT NULL,
+    `authorization_code_value`      blob,
+    `authorization_code_issued_at`  timestamp                                                     NULL DEFAULT NULL,
+    `authorization_code_expires_at` timestamp                                                     NULL DEFAULT NULL,
+    `authorization_code_metadata`   blob,
+    `access_token_value`            blob,
+    `access_token_issued_at`        timestamp                                                     NULL DEFAULT NULL,
+    `access_token_expires_at`       timestamp                                                     NULL DEFAULT NULL,
+    `access_token_metadata`         blob,
+    `access_token_type`             varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci      DEFAULT NULL,
+    `access_token_scopes`           varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
+    `oidc_id_token_value`           blob,
+    `oidc_id_token_issued_at`       timestamp                                                     NULL DEFAULT NULL,
+    `oidc_id_token_expires_at`      timestamp                                                     NULL DEFAULT NULL,
+    `oidc_id_token_metadata`        blob,
+    `oidc_id_token_claims`          blob,
+    `refresh_token_value`           blob,
+    `refresh_token_issued_at`       timestamp                                                     NULL DEFAULT NULL,
+    `refresh_token_expires_at`      timestamp                                                     NULL DEFAULT NULL,
+    `refresh_token_metadata`        blob,
+    `user_code_value`               blob,
+    `user_code_issued_at`           timestamp                                                     NULL DEFAULT NULL,
+    `user_code_expires_at`          timestamp                                                     NULL DEFAULT NULL,
+    `user_code_metadata`            blob,
+    `device_code_value`             blob,
+    `device_code_issued_at`         timestamp                                                     NULL DEFAULT NULL,
+    `device_code_expires_at`        timestamp                                                     NULL DEFAULT NULL,
+    `device_code_metadata`          blob,
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3 COMMENT ='应用管理';
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+  ROW_FORMAT = COMPACT;
 
 -- ----------------------------
--- Records of mnt_app
+-- Records of oauth2_authorization
 -- ----------------------------
 BEGIN;
 COMMIT;
 
 -- ----------------------------
--- Table structure for mnt_deploy
+-- Table structure for oauth2_authorization_consent
 -- ----------------------------
-DROP TABLE IF EXISTS `mnt_deploy`;
-CREATE TABLE `mnt_deploy`
+DROP TABLE IF EXISTS `oauth2_authorization_consent`;
+CREATE TABLE `oauth2_authorization_consent`
 (
-    `deploy_id`   bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `app_id`      bigint                                                  DEFAULT NULL COMMENT '应用编号',
-    `create_by`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '创建者',
-    `update_by`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '更新者',
-    `create_time` datetime                                                DEFAULT NULL,
-    `update_time` datetime                                                DEFAULT NULL COMMENT '更新时间',
-    PRIMARY KEY (`deploy_id`) USING BTREE,
-    KEY `FK6sy157pseoxx4fmcqr1vnvvhy` (`app_id`) USING BTREE
+    `registered_client_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL,
+    `principal_name`       varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL,
+    `authorities`          varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    PRIMARY KEY (`registered_client_id`, `principal_name`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3 COMMENT ='部署管理';
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Records of mnt_deploy
+-- Records of oauth2_authorization_consent
 -- ----------------------------
 BEGIN;
 COMMIT;
 
 -- ----------------------------
--- Table structure for mnt_deploy_history
+-- Table structure for oauth2_registered_client
 -- ----------------------------
-DROP TABLE IF EXISTS `mnt_deploy_history`;
-CREATE TABLE `mnt_deploy_history`
+DROP TABLE IF EXISTS `oauth2_registered_client`;
+CREATE TABLE `oauth2_registered_client`
 (
-    `history_id`  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT 'ID',
-    `app_name`    varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '应用名称',
-    `deploy_date` datetime                                                NOT NULL COMMENT '部署日期',
-    `deploy_user` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '部署用户',
-    `ip`          varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  NOT NULL COMMENT '服务器IP',
-    `deploy_id`   bigint DEFAULT NULL COMMENT '部署编号',
-    PRIMARY KEY (`history_id`) USING BTREE
+    `id`                            varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL,
+    `client_id`                     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL,
+    `client_id_issued_at`           timestamp                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `client_secret`                 varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci           DEFAULT NULL,
+    `client_secret_expires_at`      timestamp                                                      NULL     DEFAULT NULL,
+    `client_name`                   varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL,
+    `client_authentication_methods` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `authorization_grant_types`     varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `redirect_uris`                 varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL,
+    `scopes`                        varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `client_settings`               varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `token_settings`                varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    `post_logout_redirect_uris`     varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci          DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `client_id` (`client_id`),
+    KEY `client_name` (`client_name`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3 COMMENT ='部署历史管理';
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 -- ----------------------------
--- Records of mnt_deploy_history
+-- Records of oauth2_registered_client
 -- ----------------------------
 BEGIN;
-COMMIT;
-
--- ----------------------------
--- Table structure for mnt_deploy_server
--- ----------------------------
-DROP TABLE IF EXISTS `mnt_deploy_server`;
-CREATE TABLE `mnt_deploy_server`
-(
-    `deploy_id` bigint NOT NULL COMMENT '部署ID',
-    `server_id` bigint NOT NULL COMMENT '服务ID',
-    PRIMARY KEY (`deploy_id`, `server_id`) USING BTREE,
-    KEY `FKeaaha7jew9a02b3bk9ghols53` (`server_id`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3 COMMENT ='应用与服务器关联';
-
--- ----------------------------
--- Records of mnt_deploy_server
--- ----------------------------
-BEGIN;
-COMMIT;
-
--- ----------------------------
--- Table structure for mnt_server
--- ----------------------------
-DROP TABLE IF EXISTS `mnt_server`;
-CREATE TABLE `mnt_server`
-(
-    `server_id`   bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `account`     varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT '账号',
-    `ip`          varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  DEFAULT NULL COMMENT 'IP地址',
-    `name`        varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '名称',
-    `password`    varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '密码',
-    `port`        int                                                     DEFAULT NULL COMMENT '端口',
-    `create_by`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '创建者',
-    `update_by`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '更新者',
-    `create_time` datetime                                                DEFAULT NULL COMMENT '创建时间',
-    `update_time` datetime                                                DEFAULT NULL COMMENT '更新时间',
-    PRIMARY KEY (`server_id`) USING BTREE,
-    KEY `idx_ip` (`ip`) USING BTREE
-) ENGINE = InnoDB
-  AUTO_INCREMENT = 2
-  DEFAULT CHARSET = utf8mb3 COMMENT ='服务器管理';
-
--- ----------------------------
--- Records of mnt_server
--- ----------------------------
-BEGIN;
+INSERT INTO `oauth2_registered_client`
+VALUES ('74b93558-77bf-4b6e-8ee6-d4f262fce099', 'login-client', '2023-04-05 21:23:58',
+        '$2a$10$9ld5pThtd0BtivV7aWF1vOeiAB5havfmjz8d/g9MVTHnUVzHYy0Za', NULL, '74b93558-77bf-4b6e-8ee6-d4f262fce099',
+        'client_secret_basic', 'refresh_token,authorization_code',
+        'http://127.0.0.1:8080/login/oauth2/code/login-client', 'openid,resource.read,profile,email,resource.write',
+        '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":false,\"settings.client.require-authorization-consent\":true}',
+        '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.token.reuse-refresh-tokens\":true,\"settings.token.id-token-signature-algorithm\":[\"org.springframework.security.oauth2.jose.jws.SignatureAlgorithm\",\"RS256\"],\"settings.token.authorization-code-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.access-token-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.access-token-format\":{\"@class\":\"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat\",\"value\":\"self-contained\"},\"settings.token.refresh-token-time-to-live\":[\"java.time.Duration\",3600.000000000]}',
+        NULL);
+INSERT INTO `oauth2_registered_client`
+VALUES ('87d1cc25-772b-4de5-b523-eb65a3af0264', 'messaging-client', '2023-04-05 21:24:03',
+        '$2a$10$LS.I40Br17yt0sYZxKiyqe5QPYBUZIvhkKyKnmRTmUT1nHdC07jmG', NULL, '87d1cc25-772b-4de5-b523-eb65a3af0264',
+        'client_secret_basic', 'refresh_token,client_credentials,authorization_code',
+        'http://127.0.0.1:8080/authorized,http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc',
+        'openid,resource.read,profile,message.read,resource.write,message.write',
+        '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":false,\"settings.client.require-authorization-consent\":true}',
+        '{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.token.reuse-refresh-tokens\":true,\"settings.token.id-token-signature-algorithm\":[\"org.springframework.security.oauth2.jose.jws.SignatureAlgorithm\",\"RS256\"],\"settings.token.authorization-code-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.access-token-time-to-live\":[\"java.time.Duration\",300.000000000],\"settings.token.access-token-format\":{\"@class\":\"org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat\",\"value\":\"self-contained\"},\"settings.token.refresh-token-time-to-live\":[\"java.time.Duration\",3600.000000000]}',
+        NULL);
 COMMIT;
 
 -- ----------------------------
@@ -283,7 +269,7 @@ CREATE TABLE `sys_dept`
     KEY `inx_pid` (`pid`) USING BTREE,
     KEY `inx_enabled` (`enabled`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 24
+  AUTO_INCREMENT = 25
   DEFAULT CHARSET = utf8mb3 COMMENT ='部门';
 
 -- ----------------------------
@@ -299,7 +285,7 @@ VALUES (6, 8, 0, '测试部', 6, b'1', 'admin', 'admin', '2019-03-25 09:52:18', 
 INSERT INTO `sys_dept`
 VALUES (7, NULL, 2, '华南分部', 0, b'1', 'admin', 'admin', '2019-03-25 11:04:50', '2020-06-08 12:08:56');
 INSERT INTO `sys_dept`
-VALUES (8, NULL, 3, '华北分部', 1, b'1', 'admin', 'admin', '2019-03-25 11:04:53', '2020-05-14 12:54:00');
+VALUES (8, NULL, 4, '华北分部', 1, b'1', 'admin', 'admin', '2019-03-25 11:04:53', '2020-05-14 12:54:00');
 INSERT INTO `sys_dept`
 VALUES (15, 8, 0, 'UI部门', 7, b'1', 'admin', 'admin', '2020-05-13 22:56:53', '2020-05-14 12:54:13');
 INSERT INTO `sys_dept`
@@ -314,6 +300,8 @@ INSERT INTO `sys_dept`
 VALUES (22, 21, 0, '市场部', 1, b'1', 'admin', 'admin', '2021-11-24 18:47:22', '2021-11-24 18:47:31');
 INSERT INTO `sys_dept`
 VALUES (23, 21, 0, '支撑部', 2, b'1', 'admin', 'admin', '2021-11-24 18:47:54', '2022-03-13 21:56:40');
+INSERT INTO `sys_dept`
+VALUES (24, 8, 0, '祭祀部', 8, b'1', 'admin', 'admin', '2022-09-11 19:03:58', '2022-09-11 19:03:58');
 COMMIT;
 
 -- ----------------------------
@@ -331,7 +319,7 @@ CREATE TABLE `sys_dict`
     `update_time` datetime                                                DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`dict_id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 6
+  AUTO_INCREMENT = 7
   DEFAULT CHARSET = utf8mb3 COMMENT ='数据字典';
 
 -- ----------------------------
@@ -339,11 +327,13 @@ CREATE TABLE `sys_dict`
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_dict`
-VALUES (1, 'status', '状态', NULL, NULL, '2019-10-27 20:31:36', NULL);
+VALUES (1, 'status', '状态', NULL, 'admin', '2019-10-27 20:31:36', '2023-06-16 20:58:40');
 INSERT INTO `sys_dict`
 VALUES (4, 'dept_status', '部门状态', NULL, NULL, '2019-10-27 20:31:36', NULL);
 INSERT INTO `sys_dict`
 VALUES (5, 'job_status', '岗位状态', NULL, NULL, '2019-10-27 20:31:36', NULL);
+INSERT INTO `sys_dict`
+VALUES (6, 'Sys_Type', '类型信息', 'admin', 'admin', '2022-09-11 18:42:31', '2022-09-11 18:42:31');
 COMMIT;
 
 -- ----------------------------
@@ -364,7 +354,7 @@ CREATE TABLE `sys_dict_detail`
     PRIMARY KEY (`detail_id`) USING BTREE,
     KEY `FK5tpkputc6d9nboxojdbgnpmyb` (`dict_id`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 7
+  AUTO_INCREMENT = 10
   DEFAULT CHARSET = utf8mb3 COMMENT ='数据字典详情';
 
 -- ----------------------------
@@ -383,6 +373,12 @@ INSERT INTO `sys_dict_detail`
 VALUES (5, 5, '启用', 'true', 1, NULL, NULL, NULL, NULL);
 INSERT INTO `sys_dict_detail`
 VALUES (6, 5, '停用', 'false', 2, NULL, NULL, '2019-10-27 20:31:36', NULL);
+INSERT INTO `sys_dict_detail`
+VALUES (7, 6, 'Unicorn', 'unicorn', 1, 'admin', 'admin', '2022-09-11 18:53:58', '2022-09-11 18:53:58');
+INSERT INTO `sys_dict_detail`
+VALUES (8, 6, 'Valentine', 'valentine', 2, 'admin', 'admin', '2022-09-11 18:54:27', '2022-09-11 18:54:27');
+INSERT INTO `sys_dict_detail`
+VALUES (9, 6, 'Enterprise', 'enterprise', 3, 'admin', 'admin', '2022-09-11 18:54:48', '2022-09-11 18:54:48');
 COMMIT;
 
 -- ----------------------------
@@ -486,7 +482,7 @@ CREATE TABLE `sys_menu`
     UNIQUE KEY `uniq_name` (`name`) USING BTREE,
     KEY `inx_pid` (`pid`) USING BTREE
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 118
+  AUTO_INCREMENT = 30117
   DEFAULT CHARSET = utf8mb3 COMMENT ='系统菜单';
 
 -- ----------------------------
@@ -494,7 +490,7 @@ CREATE TABLE `sys_menu`
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_menu`
-VALUES (1, NULL, 7, 0, '系统管理', NULL, NULL, 1, 'system', 'system', b'0', b'0', b'0', NULL, NULL, NULL,
+VALUES (1, NULL, 8, 0, '系统管理', NULL, NULL, 1, 'system', 'system', b'0', b'0', b'0', NULL, NULL, NULL,
         '2018-12-18 15:11:29', NULL);
 INSERT INTO `sys_menu`
 VALUES (2, 1, 3, 1, '用户管理', 'User', 'system/user/index', 2, 'peoples', 'user', b'0', b'0', b'0', 'user:list', NULL,
@@ -656,53 +652,11 @@ INSERT INTO `sys_menu`
 VALUES (83, 10, 0, 1, '图表库', 'Echarts', 'components/Echarts', 50, 'chart', 'echarts', b'0', b'1', b'0', '', NULL,
         NULL, '2019-11-21 09:04:32', NULL);
 INSERT INTO `sys_menu`
-VALUES (90, NULL, 4, 1, '运维管理', 'Mnt', '', 20, 'mnt', 'mnt', b'0', b'0', b'0', NULL, NULL, NULL,
-        '2019-11-09 10:31:08', NULL);
-INSERT INTO `sys_menu`
-VALUES (92, 90, 3, 1, '服务器', 'ServerDeploy', 'mnt/server/index', 22, 'server', 'mnt/serverDeploy', b'0', b'0', b'0',
-        'serverDeploy:list', NULL, NULL, '2019-11-10 10:29:25', NULL);
-INSERT INTO `sys_menu`
-VALUES (93, 90, 3, 1, '应用管理', 'App', 'mnt/app/index', 23, 'app', 'mnt/app', b'0', b'0', b'0', 'app:list', NULL,
-        NULL, '2019-11-10 11:05:16', NULL);
-INSERT INTO `sys_menu`
-VALUES (94, 90, 3, 1, '部署管理', 'Deploy', 'mnt/deploy/index', 24, 'deploy', 'mnt/deploy', b'0', b'0', b'0',
-        'deploy:list', NULL, NULL, '2019-11-10 15:56:55', NULL);
-INSERT INTO `sys_menu`
-VALUES (97, 90, 1, 1, '部署备份', 'DeployHistory', 'mnt/deployHistory/index', 25, 'backup', 'mnt/deployHistory', b'0',
-        b'0', b'0', 'deployHistory:list', NULL, NULL, '2019-11-10 16:49:44', NULL);
-INSERT INTO `sys_menu`
-VALUES (102, 97, 0, 2, '删除', NULL, '', 999, '', '', b'0', b'0', b'0', 'deployHistory:del', NULL, NULL,
-        '2019-11-17 09:32:48', NULL);
-INSERT INTO `sys_menu`
-VALUES (103, 92, 0, 2, '服务器新增', NULL, '', 999, '', '', b'0', b'0', b'0', 'serverDeploy:add', NULL, NULL,
-        '2019-11-17 11:08:33', NULL);
-INSERT INTO `sys_menu`
-VALUES (104, 92, 0, 2, '服务器编辑', NULL, '', 999, '', '', b'0', b'0', b'0', 'serverDeploy:edit', NULL, NULL,
-        '2019-11-17 11:08:57', NULL);
-INSERT INTO `sys_menu`
-VALUES (105, 92, 0, 2, '服务器删除', NULL, '', 999, '', '', b'0', b'0', b'0', 'serverDeploy:del', NULL, NULL,
-        '2019-11-17 11:09:15', NULL);
-INSERT INTO `sys_menu`
-VALUES (106, 93, 0, 2, '应用新增', NULL, '', 999, '', '', b'0', b'0', b'0', 'app:add', NULL, NULL,
-        '2019-11-17 11:10:03', NULL);
-INSERT INTO `sys_menu`
-VALUES (107, 93, 0, 2, '应用编辑', NULL, '', 999, '', '', b'0', b'0', b'0', 'app:edit', NULL, NULL,
-        '2019-11-17 11:10:28', NULL);
-INSERT INTO `sys_menu`
-VALUES (108, 93, 0, 2, '应用删除', NULL, '', 999, '', '', b'0', b'0', b'0', 'app:del', NULL, NULL,
-        '2019-11-17 11:10:55', NULL);
-INSERT INTO `sys_menu`
-VALUES (109, 94, 0, 2, '部署新增', NULL, '', 999, '', '', b'0', b'0', b'0', 'deploy:add', NULL, NULL,
-        '2019-11-17 11:11:22', NULL);
-INSERT INTO `sys_menu`
-VALUES (110, 94, 0, 2, '部署编辑', NULL, '', 999, '', '', b'0', b'0', b'0', 'deploy:edit', NULL, NULL,
-        '2019-11-17 11:11:41', NULL);
-INSERT INTO `sys_menu`
-VALUES (111, 94, 0, 2, '部署删除', NULL, '', 999, '', '', b'0', b'0', b'0', 'deploy:del', NULL, NULL,
-        '2019-11-17 11:12:01', NULL);
-INSERT INTO `sys_menu`
 VALUES (116, 36, 0, 1, '生成预览', 'Preview', 'generator/preview', 999, 'java', 'generator/preview/:tableName', b'0',
         b'1', b'1', NULL, NULL, NULL, '2019-11-26 14:54:36', NULL);
+INSERT INTO `sys_menu`
+VALUES (30116, 1, 0, 1, '资源管理', 'Resource', 'system/resource/index', 5, 'backup', 'resource', b'0', b'0', b'0',
+        NULL, 'admin', 'admin', '2023-06-16 20:25:50', '2023-06-16 20:31:48');
 COMMIT;
 
 -- ----------------------------
@@ -785,17 +739,17 @@ COMMIT;
 DROP TABLE IF EXISTS `sys_resource`;
 CREATE TABLE `sys_resource`
 (
-    `resource_id` bigint                                  NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `name`        varchar(255) COLLATE utf8mb4_unicode_ci                       DEFAULT NULL COMMENT '资源名称',
-    `pattern`     varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'URI',
+    `resource_id` bigint                                                        NOT NULL AUTO_INCREMENT COMMENT 'ID',
+    `name`        varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '资源名称',
+    `pattern`     varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'URI',
     `req_method`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '请求方法 空表示全部',
     `status`      tinyint                                                       DEFAULT '1' COMMENT '状态 0-不可用 1-可用',
-    `rest_name`   varchar(255) COLLATE utf8mb4_unicode_ci                       DEFAULT NULL COMMENT '所在类名',
-    `remark`      varchar(255) COLLATE utf8mb4_unicode_ci                       DEFAULT NULL COMMENT '备注',
+    `rest_name`   varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '所在类名',
+    `remark`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`resource_id`),
     KEY `pattern` (`pattern`)
 ) ENGINE = InnoDB
-  AUTO_INCREMENT = 20
+  AUTO_INCREMENT = 30021
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='资源（API）';
 
@@ -842,9 +796,9 @@ VALUES (18, 'webSocket', '/webSocket/**', NULL, 1, NULL, 'WebSocket相关');
 INSERT INTO `sys_resource`
 VALUES (19, '匿名标记', '/api/anonymous/**', NULL, 1, NULL, '通一匿名标记');
 INSERT INTO `sys_resource`
-VALUES (20, '资源不存在', '/error', NULL, 1, NULL, '接口等不存在');
+VALUES (20, 'errorPage', '/error', '', 1, NULL, '错误页');
 INSERT INTO `sys_resource`
-VALUES (21, 'ico图标资源', '/**/*.ico', NULL, 1, NULL, '图标资源');
+VALUES (30020, 'ico图标资源', '/**/*.ico', NULL, 1, NULL, '获取图标资源，unused');
 COMMIT;
 
 -- ----------------------------
@@ -876,20 +830,20 @@ CREATE TABLE `sys_role`
 BEGIN;
 INSERT INTO `sys_role`
 VALUES (1, '超级管理员', 'admin', 1, '- 看起来比较菜', '全部', NULL, 'admin', '2018-11-23 11:04:37',
-        '2021-11-12 18:42:58');
+        '2023-06-16 20:27:40');
 INSERT INTO `sys_role`
 VALUES (2, '普通用户', 'commin', 2, '普普通通，平平坦坦', '本级', NULL, 'admin', '2018-11-23 13:09:06',
-        '2022-07-16 17:13:51');
+        '2022-12-13 09:46:06');
 INSERT INTO `sys_role`
 VALUES (3, '产品运营', 'product', 2, '产品运营及输出，瑞star', '本级', 'admin', 'admin', '2021-11-05 22:40:03',
-        '2022-07-19 21:17:02');
+        '2022-10-09 20:02:21');
 INSERT INTO `sys_role`
 VALUES (4, '大佬', 'dalao', 4, NULL, '自定义', 'admin', 'admin', '2021-11-06 19:57:46', '2021-11-09 21:03:27');
 INSERT INTO `sys_role`
 VALUES (5, 'Java 从精通到陌生', 'java', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:25:28',
-        '2021-11-24 18:49:45');
+        '2022-12-13 09:12:02');
 INSERT INTO `sys_role`
-VALUES (6, 'C语言 从看懂到看开', 'c', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:25:58', '2021-11-24 18:55:05');
+VALUES (6, 'C语言 从看懂到看开', 'c', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:25:58', '2022-12-13 09:40:02');
 INSERT INTO `sys_role`
 VALUES (7, 'Python', 'python', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:26:08', '2021-11-08 12:26:08');
 INSERT INTO `sys_role`
@@ -1066,37 +1020,9 @@ VALUES (82, 1);
 INSERT INTO `sys_roles_menus`
 VALUES (83, 1);
 INSERT INTO `sys_roles_menus`
-VALUES (90, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (92, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (93, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (94, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (97, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (102, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (103, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (104, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (105, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (106, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (107, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (108, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (109, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (110, 1);
-INSERT INTO `sys_roles_menus`
-VALUES (111, 1);
-INSERT INTO `sys_roles_menus`
 VALUES (116, 1);
+INSERT INTO `sys_roles_menus`
+VALUES (30116, 1);
 INSERT INTO `sys_roles_menus`
 VALUES (1, 2);
 INSERT INTO `sys_roles_menus`
@@ -1110,37 +1036,23 @@ VALUES (7, 2);
 INSERT INTO `sys_roles_menus`
 VALUES (9, 2);
 INSERT INTO `sys_roles_menus`
-VALUES (10, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (11, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (15, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (21, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (22, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (23, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (24, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (27, 2);
-INSERT INTO `sys_roles_menus`
 VALUES (32, 2);
 INSERT INTO `sys_roles_menus`
-VALUES (33, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (34, 2);
-INSERT INTO `sys_roles_menus`
 VALUES (35, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (36, 2);
 INSERT INTO `sys_roles_menus`
 VALUES (37, 2);
 INSERT INTO `sys_roles_menus`
 VALUES (39, 2);
 INSERT INTO `sys_roles_menus`
+VALUES (44, 2);
+INSERT INTO `sys_roles_menus`
 VALUES (45, 2);
+INSERT INTO `sys_roles_menus`
+VALUES (49, 2);
+INSERT INTO `sys_roles_menus`
+VALUES (57, 2);
+INSERT INTO `sys_roles_menus`
+VALUES (60, 2);
 INSERT INTO `sys_roles_menus`
 VALUES (64, 2);
 INSERT INTO `sys_roles_menus`
@@ -1149,8 +1061,6 @@ INSERT INTO `sys_roles_menus`
 VALUES (66, 2);
 INSERT INTO `sys_roles_menus`
 VALUES (80, 2);
-INSERT INTO `sys_roles_menus`
-VALUES (83, 2);
 INSERT INTO `sys_roles_menus`
 VALUES (1, 3);
 INSERT INTO `sys_roles_menus`
@@ -1190,13 +1100,39 @@ VALUES (77, 3);
 INSERT INTO `sys_roles_menus`
 VALUES (78, 3);
 INSERT INTO `sys_roles_menus`
-VALUES (79, 3);
-INSERT INTO `sys_roles_menus`
 VALUES (14, 4);
+INSERT INTO `sys_roles_menus`
+VALUES (2, 5);
+INSERT INTO `sys_roles_menus`
+VALUES (44, 5);
+INSERT INTO `sys_roles_menus`
+VALUES (45, 5);
 INSERT INTO `sys_roles_menus`
 VALUES (7, 6);
 INSERT INTO `sys_roles_menus`
 VALUES (9, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (14, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (44, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (45, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (48, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (49, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (52, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (53, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (56, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (57, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (60, 6);
+INSERT INTO `sys_roles_menus`
+VALUES (61, 6);
 COMMIT;
 
 -- ----------------------------
@@ -1218,22 +1154,6 @@ CREATE TABLE `sys_roles_resources`
 -- Records of sys_roles_resources
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_roles_resources`
-VALUES (1, 1);
-INSERT INTO `sys_roles_resources`
-VALUES (1, 2);
-INSERT INTO `sys_roles_resources`
-VALUES (1, 3);
-INSERT INTO `sys_roles_resources`
-VALUES (1, 4);
-INSERT INTO `sys_roles_resources`
-VALUES (2, 1);
-INSERT INTO `sys_roles_resources`
-VALUES (2, 5);
-INSERT INTO `sys_roles_resources`
-VALUES (3, 6);
-INSERT INTO `sys_roles_resources`
-VALUES (6, 7);
 INSERT INTO `sys_roles_resources`
 VALUES (16, 8);
 INSERT INTO `sys_roles_resources`
@@ -1261,7 +1181,7 @@ VALUES (16, 19);
 INSERT INTO `sys_roles_resources`
 VALUES (16, 20);
 INSERT INTO `sys_roles_resources`
-VALUES (16, 21);
+VALUES (16, 30020);
 COMMIT;
 
 -- ----------------------------
@@ -1315,8 +1235,8 @@ VALUES (2, 6, 'test', '测试-大佬', '男', '19999999999', 'test@eladmin.com',
         'admin', 'admin', '2022-04-03 11:48:23', '2020-05-05 11:15:49', '2022-04-01 07:54:28');
 INSERT INTO `sys_user`
 VALUES (3, 20, 'performer', '运营-产品', '女', '18288888888', 'perform@eladmin.com', NULL, NULL,
-        '$2a$10$uUHeP2O2SJGAAcK6ZiLLDuaI/i/8.g4VpyW3EXI0n3FTJ9zsfADs2', b'0', 1, 0xE4BAA7E59381E8BF90E890A5, 'admin',
-        'admin', '2022-04-01 11:53:12', '2021-11-05 22:38:56', '2022-06-07 08:15:05');
+        '$2a$10$uUHeP2O2SJGAAcK6ZiLLDuaI/i/8.g4VpyW3EXI0n3FTJ9zsfADs2', b'0', 0, 0xE4BAA7E59381E8BF90E890A5, 'admin',
+        'admin', '2022-04-01 11:53:12', '2021-11-05 22:38:56', '2023-07-15 22:43:34');
 COMMIT;
 
 -- ----------------------------
@@ -1353,10 +1273,12 @@ CREATE TABLE `sys_users_roles`
 (
     `user_id` bigint NOT NULL COMMENT '用户ID',
     `role_id` bigint NOT NULL COMMENT '角色ID',
-    `id`      int    NOT NULL,
-    PRIMARY KEY (`user_id`, `role_id`, `id`) USING BTREE,
-    KEY `FKq4eq273l04bpu4efj0jd0jb98` (`role_id`) USING BTREE
+    `id`      int    NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`, `user_id`, `role_id`) USING BTREE,
+    KEY `FKq4eq273l04bpu4efj0jd0jb98` (`role_id`) USING BTREE,
+    KEY `user_id` (`user_id`)
 ) ENGINE = InnoDB
+  AUTO_INCREMENT = 8
   DEFAULT CHARSET = utf8mb3 COMMENT ='用户角色关联';
 
 -- ----------------------------
@@ -1368,7 +1290,7 @@ VALUES (1, 1, 1);
 INSERT INTO `sys_users_roles`
 VALUES (2, 2, 2);
 INSERT INTO `sys_users_roles`
-VALUES (3, 3, 3);
+VALUES (3, 3, 8);
 INSERT INTO `sys_users_roles`
 VALUES (2, 4, 4);
 INSERT INTO `sys_users_roles`
@@ -1437,23 +1359,8 @@ select `sys_menu`.`menu_id`        AS `menu_id`,
        `sys_menu`.`pid`            AS `pid`,
        `sys_roles_menus`.`role_id` AS `role_id`
 from (`sys_menu` join `sys_roles_menus`)
-where (`sys_menu`.`menu_id` = `sys_roles_menus`.`menu_id`);
-
-/*
- *    Copyright (c) 2023.  lWoHvYe(Hongyan Wang)
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+where (`sys_menu`.`menu_id` = `sys_roles_menus`.`menu_id`)
+WITH CASCADED CHECK OPTION;
 
 -- ----------------------------
 -- View structure for sys_role_view
@@ -1464,7 +1371,8 @@ select `sys_role`.`role_id`     AS `role_id`,
        `sys_role`.`name`        AS `name`,
        `sys_role`.`code`        AS `code`,
        `sys_role`.`description` AS `description`
-from `sys_role`;
+from `sys_role`
+WITH CASCADED CHECK OPTION;
 
 -- ----------------------------
 -- View structure for sys_user_view
@@ -1476,80 +1384,7 @@ select `sys_user`.`user_id`  AS `user_id`,
        `sys_user`.`phone`    AS `phone`,
        `sys_user`.`password` AS `password`,
        `sys_user`.`enabled`  AS `enabled`
-from `sys_user`;
+from `sys_user`
+WITH CASCADED CHECK OPTION;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-# OAuth
-CREATE TABLE `oauth2_authorization`
-(
-    `id`                            varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `registered_client_id`          varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `principal_name`                varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `authorization_grant_type`      varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `authorized_scopes`             varchar(1000) COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-    `attributes`                    blob                                         DEFAULT NULL,
-    `state`                         varchar(500) COLLATE utf8mb4_unicode_ci      DEFAULT NULL,
-    `authorization_code_value`      blob                                         DEFAULT NULL,
-    `authorization_code_issued_at`  timestamp                               NULL DEFAULT NULL,
-    `authorization_code_expires_at` timestamp                               NULL DEFAULT NULL,
-    `authorization_code_metadata`   blob                                         DEFAULT NULL,
-    `access_token_value`            blob                                         DEFAULT NULL,
-    `access_token_issued_at`        timestamp                               NULL DEFAULT NULL,
-    `access_token_expires_at`       timestamp                               NULL DEFAULT NULL,
-    `access_token_metadata`         blob                                         DEFAULT NULL,
-    `access_token_type`             varchar(100) COLLATE utf8mb4_unicode_ci      DEFAULT NULL,
-    `access_token_scopes`           varchar(1000) COLLATE utf8mb4_unicode_ci     DEFAULT NULL,
-    `oidc_id_token_value`           blob                                         DEFAULT NULL,
-    `oidc_id_token_issued_at`       timestamp                               NULL DEFAULT NULL,
-    `oidc_id_token_expires_at`      timestamp                               NULL DEFAULT NULL,
-    `oidc_id_token_metadata`        blob                                         DEFAULT NULL,
-    `oidc_id_token_claims`          blob                                         DEFAULT NULL,
-    `refresh_token_value`           blob                                         DEFAULT NULL,
-    `refresh_token_issued_at`       timestamp                               NULL DEFAULT NULL,
-    `refresh_token_expires_at`      timestamp                               NULL DEFAULT NULL,
-    `refresh_token_metadata`        blob                                         DEFAULT NULL,
-    `user_code_value`               blob                                         DEFAULT NULL,
-    `user_code_issued_at`           timestamp                               NULL DEFAULT NULL,
-    `user_code_expires_at`          timestamp                               NULL DEFAULT NULL,
-    `user_code_metadata`            blob                                         DEFAULT NULL,
-    `device_code_value`             blob                                         DEFAULT NULL,
-    `device_code_issued_at`         timestamp                               NULL DEFAULT NULL,
-    `device_code_expires_at`        timestamp                               NULL DEFAULT NULL,
-    `device_code_metadata`          blob                                         DEFAULT NULL,
-    PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;
-
-CREATE TABLE `oauth2_authorization_consent`
-(
-    `registered_client_id` varchar(100) COLLATE utf8mb4_unicode_ci  NOT NULL,
-    `principal_name`       varchar(200) COLLATE utf8mb4_unicode_ci  NOT NULL,
-    `authorities`          varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
-    PRIMARY KEY (`registered_client_id`, `principal_name`) /*T![clustered_index] CLUSTERED */
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;
-
-CREATE TABLE `oauth2_registered_client`
-(
-    `id`                            varchar(100) COLLATE utf8mb4_unicode_ci  NOT NULL,
-    `client_id`                     varchar(100) COLLATE utf8mb4_unicode_ci  NOT NULL,
-    `client_id_issued_at`           timestamp                                NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `client_secret`                 varchar(200) COLLATE utf8mb4_unicode_ci           DEFAULT NULL,
-    `client_secret_expires_at`      timestamp                                NULL     DEFAULT NULL,
-    `client_name`                   varchar(200) COLLATE utf8mb4_unicode_ci  NOT NULL,
-    `client_authentication_methods` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `authorization_grant_types`     varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `redirect_uris`                 varchar(1000) COLLATE utf8mb4_unicode_ci          DEFAULT NULL,
-    `scopes`                        varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `client_settings`               varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `token_settings`                varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `post_logout_redirect_uris`     varchar(1000) COLLATE utf8mb4_unicode_ci          DEFAULT NULL,
-    PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,
-    KEY `client_id` (`client_id`),
-    KEY `client_name` (`client_name`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci;

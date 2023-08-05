@@ -47,7 +47,7 @@ subprojects {
     apply plugin: "io.freefair.lombok"
     // Setting a custom Lombok version when use plugin io.freefair.lombok
     lombok {
-        version = "1.18.28"
+        version = "1.18.29"
     }
 
     java {

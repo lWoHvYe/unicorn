@@ -4,6 +4,12 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        maven {
+            url 'https://repo.spring.io/milestone'
+        }
+        maven {
+            url 'https://repo.spring.io/snapshot'
+        }
     }
 }
 
@@ -17,6 +23,12 @@ dependencyResolutionManagement {
         gradlePluginPortal()
         flatDir {
             dirs "$rootProject.projectDir/ex-lib"
+        }
+        maven {
+            url 'https://repo.spring.io/snapshot'
+        }
+        maven {
+            url 'https://repo.spring.io/milestone'
         }
     }
 
@@ -42,7 +54,7 @@ dependencyResolutionManagement {
             version('oshiCore', '6.4.2')
             version('poi', '5.2.3')
             version('quartz', '2.3.2')
-            version('redisson', '3.22.0')
+            version('redisson', '3.23.0')
             version('springBoot', "$springBootVersion")
             version('springdoc', '2.1.0')
             version('thumbnailator', '0.4.20')

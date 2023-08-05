@@ -194,7 +194,31 @@ public class JsonUtils {
                 return defaultSupplier.get();
 
             var str = toJSONString(obj);
-            JavaType javaType = objectMapper.getTypeFactory().constructParametricType(List.class, tClass);
+            var typeFactory = objectMapper.getTypeFactory();
+//            JavaType used both for serialization and deserialization, allowing Jackson to work with complex types that have full generic information available.
+//            Factory method for constructing JavaType that represents a parameterized type. For example, to represent type List<Set<Integer>>, you could call
+//              JavaType inner = typeFactory.constructParametricType(Set.class, Integer.class);
+//              JavaType list = typeFactory.constructParametricType(List.class, inner);
+//            ---------------ForMap----------------
+//            Create JavaType for Map<A, B>
+//              JavaType mapType = typeFactory.constructMapType(Map.class, A.clazz, B.clazz);
+//            ---------------ForList----------------
+//            Create JavaType for List<A>
+//              JavaType listTypeA = typeFactory.constructCollectionType(List.class, A.clazz);
+//            ---------------For extends/super----------------
+//            Create JavaType for B<C>
+//              JavaType valueTypeB = typeFactory.constructType(B.clazz);
+//              JavaType boundTypeC = typeFactory.constructType(C.clazz);
+//              JavaType valueTypeBxC = typeFactory.constructSimpleType(valueTypeB.getRawClass(), new JavaType[]{boundTypeC});
+//            Create JavaType for B<C, D>
+//              JavaType boundTypeD = typeFactory.constructType(D.clazz);
+//              JavaType valueTypeBxCD = typeFactory.constructSimpleType(valueTypeB.getRawClass(), new JavaType[]{boundTypeC, boundTypeD});
+//              JavaType valueTypeBxCD = typeFactory.constructParametricType(B.clazz, C.clazz, D.clazz);
+
+            JavaType javaType = typeFactory.constructParametricType(List.class, tClass);
+//            TypeReference used mainly for deserialization.对大部分scenario，TypeReference足够了
+//            var typeReference = new TypeReference<List<T>>() {
+//            };
             return objectMapper.readValue(str, javaType);
         } catch (Exception e) {
             log.error(String.format("toJavaObjectList exception %n%s%n%s", obj, tClass), e);
