@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="UnicornAppRun" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
-      <env name="DB_PORT" value="4000" />
       <env name="DB_NAME" value="unicorn" />
+      <env name="DB_PORT" value="3306" />
+      <env name="DB_PWD" value="root" />
       <env name="DB_USER" value="root" />
-      <env name="DB_PWD" value="n0^9_MJUR1q+23VZ@7" />
     </envs>
     <module name="valentine-p2p.valentine-starter.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.unicorn.UnicornAppRun" />
