@@ -12,6 +12,10 @@ logging:
 spring:
   thymeleaf:
     cache: false
+  # use virtual threads in Spring Boot 3.2 + Java 21
+  threads:
+    virtual:
+      enabled: true
   security:
     oauth2:
       client:

@@ -22,6 +22,10 @@ spring:
     redis:
       repositories:
         enabled: false
+  # use virtual threads in Spring Boot 3.2 + Java 21
+  threads:
+    virtual:
+      enabled: true
 
   #配置 Jpa
   jpa:
@@ -34,9 +38,9 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
-  autoconfigure:
-    # to use VT, should exclude this
-    exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+  # autoconfigure:
+    # to use VT for Async, should exclude this
+    # exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
 
 #密码加密传输，前端公钥加密，后端私钥解密
 rsa:

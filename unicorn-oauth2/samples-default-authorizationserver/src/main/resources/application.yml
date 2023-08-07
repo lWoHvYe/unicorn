@@ -19,6 +19,10 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
+  # use virtual threads in Spring Boot 3.2 + Java 21
+  threads:
+    virtual:
+      enabled: true
 
   #配置数据源
   datasource:
@@ -30,7 +34,7 @@ spring:
     hikari:
       # When the pool reaches this size, and no idle connections are available, calls to getConnection() will block for up to connectionTimeout milliseconds before timing out. Please read about pool sizing. Default: 10
       maximum-pool-size: 10
-      pool-name: Resource-Server
+      pool-name: Authorize-Server
       connection-test-query: SELECT 1
 
   # cache配置
