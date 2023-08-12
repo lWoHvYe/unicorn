@@ -30,7 +30,8 @@ class ScriptEngineTest {
     void testEngine() {
 
         ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("Graal.js");
+//        ScriptEngine engine = manager.getEngineByName("Graal.js");
+        ScriptEngine engine = manager.getEngineByName("javascript");
 
         try {
             Object result = engine.eval("1 + 2");
