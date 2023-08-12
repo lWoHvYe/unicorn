@@ -94,7 +94,11 @@ springdoc:
   swagger-ui:
     urls:
       - name: security-service
+        display-name: unicorn-security
         url: /v3/api-docs/security
+      - name: gateway
+        display-name: remote-gateway
+        url: /v3/api-docs
   cache:
     disabled: true
 

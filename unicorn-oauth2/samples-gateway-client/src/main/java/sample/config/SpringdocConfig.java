@@ -30,6 +30,14 @@ import java.util.List;
 @Slf4j
 @Configuration
 public class SpringdocConfig {
+
+    /**
+     * 不太理解这个Bean的用途，并且似乎Disable也没影响
+     *
+     * @param locator
+     * @return java.util.List<org.springdoc.core.models.GroupedOpenApi>
+     * @date 2023/8/12 2:56 PM
+     */
     @Bean
     @Lazy(false)
     public List<GroupedOpenApi> apis(RouteDefinitionLocator locator) {
