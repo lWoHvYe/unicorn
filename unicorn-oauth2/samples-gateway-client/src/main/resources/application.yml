@@ -55,6 +55,11 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        ssl:
+          # trust all downstream certificates
+          useInsecureTrustManager: true
+          handshake-timeout: 5000ms
       routes:
         - id: resource
           uri: http://localhost:8090
