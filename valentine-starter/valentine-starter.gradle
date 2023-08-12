@@ -21,6 +21,8 @@ dependencies {
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
     }
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    implementation 'org.graalvm.js:js:23.0.0'
+//    implementation 'org.graalvm.js:js-scriptengine:23.0.0'
     implementation(project(':unicorn-security')) {
         capabilities {
             requireCapability('com.lwohvye:unicorn-security-captcha')
