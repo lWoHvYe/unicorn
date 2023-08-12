@@ -72,7 +72,31 @@ spring:
             - StripPrefix=1
             # 添加prefix，从/some-resource变为/api/some-resource
             - PrefixPath=/api
+        - id: security-service
+          uri:
+            https://localhost:8081
+          predicates:
+            - Path=/security/**, /unicorn/security/**
+          filters:
+            - ContextPathRewritePath=/unicorn/security/(?<path>.*), /$\{path}
+            - RewritePath=/security/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
 
+#springdoc:
+#  swagger-ui:
+#    use-root-path: true
+springdoc:
+  swagger-ui:
+    urls:
+      - name: security-service
+        url: /v3/api-docs/security
+  cache:
+    disabled: true
 
 messages:
   base-uri: http://127.0.0.1:8090/api/messages

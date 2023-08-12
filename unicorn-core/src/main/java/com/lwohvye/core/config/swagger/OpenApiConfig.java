@@ -73,23 +73,20 @@ public class OpenApiConfig {
     @Value("${jwt.header:Authorization}")
     private String tokenHeader;
 
-    @Value("${jwt.token-start-with:Bearer }")
-    private String tokenStartWith;
-
     @Bean
     public OpenAPI springDocOpenAPI() {
         //配置认证、请求头参数
         // https://swagger.io/docs/specification/authentication/
         // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#securitySchemeObject
         // 接口调试路径
-        var tryServer = new Server().url(swaggerProperties.getTryHost());
+//        var tryServer = new Server().url(swaggerProperties.getTryHost());
         var contact = new Contact().name("王红岩-_-lWoHvYe").url("https://www.lwohvye.com").email("lWoHvYe@outlook.com");
         var license = new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.html");
         return new OpenAPI()
                 .components(components())
                 // 要配置这个，Authorization的Header才生效
                 .security(securityRequirements())
-                .servers(Collections.singletonList(tryServer))
+//                .servers(Collections.singletonList(tryServer))
                 .info(new Info()
                         .title(swaggerProperties.getApplicationName() + " API Doc") // 应用程序编程接口 Application Programming Interface
                         .contact(contact)
