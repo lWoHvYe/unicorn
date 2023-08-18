@@ -72,10 +72,27 @@
       detail.（针对线程的Stack，采用的方式是yield时，copy
       stack,
       stored on the Java heap）
+    - To run code in a virtual thread, the JDK's virtual thread scheduler assigns the virtual thread for execution on a
+      platform thread by mounting the virtual thread on a platform thread. This makes the platform thread become the
+      carrier of the virtual thread. Later, after running some code, the virtual thread can unmount from its carrier. At
+      that point the platform thread is free so the scheduler can mount a different virtual thread on it, thereby making
+      it a carrier again.
+    - Typically, a virtual thread will unmount when it blocks on I/O or some other blocking operation in the JDK. When
+      the blocking operation is ready to complete, it submits the virtual thread back to the scheduler, which will mount
+      the virtual thread on a carrier to resume execution.(简而言之。I/O block不会block Platform Thread，
+      Kotlin、Go的协程实现也是不会阻塞)
+    - There are two scenarios in which a virtual thread cannot be unmounted during blocking operations because it is
+      pinned to its carrier:
+        - When it executes code inside a synchronized block or method, or
+        - When it executes a native method or a foreign function.
+        - 以上是两种会block的情况，所以较synchronized 更推荐使用API level的 Lock实现
+    - The scheduler does not compensate for pinning by expanding its parallelism. Instead, avoid frequent and long-lived
+      pinning by revising synchronized blocks or methods that run frequently and guard potentially long I/O operations
+      to use java.util.concurrent.locks.ReentrantLock instead.
+    - The primitive API to support locking, java.util.concurrent.LockSupport, now supports virtual threads。
 - [Virtual Threads in Spring 6.x](https://spring.io/blog/2022/10/11/embracing-virtual-threads)
 - [Blog-Understanding Java's Project Loom](https://www.marcobehler.com/guides/java-project-loom?mkt_tok=NDI2LVFWRC0xMTQAAAGIcjkwHcDNBFot5rdRdBEUuF6VoChWteoULzKapDGmwmAvhMcx0grhQ0louho-dN1ckoHsIo1dWoRkkUbuaEtY9jNg8gRmb1XxVmmNrLmADNkSKVgN)
 - [IntelliJ IDEA Conf 2022 | Project Loom: Revolution in Concurrency or Obscure Implementation Detail?](https://www.youtube.com/watch?v=0DUlUzqr09I)
-- [Running Kotlin Coroutines on Project Loom](https://kt.academy/article/dispatcher-loom)
 - [Spring Boot 3.2 ships support for Virtual Threads](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2.0-M1-Release-Notes)
 - [Compatibility with virtual threads (OpenJDK's Project Loom)](https://github.com/spring-projects/spring-framework/issues/23443)
 
