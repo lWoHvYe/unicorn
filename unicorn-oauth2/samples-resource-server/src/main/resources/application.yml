@@ -15,6 +15,9 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9000
+  threads:
+    virtual:
+      enabled: true
 
   #配置 Jpa
   jpa:
@@ -26,9 +29,6 @@ spring:
     hibernate:
       ddl-auto: none
     #show-sql: true
-  autoconfigure:
-    # to use VT, should exclude this
-    exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
 
 #配置数据源
   datasource:

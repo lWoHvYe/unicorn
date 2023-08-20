@@ -54,7 +54,7 @@ dependencyResolutionManagement {
             version('oshiCore', '6.4.2')
             version('poi', '5.2.3')
             version('quartz', '2.3.2')
-            version('redisson', '3.22.0')
+            version('redisson', '3.23.0')
             version('springBoot', "$springBootVersion")
             version('springdoc', '2.1.0')
             version('thumbnailator', '0.4.20')
