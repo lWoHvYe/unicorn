@@ -14,7 +14,7 @@ module lwohvye.unicorn.security {
     requires transitive spring.rabbit;
     requires transitive spring.retry;
     requires bizlog.sdk;
-    requires captcha;
+    requires captcha.core;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
     requires easy.captcha;
