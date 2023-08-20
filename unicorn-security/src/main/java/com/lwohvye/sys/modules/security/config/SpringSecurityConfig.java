@@ -107,8 +107,10 @@ public class SpringSecurityConfig {
                                            CorsFilter corsFilter,
                                            AuthorizationManager<RequestAuthorizationContext> customAuthorizationManager) throws Exception {
         // 这样注册自定义的UsernamePasswordAuthenticationFilter
-        httpSecurity.apply(MyCustomDsl.customDsl(successHandler, failureHandler));
-        httpSecurity.apply(securityConfigurerAdapter());
+        httpSecurity.with(MyCustomDsl.customDsl(successHandler, failureHandler), myCustomDsl -> {
+        });
+        httpSecurity.with(securityConfigurerAdapter(), jwtAuthTokenConfigurer -> {
+        });
         httpSecurity
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。
