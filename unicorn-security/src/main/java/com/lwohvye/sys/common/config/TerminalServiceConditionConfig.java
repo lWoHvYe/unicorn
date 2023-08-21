@@ -22,7 +22,7 @@ import com.lwohvye.sys.modules.system.service.ITerminalService;
 import com.lwohvye.sys.modules.system.service.local.LinuxTerminalServiceImpl;
 import com.lwohvye.sys.modules.system.service.local.MacOSTerminalServiceImpl;
 import com.lwohvye.sys.modules.system.service.local.WindowsTerminalServiceImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -36,7 +36,8 @@ import org.springframework.context.annotation.Configuration;
  */
 // Condition系列可用在bean或者class上
 //@Conditional({DoLoadOSCondition.class})
-@ConditionalOnExpression("${local.sys.load-os:false}")
+//@ConditionalOnProperty(prefix = "local.sys", name = "load-os", havingValue = "true")
+@ConditionalOnProperty(prefix = "local.sys", name = "load-os")
 @Configuration
 public class TerminalServiceConditionConfig {
 

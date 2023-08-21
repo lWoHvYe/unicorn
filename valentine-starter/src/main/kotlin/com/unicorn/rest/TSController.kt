@@ -19,12 +19,14 @@ import com.unicorn.service.ITSService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import kotlin.time.Duration
 
+@Profile("dev")
 @RestController
 @RequestMapping("/api/anonymous/tsScope")
 class TSController(val itsService: ITSService) {

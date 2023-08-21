@@ -16,7 +16,7 @@
 package com.lwohvye.sys.modules.security.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +38,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * @date 2021/11/28 10:24 上午
  * @see org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration
  */
-@ConditionalOnExpression("${local.sys.multi-security:false}")
+@ConditionalOnProperty(prefix = "local.sys", name = "multi-security")
 @Slf4j
 @EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 @EnableWebSecurity
