@@ -13,11 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package org.springframework.boot.autoconfigure.thread
 
-package org.springframework.boot.autoconfigure.thread;
-
-import org.springframework.boot.system.JavaVersion;
-import org.springframework.core.env.Environment;
+import org.springframework.boot.system.JavaVersion
+import org.springframework.core.env.Environment
 
 /**
  * Threading of the application.
@@ -25,29 +24,25 @@ import org.springframework.core.env.Environment;
  * @author Moritz Halbritter, lWoHvYe
  * @since 3.2.0
  */
-public enum Threading {
-
+enum class Threading {
     /**
      * Platform threads. Active if virtual threads are not active.
      */
     PLATFORM {
-        @Override
-        public boolean isActive(Environment environment) {
-            return !VIRTUAL.isActive(environment);
+        override fun isActive(environment: Environment): Boolean {
+            return !VIRTUAL.isActive(environment)
         }
-
     },
+
     /**
-     * Virtual threads. Active if {@code spring.threads.virtual.enabled} is {@code true}
+     * Virtual threads. Active if `spring.threads.virtual.enabled` is `true`
      * and running on Java 20 or later.
      */
     VIRTUAL {
-        @Override
-        public boolean isActive(Environment environment) {
-            return environment.getProperty("spring.threads.virtual.enabled", boolean.class, false)
-                    && JavaVersion.getJavaVersion().isEqualOrNewerThan(JavaVersion.TWENTY);
+        override fun isActive(environment: Environment): Boolean {
+            return (environment.getProperty("spring.threads.virtual.enabled", Boolean::class.javaPrimitiveType!!, false)
+                    && JavaVersion.getJavaVersion().isEqualOrNewerThan(JavaVersion.TWENTY))
         }
-
     };
 
     /**
@@ -56,6 +51,5 @@ public enum Threading {
      * @param environment the environment
      * @return whether the threading is active
      */
-    public abstract boolean isActive(Environment environment);
-
+    abstract fun isActive(environment: Environment): Boolean
 }

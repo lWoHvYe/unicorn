@@ -13,34 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.core.task
 
-package org.springframework.core.task;
-
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadFactory
 
 /**
  * Internal delegate for virtual thread handling on JDK 21.
  * This is the actual version compiled against JDK 21.
- * <a href="https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java21/org/springframework/core/task/VirtualThreadDelegate.java">...</a>
+ * [...](https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java21/org/springframework/core/task/VirtualThreadDelegate.java)
  *
  * @author Juergen Hoeller
  * @see VirtualThreadTaskExecutor
+ *
  * @since 6.1
  */
-final class VirtualThreadDelegate {
-
-    private final Thread.Builder threadBuilder = Thread.ofVirtual();
-
-    public ThreadFactory virtualThreadFactory() {
-        return this.threadBuilder.factory();
+internal class VirtualThreadDelegate {
+    private val threadBuilder: Thread.Builder = Thread.ofVirtual()
+    fun virtualThreadFactory(): ThreadFactory {
+        return threadBuilder.factory()
     }
 
-    public ThreadFactory virtualThreadFactory(String threadNamePrefix) {
-        return this.threadBuilder.name(threadNamePrefix, 0).factory();
+    fun virtualThreadFactory(threadNamePrefix: String?): ThreadFactory {
+        return threadBuilder.name(threadNamePrefix, 0).factory()
     }
 
-    public Thread newVirtualThread(String name, Runnable task) {
-        return this.threadBuilder.name(name).unstarted(task);
+    fun newVirtualThread(name: String?, task: Runnable?): Thread {
+        return threadBuilder.name(name).unstarted(task)
     }
-
 }
