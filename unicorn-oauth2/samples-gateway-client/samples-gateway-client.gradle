@@ -6,6 +6,7 @@ ext {
 
 dependencies {
     implementation platform(SpringBootPlugin.BOM_COORDINATES)
+    implementation(project(":virtual-thread"))
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.cloud:spring-cloud-starter-gateway:$gatewayVersion"
