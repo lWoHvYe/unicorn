@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -37,7 +37,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@ConditionalOnExpression("${local.sys.init-bf:false}")
+@ConditionalOnProperty(prefix = "local.sys", name = "init-bf")
 // Spring允许BeanFactoryPostProcessor在容器实例化任何其它bean之前读取配置元数据，并可以根据需要进行修改
 public class AuthHandlerProcessor implements BeanFactoryPostProcessor {
 

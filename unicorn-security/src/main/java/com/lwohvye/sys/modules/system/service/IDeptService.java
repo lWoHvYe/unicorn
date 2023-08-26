@@ -111,7 +111,7 @@ public interface IDeptService extends BaseService {
      * fetch all subChild by Pid
      *
      * @param pid givenPid
-     * @return java.util.List<java.lang.Long>
+     * @return java.util.List
      * @date 2023/7/9 8:18 AM
      */
     List<Long> fetchDeptChildByPid(Long pid);

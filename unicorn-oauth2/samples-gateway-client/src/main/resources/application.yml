@@ -12,6 +12,10 @@ logging:
 spring:
   thymeleaf:
     cache: false
+  # use virtual threads in Spring Boot 3.2 + Java 21
+  threads:
+    virtual:
+      enabled: true
   security:
     oauth2:
       client:
@@ -55,6 +59,11 @@ spring:
 
   cloud:
     gateway:
+      httpclient:
+        ssl:
+          # trust all downstream certificates
+          useInsecureTrustManager: true
+          handshake-timeout: 5000ms
       routes:
         - id: resource
           uri: http://localhost:8090
@@ -67,7 +76,35 @@ spring:
             - StripPrefix=1
             # 添加prefix，从/some-resource变为/api/some-resource
             - PrefixPath=/api
+        - id: security-service
+          uri:
+            https://localhost:8081
+          predicates:
+            - Path=/security/**, /unicorn/security/**
+          filters:
+            - ContextPathRewritePath=/unicorn/security/(?<path>.*), /$\{path}
+            - RewritePath=/security/(?<path>.*), /$\{path}
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
 
+#springdoc:
+#  swagger-ui:
+#    use-root-path: true
+springdoc:
+  swagger-ui:
+    urls:
+      - name: security-service
+        display-name: unicorn-security
+        url: /v3/api-docs/security
+      - name: gateway
+        display-name: remote-gateway
+        url: /v3/api-docs
+  cache:
+    disabled: true
 
 messages:
   base-uri: http://127.0.0.1:8090/api/messages

@@ -35,8 +35,8 @@ import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IResourceService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,7 +80,8 @@ import java.util.Objects;
 // 设置 securedEnabled 为 true ，就开启了角色注解 @Secured ，该注解功能要简单的多，默认情况下只能基于角色（默认需要带前缀 ROLE_）集合来进行访问控制决策。
 @EnableMethodSecurity(securedEnabled = true)
 @Configuration // spring boot 3.0开始要加上这个
-@ConditionalOnExpression("!${local.sys.multi-security:false}") // 这里用了取反。非multi时开启。默认开启
+//@ConditionalOnExpression("!${local.sys.multi-security:false}") // 这里用了取反。非multi时开启。默认开启
+@ConditionalOnProperty(prefix = "local.sys", name = "multi-security", havingValue = "false", matchIfMissing = true)
 @ConditionalOnMissingBean(SimpleSecurityConfig.class) // 如果使用了简单配置，就不加载本配置了
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SpringSecurityConfig {
@@ -107,8 +108,10 @@ public class SpringSecurityConfig {
                                            CorsFilter corsFilter,
                                            AuthorizationManager<RequestAuthorizationContext> customAuthorizationManager) throws Exception {
         // 这样注册自定义的UsernamePasswordAuthenticationFilter
-        httpSecurity.apply(MyCustomDsl.customDsl(successHandler, failureHandler));
-        httpSecurity.apply(securityConfigurerAdapter());
+        httpSecurity.with(MyCustomDsl.customDsl(successHandler, failureHandler), myCustomDsl -> {
+        });
+        httpSecurity.with(securityConfigurerAdapter(), jwtAuthTokenConfigurer -> {
+        });
         httpSecurity
                 // 禁用 CSRF
                 // CSRF（跨站点请求伪造：Cross-Site Request Forgery）的。

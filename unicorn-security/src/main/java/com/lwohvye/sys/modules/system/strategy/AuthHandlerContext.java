@@ -19,7 +19,7 @@ import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.sys.modules.system.annotation.UserTypeHandlerAnno;
 import com.lwohvye.sys.modules.system.enums.UserTypeEnum;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -37,7 +37,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-@ConditionalOnExpression("!${local.sys.init-bf:false}")
+@ConditionalOnProperty(prefix = "local.sys", name = "init-bf", havingValue = "false", matchIfMissing = true)
 public class AuthHandlerContext {
 
     final Map<Integer, AUserTypeStrategy> strategyMap;

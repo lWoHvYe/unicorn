@@ -5,6 +5,7 @@ dependencies {
         // core本是基于servlet的，而resourceServer基于reactive，所以需要exclude此处
         exclude(group: 'org.springframework', module: 'spring-webmvc')
     }
+    implementation(project(":virtual-threads"))
     implementation "org.springframework.boot:spring-boot-starter-webflux"
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"

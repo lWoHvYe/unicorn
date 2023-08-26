@@ -19,6 +19,7 @@ package com.lwohvye.core.config.security;
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +44,7 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 @EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 @EnableWebSecurity
 @Configuration
-@ConditionalOnExpression("${local.sys.sim-auth:false}") // 基于配置，是否对所有请求放行。默认关闭
+@ConditionalOnProperty(prefix = "local.sys", name = "sim-auth", havingValue = "true") // 基于配置，是否对所有请求放行。默认关闭
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 // 指定Init Bean的Condition，需要是Servlet（比如WebMVC）
 public class SimpleSecurityConfig {

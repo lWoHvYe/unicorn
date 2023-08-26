@@ -18,8 +18,8 @@ package com.lwohvye.core.config;
 
 import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.system.JavaVersion;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
@@ -35,7 +35,7 @@ import java.util.concurrent.Executors;
  */
 @AutoConfiguration
 @ConditionalOnJava(JavaVersion.NINETEEN)
-@ConditionalOnExpression("!${spring.threads.virtual.enabled:false}")
+@ConditionalOnProperty(name = "spring.threads.virtual.enabled", havingValue = "false", matchIfMissing = true)
 public class ValentineExecutorConfig {
 
     /**
