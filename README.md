@@ -36,7 +36,7 @@
 ##### Maven
 
 ```xml
-    <project.core.version>4.2.0-omicron</project.core.version>
+    <project.core.version>4.2.0-pi</project.core.version>
 
     <!--    system模块    -->
     <dependency>
@@ -58,7 +58,7 @@
 ```groovy
 // 4.x系列将基于Java 21, 部分module使用Kotlin, 使用Gradle build
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.0.1-lambda'
+    unicornVersion = '4.2.0-pi'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
