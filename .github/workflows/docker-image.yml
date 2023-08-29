@@ -20,16 +20,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      #  https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Installing-custom-Java-package-type
-      - run: |
-          download_url="https://download.oracle.com/graalvm/20/latest/graalvm-jdk-20_macos-x64_bin.tar.gz"
-          wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
-      - uses: actions/setup-java@v3
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
         with:
-          distribution: 'jdkfile'
-          jdkFile: ${{ runner.temp }}/java_package.tar.gz
           java-version: '20'
-          architecture: x64
+          distribution: 'temurin'
+          check-latest: true
+          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
+
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
