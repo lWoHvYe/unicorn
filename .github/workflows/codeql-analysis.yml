@@ -13,7 +13,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main, dev_4.0, delta-oauth2.0 ]
+    branches: [ main, delta-oauth2.0 ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]

@@ -63,7 +63,8 @@ tasks.named("bootBuildImage") {
                     " --initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
                     ",ch.qos.logback.core.status.StatusBase,ch.qos.logback.core.status.InfoStatus" +
                     ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
-                    ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader",
+                    ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader" +
+                    ",io.netty.handler.ssl.BouncyCastleAlpnSslUtils", // java.lang.ClassNotFoundException: org.bouncycastle.jsse.BCSSLEngine
             "BPE_DELIM_JAVA_TOOL_OPTIONS"    : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS"   : "-XX:+UseZGC -XX:+HeapDumpOnOutOfMemoryError --enable-preview"
     ]

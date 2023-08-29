@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "dev_3.x", "delta-oauth2.0" ]
+    branches: [ "main", "delta-oauth2.0" ]
   pull_request:
-    branches: [ "main", "dev_3.x" ]
+    branches: [ "main" ]
 
 jobs:
   build:
