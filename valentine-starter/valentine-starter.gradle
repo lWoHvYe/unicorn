@@ -56,7 +56,7 @@ tasks.named("bootRun") {
 }
 
 tasks.named("bootBuildImage") {
-    builder = "paketobuildpacks/builder:tiny"
+    // builder = "paketobuildpacks/builder:tiny"
     environment = [
             "BP_JVM_VERSION"                 : "20.*",
             "BP_NATIVE_IMAGE"                : "true",
