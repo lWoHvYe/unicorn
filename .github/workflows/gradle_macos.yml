@@ -28,6 +28,6 @@ jobs:
         java-version: '20'
         distribution: 'temurin'
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@2 # v2.6.0
+      uses: gradle/gradle-build-action@v2 # v2.6.0
       with:
         arguments: nativeCompile
