@@ -59,12 +59,11 @@ tasks.named("bootBuildImage") {
     environment = [
             "BP_JVM_VERSION"                 : "20.*",
             "BP_NATIVE_IMAGE"                : "true",
-            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx7g" + // fixed OOM with -J-Xmx7g
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx10g" + // fixed OOM with -J-Xmx7g
                     " --initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
                     ",ch.qos.logback.core.status.StatusBase,ch.qos.logback.core.status.InfoStatus" +
                     ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
-                    ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader" +
-                    ",io.netty.handler.ssl.BouncyCastleAlpnSslUtils", // java.lang.ClassNotFoundException: org.bouncycastle.jsse.BCSSLEngine
+                    ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader",
             "BPE_DELIM_JAVA_TOOL_OPTIONS"    : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS"   : "-XX:+UseZGC -XX:+HeapDumpOnOutOfMemoryError --enable-preview"
     ]
