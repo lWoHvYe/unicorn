@@ -61,13 +61,13 @@ tasks.named("bootBuildImage") {
             "BP_NATIVE_IMAGE"                : "true",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview",
             "BPE_DELIM_JAVA_TOOL_OPTIONS"    : " ",
-            "BPE_APPEND_JAVA_TOOL_OPTIONS"   : "-XX:+UseZGC --enable-preview"
+            "BPE_APPEND_JAVA_TOOL_OPTIONS"   : "-XX:+UseZGC -XX:+HeapDumpOnOutOfMemoryError --enable-preview"
     ]
     buildpacks = [
             "gcr.io/paketo-buildpacks/graalvm",
             "gcr.io/paketo-buildpacks/java-native-image"
     ]
-    jvmArgs += ["-Xmx7g"]
+    buildArgs = ['-J-Xmx7g']
 }
 
 if (graalvmEnable) {
