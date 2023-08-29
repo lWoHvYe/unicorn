@@ -62,8 +62,10 @@ tasks.named("bootBuildImage") {
             "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
     ]
-    builder = "gcr.io/paketo-buildpacks/graalvm"
-    buildpacks("urn:cnb:builder:paketo-buildpacks/java-native-image")
+    buildpacks([
+            "gcr.io/paketo-buildpacks/graalvm",
+            "gcr.io/paketo-buildpacks/java-native-image"
+    ])
 }
 
 if (graalvmEnable) {
