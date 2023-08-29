@@ -60,7 +60,7 @@ tasks.named("bootBuildImage") {
             "BP_JVM_VERSION"                 : "20.*",
             "BP_NATIVE_IMAGE"                : "true",
             "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx7g" + // fixed OOM with -J-Xmx7g
-                    "--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
+                    " --initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
                     ",ch.qos.logback.core.status.StatusBase,ch.qos.logback.core.status.InfoStatus" +
                     ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
                     ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader",
