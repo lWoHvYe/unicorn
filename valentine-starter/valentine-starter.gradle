@@ -58,11 +58,11 @@ tasks.named("bootRun") {
 tasks.named("bootBuildImage") {
     builder = "paketobuildpacks/builder:tiny"
     environment = [
-            "BP_JVM_VERSION"              : "20.*",
-            "BP_NATIVE_IMAGE"             : "true",
-            "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
-            "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
-//            ,"BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview"
+            "BP_JVM_VERSION"                 : "20.*",
+            "BP_NATIVE_IMAGE"                : "true",
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview",
+            "BPE_DELIM_JAVA_TOOL_OPTIONS"    : " ",
+            "BPE_APPEND_JAVA_TOOL_OPTIONS"   : "-XX:+UseZGC --enable-preview"
     ]
     buildpacks = [
             "gcr.io/paketo-buildpacks/graalvm",
