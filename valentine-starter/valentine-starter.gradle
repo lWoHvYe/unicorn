@@ -68,6 +68,7 @@ tasks.named("bootBuildImage") {
             "gcr.io/paketo-buildpacks/graalvm",
             "gcr.io/paketo-buildpacks/java-native-image"
     ]
+    jvmArguments(["-Xmx7g"])
 }
 
 if (graalvmEnable) {
