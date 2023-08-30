@@ -1,10 +1,6 @@
 plugins {
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
     id 'io.spring.dependency-management'
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.spring)
-    alias(libs.plugins.kotlin.jpa)
-    alias(libs.plugins.kotlin.lombok)
     // Apply GraalVM Native Image plugin
 //    id 'org.graalvm.buildtools.native'
 }
@@ -19,14 +15,6 @@ dependencies {
     String tomcatVersion = dependencyManagement.importedProperties['tomcat.version']
     implementation "org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion"
     implementation 'org.apache.httpcomponents.client5:httpclient5'
-    if (kotlinEnable) {
-        implementation project(':unicorn-tp-tools-kotlin') // kotlin as well
-        implementation "org.jetbrains.kotlin:kotlin-stdlib"
-        implementation 'org.jetbrains.kotlin:kotlin-reflect'
-        implementation libs.bundles.coroutines
-        implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
-        testImplementation 'org.jetbrains.kotlin:kotlin-test'
-    }
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 //    add following dependency if using ScriptEngine after Java 15
 //    implementation 'org.graalvm.js:js:23.0.0'
@@ -99,17 +87,5 @@ if (graalvmEnable) {
                                 ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
                                 ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
         options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
-    }
-}
-
-if (kotlinEnable) {
-    kotlin {
-        sourceSets.configureEach {
-            languageSettings {
-//                languageVersion = "2.0" // kotlin.experimental.tryK2=true
-                apiVersion = "2.0"
-            }
-        }
-        jvmToolchain(20)
     }
 }
