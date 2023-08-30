@@ -20,7 +20,7 @@ dependencies {
     implementation "org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion"
     implementation 'org.apache.httpcomponents.client5:httpclient5'
     if (kotlinEnable) {
-        // implementation project(':unicorn-tp-tools-kotlin') // kotlin as well
+        implementation project(':unicorn-tp-tools-kotlin') // kotlin as well
         implementation "org.jetbrains.kotlin:kotlin-stdlib"
         implementation 'org.jetbrains.kotlin:kotlin-reflect'
         implementation libs.bundles.coroutines
