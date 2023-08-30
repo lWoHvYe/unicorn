@@ -59,7 +59,7 @@ tasks.named("bootBuildImage") {
     environment = [
             "BP_JVM_VERSION"                 : "20.*",
             "BP_NATIVE_IMAGE"                : "true",
-            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx10g " + // fixed OOM with -J-Xmx7g
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx7g " + // fixed OOM with -J-Xmx7g
                     "-H:DeadlockWatchdogInterval=10 -H:+DeadlockWatchdogExitOnTimeout " +
                     "--initialize-at-build-time=ch.qos.logback.classic.Logger,ch.qos.logback.core.status.StatusBase" +
                     ",org.slf4j.LoggerFactory,ch.qos.logback.core.CoreConstants,ch.qos.logback.core.util.StatusPrinter" +
