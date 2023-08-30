@@ -81,10 +81,12 @@ if (graalvmEnable) {
     tasks.named("nativeCompile") {
         def options = nativeCompile.options.get().asCompileOptions()
         options.buildArgs
-                .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
-                        ",ch.qos.logback.core.status.StatusBase" +
-                        ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
-                        ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
+                .addAll(
+//                        "--gc=G1", // The G1 garbage collector ('--gc=G1') is currently only supported on Linux AMD64.
+                        "--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
+                                ",ch.qos.logback.core.status.StatusBase" +
+                                ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
+                                ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
         options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
     }
 }

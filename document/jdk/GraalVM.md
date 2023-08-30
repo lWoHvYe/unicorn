@@ -1,0 +1,2 @@
+- https://www.graalvm.org/latest/docs/introduction/
+- https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md
