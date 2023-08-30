@@ -28,7 +28,7 @@ jobs:
           check-latest: true
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-
+      # https://github.com/oktadev/auth0-full-stack-java-example/blob/main/.github/workflows/publish.yml
       - name: Set Swap Space
         if: runner.os == 'Linux'
         uses: pierotofy/set-swap-space@master
