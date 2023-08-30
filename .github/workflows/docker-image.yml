@@ -33,7 +33,7 @@ jobs:
         if: runner.os == 'Linux'
         uses: pierotofy/set-swap-space@master
         with:
-          swap-size-gb: 10
+          swap-size-gb: 6
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
