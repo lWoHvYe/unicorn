@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -56,13 +57,19 @@ public class ReactiveSecurityUtils {
                                 sink.next(userDetails.getUsername());
                                 return;
                             }
+                            if (principal instanceof Jwt jwt) {
+                                var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
+                                log.warn("...." + clientDetail);
+                                sink.next(clientDetail);
+                                return;
+                            }
                             //   - 如果 `principal` 不是 `UserDetails` 的实例，使用 `sink.error()` 抛出一个自定义的 `AuthException` 异常。
-                            sink.error(new AuthException("找不到当前登录的信息"));
+                            sink.error(new AuthException("找不到当前登录的信息: " + principal));
                         }))
                 //6. 使用 `doOnSuccess` 在成功时执行一些操作，这里是记录用户名的日志。
-                .doOnSuccess(it -> log.debug("userName {} ", it))
+                .doOnSuccess(it -> log.info("userName {} ", it))
                 //7. 使用 `doOnError` 在发生错误时执行一些操作，这里是记录错误信息的日志。
-                .doOnError(ex -> log.debug("error {} ", ex.getMessage()))
+                .doOnError(ex -> log.info("error {} ", ex.getMessage()))
                 //8. 使用 `defaultIfEmpty` 指定一个默认值，在没有找到用户名时返回 "anonymous"。
                 .defaultIfEmpty("anonymous");
     }
@@ -82,10 +89,15 @@ public class ReactiveSecurityUtils {
                         log.warn("...." + userDetails.getUsername());
                         return Mono.just(userDetails.getUsername());
                     }
-                    return Mono.error(new AuthException("找不到当前登录的信息"));
+                    if (principal instanceof Jwt jwt) {
+                        var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
+                        log.warn("...." + clientDetail);
+                        return Mono.just(clientDetail);
+                    }
+                    return Mono.error(new AuthException("找不到当前登录的信息: " + principal));
                 })
-                .doOnSuccess(username -> log.debug("userName {} ", username))
-                .doOnError(ex -> log.debug("error {} ", ex.getMessage()))
+                .doOnSuccess(username -> log.info("userName {} ", username))
+                .doOnError(ex -> log.info("error {} ", ex.getMessage()))
                 .switchIfEmpty(Mono.just("anonymous"));
     }
 

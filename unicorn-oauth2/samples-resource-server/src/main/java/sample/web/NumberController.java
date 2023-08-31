@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import sample.utils.ReactiveSecurityUtils;
 
 import java.time.Duration;
 
@@ -55,7 +56,11 @@ public class NumberController {
         Flux<String> endFlux = Flux.just("End");
 
         // 使用 Flux.concat() 组合多个 Flux，并将每次返回的整数转换为字符串类型，然后返回字符串类型的流。
-        return Flux.concat(startingFlux, numbers.map(String::valueOf), endFlux)
+        return Flux.concat(startingFlux,
+                        ReactiveSecurityUtils.getCurrentUsername(),
+                        numbers.map(String::valueOf),
+                        ReactiveSecurityUtils.getCurrentUsername2(),
+                        endFlux)
                 .delayElements(Duration.ofSeconds(1));
     }
 }
