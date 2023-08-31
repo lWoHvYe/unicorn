@@ -79,7 +79,7 @@ public class ReactiveSecurityUtils {
     //2. 使用 `switchIfEmpty` 替代 `defaultIfEmpty`：`switchIfEmpty` 操作符可以更直观地指定当流为空时的替代逻辑。
     //3. 使用 `map` 替代 `handle`：由于处理操作只是根据 `principal` 的类型进行转换，可以使用 `map` 操作符结合条件判断来达到相同的效果，而不必使用 `handle`。
     //通过这些优化，代码更加简洁、清晰，并且减少了嵌套层级，提高了代码的可读性和可维护性。
-    public static Mono<String> getCurrentUsername2() {
+    public static Mono<String> getCurrentUsernameSham() {
         return ReactiveSecurityContextHolder.getContext()
                 .filter(c -> c.getAuthentication() != null)
                 .map(SecurityContext::getAuthentication)

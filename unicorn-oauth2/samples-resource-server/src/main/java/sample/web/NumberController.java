@@ -59,7 +59,7 @@ public class NumberController {
         return Flux.concat(startingFlux,
                         ReactiveSecurityUtils.getCurrentUsername(),
                         numbers.map(String::valueOf),
-                        ReactiveSecurityUtils.getCurrentUsername2(),
+                        ReactiveSecurityUtils.getCurrentUsernameSham(),
                         endFlux)
                 .delayElements(Duration.ofSeconds(1));
     }

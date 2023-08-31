@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.lwohvye'
-version = '4.1.0-omicron-20-RC1'
+version = '4.1.0-omicron-20-RC2'
 java.sourceCompatibility = JavaVersion.VERSION_20
 
 java {
