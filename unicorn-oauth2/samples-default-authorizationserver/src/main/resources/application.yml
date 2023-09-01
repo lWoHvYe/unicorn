@@ -27,7 +27,7 @@ spring:
   #配置数据源
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:10.211.55.145}:${DB_PORT:}/${DB_NAME:}
+    url: jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:unicorn}
     username: ${DB_USER:}
     password: ${DB_PWD:}
 
@@ -43,6 +43,6 @@ spring:
   # redis配置
   data:
     redis:
-      url: redis://redis-psd@10.211.55.145:6379
+      url: redis://redis-psd@10.211.55.140:6379
       timeout: 2000
       database: 4
