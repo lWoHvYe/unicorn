@@ -33,6 +33,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * Redis相关工具类。
@@ -2015,19 +2016,13 @@ public class RedisUtils {
         // 超时500ms，未成功返回失败
         var timeout = 500L;
         while (!lock(lockKey, value, expireTime)) {
-            try {
+            // 超时返回失败
+            if (Duration.between(start, Instant.now()).toMillis() >= timeout)
+                return false;
 
-                // 超时返回失败
-                if (Duration.between(start, Instant.now()).toMillis() >= timeout)
-                    return false;
-
-                // 视业务调整sleep时间
-                Thread.sleep(50);
-                log.error("{}:等待获取锁中...", lockKey);
-            } catch (InterruptedException e) {
-                log.error("等待锁出错，锁名称:{}，原因:{}", lockKey, e.getMessage());
-                Thread.currentThread().interrupt();
-            }
+            // 视业务调整sleep时间
+            LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(50L));
+            log.info("{}:等待获取锁中...", lockKey);
         }
         // 到这里一般都是成功了
         return true;
