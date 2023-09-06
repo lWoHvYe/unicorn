@@ -72,7 +72,6 @@ tasks.named("bootBuildImage") {
 if (graalvmEnable) {
     tasks.named("processAot") {
         jvmArgs += "--enable-preview"
-        // jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
     }
 
     tasks.named("nativeCompile") {
@@ -84,6 +83,5 @@ if (graalvmEnable) {
                         ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
                         ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
         options.jvmArgs.addAll("--enable-preview")
-        // options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
     }
 }

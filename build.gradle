@@ -27,7 +27,7 @@ plugins {
 }
 
 ext {
-    graalvmEnable = true // 这个能在同为 Groovy DSL的sub-project中使用
+    graalvmEnable = false // 这个能在同为 Groovy DSL的sub-project中使用
 }
 
 ext.sharedManifest = manifest {

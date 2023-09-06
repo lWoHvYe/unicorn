@@ -36,20 +36,21 @@
 ##### Maven
 
 ```xml
-    <project.core.version>4.2.0-pi</project.core.version>
 
-    <!--    system模块    -->
-    <dependency>
-        <groupId>com.lwohvye</groupId>
-        <artifactId>unicorn-security</artifactId>
-        <version>${project.core.version}</version>
-    </dependency>
-    <!--   logging模块     -->
-    <dependency>
-        <groupId>com.lwohvye</groupId>
-        <artifactId>unicorn-logging</artifactId>
-        <version>${project.core.version}</version>
-    </dependency>
+<project.core.version>4.2.0-pi</project.core.version>
+
+        <!--    system模块    -->
+<dependency>
+<groupId>com.lwohvye</groupId>
+<artifactId>unicorn-security</artifactId>
+<version>${project.core.version}</version>
+</dependency>
+        <!--   logging模块     -->
+<dependency>
+<groupId>com.lwohvye</groupId>
+<artifactId>unicorn-logging</artifactId>
+<version>${project.core.version}</version>
+</dependency>
 
 ```
 
@@ -178,6 +179,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - rabbitmq Async log
 - unicorn-tp-tools 系统第三方工具模块(kotlin)
 - unicorn-code-gen 系统代码生成模块(kotlin)
+- loom-20-ext 在Java 20使用SpringBoot 并Enable其对VT的Support的兼容包
 ```
 
 #### 运行环境
