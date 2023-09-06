@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main", "dev_3.x", "delta-oauth2.0" ]
+    branches: [ "main", "delta-oauth2.0" ]
   pull_request:
-    branches: [ "main", "dev_3.x" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -16,10 +16,12 @@ jobs:
 
     strategy:
       fail-fast: false
+      matrix:
+        language: [ 'java' ]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
@@ -28,6 +30,12 @@ jobs:
           check-latest: true
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
+      # https://github.com/oktadev/auth0-full-stack-java-example/blob/main/.github/workflows/publish.yml
+      # - name: Set Swap Space
+      #   if: runner.os == 'Linux'
+      #   uses: pierotofy/set-swap-space@master
+      #   with:
+      #     swap-size-gb: 6
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2

@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -56,13 +57,19 @@ public class ReactiveSecurityUtils {
                                 sink.next(userDetails.getUsername());
                                 return;
                             }
+                            if (principal instanceof Jwt jwt) {
+                                var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
+                                log.warn("...." + clientDetail);
+                                sink.next(clientDetail);
+                                return;
+                            }
                             //   - 如果 `principal` 不是 `UserDetails` 的实例，使用 `sink.error()` 抛出一个自定义的 `AuthException` 异常。
-                            sink.error(new AuthException("找不到当前登录的信息"));
+                            sink.error(new AuthException("找不到当前登录的信息: " + principal));
                         }))
                 //6. 使用 `doOnSuccess` 在成功时执行一些操作，这里是记录用户名的日志。
-                .doOnSuccess(it -> log.debug("userName {} ", it))
+                .doOnSuccess(it -> log.info("userName {} ", it))
                 //7. 使用 `doOnError` 在发生错误时执行一些操作，这里是记录错误信息的日志。
-                .doOnError(ex -> log.debug("error {} ", ex.getMessage()))
+                .doOnError(ex -> log.info("error {} ", ex.getMessage()))
                 //8. 使用 `defaultIfEmpty` 指定一个默认值，在没有找到用户名时返回 "anonymous"。
                 .defaultIfEmpty("anonymous");
     }
@@ -72,7 +79,7 @@ public class ReactiveSecurityUtils {
     //2. 使用 `switchIfEmpty` 替代 `defaultIfEmpty`：`switchIfEmpty` 操作符可以更直观地指定当流为空时的替代逻辑。
     //3. 使用 `map` 替代 `handle`：由于处理操作只是根据 `principal` 的类型进行转换，可以使用 `map` 操作符结合条件判断来达到相同的效果，而不必使用 `handle`。
     //通过这些优化，代码更加简洁、清晰，并且减少了嵌套层级，提高了代码的可读性和可维护性。
-    public static Mono<String> getCurrentUsername2() {
+    public static Mono<String> getCurrentUsernameSham() {
         return ReactiveSecurityContextHolder.getContext()
                 .filter(c -> c.getAuthentication() != null)
                 .map(SecurityContext::getAuthentication)
@@ -82,10 +89,15 @@ public class ReactiveSecurityUtils {
                         log.warn("...." + userDetails.getUsername());
                         return Mono.just(userDetails.getUsername());
                     }
-                    return Mono.error(new AuthException("找不到当前登录的信息"));
+                    if (principal instanceof Jwt jwt) {
+                        var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
+                        log.warn("...." + clientDetail);
+                        return Mono.just(clientDetail);
+                    }
+                    return Mono.error(new AuthException("找不到当前登录的信息: " + principal));
                 })
-                .doOnSuccess(username -> log.debug("userName {} ", username))
-                .doOnError(ex -> log.debug("error {} ", ex.getMessage()))
+                .doOnSuccess(username -> log.info("userName {} ", username))
+                .doOnError(ex -> log.info("error {} ", ex.getMessage()))
                 .switchIfEmpty(Mono.just("anonymous"));
     }
 

@@ -129,6 +129,10 @@ public class GenericsUtils {
         }
     }
 
+    public static <T> T[] convertList2Array(List<T> list, Class<T> componentType) {
+        return list.toArray((T[]) Array.newInstance(componentType, list.size()));
+    }
+
     // 只能获取超类上的泛型信息，使用场景十分的有限
     public static void main(String[] args) {
         ArrayList<String> arr = new ArrayList<>();

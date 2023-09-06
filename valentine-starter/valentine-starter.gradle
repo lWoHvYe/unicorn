@@ -1,9 +1,6 @@
 plugins {
     id 'org.springframework.boot' // 通过引入这个，使该subModule有了相关的Task
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.spring)
-    alias(libs.plugins.kotlin.jpa)
-    alias(libs.plugins.kotlin.lombok)
+    id 'io.spring.dependency-management'
     // Apply GraalVM Native Image plugin
 //    id 'org.graalvm.buildtools.native'
 }
@@ -11,15 +8,13 @@ plugins {
 dependencies {
     implementation project(':unicorn-security')
     implementation project(':unicorn-logging')
-    implementation project(':unicorn-tp-tools-kotlin')
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
-    if (kotlinEnable) {
-        implementation "org.jetbrains.kotlin:kotlin-stdlib"
-        implementation 'org.jetbrains.kotlin:kotlin-reflect'
-        implementation libs.bundles.coroutines
-        implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
-        testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'org.apache.tomcat.embed', module: 'tomcat-embed-core'
+        exclude group: 'org.apache.tomcat.embed', module: 'tomcat-embed-websocket'
     }
+    String tomcatVersion = dependencyManagement.importedProperties['tomcat.version']
+    implementation "org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion"
+    implementation 'org.apache.httpcomponents.client5:httpclient5'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 //    add following dependency if using ScriptEngine after Java 15
 //    implementation 'org.graalvm.js:js:23.0.0'
@@ -47,12 +42,31 @@ tasks.named("bootRun") {
 }
 
 tasks.named("bootBuildImage") {
-    environment = [
-            "BP_JVM_TYPE"                 : "JDK",
-            "BP_JVM_VERSION"              : "21",
-            "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
-            "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
-    ]
+    if (graalvmEnable) {
+        environment = [
+                "BP_JVM_VERSION"                 : "20.*",
+                "BP_NATIVE_IMAGE"                : "true",
+                "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx7g " + // fixed OOM with -J-Xmx7g
+                        "-H:DeadlockWatchdogInterval=10 -H:+DeadlockWatchdogExitOnTimeout " +
+                        "--initialize-at-build-time=ch.qos.logback.classic.Logger,ch.qos.logback.core.status.StatusBase" +
+                        ",org.slf4j.LoggerFactory,ch.qos.logback.core.CoreConstants,ch.qos.logback.core.util.StatusPrinter" +
+                        ",ch.qos.logback.core.status.InfoStatus,ch.qos.logback.classic.Level,ch.qos.logback.core.util.Loader ",
+                "BPE_DELIM_JAVA_TOOL_OPTIONS"    : " ",
+                "BPE_APPEND_JAVA_TOOL_OPTIONS"   : "-XX:+UseZGC -XX:+HeapDumpOnOutOfMemoryError --enable-preview"
+        ]
+        buildpacks = [
+                "gcr.io/paketo-buildpacks/graalvm",
+                "gcr.io/paketo-buildpacks/java-native-image"
+        ]
+    } else {
+        environment = [
+                "BP_JVM_TYPE"                 : "JDK",
+                "BP_JVM_VERSION"              : "21",
+                "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
+                "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
+        ]
+    }
+
 }
 
 if (graalvmEnable) {
@@ -64,23 +78,12 @@ if (graalvmEnable) {
     tasks.named("nativeCompile") {
         def options = nativeCompile.options.get().asCompileOptions()
         options.buildArgs
+//                        "--gc=G1", // The G1 garbage collector ('--gc=G1') is currently only supported on Linux AMD64.
                 .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
                         ",ch.qos.logback.core.status.StatusBase" +
                         ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
                         ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
         options.jvmArgs.addAll("--enable-preview")
         // options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
-    }
-}
-
-if (kotlinEnable) {
-    kotlin {
-        sourceSets.configureEach {
-            languageSettings {
-//                languageVersion = "2.0" // kotlin.experimental.tryK2=true
-                apiVersion = "2.0"
-            }
-        }
-        jvmToolchain(20)
     }
 }
