@@ -26,6 +26,8 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.util.concurrent.StructuredTaskScope.Subtask;
+
 public final class ConcurrencyUtils {
 
     static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
@@ -40,18 +42,18 @@ public final class ConcurrencyUtils {
      */
     public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
         try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            List<? extends StructuredTaskScope.Subtask<?>> subtasks = null;
+            List<? extends Subtask<?>> subtasks = null;
             if (Objects.nonNull(tasks))
                 subtasks = Arrays.stream(tasks).map(scope::fork).toList();
 
             scope.join()           // Join both forks
-                .throwIfFailed();  // ... and propagate errors
+                    .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
             Object results = null;
             if (Objects.nonNull(composeResult))
                 results = composeResult.apply(Objects.nonNull(subtasks) ?
-                        subtasks.stream().map(StructuredTaskScope.Subtask::get).toList() : Collections.emptyList());
+                        subtasks.stream().map(Subtask::get).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
         } catch (ExecutionException e) {
@@ -73,7 +75,7 @@ public final class ConcurrencyUtils {
                 Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
 
             scope.join()           // Join both forks
-                .throwIfFailed();  // ... and propagate errors
+                    .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
             if (Objects.nonNull(eventual))
