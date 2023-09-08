@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
-    alias(libs.plugins.kotlin.lombok)
+//    alias(libs.plugins.kotlin.lombok)
 }
 
 description = "代码生成模块"
