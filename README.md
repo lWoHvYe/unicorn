@@ -37,20 +37,23 @@
 
 ```xml
 
-<project.core.version>4.2.0-pi</project.core.version>
+<project>
 
-        <!--    system模块    -->
-<dependency>
-<groupId>com.lwohvye</groupId>
-<artifactId>unicorn-security</artifactId>
-<version>${project.core.version}</version>
-</dependency>
-        <!--   logging模块     -->
-<dependency>
-<groupId>com.lwohvye</groupId>
-<artifactId>unicorn-logging</artifactId>
-<version>${project.core.version}</version>
-</dependency>
+    <project.core.version>4.2.0-pi</project.core.version>
+
+    <!--    system模块    -->
+    <dependency>
+        <groupId>com.lwohvye</groupId>
+        <artifactId>unicorn-security</artifactId>
+        <version>${project.core.version}</version>
+    </dependency>
+    <!--   logging模块     -->
+    <dependency>
+        <groupId>com.lwohvye</groupId>
+        <artifactId>unicorn-logging</artifactId>
+        <version>${project.core.version}</version>
+    </dependency>
+</project>
 
 ```
 

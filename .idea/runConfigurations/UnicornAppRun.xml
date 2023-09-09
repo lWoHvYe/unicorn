@@ -6,7 +6,7 @@
       <env name="DB_PWD" value="root" />
       <env name="DB_USER" value="root" />
     </envs>
-    <module name="valentine-p2p.valentine-starter.main" />
+    <module name="valentine-p2p.valentine-starter-kotlin.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.unicorn.UnicornAppRun" />
     <option name="VM_PARAMETERS" value="-XX:+UseZGC --enable-preview -Dkotlinx.coroutines.debug -XX:+UnlockExperimentalVMOptions -XX:+UseJVMCICompiler" />
     <method v="2">
