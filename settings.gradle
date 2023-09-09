@@ -116,7 +116,7 @@ def buildFiles = fileTree(rootDir) {
     include "**/*.gradle", "**/*.gradle.kts"
     exclude "build", "**/gradle", "settings.gradle", "buildSrc", "/build.gradle", ".*", "out"
     if ("$kotlinVersion".matches("^1\\.[0-8]\\.\\d{1,2}\$|^0\\.\\d+\\.\\d+\$") // current version is not Support Java 20, 1.9.0 Support Java 20
-            || "$kotlinVersion".matches("^1\\.9\\.[01]{1,2}\$") // 1.9.10 not Support Java 21
+            || "$kotlinVersion".matches("^1\\.9\\.[0-2]{1,2}-?(Beta|RC)?[0-9]?\$") // 1.9.10 not Support Java 21，1.9.20 Support Java 21 WTF Release
     ) {
         kotlinEnable = false
         exclude "**/*-kotlin.gradle.kts"
