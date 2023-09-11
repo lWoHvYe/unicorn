@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -40,7 +41,7 @@ public abstract class YRabbitAbstractConsumer {
 //    static ExecutorService simVirtualExecutor;
 //
 //    static {
-        // 兼容Old API，这里name支持 name + start的模式，start会自动递增，但考虑着虚拟线程会很多，且没必要加上start作区分
+    // 兼容Old API，这里name支持 name + start的模式，start会自动递增，但考虑着虚拟线程会很多，且没必要加上start作区分
 //        var virtualFactory = Thread.ofVirtual().name("Virtual-Rabbit").factory();
 //        simVirtualExecutor = Executors.newThreadPerTaskExecutor(virtualFactory);
 //    }
@@ -143,13 +144,9 @@ public abstract class YRabbitAbstractConsumer {
                     var header = message.getMessageProperties().getHeader(mask);
                     if (Objects.isNull(header)) {
                         message.getMessageProperties().setHeader(mask, "Ignored");
-                        try {
-                            // 暂停2s后，再重新消费一次
-                            Thread.sleep(1500L);
-                            consumer.accept(message);
-                        } catch (InterruptedException ignored) {
-                            Thread.currentThread().interrupt();
-                        }
+                        // 暂停2s后，再重新消费一次
+                        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2L));
+                        consumer.accept(message);
                     }
                 });
     }
@@ -160,13 +157,9 @@ public abstract class YRabbitAbstractConsumer {
                     var amqpMsgEntity = JsonUtils.toJavaObject(strMsg, AmqpMsgEntity.class);
                     if (!amqpMsgEntity.isConsumed()) {
                         amqpMsgEntity.setConsumed(true);
-                        try {
-                            // 暂停2s后，再重新消费一次
-                            Thread.sleep(1500L);
-                            consumer.accept(JsonUtils.toJSONString(amqpMsgEntity));
-                        } catch (InterruptedException ignored) {
-                            Thread.currentThread().interrupt();
-                        }
+                        // 暂停2s后，再重新消费一次
+                        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2L));
+                        consumer.accept(JsonUtils.toJSONString(amqpMsgEntity));
                     }
                 });
     }

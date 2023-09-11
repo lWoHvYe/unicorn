@@ -21,6 +21,7 @@ import com.lwohvye.sys.modules.quartz.service.dto.JobQueryCriteria;
 import org.springframework.data.domain.Pageable;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -139,7 +140,6 @@ public interface IQuartzJobService {
      * 执行子任务
      *
      * @param tasks /
-     * @throws InterruptedException /
      */
-    void executionSubJob(String[] tasks) throws InterruptedException;
+    void executionSubJob(String[] tasks);
 }

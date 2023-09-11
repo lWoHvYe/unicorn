@@ -25,6 +25,8 @@
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS/Jigsaw）。
 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
+**Java 19**起，引入Virtual Threads/Project Loom，相关[详见](document/jdk/Java-Preview.md)
+
 ---
 
 #### 引用方式 🎵
@@ -33,27 +35,25 @@
 
 ##### Maven
 
-**可根据需要选择版本**
-
 ```xml
-<!--2.6.18版本为springfox + 未进行动态权限改造-->
-<!-- https://mvnrepository.com/artifact/com.lwohvye/eladmin -->
-<dependency>
-    <groupId>com.lwohvye</groupId>
-    <artifactId>eladmin</artifactId>
-    <version>2.6.18</version>
-    <type>pom</type>
-</dependency>
-```
 
-```xml
-<!--3.x系列版本为springdoc + 动态权限改造 + JPMS部分改造-->
-<dependency>
-    <groupId>com.lwohvye</groupId>
-    <artifactId>unicorn</artifactId>
-    <version>3.2.0</version>
-    <type>pom</type>
-</dependency>
+<project>
+
+    <project.core.version>4.2.0-pi</project.core.version>
+
+    <!--    system模块    -->
+    <dependency>
+        <groupId>com.lwohvye</groupId>
+        <artifactId>unicorn-security</artifactId>
+        <version>${project.core.version}</version>
+    </dependency>
+    <!--   logging模块     -->
+    <dependency>
+        <groupId>com.lwohvye</groupId>
+        <artifactId>unicorn-logging</artifactId>
+        <version>${project.core.version}</version>
+    </dependency>
+</project>
 
 ```
 
@@ -62,7 +62,7 @@
 ```groovy
 // 4.x系列将基于Java 21, 部分module使用Kotlin, 使用Gradle build
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.0.1-lambda'
+    unicornVersion = '4.2.0-pi'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
@@ -86,7 +86,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 项目简介
 
-一个基于最新的Java 20 版本、 Spring Boot 3.1、 Jpa、 Spring Security、RabbitMQ、Vue的前后端分离的脚手架。
+一个基于最新的Java 21 版本、 Spring Boot 3.2、 Jpa、 Spring Security、RabbitMQ、Vue的前后端分离的脚手架。
 在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
@@ -99,7 +99,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 20、Spring Boot 3.1。(Support Virtual Threads/loom)
+- 使用最新技术栈，社区资源丰富，基于Java 21、Spring Boot 3.2。(Support Virtual Threads/fibre/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持接口级别的功能权限，动态权限控制
 - 支持数据字典，可方便地对一些状态进行管理
@@ -107,7 +107,6 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - 对一些常用前端组件封装：表格数据请求、数据字典等
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
 - 使用ShardingSphere实现多数据源和读写分离。该方式针对MySQL数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
-- 另有TiDB分布式关系型数据库 方案，优于自行分库分表，但为Commercial方案，所以还是更推荐ShardingSphere。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
 - 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，
@@ -116,7 +115,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 #### 系统功能
 
 - 用户管理：提供用户的相关配置，新增用户后，默认密码为123456
-- 角色管理：对权限与菜单进行分配，菜单权限、数据权限、接口权限(TODO)
+- 角色管理：对权限与菜单进行分配，菜单权限、数据权限(Draft)、接口权限(_In Progress_)
 - 菜单管理：已实现菜单动态路由，后端可配置化，支持多级菜单
 - 部门管理：可配置系统组织架构，树形表格展示(Draft)
 - 岗位管理：配置各个部门的职位(Draft)
@@ -136,7 +135,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - `unicorn-security` 系统权限模块，包含权限配置管理等。
 
-- `unicorn-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块
+- `unicorn-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块，亦可自行实现
 
 - `unicorn-tp-tools` 第三方工具模块，包含：邮件、S3，可视情况引入
 
@@ -144,7 +143,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - `unicorn-starter` 启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离）
 
-- `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin/Kotlinx，试用TiDB
+- `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin/Kotlinx
 
 #### 详细结构
 
@@ -156,7 +155,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
         - security 权限控制，为swarm化，提供全局关闭Security功能
         - UnicornAutoConfiguration: 自动化装配
-        - ValentineExecutorConfig: Running Spring Applications on Virtual Threads
+        - ValentineExecutorConfig: Running Spring Applications (Servlet Web Servers & Task Execution) on Virtual Threads Before Spring Boot 3.2
     - exception 项目自定义异常类
     - utils 系统通用工具类, json, rabbitmq, redis,...
         - QueryHelp 基于Annotation的JPA动态查询Specification
@@ -183,13 +182,13 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - rabbitmq Async log
 - unicorn-tp-tools 系统第三方工具模块(kotlin)
 - unicorn-code-gen 系统代码生成模块(kotlin)
+- loom-20-ext 在Java 20使用SpringBoot 并Enable其对VT的Support的兼容包
 ```
 
 #### 运行环境
 
-- Java 20 基础运行环境
+- Java 21 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
-- 拓展使用分布式关系型数据库 [TiDB](https://docs.pingcap.com/zh/tidb/stable)
 - Redis 6.0 缓存
 - RabbitMQ 发布-订阅（解耦、异步）
 - ELK 日志系统，config for prod env
@@ -218,12 +217,12 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### Feature list
 
-- dev_3.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
+- dev_4.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
   推测是Spring Boot的 ClassLoader下全是Auto-Module）
-- Resource管理页面，delay
+- Resource管理页面(partly，角色-资源管理)，delay
 - swarm化，可以参考[why-swarm (已停工，后续计划接入OAuth2.0)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO
 
 - OAuth 2.0 (_In Progress_)
-- Loom + Kotlin Coroutines
+- Loom + Kotlin Coroutines (_In Progress_)

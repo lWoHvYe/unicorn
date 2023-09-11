@@ -34,13 +34,11 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
     jvmArgs += "--enable-preview"
-    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("bootRun") {
     jvmArgs += "-XX:+UseZGC"
     jvmArgs += "--enable-preview"
-    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("bootBuildImage") {
@@ -63,7 +61,7 @@ tasks.named("bootBuildImage") {
     } else {
         environment = [
                 "BP_JVM_TYPE"                 : "JDK",
-                "BP_JVM_VERSION"              : "20",
+                "BP_JVM_VERSION"              : "21",
                 "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
                 "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
         ]
@@ -74,18 +72,16 @@ tasks.named("bootBuildImage") {
 if (graalvmEnable) {
     tasks.named("processAot") {
         jvmArgs += "--enable-preview"
-        jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
     }
 
     tasks.named("nativeCompile") {
         def options = nativeCompile.options.get().asCompileOptions()
         options.buildArgs
-                .addAll(
 //                        "--gc=G1", // The G1 garbage collector ('--gc=G1') is currently only supported on Linux AMD64.
-                        "--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
-                                ",ch.qos.logback.core.status.StatusBase" +
-                                ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
-                                ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
-        options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
+                .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
+                        ",ch.qos.logback.core.status.StatusBase" +
+                        ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
+                        ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
+        options.jvmArgs.addAll("--enable-preview")
     }
 }

@@ -27,7 +27,7 @@ plugins {
 }
 
 ext {
-    graalvmEnable = true // 这个能在同为 Groovy DSL的sub-project中使用
+    graalvmEnable = false // 这个能在同为 Groovy DSL的sub-project中使用
 }
 
 ext.sharedManifest = manifest {
@@ -69,7 +69,7 @@ subprojects {
             options.addStringOption('encoding', 'UTF-8')
             options.addStringOption('charSet', 'UTF-8')
             options.addBooleanOption('-enable-preview', true)
-            options.addStringOption('-release', '20')
+            options.addStringOption('-release', '21')
             // Add support for custom tag
             options.addStringOption('tag', 'date:a:Init Date:')
             options.addStringOption('tag', 'author:a:Major Contributor:')
