@@ -32,6 +32,8 @@ public final class ConcurrencyUtils {
 
     static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
 
+    public static final ExecutorService VIRTUAL_EXECUTOR = Executors.newThreadPerTaskExecutor(virtualFactory);
+
     /**
      * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
      *

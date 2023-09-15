@@ -204,13 +204,6 @@ springdoc:
     pageable-converter:
       enabled: true
 
-# ===== 自定义swagger配置 ===== #
-swagger:
-  application-name: ${spring.application.name}
-  application-version: 3.3.0
-  application-description: 1101100_1010111_1101111_1001000_1110110_1011001_1100101
-  try-host: http://localhost:${server.port}
-
 #是否允许生成代码，生产环境设置为false
 generator:
   enabled: false

@@ -16,32 +16,22 @@
 package com.lwohvye.core.config.swagger;
 
 import com.lwohvye.core.utils.redis.RedisUtils;
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.ExternalDocumentation;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
-import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.media.StringSchema;
-import io.swagger.v3.oas.models.parameters.HeaderParameter;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RedissonClient;
-import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.boot.SpringBootVersion;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /*
     @OpenAPIDefinition全局只能定义一个，主要配置文档信息和安全配置，这里列举了常用的请求头携带token的安全配置模式
@@ -50,23 +40,25 @@ import java.util.List;
     @SecurityScheme注解就是自定义的认证模式，配置请求头携带token
     注解配置到方式，后续可进行尝试
  */
-// @OpenAPIDefinition(
-//         info = @io.swagger.v3.oas.annotations.info.Info(
-//                 title = "EL-Admin Api Doc",
-//                 version = "3.3.0",
-//                 description = "'1101100_1010111_1101111_1001000_1110110_1011001_1100101' + SpringBootVersion.getVersion()",
-//                 contact = @Contact(name = "lWoHvYe")
-//         ),
-//         security = @SecurityRequirement(name = "Authorization"),
-//         externalDocs = @io.swagger.v3.oas.annotations.ExternalDocumentation(description = "参考文档",
-//                 url = "https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations"
-//         )
-// )
-// @io.swagger.v3.oas.annotations.security.SecurityScheme(type = SecuritySchemeType.HTTP, name = "Authorization", scheme = "Bearer", in = SecuritySchemeIn.HEADER)
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Unicorn Api Doc",
+                version = "4.2.0",
+                description = "1101100_1010111_1101111_1001000_1110110_1011001_1100101",
+                contact = @Contact(name = "王红岩-_-lWoHvYe", url = "https://www.lwohvye.com", email = "lWoHvYe@outlook.com"),
+                license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0.html")
+        ),
+        security = @SecurityRequirement(name = "Authorization"),
+        externalDocs = @ExternalDocumentation(description = "SpringDoc Full Documentation",
+                url = "https://springdoc.org"
+        )
+)
+@SecurityScheme(type = SecuritySchemeType.HTTP, name = "Authorization", scheme = "Bearer", in = SecuritySchemeIn.HEADER)
 @Slf4j
 @Configuration
 public class OpenApiConfig {
 
+/*
     @Autowired
     private SwaggerProperties swaggerProperties;
 
@@ -123,14 +115,18 @@ public class OpenApiConfig {
     // ^标识开始  ()里是一子表达式  ?!/auth表示匹配不是/auth的位置，匹配上则添加请求头，注意路径已/开头  .表示任意字符  *表示前面的字符匹配多次 $标识结束
 
 
-    /**
-     * 添加全局的请求头参数
-     */
+    */
+/**
+ * 添加全局的请求头参数
+ */
+/*
+
     @Bean
     public OpenApiCustomizer customerGlobalHeaderOpenApiCustomizer() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/SpInfo")));
     }
+*/
 
     /**
      * bean初始化前后的两个切入点
