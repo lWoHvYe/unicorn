@@ -18,6 +18,8 @@
 - 有三个角色，Authorization Server、Resources Server、Client，这里AuthServer和ResServer是一起的，Client可以看作是TP，
   User通过Client访问ResServer，需要使用从AuthServer申请的Token，之后Client使用Token访问ResServer，ResServer会找AuthServer
   validate Provided-Token
+- 在使用OAuth2-Client时，会将相关token存储在session中，从而Call端只需要传Cookie(包含JSESSIONID,SESSION)即可，
+  并且会自动refresh，这一点可以说是十分省心了，不需要Maintain Token，也不需要Refresh
 - 在AuthServer中的User和Register进来的Client，User有Roles，Client有Scopes，这俩功能还不是特别清楚，已知Register时确定的scope明确了在申请token时可以选择的scope，
   在访问Res时，Res的AccessControl也是基于scope的，AccessToken中有User的Identity，感觉在ResServer会基于此作些Datalayer的Control。
   Roles 是定义在用户身上的，它指示了一个用户能够访问哪些资源。而 Scopes 则是定义在客户端身上的，它表示了客户端能够访问哪些资源。资源包括API及Data。
@@ -56,4 +58,4 @@
 
 - 当访问client时，其会自己维护SecurityContext，并自动refresh，其原理见
   ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient 注释
-- 但作为GateWay时，有些不一样，理论上是需要Call传Token的，那么相关维护都要那端了
+- ~~但作为GateWay时，有些不一样，理论上是需要Call传Token的，那么相关维护都要那端了~~

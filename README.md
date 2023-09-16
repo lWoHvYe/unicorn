@@ -220,7 +220,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - dev_4.0 JPMS改造（3.0版本有做部分尝试，当前在IDEA中可开发调试，但模块化打包部署尚未以Named Module的方式运行，
   推测是Spring Boot的 ClassLoader下全是Auto-Module）
 - Resource管理页面(partly，角色-资源管理)，delay
-- swarm化，可以参考[why-swarm (已停工，后续计划接入OAuth2.0)](https://github.com/WHY-lWoHvYe/why-swarm)
+- swarm化，可以参考[why-swarm (已停工，后续计划重构接入OAuth2.0)](https://github.com/WHY-lWoHvYe/why-swarm)
 
 #### TODO
 
