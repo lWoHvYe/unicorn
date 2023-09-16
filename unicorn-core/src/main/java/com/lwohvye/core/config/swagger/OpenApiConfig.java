@@ -49,9 +49,7 @@ import org.springframework.context.annotation.Configuration;
                 license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0.html")
         ),
         security = @SecurityRequirement(name = "Authorization"),
-        externalDocs = @ExternalDocumentation(description = "SpringDoc Full Documentation",
-                url = "https://springdoc.org"
-        )
+        externalDocs = @ExternalDocumentation(description = "SpringDoc Full Documentation", url = "https://springdoc.org")
 )
 @SecurityScheme(type = SecuritySchemeType.HTTP, name = "Authorization", scheme = "Bearer", in = SecuritySchemeIn.HEADER)
 @Slf4j
