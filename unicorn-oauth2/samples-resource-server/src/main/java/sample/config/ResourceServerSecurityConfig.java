@@ -44,7 +44,7 @@ public class ResourceServerSecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/api/resource").hasAuthority("SCOPE_resource.write")
                         .pathMatchers(HttpMethod.DELETE, "/api/resource").hasAuthority("SCOPE_resource.write")
                         // 可匿名访问，业务中会有业务逻辑相关的control
-                        .pathMatchers("/explore/**").permitAll()
+                        .pathMatchers("/explore/**", "/webjars/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         // 需要登陆才可访问，这个一般是主体
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
