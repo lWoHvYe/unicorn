@@ -23,9 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       #  https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Installing-custom-Java-package-type
-      - run: |
-              download_url="https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_macos-x64_bin.tar.gz"
-              wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
+      - name: Download JDK
+        run: |
+          download_url="https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_macos-x64_bin.tar.gz"
+          wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
       - uses: actions/setup-java@v3
         with:
           distribution: 'jdkfile'
@@ -35,4 +36,4 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2 # v2.6.0
         with:
-          arguments: build
+          arguments: classes publishToMavenLocal
