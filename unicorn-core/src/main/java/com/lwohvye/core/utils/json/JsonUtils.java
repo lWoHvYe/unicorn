@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.lwohvye.core.utils.StringUtils;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ import java.util.function.Supplier;
  * @date 2021/11/10 11:42 下午
  */
 @Slf4j
+@UtilityClass
 @SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class JsonUtils {
     // 加载速度太慢了，放在静态代码块中

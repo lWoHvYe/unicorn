@@ -17,6 +17,8 @@
 package com.lwohvye.core.utils;
 
 
+import lombok.experimental.UtilityClass;
+
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
@@ -39,6 +41,7 @@ import static com.lwohvye.core.utils.JDKUtils.setFailsafeFieldValue;
  *
  * @date 2022/4/30 4:50 PM
  */
+@UtilityClass
 public class DynamicEnumHelper {
 
     private static <T extends Enum<?>> T makeEnum(Class<T> enumClass, String value, int ordinal, Class<?>[] additionalTypes, Object[] additionalValues) throws Throwable {

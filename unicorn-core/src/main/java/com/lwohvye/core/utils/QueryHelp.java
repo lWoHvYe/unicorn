@@ -19,6 +19,7 @@ import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.core.annotation.Query;
 import com.lwohvye.core.exception.UtilsException;
 import jakarta.persistence.criteria.*;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,7 @@ import java.util.Objects;
  * @date 2019-6-4 14:59:48
  */
 @Slf4j
+@UtilityClass
 // @SuppressWarnings 抑制警告 https://www.lwohvye.com/2021/12/05/suppresswarnings%e6%b3%a8%e8%a7%a3%e7%94%a8%e6%b3%95/
 // @SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class QueryHelp {

@@ -16,6 +16,7 @@
 
 package com.lwohvye.core.utils;
 
+import lombok.experimental.UtilityClass;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -23,6 +24,7 @@ import java.lang.reflect.Field;
 /**
  * <a href="https://github.com/alibaba/fastjson2/blob/main/core/src/main/java/com/alibaba/fastjson2/util/UnsafeUtils.java">...</a>
  */
+@UtilityClass
 @SuppressWarnings("unused")
 public class UnsafeUtils {
     public static final Unsafe UNSAFE;

@@ -17,6 +17,7 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
+import lombok.experimental.UtilityClass;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +29,8 @@ import java.util.function.Function;
 
 import static java.util.concurrent.StructuredTaskScope.Subtask;
 
-public final class ConcurrencyUtils {
+@UtilityClass
+public class ConcurrencyUtils {
 
     static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
 
