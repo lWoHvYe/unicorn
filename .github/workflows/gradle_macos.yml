@@ -1,0 +1,39 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      #  https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Installing-custom-Java-package-type
+      - run: |
+        #  download_url="https://download.oracle.com/graalvm/20/latest/graalvm-jdk-20_macos-x64_bin.tar.gz"
+               download_url="https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_macos-x64_bin.tar.gz"
+               wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'jdkfile'
+          jdkFile: ${{ runner.temp }}/java_package.tar.gz
+          java-version: '21'
+          architecture: x64
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2 # v2.6.0
+        with:
+          arguments: build
