@@ -21,6 +21,7 @@ import cn.hutool.extra.template.TemplateConfig
 import cn.hutool.extra.template.TemplateException
 import cn.hutool.extra.template.TemplateUtil
 import com.lwohvye.core.exception.UtilsException
+import com.lwohvye.core.extension.StringExtensionMethod
 import com.lwohvye.core.utils.FileUtils
 import com.lwohvye.core.utils.StringUtils
 import com.lwohvye.generator.domain.ColumnInfo
@@ -210,15 +211,15 @@ object GenUtil {
         // 表名
         genMap["tableName"] = genConfig.tableName
         // 大写开头的类名
-        var className = StringUtils.toCapitalizeCamelCase(genConfig.tableName)
+        var className = StringExtensionMethod.toCapitalizeCamelCase(genConfig.tableName)
         // 小写开头的类名
-        var changeClassName = StringUtils.toCamelCase(genConfig.tableName)
+        var changeClassName = StringExtensionMethod.toCamelCase(genConfig.tableName)
         // 判断是否去除表前缀
-        if (StringUtils.isNotEmpty(genConfig.prefix)) {
+        if (!genConfig.prefix.isNullOrBlank()) {
             className =
-                StringUtils.toCapitalizeCamelCase(StrUtil.removePrefix(genConfig.tableName, genConfig.prefix))
+                StringExtensionMethod.toCapitalizeCamelCase(StrUtil.removePrefix(genConfig.tableName, genConfig.prefix))
             changeClassName =
-                StringUtils.toCamelCase(StrUtil.removePrefix(genConfig.tableName, genConfig.prefix))
+                StringExtensionMethod.toCamelCase(StrUtil.removePrefix(genConfig.tableName, genConfig.prefix))
             changeClassName = StringUtils.uncapitalize(changeClassName)
         }
         // 保存类名
@@ -260,9 +261,9 @@ object GenUtil {
             // 主键类型
             val colType = ColUtil.cloToJava(column.columnType)
             // 小写开头的字段名
-            val changeColumnName = StringUtils.toCamelCase(column.columnName)
+            val changeColumnName = StringExtensionMethod.toCamelCase(column.columnName)
             // 大写开头的字段名
-            val capitalColumnName = StringUtils.toCapitalizeCamelCase(column.columnName)
+            val capitalColumnName = StringExtensionMethod.toCapitalizeCamelCase(column.columnName)
             if (PK == column.keyType) {
                 // 存储主键类型
                 genMap["pkColumnType"] = colType
@@ -284,7 +285,7 @@ object GenUtil {
                 genMap["auto"] = true
             }
             // 主键存在字典
-            if (StringUtils.isNotBlank(column.dictName)) {
+            if (!column.dictName.isNullOrBlank()) {
                 genMap["hasDict"] = true
                 if (!dicts.contains(column.dictName)) column.dictName?.let { dicts.add(it) }
             }
@@ -300,7 +301,7 @@ object GenUtil {
             // 表单显示
             listMap["formShow"] = column.formShow
             // 表单组件类型
-            listMap["formType"] = if (StringUtils.isNotBlank(column.formType)) column.formType else "Input"
+            listMap["formType"] = if (!column.formType.isNullOrBlank()) column.formType else "Input"
             // 小写开头的字段名称
             listMap["changeColumnName"] = changeColumnName
             //大写开头的字段名称
@@ -309,7 +310,7 @@ object GenUtil {
             listMap["dictName"] = column.dictName
             // 日期注解
             listMap["dateAnnotation"] = column.dateAnnotation
-            if (StringUtils.isNotBlank(column.dateAnnotation)) {
+            if (!column.dateAnnotation.isNullOrBlank()) {
                 genMap["hasDateAnnotation"] = true
             }
             // 添加非空字段信息
@@ -317,7 +318,7 @@ object GenUtil {
                 isNotNullColumns.add(listMap)
             }
             // 判断是否有查询，如有则把查询的字段set进columnQuery
-            if (!StringUtils.isBlank(column.queryType)) {
+            if (!column.queryType.isNullOrBlank()) {
                 // 查询类型
                 listMap["queryType"] = column.queryType
                 // 是否存在查询
@@ -364,7 +365,7 @@ object GenUtil {
     ): String? {
         // 若不设置模块名称，则不生成在模块内
         val moduleName = genConfig!!.moduleName
-        val projectPath = if (StringUtils.isNotBlank(moduleName)) rootPath + File.separator + moduleName else rootPath
+        val projectPath = if (!moduleName.isNullOrBlank()) rootPath + File.separator + moduleName else rootPath
         var packagePath =
             projectPath + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator
         if (!ObjectUtils.isEmpty(genConfig.pack)) {

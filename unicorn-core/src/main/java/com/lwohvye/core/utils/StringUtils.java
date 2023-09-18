@@ -15,7 +15,6 @@
  */
 package com.lwohvye.core.utils;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.useragent.UserAgentUtil;
@@ -33,8 +32,9 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
 
 /**
  * @author Zheng Jie
@@ -43,133 +43,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
-    private static final char SEPARATOR = '_';
     private static final String UNKNOWN = "unknown";
 
     /**
      * 注入bean
      */
     private static final Ip2regionSearcher IP_SEARCHER = SpringContextHolder.getBean(Ip2regionSearcher.class);
-
-    /**
-     * 驼峰命名法工具
-     *
-     * @return toCamelCase(" hello_world ") == "helloWorld"
-     * toCapitalizeCamelCase("hello_world") == "HelloWorld"
-     * toCapitalizeCamelCase("helloWorld") == "HelloWorld"  下划线转驼峰,且首字母转大写
-     * toUnderScoreCase("helloWorld") = "hello_world"
-     * toUnderScoreCase("HelloWorld") = "hello_world"  驼峰转下划线，且首字母转小写
-     */
-    public static String toCamelCase(String s) {
-        if (s == null) {
-            return null;
-        }
-
-//        先统一转了小写。如果传个驼峰的进来，就会把驼峰转成小写，所以移除掉
-//        s = s.toLowerCase();
-
-        StringBuilder sb = new StringBuilder(s.length());
-        boolean upperCase = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-
-            if (c == SEPARATOR) {
-                upperCase = true;
-            } else if (upperCase) {
-                sb.append(Character.toUpperCase(c));
-                upperCase = false;
-            } else {
-                sb.append(c);
-            }
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * 驼峰命名法工具
-     *
-     * @return toCamelCase(" hello_world ") == "helloWorld"
-     * toCapitalizeCamelCase("hello_world") == "HelloWorld"
-     * toUnderScoreCase("helloWorld") = "hello_world"
-     */
-    public static String toCapitalizeCamelCase(String s) {
-        if (s == null) {
-            return null;
-        }
-        s = toCamelCase(s);
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
-    }
-
-    /**
-     * 驼峰命名法工具
-     *
-     * @return toCamelCase(" hello_world ") == "helloWorld"
-     * toCapitalizeCamelCase("hello_world") == "HelloWorld"
-     * toUnderScoreCase("helloWorld") = "hello_world"
-     */
-    static String toUnderScoreCase(String s) {
-        if (s == null) {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        boolean upperCase = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-
-            boolean nextUpperCase = true;
-
-            if (i < (s.length() - 1)) {
-                nextUpperCase = Character.isUpperCase(s.charAt(i + 1));
-            }
-
-            if ((i > 0) && Character.isUpperCase(c)) {
-                if (!upperCase || !nextUpperCase) {
-                    sb.append(SEPARATOR);
-                }
-                upperCase = true;
-            } else {
-                upperCase = false;
-            }
-
-            sb.append(Character.toLowerCase(c));
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * 只把首字母转小写。
-     *
-     * @param s
-     * @return java.lang.String
-     * @date 2021/7/13 11:53 上午
-     */
-    public static String lowerFirstChar(String s) {
-        if (CharSequenceUtil.isEmpty(s))
-            return s;
-        var chars = s.toCharArray();
-        if (Character.isUpperCase(chars[0]))
-            chars[0] += 32;
-        return String.valueOf(chars);
-    }
-
-    /**
-     * 只把首字母转大写。
-     *
-     * @param s
-     * @return java.lang.String
-     * @date 2021/7/13 11:54 上午
-     */
-    public static String upperFirstChar(String s) {
-        if (CharSequenceUtil.isEmpty(s))
-            return s;
-        var chars = s.toCharArray();
-        if (Character.isLowerCase(chars[0]))
-            chars[0] -= 32;
-        return String.valueOf(chars);
-    }
 
     /**
      * 获取ip地址
@@ -291,18 +170,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         } catch (Exception e) {
             return "";
         }
-    }
-
-    public static List<Long> parseStrToArrLong(String str) {
-        return StringUtils.isNotEmpty(str) ? Arrays.stream(str.split(",")).map(Long::parseLong).collect(Collectors.toList()) : new ArrayList<>();
-    }
-
-    public static List<Integer> parseStrToArrInteger(String str) {
-        return StringUtils.isNotEmpty(str) ? Arrays.stream(str.split(",")).map(Integer::parseInt).collect(Collectors.toList()) : new ArrayList<>();
-    }
-
-    public static List<String> parseStrToArrString(String str) {
-        return StringUtils.isNotEmpty(str) ? Arrays.stream(str.split(",")).collect(Collectors.toList()) : new ArrayList<>();
     }
 
     /**

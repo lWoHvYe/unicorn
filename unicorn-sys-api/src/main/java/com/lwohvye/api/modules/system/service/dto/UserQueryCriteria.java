@@ -17,8 +17,9 @@ package com.lwohvye.api.modules.system.service.dto;
 
 import cn.hutool.core.util.StrUtil;
 import com.lwohvye.core.annotation.Query;
-import com.lwohvye.core.utils.StringUtils;
+import com.lwohvye.core.extension.StringExtensionMethod;
 import lombok.Data;
+import lombok.experimental.ExtensionMethod;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -31,6 +32,7 @@ import java.util.Set;
  * @date 2018-11-23
  */
 @Data
+@ExtensionMethod({StringExtensionMethod.class})
 public class UserQueryCriteria implements Serializable {
 
     @Query
@@ -77,6 +79,6 @@ public class UserQueryCriteria implements Serializable {
      * @date 2021/3/10 22:12
      */
     public void setUsernameStr(String usernameStr) {
-        this.usernames = StrUtil.isNotEmpty(usernameStr) ? StringUtils.parseStrToArrString(usernameStr) : null;
+        this.usernames = StrUtil.isNotEmpty(usernameStr) ? usernameStr.parseStrToArrString() : null;
     }
 }

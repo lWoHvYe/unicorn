@@ -21,7 +21,6 @@ import cn.hutool.core.util.ZipUtil
 import com.lwohvye.core.exception.BadRequestException
 import com.lwohvye.core.utils.FileUtils
 import com.lwohvye.core.utils.PageUtils
-import com.lwohvye.core.utils.StringUtils
 import com.lwohvye.generator.domain.ColumnInfo
 import com.lwohvye.generator.domain.GenConfig
 import com.lwohvye.generator.domain.vo.TableInfo
@@ -70,7 +69,7 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
         val query = em.createNativeQuery(sql)
         query.setFirstResult(startEnd[0])
         query.setMaxResults(startEnd[1] - startEnd[0])
-        query.setParameter("table", if (StringUtils.isNotBlank(name)) "%$name%" else "%%")
+        query.setParameter("table", if (name.isNotBlank()) "%$name%" else "%%")
         val result = query.resultList
         val tableInfos: MutableList<TableInfo> = ArrayList()
         for (obj in result) {
@@ -90,7 +89,7 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
                     where table_schema = (select database()) and table_name like :table
         """.trimIndent()
         val queryCount = em.createNativeQuery(countSql)
-        queryCount.setParameter("table", if (StringUtils.isNotBlank(name)) "%$name%" else "%%")
+        queryCount.setParameter("table", if (name.isNotBlank()) "%$name%" else "%%")
         val totalElements = queryCount.singleResult
         return PageUtils.toPage(tableInfos, totalElements)
     }
@@ -144,7 +143,7 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
                 column.columnType = columnInfo?.columnType!!
                 column.extra = columnInfo.extra
                 column.keyType = columnInfo.keyType
-                if (StringUtils.isBlank(column.remark)) {
+                if (column.remark.isNullOrBlank()) {
                     column.remark = columnInfo.remark
                 }
                 columnInfoRepository.save(column)

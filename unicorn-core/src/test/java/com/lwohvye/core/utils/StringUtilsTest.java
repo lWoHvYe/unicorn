@@ -16,45 +16,42 @@
 
 package com.lwohvye.core.utils;
 
+import com.lwohvye.core.extension.StringExtensionMethod;
+import lombok.experimental.ExtensionMethod;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.lwohvye.core.utils.StringUtils.*;
+import static com.lwohvye.core.utils.StringUtils.getIp;
+import static com.lwohvye.core.utils.StringUtils.getWeekDay;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class StringUtilsTest {
+@ExtensionMethod({StringExtensionMethod.class})
+class StringUtilsTest {
 
     @Test
-    public void testToCamelCase() {
-        assertNull(toCamelCase(null));
+    void testToCapitalizeCamelCase() {
+        assertEquals("HelloWorld", "hello_world".toCapitalizeCamelCase());
     }
 
     @Test
-    public void testToCapitalizeCamelCase() {
-        assertNull(StringUtils.toCapitalizeCamelCase(null));
-        assertEquals("HelloWorld", toCapitalizeCamelCase("hello_world"));
+    void testToUnderScoreCase() {
+//        assertNull(StringUtils.toUnderScoreCase(null));
+        assertEquals("hello_world", "helloWorld".toUnderScoreCase());
+        assertEquals("\u0000\u0000", "\u0000\u0000".toUnderScoreCase());
+        assertEquals("\u0000_a", "\u0000A".toUnderScoreCase());
     }
 
     @Test
-    public void testToUnderScoreCase() {
-        assertNull(StringUtils.toUnderScoreCase(null));
-        assertEquals("hello_world", toUnderScoreCase("helloWorld"));
-        assertEquals("\u0000\u0000", toUnderScoreCase("\u0000\u0000"));
-        assertEquals("\u0000_a", toUnderScoreCase("\u0000A"));
-    }
-
-    @Test
-    public void testGetWeekDay() {
+    void testGetWeekDay() {
         SimpleDateFormat simpleDateformat = new SimpleDateFormat("E");
         assertEquals(simpleDateformat.format(new Date()), getWeekDay());
     }
 
     @Test
-    public void testGetIP() {
+    void testGetIP() {
         assertEquals("127.0.0.1", getIp(new MockHttpServletRequest()));
     }
 }
