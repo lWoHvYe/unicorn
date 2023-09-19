@@ -15,6 +15,7 @@ plugins {
 }
 
 val graalvmEnable = false
+val graalvmVersion = "23.1.0"
 
 dependencies {
     implementation(project(":unicorn-security"))
@@ -34,8 +35,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // add following dependency if using ScriptEngine after Java 15
-    // implementation("org.graalvm.js:js:23.0.0")
-    // implementation("org.graalvm.js:js-scriptengine:23.0.0")
+    implementation("org.graalvm.polyglot:js:$graalvmVersion")
+    implementation("org.graalvm.js:js-scriptengine:$graalvmVersion")
     implementation(project(":unicorn-security")) {
         capabilities {
             requireCapability("com.lwohvye:unicorn-security-captcha")
