@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0-M2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -30,14 +30,15 @@
     <name>Common Starter</name>
 
     <properties>
-        <java.version>20</java.version>
-        <project.core.version>4.1.0-omicron-20-RC1</project.core.version>
-        <maven.compiler.release>20</maven.compiler.release>
+        <java.version>21</java.version>
+        <project.core.version>4.2.0-pi-Beta</project.core.version>
+        <maven.compiler.release>21</maven.compiler.release>
         <lombok.version>1.18.28</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <javassist.version>3.29.2-GA</javassist.version>
-        <shardingsphere.version>5.2.0</shardingsphere.version>
-        <kotlin.version>1.9.10</kotlin.version>
+        <shardingsphere.version>5.4.0</shardingsphere.version>
+        <snakeyaml.version>1.33</snakeyaml.version>
+        <kotlin.version>1.9.20-Beta</kotlin.version>
         <kotlin-coroutines.version>1.7.3</kotlin-coroutines.version>
     </properties>
 
@@ -166,8 +167,13 @@
                 <!--分库分表中间件-->
                 <dependency>
                     <groupId>org.apache.shardingsphere</groupId>
-                    <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+                    <artifactId>shardingsphere-jdbc-core</artifactId>
                     <version>${shardingsphere.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                    <version>2.3.8</version>
                 </dependency>
             </dependencies>
             <build>
@@ -372,4 +378,14 @@
             <url>https://repo.spring.io/milestone</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

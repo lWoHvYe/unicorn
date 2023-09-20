@@ -1,85 +1,9 @@
-#配置数据源
 spring:
-  shardingsphere:
-    # 模式配置
-    mode:
-      type: Standalone # 运行模式类型。可选配置：Standalone、Cluster
-      repository:
-        #type: File # 持久化仓库类型, File类型需自行实现好像
-        #props:
-        #<key>= # 持久化仓库所需属性
-        #  path: .shardingsphere
-        type: JDBC
-        # 下面几个都是默认值
-        #props:
-        #  provider: H2
-        #  jdbc_url: jdbc:h2:mem:config;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MYSQL
-        #  username: sa
-        #  password:
-      overwrite: false # 是否使用本地配置覆盖持久化配置
 
-    datasource:
-      names: write-ds,read-ds-0,read-ds-1
-      # 主数据源
-      write-ds:
-        type: com.zaxxer.hikari.HikariDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        jdbc-url: jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-        username: ${DB_USER:root}
-        password: ${DB_PWD:root}
-        pool-name: WriteDBP
-
-      # 分数据源
-      read-ds-0:
-        type: com.zaxxer.hikari.HikariDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        jdbc-url: jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3308}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-        # 从库改用只读账号
-        username: ${DB_USER:reader}
-        password: ${DB_PWD:123456}
-        pool-name: ReadDBP_0
-      # 分数据源
-      read-ds-1:
-        type: com.zaxxer.hikari.HikariDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        jdbc-url: jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3310}/${DB_NAME:eladmin}?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
-        # 从库改用只读账号
-        username: ${DB_USER:reader}
-        password: ${DB_PWD:123456}
-        pool-name: ReadDBP_1
-    # 主从配置
-    # 读写分离参考: https://shardingsphere.apache.org/document/current/cn/user-manual/shardingsphere-jdbc/spring-boot-starter/
-    #spring.shardingsphere.rules.readwrite-splitting.data-sources.<readwrite-splitting-data-source-name>.static-strategy.write-data-source-name= # 写库数据源名称
-    #spring.shardingsphere.rules.readwrite-splitting.data-sources.<readwrite-splitting-data-source-name>.static-strategy.read-data-source-names= # 读库数据源列表，多个从数据源用逗号分隔
-    #spring.shardingsphere.rules.readwrite-splitting.data-sources.<readwrite-splitting-data-source-name>.load-balancer-name= # 负载均衡算法名称
-    # 负载均衡算法配置
-    #spring.shardingsphere.rules.readwrite-splitting.load-balancers.<load-balance-algorithm-name>.type= # 负载均衡算法类型
-    #spring.shardingsphere.rules.readwrite-splitting.load-balancers.<load-balance-algorithm-name>.props.xxx= # 负载均衡算法属性配置
-    rules:
-      # 这里指定了规则，读写分离
-      readwrite-splitting:
-        data-sources:
-          # 这个readwrite_ds不要漏了。
-          # <data-source-name> (+): # 读写分离逻辑数据源名称
-          readwrite_ds:
-            static-strategy:
-              write-data-source-name: write-ds #主库数据源名称
-              read-data-source-names: read-ds-0,read-ds-1 # 从库数据源名称
-
-            load-balancer-name: round_robin # 负载均衡算法名称
-        # 负载均衡算法配置
-        #https://shardingsphere.apache.org/document/current/cn/user-manual/common-config/builtin-algorithm/load-balance/
-        #ROUND_ROBIN：事务内，读请求路由到 primary，事务外，采用轮询策略路由到 replica。所以之前读写分离未生效是因为算法的问题
-        #TRANSACTION_ROUND_ROBIN：显示/非显示开启事务，读请求采用轮询策略路由到多个 replica。
-        load-balancers:
-          # <load-balancer-name> (+): # 负载均衡算法名称
-          round_robin:
-            type: TRANSACTION_ROUND_ROBIN # 负载均衡算法类型
-          #  props: # 负载均衡算法属性配置
-
-    props:
-      sql:
-        show：true
+  #配置数据源
+  datasource:
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: 'jdbc:shardingsphere:classpath:datasource-config.yaml'
 
   # cache配置
   cache:
@@ -104,11 +28,11 @@ spring:
           clientName: null
           loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> { }
           subscriptionConnectionMinimumIdleSize: 1
-          subscriptionConnectionPoolSize: 50
-          slaveConnectionMinimumIdleSize: 32
-          slaveConnectionPoolSize: 64
-          masterConnectionMinimumIdleSize: 32
-          masterConnectionPoolSize: 64
+          subscriptionConnectionPoolSize: 8
+          slaveConnectionMinimumIdleSize: 4
+          slaveConnectionPoolSize: 8
+          masterConnectionMinimumIdleSize: 4
+          masterConnectionPoolSize: 8
           readMode: "SLAVE"
           slaveAddresses:
             - "redis://10.211.55.140:6378"

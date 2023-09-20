@@ -16,9 +16,6 @@ dependencies {
     implementation "org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion"
     implementation 'org.apache.httpcomponents.client5:httpclient5'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//    add following dependency if using ScriptEngine after Java 15
-//    implementation 'org.graalvm.js:js:23.0.0'
-//    implementation 'org.graalvm.js:js-scriptengine:23.0.0'
     implementation(project(':unicorn-security')) {
         capabilities {
             requireCapability('com.lwohvye:unicorn-security-captcha')
@@ -44,7 +41,7 @@ tasks.named("bootRun") {
 tasks.named("bootBuildImage") {
     if (graalvmEnable) {
         environment = [
-                "BP_JVM_VERSION"                 : "20.*",
+                "BP_JVM_VERSION"                 : "21.*",
                 "BP_NATIVE_IMAGE"                : "true",
                 "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx7g " + // fixed OOM with -J-Xmx7g
                         "-H:DeadlockWatchdogInterval=10 -H:+DeadlockWatchdogExitOnTimeout " +
