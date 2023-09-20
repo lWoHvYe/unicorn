@@ -46,7 +46,7 @@ subprojects {
     apply plugin: "io.freefair.lombok"
     // Setting a custom Lombok version when use plugin io.freefair.lombok
     lombok {
-        version = "edge"
+        version = "1.18.30"
     }
 
     java {
