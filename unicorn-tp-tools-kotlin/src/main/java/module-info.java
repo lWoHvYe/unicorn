@@ -1,5 +1,5 @@
 @SuppressWarnings({"requires-automatic"})
-module lwohvye.unicorn.tp.tools {
+module lwohvye.unicorn.tp.tools.kotlin {
     requires transitive lwohvye.unicorn.core;
     requires spring.context.support;
     requires kotlin.stdlib;

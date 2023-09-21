@@ -1,5 +1,5 @@
-@SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
-module lwohvye.unicorn.code.gen {
+@SuppressWarnings({"requires-automatic"})
+module lwohvye.unicorn.code.gen.kotlin {
     requires transitive lwohvye.unicorn.core;
     requires kotlin.stdlib;
     requires org.apache.commons.configuration2;
