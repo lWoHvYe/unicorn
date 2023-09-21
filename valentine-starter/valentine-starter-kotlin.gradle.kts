@@ -15,6 +15,7 @@ plugins {
 }
 
 val graalvmEnable = false
+val graalvmVersion = "23.1.0"
 
 dependencies {
     implementation(project(":unicorn-security"))
@@ -34,8 +35,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // add following dependency if using ScriptEngine after Java 15
-    // implementation("org.graalvm.js:js:23.0.0")
-    // implementation("org.graalvm.js:js-scriptengine:23.0.0")
+    implementation("org.graalvm.polyglot:js:$graalvmVersion")
+    implementation("org.graalvm.js:js-scriptengine:$graalvmVersion")
     implementation(project(":unicorn-security")) {
         capabilities {
             requireCapability("com.lwohvye:unicorn-security-captcha")
@@ -52,19 +53,17 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("--enable-preview")
-    jvmArgs("--add-modules=jdk.incubator.concurrent") // for unnamed module
 }
 
 tasks.withType<BootRun> {
     jvmArgs("-XX:+UseZGC", "--enable-preview")
-    jvmArgs("--add-modules=jdk.incubator.concurrent") // for unnamed module
 }
 
 tasks.withType<BootBuildImage> {
     if (graalvmEnable) {
         environment.set(
             mapOf(
-                "BP_JVM_VERSION" to "20.*",
+                "BP_JVM_VERSION" to "21.*",
                 "BP_NATIVE_IMAGE" to "true",
                 "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "--enable-preview -J-Xmx7g " +
                         "-H:DeadlockWatchdogInterval=10 -H:+DeadlockWatchdogExitOnTimeout " +
@@ -86,7 +85,7 @@ tasks.withType<BootBuildImage> {
         environment.set(
             mapOf(
                 "BP_JVM_TYPE" to "JDK",
-                "BP_JVM_VERSION" to "20",
+                "BP_JVM_VERSION" to "21",
                 "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
                 "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:+UseZGC --enable-preview"
             )
@@ -97,7 +96,6 @@ tasks.withType<BootBuildImage> {
 if (graalvmEnable) {
     tasks.withType<ProcessAot> {
         jvmArgs("--enable-preview")
-        jvmArgs("--add-modules=jdk.incubator.concurrent") // for unnamed module
     }
 
     tasks.withType<BuildNativeImageTask> {
@@ -108,7 +106,7 @@ if (graalvmEnable) {
                     ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
                     ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader"
         )
-        options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
+        options.jvmArgs.addAll("--enable-preview")
     }
 }
 
@@ -118,6 +116,6 @@ kotlin {
             apiVersion = "2.0"
         }
     }
-    jvmToolchain(20)
+    jvmToolchain(21)
 }
 

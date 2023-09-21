@@ -1,0 +1,59 @@
+<!--
+  ~    Copyright (c) 2023.  lWoHvYe(Hongyan Wang)
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Session Attributes</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<div class="container">
+    <h1>Description</h1>
+    <p>This application demonstrates how to customize the session cookie. Notice that the name of the cookie is
+        JSESSIONID.</p>
+
+    <h1>Try it</h1>
+
+    <form class="form-inline" role="form" action="./session" method="post">
+        <label for="attributeName">Attribute Name</label>
+        <input id="attributeName" type="text" name="attributeName"/>
+        <label for="attributeValue">Attribute Value</label>
+        <input id="attributeValue" type="text" name="attributeValue"/>
+        <input type="submit" value="Set Attribute"/>
+    </form>
+
+    <hr/>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Attribute Name</th>
+            <th>Attribute Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="attr : ${webSession.attributes}">
+            <td th:text="${attr.key}"/>
+            <td th:text="${attr.value}"/>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

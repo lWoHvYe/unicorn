@@ -85,7 +85,7 @@
       pinned to its carrier:
         - When it executes code inside a synchronized block or method, or
         - When it executes a native method or a foreign function.
-        - 以上是两种会block的情况，所以较synchronized 更推荐使用API level的 Lock实现
+        - 以上是两种会block的情况，所以较synchronized 更推荐使用API level的 Lock实现，对于Kotlin的协程实现，同样有这个问题
     - The scheduler does not compensate for pinning by expanding its parallelism. Instead, avoid frequent and long-lived
       pinning by revising synchronized blocks or methods that run frequently and guard potentially long I/O operations
       to use java.util.concurrent.locks.ReentrantLock instead.

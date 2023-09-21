@@ -120,7 +120,7 @@ public class FileUtils extends FileUtil {
      * 获取文件扩展名，不带 .
      */
     public static String getExtensionName(String filename) {
-        if ((filename != null) && (filename.length() > 0)) {
+        if ((filename != null) && (!filename.isEmpty())) {
             int dot = filename.lastIndexOf('.');
             if ((dot > -1) && (dot < (filename.length() - 1)))
                 return filename.substring(dot + 1).replaceAll("[/\\\\]", "");
@@ -133,9 +133,9 @@ public class FileUtils extends FileUtil {
      * Java文件操作 获取不带扩展名的文件名
      */
     public static String getFileNameNoEx(String filename) {
-        if ((filename != null) && (filename.length() > 0)) {
+        if ((filename != null) && (!filename.isEmpty())) {
             int dot = filename.lastIndexOf('.');
-            if ((dot > -1) && (dot < (filename.length())))
+            if (dot > -1)
                 return filename.substring(0, dot).replaceAll("[./\\\\]", "");
         }
         // 移除文件命中的 . / 这些跟目录层级有关的部分

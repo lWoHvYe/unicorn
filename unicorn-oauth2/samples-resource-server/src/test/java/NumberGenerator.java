@@ -15,7 +15,10 @@
  */
 
 import reactor.core.publisher.Flux;
+
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 public class NumberGenerator {
 
@@ -31,10 +34,6 @@ public class NumberGenerator {
                 .subscribe(System.out::println);
 
         // 等待一段时间，确保输出完整
-        try {
-            Thread.sleep(12000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(12L));
     }
 }

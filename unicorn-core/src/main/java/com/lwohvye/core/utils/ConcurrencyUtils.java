@@ -17,7 +17,7 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
-import jdk.incubator.concurrent.StructuredTaskScope;
+import lombok.experimental.UtilityClass;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,9 +27,14 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public final class ConcurrencyUtils {
+import static java.util.concurrent.StructuredTaskScope.Subtask;
+
+@UtilityClass
+public class ConcurrencyUtils {
 
     static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
+
+    public static final ExecutorService VIRTUAL_EXECUTOR = Executors.newThreadPerTaskExecutor(virtualFactory);
 
     /**
      * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
@@ -41,18 +46,18 @@ public final class ConcurrencyUtils {
      */
     public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
         try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            List<? extends Future<?>> futures = null;
+            List<? extends Subtask<?>> subtasks = null;
             if (Objects.nonNull(tasks))
-                futures = Arrays.stream(tasks).map(scope::fork).toList();
+                subtasks = Arrays.stream(tasks).map(scope::fork).toList();
 
-            scope.join();           // Join both forks
-            scope.throwIfFailed();  // ... and propagate errors
+            scope.join()           // Join both forks
+                    .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
             Object results = null;
             if (Objects.nonNull(composeResult))
-                results = composeResult.apply(Objects.nonNull(futures) ?
-                        futures.stream().map(Future::resultNow).toList() : Collections.emptyList());
+                results = composeResult.apply(Objects.nonNull(subtasks) ?
+                        subtasks.stream().map(Subtask::get).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
         } catch (ExecutionException e) {
@@ -73,8 +78,8 @@ public final class ConcurrencyUtils {
             if (Objects.nonNull(tasks))
                 Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
 
-            scope.join();           // Join both forks
-            scope.throwIfFailed();  // ... and propagate errors
+            scope.join()           // Join both forks
+                    .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
             if (Objects.nonNull(eventual))

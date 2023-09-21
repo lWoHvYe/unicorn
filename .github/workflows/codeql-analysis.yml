@@ -22,7 +22,6 @@ on:
 
 jobs:
   analyze:
-    name: Analyze
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
@@ -34,11 +33,13 @@ jobs:
       fail-fast: false
       matrix:
         language: [ 'java' ]
+        distribution: [ 'zulu', 'temurin', 'oracle' ]
+        java: [ '21' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'swift' ]
         # Use only 'java' to analyze code written in Java, Kotlin or both
         # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
         # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
-
+    name: Analyze Java ${{ matrix.Java }} (${{ matrix.distribution }}) Build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,9 +48,9 @@ jobs:
         uses: actions/setup-java@v3
         with:
           # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
-          java-version: '20'
+          java-version: ${{ matrix.java }}
           # Java distribution. See the list of supported distributions in README file
-          distribution: 'oracle'
+          distribution: ${{ matrix.distribution }}
           # The package type (jdk, jre, jdk+fx, jre+fx)
           #java-package: # optional, default is jdk
           # The architecture of the package
@@ -107,10 +108,6 @@ jobs:
       # - run: |
       #     echo "Run, Build Application using script"
       #     ./location_of_script_within_repo/buildscript.sh
-      - name: Publish 2 MavenLocal
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: publishToMavenLocal
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

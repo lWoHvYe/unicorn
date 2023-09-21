@@ -64,7 +64,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 // assert authUser != null; // 在jvm中，通过-ea开启断言，该方式只适合与测试环节，正式参数校验建议用Assert系列，底层为抛出异常
                 Assert.notNull(authUser, "用户信息不可为空");
                 var username = authUser.getUsername();
-                username = StringUtils.isNotBlank(username) ? username : "";
+                username = !username.isBlank() ? username : "";
 
                 var ip = StringUtils.getIp(request);
                 var lockedIp = ip + "||authLocked||";
@@ -76,7 +76,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 }
                 // 密码解密
                 var password = authUser.getPassword();
-                password = StringUtils.isNotBlank(password) ? RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, password) : "";
+                password = !password.isBlank() ? RsaUtils.decryptByPrivateKey(RsaProperties.privateKey, password) : "";
 
                 if (extraVerifyFailed(response, authUser)) return null;
 

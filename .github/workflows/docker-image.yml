@@ -25,8 +25,8 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '20'
-          distribution: 'temurin'
+          java-version: '21'
+          distribution: 'oracle'
           check-latest: true
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
@@ -46,9 +46,3 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: publishToMavenLocal
-
-      - name: Remove module-info
-        run: rm -rf unicorn-starter/src/main/java/module-info.java
-
-      - name: Build Unicorn-Starter
-        run: mvn -B package --file unicorn-starter/pom.xml -P jigsaw

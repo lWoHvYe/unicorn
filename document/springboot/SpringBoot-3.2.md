@@ -9,10 +9,12 @@
 
 - A virtual thread executor is now auto-configured for the Kafka listener if virtual threads are enabled.
 
+- Spring Data Redis' ClusterCommandExecutor will now use virtual threads if enabled.
+
 ##### Servlet Web Servers
 
 - When virtual threads are enabled, Tomcat and Jetty will use virtual threads for request processing. This means that your
-application code that is handling a web request, such as a method in a controller, will run on a virtual thread.
+  application code that is handling a web request, such as a method in a controller, will run on a virtual thread.
 
 ##### Task Execution
 
@@ -40,8 +42,8 @@ application code that is handling a web request, such as a method in a controlle
 ##### Blocking Execution with Spring WebFlux
 
 - Spring WebFlux’s support for block execution is auto-configured to use the applicationTaskExecutor bean when it is an
-AsyncTaskExecutor. The applicationTaskExecutor is an AsyncTaskExecutor both by default and when virtual threads are
-enabled.
+  AsyncTaskExecutor. The applicationTaskExecutor is an AsyncTaskExecutor both by default and when virtual threads are
+  enabled.
 
 #### Link
 

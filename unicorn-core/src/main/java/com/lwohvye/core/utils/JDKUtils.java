@@ -17,6 +17,7 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,7 @@ import static java.lang.invoke.MethodType.methodType;
 /**
  * <a href="https://github.com/alibaba/fastjson2/blob/main/core/src/main/java/com/alibaba/fastjson2/util/JDKUtils.java">...</a>
  */
+@UtilityClass
 @SuppressWarnings({"unchecked", "unused"})
 public class JDKUtils {
     public static final int JVM_VERSION;

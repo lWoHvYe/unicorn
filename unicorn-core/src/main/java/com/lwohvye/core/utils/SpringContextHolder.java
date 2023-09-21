@@ -16,6 +16,8 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
+import com.lwohvye.core.extension.StringExtensionMethod;
+import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -51,6 +53,7 @@ import java.util.jar.JarFile;
  * @see cn.hutool.extra.spring.SpringUtil
  */
 @Slf4j
+@ExtensionMethod({StringExtensionMethod.class})
 @SuppressWarnings("unused")
 public class SpringContextHolder implements BeanFactoryPostProcessor, ApplicationContextAware, DisposableBean {
 
@@ -169,7 +172,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
      * 拿到ApplicationContext对象实例后就可以手动获取Bean的注入实例对象
      */
     public static <T> T getBean(String beanName, Class<T> clazz) {
-        if (StringUtils.isBlank(beanName)) {
+        if (beanName.isBlank()) {
             return getBeanFactory().getBean(clazz);
         } else {
             return getBeanFactory().getBean(beanName, clazz);
@@ -308,7 +311,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
                 if (isSpringBeanClass(clazz)) {
                     var beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
                     // 向容器中注册bean，视情况是否允许覆盖
-                    defaultListableBeanFactory.registerBeanDefinition(StringUtils.lowerFirstChar(className), beanDefinitionBuilder.getBeanDefinition());
+                    defaultListableBeanFactory.registerBeanDefinition(className.lowerFirstChar(), beanDefinitionBuilder.getBeanDefinition());
                 }
             }
         }
@@ -325,7 +328,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
                 var clazz = urlClassLoader.loadClass(className);
                 if (isSpringBeanClass(clazz)) {
                     // 从容器中删除bean
-                    defaultListableBeanFactory.removeBeanDefinition(StringUtils.lowerFirstChar(className));
+                    defaultListableBeanFactory.removeBeanDefinition(className.lowerFirstChar());
                 }
             }
         }

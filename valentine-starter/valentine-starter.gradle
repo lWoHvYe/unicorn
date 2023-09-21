@@ -16,9 +16,6 @@ dependencies {
     implementation "org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion"
     implementation 'org.apache.httpcomponents.client5:httpclient5'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//    add following dependency if using ScriptEngine after Java 15
-//    implementation 'org.graalvm.js:js:23.0.0'
-//    implementation 'org.graalvm.js:js-scriptengine:23.0.0'
     implementation(project(':unicorn-security')) {
         capabilities {
             requireCapability('com.lwohvye:unicorn-security-captcha')
@@ -34,19 +31,17 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
     jvmArgs += "--enable-preview"
-    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("bootRun") {
     jvmArgs += "-XX:+UseZGC"
     jvmArgs += "--enable-preview"
-    jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
 }
 
 tasks.named("bootBuildImage") {
     if (graalvmEnable) {
         environment = [
-                "BP_JVM_VERSION"                 : "20.*",
+                "BP_JVM_VERSION"                 : "21.*",
                 "BP_NATIVE_IMAGE"                : "true",
                 "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--enable-preview -J-Xmx7g " + // fixed OOM with -J-Xmx7g
                         "-H:DeadlockWatchdogInterval=10 -H:+DeadlockWatchdogExitOnTimeout " +
@@ -63,7 +58,7 @@ tasks.named("bootBuildImage") {
     } else {
         environment = [
                 "BP_JVM_TYPE"                 : "JDK",
-                "BP_JVM_VERSION"              : "20",
+                "BP_JVM_VERSION"              : "21",
                 "BPE_DELIM_JAVA_TOOL_OPTIONS" : " ",
                 "BPE_APPEND_JAVA_TOOL_OPTIONS": "-XX:+UseZGC --enable-preview"
         ]
@@ -74,18 +69,16 @@ tasks.named("bootBuildImage") {
 if (graalvmEnable) {
     tasks.named("processAot") {
         jvmArgs += "--enable-preview"
-        jvmArgs += "--add-modules=jdk.incubator.concurrent" // for unnamed module
     }
 
     tasks.named("nativeCompile") {
         def options = nativeCompile.options.get().asCompileOptions()
         options.buildArgs
-                .addAll(
 //                        "--gc=G1", // The G1 garbage collector ('--gc=G1') is currently only supported on Linux AMD64.
-                        "--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
-                                ",ch.qos.logback.core.status.StatusBase" +
-                                ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
-                                ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
-        options.jvmArgs.addAll("--enable-preview", "--add-modules=jdk.incubator.concurrent") // for unnamed module
+                .add("--initialize-at-build-time=ch.qos.logback.classic.Logger,org.slf4j.LoggerFactory" +
+                        ",ch.qos.logback.core.status.StatusBase" +
+                        ",ch.qos.logback.classic.Level,ch.qos.logback.core.CoreConstants,org.slf4j.MDC" +
+                        ",ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader")
+        options.jvmArgs.addAll("--enable-preview")
     }
 }

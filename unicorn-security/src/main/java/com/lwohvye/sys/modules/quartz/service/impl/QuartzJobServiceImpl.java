@@ -39,6 +39,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author Zheng Jie
@@ -147,7 +149,7 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
     @Async
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void executionSubJob(String[] tasks) throws InterruptedException {
+    public void executionSubJob(String[] tasks) {
         for (String id : tasks) {
             if (StrUtil.isBlank(id)) {
                 // 如果是手动清除子任务id，会出现id为空字符串的问题
@@ -163,7 +165,7 @@ public class QuartzJobServiceImpl implements IQuartzJobService {
             Boolean result = (Boolean) redisUtils.get(uuid);
             while (ObjectUtil.isNull(result)) {
                 // 休眠5秒，再次获取子任务执行情况
-                Thread.sleep(5000);
+                LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(5L));
                 result = (Boolean) redisUtils.get(uuid);
             }
             if (Boolean.FALSE.equals(result)) {

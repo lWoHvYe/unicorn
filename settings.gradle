@@ -7,14 +7,11 @@ pluginManagement {
         maven {
             url 'https://repo.spring.io/milestone'
         }
-        maven {
-            url 'https://repo.spring.io/snapshot'
-        }
     }
 }
 
 plugins {
-    id 'com.gradle.enterprise' version '3.14'
+    id 'com.gradle.enterprise' version '3.15'
 }
 
 dependencyResolutionManagement {
@@ -23,9 +20,6 @@ dependencyResolutionManagement {
         gradlePluginPortal()
         flatDir {
             dirs "$rootProject.projectDir/ex-lib"
-        }
-        maven {
-            url 'https://repo.spring.io/snapshot'
         }
         maven {
             url 'https://repo.spring.io/milestone'
@@ -54,7 +48,7 @@ dependencyResolutionManagement {
             version('oshiCore', '6.4.2')
             version('poi', '5.2.3')
             version('quartz', '2.3.2')
-            version('redisson', '3.23.0')
+            version('redisson', '3.23.4')
             version('springBoot', "$springBootVersion")
             version('springdoc', '2.2.0')
             version('thumbnailator', '0.4.20')
@@ -116,7 +110,7 @@ def buildFiles = fileTree(rootDir) {
     include "**/*.gradle", "**/*.gradle.kts"
     exclude "build", "**/gradle", "settings.gradle", "buildSrc", "/build.gradle", ".*", "out"
     if ("$kotlinVersion".matches("^1\\.[0-8]\\.\\d{1,2}\$|^0\\.\\d+\\.\\d+\$") // current version is not Support Java 20, 1.9.0 Support Java 20
-//            || "$kotlinVersion".matches("^1\\.9\\.[01]{1,2}\$") // 1.9.10 not Support Java 21
+            || "$kotlinVersion".matches("^1\\.9\\.[0-1]{1,2}-?(Beta|RC)?[0-9]?\$") // 1.9.10 not Support Java 21，1.9.20 Support Java 21 WTF Release
     ) {
         kotlinEnable = false
         exclude "**/*-kotlin.gradle.kts"
