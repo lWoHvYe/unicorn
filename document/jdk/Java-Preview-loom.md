@@ -124,6 +124,3 @@
 - [JEP 429: Scoped Values (Incubator)](https://openjdk.org/jeps/429)
 - [JEP 446: Scoped Values (Preview)](https://openjdk.org/jeps/446)
 
-#### Valhalla
-
-- [Valhalla](https://openjdk.org/projects/valhalla/)

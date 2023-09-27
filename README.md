@@ -14,6 +14,8 @@
 
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
+For lWoHvYe/eladmin project, will stay at Java 21 until 2025. will try Java 21+ in WHY-lWoHvYe/valentine-p2p
+
 ---
 
 启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
@@ -25,7 +27,7 @@
 ``--add-opens java.base/java.lang=ALL-UNNAMED`` ，也可根据需要缩小范围（在Java 9引入的JPMS/Jigsaw）。
 详见：[Java 16](document/jdk/Java-16.md) [Java 17](document/jdk/Java-17.md)
 
-**Java 19**起，引入Virtual Threads/Project Loom，相关[详见](document/jdk/Java-Preview.md)
+**Java 19**起，引入Virtual Threads/Project Loom，相关[详见](document/jdk/Java-Preview-loom.md)
 
 ---
 
@@ -57,7 +59,7 @@
 
 ```
 
-##### Gradle (draft)
+##### Gradle
 
 ```groovy
 // 4.x系列将基于Java 21, 部分module使用Kotlin, 使用Gradle build
