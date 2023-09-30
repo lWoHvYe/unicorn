@@ -18,10 +18,7 @@ package com.unicorn;
 
 import org.junit.jupiter.api.Test;
 
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 
 class ScriptEngineTest {
 
@@ -50,6 +47,33 @@ class ScriptEngineTest {
         } catch (ScriptException e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Test
+    void testGraalVMEngine() throws ScriptException {
+//        To avoid unnecessary re-compilation of JS sources, it is recommended to use CompiledScript.eval instead of ScriptEngine.eval.
+//        This prevents JIT-compiled code from being garbage-collected as long as the corresponding CompiledScript object is alive.
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("js");
+
+        CompiledScript script = ((Compilable) engine).compile("console.log('hello world');");
+        script.eval();
+        CompiledScript script1 = ((Compilable) engine).compile("1 + 2");
+        Object result = script1.eval();
+        System.out.println("Result: " + result); // 输出：Result: 3
+
+        CompiledScript script2 = ((Compilable) engine).compile("console.log('start');var start = Date.now(); while (Date.now()-start < 2000);console.log('end');");
+        Thread.ofVirtual().start(() -> {
+            try {
+                // Create ScriptEngine for this thread (with a shared polyglot Engine)
+                ScriptEngine innerEngine = manager.getEngineByName("js");
+                script2.eval(innerEngine.getContext());
+            } catch (ScriptException scriptException) {
+                scriptException.printStackTrace();
+            }
+        });
+        script2.eval();
 
     }
 }
