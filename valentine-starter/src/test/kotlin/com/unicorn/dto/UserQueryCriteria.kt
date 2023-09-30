@@ -16,6 +16,7 @@
 package com.unicorn.dto
 
 import cn.hutool.core.util.StrUtil
+import com.lwohvye.core.extension.StringExtensionMethod
 import com.lwohvye.core.utils.StringUtils
 import com.unicorn.annotation.Query
 import java.io.Serializable
@@ -47,7 +48,7 @@ class UserQueryCriteria : Serializable {
      */
     var usernameStr: String? = null
         set(value) {
-            usernames = if (StrUtil.isNotEmpty(value)) StringUtils.parseStrToArrString(value) else null
+            usernames = if (StrUtil.isNotEmpty(value)) StringExtensionMethod.parseStrToArrString(value) else null
         }
 
     @Query(propName = "username", type = Query.Type.IN_INNER_LIKE)
