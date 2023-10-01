@@ -172,8 +172,8 @@ uses <interface | abstract class>: 声明模块依赖的 Java SPI 服务，加�
 
 ```shell
 # 将无法模块化的放到clib中，可模块化的放到mlib，将未升级模块的依赖放入mlib中，会自动模块化，称为自动模块
-# 当前待解决：模块 lwohvye.eladmin.starter 不具有 ModuleMainClass 属性，请使用 -m <模块>/<主类>。针对Spring Boot项目，应该有某个地方不一样
-java -p mlib -Dloader.path=clib -m lwohvye.eladmin.starter
+# 当前待解决：模块 lwohvye.unicorn.starter 不具有 ModuleMainClass 属性，请使用 -m <模块>/<主类>。针对Spring Boot项目，应该有某个地方不一样
+java -p mlib -Dloader.path=clib -m lwohvye.unicorn.starter
 ```
 
 - ~~在Idea的 Run/Debug Configurations中的VM options中，部分可能需要调一下~~
@@ -209,7 +209,7 @@ IDEA中，两种启动方式的启动参数，另通过查看VM参数，module�
 # 非module
 java -classpath lib com.lwohvye.AppSearchRun
 # module
-java -classpath lib -m lwohvye.eladmin.starter/com.lwohvye.AppRun
+java -classpath lib -m lwohvye.unicorn.starter/com.lwohvye.AppRun
 ```
 
 [SpringBoot jar包启动原理](https://www.lwohvye.com/2022/03/09/springboot-jar%e5%8c%85%e5%90%af%e5%8a%a8%e7%9a%84%e5%8e%9f%e7%90%86/)

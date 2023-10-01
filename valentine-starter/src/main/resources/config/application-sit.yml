@@ -154,11 +154,11 @@ file:
     path: ~/file/
     avatar: ~/avatar/
   linux:
-    path: /home/eladmin/file/
-    avatar: /home/eladmin/avatar/
+    path: /home/unicorn/file/
+    avatar: /home/unicorn/avatar/
   windows:
-    path: C:\eladmin\file\
-    avatar: C:\eladmin\avatar\
+    path: C:\unicorn\file\
+    avatar: C:\unicorn\avatar\
   # 文件大小 /M
   maxSize: 100
   avatarMaxSize: 5

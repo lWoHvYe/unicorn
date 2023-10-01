@@ -103,10 +103,10 @@ object GenUtil {
 
     @Throws(IOException::class)
     fun download(columns: List<ColumnInfo?>?, genConfig: GenConfig?): String {
-        // 拼接的路径：/tmpeladmin-gen-temp/，这个路径在Linux下需要root用户才有权限创建,非root用户会权限错误而失败，更改为： /tmp/eladmin-gen-temp/
-        // String tempPath =SYS_TEM_DIR + "eladmin-gen-temp" + File.separator + genConfig.getTableName() + File.separator;
+        // 拼接的路径：/tmpunicorn-gen-temp/，这个路径在Linux下需要root用户才有权限创建,非root用户会权限错误而失败，更改为： /tmp/unicorn-gen-temp/
+        // String tempPath =SYS_TEM_DIR + "unicorn-gen-temp" + File.separator + genConfig.getTableName() + File.separator;
         val tempPath =
-            FileUtils.SYS_TEM_DIR + "eladmin-gen-temp" + File.separator + genConfig!!.tableName + File.separator
+            FileUtils.SYS_TEM_DIR + "unicorn-gen-temp" + File.separator + genConfig!!.tableName + File.separator
         val genMap = getGenMap(columns, genConfig)
         val engine = TemplateUtil.createEngine(TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH))
         // 生成后端代码
@@ -117,7 +117,7 @@ object GenUtil {
                 templateName,
                 genConfig,
                 genMap["className"].toString(),
-                tempPath + "eladmin" + File.separator
+                tempPath + "unicorn" + File.separator
             )!!
             val file = File(filePath)
             // 如果非覆盖生成
@@ -131,7 +131,7 @@ object GenUtil {
         templates = frontTemplateNames
         for (templateName in templates) {
             val template = engine.getTemplate("generator/front/$templateName.ftl")
-            val path = tempPath + "eladmin-web" + File.separator
+            val path = tempPath + "unicorn-web" + File.separator
             val apiPath = path + "src" + File.separator + "api" + File.separator
             val srcPath =
                 path + "src" + File.separator + "views" + File.separator + genMap["changeClassName"].toString() + File.separator

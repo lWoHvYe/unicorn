@@ -1226,15 +1226,15 @@ CREATE TABLE `sys_user`
 BEGIN;
 INSERT INTO `sys_user`
 VALUES (1, 2, 'admin', '管理员-咸鱼', '男', '18888888888', '201507802@qq.com', 'avatar-20200806032259161.png',
-        '/Users/jie/Documents/work/me/admin/eladmin/~/avatar/avatar-20200806032259161.png',
+        '/Users/jie/Documents/work/me/admin/unicorn/~/avatar/avatar-20200806032259161.png',
         '$2a$10$tm56TdWtcFwRdo2VurgDUuqdThBEK0yN5kJBl9FHprXAnqz23hlL6', b'1', 1, 0xE592B8E9B1BC2DE4B88DE7BFBBE8BAAB,
         NULL, 'admin', '2021-11-11 12:25:14', '2018-08-23 09:11:56', '2021-11-24 18:45:19');
 INSERT INTO `sys_user`
-VALUES (2, 6, 'test', '测试-大佬', '男', '19999999999', 'test@eladmin.com', NULL, NULL,
+VALUES (2, 6, 'test', '测试-大佬', '男', '19999999999', 'test@unicorn.com', NULL, NULL,
         '$2a$10$4XcyudOYTSz6fue6KFNMHeUQnCX5jbBQypLEnGk1PmekXt5c95JcK', b'0', 1, 0xE4B880E58FAA206C6974746C6520,
         'admin', 'admin', '2022-04-03 11:48:23', '2020-05-05 11:15:49', '2022-04-01 07:54:28');
 INSERT INTO `sys_user`
-VALUES (3, 20, 'performer', '运营-产品', '女', '18288888888', 'perform@eladmin.com', NULL, NULL,
+VALUES (3, 20, 'performer', '运营-产品', '女', '18288888888', 'perform@unicorn.com', NULL, NULL,
         '$2a$10$uUHeP2O2SJGAAcK6ZiLLDuaI/i/8.g4VpyW3EXI0n3FTJ9zsfADs2', b'0', 0, 0xE4BAA7E59381E8BF90E890A5, 'admin',
         'admin', '2022-04-01 11:53:12', '2021-11-05 22:38:56', '2023-07-15 22:43:34');
 COMMIT;

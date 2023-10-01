@@ -4,17 +4,17 @@
 </div>
 <div style="text-align: center">
 
-[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/lWoHvYe/eladmin/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/lWoHvYe/eladmin.svg?style=social&label=Stars)](https://github.com/lWoHvYe/eladmin)
-[![GitHub forks](https://img.shields.io/github/forks/lWoHvYe/eladmin.svg?style=social&label=Fork)](https://github.com/lWoHvYe/eladmin)
-[![Dependency Review](https://github.com/lWoHvYe/eladmin/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/dependency-review.yml)
-[![CodeQL](https://github.com/lWoHvYe/eladmin/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/codeql-analysis.yml)
-[![Gradle Package](https://github.com/lWoHvYe/eladmin/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/lWoHvYe/eladmin/actions/workflows/gradle-publish.yml)
+[![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/lWoHvYe/unicorn/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/lWoHvYe/unicorn.svg?style=social&label=Stars)](https://github.com/lWoHvYe/unicorn)
+[![GitHub forks](https://img.shields.io/github/forks/lWoHvYe/unicorn.svg?style=social&label=Fork)](https://github.com/lWoHvYe/unicorn)
+[![Dependency Review](https://github.com/lWoHvYe/unicorn/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/lWoHvYe/unicorn/actions/workflows/dependency-review.yml)
+[![CodeQL](https://github.com/lWoHvYe/unicorn/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lWoHvYe/unicorn/actions/workflows/codeql-analysis.yml)
+[![Gradle Package](https://github.com/lWoHvYe/unicorn/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/lWoHvYe/unicorn/actions/workflows/gradle-publish.yml)
 </div>
 
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
-For lWoHvYe/eladmin project, will stay at Java 21 until 2025. will try Java 21+ in WHY-lWoHvYe/valentine-p2p
+For lWoHvYe/unicorn project, will stay at Java 21 until 2025. will try Java 21+ in WHY-lWoHvYe/valentine-p2p
 
 ---
 
@@ -97,7 +97,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 |------------|------------------------------------|----------------------------------------|
 | 原项目-github | https://github.com/elunez/eladmin  | https://github.com/elunez/eladmin-web  |
 | 原项目-码云     | https://gitee.com/elunez/eladmin   | https://gitee.com/elunez/eladmin-web   |
-| github     | https://github.com/lWoHvYe/eladmin | https://github.com/lWoHvYe/eladmin-web |
+| github     | https://github.com/lWoHvYe/unicorn | https://github.com/lWoHvYe/unicorn-web |
 
 #### 主要特性
 

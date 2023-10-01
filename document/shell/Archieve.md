@@ -10,7 +10,7 @@ nohup java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 
 
 ```shell
 #2.x版本启动示例
-nohup java --add-opens java.base/java.lang=ALL-UNNAMED -Dloader.path=lib -jar eladmin-starter-2.6.18.jar >nohup.out 2>&1 &
+nohup java --add-opens java.base/java.lang=ALL-UNNAMED -Dloader.path=lib -jar unicorn-starter-2.6.18.jar >nohup.out 2>&1 &
 ```
 
 ```shell

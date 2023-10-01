@@ -41,7 +41,7 @@ class MultipartConfig {
     @Bean
     fun multipartConfigElement(): MultipartConfigElement {
         val factory = MultipartConfigFactory()
-        val location = System.getProperty("user.home") + "/.eladmin/file/tmp"
+        val location = System.getProperty("user.home") + "/.unicorn/file/tmp"
         val tmpFile = File(location)
         if (!tmpFile.exists() && !tmpFile.mkdirs()) {
             println("create was not successful.")
