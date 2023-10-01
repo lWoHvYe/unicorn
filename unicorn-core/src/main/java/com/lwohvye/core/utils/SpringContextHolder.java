@@ -302,7 +302,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
         var file = new File(jarAddress);
         var jarPath = file.toURI().toURL();
         // 通过线程的上下文类加载器来加载
-        // URLClassLoader既可以加载本地文件系统的jar包，也可以加载远程jar包。比如URL jarPath = "https://repo1.maven.org/maven2/com/lwohvye/eladmin-common/3.0.2/eladmin-common-3.0.2.jar" 也可以，只是会比较慢
+        // URLClassLoader既可以加载本地文件系统的jar包，也可以加载远程jar包。比如URL jarPath = "https://repo1.maven.org/maven2/com/lwohvye/unicorn-sys-api/4.2.0-pi-RC1/unicorn-core-4.2.0-pi-RC2.jar" 也可以，只是会比较慢
         // 这种远程执行，印象中在哪里看过
         try (var urlClassLoader = new URLClassLoader(new URL[]{jarPath}, Thread.currentThread().getContextClassLoader())) {
             var classNameSet = readJarFile(jarAddress);

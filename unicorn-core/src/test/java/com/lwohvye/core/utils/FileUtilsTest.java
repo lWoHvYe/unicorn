@@ -56,7 +56,7 @@ public class FileUtilsTest {
 
     @Test
     public void testLoadClass() throws Exception {
-        String jarAddress = "/Users/lWoHvYe/IdeaProjects/eladmin/eladmin-common/target/eladmin-common-3.0.3.jar";
+        String jarAddress = "/Users/lWoHvYe/IdeaProjects/unicorn/unicorn-core/build/libs/unicorn-core-4.2.0-pi-RC2.jar";
         // jar的Url路径为jarPath，jarPath = "file:" + jarAddress。也可以这样：
         var file = new File(jarAddress);
         var jarPath = file.toURI().toURL();
@@ -69,10 +69,10 @@ public class FileUtilsTest {
         }
 
         // 因为测试类在common中，这里如果读远程的common的化，可能要结果不那么突出，因为本地的也可以被加载，所以改读api了
-        jarPath = new URL("https://repo1.maven.org/maven2/com/lwohvye/eladmin-api/3.0.2/eladmin-api-3.0.2.jar");
+        jarPath = new URL("https://repo1.maven.org/maven2/com/lwohvye/unicorn-sys-api/4.2.0-pi-RC1/unicorn-core-4.2.0-pi-RC2.jar");
         try (var urlClassLoader = new URLClassLoader(new URL[]{jarPath}, Thread.currentThread().getContextClassLoader())) {
-            // Class<?> aClass = urlClassLoader.loadClass("com.lwohvye.api.modules.system.api.SysUserAPI"); // 3.0.3开始的结构，读3.0.2的jar会报类找不到，这是正确的
-            Class<?> aClass = urlClassLoader.loadClass("com.lwohvye.modules.system.api.SysUserAPI"); // 3.0.2时的结构
+            Class<?> aClass = urlClassLoader.loadClass("com.lwohvye.api.modules.system.api.SysUserAPI"); // 3.0.3开始的结构，读3.0.2的jar会报类找不到，这是正确的
+//            Class<?> aClass = urlClassLoader.loadClass("com.lwohvye.modules.system.api.SysUserAPI"); // 3.0.2时的结构
             System.out.println(aClass.descriptorString());
         }
     }

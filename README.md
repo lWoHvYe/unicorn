@@ -18,8 +18,9 @@ For lWoHvYe/unicorn project, will stay at Java 21 until 2025. will try Java 21+ 
 
 ---
 
-启动类 [AppRun.java](unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
-和配置文件 [resources](unicorn-starter/src/main/resources)详见 [unicorn-starter](unicorn-starter)
+启动类 [AppRun.java](https://github.com/lWoHvYe/unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
+和配置文件 [resources](https://github.com/lWoHvYe/unicorn-starter/src/main/resources)
+详见 [unicorn-starter](https://github.com/lWoHvYe/unicorn-starter)
 模块。[启停脚本](script)。
 
 **Java16**之后，默认强封装JDK内部类，详见[JEP 396](https://openjdk.java.net/jeps/396)
@@ -108,7 +109,8 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - 高效率开发，代码生成器可一键生成前后端代码
 - 对一些常用前端组件封装：表格数据请求、数据字典等
 - 前后端统一异常拦截处理，统一输出异常，避免繁琐的判断
-- 使用ShardingSphere实现多数据源和读写分离。该方式针对MySQL数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）。
+- 使用ShardingSphere实现多数据源和读写分离。该方式针对MySQL数据库。对系统侵入性小。（只需引入依赖，并在yaml中配置数据源信息即可）
+  [unicorn-starter](https://github.com/lWoHvYe/unicorn-starter)。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
 - 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，
@@ -227,4 +229,3 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 #### TODO
 
 - OAuth 2.0 (_In Progress_)
-- Loom + Kotlin Coroutines (_In Progress_)

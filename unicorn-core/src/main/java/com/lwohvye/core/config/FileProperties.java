@@ -16,7 +16,7 @@
 package com.lwohvye.core.config;
 
 import lombok.Data;
-import com.lwohvye.core.constant.ElAdminConstant;
+import com.lwohvye.core.constant.UnicornCoreConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -46,9 +46,9 @@ public class FileProperties {
 
     public ElPath getOSPath() {
         String os = System.getProperty("os.name");
-        if (os.toLowerCase().startsWith(ElAdminConstant.WIN)) {
+        if (os.toLowerCase().startsWith(UnicornCoreConstant.WIN)) {
             return windows;
-        } else if (os.toLowerCase().startsWith(ElAdminConstant.MAC)) {
+        } else if (os.toLowerCase().startsWith(UnicornCoreConstant.MAC)) {
             return mac;
         }
         return linux;

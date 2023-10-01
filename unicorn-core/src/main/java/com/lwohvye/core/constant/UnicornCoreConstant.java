@@ -21,7 +21,7 @@ package com.lwohvye.core.constant;
  * @author Zheng Jie
  * @date 2018-12-26
  */
-public class ElAdminConstant {
+public class UnicornCoreConstant {
 
     /**
      * 用于IP定位转换
