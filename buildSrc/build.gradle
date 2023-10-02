@@ -9,7 +9,7 @@ plugins {
 }
 
 ext {
-    asmVersion = '9.5' // 这里单双引号都可以
+    asmVersion = '9.6' // 这里单双引号都可以
 }
 
 dependencies {
