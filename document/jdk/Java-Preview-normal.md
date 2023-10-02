@@ -7,4 +7,4 @@
     - Enable the replacement of existing uses of ASM within the JDK, eventually enabling the removal of the JDK's
       internal copy of the ASM library. We may similarly be able to remove the JDK's two custom internal class-file
       libraries.
-- 
+- [OpenJDK ClassFile API and ASM (By ASM)](https://gitlab.ow2.org/asm/asm/-/issues/317978)
