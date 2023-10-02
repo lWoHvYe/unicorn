@@ -20,6 +20,7 @@ import com.lwohvye.core.utils.StringUtils;
 import com.wf.captcha.*;
 import com.wf.captcha.base.Captcha;
 import lombok.Data;
+import lombok.Synchronized;
 
 import java.awt.*;
 import java.util.Objects;
@@ -74,36 +75,35 @@ public class LoginProperties {
      * @param loginCode 验证码配置信息
      * @return /
      */
+    @Synchronized
     private Captcha switchCaptcha(LoginCode loginCode) {
         Captcha captcha;
-        synchronized (this) {
-            switch (loginCode.getCodeType()) {
-                case arithmetic -> {
-                    // 算术类型
-                    captcha = new ArithmeticCaptcha(loginCode.getWidth(), loginCode.getHeight());
-                    // 几位数运算，默认是两位
-                    captcha.setLen(loginCode.getLength());
-                }
-                case chinese -> {
-                    captcha = new ChineseCaptcha(loginCode.getWidth(), loginCode.getHeight());
-                    captcha.setLen(loginCode.getLength());
-                }
-                case chinese_gif -> {
-                    captcha = new ChineseGifCaptcha(loginCode.getWidth(), loginCode.getHeight());
-                    captcha.setLen(loginCode.getLength());
-                }
-                case gif -> {
-                    captcha = new GifCaptcha(loginCode.getWidth(), loginCode.getHeight());
-                    captcha.setLen(loginCode.getLength());
-                }
-                case spec -> {
-                    captcha = new SpecCaptcha(loginCode.getWidth(), loginCode.getHeight());
-                    captcha.setLen(loginCode.getLength());
-                }
-                default -> throw new BadConfigurationException("验证码配置信息错误！正确配置查看 LoginCodeEnum ");
+        switch (loginCode.getCodeType()) {
+            case arithmetic -> {
+                // 算术类型
+                captcha = new ArithmeticCaptcha(loginCode.getWidth(), loginCode.getHeight());
+                // 几位数运算，默认是两位
+                captcha.setLen(loginCode.getLength());
             }
+            case chinese -> {
+                captcha = new ChineseCaptcha(loginCode.getWidth(), loginCode.getHeight());
+                captcha.setLen(loginCode.getLength());
+            }
+            case chinese_gif -> {
+                captcha = new ChineseGifCaptcha(loginCode.getWidth(), loginCode.getHeight());
+                captcha.setLen(loginCode.getLength());
+            }
+            case gif -> {
+                captcha = new GifCaptcha(loginCode.getWidth(), loginCode.getHeight());
+                captcha.setLen(loginCode.getLength());
+            }
+            case spec -> {
+                captcha = new SpecCaptcha(loginCode.getWidth(), loginCode.getHeight());
+                captcha.setLen(loginCode.getLength());
+            }
+            default -> throw new BadConfigurationException("验证码配置信息错误！正确配置查看 LoginCodeEnum ");
         }
-        if(StringUtils.isNotBlank(loginCode.getFontName())){
+        if (StringUtils.isNotBlank(loginCode.getFontName())) {
             captcha.setFont(new Font(loginCode.getFontName(), Font.PLAIN, loginCode.getFontSize()));
         }
         return captcha;
