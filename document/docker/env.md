@@ -1,6 +1,10 @@
 #### RabbitMQ镜像集群
 
 ```shell
+
+docker cp rabbitmq_delayed_message_exchange-3.12.0.ez rabbitmq:/plugins
+rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+
 # 加入集群。先拷贝.erlang.cookie到各节点，然后在要加入的各节点上执行
 # 停止服务
 rabbitmqctl stop_app
@@ -19,4 +23,9 @@ rabbitmqctl set_policy ha-half -p /unicorn "^data\.|sp-sync" '{"ha-mode":"exactl
 
 ```shell
 change master to master_host='mysql',master_user='slave',master_password='123456',master_port=3306,master_log_file='replicas-mysql-bin.000001',master_log_pos=156,master_connect_retry=30,get_master_public_key=1;
+```
+
+#### Main
+```shell
+docker-compose -f docker-compose-env.yml up -d
 ```

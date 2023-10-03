@@ -89,7 +89,7 @@ services:
     ports:
       - 80:80
   rabbitmq:
-    image: rabbitmq:3.9.9-management
+    image: rabbitmq:3.12.6-management
     container_name: rabbitmq
     volumes:
       - /mydata/rabbitmq/data:/var/lib/rabbitmq #数据文件挂载
@@ -98,7 +98,7 @@ services:
       - 5672:5672
       - 15672:15672
   rabbitmq-p2:
-    image: rabbitmq:3.9.9-management
+    image: rabbitmq:3.12.6-management
     container_name: rabbitmq-p2
     volumes:
       - /mydata/rabbitmq-p2/data:/var/lib/rabbitmq #数据文件挂载
@@ -107,7 +107,7 @@ services:
       - 5674:5672
       - 15674:15672
   rabbitmq-p3:
-    image: rabbitmq:3.9.9-management
+    image: rabbitmq:3.12.6-management
     container_name: rabbitmq-p3
     volumes:
       - /mydata/rabbitmq-p3/data:/var/lib/rabbitmq #数据文件挂载
