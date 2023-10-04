@@ -30,7 +30,7 @@ import java.util.concurrent.ThreadFactory
 internal class VirtualThreadDelegate {
     private val threadBuilder: Thread.Builder = Thread.ofVirtual()
     fun virtualThreadFactory(): ThreadFactory {
-        return threadBuilder.name("Virtual-Spring").factory()
+        return threadBuilder.name("Virtual-Delegate").factory()
     }
 
     fun virtualThreadFactory(threadNamePrefix: String?): ThreadFactory {

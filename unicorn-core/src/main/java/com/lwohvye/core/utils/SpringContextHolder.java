@@ -28,6 +28,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -273,6 +274,58 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
      */
     public static <T> T getProperties(String property, Class<T> requiredType) {
         return getProperties(property, null, requiredType);
+    }
+
+    /**
+     * 获取当前的环境配置
+     *
+     * @return 当前的环境配置
+     */
+    public static String[] getActiveProfiles() {
+        if (Objects.isNull(applicationContext))
+            return new String[0];
+        return applicationContext.getEnvironment().getActiveProfiles();
+    }
+
+    /**
+     * 获取当前的环境配置，当有多个环境配置时，只获取第一个
+     *
+     * @return 当前的环境配置
+     */
+    public static String getActiveProfile() {
+        var activeProfiles = getActiveProfiles();
+        return activeProfiles.length != 0 ? activeProfiles[0] : null;
+    }
+
+    /**
+     * 动态向Spring注册Bean
+     * <p>
+     * 由{@link org.springframework.beans.factory.BeanFactory} 实现，通过工具开放API
+     * <p>
+     *
+     * @param <T>      Bean类型
+     * @param beanName 名称
+     * @param bean     bean
+     */
+    public static <T> void registerBean(String beanName, T bean) {
+        var factory = getConfigurableBeanFactory();
+        factory.autowireBean(bean);
+        factory.registerSingleton(beanName, bean);
+    }
+
+    /**
+     * 注销bean
+     * <p>
+     * 将Spring中的bean注销，请谨慎使用
+     *
+     * @param beanName bean名称
+     */
+    public static void unregisterBean(String beanName) {
+        var factory = getConfigurableBeanFactory();
+        if (factory instanceof DefaultSingletonBeanRegistry registry)
+            registry.destroySingleton(beanName);
+        else
+            throw new UtilsException("Can not unregister bean, the factory is not a DefaultSingletonBeanRegistry!");
     }
 
     /**

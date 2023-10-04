@@ -74,7 +74,7 @@ public class AuthRetryService {
      * @Retryable – 表示这个方法需要重试，它有很丰富的参数，可以满足你对重试的需求
      * recover：指定兜底/补偿的方法名。如果不指定，默认对照 @Recover 标识的，第一入参为重试异常，其余入参和出参一致的方法；
      * interceptor：指定方法切面 bean， org.aopalliance.intercept.MethodInterceptor 实现类
-     * value / include：两者用途一致，指出哪些类型需要重试；
+     * retryFor / include：两者用途一致，指出哪些类型需要重试；
      * exclude：和 include 相反，指出哪些异常不需要重试；
      * label：可以指定唯一标签，用于统计；
      * stateful：默认false。重试是否是有状态的；
@@ -111,7 +111,7 @@ public class AuthRetryService {
      * @Recover标记的方法需与@Retryable标记的方法在同一类中
      * @date 2021/4/23 1:13 下午
      */
-    @Retryable(value = IllegalAccessException.class, maxAttempts = 5,
+    @Retryable(retryFor = IllegalAccessException.class, maxAttempts = 5,
             backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
     public void retryService(String str) throws IllegalAccessException {
         log.info("service method...      start");

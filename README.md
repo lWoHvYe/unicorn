@@ -180,20 +180,18 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 	    - rabbitmq 消息队列相关
 	    - security 核心权限控制
 	    - system 用户-权限管理
-- unicorn-starter 系统启动入口。相关示例
 - unicorn-logging 系统日志模块
     - aspect 基于Anno的log切面
     - rabbitmq Async log
-- unicorn-tp-tools 系统第三方工具模块(kotlin)
-- unicorn-code-gen 系统代码生成模块(kotlin)
-- loom-20-ext 在Java 20使用SpringBoot 并Enable其对VT的Support的兼容包
+- unicorn-tp-tools-kotlin 系统第三方工具模块(kotlin)
+- unicorn-code-gen-kotlin 系统代码生成模块(kotlin)
 ```
 
 #### 运行环境
 
 - Java 21 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
-- Redis 6.0 缓存
+- Redis 7.2 缓存
 - RabbitMQ 发布-订阅（解耦、异步）
 - ELK 日志系统，config for prod env
 - 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ记得装延迟插件，ES记得装IK
