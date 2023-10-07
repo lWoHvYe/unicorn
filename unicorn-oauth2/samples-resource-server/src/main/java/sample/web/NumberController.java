@@ -16,6 +16,7 @@
 
 package sample.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ import sample.utils.ReactiveSecurityUtils;
 
 import java.time.Duration;
 
+@Slf4j
 @RestController
 public class NumberController {
 
@@ -61,6 +63,15 @@ public class NumberController {
                         numbers.map(String::valueOf),
                         ReactiveSecurityUtils.getCurrentUsernameSham(),
                         endFlux)
+                .doFirst(() -> log.info("start generate response"))
+                .doFinally(signalType -> {
+                    switch (signalType) {
+                        case ON_COMPLETE, CANCEL -> log.info("Complete Success");
+                        case ON_ERROR -> log.info("Terminate by Error");
+                        default -> log.info("Terminate by other reason");
+
+                    }
+                })
                 .delayElements(Duration.ofSeconds(1));
     }
 }

@@ -17,6 +17,7 @@
 package sample.utils;
 
 import jakarta.security.auth.message.AuthException;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -25,6 +26,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
 
 @Slf4j
+@UtilityClass
 public class ReactiveSecurityUtils {
     // 这段代码是一个用于获取当前用户名的方法，返回一个 `Mono<String>`。它使用了 Reactor 的响应式编程风格。
     //总体而言，这段代码使用了 Reactor 提供的响应式操作符对安全上下文进行处理，并返回一个 `Mono`，以支持异步非阻塞的响应式编程模型。
@@ -79,6 +81,15 @@ public class ReactiveSecurityUtils {
     //2. 使用 `switchIfEmpty` 替代 `defaultIfEmpty`：`switchIfEmpty` 操作符可以更直观地指定当流为空时的替代逻辑。
     //3. 使用 `map` 替代 `handle`：由于处理操作只是根据 `principal` 的类型进行转换，可以使用 `map` 操作符结合条件判断来达到相同的效果，而不必使用 `handle`。
     //通过这些优化，代码更加简洁、清晰，并且减少了嵌套层级，提高了代码的可读性和可维护性。
+    // map 操作符：
+    //  map 操作符用于将每个流中的元素应用一个函数，并将函数的结果包装成一个新的元素，最终返回一个新的流。
+    //  map 操作符的函数返回的是一个普通的值，而不是一个包含多个元素的流。
+    //  map 操作符的输出流的元素个数和输入流的元素个数相同，一一对应。
+    // flatMap 操作符：
+    //  flatMap 操作符用于将每个流中的元素应用一个函数，这个函数的返回值是一个新的流，然后将这些新的流合并成一个输出流。
+    //  flatMap 操作符的函数返回的是一个包含多个元素的流，因此可以将多个流合并成一个。
+    //  flatMap 操作符通常用于处理嵌套的流或执行异步操作。
+    //map 用于简单的一对一元素转换。flatMap 用于处理一对多的元素转换或进行流的合并操作。在下例中若将flatMap改为map需return String而非Mono<String>
     public static Mono<String> getCurrentUsernameSham() {
         return ReactiveSecurityContextHolder.getContext()
                 .filter(c -> c.getAuthentication() != null)
