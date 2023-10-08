@@ -17,7 +17,7 @@ package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.extension.StringExtensionMethod;
-import lombok.Synchronized;
+import lombok.Locked;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -146,7 +146,7 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
      *
      * @param callBack 回调函数
      */
-    @Synchronized
+    @Locked
     public static void addCallBacks(CallBack callBack) {
         if (addCallback) {
             SpringContextHolder.CALL_BACKS.add(callBack);
