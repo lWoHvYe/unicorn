@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.sys.modules.security.security;
+package com.lwohvye.sys.modules.security.core;
 
 import cn.hutool.core.util.IdUtil;
 import com.lwohvye.sys.modules.mnt.websocket.MsgType;

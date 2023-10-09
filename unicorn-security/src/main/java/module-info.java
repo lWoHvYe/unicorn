@@ -41,11 +41,11 @@ module lwohvye.unicorn.security {
     exports com.lwohvye.sys.modules.quartz.utils to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.rabbitmq.service; // 这个要export to spring.beans和unnamed module。消费者应该都是这样的
     exports com.lwohvye.sys.modules.rabbitmq.config;
+    exports com.lwohvye.sys.modules.security.core;
+    exports com.lwohvye.sys.modules.security.core.filter;
+    exports com.lwohvye.sys.modules.security.core.handler;
     exports com.lwohvye.sys.modules.security.service;
     exports com.lwohvye.sys.modules.security.service.dto;
-    exports com.lwohvye.sys.modules.security.security;
-    exports com.lwohvye.sys.modules.security.security.filter;
-    exports com.lwohvye.sys.modules.security.security.handler;
     exports com.lwohvye.sys.modules.security.rest to spring.beans, spring.aop, spring.web;
     exports com.lwohvye.sys.modules.system.annotation;
     exports com.lwohvye.sys.modules.system.enums;

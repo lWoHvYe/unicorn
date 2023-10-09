@@ -13,9 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.sys.modules.security.security;
+package com.lwohvye.sys.modules.security.core;
 
-import com.lwohvye.sys.modules.security.security.filter.JwtAuthenticationTokenFilter;
+import com.lwohvye.sys.modules.security.core.filter.JwtAuthenticationTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

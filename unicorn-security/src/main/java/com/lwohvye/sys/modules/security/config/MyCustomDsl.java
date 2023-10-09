@@ -17,8 +17,8 @@
 package com.lwohvye.sys.modules.security.config;
 
 import com.lwohvye.core.utils.JDKUtils;
-import com.lwohvye.sys.modules.security.security.filter.CustomAuthenticationCaptchaFilter;
-import com.lwohvye.sys.modules.security.security.filter.CustomAuthenticationFilter;
+import com.lwohvye.sys.modules.security.core.filter.CustomAuthenticationCaptchaFilter;
+import com.lwohvye.sys.modules.security.core.filter.CustomAuthenticationFilter;
 import com.lwohvye.core.utils.SpringContextHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

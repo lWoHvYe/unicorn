@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.security.security;
+package com.lwohvye.sys.modules.security.core;
 
 import com.lwohvye.core.constant.SecurityConstant;
 import org.springframework.security.access.ConfigAttribute;
