@@ -30,7 +30,6 @@ dependencyResolutionManagement {
         libs {
             // 启用versionCatalogs
             version('asm', '9.6') // 这里单双引号都可以
-            version('authorizationServer', '1.1.2')
             version('bizlog', '3.0.6')
             version('captcha', '2.1.0')
             version('commonsBeanutils', '1.9.4')
@@ -64,7 +63,6 @@ dependencyResolutionManagement {
             plugin('kotlin-lombok', 'org.jetbrains.kotlin.plugin.lombok').versionRef('kotlin')
 
             library('asm', 'org.ow2.asm', 'asm').versionRef('asm')
-            library('authorization-server', 'org.springframework.security', 'spring-security-oauth2-authorization-server').versionRef('authorizationServer')
             library('bizlog', 'io.github.mouzt', 'bizlog-sdk').versionRef('bizlog')
             library('captcha', 'com.lwohvye.captcha', 'captcha-spring-boot-starter').versionRef('captcha')
             library('commons-beanutils', 'commons-beanutils', 'commons-beanutils').versionRef('commonsBeanutils')
