@@ -24,19 +24,23 @@ tasks.withType<JavaCompile> {
     options.javaModuleVersion = provider { project.version as String }
 }
 
+val sharedManifest = java.manifest {
+    attributes(
+        "Developer" to "lWoHvYe",
+        "Created-By" to "Gradle",
+        "Built-By" to System.getProperty("user.name"),
+        "Build-Jdk-Spec" to System.getProperty("java.version"),
+    )
+}
+
 tasks.jar {
     enabled = true
     manifest {
+        from(sharedManifest)
         attributes(
-            mapOf(
-                "Developer" to "lWoHvYe",
-                "Created-By" to "Gradle",
-                "Built-By" to System.getProperty("user.name"),
-                "Build-Jdk-Spec" to System.getProperty("java.version"),
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version,
-                "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
-            )
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version,
+            "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
@@ -60,7 +64,7 @@ publishing {
             pom {
                 name.set("Unicorn Core")
                 description.set("Core module with BaseConfig, Utils, QueryAnno and so on")
-                url.set("https://github.com/WHY-lWoHvYe/valentine-p2p.git")
+                url.set("https://github.com/lWoHvYe/unicorn.git")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
@@ -76,9 +80,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/WHY-lWoHvYe/valentine-p2p.git")
-                    developerConnection.set("scm:git:ssh://github.com/WHY-lWoHvYe/valentine-p2p.git")
-                    url.set("https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main")
+                    connection.set("scm:git:git://github.com/lWoHvYe/unicorn.git")
+                    developerConnection.set("scm:git:ssh://github.com/lWoHvYe/unicorn.git")
+                    url.set("https://github.com/lWoHvYe/unicorn/tree/main")
                 }
             }
         }

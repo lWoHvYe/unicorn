@@ -65,7 +65,7 @@ spring:
           useInsecureTrustManager: true
           handshake-timeout: 5000ms
       routes:
-        - id: resource
+        - id: resource-service
           uri: http://localhost:8090
           predicates:
             - Path=/res/**

@@ -3,8 +3,6 @@ plugins {
     id("io.spring.dependency-management")
 }
 
-extra["springCloudVersion"] = project.findProperty("springCloudVersion") as String
-
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")

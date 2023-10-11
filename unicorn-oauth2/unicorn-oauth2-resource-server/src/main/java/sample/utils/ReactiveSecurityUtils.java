@@ -55,13 +55,13 @@ public class ReactiveSecurityUtils {
                             var principal = authentication.getPrincipal();
                             //   - 如果 `principal` 是 `UserDetails` 的实例，将其转换为 `UserDetails`，并使用 `sink.next()` 发出用户名。
                             if (principal instanceof UserDetails userDetails) {
-                                log.warn("...." + userDetails.getUsername());
+                                log.warn("UserDetails.... {} ", userDetails.getUsername());
                                 sink.next(userDetails.getUsername());
                                 return;
                             }
                             if (principal instanceof Jwt jwt) {
                                 var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
-                                log.warn("...." + clientDetail);
+                                log.warn("Jwt.... {} n_n {} ", clientDetail, jwt.getClaims().getOrDefault("userId", "ANONYMOUS"));
                                 sink.next(clientDetail);
                                 return;
                             }
@@ -97,12 +97,12 @@ public class ReactiveSecurityUtils {
                 .flatMap(authentication -> {
                     var principal = authentication.getPrincipal();
                     if (principal instanceof UserDetails userDetails) {
-                        log.warn("...." + userDetails.getUsername());
+                        log.warn("UserDetails.... {} ", userDetails.getUsername());
                         return Mono.just(userDetails.getUsername());
                     }
                     if (principal instanceof Jwt jwt) {
                         var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
-                        log.warn("...." + clientDetail);
+                        log.warn("Jwt.... {} n_n {} ", clientDetail, jwt.getClaims().getOrDefault("userId", "ANONYMOUS"));
                         return Mono.just(clientDetail);
                     }
                     return Mono.error(new AuthException("找不到当前登录的信息: " + principal));

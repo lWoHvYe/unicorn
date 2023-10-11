@@ -27,17 +27,8 @@ plugins {
 }
 
 ext {
-    graalvmEnable = false // 这个能在同为 Groovy DSL的sub-project中使用
+    graalvmEnable = false // 这个若在Kotlin DSL中使用，首先需要Kotlin Support run on current JDK
 }
-
-ext.sharedManifest = manifest {
-    attributes(
-            'Developer': 'lWoHvYe',
-            'Created-By': 'Gradle',
-            'Built-By': System.properties['user.name'],
-            'Build-Jdk-Spec': "${System.properties['java.version']}"
-    )
-} as DefaultManifest
 
 subprojects {
 
@@ -123,7 +114,7 @@ publishing {
                 packaging = 'pom'
                 // optionally artifactId can be defined here
                 description = 'A Spring Boot Project With Jpa JWT Security and so on'
-                url = 'https://github.com/WHY-lWoHvYe/valentine-p2p.git'
+                url = 'https://github.com/lWoHvYe/unicorn.git'
                 properties = [
                         myProp                : "chaste unicorn",
                         "spring-boot.version" : "${springBootVersion}",
@@ -144,9 +135,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/WHY-lWoHvYe/valentine-p2p.git'
-                    developerConnection = 'scm:git:ssh://github.com/WHY-lWoHvYe/valentine-p2p.git'
-                    url = 'https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main'
+                    connection = 'scm:git:git://github.com/lWoHvYe/unicorn.git'
+                    developerConnection = 'scm:git:ssh://github.com/lWoHvYe/unicorn.git'
+                    url = 'https://github.com/lWoHvYe/unicorn/tree/main'
                     tag = "unicorn-v${version}"
                 }
             }

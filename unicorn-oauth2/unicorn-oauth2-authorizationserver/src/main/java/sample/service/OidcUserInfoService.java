@@ -47,7 +47,7 @@ public class OidcUserInfoService {
                 // The class with java.util.ImmutableCollections$ListN and name of java.util.ImmutableCollections$ListN is not in the allowlist.
                 // If you believe this class is safe to deserialize, please provide an explicit mapping using Jackson annotations or by providing a Mixin.
                 // If the serialization is only done by a trusted source, you can also enable default typing. See https://github.com/spring-projects/spring-security/issues/4370 for details
-                // 有相关的限制，这里的value不能是Long类型，String可以
+                // 有相关的限制，这里的value不能是Long类型，String可以，但实际中，不建议使用userId，而更应用subject/username这些
                 .claim("userId", user.getId().toString())
                 .build();
     }

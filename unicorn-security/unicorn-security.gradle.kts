@@ -58,7 +58,7 @@ publishing {
             pom {
                 name.set("Unicorn Security Control")
                 description.set("Security module with Control and Management")
-                url.set("https://github.com/WHY-lWoHvYe/valentine-p2p.git")
+                url.set("https://github.com/lWoHvYe/unicorn.git")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
@@ -74,9 +74,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/WHY-lWoHvYe/valentine-p2p.git")
-                    developerConnection.set("scm:git:ssh://github.com/WHY-lWoHvYe/valentine-p2p.git")
-                    url.set("https://github.com/WHY-lWoHvYe/valentine-p2p/tree/main")
+                    connection.set("scm:git:git://github.com/lWoHvYe/unicorn.git")
+                    developerConnection.set("scm:git:ssh://github.com/lWoHvYe/unicorn.git")
+                    url.set("https://github.com/lWoHvYe/unicorn/tree/main")
                 }
             }
         }
