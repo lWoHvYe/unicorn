@@ -18,17 +18,21 @@ package sample;
 import com.lwohvye.core.utils.SpringContextHolder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * @author Joe Grandja
  * @since 0.0.1
  */
+@EnableJpaRepositories
+@EntityScan
 @SpringBootApplication
-public class SamplesResourceApplication {
+public class OAuth2ResourceMVCApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SamplesResourceApplication.class, args);
+		SpringApplication.run(OAuth2ResourceMVCApplication.class, args);
 	}
 
 	@Bean

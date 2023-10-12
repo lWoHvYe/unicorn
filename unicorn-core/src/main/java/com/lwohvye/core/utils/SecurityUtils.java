@@ -24,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
  * 获取当前登录的用户
@@ -56,6 +57,8 @@ public class SecurityUtils {
         var principal = authentication.getPrincipal();
         if (principal instanceof UserDetails userDetails)
             return userDetails.getUsername();
+        if (principal instanceof Jwt jwt)
+            return jwt.getSubject();
         throw new BadRequestException(HttpStatus.UNAUTHORIZED, "找不到当前登录的信息");
     }
 

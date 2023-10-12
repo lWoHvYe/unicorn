@@ -1,0 +1,92 @@
+server:
+  port: 8090
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+#    org.springframework.boot.autoconfigure: DEBUG
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9000
+  threads:
+    virtual:
+      enabled: true
+
+  #配置 Jpa
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_no_trans: true
+    open-in-view: true
+    hibernate:
+      ddl-auto: none
+
+#配置数据源
+#  datasource:
+#    driverClassName: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:unicorn}
+#    username: ${DB_USER:}
+#    password: ${DB_PWD:}
+#
+#    hikari:
+#      # When the pool reaches this size, and no idle connections are available, calls to getConnection() will block for up to connectionTimeout milliseconds before timing out. Please read about pool sizing. Default: 10
+#      maximum-pool-size: 10
+#      pool-name: Resource-Server
+#      connection-test-query: SELECT 1
+
+  # cache配置
+  cache:
+    type: redis
+  # redis配置
+  redis:
+    #详细版的redisson配置可参考：https://github.com/redisson/redisson/tree/master/redisson-spring-boot-starter
+    redisson:
+      config: |
+        singleServerConfig:
+          idleConnectionTimeout: 10000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+          password: redis-psd
+          subscriptionsPerConnection: 5
+          clientName: null
+          address: redis://10.211.55.140:6379
+          subscriptionConnectionMinimumIdleSize: 2
+          subscriptionConnectionPoolSize: 16
+          connectionMinimumIdleSize: 8
+          connectionPoolSize: 16
+          database: 6
+          dnsMonitoringInterval: 5000
+        codec: !<org.redisson.codec.JsonJacksonCodec> { }
+        "transportMode": "NIO"
+
+  ##### RabbitMQ ####
+  rabbitmq:
+    #    RabbitMQ集群，通过addresses配置，多个以逗号分隔(优先取addresses，然后再取host)
+    addresses: 10.211.55.140:5672
+    virtual-host: /unicorn # rabbitmq的虚拟host
+    username: admin # rabbitmq的用户名
+    password: admin # rabbitmq的密码
+    ####开始消费最大重试次数，避免一直重复消费的问题
+    listener:
+      simple:
+        concurrency: 1 # Minimum number of consumers.
+        max-concurrency: 20 # Maximum number of consumers.
+        prefetch: 50
+        default-requeue-rejected: true #意思是，消息被拒后（即未消费），重新（true）放入队列
+        retry:
+          enabled: true #是否开启消费者重试（为false时关闭消费者重试，这时消费端代码异常会一直重复收到消息）
+          max-attempts: 3 #最大重试次数
+          initial-interval: 5000ms
+  r2dbc:
+    url: r2dbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:unicorn}
+    username: ${DB_USER:}
+    password: ${DB_PWD:}

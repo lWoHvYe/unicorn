@@ -36,7 +36,7 @@ public class ResourceServerSecurityConfig {
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(authorizeHttpRequests -> authorizeHttpRequests
+                .authorizeExchange((authorize) -> authorize
                         // 需要特定authority
                         .pathMatchers("/api/messages").hasAuthority("SCOPE_message.read")
                         .pathMatchers(HttpMethod.GET, "/api/resource").hasAuthority("SCOPE_resource.read")
@@ -47,7 +47,7 @@ public class ResourceServerSecurityConfig {
                         .pathMatchers("/explore/**", "/webjars/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         // 需要登陆才可访问，这个一般是主体
                         .anyExchange().authenticated())
-                .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
+                .oauth2ResourceServer((oauth2) -> oauth2
                         .jwt(withDefaults()));
         return http.build();
     }

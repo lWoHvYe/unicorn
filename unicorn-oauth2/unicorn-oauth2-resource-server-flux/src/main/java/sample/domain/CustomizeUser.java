@@ -15,40 +15,33 @@
  */
 package sample.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Set;
 
-@Entity
 @Getter
 @Setter
+@ToString
 @Accessors(chain = true)
-@Table(name = "sys_role")
-public class CustomizeRole implements Serializable {
+@Table(name = "sys_user")
+public class CustomizeUser implements Serializable {
 
     @Id
-    @Column(name = "role_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "customizeRoles")
-    private Set<CustomizeUser> customizeUsers;
+    private String username;
 
-    private String name;
+    private String email;
 
-    private String code;
+    private String phone;
 
-    @Column(name = "level")
-    private Integer level = 3;
-
-    private String description;
+    private String gender;
 
     @Override
     public boolean equals(Object o) {
@@ -58,12 +51,13 @@ public class CustomizeRole implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CustomizeRole customizeRole = (CustomizeRole) o;
-        return Objects.equals(id, customizeRole.id);
+        CustomizeUser customizeUser = (CustomizeUser) o;
+        return Objects.equals(userId, customizeUser.userId) &&
+                Objects.equals(username, customizeUser.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(userId, username);
     }
 }

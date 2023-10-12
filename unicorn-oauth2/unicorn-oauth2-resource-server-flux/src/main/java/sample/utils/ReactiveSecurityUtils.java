@@ -16,12 +16,12 @@
 
 package sample.utils;
 
-import jakarta.security.auth.message.AuthException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import reactor.core.publisher.Mono;
 
@@ -62,11 +62,11 @@ public class ReactiveSecurityUtils {
                             if (principal instanceof Jwt jwt) {
                                 var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
                                 log.warn("Jwt.... {} n_n {} ", clientDetail, jwt.getClaims().getOrDefault("userId", "ANONYMOUS"));
-                                sink.next(clientDetail);
+                                sink.next(jwt.getSubject());
                                 return;
                             }
                             //   - 如果 `principal` 不是 `UserDetails` 的实例，使用 `sink.error()` 抛出一个自定义的 `AuthException` 异常。
-                            sink.error(new AuthException("找不到当前登录的信息: " + principal));
+                            sink.error(new UsernameNotFoundException("找不到当前登录的信息: " + principal));
                         }))
                 //6. 使用 `doOnSuccess` 在成功时执行一些操作，这里是记录用户名的日志。
                 .doOnSuccess(it -> log.info("userName {} ", it))
@@ -103,9 +103,9 @@ public class ReactiveSecurityUtils {
                     if (principal instanceof Jwt jwt) {
                         var clientDetail = jwt.getSubject() + " -> " + jwt.getIssuer();
                         log.warn("Jwt.... {} n_n {} ", clientDetail, jwt.getClaims().getOrDefault("userId", "ANONYMOUS"));
-                        return Mono.just(clientDetail);
+                        return Mono.just(jwt.getSubject());
                     }
-                    return Mono.error(new AuthException("找不到当前登录的信息: " + principal));
+                    return Mono.error(new UsernameNotFoundException("找不到当前登录的信息: " + principal));
                 })
                 .doOnSuccess(username -> log.info("userName {} ", username))
                 .doOnError(ex -> log.info("error {} ", ex.getMessage()))

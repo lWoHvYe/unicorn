@@ -51,6 +51,7 @@ module lwohvye.unicorn.core {
     requires transitive org.bouncycastle.pkix;
     requires transitive org.bouncycastle.provider;
     requires net.coobird.thumbnailator;
+    requires spring.security.oauth2.jose;
 
     exports com.lwohvye.core.advice;
     exports com.lwohvye.core.annotation;
