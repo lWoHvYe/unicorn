@@ -18,6 +18,7 @@ package com.lwohvye.core.utils;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.enums.DataScopeEnum;
 import com.lwohvye.core.utils.json.JsonUtils;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -33,6 +34,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
  * @date 2019-01-17
  */
 @Slf4j
+@UtilityClass
 public class SecurityUtils {
 
     /**

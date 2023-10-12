@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sample.domain.CustomizeUser;
 import sample.repo.CustomizeUserInfoRepository;
 
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class OidcUserInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public OidcUserInfo loadUser(String username) {
-        var user = customizeUserInfoRepository.findByUsername(username);
+        var user = customizeUserInfoRepository.findByUsername(username).orElseGet(CustomizeUser::new);
         return OidcUserInfo.builder()
                 .subject(username)
                 .name(username)
@@ -48,7 +49,7 @@ public class OidcUserInfoService {
                 // If you believe this class is safe to deserialize, please provide an explicit mapping using Jackson annotations or by providing a Mixin.
                 // If the serialization is only done by a trusted source, you can also enable default typing. See https://github.com/spring-projects/spring-security/issues/4370 for details
                 // 有相关的限制，这里的value不能是Long类型，String可以，但实际中，不建议使用userId，而更应用subject/username这些
-                .claim("userId", user.getId().toString())
+                .claim("userId", String.valueOf(user.getId()))
                 .build();
     }
 }

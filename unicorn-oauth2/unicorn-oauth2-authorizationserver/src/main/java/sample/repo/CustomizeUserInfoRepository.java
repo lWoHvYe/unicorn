@@ -20,8 +20,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import sample.domain.CustomizeUser;
 
+import java.util.Optional;
+
 @Repository
 public interface CustomizeUserInfoRepository extends JpaRepository<CustomizeUser,Long> {
 
-    CustomizeUser findByUsername(String username);
+    Optional<CustomizeUser> findByUsername(String username);
 }

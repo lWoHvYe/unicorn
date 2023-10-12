@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sample.domain.CustomizeUser;
 import sample.repo.CustomizeUserInfoRepository;
 
 @Service
@@ -35,7 +36,7 @@ public class CustomizeUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var customizeUser = customizeUserInfoRepository.findByUsername(username);
+        var customizeUser = customizeUserInfoRepository.findByUsername(username).orElseGet(CustomizeUser::new);
 
         return User.builder()
                 .username(customizeUser.getUsername())
