@@ -25,10 +25,13 @@ import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.security.utils.SecuritySysUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -49,14 +52,20 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 // InitializingBean的用法基本上与@PostConstruct一致，只不过相应的Bean需要实现afterPropertiesSet方法。用于在bean初始化之后执行一些操作
-public class TokenProvider {
+public class TokenProvider implements InitializingBean {
 
     private final SecurityProperties properties;
     private final RedissonClient redisson;
     private final UserDetailsService userDetailsService;
     public static final String AUTHORITIES_KEY = "user";
 
-    public static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
+    private SecretKey secretKey;
+
+    @Override
+    public void afterPropertiesSet() {
+        var secretString = properties.getBase64Secret();
+        secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
+    }
 
     /**
      * 创建Token ，
@@ -101,7 +110,7 @@ public class TokenProvider {
                 .issuedAt(DateUtils.toDate(curDate))
                 // 设置过期时间，
                 .expiration(expirationDate)
-                .signWith(SECRET_KEY)
+                .signWith(secretKey)
                 .compact();
     }
 
@@ -125,7 +134,7 @@ public class TokenProvider {
         // 解密的算法由header中指定，后续看看有没有办法固定化。加密是🧷的
         return Jwts.parser()
                 // .keyLocator(keyLocator) // (2) dynamically locate signing or encryption keys
-                .verifyWith(SECRET_KEY)      //     or a constant key used to verify all signed JWTs
+                .verifyWith(secretKey)      //     or a constant key used to verify all signed JWTs
                 //.decryptWith(key)     //     or a constant key used to decrypt all encrypted JWTs
                 .build()
                 .parseSignedClaims(token)

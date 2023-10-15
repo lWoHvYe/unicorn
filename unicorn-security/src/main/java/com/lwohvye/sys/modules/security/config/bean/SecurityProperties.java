@@ -37,6 +37,11 @@ public class SecurityProperties {
     private String tokenStartWith = "Bearer";
 
     /**
+     * 必须使用Base64对该令牌进行编码
+     */
+    private String base64Secret;
+
+    /**
      * 令牌过期时间 此处单位/秒。默认2小时
      */
     private Long tokenValidityInSeconds = 7200L;
