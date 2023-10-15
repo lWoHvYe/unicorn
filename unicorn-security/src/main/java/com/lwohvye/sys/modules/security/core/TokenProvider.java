@@ -16,20 +16,19 @@
 package com.lwohvye.sys.modules.security.core;
 
 import cn.hutool.core.util.IdUtil;
+import com.lwohvye.core.utils.DateUtils;
 import com.lwohvye.sys.modules.mnt.websocket.MsgType;
 import com.lwohvye.sys.modules.mnt.websocket.SocketMsg;
 import com.lwohvye.sys.modules.mnt.websocket.WebSocketServer;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.security.utils.SecuritySysUtil;
-import com.lwohvye.core.utils.DateUtils;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -37,9 +36,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -51,26 +49,14 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 // InitializingBean的用法基本上与@PostConstruct一致，只不过相应的Bean需要实现afterPropertiesSet方法。用于在bean初始化之后执行一些操作
-public class TokenProvider implements InitializingBean {
+public class TokenProvider {
 
     private final SecurityProperties properties;
     private final RedissonClient redisson;
     private final UserDetailsService userDetailsService;
     public static final String AUTHORITIES_KEY = "user";
-    private JwtParser jwtParser;
-    private JwtBuilder jwtBuilder;
 
-    @Override
-    public void afterPropertiesSet() {
-        byte[] keyBytes = Decoders.BASE64.decode(properties.getBase64Secret());
-        Key key = Keys.hmacShaKeyFor(keyBytes);
-        jwtParser = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build();
-        jwtBuilder = Jwts.builder()
-                // 这里指定了加密算法和密钥
-                .signWith(key, SignatureAlgorithm.HS512);
-    }
+    public static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
 
     /**
      * 创建Token ，
@@ -99,22 +85,23 @@ public class TokenProvider implements InitializingBean {
     public String createToken(Authentication authentication) {
         var curDate = LocalDateTime.now();
         final Date expirationDate = DateUtils.toDate(curDate.plusSeconds(properties.getTokenValidityInSeconds()));
-        return jwtBuilder
+        return Jwts.builder()
                 // 加入ID确保生成的 Token 都不一致
-                .setId(IdUtil.simpleUUID())
+                .id(IdUtil.simpleUUID())
                 // 签发者
-                .setIssuer("lWoHvYe")
+                .issuer("lWoHvYe")
                 // 私有声明。权限作为偏动态的，不放入token中
                 .claim(AUTHORITIES_KEY, authentication.getName())
                 // 这里放入了username。然后在 getAuthentication()中，解密并取出来，构建了Authentication。
                 // 在doFilter()中，将Authentication存入上下文。SecurityContextHolder.getContext().setAuthentication(authentication);
                 // 在getCurrentUser()中，从上下文中取出Authentication，然后根据其中的username，通过方法获取用户信息并返回。userDetailsService.loadUserByUsername(getCurrentUsername());
                 // 所以请求携带的token中，比较主要的属性就是username。用户的具体信息，都是通过用户名称去方法中获取的。这样做使得在用户的角色权限等变更时，原token可继续使用，且权限已为最新的
-                .setSubject(authentication.getName())
+                .subject(authentication.getName())
                 // 设置颁发时间
-                .setIssuedAt(DateUtils.toDate(curDate))
+                .issuedAt(DateUtils.toDate(curDate))
                 // 设置过期时间，
-                .setExpiration(expirationDate)
+                .expiration(expirationDate)
+                .signWith(SECRET_KEY)
                 .compact();
     }
 
@@ -136,9 +123,13 @@ public class TokenProvider implements InitializingBean {
 
     public Claims getClaims(String token) {
         // 解密的算法由header中指定，后续看看有没有办法固定化。加密是🧷的
-        return jwtParser
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser()
+                // .keyLocator(keyLocator) // (2) dynamically locate signing or encryption keys
+                .verifyWith(SECRET_KEY)      //     or a constant key used to verify all signed JWTs
+                //.decryptWith(key)     //     or a constant key used to decrypt all encrypted JWTs
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**

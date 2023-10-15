@@ -34,7 +34,7 @@ suspend fun massiveRun(action: suspend () -> Unit) {
     println("Completed ${n * k} actions in $time ms")
 }
 
-@OptIn(DelicateCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 val counterContext = newSingleThreadContext("CounterContext")
 var counter = 0
 

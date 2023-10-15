@@ -41,9 +41,9 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorize -> authorize
-//                        .pathMatchers("/public/**","/unicorn/**").permitAll()
-//                        .anyExchange().authenticated()
-                                .anyExchange().permitAll()
+                        .pathMatchers("/","/index","**.html").permitAll()
+                        .pathMatchers("/public/**","/unicorn/**","/res/**").permitAll()
+                        .anyExchange().authenticated()
                 )
                 .oauth2Login(withDefaults())
                 .formLogin(withDefaults())

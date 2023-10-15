@@ -37,5 +37,13 @@ public interface CallBack extends Runnable {
     default String getCallBackName() {
         return Thread.currentThread().threadId() + ":" + this.getClass().getName();
     }
+
+    default <T> void onSuccess(T result) {
+
+    }
+
+    default void onError(Throwable error) {
+
+    }
 }
 

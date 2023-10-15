@@ -20,7 +20,6 @@ module lwohvye.unicorn.security {
     requires transitive io.netty.common;
     requires transitive org.apache.tomcat.embed.websocket;
     requires transitive jjwt.api;
-    requires transitive jjwt.impl;
     requires transitive org.apache.commons.io;
     requires transitive quartz;
 

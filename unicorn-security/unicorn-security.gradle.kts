@@ -86,9 +86,7 @@ publishing {
 dependencies {
     api(project(":unicorn-sys-api"))
     api("org.springframework.boot:spring-boot-starter-websocket")
-    api(libs.jjwt.api)
-    api(libs.jjwt.impl)
-    api(libs.jjwt.jackson)
+    api(libs.jjwt)
     api(libs.quartz)
     api(libs.easy.captcha)
     "captchaImplementation"(libs.captcha)

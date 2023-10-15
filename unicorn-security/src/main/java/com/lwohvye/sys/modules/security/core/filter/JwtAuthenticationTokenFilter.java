@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.security.core.filter;
 import com.lwohvye.sys.modules.security.core.TokenProvider;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class JwtAuthenticationTokenFilter extends GenericFilterBean {
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 }
-            } catch (ExpiredJwtException e) {
+            } catch (JwtException e) {
                 log.error(e.getMessage());
             }
         }
