@@ -15,9 +15,21 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          check-latest: true
+          server-id: github 
+          settings-path: ${{ github.workspace }} 
+
       - name: update gradle
         id: gradleUpdate
         uses: EdwarDDay/upgrade-gradle-action@v1
+
+      - name: remove tmp settings.xml & toolchains.xml
+        run: rm settings.xml toolchains.xml
 
       - name: create pull request
         uses: peter-evans/create-pull-request@v5
