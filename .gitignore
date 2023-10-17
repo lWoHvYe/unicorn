@@ -284,3 +284,7 @@ Temporary Items
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+
+### Temp File
+settings.xml
+toolchains.xml
