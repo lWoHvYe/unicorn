@@ -3,6 +3,8 @@ name: Gradle Wrapper Update
 on:
   schedule:
     - cron: "0 20 * * 1"
+  push:
+    branches: [ "main", "lWoHvYe-patch-1" ]
 
 jobs:
   update:
