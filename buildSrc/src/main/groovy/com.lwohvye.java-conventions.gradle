@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.lwohvye'
-version = '4.2.0-pi-RC2'
+version = '4.2.0-pi-RC3'
 java.sourceCompatibility = JavaVersion.VERSION_21
 
 java {
