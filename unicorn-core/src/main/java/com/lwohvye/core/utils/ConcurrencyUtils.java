@@ -18,14 +18,13 @@ package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
 import lombok.experimental.UtilityClass;
+import org.slf4j.MDC;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.util.concurrent.StructuredTaskScope.Subtask;
 
@@ -91,5 +90,21 @@ public class ConcurrencyUtils {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static Runnable withMdc(Runnable runnable) {
+        var mdc = MDC.getCopyOfContextMap();
+        return () -> {
+            MDC.setContextMap(mdc);
+            runnable.run();
+        };
+    }
+
+    public static <U> Supplier<U> withMdc(Supplier<U> supplier) {
+        var mdc = MDC.getCopyOfContextMap();
+        return () -> {
+            MDC.setContextMap(mdc);
+            return supplier.get();
+        };
     }
 }

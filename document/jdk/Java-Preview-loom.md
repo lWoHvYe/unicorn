@@ -101,6 +101,10 @@
 
 ![](../images/Threads%20wtb%20.png)
 
+在新版本的Reactor中，可以看到reactor-http-nio,reactor-tcp-nio及loomBoundedElastic都是VirtualThreads
+
+![img.png](../images/reactor.png)
+
 #### Foreign Function & Memory API
 
 - Introduce an API by which Java programs can interoperate with code and data outside of the Java runtime.
