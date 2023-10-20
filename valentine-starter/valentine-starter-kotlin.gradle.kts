@@ -50,6 +50,15 @@ dependencies {
     }
 }
 
+tasks.jar {
+    enabled = true
+    manifest {
+        attributes(
+            "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
+        )
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("--enable-preview")

@@ -13,7 +13,8 @@
 
 ##### Servlet Web Servers
 
-- When virtual threads are enabled, Tomcat and Jetty will use virtual threads for request processing. This means that your
+- When virtual threads are enabled, Tomcat and Jetty will use virtual threads for request processing. This means that
+  your
   application code that is handling a web request, such as a method in a controller, will run on a virtual thread.
 
 ##### Task Execution
@@ -44,6 +45,11 @@
 - Spring WebFlux’s support for block execution is auto-configured to use the applicationTaskExecutor bean when it is an
   AsyncTaskExecutor. The applicationTaskExecutor is an AsyncTaskExecutor both by default and when virtual threads are
   enabled.
+
+#### Keeping the JVM Alive
+
+- There’s a new property called spring.main.keep-alive. When set to true, the JVM is kept alive, even if all other
+  threads are virtual (or daemon) threads.
 
 #### Link
 

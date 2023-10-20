@@ -37,7 +37,7 @@ dependencyResolutionManagement {
             version('easyCaptcha', '1.6.2')
             version('hutool', '5.8.20')
             version('ip2region', '3.0.4')
-            version('jjwt', '0.12.2')
+            version('jjwt', '0.12.3')
             version('kotlin', "$kotlinVersion")
             version('kotlinxCoroutines', '1.7.3')
             version('log4jdbc', '1.18')

@@ -1,7 +1,18 @@
-import org.springframework.boot.gradle.plugin.SpringBootPlugin
+plugins {
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+}
+
+tasks.jar {
+    enabled = true
+    manifest {
+        attributes(
+            "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
+        )
+    }
+}
 
 dependencies {
-    implementation(platform(SpringBootPlugin.BOM_COORDINATES))
     implementation("org.springframework.security:spring-security-oauth2-authorization-server")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")

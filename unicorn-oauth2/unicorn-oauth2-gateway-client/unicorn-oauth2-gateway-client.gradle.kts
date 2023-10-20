@@ -3,6 +3,15 @@ plugins {
     id("io.spring.dependency-management")
 }
 
+tasks.jar {
+    enabled = true
+    manifest {
+        attributes(
+            "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
+        )
+    }
+}
+
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
