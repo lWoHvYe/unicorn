@@ -18,10 +18,8 @@ package com.lwohvye.core.config;
 
 import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnJava;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
-import org.springframework.boot.system.JavaVersion;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -34,7 +32,7 @@ import java.util.concurrent.Executors;
  * <a href="https://spring.io/blog/2022/10/11/embracing-virtual-threads">embracing virtual threads</a>
  */
 @AutoConfiguration
-@ConditionalOnJava(JavaVersion.NINETEEN)
+//@ConditionalOnJava(JavaVersion.NINETEEN)
 @ConditionalOnProperty(name = "spring.threads.virtual.enabled", havingValue = "false", matchIfMissing = true)
 public class ValentineExecutorConfig {
 

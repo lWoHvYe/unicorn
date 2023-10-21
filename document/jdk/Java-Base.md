@@ -1,1 +1,2 @@
-[Java Generics](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html)
+- [Java Generics](http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html)
+- [JEP 238: Multi-Release JAR Files](https://openjdk.org/jeps/238)

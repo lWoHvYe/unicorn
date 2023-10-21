@@ -18,7 +18,6 @@ package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 
 import java.util.Arrays;
@@ -30,11 +29,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Slf4j
+import static java.util.concurrent.StructuredTaskScope.Subtask;
+
 @UtilityClass
 public class ConcurrencyUtils {
 
-    public static final ExecutorService TASK_EXECUTOR = Executors.newFixedThreadPool(8);
+    static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
+
+    public static final ExecutorService VIRTUAL_EXECUTOR = Executors.newThreadPerTaskExecutor(virtualFactory);
 
     /**
      * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
@@ -45,27 +47,28 @@ public class ConcurrencyUtils {
      * @date 2022/9/22 8:26 PM
      */
     public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
-        log.warn("In Java 17 Source");
-        List<? extends Future<?>> subtasks = null;
-        if (Objects.nonNull(tasks))
-            subtasks = Arrays.stream(tasks).map(TASK_EXECUTOR::submit).toList();
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+            List<? extends Subtask<?>> subtasks = null;
+            if (Objects.nonNull(tasks))
+                subtasks = Arrays.stream(tasks).map(scope::fork).toList();
 
-        Object results = null;
-        if (Objects.nonNull(composeResult))
-            results = composeResult.apply(Objects.nonNull(subtasks) ?
-                    subtasks.stream().map(future -> {
-                        try {
-                            return future.get();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        } catch (ExecutionException e) {
-                            throw new UtilsException(e.getMessage());
-                        }
-                        return null;
-                    }).toList() : Collections.emptyList());
-        if (Objects.nonNull(eventual))
-            eventual.accept(results);
+            scope.join()           // Join both forks
+                    .throwIfFailed();  // ... and propagate errors
 
+            // Here, both forks have succeeded, so compose their results
+            Object results = null;
+            if (Objects.nonNull(composeResult))
+                results = composeResult.apply(Objects.nonNull(subtasks) ?
+                        subtasks.stream().map(Subtask::get).toList() : Collections.emptyList());
+            if (Objects.nonNull(eventual))
+                eventual.accept(results);
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof RuntimeException re)
+                throw re;
+            throw new UtilsException(e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     // Returns a Callable object that, when called, runs the given task and returns null.
@@ -73,12 +76,23 @@ public class ConcurrencyUtils {
     // A FutureTask can be used to wrap a Callable or Runnable object. Because FutureTask implements Runnable, a FutureTask can be submitted to an Executor for execution.
     // var futureTask = new FutureTask<T>(Callable/Runnable) // Callable/Runnable 2 Runnable/Future
     public static void structuredExecute(Runnable eventual, Runnable... tasks) {
-        log.warn("In Java 17 Source");
-        if (Objects.nonNull(tasks))
-            Arrays.stream(tasks).forEach(TASK_EXECUTOR::execute);
-        // Here, both forks have succeeded, so compose their results
-        if (Objects.nonNull(eventual))
-            log.warn("Unsupported Java below 21 Skip EventualTask");
+        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+            if (Objects.nonNull(tasks))
+                Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
+
+            scope.join()           // Join both forks
+                    .throwIfFailed();  // ... and propagate errors
+
+            // Here, both forks have succeeded, so compose their results
+            if (Objects.nonNull(eventual))
+                eventual.run();
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof RuntimeException re)
+                throw re;
+            throw new UtilsException(e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public static Runnable withMdc(Runnable runnable) {

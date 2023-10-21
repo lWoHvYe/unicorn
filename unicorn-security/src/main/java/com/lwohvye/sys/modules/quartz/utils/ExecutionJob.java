@@ -16,7 +16,6 @@
 package com.lwohvye.sys.modules.quartz.utils;
 
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.core.config.ValentineExecutorConfig;
 import com.lwohvye.core.utils.MailAdapter;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.StringUtils;
@@ -40,7 +39,7 @@ import java.util.concurrent.FutureTask;
  *
  * @author /
  * @date 2019-01-07
- * @see ValentineExecutorConfig asyncTaskExecutor()，use this pool for JobRunning
+ * @see com.lwohvye.core.config.ValentineExecutorConfig asyncTaskExecutor()，use this pool for JobRunning
  */
 @Async
 @Slf4j

@@ -21,6 +21,7 @@ plugins {
     alias(libs.plugins.spring.boot) apply false
     // This plugin simplifies the use of Lombok in Gradle
     id "io.freefair.lombok" version "8.4" apply false
+    id 'me.champeau.mrjar' version '0.1.1'
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
     id 'io.github.gradle-nexus.publish-plugin' version '1.3.0'
     id 'org.graalvm.buildtools.native' version '0.9.27' apply false
@@ -29,6 +30,15 @@ plugins {
 ext {
     graalvmEnable = false // 这个若在Kotlin DSL中使用，首先需要Kotlin Support run on current JDK
 }
+
+ext.sharedManifest = manifest {
+    attributes(
+            'Developer': 'lWoHvYe',
+            'Created-By': 'Gradle',
+            'Built-By': System.properties['user.name'],
+            'Build-Jdk-Spec': "${System.properties['java.version']}"
+    )
+} as DefaultManifest
 
 subprojects {
 
