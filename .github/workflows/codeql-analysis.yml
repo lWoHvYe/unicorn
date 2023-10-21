@@ -34,7 +34,7 @@ jobs:
       matrix:
         language: [ 'java' ]
         distribution: [ 'zulu', 'temurin', 'oracle' ]
-        java: [ '17', '21' ]
+        java: [ '21' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'swift' ]
         # Use only 'java' to analyze code written in Java, Kotlin or both
         # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
@@ -48,7 +48,9 @@ jobs:
         uses: actions/setup-java@v3
         with:
           # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
-          java-version: ${{ matrix.java }}
+          java-version: |
+            17
+            ${{ matrix.java }}
           # Java distribution. See the list of supported distributions in README file
           distribution: ${{ matrix.distribution }}
           # The package type (jdk, jre, jdk+fx, jre+fx)
