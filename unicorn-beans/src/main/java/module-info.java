@@ -1,5 +1,6 @@
 module lwohvye.unicorn.beans {
     requires transitive lwohvye.unicorn.core;
+    requires spring.webmvc; // do transitive on the upper layer
 
     exports com.lwohvye.beans.advice;
     exports com.lwohvye.beans.aspect to spring.beans, spring.aop;

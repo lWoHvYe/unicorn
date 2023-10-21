@@ -17,7 +17,6 @@ module lwohvye.unicorn.core {
     requires transitive spring.aop;
     requires transitive spring.aspects;
     requires transitive spring.web;
-    requires spring.webmvc; // do transitive on the upper layer
     requires transitive spring.jdbc;
     requires transitive spring.data.commons;
     requires transitive spring.data.jpa;
