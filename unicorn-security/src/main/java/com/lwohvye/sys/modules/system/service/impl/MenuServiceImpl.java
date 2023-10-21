@@ -25,6 +25,7 @@ import com.lwohvye.api.modules.system.domain.vo.MenuVo;
 import com.lwohvye.api.modules.system.service.dto.MenuDto;
 import com.lwohvye.api.modules.system.service.dto.MenuQueryCriteria;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.sys.common.constant.SysCacheKey;
 import com.lwohvye.core.base.SimplePOJO;
 import com.lwohvye.core.context.CycleAvoidingMappingContext;
 import com.lwohvye.core.exception.BadRequestException;
@@ -100,7 +101,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
+    @Cacheable(key = "'id:' + #p0")
     public MenuDto findById(long id) {
         Menu menu = menuRepository.findById(id).orElseGet(Menu::new);
         ValidationUtils.isNull(menu.getId(), "Menu", "id", id);
@@ -404,7 +405,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
 
     @SneakyThrows
     @Override
-    @Cacheable(key = " target.getSysName() + 'menu4user:' + #p0")
+    @Cacheable(key = "'menu4user:' + #p0")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<MenuVo> buildWebMenus(Long uid) {
         CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
@@ -470,6 +471,6 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
 
     @EventListener
     public void objUpdate(UserEvent userEvent) {
-        redisUtils.delInRC(CacheKey.MENU_USER, userEvent.getDataId());
+        redisUtils.delInRC(SysCacheKey.MENU_USER, userEvent.getDataId());
     }
 }

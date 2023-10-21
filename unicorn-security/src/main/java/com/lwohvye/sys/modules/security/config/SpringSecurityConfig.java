@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.config;
 
-import com.lwohvye.core.config.security.SimpleSecurityConfig;
+import com.lwohvye.beans.config.security.SimpleSecurityConfig;
 import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.core.utils.json.JsonUtils;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;

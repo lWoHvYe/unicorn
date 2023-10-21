@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.rabbitmq.config;
 
-import com.lwohvye.core.config.LocalCoreConfig;
+import com.lwohvye.beans.config.LocalPropertyConfig;
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -230,7 +230,7 @@ public class RabbitMQConfig {
     @Bean
     public Queue spSyncQueue() {
         return QueueBuilder
-                .durable(LocalCoreConfig.SP_SYNC_DELAY_QUEUE)
+                .durable(LocalPropertyConfig.SP_SYNC_DELAY_QUEUE)
                 // 满足要求后转发的死信交换机及路由键
                 .withArgument("x-dead-letter-exchange", DEAD_INFO_EXCHANGE)
                 .withArgument("x-dead-letter-routing-key", DEAD_ROUTE_KEY)

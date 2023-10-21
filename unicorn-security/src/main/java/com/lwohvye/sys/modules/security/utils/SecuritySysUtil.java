@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.utils;
 
-import com.lwohvye.core.config.LocalCoreConfig;
+import com.lwohvye.beans.config.LocalPropertyConfig;
 import com.lwohvye.sys.modules.security.config.bean.SecurityProperties;
 import org.springframework.util.Assert;
 
@@ -36,7 +36,7 @@ public class SecuritySysUtil {
      */
     public static String getExpireNoticeKey(SecurityProperties properties) {
         Assert.notNull(properties, "系统错误。请联系研发处理");
-        return properties.getExpireNoticeKey() + LocalCoreConfig.SYS_NAME;
+        return properties.getExpireNoticeKey() + LocalPropertyConfig.SYS_NAME;
     }
 
 }

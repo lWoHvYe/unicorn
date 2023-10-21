@@ -15,7 +15,7 @@
  */
 package com.lwohvye.sys.modules.security.core.filter;
 
-import com.lwohvye.core.config.RsaProperties;
+import com.lwohvye.beans.config.RsaProperties;
 import com.lwohvye.sys.modules.security.service.dto.AuthUserDto;
 import com.lwohvye.core.utils.RsaUtils;
 import com.lwohvye.core.utils.SpringContextHolder;

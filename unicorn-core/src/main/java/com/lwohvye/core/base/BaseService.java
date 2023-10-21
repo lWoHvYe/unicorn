@@ -15,7 +15,6 @@
  */
 package com.lwohvye.core.base;
 
-import com.lwohvye.core.config.LocalCoreConfig;
 import com.lwohvye.core.exception.NeedImplementException;
 
 /**
@@ -25,11 +24,6 @@ import com.lwohvye.core.exception.NeedImplementException;
  * @date 2021/6/17 5:07 下午
  */
 public interface BaseService {
-
-    //接口中可以有静态方法、默认方法、私有方法
-    default String getSysName() {
-        return LocalCoreConfig.getSysName();
-    }
 
     /**
      * 部分场景下，在类初始化完成后，执行部分额外操作

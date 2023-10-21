@@ -18,6 +18,7 @@ package com.lwohvye.sys.modules.system.service.impl;
 import com.lwohvye.api.modules.system.domain.Resource;
 import com.lwohvye.api.modules.system.service.dto.ResourceDto;
 import com.lwohvye.api.modules.system.service.dto.ResourceQueryCriteria;
+import com.lwohvye.sys.common.constant.SysCacheKey;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.core.utils.redis.RedisUtils;
 import com.lwohvye.sys.modules.system.event.ResEvent;
@@ -80,7 +81,7 @@ public class ResourceServiceImpl implements IResourceService, ApplicationEventPu
     }
 
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'allResources' ")
+    @Cacheable(key = "'allResources' ")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<ResourceDto> queryAllRes() {
         // 序列化是一个数组，无法反序列化。序列化结果为：[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]
@@ -155,6 +156,6 @@ public class ResourceServiceImpl implements IResourceService, ApplicationEventPu
 
     @EventListener
     public void objUpdate(RoleEvent roleEvent) {
-        redisUtils.delInRC(CacheKey.RESOURCE_ALL, null);
+        redisUtils.delInRC(SysCacheKey.RESOURCE_ALL, null);
     }
 }

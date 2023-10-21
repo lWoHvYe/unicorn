@@ -15,7 +15,8 @@
  */
 package com.lwohvye.core.annotation;
 
-import com.lwohvye.core.aspect.LimitType;
+
+import com.lwohvye.core.enums.LimitType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

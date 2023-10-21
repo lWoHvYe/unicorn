@@ -19,7 +19,7 @@ import com.lwohvye.core.annotation.AnonymousAccess;
 import com.lwohvye.core.constant.SecurityConstant;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.utils.StringUtils;
-import com.lwohvye.core.utils.enums.RequestMethodEnum;
+import com.lwohvye.core.enums.RequestMethodEnum;
 import com.lwohvye.sys.modules.security.config.SpringSecurityConfig;
 import com.lwohvye.sys.modules.system.service.IResourceService;
 import org.springframework.http.server.PathContainer;

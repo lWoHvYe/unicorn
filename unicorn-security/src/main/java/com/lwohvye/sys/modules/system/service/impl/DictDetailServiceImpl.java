@@ -78,7 +78,7 @@ public class DictDetailServiceImpl implements IDictDetailService {
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    @Cacheable(key = " #root.target.getSysName() + 'name:' + #p0")
+    @Cacheable(key = "'name:' + #p0")
     public List<DictDetailDto> getDictByName(String name) {
         return new ArrayList<>(dictDetailRepository.findByDictName(name).stream().map(dictDetail -> conversionService.convert(dictDetail, DictDetailDto.class)).toList());
     }

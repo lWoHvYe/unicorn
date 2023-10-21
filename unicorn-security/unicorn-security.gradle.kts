@@ -85,6 +85,7 @@ publishing {
 
 dependencies {
     api(project(":unicorn-sys-api"))
+    api(project(":unicorn-beans"))
     api("org.springframework.boot:spring-boot-starter-websocket")
     api(libs.jjwt)
     api(libs.quartz)

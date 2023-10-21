@@ -15,8 +15,8 @@
  */
 package com.lwohvye.tools.rest
 
-import com.lwohvye.core.utils.enums.CodeBiEnum
-import com.lwohvye.core.utils.enums.CodeEnum
+import com.lwohvye.core.enums.CodeBiEnum
+import com.lwohvye.core.enums.CodeEnum
 import com.lwohvye.core.utils.result.ResultInfo
 import com.lwohvye.tools.service.IEmailService
 import com.lwohvye.tools.service.IVerifyService
@@ -58,8 +58,10 @@ class VerifyController(val verificationCodeService: IVerifyService, val emailSer
     ): ResultInfo<String> {
         val biEnum = CodeBiEnum.find(codeBi)
         when (Objects.requireNonNull(biEnum)) {
-            CodeBiEnum.ONE -> verificationCodeService.validated(CodeEnum.EMAIL_RESET_EMAIL_CODE.key + email, code)
-            CodeBiEnum.TWO -> verificationCodeService.validated(CodeEnum.EMAIL_RESET_PWD_CODE.key + email, code)
+            CodeBiEnum.ONE -> verificationCodeService.validated(
+                CodeEnum.EMAIL_RESET_EMAIL_CODE.key + email, code)
+            CodeBiEnum.TWO -> verificationCodeService.validated(
+                CodeEnum.EMAIL_RESET_PWD_CODE.key + email, code)
             else -> {}
         }
         return ResultInfo.success()

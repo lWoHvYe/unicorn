@@ -82,7 +82,7 @@ publishing {
 }
 
 dependencies {
-    api(project(":unicorn-core"))
+    api(project(":unicorn-beans"))
     api("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

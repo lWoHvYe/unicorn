@@ -36,7 +36,7 @@ module lwohvye.unicorn.core {
     requires transitive io.swagger.v3.oas.annotations;
     requires transitive lombok;
     requires mica.ip2region;
-    requires org.apache.commons.codec;
+    requires transitive org.apache.commons.codec;
     requires org.apache.commons.lang3;
     requires transitive org.apache.poi.poi;
     requires transitive org.apache.poi.ooxml;
@@ -54,33 +54,22 @@ module lwohvye.unicorn.core {
     requires reactor.core;
     requires spring.security.oauth2.jose;
 
-    exports com.lwohvye.core.advice;
     exports com.lwohvye.core.annotation;
     exports com.lwohvye.core.annotation.log;
     exports com.lwohvye.core.annotation.rest;
-    exports com.lwohvye.core.aspect to spring.beans, spring.aop;
     exports com.lwohvye.core.base;
-    exports com.lwohvye.core.config;
-    exports com.lwohvye.core.config.cache;
-    exports com.lwohvye.core.config.security; // opens是针对reflect，exports主要是针对import，这俩不存在包含关系
-    exports com.lwohvye.core.config.swagger;
     exports com.lwohvye.core.constant;
     exports com.lwohvye.core.context;
     exports com.lwohvye.core.exception;
     exports com.lwohvye.core.extension;
     exports com.lwohvye.core.utils;
-    exports com.lwohvye.core.utils.enums;
+    exports com.lwohvye.core.enums;
     exports com.lwohvye.core.utils.json;
-    exports com.lwohvye.core.utils.mapper;
     exports com.lwohvye.core.utils.rabbitmq;
     exports com.lwohvye.core.utils.redis;
     exports com.lwohvye.core.utils.result;
 
     opens com.lwohvye.core.base;
-    opens com.lwohvye.core.config to spring.core;
-    opens com.lwohvye.core.config.cache to spring.core;
-    opens com.lwohvye.core.config.security; // 这里应该能细化，先这样粗化，后续再说
-    opens com.lwohvye.core.config.swagger to spring.core;
     opens com.lwohvye.core.utils to spring.core;
     opens com.lwohvye.core.utils.json to spring.core;
     opens com.lwohvye.core.utils.rabbitmq to spring.core;

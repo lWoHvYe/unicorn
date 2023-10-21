@@ -20,7 +20,6 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.http.useragent.UserAgentUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.lwohvye.core.config.LocalCoreConfig;
 import com.lwohvye.core.constant.UnicornCoreConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -78,17 +77,6 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             }
         }
         return ip;
-    }
-
-    /**
-     * 根据ip获取详细地址
-     */
-    public static String getCityInfo(String ip) {
-        if (LocalCoreConfig.IP_LOCAL) {
-            return getLocalCityInfo(ip);
-        } else {
-            return getHttpCityInfo(ip);
-        }
     }
 
     /**

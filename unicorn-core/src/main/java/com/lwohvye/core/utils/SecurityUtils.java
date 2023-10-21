@@ -16,7 +16,7 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.utils.enums.DataScopeEnum;
+import com.lwohvye.core.enums.DataScopeEnum;
 import com.lwohvye.core.utils.json.JsonUtils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;

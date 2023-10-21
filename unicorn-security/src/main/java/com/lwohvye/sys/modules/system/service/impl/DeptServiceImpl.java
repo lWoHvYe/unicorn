@@ -22,7 +22,7 @@ import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.core.context.CycleAvoidingMappingContext;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.*;
-import com.lwohvye.core.utils.enums.DataScopeEnum;
+import com.lwohvye.core.enums.DataScopeEnum;
 import com.lwohvye.sys.modules.system.event.DeptEvent;
 import com.lwohvye.sys.modules.system.repository.DeptRepository;
 import com.lwohvye.sys.modules.system.service.IDeptService;
@@ -106,7 +106,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     }
 
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
+    @Cacheable(key = "'id:' + #p0")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public DeptDto findById(Long id) {
         Dept dept = deptRepository.findById(id).orElseGet(Dept::new);

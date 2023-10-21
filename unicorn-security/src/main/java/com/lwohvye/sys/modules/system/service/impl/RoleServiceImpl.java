@@ -20,6 +20,7 @@ import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
 import com.lwohvye.api.modules.system.service.dto.RoleSmallDto;
+import com.lwohvye.sys.common.constant.SysCacheKey;
 import com.lwohvye.core.context.CycleAvoidingMappingContext;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.*;
@@ -75,7 +76,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     private ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'all-roles'")
+    @Cacheable(key = "'all-roles'")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<RoleDto> queryAll() {
         Sort sort = Sort.by(Sort.Direction.ASC, "level");
@@ -102,7 +103,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class, readOnly = true)
 //    当使用root对象的属性作为key时，可以将“#root”省略，因为Spring默认使用的就是root对象的属性。
 //    需注意是 target.xxx 不带前面的 #
-    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
+    @Cacheable(key = "'id:' + #p0")
     public RoleDto findById(long id) {
         Role role = roleRepository.findById(id).orElseGet(Role::new);
         ValidationUtils.isNull(role.getId(), "Role", "id", id);
@@ -256,7 +257,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @EventListener
     public void objUpdate(MenuEvent menuEvent) {
         roleRepository.findInMenuId(Collections.singletonList(menuEvent.getDataId())).forEach(role -> {
-            redisUtils.delInRC(CacheKey.ROLE_ID, role.getId());
+            redisUtils.delInRC(SysCacheKey.ROLE_ID, role.getId());
             publishRoleEvent(role);
         });
     }

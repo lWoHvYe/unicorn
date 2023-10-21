@@ -133,7 +133,9 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-core` 系统的核心模块，各种工具类，公共配置存在该模块，To C业务可只引入该dependency
+- `unicorn-core` 系统的核心模块，基类及各种工具，(基于Multi-Release JAR Files，Support Java 17 - 21)
+
+- `unicorn-beans` 基础Beans的Definition及Configuration，To C业务可只引入该dependency
 
 - `unicorn-sys-api` Sys Module基础实体及API，方便服务拆分
 
@@ -153,18 +155,19 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 ```
 - unicorn-core 公共模块
-    - advice 统一数据返回及异常处理
     - annotation 为系统自定义注解
     - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper
-    - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
-        - security 权限控制，为swarm化，提供全局关闭Security功能
-        - UnicornAutoConfiguration: 自动化装配
-        - ValentineExecutorConfig: Running Spring Applications (Servlet Web Servers & Task Execution) on Virtual Threads Before Spring Boot 3.2
     - exception 项目自定义异常类
     - utils 系统通用工具类, json, rabbitmq, redis,...
         - QueryHelp 基于Annotation的JPA动态查询Specification
         - SpringContextHolder 自定义SpringUtil
         - JDKUtils, UnsafeUtils
+- unicorn-beans 基础Bean
+    - advice 统一数据返回及异常处理
+    - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
+        - security 权限控制，为swarm化，提供全局关闭Security功能
+        - UnicornAutoConfiguration: 自动化装配
+        - ValentineExecutorConfig: Running Spring Applications (Servlet Web Servers & Task Execution) on Virtual Threads Before Spring Boot 3.2
 - unicorn-sys-api 基础实体及DTO
     - modules 基础实体及接口定义
 - unicorn-security 系统核心模块

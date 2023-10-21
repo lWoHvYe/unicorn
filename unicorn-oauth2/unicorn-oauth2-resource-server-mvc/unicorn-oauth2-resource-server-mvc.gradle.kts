@@ -13,7 +13,7 @@ tasks.jar {
 }
 
 dependencies {
-    implementation(project(":unicorn-core"))
+    implementation(project(":unicorn-beans"))
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
 }

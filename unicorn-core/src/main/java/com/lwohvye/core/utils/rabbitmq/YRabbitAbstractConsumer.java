@@ -16,6 +16,7 @@
 
 package com.lwohvye.core.utils.rabbitmq;
 
+import com.lwohvye.core.utils.ConcurrencyUtils;
 import com.lwohvye.core.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -23,7 +24,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -36,8 +37,15 @@ import java.util.function.Function;
 @Slf4j
 public abstract class YRabbitAbstractConsumer {
 
-    // 使用线程池，做资源隔离。考虑到服务器配置，因为会有多个独立的线程池，这里根据需要调小一些
-    static final ThreadPoolExecutor SIMPLE_EXECUTOR = new ThreadPoolExecutor(4, 6, 200, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100));
+    // 使用线程池，做资源隔离。这里从19开始使用Virtual Threads（不再是一个用后归还的pool）。这个是类变量(static)，所有子类(实例)共享
+    // As for Virtual Threads We create it, run it and then forget it. So this pool is just used for creating Threads.
+//    static ExecutorService simVirtualExecutor;
+//
+//    static {
+    // 兼容Old API，这里name支持 name + start的模式，start会自动递增，但考虑着虚拟线程会很多，且没必要加上start作区分
+//        var virtualFactory = Thread.ofVirtual().name("Virtual-Rabbit").factory();
+//        simVirtualExecutor = Executors.newThreadPerTaskExecutor(virtualFactory);
+//    }
 
     // 若用到该属性，子类需通过set注入
     protected RedissonClient redissonClient;
@@ -130,7 +138,7 @@ public abstract class YRabbitAbstractConsumer {
      */
     protected void reConsumeMsg(Consumer<Message> consumer, Message message) {
         // 线程池来执行，异步
-        SIMPLE_EXECUTOR.execute(() -> {
+        ConcurrencyUtils.TASK_EXECUTOR.execute(() -> {
             // 打个标记，只会重消费一次，不然就无穷无尽了
             var mask = "ReConsumed";
             var header = message.getMessageProperties().getHeader(mask);
@@ -144,7 +152,7 @@ public abstract class YRabbitAbstractConsumer {
     }
 
     protected void reConsumeMsg(Consumer<String> consumer, String strMsg) {
-        SIMPLE_EXECUTOR.execute(() -> {
+        ConcurrencyUtils.TASK_EXECUTOR.execute(() -> {
             var amqpMsgEntity = JsonUtils.toJavaObject(strMsg, AmqpMsgEntity.class);
             if (!amqpMsgEntity.isConsumed()) {
                 amqpMsgEntity.setConsumed(true);

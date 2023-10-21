@@ -22,8 +22,8 @@ import com.lwohvye.sys.modules.system.event.UserEvent;
 import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
-import com.lwohvye.core.utils.CacheKey;
-import com.lwohvye.core.utils.enums.DataScopeEnum;
+import com.lwohvye.sys.common.constant.SysCacheKey;
+import com.lwohvye.core.enums.DataScopeEnum;
 import com.lwohvye.core.utils.redis.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
@@ -57,7 +57,7 @@ public class DataServiceImpl implements IDataService {
      * @return /
      */
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'user:' + #p0")
+    @Cacheable(key = "'user:' + #p0")
     public List<Long> getDeptIds(Long userId, Long deptId) {
         // 用于存储部门id
         Set<Long> deptIds = new HashSet<>();
@@ -81,7 +81,7 @@ public class DataServiceImpl implements IDataService {
     }
 
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'data_scope4user:' + #p0")
+    @Cacheable(key = "'data_scope4user:' + #p0")
     public String getDataScope(Long userId) {
         var dataScopes = roleService.findByUserId(userId).stream().map(RoleSmallDto::getDataScope).toList();
         if (dataScopes.contains(DataScopeEnum.ALL.getValue()))
@@ -111,13 +111,13 @@ public class DataServiceImpl implements IDataService {
 
     @EventListener
     public void objUpdate(UserEvent userEvent) {
-        redisUtils.delInRC(CacheKey.DATA_USER, userEvent.getDataId());
-        redisUtils.delInRC(CacheKey.DATA_SCOPE, userEvent.getDataId());
+        redisUtils.delInRC(SysCacheKey.DATA_USER, userEvent.getDataId());
+        redisUtils.delInRC(SysCacheKey.DATA_SCOPE, userEvent.getDataId());
     }
 
     @EventListener
     public void objUpdate(RoleEvent roleEvent) {
-        redisUtils.delInRC(CacheKey.DATA_USER, null);
-        redisUtils.delInRC(CacheKey.DATA_SCOPE, null);
+        redisUtils.delInRC(SysCacheKey.DATA_USER, null);
+        redisUtils.delInRC(SysCacheKey.DATA_SCOPE, null);
     }
 }

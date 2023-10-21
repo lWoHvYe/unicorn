@@ -13,7 +13,7 @@ plugins {
     id 'me.champeau.mrjar'
 }
 
-description = '系统核心模块'
+description = '系统Core模块'
 
 multiRelease {
     targetVersions 17, 21
@@ -62,7 +62,7 @@ publishing {
             }
             pom {
                 name = 'Unicorn Core'
-                description = 'Common module with BaseConfig, Utils, QueryAnno and so on'
+                description = 'Core module with Utils, QueryAnno and so on'
                 url = 'https://github.com/lWoHvYe/unicorn.git'
                 licenses {
                     license {

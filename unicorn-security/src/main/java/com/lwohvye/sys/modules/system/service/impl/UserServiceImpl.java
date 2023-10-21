@@ -22,7 +22,8 @@ import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.domain.projection.UserProj;
 import com.lwohvye.api.modules.system.service.dto.*;
-import com.lwohvye.core.config.FileProperties;
+import com.lwohvye.sys.common.constant.SysCacheKey;
+import com.lwohvye.beans.config.FileProperties;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.core.utils.redis.RedisUtils;
@@ -136,7 +137,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     }
 
     @Override
-    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
+    @Cacheable(key = "'id:' + #p0")
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public UserDto findById(long id) {
         User user = userRepository.findById(id).orElseGet(User::new);
@@ -264,7 +265,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    @Cacheable(key = " #root.target.getSysName() + 'userInfo:' + #p0")
+    @Cacheable(key = "'userInfo:' + #p0")
     public UserDto findByName(String userName) {
         User user = userRepository.findByUsername(userName);
         // 这里只做标记用，当前业务暂不需要Projection
@@ -384,7 +385,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     public void objUpdate(RoleEvent roleEvent) {
         userRepository.findByRoleId(roleEvent.getDataId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
-            redisUtils.delInRC(CacheKey.USER_ID, user.getId());
+            redisUtils.delInRC(SysCacheKey.USER_ID, user.getId());
             publishUserEvent(user);
         });
     }
@@ -393,7 +394,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     public void objUpdate(MenuEvent menuEvent) {
         userRepository.findByMenuId(menuEvent.getDataId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
-            redisUtils.delInRC(CacheKey.USER_ID, user.getId());
+            redisUtils.delInRC(SysCacheKey.USER_ID, user.getId());
             publishUserEvent(user);
         });
     }
@@ -402,7 +403,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
     public void objUpdate(DeptEvent deptEvent) {
         userRepository.findByRoleDeptId(deptEvent.getDataId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
-            redisUtils.delInRC(CacheKey.USER_ID, user.getId());
+            redisUtils.delInRC(SysCacheKey.USER_ID, user.getId());
             publishUserEvent(user);
         });
     }

@@ -17,16 +17,14 @@ package com.lwohvye.core.utils.redis;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.lwohvye.core.utils.CacheKey;
+import com.lwohvye.core.constant.LocalCoreConstant;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.time.Duration;
@@ -41,7 +39,6 @@ import java.util.concurrent.locks.LockSupport;
  *
  * @author lWoHvYe
  */
-@Component
 @SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class RedisUtils {
     private static final Logger log = LoggerFactory.getLogger(RedisUtils.class);
@@ -54,12 +51,10 @@ public class RedisUtils {
     protected RedissonClient redissonClient;
 
     //    分布式锁前缀
-    @Value("${local.redis.lock-prefix:redis-lock-}")
-    private String lockPrefix;
+    private static final String DISTRIBUTE_LOCK_PREFIX = "redis-lock-";
 
     //    分布式锁失效时间
-    @Value("${local.redis.lock-expire:200000}")
-    private long lockExpire;
+    private static final Long DISTRIBUTE_LOCK_EXPIRE = 200_000L;
 
     public RedisUtils(RedisTemplate<Object, Object> redisTemplate, StringRedisTemplate stringRedisTemplate, RedissonClient redissonClient) {
         this.redisTemplate = redisTemplate;
@@ -1927,8 +1922,8 @@ public class RedisUtils {
      * @date 2022/3/12 12:03 AM
      */
     public void delInRC(Map<String, String> map, Object suf) {
-        var mapCache = redissonClient.getMapCache(map.get(CacheKey.CACHE_NAME));
-        var prefix = map.get(CacheKey.CACHE_KEY);
+        var mapCache = redissonClient.getMapCache(map.get(LocalCoreConstant.CACHE_NAME));
+        var prefix = map.get(LocalCoreConstant.CACHE_KEY);
         mapCache.remove(Objects.nonNull(suf) ? prefix + suf : prefix);
     }
 
@@ -1938,8 +1933,8 @@ public class RedisUtils {
      */
     public void delByKeys4Business(Map<String, String> map, Set<Long> ids) {
         // Set<Object> keys = new HashSet<>();
-        var mapCache = redissonClient.getMapCache(map.get(CacheKey.CACHE_NAME));
-        var prefix = map.get(CacheKey.CACHE_KEY);
+        var mapCache = redissonClient.getMapCache(map.get(LocalCoreConstant.CACHE_NAME));
+        var prefix = map.get(LocalCoreConstant.CACHE_KEY);
         for (Long id : ids)
             mapCache.remove(prefix + id);
     }
@@ -1951,10 +1946,10 @@ public class RedisUtils {
      * @return 是否获取到
      */
     public Boolean lock(String key) {
-        String lock = lockPrefix + key;
+        String lock = DISTRIBUTE_LOCK_PREFIX + key;
         // 利用lambda表达式
         return (Boolean) redisTemplate.execute((RedisCallback<Object>) redisConnection -> {
-            long expireAt = System.currentTimeMillis() + lockExpire + 1;
+            long expireAt = System.currentTimeMillis() + DISTRIBUTE_LOCK_EXPIRE + 1;
             Boolean acquire = redisConnection.stringCommands().setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
             if (Boolean.TRUE.equals(acquire)) {
                 return true;
@@ -1964,7 +1959,7 @@ public class RedisUtils {
                     long expireTime = Long.parseLong(new String(value));
                     if (expireTime < System.currentTimeMillis()) {
                         // 如果锁已经过期
-                        byte[] oldValue = redisConnection.stringCommands().getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + lockExpire + 1).getBytes());
+                        byte[] oldValue = redisConnection.stringCommands().getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + DISTRIBUTE_LOCK_EXPIRE + 1).getBytes());
                         // 防止死锁
                         Assert.notNull(oldValue, "入参有误，原值不可为空");
                         return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
@@ -2039,11 +2034,11 @@ public class RedisUtils {
     public boolean lock(String lockKey, String value, Long expireTime) {
         if (ObjectUtil.isNull(expireTime))
 //            设置默认过期时间
-            expireTime = lockExpire;
+            expireTime = DISTRIBUTE_LOCK_EXPIRE;
         if (StrUtil.isEmpty(lockKey))
             throw new RuntimeException("分布式锁的key不可为空");
 //        添加默认前缀
-        lockKey = lockPrefix + lockKey;
+        lockKey = DISTRIBUTE_LOCK_PREFIX + lockKey;
 
         Object result = stringRedisTemplate.execute(lockRedisScript, Collections.singletonList(lockKey), value, String.valueOf(expireTime));
         return SUCCESS.equals(result);
@@ -2061,7 +2056,7 @@ public class RedisUtils {
         if (StrUtil.isEmpty(lockKey))
             throw new RuntimeException("分布式锁的key不可为空");
 //        添加默认前缀
-        lockKey = lockPrefix + lockKey;
+        lockKey = DISTRIBUTE_LOCK_PREFIX + lockKey;
 
         try {
             Object result = stringRedisTemplate.execute(unLockRedisScript, Collections.singletonList(lockKey), value);

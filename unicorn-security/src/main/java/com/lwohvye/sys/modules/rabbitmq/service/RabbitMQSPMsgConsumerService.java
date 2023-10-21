@@ -16,7 +16,7 @@
 
 package com.lwohvye.sys.modules.rabbitmq.service;
 
-import com.lwohvye.core.config.LocalCoreConfig;
+import com.lwohvye.beans.config.LocalPropertyConfig;
 import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
@@ -53,9 +53,9 @@ public class RabbitMQSPMsgConsumerService extends YRabbitAbstractConsumer {
     }
 
     @RabbitHandler
-    @RabbitListener(queues = "#{localCoreConfig.SP_SYNC_DELAY_QUEUE}") // 可以通过SpEL从别处获取监听的队列名
+    @RabbitListener(queues = "#{localPropertyConfig.SP_SYNC_DELAY_QUEUE}") // 可以通过SpEL从别处获取监听的队列名
     public void spMsgConsumer(Message message) {
-        var curOrigin = LocalCoreConfig.ORIGIN;
+        var curOrigin = LocalPropertyConfig.ORIGIN;
         var checkedCache = "ConsumerSpMsgId";
         baseMessageConsumer(message, "sp", curOrigin, checkedCache, msgEntity -> {
             var extraData = msgEntity.getExtraData();

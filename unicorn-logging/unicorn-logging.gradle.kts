@@ -74,5 +74,5 @@ publishing {
 }
 
 dependencies {
-    api(project(":unicorn-core"))
+    api(project(":unicorn-beans"))
 }

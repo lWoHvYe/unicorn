@@ -104,7 +104,7 @@ public class LogServiceImpl implements ILogService {
         Assert.notNull(log, "信息有误，不可为空");
         log.setRequestIp(ip);
 
-        log.setAddress(StringUtils.getCityInfo(log.getRequestIp()));
+        log.setAddress(StringUtils.getHttpCityInfo(log.getRequestIp()));
         log.setMethod(methodName);
         log.setUsername(username);
         log.setParams(getParameter(method, joinPoint.getArgs()));

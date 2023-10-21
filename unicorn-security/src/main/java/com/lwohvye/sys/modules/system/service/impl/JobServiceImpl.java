@@ -70,7 +70,7 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    @Cacheable(key = " #root.target.getSysName() + 'id:' + #p0")
+    @Cacheable(key = "'id:' + #p0")
     public JobDto findById(Long id) {
         Job job = jobRepository.findById(id).orElseGet(Job::new);
         ValidationUtils.isNull(job.getId(), "Job", "id", id);

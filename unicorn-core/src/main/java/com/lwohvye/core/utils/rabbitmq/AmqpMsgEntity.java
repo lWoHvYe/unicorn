@@ -15,7 +15,7 @@
  */
 package com.lwohvye.core.utils.rabbitmq;
 
-import com.lwohvye.core.utils.enums.DataOperatorEnum;
+import com.lwohvye.core.enums.DataOperatorEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
