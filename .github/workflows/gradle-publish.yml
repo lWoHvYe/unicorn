@@ -24,15 +24,12 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '21'
+          java-version: |
+            17
+            21
           distribution: 'zulu'
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-
-#      - name: Build with Gradle
-#        uses: gradle/gradle-build-action@v2
-#        with:
-#          arguments: build
 
       # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
       # the publishing section of your build.gradle
