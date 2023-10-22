@@ -89,7 +89,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 项目简介
 
-一个基于最新的Java 21 版本、 Spring Boot 3.2、 Jpa、 Spring Security、RabbitMQ、Vue的前后端分离的脚手架。
+一个基于最新的Java 21(17) 版本、 Spring Boot 3.2、 Jpa、 Spring Security、RabbitMQ、Vue的前后端分离的脚手架。
 在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
@@ -102,7 +102,8 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 21、Spring Boot 3.2。(Support Virtual Threads/fibre/loom)
+- 使用最新技术栈，社区资源丰富，基于Java 21(Core Module Support 17-21)、Spring Boot 3.2。
+  (Support Virtual Threads/fibre/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持接口级别的功能权限，动态权限控制
 - 支持数据字典，可方便地对一些状态进行管理
@@ -113,8 +114,8 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
   [unicorn-starter](https://github.com/lWoHvYe/unicorn-starter)。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
-- 各模块独立，基本可插拔：若只需查询注解类基础功能，只需引入core模块即可，权限、日志、3rd Tools模块可插拔可独立部署，
-  除了传统To B业务，还可用于To C业务（see [OAuth2.0 part](unicorn-oauth2) ）
+- 各模块独立，基本可插拔：若只需查询注解等基础功能，只需引入Core模块即可，Beans, Security, Logging, 3rd Tools, Code Gen
+  模块可插拔， 除了传统To B业务，还可用于To C业务（see [OAuth2.0 part](unicorn-oauth2) ）
 
 #### 系统功能
 
@@ -133,7 +134,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-core` 系统的核心模块，基类及各种工具，(基于Multi-Release JAR Files，Support Java 17 - 21)
+- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17 - 21)
 
 - `unicorn-beans` 基础Beans的Definition及Configuration，To C业务可只引入该dependency
 
@@ -143,13 +144,15 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - `unicorn-logging` 系统的日志模块，其他模块如果需要记录日志需要引入该模块，亦可自行实现
 
-- `unicorn-tp-tools` 第三方工具模块，包含：邮件、S3，可视情况引入
+- `unicorn-tp-tools-kotlin` 第三方工具模块，包含：邮件、S3，可视情况引入
 
-- `unicorn-code-gen` 系统的代码生成模块。这部分待优化，亦非必须模块
+- `unicorn-code-gen-kotlin` 系统的代码生成模块。这部分待优化，亦非必须模块
 
-- `unicorn-starter` 启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离）
+- `unicorn-starter` [启动类(Maven)，项目入口，包含模块及组件配置（DB读写分离 + Cache读写分离）](https://github.com/lWoHvYe/unicorn-starter)
 
 - `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin/Kotlinx
+
+- `unicorn-oauth2` OAuth2 Sample，AuthorizationServer, OAuth2Client + Gateway, ResourceServer
 
 #### 详细结构
 
@@ -158,10 +161,12 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - annotation 为系统自定义注解
     - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper
     - exception 项目自定义异常类
-    - utils 系统通用工具类, json, rabbitmq, redis,...
+    - utils 系统通用工具类, security, json, rabbitmq, redis,...
         - QueryHelp 基于Annotation的JPA动态查询Specification
         - SpringContextHolder 自定义SpringUtil
         - JDKUtils, UnsafeUtils
+        - XRabbitAbstractProducer, YRabbitAbstractConsumer
+        - SecurityUtils, ReactiveSecurityUtils
 - unicorn-beans 基础Bean
     - advice 统一数据返回及异常处理
     - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
