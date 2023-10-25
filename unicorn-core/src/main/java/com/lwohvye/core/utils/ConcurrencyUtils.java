@@ -32,9 +32,8 @@ import java.util.function.Supplier;
 
 @Slf4j
 @UtilityClass
-public class ConcurrencyUtils {
+public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
 
-    public static final ExecutorService TASK_EXECUTOR = Executors.newFixedThreadPool(8);
 
     /**
      * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual

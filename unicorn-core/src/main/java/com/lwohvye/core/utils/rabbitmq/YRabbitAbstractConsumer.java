@@ -16,7 +16,7 @@
 
 package com.lwohvye.core.utils.rabbitmq;
 
-import com.lwohvye.core.utils.ConcurrencyUtils;
+import com.lwohvye.core.utils.UnicornAbstractThreadUtils;
 import com.lwohvye.core.utils.json.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -138,7 +138,7 @@ public abstract class YRabbitAbstractConsumer {
      */
     protected void reConsumeMsg(Consumer<Message> consumer, Message message) {
         // 线程池来执行，异步
-        ConcurrencyUtils.TASK_EXECUTOR.execute(() -> {
+        UnicornAbstractThreadUtils.TASK_EXECUTOR.execute(() -> {
             // 打个标记，只会重消费一次，不然就无穷无尽了
             var mask = "ReConsumed";
             var header = message.getMessageProperties().getHeader(mask);
@@ -152,7 +152,7 @@ public abstract class YRabbitAbstractConsumer {
     }
 
     protected void reConsumeMsg(Consumer<String> consumer, String strMsg) {
-        ConcurrencyUtils.TASK_EXECUTOR.execute(() -> {
+        UnicornAbstractThreadUtils.TASK_EXECUTOR.execute(() -> {
             var amqpMsgEntity = JsonUtils.toJavaObject(strMsg, AmqpMsgEntity.class);
             if (!amqpMsgEntity.isConsumed()) {
                 amqpMsgEntity.setConsumed(true);

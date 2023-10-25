@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * 通用返回对象。与统一异常处理。配套的统一异常处理{@link com.lwohvye.core.advice.ResponseResultBodyAdvice}类
+ * 通用返回对象。与统一异常处理。配套的统一异常处理{@link com.lwohvye.beans.advice.ResponseResultBodyAdvice}类
  * Created by cy on 2021/01/08.
  */
 @Getter

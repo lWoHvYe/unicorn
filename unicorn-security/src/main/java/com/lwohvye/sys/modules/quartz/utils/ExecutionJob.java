@@ -39,7 +39,7 @@ import java.util.concurrent.FutureTask;
  *
  * @author /
  * @date 2019-01-07
- * @see com.lwohvye.core.config.ValentineExecutorConfig asyncTaskExecutor()，use this pool for JobRunning
+ * @see com.lwohvye.beans.config.ValentineExecutorConfig asyncTaskExecutor()，use this pool for JobRunning
  */
 @Async
 @Slf4j

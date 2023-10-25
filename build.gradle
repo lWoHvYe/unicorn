@@ -69,8 +69,6 @@ subprojects {
             options.addStringOption('Xdoclint:none', '-quiet')
             options.addStringOption('encoding', 'UTF-8')
             options.addStringOption('charSet', 'UTF-8')
-            options.addBooleanOption('-enable-preview', true)
-            options.addStringOption('-release', '21')
             // Add support for custom tag
             options.addStringOption('tag', 'date:a:Init Date:')
             options.addStringOption('tag', 'author:a:Major Contributor:')
@@ -88,6 +86,18 @@ subprojects {
         // runtimeOnly
 //        automaticModule("org.apache.commons:commons-math3", 'commons.math3')
 //        automaticModule("com.zaxxer:SparseBitSet", 'SparseBitSet')
+    }
+}
+
+allprojects {
+    javadoc {
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
+            options.addBooleanOption('-enable-preview', true)
+            options.addStringOption('-release', '21')
+        }
     }
 }
 
@@ -150,12 +160,6 @@ publishing {
                 }
             }
         }
-    }
-}
-
-javadoc {
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
     }
 }
 
