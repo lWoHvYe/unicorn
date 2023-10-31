@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "org.gradlex:extra-java-module-info:1.4.2"
+        classpath "org.gradlex:extra-java-module-info:1.5"
     }
 }
 
