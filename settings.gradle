@@ -97,20 +97,10 @@ dependencyResolutionManagement {
 
 rootProject.name = 'valentine-p2p'
 
-
-var kotlinEnable = true // 这个只能本file中有效
-
-
 def buildFiles = fileTree(rootDir) {
     def excludes = gradle.startParameter.projectProperties.get("excludeProjects")?.split(",")
     include "**/*.gradle", "**/*.gradle.kts"
     exclude "build", "**/gradle", "settings.gradle", "buildSrc", "/build.gradle", ".*", "out"
-    if ("$kotlinVersion".matches("^1\\.[0-8]\\.\\d{1,2}\$|^0\\.\\d+\\.\\d+\$") // current version is not Support Java 20, 1.9.0 Support Java 20
-            || "$kotlinVersion".matches("^1\\.9\\.[0-1]{1,2}-?(Beta|RC)?[0-9]?\$") // 1.9.10 not Support Java 21，1.9.20 Support Java 21 WTF Release
-    ) {
-        kotlinEnable = false
-        exclude "**/*-kotlin.gradle.kts"
-    }
     if (excludes) {
         exclude excludes
     }
@@ -119,8 +109,6 @@ def buildFiles = fileTree(rootDir) {
 buildFiles.forEach { buildFile ->
     def isDefaultName = buildFile.name == "build.gradle" || buildFile.name == "build.gradle.kts"
     def isKotlin = buildFile.name.endsWith ".kts"
-
-    if (kotlinEnable && buildFile.name.equalsIgnoreCase("valentine-starter.gradle")) return // When kotlinEnable exclude this Groovy DSL module，use the Kotlin DSL one
 
     if (isDefaultName) {
         def buildFilePath = buildFile.parentFile.absolutePath
