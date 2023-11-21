@@ -76,6 +76,8 @@ subprojects {
     }
 
     extraJavaModuleInfo {
+        // deriveAutomaticModuleNamesFromFileNames = true //  failed due to split package issue
+        // legacy configure start
         failOnMissingModuleInfo.set(false)
         automaticModule("io.github.mouzt:bizlog-sdk", 'bizlog.sdk')
         automaticModule("com.github.whvcse:easy-captcha", 'easy.captcha')
@@ -83,9 +85,7 @@ subprojects {
         automaticModule("org.quartz-scheduler:quartz", 'quartz')
         automaticModule("org.redisson:redisson", 'redisson')
         automaticModule("org.springframework.retry:spring-retry", 'spring.retry')
-        // runtimeOnly
-//        automaticModule("org.apache.commons:commons-math3", 'commons.math3')
-//        automaticModule("com.zaxxer:SparseBitSet", 'SparseBitSet')
+        // end
     }
 }
 
