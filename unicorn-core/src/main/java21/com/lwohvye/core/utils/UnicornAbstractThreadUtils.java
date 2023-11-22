@@ -22,6 +22,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+/**
+ * Represents a utility class for handling threads in a virtualized environment.
+ * This abstract class provides a thread factory and an executor service for executing tasks.
+ */
 @Slf4j
 public abstract class UnicornAbstractThreadUtils {
 

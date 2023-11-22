@@ -66,7 +66,7 @@ object QueryHelp {
             val q = javaField.getAnnotation(Query::class.java)
             val value = javaField.get(query)
             if (q != null && value.hasValue()) {
-                analyzeQuery(root, query, cb, list, this, q, value!!)
+                analyzeQuery(root, cb, list, this, q, value!!)
             }
         } ?: run {
             log.error("JavaField of KProperty1<out Any, *> object is null!")
@@ -77,13 +77,13 @@ object QueryHelp {
 
     @Throws(IllegalAccessException::class)
     private fun analyzeQuery(
-        root: Root<*>, query: Any, cb: CriteriaBuilder, list: ArrayList<Predicate>,
-        kProperty1: KProperty1<out Any, *>, q: Query, value: Any
+        root: Root<*>, cb: CriteriaBuilder, list: ArrayList<Predicate>, kProperty1: KProperty1<out Any, *>,
+        q: Query, value: Any
     ) {
         if (q.blurry.isNotBlank()) {
             proceedBlurry(root, cb, list, q.blurry, value)
         } else {
-            defineAttrNameAndProceedFurther(root, query, cb, list, kProperty1, q, value)
+            defineAttrNameAndProceedFurther(root, cb, list, kProperty1, q, value)
         }
     }
 
@@ -101,12 +101,12 @@ object QueryHelp {
 
     @Throws(IllegalAccessException::class)
     private fun defineAttrNameAndProceedFurther(
-        root: Root<*>, query: Any, cb: CriteriaBuilder, list: ArrayList<Predicate>,
-        kProperty1: KProperty1<out Any, *>, q: Query, value: Any
+        root: Root<*>, cb: CriteriaBuilder, list: ArrayList<Predicate>, kProperty1: KProperty1<out Any, *>,
+        q: Query, value: Any
     ) {
         val attributeName = q.propName.takeIf { it.isNotBlank() } ?: kProperty1.name
         val join = analyzeJoinType(root, q, value)
-        proceedQueryType(root, query, cb, list, kProperty1, q, attributeName, join, value)
+        proceedQueryType(root, cb, list, kProperty1, q, attributeName, join, value)
     }
 
     private fun analyzeJoinType(root: Root<*>, q: Query?, value: Any?): Join<out Any, *>? {
@@ -142,8 +142,8 @@ object QueryHelp {
 
     @Throws(IllegalAccessException::class)
     private fun proceedQueryType(
-        root: Root<*>, query: Any, cb: CriteriaBuilder, list: ArrayList<Predicate>, kProperty1: KProperty1<out Any, *>,
-        q: Query, attributeName: String, join: Join<out Any, *>?, value: Any
+        root: Root<*>, cb: CriteriaBuilder, list: ArrayList<Predicate>, kProperty1: KProperty1<out Any, *>, q: Query,
+        attributeName: String, join: Join<out Any, *>?, value: Any
     ) {
         val fieldType = kProperty1.javaField?.type
         val comparableFieldType = value.castToComparableFieldType()
