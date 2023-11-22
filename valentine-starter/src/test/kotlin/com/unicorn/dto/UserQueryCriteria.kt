@@ -65,7 +65,7 @@ class UserQueryCriteria : Serializable {
     var roleDeptEnable: Boolean? = null
 
     @Query(propName = "status", type = Query.Type.EQUAL, joinName = "roles>resources")
-    var roleResourceStatus: Int = 1
+    var roleResourceStatus: Int? = null
 
     // endregion
     // 库中使用Base64存储，做模糊查询（业务不建议。因为无法使用索引，效率很低，这里只是提供一种调用库函数的方式）
