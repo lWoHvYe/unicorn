@@ -15,23 +15,26 @@ java {
     withJavadocJar()
 }
 
+val sharedManifest = java.manifest {
+    attributes(
+        "Developer" to "lWoHvYe",
+        "Created-By" to "Gradle",
+        "Built-By" to System.getProperty("user.name"),
+        "Build-Jdk-Spec" to System.getProperty("java.version"),
+    )
+}
+
 tasks.jar {
-    enabled = true // separates boot jar from normal jar
     manifest {
+        from(sharedManifest)
         attributes(
-            mapOf(
-                "Developer" to "lWoHvYe",
-                "Created-By" to "Gradle",
-                "Built-By" to System.getProperty("user.name"),
-                "Build-Jdk-Spec" to System.getProperty("java.version"),
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version,
-                "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
-            )
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version,
+            "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
-        from("generatePomFileForMavenJava3rdToolPublication")
+        from({ tasks["generatePomFileForMavenJava3rdToolPublication"] })
         rename(".*", "pom.xml")
     }
 }
