@@ -31,9 +31,11 @@ import java.util.function.Supplier;
 
 import static java.util.concurrent.StructuredTaskScope.Subtask;
 
+/**
+ * This class provides utility methods for handling concurrency and executing tasks in a structured manner.
+ */
 @UtilityClass
 public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
-
 
 
     /**

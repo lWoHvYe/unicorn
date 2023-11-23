@@ -12,23 +12,26 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
+val sharedManifest = java.manifest {
+    attributes(
+        "Developer" to "lWoHvYe",
+        "Created-By" to "Gradle",
+        "Built-By" to System.getProperty("user.name"),
+        "Build-Jdk-Spec" to System.getProperty("java.version"),
+    )
+}
+
 tasks.jar {
-    enabled = true
     manifest {
+        from(sharedManifest)
         attributes(
-            mapOf(
-                "Developer" to "lWoHvYe",
-                "Created-By" to "Gradle",
-                "Built-By" to System.getProperty("user.name"),
-                "Build-Jdk-Spec" to System.getProperty("java.version"),
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version,
-                "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
-            )
+            "Implementation-Title" to project.name,
+            "Implementation-Version" to project.version,
+            "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
-        from("generatePomFileForMavenJavaLogPublication")
+        from({ tasks["generatePomFileForMavenJavaLogPublication"] })
         rename(".*", "pom.xml")
     }
 }

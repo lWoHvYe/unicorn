@@ -1,18 +1,8 @@
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.spring)
-    alias(libs.plugins.kotlin.jpa)
-    alias(libs.plugins.kotlin.lombok)
-}
 
-description = "代码生成模块"
+description = "基础Bean模块"
 
 java {
     withJavadocJar()
-}
-
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
 }
 
 val sharedManifest = java.manifest {
@@ -30,18 +20,18 @@ tasks.jar {
         attributes(
             "Implementation-Title" to project.name,
             "Implementation-Version" to project.version,
-            "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
+            "Automatic-Module-Name" to "lwohvye." + project.name.replace("-", ".")
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
-        from({ tasks["generatePomFileForMavenJavaCodeGenPublication"] })
+        from({ tasks["generatePomFileForMavenJavaBeansPublication"] })
         rename(".*", "pom.xml")
     }
 }
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJavaCodeGen") {
+        create<MavenPublication>("mavenJavaBeans") {
             from(components["java"])
             versionMapping {
                 usage("java-api") {
@@ -52,8 +42,8 @@ publishing {
                 }
             }
             pom {
-                name.set("Unicorn Code Generator")
-                description.set("Server and Web Code Generator")
+                name.set("Unicorn Beans")
+                description.set("Beans & Configuration module")
                 url.set("https://github.com/lWoHvYe/unicorn.git")
                 licenses {
                     license {
@@ -80,22 +70,5 @@ publishing {
 }
 
 dependencies {
-    api(project(":unicorn-beans"))
-    api("org.springframework.boot:spring-boot-starter-freemarker")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation(libs.bundles.coroutines)
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation(libs.commons.configuration)
-    implementation(libs.commons.beanutils)
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-}
-
-kotlin {
-    sourceSets.configureEach {
-        languageSettings {
-            apiVersion = "2.0"
-        }
-    }
-    jvmToolchain(21)
+    api(project(":unicorn-core"))
 }
