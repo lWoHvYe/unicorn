@@ -27,7 +27,7 @@ jobs:
         run: |
           download_url="https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_macos-x64_bin.tar.gz"
           wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'jdkfile'
           jdkFile: ${{ runner.temp }}/java_package.tar.gz
