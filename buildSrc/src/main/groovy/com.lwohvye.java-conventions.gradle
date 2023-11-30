@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'com.lwohvye'
-version = '4.2.0-pi'
+version = '4.3.0-rho'
 
 java {
     withSourcesJar()
