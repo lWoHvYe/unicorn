@@ -39,7 +39,7 @@ plugins {
     id("org.graalvm.buildtools.native") version "0.9.28" apply false
 }
 
-val sharedManifest = java.manifest {
+extra["sharedManifest"] = java.manifest {
     attributes(
         "Developer" to "lWoHvYe",
         "Created-By" to "Gradle",
@@ -114,8 +114,6 @@ allprojects {
 tasks.withType<Checkstyle>().configureEach {
     reports {
         xml.required.set(false)
-//        html.isEnabled = true
-//        html.stylesheet(resources.text.fromFile("config/xsl/checkstyle-custom.xsl"))
     }
 }
 
@@ -125,7 +123,7 @@ java {
     withSourcesJar()
 }
 
-configure<PublishingExtension> {
+publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             artifactId = "unicorn"
@@ -175,13 +173,13 @@ configure<PublishingExtension> {
 }
 
 // this is the equivalent of the `nexusPublishing` block
-//configure<NexusPublishPluginExtension> {
-//    repositories {
-//        sonatype {
-//            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-//            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-//            username.set(findProperty("OSSRH_USERNAME") as String? ?: System.getenv("OSSRH_USERNAME"))
-//            password.set(findProperty("OSSRH_PASSWORD") as String? ?: System.getenv("OSSRH_PASSWORD"))
-//        }
-//    }
-//}
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(findProperty("OSSRH_USERNAME") as String? ?: System.getenv("OSSRH_USERNAME"))
+            password.set(findProperty("OSSRH_PASSWORD") as String? ?: System.getenv("OSSRH_PASSWORD"))
+        }
+    }
+}

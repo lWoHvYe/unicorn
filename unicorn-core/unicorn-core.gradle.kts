@@ -43,14 +43,7 @@ configurations {
     }
 }
 
-val sharedManifest = java.manifest {
-    attributes(
-        "Developer" to "lWoHvYe",
-        "Created-By" to "Gradle",
-        "Built-By" to System.getProperty("user.name"),
-        "Build-Jdk-Spec" to System.getProperty("java.version"),
-    )
-}
+val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {
     enabled = true // separates boot jar from normal jar
