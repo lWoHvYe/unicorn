@@ -102,10 +102,10 @@ allprojects {
         if (JavaVersion.current().isJava9Compatible) {
             (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
         }
-        if (JavaVersion.current().isJava10Compatible) {
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
             (options as StandardJavadocDocletOptions).apply {
                 addBooleanOption("-enable-preview", true)
-                addStringOption("-release", "12")
+                addStringOption("-release", "21")
             }
         }
     }

@@ -146,5 +146,5 @@ tasks.named("compileJava") {
 }
 
 tasks.javadoc {
-    (this.options as StandardJavadocDocletOptions).addStringOption("release", "17")
+    (this.options as StandardJavadocDocletOptions).addStringOption("-release", "17")
 }
