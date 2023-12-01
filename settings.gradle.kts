@@ -14,13 +14,6 @@ plugins {
     id("com.gradle.enterprise") version "3.15"
 }
 
-extra["springBootVersion"] = "3.2.0"
-extra["kotlinVersion"] = "1.9.20"
-
-val springBootVersion: String by extra
-val kotlinVersion: String by extra
-
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -44,7 +37,7 @@ dependencyResolutionManagement {
             version("hutool", "5.8.20")
             version("ip2region", "3.0.4")
             version("jjwt", "0.12.3")
-            version("kotlin", kotlinVersion)
+            version("kotlin", providers.gradleProperty("kotlinVersion").get())
             version("kotlinxCoroutines", "1.7.3")
             version("log4jdbc", "1.18")
             version("logstash", "7.4")
@@ -54,7 +47,7 @@ dependencyResolutionManagement {
             version("poi", "5.2.4")
             version("quartz", "2.3.2")
             version("redisson", "3.23.4")
-            version("springBoot", springBootVersion)
+            version("springBoot", providers.gradleProperty("springBootVersion").get())
             version("springdoc", "2.2.0")
             version("thumbnailator", "0.4.20")
             version("xerces", "2.12.2")
