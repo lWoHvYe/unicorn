@@ -91,7 +91,6 @@ subprojects {
         automaticModule("com.github.whvcse:easy-captcha", "easy.captcha")
         automaticModule("io.jsonwebtoken:jjwt-api", "jjwt.api")
         automaticModule("org.quartz-scheduler:quartz", "quartz")
-        automaticModule("org.redisson:redisson", "redisson")
         automaticModule("org.springframework.retry:spring-retry", "spring.retry")
         // end
     }
