@@ -1,7 +1,11 @@
-
 documentation:
-  - document/**/*.md
+  - changed-files:
+      - any-glob-to-any-file: 'document/**/*.md'
 
 foundational:
-  - unicorn-core/src/main/java/**/*
-  - unicorn-reactive/src/main/java/**/*
+  - changed-files:
+      - any-glob-to-any-file: [ 'unicorn-core/src/main/java/**/*', 'unicorn-beans/src/main/java/**/*' ]
+
+# Add 'release' label to any PR that is opened against the `main` branch
+release:
+  - base-branch: 'main'
