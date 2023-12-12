@@ -38,7 +38,7 @@ dependencyResolutionManagement {
             version("ip2region", "3.0.4")
             version("jjwt", "0.12.3")
             version("kotlin", providers.gradleProperty("kotlinVersion").get())
-            version("kotlinxCoroutines", "1.7.3")
+            version("kotlinxCoroutines", "1.8.0-RC")
             version("log4jdbc", "1.18")
             version("logstash", "7.4")
             version("mapstruct", "1.5.5.Final")
