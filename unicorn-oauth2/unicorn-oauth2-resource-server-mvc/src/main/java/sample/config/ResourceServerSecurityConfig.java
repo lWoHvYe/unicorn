@@ -37,7 +37,7 @@ public class ResourceServerSecurityConfig {
                 .csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers("/**"))
                 .authorizeHttpRequests((authorize) -> authorize
                         // 可匿名访问，业务中会有业务逻辑相关的control
-                        .requestMatchers("/explore/**", "/webjars/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/explore/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         // 需要登陆才可访问，这个一般是主体
                         .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2

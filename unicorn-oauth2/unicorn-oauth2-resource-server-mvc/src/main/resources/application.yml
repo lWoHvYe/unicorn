@@ -1,5 +1,12 @@
 server:
   port: 8090
+  servlet:
+    context-path: /res-mvc
+  #  this may not work well with Gateway-StripPrefix/PrefixPath,
+  #   as the X-Forwarded-Prefix may not same as the actual route-path
+  # if Path = /a/b/c/** , StripPrefix = 2, than the value of X-Forwarded-Prefix will be /a/b
+  # in all，that is not compliance with context-path，if context-path is null, that may work well
+  forward-headers-strategy: framework
 
 logging:
   level:
@@ -29,7 +36,7 @@ spring:
       ddl-auto: none
     #show-sql: true
 
-#配置数据源
+  #配置数据源
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:unicorn}
