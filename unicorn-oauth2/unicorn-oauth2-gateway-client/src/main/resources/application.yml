@@ -64,6 +64,8 @@ spring:
           # trust all downstream certificates
           useInsecureTrustManager: true
           handshake-timeout: 5000ms
+      x-forwarded:
+        prefix-enabled: false # need to disable & add manually。这个在下面各种filter之后，这个是个list
       routes:
         - id: resource-service
           uri: http://localhost:8090
@@ -76,6 +78,7 @@ spring:
             - StripPrefix=1
             # 添加prefix，从/some-resource变为/api/some-resource
             #- PrefixPath=/api
+            - AddRequestHeader=X-Forwarded-Prefix, /res/res-mvc
         - id: security-service
           uri:
             https://localhost:8081
@@ -84,6 +87,7 @@ spring:
           filters:
             - ContextPathRewritePath=/unicorn/security/(?<path>.*), /$\{path}
             - RewritePath=/security/(?<path>.*), /$\{path}
+            - AddRequestHeader=X-Forwarded-Prefix, /security
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
@@ -109,7 +113,7 @@ springdoc:
         url: /v3/api-docs/security
       - name: resource-service
         display-name: unicorn-resource
-        url: /v3/api-docs/res
+        url: /v3/api-docs/res/res-mvc
       - name: gateway
         display-name: remote-gateway
         url: /v3/api-docs
