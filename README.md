@@ -18,8 +18,8 @@ For lWoHvYe/unicorn project, will stay at Java 21 until 2025. will try Java 21+ 
 
 ---
 
-启动类 [AppRun.java](https://github.com/lWoHvYe/unicorn-starter/src/main/java/com/lwohvye/AppRun.java)
-和配置文件 [resources](https://github.com/lWoHvYe/unicorn-starter/src/main/resources)
+启动类 [AppRun.java](https://github.com/lWoHvYe/unicorn-starter/tree/master/src/main/java/com/lwohvye/AppRun.java)
+和配置文件 [resources](https://github.com/lWoHvYe/unicorn-starter/tree/master/src/main/resources)
 详见 [unicorn-starter](https://github.com/lWoHvYe/unicorn-starter)
 模块。[启停脚本](script)。
 

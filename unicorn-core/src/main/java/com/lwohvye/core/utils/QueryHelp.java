@@ -33,8 +33,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * A utility class for parsing and generating query predicates based on query annotations on fields.
+ * <p>
+ * This class provides methods for analyzing and generating query predicates based on query annotations
+ * on fields of a given query object. It supports simple multiple condition and join queries, but does
+ * not support complex And, Or combination queries. For complex queries, it is recommended to use
+ * QueryDSL or Native SQL.
+ *
  * @author Zheng Jie, lWoHvYe
- * @date 2019-6-4 14:59:48
+ * @since 2.6.0
  */
 @Slf4j
 @UtilityClass
