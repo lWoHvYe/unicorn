@@ -35,7 +35,7 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
-    show-sql: false
+    show-sql: true
   # autoconfigure:
     # to use VT for Async, should exclude this
     # exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
