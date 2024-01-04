@@ -39,6 +39,10 @@ spring:
   # autoconfigure:
     # to use VT for Async, should exclude this
     # exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+management:
+  tracing:
+    baggage:
+      remote-fields: Authorization
 
 #密码加密传输，前端公钥加密，后端私钥解密
 rsa:
