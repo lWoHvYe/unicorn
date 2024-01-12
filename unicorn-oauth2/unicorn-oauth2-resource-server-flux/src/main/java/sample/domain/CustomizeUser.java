@@ -15,6 +15,7 @@
  */
 package sample.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,6 +36,9 @@ public class CustomizeUser implements Serializable {
     @Id
     private Long userId;
 
+    // 当属性是private时，反序列化时，将根据get/set方法设置属性的值，所以若属性命名不规范（比如首字母大写Username，即便json中也是Username，但setUsername对应的属性应为username，所以绑定不上），
+    // 就可能绑定不上，这时可用该注解来定义。当然也可将属性定义成public的，这时应可直接获得属性的名称，所以可以绑定上，但极度不推荐
+    @JsonProperty("UserName")
     private String username;
 
     private String email;
