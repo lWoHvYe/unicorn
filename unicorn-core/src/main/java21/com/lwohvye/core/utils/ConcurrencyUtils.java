@@ -37,6 +37,7 @@ import static java.util.concurrent.StructuredTaskScope.Subtask;
 @UtilityClass
 public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
 
+    public static final ThreadLocal<Object> threadLocal = new ThreadLocal<>();
 
     /**
      * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
@@ -95,6 +96,32 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         }
     }
 
+    // 下面这个，就是解决InheritableThreadLocal 和 ThreadPool一起使用时的问题，使用ThreadLocal 然后自行实现值的传递
+    public static Runnable withThreadLocalAndThreadPool(Runnable runnable) {
+        var sharedVar = ConcurrencyUtils.threadLocal.get();
+        return () -> {
+            ConcurrencyUtils.threadLocal.set(sharedVar);
+            runnable.run();
+        };
+    }
+
+    public static <U> Supplier<U> withThreadLocalAndThreadPool(Supplier<U> supplier) {
+        var sharedVar = ConcurrencyUtils.threadLocal.get();
+        return () -> {
+            ConcurrencyUtils.threadLocal.set(sharedVar);
+            return supplier.get();
+        };
+    }
+
+    public static <V> Callable<V> withThreadLocalAndThreadPool(Callable<V> callable) {
+        var sharedVar = ConcurrencyUtils.threadLocal.get();
+        return () -> {
+            ConcurrencyUtils.threadLocal.set(sharedVar);
+            return callable.call();
+        };
+    }
+
+    // 下面这俩采用类似的思想
     public static Runnable withMdc(Runnable runnable) {
         var mdc = MDC.getCopyOfContextMap();
         return () -> {
