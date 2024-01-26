@@ -107,10 +107,10 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      */
 
     public static Runnable withThreadLocalAndThreadPool(Runnable runnable) {
-        var sharedVar = ConcurrencyUtils.threadLocal.get();
-        return () -> {
-            ConcurrencyUtils.threadLocal.set(sharedVar);
-            runnable.run();
+        var sharedVar = ConcurrencyUtils.threadLocal.get(); // 在parent thread中执行
+        return () -> { // sharedVar的传递还不清楚，但已知因为是非基本类型，所以传递的引用
+            ConcurrencyUtils.threadLocal.set(sharedVar); // 在sub thread中执行
+            runnable.run(); // runnable在调用 run()的线程执行，当前是 sub thread。
         };
     }
 
