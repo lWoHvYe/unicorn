@@ -34,6 +34,6 @@ jobs:
           java-version: '21'
           architecture: x64
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2 # v2.6.0
+        uses: gradle/gradle-build-action@v3 # v2.6.0
         with:
           arguments: classes publishToMavenLocal

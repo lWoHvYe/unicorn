@@ -40,11 +40,11 @@ jobs:
       #     swap-size-gb: 6
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: bootBuildImage
 
       - name: Publish 2 MavenLocal
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: publishToMavenLocal
