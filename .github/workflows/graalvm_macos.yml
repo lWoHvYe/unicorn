@@ -33,7 +33,8 @@ jobs:
           jdkFile: ${{ runner.temp }}/java_package.tar.gz
           java-version: '21'
           architecture: x64
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2 # v2.6.0
-        with:
-          arguments: classes publishToMavenLocal
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Publish
+        run: ./gradlew classes publishToMavenLocal
