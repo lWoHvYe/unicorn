@@ -25,7 +25,18 @@ pluginManagement {
 
 plugins {
     id("com.gradle.enterprise") version "3.15"
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.7.0")
+//    id("org.gradle.toolchains.foojay-resolver-convention") version ("0.7.0")
+    id("org.gradle.toolchains.foojay-resolver") version "0.7.0"
+}
+
+toolchainManagement {
+    jvm {
+        javaRepositories {
+            repository("foojay") {
+                resolverClass.set(org.gradle.toolchains.foojay.FoojayToolchainResolver::class.java)
+            }
+        }
+    }
 }
 
 dependencyResolutionManagement {
