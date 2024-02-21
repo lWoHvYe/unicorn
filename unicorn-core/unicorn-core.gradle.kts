@@ -19,15 +19,15 @@
  */
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
-plugins {
-    id("me.champeau.mrjar")
-}
+//plugins {
+//    id("me.champeau.mrjar")
+//}
 
 description = "系统Core模块"
 
-multiRelease {
-    targetVersions(17, 21)
-}
+//multiRelease {
+//    targetVersions(17, 21)
+//}
 
 java {
     withJavadocJar()
@@ -37,11 +37,11 @@ java {
     }
 }
 
-configurations {
-    named("java21Implementation") {
-        extendsFrom(implementation.get())
-    }
-}
+//configurations {
+//    named("java21Implementation") {
+//        extendsFrom(implementation.get())
+//    }
+//}
 
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
