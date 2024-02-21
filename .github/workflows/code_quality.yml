@@ -19,15 +19,6 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
           fetch-depth: 0  # a full history is required for pull request analysis
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: |
-            17
-            21
-          distribution: 'oracle'
-          check-latest: true
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
 
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2023.3
