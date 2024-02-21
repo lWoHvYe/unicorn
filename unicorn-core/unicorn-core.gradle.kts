@@ -138,6 +138,6 @@ tasks.named("compileJava") {
     (this as JavaCompile).options.javaModuleVersion = project.version.toString()
 }
 
-tasks.javadoc {
-    (this.options as StandardJavadocDocletOptions).addStringOption("-release", "17")
-}
+//tasks.javadoc {
+//    (this.options as StandardJavadocDocletOptions).addStringOption("-release", "17")
+//}
