@@ -1,3 +1,2 @@
-version: "1.0"
-linter: jetbrains/qodana-jvm-community:2023.3
+bootstrap: apt install openjdk-17-jdk
 projectJDK: 21
