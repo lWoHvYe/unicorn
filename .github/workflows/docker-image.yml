@@ -25,9 +25,7 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
-          java-version: |
-            17
-            21
+          java-version: 21
           distribution: 'oracle'
           check-latest: true
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
