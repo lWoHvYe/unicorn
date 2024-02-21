@@ -23,8 +23,8 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: |
-            21
             17
+            21
           distribution: 'oracle'
           check-latest: true
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
