@@ -31,11 +31,6 @@ multiRelease {
 
 java {
     withJavadocJar()
-
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-
     // 这个要放到dependencies之前
     registerFeature("log4jdbc") {
         usingSourceSet(sourceSets["main"])
