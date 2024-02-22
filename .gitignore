@@ -106,6 +106,7 @@ gradle-app.setting
 .idea/modules
 *.iml
 *.ipr
+.idea
 
 # CMake
 cmake-build-*/
