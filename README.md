@@ -10,6 +10,7 @@
 [![Dependency Review](https://github.com/lWoHvYe/unicorn/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/lWoHvYe/unicorn/actions/workflows/dependency-review.yml)
 [![CodeQL](https://github.com/lWoHvYe/unicorn/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/lWoHvYe/unicorn/actions/workflows/codeql-analysis.yml)
 [![Gradle Package](https://github.com/lWoHvYe/unicorn/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/lWoHvYe/unicorn/actions/workflows/gradle-publish.yml)
+[![Qodana](https://github.com/lWoHvYe/unicorn/actions/workflows/qodana_code_quality.yml/badge.svg?branch=main)](https://github.com/lWoHvYe/unicorn/actions/workflows/qodana_code_quality.yml)
 </div>
 
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
