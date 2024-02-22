@@ -325,6 +325,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         return menuRepository.findByRoleIdsAndPidIsNullAndTypeNot(roleIds, 2).orElseGet(LinkedHashSet::new)
                 .parallelStream().map(menu -> {
                     var dto = conversionService.convert(menu, MenuDto.class);
+                    assert dto != null;
                     var id = dto.getId();
                     dto.setChildren(getChild4CurUser(id, roleIds));
                     return dto;
@@ -336,6 +337,7 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         return menuRepository.findByRoleIdsAndPidAndTypeNot(roleIds, pid, 2).orElseGet(LinkedHashSet::new)
                 .parallelStream().map(menu -> {
                     var dto = conversionService.convert(menu, MenuDto.class);
+                    assert dto != null;
                     var id = dto.getId();
                     dto.setChildren(getChild4CurUser(id, roleIds));
                     return dto;
