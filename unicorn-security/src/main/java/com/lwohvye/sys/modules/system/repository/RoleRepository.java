@@ -101,7 +101,7 @@ public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificat
 //    select role0_.role_id as col_0_0_ from sys_role role0_ left outer join sys_roles_depts depts1_
 //    on role0_.role_id=depts1_.role_id left outer join sys_dept dept2_ on depts1_.dept_id=dept2_.dept_id
 //    where dept2_.dept_id in (5) limit 1
-    Boolean existsByDeptsIn(Collection<Set<Dept>> depts);
+    Boolean existsByDeptsIn(Collection<Dept> depts);
 
     /**
      * 根据菜单Id查询
