@@ -27,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 策略模式，处理type与实现类的映射关系，同时使用了单例模式
@@ -51,8 +52,8 @@ public class AuthHandlerProcessor implements BeanFactoryPostProcessor {
     public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
         var handlerMap = new HashMap<Integer, AUserTypeStrategy>();
         for (var temp : UserTypeEnum.values()) {
-            var beanInstance = getBeansWithAnnotation(configurableListableBeanFactory, AUserTypeStrategy.class, UserTypeHandlerAnno.class, temp.getType());
-            if (Objects.nonNull(beanInstance)) handlerMap.put(temp.getType(), beanInstance);
+            var optionalBeanInstance = getBeansWithAnnotation(configurableListableBeanFactory, AUserTypeStrategy.class, UserTypeHandlerAnno.class, temp.getType());
+            optionalBeanInstance.ifPresent(aUserTypeStrategy -> handlerMap.put(temp.getType(), aUserTypeStrategy));
         }
         var context = new AuthHandlerContext(handlerMap);
         //单例注入，单例模式
@@ -64,20 +65,20 @@ public class AuthHandlerProcessor implements BeanFactoryPostProcessor {
      */
     // @Nullable 该方法用在方法上或返回值前，用以标识方法可能返回null。也可用方法签名上的某个参数前，标识该参数可以传null，内部有做相关处理
     // private @Nullable
-    <T> T getBeansWithAnnotation(ConfigurableListableBeanFactory beanFactory, Class<T> manager, Class<? extends UserTypeHandlerAnno> annotation, Integer userType) throws BeansException {
-        if (ObjectUtils.isEmpty(userType)) return null;
+    <T> Optional<T> getBeansWithAnnotation(ConfigurableListableBeanFactory beanFactory, Class<T> manager, Class<? extends UserTypeHandlerAnno> annotation, Integer userType) throws BeansException {
+        if (ObjectUtils.isEmpty(userType)) return Optional.empty();
 
         var tCollection = beanFactory.getBeansOfType(manager).values();
         for (T t : tCollection) {
             var userTypeHandlerAnno = t.getClass().getAnnotation(annotation);
             if (ObjectUtils.isEmpty(userTypeHandlerAnno)) {
                 log.warn(" {} 类的 {} 注解没有写入值 ", t.getClass().getSimpleName(), annotation.getSimpleName());
-                return null;
+                return Optional.empty();
             }
             //注解值是否与userType相等
-            if (Objects.equals(userTypeHandlerAnno.value().getType(), userType)) return t;
+            if (Objects.equals(userTypeHandlerAnno.value().getType(), userType)) return Optional.of(t);
         }
         log.warn(" {} 没有对应的类 ", userType);
-        return null;
+        return Optional.empty();
     }
 }
