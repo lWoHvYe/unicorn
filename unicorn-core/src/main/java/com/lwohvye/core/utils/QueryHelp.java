@@ -239,6 +239,7 @@ public class QueryHelp {
             case BETWEEN -> {
                 if (value instanceof List<?> col && col.size() == 2 && col.get(0) instanceof Comparable<?> start && col.get(1) instanceof Comparable<?> end) {
                     var eleType = start.castComparableFieldType();
+                    assert eleType != null;
                     list.add(cb.between(getExpression(attributeName, join, root).as(eleType),
                             start.castToComparable(attributeName, eleType), eleType.cast(end)));
                 }

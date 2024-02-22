@@ -138,6 +138,7 @@ public class JDKUtils {
             var lookupClass = MethodHandles.Lookup.class;
             // IMPL_LOOKUP 是用来判断私有方法是否被信任的标识，用来控制访问权限的.默认是false
             var implLookup = lookupClass.getDeclaredField("IMPL_LOOKUP");
+            assert UnsafeUtils.UNSAFE != null;
             var fieldOffset = UnsafeUtils.UNSAFE.staticFieldOffset(implLookup);
             // implLookupField.trySetAccessible();
             // 当前这里只能通过Unsafe来获取，后续再试试其他的获取方式，比如被注释的通过反射获取的，既然有人这样写，理论上是可行的，只是某些条件不满足
