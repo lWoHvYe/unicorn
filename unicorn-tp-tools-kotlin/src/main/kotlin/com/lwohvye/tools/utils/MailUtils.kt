@@ -82,7 +82,7 @@ class MailUtils(val mailSender: JavaMailSender) {
             ?.toTypedArray()?.let { messageHelper.setBcc(it) }
         if (mailVo.multipartFiles != null)
             for (multipartFile in mailVo.multipartFiles!!)
-                messageHelper.addAttachment(Objects.requireNonNull(multipartFile.originalFilename), multipartFile)
+                multipartFile.originalFilename?.let { messageHelper.addAttachment(it, multipartFile) }
         if (ObjectUtil.isEmpty(mailVo.sentDate)) {
             mailVo.sentDate = Date()
             mailVo.sentDate?.let { messageHelper.setSentDate(it) }

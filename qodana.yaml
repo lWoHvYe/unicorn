@@ -28,3 +28,6 @@ exclude:
       - unicorn-security/src/main/java/com/lwohvye/sys/modules/system/strategy/NormalUserTypeStrategy.java
       - unicorn-security/src/main/java/com/lwohvye/sys/modules/system/repository/UserRepository.java
       - unicorn-security/src/main/java/com/lwohvye/sys/modules/system/repository/RoleRepository.java
+      - unicorn-tp-tools-kotlin/src/main/kotlin/com/lwohvye/tools/utils/MailUtils.kt
+      - unicorn-core/src/main/java/com/lwohvye/core/utils/GenericsUtils.java
+  - name: SpringJavaAutowiredFieldsWarningInspection
