@@ -40,8 +40,11 @@ import java.util.stream.Collectors;
 @UserTypeHandlerAnno(UserTypeEnum.NORMAL)
 public final class NormalUserTypeStrategy implements AUserTypeStrategy {
 
-    @Autowired
-    private IRoleService roleService;
+    private final IRoleService roleService;
+
+    public NormalUserTypeStrategy(IRoleService roleService) {
+        this.roleService = roleService;
+    }
 
     /**
      * 属性注入。这里不使用@PostConstruct后置处理，是因为之前有验证在执行后置处理的时候，SpringContextHolder还无法获取到相关的bean（因为applicationContext还未注入）
@@ -50,8 +53,6 @@ public final class NormalUserTypeStrategy implements AUserTypeStrategy {
      */
     @Override
     public void doInit() {
-        if (Objects.isNull(roleService)) // 这里只是为了适配一些情况，当前默认情况是不需要这部分init的，但通过调整参数使用PostProcessor来Inject StrategyBean时，field会是null，此时需要这块逻辑
-            this.roleService = SpringContextHolder.getBean(IRoleService.class);
     }
 
     @Override

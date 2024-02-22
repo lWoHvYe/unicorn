@@ -52,7 +52,7 @@ public class AuthHandlerProcessor implements BeanFactoryPostProcessor {
         var handlerMap = new HashMap<Integer, AUserTypeStrategy>();
         for (var temp : UserTypeEnum.values()) {
             var beanInstance = getBeansWithAnnotation(configurableListableBeanFactory, AUserTypeStrategy.class, UserTypeHandlerAnno.class, temp.getType());
-            if (Objects.nonNull(beanInstance)) handlerMap.put(temp.getType(), beanInstance);
+            handlerMap.put(temp.getType(), beanInstance);
         }
         var context = new AuthHandlerContext(handlerMap);
         //单例注入，单例模式

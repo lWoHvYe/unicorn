@@ -32,7 +32,7 @@ public class AuthRetryService {
 
     // https://github.com/spring-projects/spring-retry
     // 使用RetryTemplate是另一种重试的配置方式，较注解的方式复杂，但更为灵活。一般用注解但方式。
-    {
+    static {
         RetryTemplate.builder()
                 .maxAttempts(10)
                 // 指数递增延迟

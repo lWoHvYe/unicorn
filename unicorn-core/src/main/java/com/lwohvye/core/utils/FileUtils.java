@@ -384,7 +384,7 @@ public class FileUtils extends FileUtil {
     @Nullable
     public static String verifyFilename(String fileName) {
         if (Objects.isNull(fileName))
-            return fileName;
+            return null;
         // 过滤掉特殊字符
         fileName = fileName.replaceAll("[\\\\/:*?\"<>|~\\s]", "");
 
