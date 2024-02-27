@@ -5,7 +5,7 @@
  */
 
 job("Assemble & BuildImage") {
-    container(displayName = "Run gradle build", image = "eclipse-temurin:21-alpine") {
+    container(displayName = "Run gradle build", image = "ibm-semeru-runtimes:open-21-jdk") {
 
         kotlinScript { api ->
             // here can be your complex logic
