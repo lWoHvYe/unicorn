@@ -34,6 +34,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-aop")
-    runtimeOnly("io.asyncer:r2dbc-mysql:1.0.4")
+    runtimeOnly("io.asyncer:r2dbc-mysql:1.1.2")
     api(libs.springdoc.webflux.ui)
 }

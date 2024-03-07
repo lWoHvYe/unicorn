@@ -88,5 +88,5 @@ spring:
           initial-interval: 5000ms
   r2dbc:
     url: r2dbc:mysql://${DB_HOST:10.211.55.140}:${DB_PORT:3306}/${DB_NAME:unicorn}
-    username: ${DB_USER:}
+    username: ${DB_USER:lWoHvYe}
     password: ${DB_PWD:}
