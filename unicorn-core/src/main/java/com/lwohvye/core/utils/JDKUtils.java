@@ -40,10 +40,6 @@ import static java.lang.invoke.MethodType.methodType;
 public class JDKUtils {
     public static final int JVM_VERSION;
 
-    static final Class<?> CLASS_SQL_DATASOURCE;
-    static final Class<?> CLASS_SQL_ROW_SET;
-    public static final boolean HAS_SQL;
-
     // Android not support
     public static final Class<?> CLASS_TRANSIENT;
     public static final boolean BIG_ENDIAN;
@@ -51,17 +47,15 @@ public class JDKUtils {
     public static final boolean UNSAFE_SUPPORT;
 
     static final MethodHandles.Lookup IMPL_LOOKUP;
-    static final boolean OPEN_J9;
     static volatile MethodHandle CONSTRUCTOR_LOOKUP;
     static volatile boolean CONSTRUCTOR_LOOKUP_ERROR;
     static volatile Throwable initErrorLast;
 
     static {
         int jvmVersion = -1;
-        boolean openj9 = false, android = false;
+        boolean android = false;
         try {
             var jmvName = System.getProperty("java.vm.name");
-            openj9 = jmvName.contains("OpenJ9");
             android = jmvName.equals("Dalvik");
 
             var javaSpecVer = System.getProperty("java.specification.version");
@@ -75,21 +69,6 @@ public class JDKUtils {
         } catch (Throwable ignored) {
             initErrorLast = ignored;
         }
-
-        OPEN_J9 = openj9;
-
-        boolean hasJavaSql = true;
-        Class<?> dataSourceClass = null;
-        Class<?> rowSetClass = null;
-        try {
-            dataSourceClass = Class.forName("javax.sql.DataSource");
-            rowSetClass = Class.forName("javax.sql.RowSet");
-        } catch (Throwable ignored) {
-            hasJavaSql = false;
-        }
-        CLASS_SQL_DATASOURCE = dataSourceClass;
-        CLASS_SQL_ROW_SET = rowSetClass;
-        HAS_SQL = hasJavaSql;
 
         Class<?> transientClass = null;
         if (!android) {
@@ -156,11 +135,6 @@ public class JDKUtils {
 
     }
 
-    public static boolean isSQLDataSourceOrRowSet(Class<?> type) {
-        return (CLASS_SQL_DATASOURCE != null && CLASS_SQL_DATASOURCE.isAssignableFrom(type))
-                || (CLASS_SQL_ROW_SET != null && CLASS_SQL_ROW_SET.isAssignableFrom(type));
-    }
-
     /**
      * JDK 8开始支持Lambda，为了方便将一个Method映射为一个Lambda Function，避免反射开销。
      * java.invoke.LambdaMetafactory 可以实现这一功能，但这个也受限于可见性的限制，也就是说不能调用私有方法。
@@ -184,11 +158,7 @@ public class JDKUtils {
                         );
                         CONSTRUCTOR_LOOKUP = constructor;
                     }
-                    var FULL_ACCESS_MASK = 31; // for IBM Open J9 JDK
-                    return (MethodHandles.Lookup) constructor.invoke(
-                            objectClass,
-                            OPEN_J9 ? FULL_ACCESS_MASK : TRUSTED
-                    );
+                    return (MethodHandles.Lookup) constructor.invoke(objectClass, TRUSTED);
                 } else {
                     if (constructor == null) {
                         constructor = IMPL_LOOKUP.findConstructor(
