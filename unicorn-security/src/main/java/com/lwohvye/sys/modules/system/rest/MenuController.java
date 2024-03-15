@@ -131,7 +131,7 @@ public class MenuController implements SysMenuAPI {
     @Override
     public ResultInfo<String> delete(@RequestBody Set<Long> ids) {
         var menuSet = Optional.of(ids).orElseGet(Collections::emptySet)
-                .parallelStream().flatMap(id -> menuService.fetchMenuByPid(id).stream())
+                .stream().flatMap(id -> menuService.fetchMenuByPid(id).stream())
                 .distinct()
                 .map(simplePOJO -> {
                     var menuDto = new MenuDto();

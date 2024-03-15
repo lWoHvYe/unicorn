@@ -88,13 +88,13 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
                         && (StringUtils.isBlank(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), httpMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
                 .flatMap(resource -> resource.getRoleCodes().stream()) // 用flatMap合并流
                 .distinct() // 排重。到这里，因为是角色级别的，理论上不会太多，排重与否影响不大
-                .map(role -> new SecurityConfig("ROLE_" + role.trim())); // 需注意，toList的结果是ImmutableCollections
+                .map(role -> new SecurityConfig(STR."ROLE_\{role.trim()}")); // 需注意，toList的结果是ImmutableCollections
         // 处理匿名注解部分
         var requestPath = PathContainer.parsePath(url);
         var anonymousSecurityConfigStream = Stream.concat(anonymousPaths.getOrDefault(httpMethod, Collections.emptyList()).stream(), // 方法与请求匹配的部分
                         anonymousPaths.getOrDefault(RequestMethodEnum.ALL.getType(), Collections.emptyList()).stream()) // 方法无类型
                 .filter(pathPattern -> pathPattern.matches(requestPath)) // 匹配上
-                .map(pathPattern -> new SecurityConfig(SecurityConstant.ROLE_ANONYMOUS));
+                .map(_ -> new SecurityConfig(SecurityConstant.ROLE_ANONYMOUS));
         var securityConfigs = Stream.concat(securityConfigStream, anonymousSecurityConfigStream).toList(); // 合并两股流
         if (!securityConfigs.isEmpty())
             attributes = new ArrayList<>(securityConfigs); // 构建返回
@@ -115,11 +115,12 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
         }
 
         // 关于parallelStream，其是使用ForkJoinPool采用分治法来解决问题，池中默认线程为核数-1，需注意提交任务的main线程也参与任务的执行，即实际执行任务的是main线程+池中的线程
+        // when using parallelStream + flatMap()，flatMap will reset stream to sequential, so we should use map() + reduce() to concat the stream
         // 根据方法类型分组。值为pattern的集合
         anonymousPaths = handlerMethodMap.entrySet().parallelStream()
                 // 有匿名访问注解
                 .filter(infoEntry -> !Objects.isNull(infoEntry.getValue().getMethodAnnotation(AnonymousAccess.class)))
-                .flatMap(infoEntry -> {
+                .map(infoEntry -> {
                     // 先拿到方法类型
                     var requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
                     var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
@@ -138,7 +139,7 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
                             // Pair.of(request.getType(), parser.parse(pattern))
                             new PatternMatchCarrier(request.getType(), parser.parse(pattern))
                     );
-                })
+                }).reduce(Stream::concat).orElse(Stream.empty())
                 .collect(Collectors.groupingBy(PatternMatchCarrier::methodType, Collectors.mapping(PatternMatchCarrier::pathPattern, Collectors.toUnmodifiableList())));
     }
 
