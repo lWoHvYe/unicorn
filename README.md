@@ -15,7 +15,7 @@
 
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
-For lWoHvYe/unicorn project, will stay at Java 21 until 2025. will try Java 21+ in WHY-lWoHvYe/valentine-p2p
+For lWoHvYe/unicorn project, will stay at Java 21 until 2025. will try Java 21+ in WHY-lWoHvYe/valentine-p2p (skip Java 22)
 
 ---
 

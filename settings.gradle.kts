@@ -57,9 +57,9 @@ dependencyResolutionManagement {
             version("oshiCore", "6.4.2")
             version("poi", "5.2.4")
             version("quartz", "2.3.2")
-            version("redisson", "3.27.1")
+            version("redisson", "3.27.2")
             version("springBoot", providers.gradleProperty("springBootVersion").get())
-            version("springdoc", "2.3.0")
+            version("springdoc", "2.4.0")
             version("thumbnailator", "0.4.20")
             version("xerces", "2.12.2")
 
