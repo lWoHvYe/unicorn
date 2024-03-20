@@ -31,10 +31,6 @@ multiRelease {
 
 java {
     withJavadocJar()
-    // 这个要放到dependencies之前
-    registerFeature("log4jdbc") {
-        usingSourceSet(sourceSets["main"])
-    }
 }
 
 configurations {
@@ -131,7 +127,6 @@ dependencies {
     api("org.jetbrains:annotations:24.1.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("com.mysql:mysql-connector-j")
-    "log4jdbcRuntimeOnly"(libs.log4jdbc)
 }
 
 tasks.named("compileJava") {
