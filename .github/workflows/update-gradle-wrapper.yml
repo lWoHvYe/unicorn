@@ -8,6 +8,10 @@ jobs:
   update:
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
 
     steps:
       - name: checkout
@@ -19,8 +23,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           check-latest: true
-          server-id: github 
-          settings-path: ${{ github.workspace }} 
+          server-id: github
+          settings-path: ${{ github.workspace }}
 
       - name: update gradle
         id: gradleUpdate
