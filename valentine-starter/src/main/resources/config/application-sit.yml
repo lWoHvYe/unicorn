@@ -81,6 +81,7 @@ spring:
   ##### 邮箱配置（配合3rd-tools模块使用）
   mail:
     host: smtp.office365.com #SMTP server host
+    port: 587
     username: xxx@outlook.com #login user
     password: xxx #login password
     properties:
