@@ -40,6 +40,8 @@ import com.lwohvye.sys.modules.system.service.mapstruct.MenuMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -68,6 +70,7 @@ import java.util.stream.Collectors;
 @CacheConfig(cacheNames = "menu")
 public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherAware {
 
+    private static final Logger log = LoggerFactory.getLogger(MenuServiceImpl.class);
     private final MenuMapper menuMapper;
     private final MenuRepository menuRepository;
 
@@ -413,6 +416,11 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
         CompletableFuture<List<MenuVo>> cf = CompletableFuture.completedFuture(findByUser(uid))
                 .thenApply(this::buildTree)
                 .thenApply(this::buildMenus);
+        // Exception Handler，we can use exceptionally() or handle() to handle exception
+        cf.exceptionally(throwable -> {
+            log.error("load menus error", throwable);
+            throw new BadRequestException(throwable.getMessage());
+        });
         cf.join();
         // 直接cf.get()返回。序列化是一个数组，无法反序列化。序列化结果为：[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]
         // 所以需要new 一个List对象返回。此时序列化的结果为：[“java.util.ArrayList”,[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]]
