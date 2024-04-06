@@ -36,7 +36,7 @@ public class NumberController {
     @Autowired
     CustomizeUserRepository customizeUserRepository;
 
-    // http://127.0.0.1:8080/res/res-mvc/concatNumbers
+    // http://127.0.0.1:8080/res/res-mvc/api/concatNumbers
     @GetMapping(value = "/api/concatNumbers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> generateConcatNumbers() {
         // 创建包含初始字符串 "starting" 的 Flux
