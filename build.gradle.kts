@@ -35,7 +35,7 @@ plugins {
     id("me.champeau.mrjar") version "0.1.1"
     id("org.gradlex.extra-java-module-info") version "1.8"
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
-    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 extra["sharedManifest"] = java.manifest {
