@@ -21,6 +21,7 @@ module lwohvye.unicorn.core {
     requires transitive spring.data.commons;
     requires transitive spring.data.jpa;
     requires transitive spring.data.redis;
+    requires transitive spring.rabbit;
     requires transitive spring.security.config;
     requires transitive spring.security.core;
     requires transitive spring.security.crypto;
