@@ -141,6 +141,7 @@ public abstract class YRabbitAbstractConsumer {
         UnicornAbstractThreadUtils.TASK_EXECUTOR.execute(() -> {
             // 打个标记，只会重消费一次，不然就无穷无尽了
             var mask = "ReConsumed";
+            // var redelivered = message.getMessageProperties().getRedelivered(); 这里也标记了是否是重新投递的，但只说明上次没成功消费，所以并不适合此场景，
             var header = message.getMessageProperties().getHeader(mask);
             if (Objects.isNull(header)) {
                 message.getMessageProperties().setHeader(mask, "Ignored");

@@ -25,4 +25,9 @@ import sample.domain.CustomizeUser;
 @Repository
 public interface CustomizeUserRepository extends ReactiveCrudRepository<CustomizeUser, Long> {
     Mono<CustomizeUser> findByUsername(Publisher<String> username);
+
+    Mono<CustomizeUser> findByUsername(String username);
+    // while there are multi-satisfied result, will get this error
+    // reactor.core.Exceptions$ErrorCallbackNotImplemented: java.lang.IllegalArgumentException: Cannot encode class java.util.ArrayList
+//    Flux<CustomizeUser> findByUsername(Publisher<String> username);
 }

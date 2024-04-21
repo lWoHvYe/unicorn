@@ -20,9 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import sample.domain.CustomizeUser;
+import sample.dto.UserVO;
 import sample.repo.CustomizeUserRepository;
 import sample.utils.ReactiveSecurityUtils;
 
@@ -71,6 +74,47 @@ public class NumberController {
                         customizeUserRepository.findByUsername(ReactiveSecurityUtils.getCurrentUsernameSham())
                                 .map(CustomizeUser::toString),
                         endFlux)
+                .doFirst(() -> log.info("start generate response"))
+                .doFinally(signalType -> {
+                    switch (signalType) {
+                        case ON_COMPLETE, CANCEL -> log.info("Complete Success");
+                        case ON_ERROR -> log.info("Terminate by Error");
+                        default -> log.info("Terminate by other reason");
+
+                    }
+                })
+                .delayElements(Duration.ofSeconds(1));
+    }
+
+    // 这个会触发file download
+    // http://127.0.0.1:8080/res/res-flux/api/concatObj
+    @GetMapping(value = "/api/concatObj", produces = MediaType.APPLICATION_NDJSON_VALUE) // 如果返回一个对象，用这个返回json格式
+    public Flux<CustomizeUser> generateConcatObj() {
+
+        // 使用 Flux.concat() 组合多个 Flux
+        return Flux.concat(
+                        customizeUserRepository.findByUsername(ReactiveSecurityUtils.getCurrentUsername()),
+                        customizeUserRepository.findByUsername(ReactiveSecurityUtils.getCurrentUsernameSham())
+                )
+                .doFirst(() -> log.info("start generate response"))
+                .doFinally(signalType -> {
+                    switch (signalType) {
+                        case ON_COMPLETE, CANCEL -> log.info("Complete Success");
+                        case ON_ERROR -> log.info("Terminate by Error");
+                        default -> log.info("Terminate by other reason");
+
+                    }
+                })
+                .delayElements(Duration.ofSeconds(1));
+    }
+
+    // 如果返回一个对象，用这个返回json格式，同时用consumes指明入参格式
+    @PostMapping(value = "/api/combineObj", consumes = MediaType.APPLICATION_NDJSON_VALUE, produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<CustomizeUser> combineObj(@RequestBody Flux<UserVO> userNames) {
+        // 使用 Flux.concat() 组合多个 Flux
+        return Flux.concat(customizeUserRepository.findByUsername(ReactiveSecurityUtils.getCurrentUsername()),
+                        userNames.flatMap(user -> customizeUserRepository.findByUsername(user.getUsername())),
+                        customizeUserRepository.findByUsername(ReactiveSecurityUtils.getCurrentUsernameSham()))
                 .doFirst(() -> log.info("start generate response"))
                 .doFinally(signalType -> {
                     switch (signalType) {
