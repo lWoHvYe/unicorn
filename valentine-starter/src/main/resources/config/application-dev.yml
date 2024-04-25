@@ -24,6 +24,8 @@ spring:
       maximum-pool-size: 10
       pool-name: ValentineCCP
       connection-test-query: SELECT 1
+      # 对于诸如Oracle，有时需要这样指定current_schema，包含jpa及native sql
+      schema: unicorn
 
   # cache配置
   cache:
