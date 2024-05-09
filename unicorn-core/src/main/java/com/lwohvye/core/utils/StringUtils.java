@@ -18,6 +18,7 @@ package com.lwohvye.core.utils;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.useragent.UserAgentUtil;
+import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.lwohvye.core.constant.UnicornCoreConstant;
@@ -84,8 +85,12 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      */
     public static String getHttpCityInfo(String ip) {
         String api = String.format(UnicornCoreConstant.Url.IP_URL, ip);
-        JSONObject object = JSONUtil.parseObj(HttpUtil.get(api));
-        return object.get("addr", String.class);
+        try {
+            JSONObject object = JSONUtil.parseObj(HttpUtil.get(api));
+            return object.get("addr", String.class);
+        } catch (JSONException e) {
+            return "Moon";
+        }
     }
 
     /**

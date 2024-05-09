@@ -104,9 +104,9 @@ public class RedisConfig implements CachingConfigurer {
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         // enableDefaultTyping 可以认为是序列化是，添加复杂类型的默认类型，以便反序列化时可以精确类型。有下面五种选型
         // - JAVA_LANG_OBJECT：表示将Object类型作为声明类型的属性 设置默认类型。但尽管设置Object，一般都为复杂类型的值，像基本类型和其包装类型的值(String、Boolean、Integer、Double)不会添加默认类型。像自定义对象，List，map等实际对象的都会被添加。
-        // - OBJECT_AND_NON_CONCRETE：当属性为Object或非具体类型(抽象类或接口)，但不包括数组类型。当我们定义一个含有接口类的属性时，会设置默认类型
+        // - OBJECT_AND_NON_CONCRETE：当属性为Object或非具体类型(抽象类或接口)，但不包括数组类型。当我们定义一个含有接口类的属性时，会设置默认类型，包含了ArrayList这种(List接口的具体实现)，
         // - NON_CONCRETE_AND_ARRAYS：OBJECT_AND_NON_CONCRETE值说明了不包含array类型。此属性专门添加了array类型
-        // - NON_FINAL：表示将应用与除final修饰外的所有属性，以及所有非final的数组。基本上Object类型和array类型及interface、abstract修饰的类。这些都足以进行序列化。
+        // - NON_FINAL：表示将应用与除final修饰外的所有属性，以及所有非final的数组。基本上Object类型和array类型及interface、abstract修饰的类。这些都足以进行序列化。包含了极其详细的类型信息
         // - EVERYTHING：在新版本添加的，如其名
         // 其重载方法包含了两个参数DefaultTyping类型和JsonTypeInfo.As类型
         // JsonTypeInfo.As
@@ -131,8 +131,9 @@ public class RedisConfig implements CachingConfigurer {
         // CUSTOM
         //
         // 使用自定义的实现TypeSerializer和TypeDeserializer
-        // 必须设置，否则无法将JSON转化为对象，会转化成Map类型。指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会抛出异常（使用NON_FINAL时）
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
+        // 必须设置，否则无法将JSON转化为对象，会反序列化成Map类型(LinkedHashMap)。指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会抛出异常（使用NON_FINAL时）
+        // 大部分时候，应该JAVA_LANG_OBJECT就可以了，当结果是集合时，会保存集合元素的类型，这对反序列化来说足够了
+        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY);
         return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
     }
 
