@@ -60,6 +60,7 @@ module lwohvye.unicorn.core {
     exports com.lwohvye.core.base;
     exports com.lwohvye.core.constant;
     exports com.lwohvye.core.context;
+    exports com.lwohvye.core.custom;
     exports com.lwohvye.core.exception;
     exports com.lwohvye.core.extension;
     exports com.lwohvye.core.utils;

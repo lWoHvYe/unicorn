@@ -67,6 +67,7 @@ public class UserLocalCache {
      */
     //  这种本地缓存的方式，也是解决热Key的一种方案，可以减轻Redis的压力（多个Redis集群，单个Redis不再保存全量数据，分散）。针对失效、过期等，可接入RQ，进行相关事件通知。
     //  不能存redis中，使用fastjson时没什么问题。但使用jackson反序列化需要实体有空参构造。而SimpleGrantedAuthority无空参构造。解决方案是自定义一个Authority类继承GrantedAuthority即可，感谢大佬那边的思路
+    //  需要注意，使用localCache时，返回的对象与cache中是同一个对象，
     LoadingCache<String, JwtUserDto> userLRUCache = Caffeine.newBuilder()
             .initialCapacity(16) // 合理设置初始容量
             .maximumSize(32) // 最大容量，当缓存数量达到或接近该最大值时，Cache将清除掉那些最近最少使用的缓存

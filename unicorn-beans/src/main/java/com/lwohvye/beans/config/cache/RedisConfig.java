@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.lwohvye.beans.config.LocalPropertyConfig;
+import com.lwohvye.core.custom.ConcurrentFreshCacheManager;
 import com.lwohvye.core.utils.json.JsonUtils;
 import com.lwohvye.core.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -63,8 +65,15 @@ public class RedisConfig implements CachingConfigurer {
 
     // 这个是替换原来的RedisCacheManager的。通过该CacheManager，使用Cacheable 注解，缓存数据会被放在一个RMap 中，搞清楚这点后，可以比较精准的清除一些key
     @Bean
+    @Primary
     CacheManager redissonCacheManager(RedissonClient redissonClient) {
         return new RedissonSpringCacheManager(redissonClient, "classpath:cache-config.yaml");
+    }
+
+    // not suitable for caffeine
+    @Bean
+    CacheManager localCacheManager() {
+        return new ConcurrentFreshCacheManager();
     }
 
     /**

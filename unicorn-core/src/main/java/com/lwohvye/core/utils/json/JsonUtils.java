@@ -15,6 +15,7 @@
  */
 package com.lwohvye.core.utils.json;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -22,7 +23,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.lwohvye.core.utils.StringUtils;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,8 +50,10 @@ import java.util.function.Supplier;
 @SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class JsonUtils {
     // 加载速度太慢了，放在静态代码块中
-    // private static final ObjectMapper mapper = new ObjectMapper();
     private static final ObjectMapper objectMapper;
+
+    // enable DefaultType for deserialize
+    private static final ObjectMapper objectMapper5Details;
 
     /**
      * 设置一些通用的属性
@@ -77,6 +82,11 @@ public class JsonUtils {
                 .enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
                 // 允许有Java注释
                 .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
+                .build();
+
+        objectMapper5Details = JsonMapper.builder()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
                 .build();
     }
 
@@ -235,6 +245,12 @@ public class JsonUtils {
         return obj != null ? toJavaObject(obj, tClass) : null;
     }
 
+    @SneakyThrows
+    public static <T> T deepCopy(T o, Class<T> tClass) {
+        // if all element and sub-element are Serializable
+//        return ObjectUtil.cloneByStream(o);
+        return objectMapper5Details.readValue(objectMapper5Details.writeValueAsBytes(o), tClass);
+    }
     // region   toCollection
 
     public static Map<String, Object> toMap(Object obj) {
