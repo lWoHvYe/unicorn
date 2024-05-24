@@ -77,6 +77,7 @@ buildNumber.properties
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
+.kotlin/sessions/
 
 .gradle
 **/build/
