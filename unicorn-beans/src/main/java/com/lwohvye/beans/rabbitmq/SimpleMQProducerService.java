@@ -75,7 +75,7 @@ public sealed class SimpleMQProducerService extends XRabbitAbstractProducer perm
          * exchange：当时这个消息发给哪个交换机
          * routingKey：当时这个消息用哪个路邮键
          */
-        rabbitTemplate.setReturnsCallback(returnedMessage -> log.warn("Fail Message[{}]==>replyCode[{}]==>replyText[{}]==>exchange[{}]==>routingKey[{}]",
+        rabbitTemplate.setReturnsCallback(returnedMessage -> log.debug("Fail Message[{}]==>replyCode[{}]==>replyText[{}]==>exchange[{}]==>routingKey[{}]",
                 returnedMessage.getMessage(), returnedMessage.getReplyCode(), returnedMessage.getReplyText(), returnedMessage.getExchange(), returnedMessage.getRoutingKey()));
     }
 }

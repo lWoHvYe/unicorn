@@ -15,7 +15,6 @@
 
 本项目在eladmin项目的基础上，进行了部分扩展及尝试，在此表示感谢。
 
-For lWoHvYe/unicorn project, will stay at Java 21 until 2025. will try Java 21+ in WHY-lWoHvYe/valentine-p2p (skip Java 22)
 
 ---
 
@@ -90,7 +89,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 项目简介
 
-一个基于最新的Java 21(17) 版本、 Spring Boot 3.2、 Jpa、 Spring Security、RabbitMQ、Vue的前后端分离的脚手架。
+一个基于最新的Java 21(17) 版本、 Spring Boot 3.3、 Jpa、 Spring Security、RabbitMQ、Vue的前后端分离的脚手架。
 在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码

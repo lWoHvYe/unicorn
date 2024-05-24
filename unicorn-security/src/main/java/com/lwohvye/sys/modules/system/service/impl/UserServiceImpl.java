@@ -147,6 +147,9 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
 
     @Override
 //  先简单处理，清理该域中所有缓存
+    // 在配置Cacheable时，可以即配置cacheNames又配置key，若将cacheNames视为一个Map，key就是其中单个key
+    // 在配置CacheEvict时，若只配置cacheNames，而未配置key，则需要将allEntries = true，否则可能不生效
+    // 这个也容易理解，因为cacheNames是一个很大的Cache，可能多个class共同使用，而key的gen是默认带上当前class信息的。主要是为了避免误清理过多的Cache
     @CacheEvict(allEntries = true)
     @Transactional(rollbackFor = Exception.class)
     public void create(User resources) {
