@@ -46,14 +46,21 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      */
     public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
         log.warn("In Java 17 Source");
-        List<? extends Future<?>> subtasks = null;
-        if (Objects.nonNull(tasks))
-            subtasks = Arrays.stream(tasks).map(TASK_EXECUTOR::submit).toList();
-
+        List<? extends CompletableFuture<?>> futures = null;
+        if (Objects.nonNull(tasks)) {
+            futures = Arrays.stream(tasks).map(task -> CompletableFuture.supplyAsync(() -> {
+                try {
+                    return task.call();
+                } catch (Exception e) {
+                    throw new UtilsException(e.getMessage());
+                }
+            }, TASK_EXECUTOR)).toList();
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        }
         Object results = null;
         if (Objects.nonNull(composeResult))
-            results = composeResult.apply(Objects.nonNull(subtasks) ?
-                    subtasks.stream().map(future -> {
+            results = composeResult.apply(Objects.nonNull(futures) ?
+                    futures.stream().map(future -> {
                         try {
                             return future.get();
                         } catch (InterruptedException e) {
@@ -62,7 +69,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
                             throw new UtilsException(e.getMessage());
                         }
                         return null;
-                    }).toList() : Collections.emptyList());
+                    }).filter(Objects::nonNull).toList() : Collections.emptyList());
         if (Objects.nonNull(eventual))
             eventual.accept(results);
 
@@ -74,11 +81,13 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
     // var futureTask = new FutureTask<T>(Callable/Runnable) // Callable/Runnable 2 Runnable/Future
     public static void structuredExecute(Runnable eventual, Runnable... tasks) {
         log.warn("In Java 17 Source");
-        if (Objects.nonNull(tasks))
-            Arrays.stream(tasks).forEach(TASK_EXECUTOR::execute);
+        if (Objects.nonNull(tasks)) {
+            var futureTasks = Arrays.stream(tasks).map(task -> CompletableFuture.runAsync(task, TASK_EXECUTOR)).toList();
+            CompletableFuture.allOf(futureTasks.toArray(new CompletableFuture[0])).join();
+        }
         // Here, both forks have succeeded, so compose their results
         if (Objects.nonNull(eventual))
-            log.warn("Unsupported Java below 21 Skip EventualTask");
+            eventual.run();
     }
 
     /*

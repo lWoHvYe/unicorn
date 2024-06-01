@@ -60,7 +60,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
             Object results = null;
             if (Objects.nonNull(composeResult))
                 results = composeResult.apply(Objects.nonNull(subtasks) ?
-                        subtasks.stream().map(Subtask::get).toList() : Collections.emptyList());
+                        subtasks.stream().map(Subtask::get).filter(Objects::nonNull).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
         } catch (ExecutionException e) {

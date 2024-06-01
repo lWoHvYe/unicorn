@@ -66,12 +66,12 @@ public class LogAspect {
      */
     @Around("logPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        return ScopedValue.where(SCOPED_VALUE, Instant.now()).call(() -> {
+        return ScopedValue.callWhere(SCOPED_VALUE, Instant.now(), () -> {
             Object result;
             try {
                 result = joinPoint.proceed();
             } catch (Throwable e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getMessage());
             }
             Log log = new Log("INFO", Duration.between(SCOPED_VALUE.get(), Instant.now()).toMillis());
             HttpServletRequest request = RequestHolder.getHttpServletRequest();
