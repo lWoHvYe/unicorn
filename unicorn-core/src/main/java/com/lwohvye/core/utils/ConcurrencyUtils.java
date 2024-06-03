@@ -42,7 +42,6 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      * @param composeResult consume the task res
      * @param eventual      finally execute, consume the res of  composeResult
      * @param tasks         tasks wtd
-     * @date 2022/9/22 8:26 PM
      */
     public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
         log.warn("In Java 17 Source");

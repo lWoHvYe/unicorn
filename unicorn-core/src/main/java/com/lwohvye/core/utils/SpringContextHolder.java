@@ -17,6 +17,7 @@ package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.extension.StringExtensionMethod;
+import lombok.Getter;
 import lombok.Locked;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,6 @@ import java.util.jar.JarFile;
  * 针对接口，需要获取相关的实现类，因为注解是在实现类上的
  *
  * @author Jie, Super Idol lv, Super Idol peng
- * @date 2019-01-07
  * @see cn.hutool.extra.spring.SpringUtil
  */
 @Slf4j
@@ -66,7 +66,10 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
     private static ConfigurableListableBeanFactory beanFactory;
     /**
      * Spring应用上下文环境
+     * -- GETTER --
+     * 获取
      */
+    @Getter
     private static ApplicationContext applicationContext;
     private static DefaultListableBeanFactory defaultListableBeanFactory = null;
     private static final List<CallBack> CALL_BACKS = new ArrayList<>();
@@ -93,15 +96,6 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
         SpringContextHolder.addCallback = false; // 这个只在启动后执行一下，后面就没必要了。CALL_BACKS里存的就是预先放进去，要在初始化完成后执行的任务。
 
         defaultListableBeanFactory = (DefaultListableBeanFactory) applicationContext.getAutowireCapableBeanFactory();
-    }
-
-    /**
-     * 获取{@link ApplicationContext}
-     *
-     * @return {@link ApplicationContext}
-     */
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
     }
 
     /**
@@ -192,7 +186,6 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
      *
      * @param clazz 类型
      * @return java.util.Map key为beanName，value为beanInstance
-     * @date 2021/11/23 11:48 上午
      */
     public static <T> Map<String, T> getBeansOfType(Class<T> clazz) {
         return getBeanFactory().getBeansOfType(clazz);
@@ -203,7 +196,6 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
      *
      * @param beanName /
      * @return boolean
-     * @date 2021/11/23 9:33 上午
      */
     public static boolean containsBean(String beanName) {
         return getBeanFactory().containsBean(beanName);
@@ -214,7 +206,6 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
      *
      * @param name /
      * @return boolean
-     * @date 2021/11/23 9:34 上午
      */
     public static boolean isSingleton(String name) throws NoSuchBeanDefinitionException {
         return getBeanFactory().isSingleton(name);
@@ -225,7 +216,6 @@ public class SpringContextHolder implements BeanFactoryPostProcessor, Applicatio
      *
      * @param beanName /
      * @return java.lang.Class
-     * @date 2021/11/23 9:35 上午
      */
     public static Class<?> getType(String beanName) throws NoSuchBeanDefinitionException {
         return getBeanFactory().getType(beanName);
