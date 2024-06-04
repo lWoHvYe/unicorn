@@ -48,9 +48,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
-          java-version: |
-            17
-            ${{ matrix.java }}
+          java-version: ${{ matrix.java }}
           # Java distribution. See the list of supported distributions in README file
           distribution: ${{ matrix.distribution }}
           # The package type (jdk, jre, jdk+fx, jre+fx)
