@@ -129,4 +129,6 @@ public class AuthRetryService {
     public void recover(IllegalAccessException e) {
         log.error("service retry after Recover => {}", e.getMessage());
     }
+
+    // @Retryable 和 @Recover都支持在接口上，@Retryable可配合@Async一起使用
 }
