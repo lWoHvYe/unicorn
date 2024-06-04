@@ -24,10 +24,8 @@ plugins {
     `java-gradle-plugin`
 }
 
-val asmVersion by extra { "9.6" }
-
 dependencies {
-    implementation("org.ow2.asm:asm:$asmVersion")
+    implementation(libs.asm)
 }
 
 repositories {

@@ -67,7 +67,7 @@ subprojects {
 //        implementation(libs.asm)
         "coreCompCompileOnly"("org.mapstruct", "mapstruct-processor", "1.5.5.Final")
         annotationProcessor("org.mapstruct", "mapstruct-processor", "1.5.5.Final")
-        annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "1.1.0")
+        annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "1.1.1")
     }
 
     tasks.withType<Javadoc>().configureEach {
@@ -142,7 +142,7 @@ publishing {
                 url.set("https://github.com/lWoHvYe/unicorn.git")
                 properties = mapOf(
                     "myProp" to "chaste unicorn",
-                    "spring-boot.version" to "${property("springBootVersion")}",
+                    "spring-boot.version" to "${libs.versions.springBoot.get()}",
                     "project.core.version" to version
                 )
                 licenses {
