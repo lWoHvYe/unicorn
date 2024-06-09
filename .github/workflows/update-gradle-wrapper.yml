@@ -6,12 +6,16 @@ on:
 
 jobs:
   update:
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: ${{ (matrix.language == 'swift' && matrix.os) || 'ubuntu-latest' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
       issues: write
       pull-requests: write
       contents: write
+
+    strategy:
+      matrix:
+        os: [ macos-latest, macos-11 ]
 
     steps:
       - name: checkout
