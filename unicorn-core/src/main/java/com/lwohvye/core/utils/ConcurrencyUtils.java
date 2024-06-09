@@ -59,16 +59,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         Object results = null;
         if (Objects.nonNull(composeResult))
             results = composeResult.apply(Objects.nonNull(futures) ?
-                    futures.stream().map(future -> {
-                        try {
-                            return future.get();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        } catch (ExecutionException e) {
-                            throw new UtilsException(e.getMessage());
-                        }
-                        return null;
-                    }).filter(Objects::nonNull).toList() : Collections.emptyList());
+                    futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).toList() : Collections.emptyList());
         if (Objects.nonNull(eventual))
             eventual.accept(results);
 
