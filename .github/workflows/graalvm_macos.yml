@@ -18,7 +18,10 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, macos-11.7 ]
 
     steps:
       - uses: actions/checkout@v4
