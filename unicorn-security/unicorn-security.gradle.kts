@@ -32,8 +32,6 @@ java {
     withJavadocJar()
     registerFeature("businessLog") {
         usingSourceSet(sourceSets["businessLog"])
-        withJavadocJar()
-        withSourcesJar()
     }
 }
 
