@@ -20,13 +20,20 @@
 
 description = "权限管理模块"
 
+sourceSets {
+    create("businessLog") {
+        java {
+            srcDir("src/businessLog/java")
+        }
+    }
+}
+
 java {
     withJavadocJar()
-    registerFeature("captcha") {
-        usingSourceSet(sourceSets["main"])
-    }
     registerFeature("businessLog") {
-        usingSourceSet(sourceSets["main"])
+        usingSourceSet(sourceSets["businessLog"])
+        withJavadocJar()
+        withSourcesJar()
     }
 }
 
@@ -99,9 +106,10 @@ dependencies {
     api(libs.jjwt)
     api(libs.quartz)
     api(libs.easy.captcha)
-    "captchaImplementation"(libs.captcha)
+    implementation(libs.captcha)
     api(libs.oshi.core)
     // It seems that xxxImplementation will work on runtimeClasspath for the customers while xxxApi compileClasspath
     "businessLogApi"(libs.bizlog)
+    "businessLogApi"(project(":unicorn-beans"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

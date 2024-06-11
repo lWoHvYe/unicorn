@@ -13,7 +13,6 @@ module lwohvye.unicorn.security {
     requires spring.websocket;
     requires transitive spring.rabbit;
     requires transitive spring.retry;
-    requires bizlog.sdk;
     requires captcha.core;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
@@ -28,9 +27,6 @@ module lwohvye.unicorn.security {
 
     exports com.lwohvye.sys.common.annotation;
     exports com.lwohvye.sys.common.condition to spring.beans, spring.aop;
-    exports com.lwohvye.sys.modules.infrastructure.constants;
-    exports com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.beans, spring.aop;
-    exports com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
     exports com.lwohvye.sys.modules.quartz.domain;
     exports com.lwohvye.sys.modules.quartz.repository; // 若要使用JRebel + XRebel，则需要exports to unnamed module
@@ -65,8 +61,6 @@ module lwohvye.unicorn.security {
     opens com.lwohvye.sys.common.init;
     opens com.lwohvye.sys.common.orm;
     opens com.lwohvye.sys.common.web;
-    opens com.lwohvye.sys.modules.infrastructure.logrecord.function to spring.core;
-    opens com.lwohvye.sys.modules.infrastructure.logrecord.service to spring.core;
     opens com.lwohvye.sys.modules.mnt.websocket to spring.core;
     opens com.lwohvye.sys.modules.quartz.config;
     opens com.lwohvye.sys.modules.quartz.domain;

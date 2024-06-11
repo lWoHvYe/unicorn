@@ -57,15 +57,7 @@ subprojects {
         version = "1.18.32"
     }
 
-    java {
-        registerFeature("coreComp") {
-            usingSourceSet(sourceSets["main"])
-        }
-    }
-
     dependencies {
-//        implementation(libs.asm)
-        "coreCompCompileOnly"("org.mapstruct", "mapstruct-processor", "1.5.5.Final")
         annotationProcessor("org.mapstruct", "mapstruct-processor", "1.5.5.Final")
         annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "1.1.1")
     }

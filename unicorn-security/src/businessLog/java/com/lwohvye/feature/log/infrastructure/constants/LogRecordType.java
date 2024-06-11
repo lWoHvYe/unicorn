@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.infrastructure.constants;
+package com.lwohvye.feature.log.infrastructure.constants;
 
 
 /**

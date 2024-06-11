@@ -20,7 +20,7 @@ import com.lwohvye.core.annotation.log.OprLog
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
 import com.lwohvye.core.utils.result.ResultInfo
 import com.lwohvye.sys.common.annotation.ApiVersion
-import com.lwohvye.sys.modules.infrastructure.constants.LogRecordType
+import com.lwohvye.feature.log.infrastructure.constants.LogRecordType
 import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext
 import com.mzt.logapi.starter.annotation.LogRecord
 import jakarta.annotation.PostConstruct

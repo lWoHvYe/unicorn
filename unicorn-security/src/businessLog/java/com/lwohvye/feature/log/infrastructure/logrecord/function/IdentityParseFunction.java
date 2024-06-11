@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.infrastructure.logrecord.function;
+package com.lwohvye.feature.log.infrastructure.logrecord.function;
 
 
 import com.mzt.logapi.service.IParseFunction;

@@ -50,11 +50,6 @@ dependencies {
     implementation("org.graalvm.js:js-scriptengine:$graalvmVersion")
     implementation(project(":unicorn-security")) {
         capabilities {
-            requireCapability("com.lwohvye:unicorn-security-captcha")
-        }
-    }
-    implementation(project(":unicorn-security")) {
-        capabilities {
             // 这里只支撑横线，不支持驼峰
             requireCapability("com.lwohvye:unicorn-security-business-log")
         }

@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package com.lwohvye.sys.modules.infrastructure.logrecord.service;
+package com.lwohvye.feature.log.infrastructure.logrecord.service;
 
+import com.lwohvye.beans.rabbitmq.SimpleMQProducerService;
 import com.lwohvye.core.utils.json.JsonUtils;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
-import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
-import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
+import com.lwohvye.feature.log.infrastructure.config.RabbitMQZConfig;
 import com.mzt.logapi.beans.LogRecord;
 import com.mzt.logapi.service.ILogRecordService;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +36,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RabbitLogRecordService implements ILogRecordService {
 
-    private final RabbitMQProducerService rabbitMQProducerService;
+    private final SimpleMQProducerService rabbitMQProducerService;
 
     @Override
     public void record(LogRecord logRecord) {
         var recordMsg = new AmqpMsgEntity().setMsgType("business").setMsgData(JsonUtils.toJSONString(logRecord)).setExtraData("saveMultiLog");
         //  发送消息
-        rabbitMQProducerService.sendMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.BUSINESS_LOG_ROUTE_KEY, recordMsg);
+        rabbitMQProducerService.sendMsg(RabbitMQZConfig.DIRECT_SYNC_EXCHANGE, RabbitMQZConfig.BUSINESS_LOG_ROUTE_KEY, recordMsg);
     }
 
     @Override
