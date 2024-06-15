@@ -20,15 +20,19 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lwohvye.beans.config.FileProperties;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -46,7 +50,7 @@ import java.util.List;
  * @author Zheng Jie
  * @date 2018-11-30
  */
-@Configuration
+@SpringBootConfiguration
 // 在WebMvcAutoConfiguration类上标了一个如下注解：
 // @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 // 以上这行代码的意思就是当前IOC容器中没有WebMvcConfigurationSupport这个类的实例时自动配置类才会生效，这也就是在配置类上标注@EnableWebMvc会导致自动配置类WebMvcAutoConfiguration失效的原因。
@@ -100,15 +104,29 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(@NotNull InterceptorRegistry registry) {
         try {
-            var registrationsVarHandle = MethodHandles.privateLookupIn(InterceptorRegistry.class, MethodHandles.lookup()).findVarHandle(InterceptorRegistry.class, "registrations", List.class);
+            var registrationsVarHandle = MethodHandles.privateLookupIn(InterceptorRegistry.class,
+                    MethodHandles.lookup()).findVarHandle(InterceptorRegistry.class, "registrations", List.class);
             var registrations = (List<InterceptorRegistration>) registrationsVarHandle.get(registry);
             if (registrations != null) {
                 for (var interceptorRegistration : registrations) {
                     interceptorRegistration.excludePathPatterns("/v3/api-docs/**", "/swagger-ui/**");
                 }
             }
+            registry.addInterceptor(new HandlerInterceptor() {
+                @Override
+                public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+                    if (!request.getRequestURI().equals("/favicon.ico"))
+                        // while not (Get + URI == /favicon.ico)，这样写是为了提高分支预测准确率，一般会预测执行分支，具体场景下当前分支内是普适的
+                        return HandlerInterceptor.super.preHandle(request, response, handler);
+                    if (!"GET".equals(request.getMethod()))
+                        return HandlerInterceptor.super.preHandle(request, response, handler);
+                    // ignore Get /favicon.ico
+                    response.setStatus(HttpServletResponse.SC_NO_CONTENT); // 设置状态码为 204 No Content
+                    return false;
+                }
+            }).addPathPatterns("/**");
         } catch (Exception e) {
             e.printStackTrace();
         }
