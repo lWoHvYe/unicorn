@@ -13,19 +13,34 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.lwohvye.log.service.mapstruct;
+package com.lwohvye.log.service.dto;
 
-import com.lwohvye.core.base.BaseMapper;
-import com.lwohvye.log.domain.Log;
-import com.lwohvye.log.service.dto.LogErrorDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
+import lombok.Data;
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
- * @author Zheng Jie
- * @date 2019-5-22
- */
-@Mapper(componentModel = "spring",unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface LogErrorMapper extends BaseMapper<LogErrorDTO, Log> {
+* @author Zheng Jie
+* @date 2019-5-22
+*/
+@Data
+public class BzLogErrorDTO implements Serializable {
 
+    private Long id;
+
+    private String username;
+
+    private String description;
+
+    private String method;
+
+    private String params;
+
+    private String browser;
+
+    private String requestIp;
+
+    private String address;
+
+    private Timestamp createTime;
 }

@@ -197,7 +197,7 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public final ResponseEntity<ResultInfo<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, WebRequest request) {
         log.error(ThrowableUtils.getStackTrace(ex));
-        ObjectError objectError = ex.getBindingResult().getAllErrors().get(0);
+        ObjectError objectError = ex.getBindingResult().getAllErrors().getFirst();
         String message = objectError.getDefaultMessage();
         if (objectError instanceof FieldError error) {
             message = error.getField() + ": " + message;

@@ -20,8 +20,8 @@ import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
-import com.lwohvye.log.service.ILogService;
-import com.lwohvye.log.service.dto.LogQueryCriteria;
+import com.lwohvye.log.service.IBzLogService;
+import com.lwohvye.log.service.dto.BzLogQueryCriteria;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -42,59 +42,59 @@ import java.util.Map;
 @Tag(name = "LogController", description = "系统：日志管理")
 public class LogController {
 
-    private final ILogService logService;
+    private final IBzLogService bzLogService;
 
     @Operation(summary = "导出数据")
     @GetMapping(value = "/download")
-    public void download(HttpServletResponse response, LogQueryCriteria criteria) throws IOException {
+    public void download(HttpServletResponse response, BzLogQueryCriteria criteria) throws IOException {
         criteria.setLogType("INFO");
-        logService.download(logService.queryAll(criteria), response);
+        bzLogService.download(bzLogService.queryAll(criteria), response);
     }
 
     @Operation(summary = "导出错误数据")
     @GetMapping(value = "/error/download")
-    public void downloadErrorLog(HttpServletResponse response, LogQueryCriteria criteria) throws IOException {
+    public void downloadErrorLog(HttpServletResponse response, BzLogQueryCriteria criteria) throws IOException {
         criteria.setLogType("ERROR");
-        logService.download(logService.queryAll(criteria), response);
+        bzLogService.download(bzLogService.queryAll(criteria), response);
     }
 
     @GetMapping
     @RespResultBody
     @Operation(summary = "日志查询")
-    public Map<String, Object> query(LogQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> query(BzLogQueryCriteria criteria, Pageable pageable) {
         criteria.setLogType("INFO");
-        return logService.queryAll(criteria, pageable);
+        return bzLogService.queryAll(criteria, pageable);
     }
 
     @GetMapping(value = "/user")
     @RespResultBody
     @Operation(summary = "用户日志查询")
-    public Map<String, Object> queryUserLog(LogQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryUserLog(BzLogQueryCriteria criteria, Pageable pageable) {
         criteria.setLogType("INFO");
         criteria.setBlurry(SecurityUtils.getCurrentUsername());
-        return logService.queryAllByUser(criteria, pageable);
+        return bzLogService.queryAllByUser(criteria, pageable);
     }
 
     @GetMapping(value = "/error")
     @RespResultBody
     @Operation(summary = "错误日志查询")
-    public Map<String, Object> queryErrorLog(LogQueryCriteria criteria, Pageable pageable) {
+    public Map<String, Object> queryErrorLog(BzLogQueryCriteria criteria, Pageable pageable) {
         criteria.setLogType("ERROR");
-        return logService.queryAll(criteria, pageable);
+        return bzLogService.queryAll(criteria, pageable);
     }
 
     @GetMapping(value = "/error/{id}")
     @RespResultBody
     @Operation(summary = "日志异常详情查询")
     public Dict queryErrorLogs(@PathVariable Long id) {
-        return logService.findByErrDetail(id);
+        return bzLogService.findByErrDetail(id);
     }
 
     @DeleteMapping(value = "/del/error")
     @OprLog("删除所有ERROR日志")
     @Operation(summary = "删除所有ERROR日志")
     public ResultInfo<String> delAllErrorLog() {
-        logService.delAllByError();
+        bzLogService.delAllByError();
         return ResultInfo.success();
     }
 
@@ -102,7 +102,7 @@ public class LogController {
     @OprLog("删除所有INFO日志")
     @Operation(summary = "删除所有INFO日志")
     public ResultInfo<String> delAllInfoLog() {
-        logService.delAllByInfo();
+        bzLogService.delAllByInfo();
         return ResultInfo.success();
     }
 }

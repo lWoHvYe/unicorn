@@ -16,26 +16,24 @@
 package com.lwohvye.log.service.dto;
 
 import lombok.Data;
-
-import java.io.Serializable;
+import com.lwohvye.core.annotation.Query;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
+ * 日志查询类
  * @author Zheng Jie
- * @date 2019-5-22
+ * @date 2019-6-4 09:23:07
  */
 @Data
-public class LogSmallDTO implements Serializable {
+public class BzLogQueryCriteria {
 
-    private String description;
+    @Query(blurry = "username,description,address,requestIp,method,params")
+    private String blurry;
 
-    private String requestIp;
+    @Query
+    private String logType;
 
-    private Long time;
-
-    private String address;
-
-    private String browser;
-
-    private Timestamp createTime;
+    @Query(type = Query.Type.BETWEEN)
+    private List<Timestamp> createTime;
 }

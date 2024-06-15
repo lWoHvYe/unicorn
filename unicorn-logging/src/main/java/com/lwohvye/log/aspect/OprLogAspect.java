@@ -15,8 +15,8 @@
  */
 package com.lwohvye.log.aspect;
 
-import com.lwohvye.log.domain.Log;
-import com.lwohvye.log.service.ILogService;
+import com.lwohvye.log.domain.BzLog;
+import com.lwohvye.log.service.IBzLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.lwohvye.core.utils.RequestHolder;
@@ -31,8 +31,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.time.Duration;
 import java.time.Instant;
 
@@ -45,9 +43,9 @@ import java.time.Instant;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class LogAspect {
+public class OprLogAspect {
 
-    private final ILogService logService;
+    private final IBzLogService oprLogService;
 
     static final ScopedValue<Instant> SCOPED_VALUE = ScopedValue.newInstance();
 
@@ -73,11 +71,11 @@ public class LogAspect {
             } catch (Throwable e) {
                 throw new RuntimeException(e.getMessage());
             }
-            Log log = new Log("INFO", Duration.between(SCOPED_VALUE.get(), Instant.now()).toMillis());
-            HttpServletRequest request = RequestHolder.getHttpServletRequest();
+            var bzLog = new BzLog("INFO", Duration.between(SCOPED_VALUE.get(), Instant.now()).toMillis());
+            var request = RequestHolder.getHttpServletRequest();
             // TODO: 2022/2/14 保持日志这块，有循环依赖导致的栈溢出问题，待解决
             // TODO: 2022/2/28 栈溢出应该有别的条件。人员状态的修改，未出现该问题
-            logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), joinPoint, log);
+            oprLogService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), joinPoint, bzLog);
             return result;
         });
     }
@@ -91,10 +89,10 @@ public class LogAspect {
     @AfterThrowing(pointcut = "logPointcut()", throwing = "e")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable e) {
         if (!SCOPED_VALUE.isBound()) return;
-        Log log = new Log("ERROR", Duration.between(SCOPED_VALUE.get(), Instant.now()).toMillis());
-        log.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
-        HttpServletRequest request = RequestHolder.getHttpServletRequest();
-        logService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), (ProceedingJoinPoint) joinPoint, log);
+        var bzLog = new BzLog("ERROR", Duration.between(SCOPED_VALUE.get(), Instant.now()).toMillis());
+        bzLog.setExceptionDetail(ThrowableUtils.getStackTrace(e).getBytes());
+        var request = RequestHolder.getHttpServletRequest();
+        oprLogService.save(getUsername(), StringUtils.getBrowser(request), StringUtils.getIp(request), (ProceedingJoinPoint) joinPoint, bzLog);
     }
 
     public String getUsername() {

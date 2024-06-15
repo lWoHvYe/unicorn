@@ -16,8 +16,8 @@
 
 package com.lwohvye.log.service.local;
 
-import com.lwohvye.log.domain.Log;
-import com.lwohvye.log.service.ILogService;
+import com.lwohvye.log.domain.BzLog;
+import com.lwohvye.log.service.IBzLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +25,14 @@ import org.springframework.stereotype.Service;
 public class MultiLogService {
     //    -------------------记录鉴权信息-----------------------------
     @Autowired
-    private ILogService logService;
+    private IBzLogService bzLogService;
 
     public void saveAuthorizeLog(String msgData) {
-        var log = new Log().setDescription("记录用户登录信息").setLogType("Auth").setParams(msgData);
-        logService.save(log);
+        var opLog = new BzLog().setDescription("记录用户登录信息").setLogType("Auth").setParams(msgData);
+        bzLogService.save(opLog);
     }
 
     public void saveMultiLog(String msgType, String msgData, String desc) {
-        logService.save(new Log().setLogType(msgType).setParams(msgData).setDescription(desc));
+        bzLogService.save(new BzLog().setLogType(msgType).setParams(msgData).setDescription(desc));
     }
 }

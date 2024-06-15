@@ -34,7 +34,7 @@ import java.sql.Timestamp;
 @Table(name = "sys_log")
 @Accessors(chain = true)
 @NoArgsConstructor
-public class Log  implements Serializable {
+public class BzLog implements Serializable {
 
     @Id
     @Column(name = "log_id")
@@ -75,7 +75,7 @@ public class Log  implements Serializable {
     @CreationTimestamp
     private Timestamp createTime;
 
-    public Log(String logType, Long time) {
+    public BzLog(String logType, Long time) {
         this.logType = logType;
         this.time = time;
     }

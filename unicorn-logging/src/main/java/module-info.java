@@ -3,6 +3,7 @@ module lwohvye.unicorn.logging {
 
     requires transitive lwohvye.unicorn.beans;
     requires transitive spring.rabbit;
+    requires transitive spring.retry;
 
     exports com.lwohvye.log.aspect to spring.beans, spring.aop;
     exports com.lwohvye.log.domain;

@@ -15,7 +15,7 @@
  */
 package com.lwohvye.log.repository;
 
-import com.lwohvye.log.domain.Log;
+import com.lwohvye.log.domain.BzLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
  * @date 2018-11-24
  */
 @Repository
-public interface LogRepository extends JpaRepository<Log,Long>, JpaSpecificationExecutor<Log> {
+public interface BzLogRepository extends JpaRepository<BzLog,Long>, JpaSpecificationExecutor<BzLog> {
 
     /**
      * 根据日志类型删除信息

@@ -20,18 +20,23 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.utils.*;
-import com.lwohvye.log.domain.Log;
-import com.lwohvye.log.repository.LogRepository;
-import com.lwohvye.log.service.ILogService;
-import com.lwohvye.log.service.dto.LogErrorDTO;
-import com.lwohvye.log.service.dto.LogQueryCriteria;
-import com.lwohvye.log.service.dto.LogSmallDTO;
+import com.lwohvye.log.domain.BzLog;
+import com.lwohvye.log.repository.BzLogRepository;
+import com.lwohvye.log.service.IBzLogService;
+import com.lwohvye.log.service.dto.BzLogErrorDTO;
+import com.lwohvye.log.service.dto.BzLogQueryCriteria;
+import com.lwohvye.log.service.dto.BzLogSmallDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -48,36 +53,37 @@ import java.util.*;
  * @author Zheng Jie
  * @date 2018-11-24
  */
+@Slf4j
 @Service
 //有参构造
 @RequiredArgsConstructor
-public class LogServiceImpl implements ILogService {
-    private final LogRepository logRepository;
+public class BzLogServiceImpl implements IBzLogService {
+    private final BzLogRepository bzLogRepository;
 
     private final ConversionService conversionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public Map<String, Object> queryAll(LogQueryCriteria criteria, Pageable pageable) {
-        Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
+    public Map<String, Object> queryAll(BzLogQueryCriteria criteria, Pageable pageable) {
+        Page<BzLog> page = bzLogRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
         String status = "ERROR";
         if (status.equals(criteria.getLogType())) {
-            return PageUtils.toPage(page.map(errInfo -> conversionService.convert(errInfo, LogErrorDTO.class)));
+            return PageUtils.toPage(page.map(errInfo -> conversionService.convert(errInfo, BzLogErrorDTO.class)));
         }
         return PageUtils.toPage(page);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public List<Log> queryAll(LogQueryCriteria criteria) {
-        return logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
+    public List<BzLog> queryAll(BzLogQueryCriteria criteria) {
+        return bzLogRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public Map<String, Object> queryAllByUser(LogQueryCriteria criteria, Pageable pageable) {
-        Page<Log> page = logRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
-        return PageUtils.toPage(page.map(logInfo -> conversionService.convert(logInfo, LogSmallDTO.class)));
+    public Map<String, Object> queryAllByUser(BzLogQueryCriteria criteria, Pageable pageable) {
+        Page<BzLog> page = bzLogRepository.findAll(((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder)), pageable);
+        return PageUtils.toPage(page.map(logInfo -> conversionService.convert(logInfo, BzLogSmallDTO.class)));
     }
 
     /**
@@ -86,36 +92,39 @@ public class LogServiceImpl implements ILogService {
      * @params [username, browser, ip, joinPoint, log]
      * @date 2021/3/25 23:39
      */
+    @Async
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, Log log) {
+    public void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, BzLog opBzLog) {
 
         var signature = (MethodSignature) joinPoint.getSignature();
         var method = signature.getMethod();
         var aopLog = method.getAnnotation(OprLog.class);
 
         // 方法路径
-        var methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";
+        var methodName = STR."\{joinPoint.getTarget().getClass().getName()}.\{signature.getName()}()";
 
         // 描述
-        if (log != null) {
-            log.setDescription(aopLog.value());
+        if (opBzLog != null) {
+            opBzLog.setDescription(aopLog.value());
         }
-        Assert.notNull(log, "信息有误，不可为空");
-        log.setRequestIp(ip);
+        Assert.notNull(opBzLog, "信息有误，不可为空");
+        opBzLog.setRequestIp(ip);
 
-        log.setAddress(StringUtils.getHttpCityInfo(log.getRequestIp()));
-        log.setMethod(methodName);
-        log.setUsername(username);
-        log.setParams(getParameter(method, joinPoint.getArgs()));
-        log.setBrowser(browser);
-        logRepository.save(log);
+        opBzLog.setAddress(StringUtils.getHttpCityInfo(opBzLog.getRequestIp()));
+        opBzLog.setMethod(methodName);
+        opBzLog.setUsername(username);
+        opBzLog.setParams(getParameter(method, joinPoint.getArgs()));
+        opBzLog.setBrowser(browser);
+        bzLogRepository.save(opBzLog);
     }
 
+    @Async
+    @Retryable(retryFor = RuntimeException.class, backoff = @Backoff(delay = 3200, multiplier = 2))
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(Log resource) {
-        logRepository.save(resource);
+    public void save(BzLog resource) {
+        bzLogRepository.save(resource);
     }
 
     /**
@@ -146,31 +155,31 @@ public class LogServiceImpl implements ILogService {
         if (argList.isEmpty()) {
             return "";
         }
-        return argList.size() == 1 ? JSONUtil.toJsonStr(argList.get(0)) : JSONUtil.toJsonStr(argList);
+        return argList.size() == 1 ? JSONUtil.toJsonStr(argList.getFirst()) : JSONUtil.toJsonStr(argList);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public Dict findByErrDetail(Long id) {
-        Log log = logRepository.findById(id).orElseGet(Log::new);
-        ValidationUtils.isNull(log.getId(), "Log", "id", id);
-        byte[] details = log.getExceptionDetail();
+        BzLog bzLog = bzLogRepository.findById(id).orElseGet(BzLog::new);
+        ValidationUtils.isNull(bzLog.getId(), "Log", "id", id);
+        byte[] details = bzLog.getExceptionDetail();
         return Dict.create().set("exception", new String(ObjectUtil.isNotNull(details) ? details : "".getBytes()));
     }
 
     @Override
-    public void download(List<Log> logs, HttpServletResponse response) throws IOException {
+    public void download(List<BzLog> opBzLogs, HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = new ArrayList<>();
-        for (Log log : logs) {
+        for (BzLog bzLog : opBzLogs) {
             Map<String, Object> map = new LinkedHashMap<>();
-            map.put("用户名", log.getUsername());
-            map.put("IP", log.getRequestIp());
-            map.put("IP来源", log.getAddress());
-            map.put("描述", log.getDescription());
-            map.put("浏览器", log.getBrowser());
-            map.put("请求耗时/毫秒", log.getTime());
-            map.put("异常详情", new String(ObjectUtil.isNotNull(log.getExceptionDetail()) ? log.getExceptionDetail() : "".getBytes()));
-            map.put("创建日期", log.getCreateTime());
+            map.put("用户名", bzLog.getUsername());
+            map.put("IP", bzLog.getRequestIp());
+            map.put("IP来源", bzLog.getAddress());
+            map.put("描述", bzLog.getDescription());
+            map.put("浏览器", bzLog.getBrowser());
+            map.put("请求耗时/毫秒", bzLog.getTime());
+            map.put("异常详情", new String(ObjectUtil.isNotNull(bzLog.getExceptionDetail()) ? bzLog.getExceptionDetail() : "".getBytes()));
+            map.put("创建日期", bzLog.getCreateTime());
             list.add(map);
         }
         FileUtils.downloadExcel(list, response);
@@ -179,12 +188,17 @@ public class LogServiceImpl implements ILogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delAllByError() {
-        logRepository.deleteByLogType("ERROR");
+        bzLogRepository.deleteByLogType("ERROR");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delAllByInfo() {
-        logRepository.deleteByLogType("INFO");
+        bzLogRepository.deleteByLogType("INFO");
+    }
+
+    @Recover
+    public void saveRecover(RuntimeException e, BzLog resource) {
+        log.error("Error [{}] occurred while save op log [{}] ", e.getMessage(), resource);
     }
 }

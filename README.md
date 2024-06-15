@@ -70,13 +70,7 @@ ext { // 这个定义是可以传递的
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
 
-// 引入滑动captcha
-implementation("com.lwohvye:unicorn-security:$unicornVersion") {
-    capabilities {
-        requireCapability('com.lwohvye:unicorn-security-captcha')
-    }
-}
-// 引入custom-log
+// 引入custom-bzLog
 implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     capabilities {
         // 这里只支撑横线，不支持驼峰
@@ -102,7 +96,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 21(Core Module Support 17-21)、Spring Boot 3.2。
+- 使用最新技术栈，社区资源丰富，基于Java 21(Core Module Support 17-21)、Spring Boot 3.3。
   (Support Virtual Threads/fibre/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持接口级别的功能权限，动态权限控制
@@ -152,7 +146,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin/Kotlinx
 
-- `unicorn-oauth2` OAuth2 Sample，AuthorizationServer, OAuth2Client + Gateway, ResourceServer
+- `unicorn-oauth2` OAuth2 Sample，AuthorizationServer, OAuth2Client + Gateway, ResourceServer(Web MVC & WebFlux)
 
 #### 详细结构
 

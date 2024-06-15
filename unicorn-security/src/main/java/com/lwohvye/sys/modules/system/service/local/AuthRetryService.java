@@ -124,6 +124,7 @@ public class AuthRetryService {
      * 在@Retryable多次重试失败后，调用该方法。
      * 要触发@Recover标记的方法，@Retryable标记的方法不能有返回值，只能是void才能触发。
      * 被@Recover标记的方法的第一入参要与发生的异常一至，才会被调用
+     * 除了第一个参数，还支持其他参数，当与retry当方法一致/兼容时，recover被调用
      */
     @Recover
     public void recover(IllegalAccessException e) {

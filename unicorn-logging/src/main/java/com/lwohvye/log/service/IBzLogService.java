@@ -16,13 +16,13 @@
 package com.lwohvye.log.service;
 
 import cn.hutool.core.lang.Dict;
-import com.lwohvye.log.service.dto.LogQueryCriteria;
-import com.lwohvye.log.domain.Log;
+import com.lwohvye.log.domain.BzLog;
+import com.lwohvye.log.service.dto.BzLogQueryCriteria;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import java.util.Map;
  * @author Zheng Jie
  * @date 2018-11-24
  */
-public interface ILogService {
+public interface IBzLogService {
 
     /**
      * 分页查询
@@ -40,7 +40,7 @@ public interface ILogService {
      * @param pageable 分页参数
      * @return /
      */
-    Map<String, Object> queryAll(LogQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAll(BzLogQueryCriteria criteria, Pageable pageable);
 
     /**
      * 查询全部数据
@@ -48,7 +48,7 @@ public interface ILogService {
      * @param criteria 查询条件
      * @return /
      */
-    List<Log> queryAll(LogQueryCriteria criteria);
+    List<BzLog> queryAll(BzLogQueryCriteria criteria);
 
     /**
      * 查询用户日志
@@ -57,7 +57,7 @@ public interface ILogService {
      * @param pageable 分页参数
      * @return -
      */
-    Map<String, Object> queryAllByUser(LogQueryCriteria criteria, Pageable pageable);
+    Map<String, Object> queryAllByUser(BzLogQueryCriteria criteria, Pageable pageable);
 
     /**
      * 保存日志数据。异步写日志
@@ -66,13 +66,11 @@ public interface ILogService {
      * @param browser   浏览器
      * @param ip        请求IP
      * @param joinPoint /
-     * @param log       日志实体
+     * @param opBzLog       日志实体
      */
-    @Async
-    void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, Log log);
+    void save(String username, String browser, String ip, ProceedingJoinPoint joinPoint, BzLog opBzLog);
 
-    @Async
-    void save(Log resource);
+    void save(BzLog resource);
 
     /**
      * 查询异常详情
@@ -85,11 +83,11 @@ public interface ILogService {
     /**
      * 导出日志
      *
-     * @param logs     待导出的数据
+     * @param opBzLogs     待导出的数据
      * @param response /
      * @throws IOException /
      */
-    void download(List<Log> logs, HttpServletResponse response) throws IOException;
+    void download(List<BzLog> opBzLogs, HttpServletResponse response) throws IOException;
 
     /**
      * 删除所有错误日志
@@ -100,4 +98,5 @@ public interface ILogService {
      * 删除所有INFO日志
      */
     void delAllByInfo();
+
 }
