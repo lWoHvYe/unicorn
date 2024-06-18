@@ -117,16 +117,14 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
             registry.addInterceptor(new HandlerInterceptor() {
                 @Override
                 public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
-                    if (!request.getRequestURI().equals("/favicon.ico"))
-                        // while not (Get + URI == /favicon.ico)，这样写是为了提高分支预测准确率，一般会预测执行分支，具体场景下当前分支内是普适的
-                        return HandlerInterceptor.super.preHandle(request, response, handler);
-                    if (!"GET".equals(request.getMethod()))
-                        return HandlerInterceptor.super.preHandle(request, response, handler);
-                    // ignore Get /favicon.ico
-                    response.setStatus(HttpServletResponse.SC_NO_CONTENT); // 设置状态码为 204 No Content
-                    return false;
+                    if ("GET".equals(request.getMethod())) {
+                        // ignore Get /favicon.ico
+                        response.setStatus(HttpServletResponse.SC_NO_CONTENT); // 204 No Content
+                        return false;
+                    }
+                    return HandlerInterceptor.super.preHandle(request, response, handler);
                 }
-            }).addPathPatterns("/**");
+            }).addPathPatterns("/favicon.ico");
         } catch (Exception e) {
             e.printStackTrace();
         }
