@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.lwohvye"
-version = "4.4.0-sigma"
+version = "4.5.0-tau-Beta"
 
 java {
     withSourcesJar()

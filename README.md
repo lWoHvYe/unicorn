@@ -42,7 +42,7 @@
 
 <project>
 
-    <project.core.version>4.3.0-rho</project.core.version>
+    <project.core.version>4.4.0-sigma</project.core.version>
 
     <!--    system模块    -->
     <dependency>
@@ -63,9 +63,9 @@
 ##### Gradle
 
 ```groovy
-// 4.x系列将基于Java 21, 部分module使用Kotlin, 使用Gradle build
+// 4.x系列基于Java 21, 部分module使用Kotlin, 使用Gradle build
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.3.0-rho'
+    unicornVersion = '4.4.0-sigma'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
@@ -128,7 +128,8 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17 - 21)
+- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17 - 21), 
+  baseline 为Java 17, 在Runtime = 17 时使用传统threadPool，在Runtime >= 21时使用Virtual Threads
 
 - `unicorn-beans` 基础Beans的Definition及Configuration，To C业务可只引入该dependency
 
@@ -151,7 +152,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 #### 详细结构
 
 ```
-- unicorn-core 公共模块
+- unicorn-core 公共模块(Baseline Java 17)
     - annotation 为系统自定义注解
     - base 提供了Entity、Service、DTO基类和mapstruct的通用mapper
     - exception 项目自定义异常类
@@ -161,6 +162,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
         - JDKUtils, UnsafeUtils
         - XRabbitAbstractProducer, YRabbitAbstractConsumer
         - SecurityUtils, ReactiveSecurityUtils
+    - java21/utils Virtual Threads for Java Runtime 21+ (Multi-Release Jar)
 - unicorn-beans 基础Bean
     - advice 统一数据返回及异常处理
     - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等

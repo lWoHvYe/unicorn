@@ -83,21 +83,21 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
     /*
         var i = c.incrementAndGet();
         ConcurrencyUtils.threadLocal.set(String.valueOf(i));
-        threadPoolExecutor.execute(ConcurrencyUtils.withThreadLocalAndThreadPool(() -> {
-            var s = ConcurrencyUtils.threadLocal.get();
+        threadPoolExecutor.execute(ConcurrencyUtils.withTLTP(() -> {
+            var s = ConcurrencyUtils.threadLocal.get(); // 这里获得的就是Target val
             log.info((String) s);
         }));
         threadLocal.remove();
      */
 
     /*
-        var voidCompletableFuture = CompletableFuture.runAsync(ConcurrencyUtils.withThreadLocalAndThreadPool(() -> {
+        var voidCompletableFuture = CompletableFuture.runAsync(ConcurrencyUtils.withTLTP(() -> {
             var s = ConcurrencyUtils.threadLocal.get();
             log.info((String) s);
         }));
         var unused = voidCompletableFuture.get();
 
-        var stringCompletableFuture = CompletableFuture.supplyAsync(ConcurrencyUtils.withThreadLocalAndThreadPool(() -> {
+        var stringCompletableFuture = CompletableFuture.supplyAsync(ConcurrencyUtils.withTLTP(() -> {
             var s = ConcurrencyUtils.threadLocal.get();
             log.info((String) s);
             return String.valueOf(s);
@@ -105,7 +105,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         var s = stringCompletableFuture.get();
      */
 
-    public static Runnable withThreadLocalAndThreadPool(Runnable runnable) {
+    public static Runnable withTLTP(Runnable runnable) {
         var sharedVar = ConcurrencyUtils.threadLocal.get(); // 在parent thread中执行
         return () -> { // sharedVar的传递还不清楚，但已知因为是非基本类型，所以传递的引用
             ConcurrencyUtils.threadLocal.set(sharedVar); // 在sub thread中执行
@@ -113,7 +113,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         };
     }
 
-    public static <U> Supplier<U> withThreadLocalAndThreadPool(Supplier<U> supplier) {
+    public static <U> Supplier<U> withTLTP(Supplier<U> supplier) {
         var sharedVar = ConcurrencyUtils.threadLocal.get();
         return () -> {
             ConcurrencyUtils.threadLocal.set(sharedVar);
@@ -121,7 +121,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         };
     }
 
-    public static <V> Callable<V> withThreadLocalAndThreadPool(Callable<V> callable) {
+    public static <V> Callable<V> withTLTP(Callable<V> callable) {
         var sharedVar = ConcurrencyUtils.threadLocal.get();
         return () -> {
             ConcurrencyUtils.threadLocal.set(sharedVar);

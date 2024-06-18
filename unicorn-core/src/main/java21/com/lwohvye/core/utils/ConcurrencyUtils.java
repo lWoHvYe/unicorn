@@ -96,7 +96,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
     }
 
     // 下面这个，就是解决InheritableThreadLocal 和 ThreadPool一起使用时的问题，使用ThreadLocal 然后自行实现值的传递
-    public static Runnable withThreadLocalAndThreadPool(Runnable runnable) {
+    public static Runnable withTLTP(Runnable runnable) {
         var sharedVar = ConcurrencyUtils.threadLocal.get();
         return () -> {
             ConcurrencyUtils.threadLocal.set(sharedVar);
@@ -104,7 +104,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         };
     }
 
-    public static <U> Supplier<U> withThreadLocalAndThreadPool(Supplier<U> supplier) {
+    public static <U> Supplier<U> withTLTP(Supplier<U> supplier) {
         var sharedVar = ConcurrencyUtils.threadLocal.get();
         return () -> {
             ConcurrencyUtils.threadLocal.set(sharedVar);
@@ -112,7 +112,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         };
     }
 
-    public static <V> Callable<V> withThreadLocalAndThreadPool(Callable<V> callable) {
+    public static <V> Callable<V> withTLTP(Callable<V> callable) {
         var sharedVar = ConcurrencyUtils.threadLocal.get();
         return () -> {
             ConcurrencyUtils.threadLocal.set(sharedVar);
