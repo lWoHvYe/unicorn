@@ -102,7 +102,7 @@ public class BzLogServiceImpl implements IBzLogService {
         var aopLog = method.getAnnotation(OprLog.class);
 
         // 方法路径
-        var methodName = STR."\{joinPoint.getTarget().getClass().getName()}.\{signature.getName()}()";
+        var methodName = joinPoint.getTarget().getClass().getName() + "." + signature.getName() + "()";
 
         // 描述
         if (opBzLog != null) {

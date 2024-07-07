@@ -88,13 +88,13 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
                         && (StringUtils.isBlank(resource.getReqMethod()) || Objects.equals(resource.getReqMethod(), httpMethod))) // 请求方法类型匹配。资源未配置请求方法视为全部
                 .flatMap(resource -> resource.getRoleCodes().stream()) // 用flatMap合并流
                 .distinct() // 排重。到这里，因为是角色级别的，理论上不会太多，排重与否影响不大
-                .map(role -> new SecurityConfig(STR."ROLE_\{role.trim()}")); // 需注意，toList的结果是ImmutableCollections
+                .map(role -> new SecurityConfig("ROLE_" + role.trim())); // 需注意，toList的结果是ImmutableCollections
         // 处理匿名注解部分
         var requestPath = PathContainer.parsePath(url);
         var anonymousSecurityConfigStream = Stream.concat(anonymousPaths.getOrDefault(httpMethod, Collections.emptyList()).stream(), // 方法与请求匹配的部分
                         anonymousPaths.getOrDefault(RequestMethodEnum.ALL.getType(), Collections.emptyList()).stream()) // 方法无类型
                 .filter(pathPattern -> pathPattern.matches(requestPath)) // 匹配上
-                .map(_ -> new SecurityConfig(SecurityConstant.ROLE_ANONYMOUS));
+                .map(pathPattern -> new SecurityConfig(SecurityConstant.ROLE_ANONYMOUS));
         var securityConfigs = Stream.concat(securityConfigStream, anonymousSecurityConfigStream).toList(); // 合并两股流
         if (!securityConfigs.isEmpty())
             attributes = new ArrayList<>(securityConfigs); // 构建返回
@@ -123,7 +123,7 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
                 .map(infoEntry -> {
                     // 先拿到方法类型
                     var requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
-                    var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.get(0).name());
+                    var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.getFirst().name());
                     // 获取pathPatternsCondition
                     var activePatternsCondition = infoEntry.getKey().getActivePatternsCondition();
                     Set<String> patterns;
@@ -153,9 +153,6 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
 
     /**
      * 返回类对象是否支持校验
-     *
-     * @param clazz
-     * @return
      */
     @Override
     public boolean supports(Class<?> clazz) {
