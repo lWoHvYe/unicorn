@@ -102,9 +102,6 @@ dependencies {
     // java21TestImplementation("") // it is possible to add a dependency only used to compile the sources found in src/main/java21
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     api("org.springframework.boot:spring-boot-starter-web")
-    // use !! fot strictly version
-    api("org.apache.tomcat.embed:tomcat-embed-core:10.1.25!!")
-    api("org.apache.tomcat.embed:tomcat-embed-websocket:10.1.25!!")
     api("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     api("org.springframework.boot:spring-boot-starter-amqp")
