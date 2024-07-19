@@ -31,12 +31,14 @@ val graalvmVersion = "23.1.0"
 dependencies {
     implementation(project(":unicorn-security"))
     implementation(project(":unicorn-logging"))
-    implementation("org.springframework.boot:spring-boot-starter-web") {
-        exclude(group = "org.apache.tomcat.embed", module = "tomcat-embed-core")
-        exclude(group = "org.apache.tomcat.embed", module = "tomcat-embed-websocket")
-    }
-    val tomcatVersion = dependencyManagement.importedProperties["tomcat.version"]
-    implementation("org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion")
+//    implementation("org.springframework.boot:spring-boot-starter-web") {
+//        exclude(group = "org.apache.tomcat.embed", module = "tomcat-embed-core")
+//        exclude(group = "org.apache.tomcat.embed", module = "tomcat-embed-websocket")
+//    }
+//    val tomcatVersion = dependencyManagement.importedProperties["tomcat.version"]
+//    implementation("org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion")
+    api("org.apache.tomcat.embed:tomcat-embed-core:10.1.25!!")
+    api("org.apache.tomcat.embed:tomcat-embed-websocket:10.1.25!!")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation(project(":unicorn-tp-tools-kotlin")) // kotlin as well
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
