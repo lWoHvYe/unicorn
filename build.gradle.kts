@@ -83,6 +83,8 @@ subprojects {
         automaticModule("io.jsonwebtoken:jjwt-api", "jjwt.api")
         automaticModule("org.quartz-scheduler:quartz", "quartz")
         automaticModule("org.springframework.retry:spring-retry", "spring.retry")
+        automaticModule("org.apache.tomcat.embed:tomcat-embed-core", "org.apache.tomcat.embed.core")
+        automaticModule("org.apache.tomcat.embed:tomcat-embed-websocket", "org.apache.tomcat.embed.websocket")
         // end
     }
 }
