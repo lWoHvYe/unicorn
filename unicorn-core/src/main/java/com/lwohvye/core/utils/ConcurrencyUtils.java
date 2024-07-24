@@ -54,7 +54,16 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
                     throw new UtilsException(e.getMessage());
                 }
             }, TASK_EXECUTOR)).toList();
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            var allCF = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+            // whenComplete 只是一个处理完成状态的方法，它不会吞掉异常，也不会改变 CompletableFuture 的状态。
+            allCF.whenComplete((voidResult, throwable) -> {
+                if (throwable == null) {
+                    log.info("All tasks completed successfully");
+                } else {
+                    log.warn("Exception occurred when execute task: {} ", throwable.getMessage());
+                }
+            });
+            allCF.join(); // This will still throw an exception if any of the futures failed
         }
         Object results = null;
         if (Objects.nonNull(composeResult))

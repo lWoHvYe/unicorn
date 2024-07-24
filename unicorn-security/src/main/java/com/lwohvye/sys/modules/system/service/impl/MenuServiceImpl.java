@@ -417,10 +417,18 @@ public class MenuServiceImpl implements IMenuService, ApplicationEventPublisherA
                 .thenApply(this::buildTree)
                 .thenApply(this::buildMenus);
         // Exception Handler，we can use exceptionally() or handle() to handle exception
-        cf.exceptionally(throwable -> {
+        // Using exceptionally() and assigning the result to future
+        cf = cf.exceptionally(throwable -> {
             log.error("load menus error", throwable);
             throw new BadRequestException(throwable.getMessage());
         });
+/*        cf = cf.handle((result, ex) -> {
+            if (ex != null) {
+                log.error("load menus error", ex);
+                throw new BadRequestException(ex.getMessage());
+            }
+            return result;
+        });*/
         cf.join();
         // 直接cf.get()返回。序列化是一个数组，无法反序列化。序列化结果为：[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]
         // 所以需要new 一个List对象返回。此时序列化的结果为：[“java.util.ArrayList”,[{“@class”:”xxx”,”name”:”xx”},{“@class”:”xxx”,”name”:”xx”}]]
