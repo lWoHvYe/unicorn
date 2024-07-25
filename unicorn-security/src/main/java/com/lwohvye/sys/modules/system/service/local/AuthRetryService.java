@@ -17,14 +17,17 @@ package com.lwohvye.sys.modules.system.service.local;
 
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetryTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -109,7 +112,6 @@ public class AuthRetryService {
      * ------------------------------------------------------------------------------------------------------
      * @Retryable标记的方法，不必是接口的实现，但调用方需在另一个类中
      * @Recover标记的方法需与@Retryable标记的方法在同一类中
-     * @date 2021/4/23 1:13 下午
      */
     @Retryable(retryFor = IllegalAccessException.class, maxAttempts = 5,
             backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
@@ -122,8 +124,12 @@ public class AuthRetryService {
 
     /**
      * 在@Retryable多次重试失败后，调用该方法。
-     * 要触发@Recover标记的方法，@Retryable标记的方法不能有返回值，只能是void才能触发。
-     * 被@Recover标记的方法的第一入参要与发生的异常一至，才会被调用
+     * If you want to take an alternative code path when the retry is exhausted, you can supply a recovery method.
+     * Methods should be declared in the same class as the @Retryable instance and marked @Recover. The return type must match the @Retryable method.
+     * The arguments for the recovery method can optionally include the exception that was thrown and (optionally) the arguments passed to the original retryable method
+     * (or a partial list of them as long as none are omitted up to the last one needed).
+     * 被@Recover标记的方法的第一入参要与发生的异常一至，只要求第一个参数为发生的异常，返回值相同
+     * 这次update主要更新了之前的描述，被@Retryable和@Recover标记的方法需要有相同的返回值，而非只能是void
      * 除了第一个参数，还支持其他参数，当与retry当方法一致/兼容时，recover被调用
      */
     @Recover
@@ -132,4 +138,21 @@ public class AuthRetryService {
     }
 
     // @Retryable 和 @Recover都支持在接口上，@Retryable可配合@Async一起使用
+
+    // @Async Invalid return type for async method (only Future and void supported)
+    @Retryable(retryFor = IllegalAccessException.class, backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
+    public String retryServicePlus(String str, @NotNull List<String> tempList) throws IllegalAccessException {
+        tempList.add(str);
+        if (RandomUtil.randomBoolean())
+            throw new IllegalAccessException("manual exception");
+        return str + " Success";
+    }
+
+    @Recover
+    public String recoverPlus(IllegalAccessException e, String str, @NotNull List<String> tempList) {
+        // 这里因为tempList是引用类型，所以在每次retry时add到其中的值会累积，利用这一点可以做些事情
+        log.info(" temp -> {} ", tempList);
+        log.error("service retry after Recover => {}", e.getMessage());
+        return "Default Result from recover";
+    }
 }
