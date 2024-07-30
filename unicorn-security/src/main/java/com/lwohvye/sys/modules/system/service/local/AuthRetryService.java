@@ -22,7 +22,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
@@ -105,7 +104,7 @@ public class AuthRetryService {
      * UniformRandomBackOffPolicy 这个跟上面的区别就是，上面的延迟会不停递增，这个只会在固定的区间随机
      * StatelessBackOffPolicy 这个说明是无状态的，所谓无状态就是对上次的退避无感知
      * ------------------------------------------------------------------------------------------------------
-     * @Recover – 兜底方法，即多次重试后还是失败就会执行这个方法
+     * @Recover – 兜底方法，即多次重试后还是失败就会执行这个方法，如果未配置该方法，则会抛出异常，若在该方法中未抛出异常，则不会抛出异常
      * <p>
      * Spring-Retry 的功能丰富在于其重试策略和退避策略，还有兜底，监听器等操作。
      * 由于@Retryable注解是通过切面实现的，因此要避免@Retryable 注解的方法的调用方和被调用方处于同一个类中，这样会使@Retryable 注解失效
@@ -142,6 +141,8 @@ public class AuthRetryService {
     // @Async Invalid return type for async method (only Future and void supported)
     @Retryable(retryFor = IllegalAccessException.class, backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
     public String retryServicePlus(String str, @NotNull List<String> tempList) throws IllegalAccessException {
+        // 这是一个thread safe的 set，因为CopyOnWriteArrayList适合于读多写少的场合，在写多多场合可以用这个set
+        // var concurrentSet = ConcurrentHashMap.newKeySet();
         tempList.add(str);
         if (RandomUtil.randomBoolean())
             throw new IllegalAccessException("manual exception");

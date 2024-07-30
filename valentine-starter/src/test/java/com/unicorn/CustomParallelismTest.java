@@ -32,6 +32,7 @@ public class CustomParallelismTest {
         largeDataSet.add("1");
         largeDataSet.add(2);
 
+        // ExecutorService在Java 21时 implement AutoCloseable，所以可以用 try-with-resource，在Java 17时还是不行的
         try (var customThreadPool = new ForkJoinPool(16)) {
             customThreadPool.submit(() ->
                     largeDataSet.parallelStream().forEach(System.out::println));
