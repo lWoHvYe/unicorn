@@ -54,6 +54,7 @@ public class CustomParallelismTest {
     @Retryable(retryFor = RuntimeException.class, backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
     public String retrySample() {
         // 以下不能确定，当下面配合@Retryable和@Recover 使用时，当future中出现Exception时，wftAll理论上会立即接收到，但似乎不会立即throw并触发retry，而是等所有future都结束后才throw Exception，然后wait指定的时间再触发retry
+        // 根据copilot等解释，CompletableFuture.allOf()会等待所有的CompletableFuture都完成，无论这些任务是否有抛出异常，join()是等该Future完成而非那个任务集
         var allFuture = new ArrayList<CompletableFuture<String>>();
         try (var pool = new ForkJoinPool(8)) {
             for (int i = 0; i < 10; i++) {
