@@ -34,7 +34,7 @@ jobs:
       # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
       # the publishing section of your build.gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Release Package
         run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
