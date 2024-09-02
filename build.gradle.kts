@@ -58,8 +58,8 @@ subprojects {
     }
 
     dependencies {
-        annotationProcessor("org.mapstruct", "mapstruct-processor", "1.5.5.Final")
-        annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "1.1.1")
+        annotationProcessor("org.mapstruct", "mapstruct-processor", "1.6.0")
+        annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "1.1.2")
     }
 
     tasks.withType<Javadoc>().configureEach {

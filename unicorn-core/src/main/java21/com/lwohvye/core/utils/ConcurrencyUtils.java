@@ -96,6 +96,9 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
     }
 
     // 下面这个，就是解决InheritableThreadLocal 和 ThreadPool一起使用时的问题，使用ThreadLocal 然后自行实现值的传递
+    // 因为ITL只在Thread Create时传递，而ThreadPool通常是share的，所以当run CompletableFuture时，ITL会失效，
+    // 对此可以在每次run一批Task时 Create New ThreadPool，且避免Thread的复用，因为若复用Thread仍会有该问题,这有悖Pool的部分初衷了
+    // 当使用Virtual Threads时，虽然也可以定义ThreadPool,但每次都是New Thread，不会复用，是否还有这个问题，待验证，但用VT时，更推荐用ScopedValue
     public static Runnable withTLTP(Runnable runnable) {
         var sharedVar = ConcurrencyUtils.threadLocal.get();
         return () -> {
