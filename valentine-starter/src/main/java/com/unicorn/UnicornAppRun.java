@@ -17,8 +17,11 @@ package com.unicorn;
 
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.core.utils.SpringContextHolder;
+import com.lwohvye.core.utils.UnicornAbstractThreadUtils;
+import com.lwohvye.sys.modules.system.service.local.AuthRetryService;
 import com.mzt.logapi.starter.annotation.EnableLogRecord;
 import io.swagger.v3.oas.annotations.Hidden;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,9 +31,15 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+
 /**
  * App启动入口
  */
+@Slf4j
 @EnableAsync // 开启异步
 @RestController
 @Hidden
@@ -67,7 +76,28 @@ public class UnicornAppRun {
      * @return /
      */
     @AnonymousGetMapping("/")
-    public String index() {
+    public String index() throws IllegalAccessException, ExecutionException, InterruptedException {
+        var retryService = SpringContextHolder.getBean(AuthRetryService.class);
+        var seed = "Seed";
+        var taskPro = new FutureTask<>(() -> retryService.retryServicePro(
+                () -> {
+                    log.info("In Pro - {}", seed);
+                    LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(200L));
+                    throw new RuntimeException("Error Pro");
+                },
+                () -> {
+                    log.info("In fallback Pro - {}", seed);
+                    return "Done";
+                }));
+        //taskPro.run(); // dont run directly
+        UnicornAbstractThreadUtils.TASK_EXECUTOR.execute(taskPro);
+        // another task
+        retryService.retryService("Normal");
+        while (!taskPro.isDone()) {
+            log.info("Waiting for TaskPro - {}", seed);
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1L));
+        }
+        log.info("Pro result {}", taskPro.get());
         return "Unicorn is Running!!";
     }
 }

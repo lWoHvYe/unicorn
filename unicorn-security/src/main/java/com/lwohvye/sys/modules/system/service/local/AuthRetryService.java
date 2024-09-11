@@ -16,17 +16,21 @@
 package com.lwohvye.sys.modules.system.service.local;
 
 import cn.hutool.core.util.RandomUtil;
+import com.lwohvye.core.exception.UtilsException;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.support.RetryTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Callable;
 
 @Slf4j
 @Service
@@ -112,6 +116,7 @@ public class AuthRetryService {
      * @Retryable标记的方法，不必是接口的实现，但调用方需在另一个类中
      * @Recover标记的方法需与@Retryable标记的方法在同一类中
      */
+    @Async
     @Retryable(retryFor = IllegalAccessException.class, maxAttempts = 5,
             backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
     public void retryService(String str) throws IllegalAccessException {
@@ -133,15 +138,14 @@ public class AuthRetryService {
      */
     @Recover
     public void recover(IllegalAccessException e) {
-        log.error("service retry after Recover => {}", e.getMessage());
+        logoutError(e);
     }
 
     // @Retryable 和 @Recover都支持在接口上，@Retryable可配合@Async一起使用
-
-    // @Async Invalid return type for async method (only Future and void supported)
+    // @Async Invalid return type for async method (only Future and void supported), 只推荐void，需要Future时，自行在外面包一层即可
     @Retryable(retryFor = IllegalAccessException.class, backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
     public String retryServicePlus(String str, @NotNull List<String> tempList) throws IllegalAccessException {
-        // 这是一个thread safe的 set，因为CopyOnWriteArrayList适合于读多写少的场合，在写多多场合可以用这个set
+        // 这是一个thread safe的 set，因为CopyOnWriteArrayList适合于读多写少的场合，在写多的场合可以用这个set
         // var concurrentSet = ConcurrentHashMap.newKeySet();
         tempList.add(str);
         if (RandomUtil.randomBoolean())
@@ -153,7 +157,32 @@ public class AuthRetryService {
     public String recoverPlus(IllegalAccessException e, String str, @NotNull List<String> tempList) {
         // 这里因为tempList是引用类型，所以在每次retry时add到其中的值会累积，利用这一点可以做些事情
         log.info(" temp -> {} ", tempList);
-        log.error("service retry after Recover => {}", e.getMessage());
+        logoutError(e);
         return "Default Result from recover";
+    }
+
+    @Retryable(retryFor = UtilsException.class,
+            backoff = @Backoff(value = 1500, maxDelay = 10000, multiplier = 1.2, random = true))
+    public <T> T retryServicePro(Callable<T> callable, Callable<T> fallback) {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            throw new UtilsException(e.getMessage());
+        }
+    }
+
+    @Recover
+    public <T> T recoverPro(UtilsException e, Callable<T> callable, Callable<T> fallback) {
+        logoutError(e);
+        if (Objects.isNull(fallback)) return null;
+        try {
+            return fallback.call();
+        } catch (Exception ex) {
+            throw new UtilsException(e.getMessage());
+        }
+    }
+
+    void logoutError(Exception e) {
+        log.error("service retry after Recover => {}", e.getMessage());
     }
 }
