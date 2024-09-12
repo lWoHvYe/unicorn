@@ -143,18 +143,19 @@ public class AuthRetryService {
 
     // @Retryable 和 @Recover都支持在接口上，@Retryable可配合@Async一起使用
     // @Async Invalid return type for async method (only Future and void supported), 只推荐void，需要Future时，自行在外面包一层即可
-    @Retryable(retryFor = IllegalAccessException.class, backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
-    public String retryServicePlus(String str, @NotNull List<String> tempList) throws IllegalAccessException {
+    @Retryable(retryFor = UtilsException.class, backoff = @Backoff(value = 1500, maxDelay = 100000, multiplier = 1.2, random = true))
+    public String retryServicePlus(String str, @NotNull List<String> tempList) {
+        log.info("In Plus - {}", str);
         // 这是一个thread safe的 set，因为CopyOnWriteArrayList适合于读多写少的场合，在写多的场合可以用这个set
         // var concurrentSet = ConcurrentHashMap.newKeySet();
         tempList.add(str);
-        if (RandomUtil.randomBoolean())
-            throw new IllegalAccessException("manual exception");
-        return str + " Success";
+        if (RandomUtil.randomInt(0, 4) < 3)
+            throw new UtilsException("Error Plus");
+        return "Plus Done";
     }
 
     @Recover
-    public String recoverPlus(IllegalAccessException e, String str, @NotNull List<String> tempList) {
+    public String recoverPlus(UtilsException e, String str, @NotNull List<String> tempList) {
         // 这里因为tempList是引用类型，所以在每次retry时add到其中的值会累积，利用这一点可以做些事情
         log.info(" temp -> {} ", tempList);
         logoutError(e);
