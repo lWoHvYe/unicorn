@@ -74,7 +74,7 @@ public class ThumbnailUtils {
             }
 
         } catch (Exception e1) {
-            log.error("操作失败" + e1.getMessage());
+            log.error("操作失败{}", e1.getMessage());
         }
 //        压缩后的图片都是jpg格式的
         return thumbnailFilePathName + ".jpg";
