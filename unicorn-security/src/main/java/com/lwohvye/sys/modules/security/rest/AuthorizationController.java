@@ -106,7 +106,7 @@ public class AuthorizationController {
         var session = request.getSession();
         // SessionId
         var sessionId = session.getId();
-        log.info("CurSessionId is : {}", sessionId);
+        log.info("CurSessionId is : {}", null);
         // 设置属性
         session.setAttribute("sysName", "el-Auth");
         // 获取属性

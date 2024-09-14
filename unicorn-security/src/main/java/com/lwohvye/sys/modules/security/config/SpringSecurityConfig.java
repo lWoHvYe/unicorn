@@ -214,18 +214,6 @@ public class SpringSecurityConfig {
             // 针对于密码错误行为，需进行记录
             if (authenticationException instanceof BadCredentialsException) {
                 var username = request.getAttribute("username");
-                if (Objects.nonNull(username)) {
-                    var ip = StringUtils.getIp(request);
-                    var lockedIp = ip + "||authLocked||";
-
-                    var infoMap = new HashMap<String, Object>();
-                    infoMap.put("ip", ip);
-                    infoMap.put("username", username);
-                    infoMap.put("lockedIp", lockedIp);
-                    var authFailedMsg = new AmqpMsgEntity().setMsgType("auth").setMsgData(JsonUtils.toJSONString(infoMap)).setExtraData("solveAuthFailed");
-                    //  发送消息，因为在Consumer侧限制了MsgType，所以Success与Failure虽然配置差不多，但只有正确的Consumer会成功消费，其他的会ignore
-                    rabbitMQProducerService.sendMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.AUTH_LOCAL_ROUTE_KEY, authFailedMsg);
-                }
             }
             // 返回错误信息。用下面的sendError会被EntryPoint拦截并覆盖。
 //            response.sendError(HttpServletResponse.SC_BAD_REQUEST, authenticationException.getMessage());
