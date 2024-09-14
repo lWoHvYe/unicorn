@@ -77,7 +77,7 @@ public class WebSocketServer {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        log.info("收到来" + sid + "的信息:" + message);
+        log.info("收到来{}的信息:{}", sid, message);
         //群发消息
         for (WebSocketServer item : webSocketSet) {
             try {
@@ -107,7 +107,7 @@ public class WebSocketServer {
      */
     public static void sendInfo(SocketMsg socketMsg, @PathParam("sid") String sid) throws IOException {
         String message = JsonUtils.toJSONString(socketMsg);
-        log.info("推送消息到" + sid + "，推送内容:" + message);
+        log.info("推送消息到{}，推送内容:{}", sid, message);
         for (WebSocketServer item : webSocketSet) {
             try {
                 //这里可以设定只推送给这个sid的，为null则全部推送

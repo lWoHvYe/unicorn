@@ -45,7 +45,7 @@ public class SpringdocConfig {
         List<RouteDefinition> definitions = locator.getRouteDefinitions().collectList().block();
         assert definitions != null;
         for (RouteDefinition definition : definitions) {
-            log.info("id: " + definition.getId() + "  " + definition.getUri().toString());
+            log.info("id: {}  {}", definition.getId(), definition.getUri().toString());
         }
         definitions.stream().filter(routeDefinition -> routeDefinition.getId().matches(".*-service")).forEach(routeDefinition -> {
             String name = routeDefinition.getId().replace("-service", "");
