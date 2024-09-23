@@ -90,6 +90,7 @@
       pinning by revising synchronized blocks or methods that run frequently and guard potentially long I/O operations
       to use java.util.concurrent.locks.ReentrantLock instead.
     - The primitive API to support locking, java.util.concurrent.LockSupport, now supports virtual threads。
+    - [Synchronization without pinning virtual threads](https://openjdk.org/jeps/8337395) 这个JEP drfat 意在解决synchronized会block VT的问题
 - [Virtual Threads in Spring 6.x](https://spring.io/blog/2022/10/11/embracing-virtual-threads)
 - [Blog-Understanding Java's Project Loom](https://www.marcobehler.com/guides/java-project-loom?mkt_tok=NDI2LVFWRC0xMTQAAAGIcjkwHcDNBFot5rdRdBEUuF6VoChWteoULzKapDGmwmAvhMcx0grhQ0louho-dN1ckoHsIo1dWoRkkUbuaEtY9jNg8gRmb1XxVmmNrLmADNkSKVgN)
 - [IntelliJ IDEA Conf 2022 | Project Loom: Revolution in Concurrency or Obscure Implementation Detail?](https://www.youtube.com/watch?v=0DUlUzqr09I)
