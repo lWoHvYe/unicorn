@@ -58,7 +58,7 @@ subprojects {
     }
 
     dependencies {
-        annotationProcessor("org.mapstruct", "mapstruct-processor", "1.6.0")
+        annotationProcessor("org.mapstruct", "mapstruct-processor", "1.6.2")
         annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "1.1.2")
     }
 

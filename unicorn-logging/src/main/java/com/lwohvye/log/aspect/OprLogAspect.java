@@ -64,7 +64,7 @@ public class OprLogAspect {
      */
     @Around("logPointcut()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        return ScopedValue.callWhere(SCOPED_VALUE, Instant.now(), () -> {
+        return ScopedValue.where(SCOPED_VALUE, Instant.now()).call(() -> {
             Object result;
             try {
                 result = joinPoint.proceed();
