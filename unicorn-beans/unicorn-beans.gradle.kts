@@ -21,10 +21,6 @@ java {
     withJavadocJar()
 }
 
-tasks.withType<JavaCompile> {
-    options.release = 21
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {
