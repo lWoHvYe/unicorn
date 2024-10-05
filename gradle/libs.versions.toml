@@ -35,12 +35,7 @@ bizlog = {group = "io.github.mouzt", name = "bizlog-sdk", version.ref = "bizlog"
 captcha = {group = "com.lwohvye.captcha", name = "captcha-spring-boot-starter", version.ref = "captcha" }
 commons-beanutils = {group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutils" }
 commons-configuration = {group = "org.apache.commons", name = "commons-configuration2", version.ref = "commonsConfiguration" }
-kotlin-stdlib = {group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
-kotlin-reflect = {group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
-kotlin-test = {group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 coroutines-core = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-coroutines-jvm = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core-jvm", version.ref = "kotlinxCoroutines" }
-coroutines-reactive = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-reactive", version.ref = "kotlinxCoroutines" }
 coroutines-jdk8 = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutines" }
 coroutines-jdk9 = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk9", version.ref = "kotlinxCoroutines" }
 easy-captcha = {group = "com.github.whvcse", name = "easy-captcha", version.ref = "easyCaptcha" }
@@ -63,8 +58,7 @@ thumbnailator = {group = "net.coobird", name = "thumbnailator", version.ref = "t
 xerces = {group = "xerces", name = "xercesImpl", version.ref = "xerces" }
 
 [bundles]
-kotlins = ["kotlin-stdlib", "kotlin-reflect"]
-coroutines = ["coroutines-core", "coroutines-jvm", "coroutines-reactive", "coroutines-jdk8", "coroutines-jdk9"]
+coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-jdk9"]
 
 [plugins]
 kotlin-jpa = {id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }

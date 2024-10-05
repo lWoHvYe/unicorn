@@ -96,12 +96,13 @@ publishing {
 dependencies {
     api(project(":unicorn-beans"))
     api("org.springframework.boot:spring-boot-starter-mail")
-    implementation(libs.bundles.kotlins)
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation(libs.bundles.coroutines)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.boot:spring-boot-starter-freemarker")
     implementation("software.amazon.awssdk:s3-transfer-manager:2.18.28-PREVIEW")
-    testImplementation(libs.kotlin.test)
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
 kotlin {
