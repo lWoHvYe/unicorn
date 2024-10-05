@@ -91,13 +91,12 @@ publishing {
 dependencies {
     api(project(":unicorn-beans"))
     api("org.springframework.boot:spring-boot-starter-freemarker")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation(libs.bundles.kotlins)
     implementation(libs.bundles.coroutines)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(libs.commons.configuration)
     implementation(libs.commons.beanutils)
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation(libs.kotlin.test)
 }
 
 kotlin {

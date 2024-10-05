@@ -39,11 +39,10 @@ dependencies {
     implementation("org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation(project(":unicorn-tp-tools-kotlin")) // kotlin as well
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation(libs.bundles.kotlins)
     implementation(libs.bundles.coroutines)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation(libs.kotlin.test)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // add following dependency if using ScriptEngine after Java 15
     implementation("org.graalvm.polyglot:js:$graalvmVersion")
