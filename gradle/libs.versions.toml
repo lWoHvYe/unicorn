@@ -5,7 +5,7 @@
 format.version = "1.1"
 
 [versions]
-asm = "9.7"
+asm = "9.7.1"
 bizlog = "3.0.6"
 captcha = "2.1.0"
 commonsBeanutils = "1.9.4"
