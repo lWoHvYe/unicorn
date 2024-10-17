@@ -76,15 +76,6 @@ public class RedisUtils {
     }
 
     /**
-     * 批量删除key
-     *
-     * @param keys
-     */
-    public void delete(Collection<String> keys) {
-        redisTemplate.delete(keys);
-    }
-
-    /**
      * 删除缓存
      *
      * @param keys 可以传一个值 或多个
@@ -104,16 +95,6 @@ public class RedisUtils {
                 log.debug("缓存删除数量：{} 个", count);
             }
         }
-    }
-
-    /**
-     * 序列化key
-     *
-     * @param key
-     * @return
-     */
-    public byte[] dump(String key) {
-        return redisTemplate.dump(key);
     }
 
     /**
@@ -165,48 +146,6 @@ public class RedisUtils {
     }
 
     /**
-     * 查找匹配的key
-     *
-     * @param pattern
-     * @return
-     */
-    public Set<Object> keys(String pattern) {
-        return redisTemplate.keys(pattern);
-    }
-
-    /**
-     * 将当前数据库的 key 移动到给定的数据库 db 当中
-     *
-     * @param key
-     * @param dbIndex
-     * @return
-     */
-    public Boolean move(String key, int dbIndex) {
-        return redisTemplate.move(key, dbIndex);
-    }
-
-    /**
-     * 移除 key 的过期时间，key 将持久保持
-     *
-     * @param key
-     * @return
-     */
-    public Boolean persist(String key) {
-        return redisTemplate.persist(key);
-    }
-
-    /**
-     * 返回 key 的剩余的过期时间
-     *
-     * @param key
-     * @param unit
-     * @return
-     */
-    public Long getExpire(String key, TimeUnit unit) {
-        return redisTemplate.getExpire(key, unit);
-    }
-
-    /**
      * 返回 key 的剩余的过期时间
      *
      * @param key
@@ -224,15 +163,6 @@ public class RedisUtils {
      */
     public Long getExpire(Object key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
-    }
-
-    /**
-     * 从当前数据库中随机返回一个 key
-     *
-     * @return
-     */
-    public Object randomKey() {
-        return redisTemplate.randomKey();
     }
 
     /**
@@ -444,18 +374,6 @@ public class RedisUtils {
     }
 
     /**
-     * 返回 key 中字符串值的子字符
-     *
-     * @param key
-     * @param start
-     * @param end
-     * @return
-     */
-    public String getRange(String key, long start, long end) {
-        return redisTemplate.opsForValue().get(key, start, end);
-    }
-
-    /**
      * 将给定 key 的值设为 value ，并返回 key 的旧值(old value)
      *
      * @param key
@@ -464,40 +382,6 @@ public class RedisUtils {
      */
     public Object getAndSet(String key, Object value) {
         return redisTemplate.opsForValue().getAndSet(key, value);
-    }
-
-    /**
-     * 对 key 所储存的字符串值，获取指定偏移量上的位(bit)
-     *
-     * @param key
-     * @param offset
-     * @return
-     */
-    public Boolean getBit(String key, long offset) {
-        return redisTemplate.opsForValue().getBit(key, offset);
-    }
-
-    /**
-     * 批量获取
-     *
-     * @param keys
-     * @return
-     */
-    public List<Object> multiGet(List<String> keys) {
-        List list = redisTemplate.opsForValue().multiGet(Set.of(keys));
-        List resultList = new ArrayList<>();
-        Optional.ofNullable(list).ifPresent(e -> list.forEach(ele -> Optional.ofNullable(ele).ifPresent(resultList::add)));
-        return resultList;
-    }
-
-    /**
-     * 批量获取
-     *
-     * @param keys
-     * @return
-     */
-    public List<Object> multiGet(Collection<Object> keys) {
-        return redisTemplate.opsForValue().multiGet(keys);
     }
 
     /**
@@ -609,17 +493,6 @@ public class RedisUtils {
     }
 
     /**
-     * 用 value 参数覆写给定 key 所储存的字符串值，从偏移量 offset 开始
-     *
-     * @param key
-     * @param value
-     * @param offset 从指定位置开始覆写
-     */
-    public void setRange(String key, Object value, long offset) {
-        redisTemplate.opsForValue().set(key, value, offset);
-    }
-
-    /**
      * 获取字符串的长度
      *
      * @param key
@@ -630,25 +503,6 @@ public class RedisUtils {
     }
 
     /**
-     * 批量添加
-     *
-     * @param maps
-     */
-    public void multiSet(Map<String, String> maps) {
-        redisTemplate.opsForValue().multiSet(maps);
-    }
-
-    /**
-     * 同时设置一个或多个 key-value 对，当且仅当所有给定 key 都不存在
-     *
-     * @param maps
-     * @return 之前已经存在返回false, 不存在返回true
-     */
-    public boolean multiSetIfAbsent(Map<String, String> maps) {
-        return Boolean.TRUE.equals(redisTemplate.opsForValue().multiSetIfAbsent(maps));
-    }
-
-    /**
      * 增加(自增长), 负数则为自减
      *
      * @param key
@@ -656,15 +510,6 @@ public class RedisUtils {
      * @return
      */
     public Long incrBy(String key, long increment) {
-        return redisTemplate.opsForValue().increment(key, increment);
-    }
-
-    /**
-     * @param key
-     * @param increment
-     * @return
-     */
-    public Double incrByFloat(String key, double increment) {
         return redisTemplate.opsForValue().increment(key, increment);
     }
 
@@ -700,30 +545,8 @@ public class RedisUtils {
      * @param key
      * @return
      */
-    public Map<Object, Object> hGetAll(String key) {
+    public Map<Object, Object> hEntries(String key) {
         return redisTemplate.opsForHash().entries(key);
-    }
-
-    /**
-     * 获取所有给定字段的值
-     *
-     * @param key
-     * @param items
-     * @return
-     */
-    public List<Object> hMultiGet(String key, Collection<Object> items) {
-        return redisTemplate.opsForHash().multiGet(key, items);
-    }
-
-    /**
-     * 获取hashKey对应的所有键值
-     *
-     * @param key 键
-     * @return 对应的多个键值
-     */
-    public Map<Object, Object> hMGet(String key) {
-        return redisTemplate.opsForHash().entries(key);
-
     }
 
     /**
@@ -865,18 +688,6 @@ public class RedisUtils {
     }
 
     /**
-     * 为哈希表 key 中的指定字段的整数值加上增量 increment
-     *
-     * @param key
-     * @param field
-     * @param delta
-     * @return
-     */
-    public Double hIncrByFloat(String key, Object field, double delta) {
-        return redisTemplate.opsForHash().increment(key, field, delta);
-    }
-
-    /**
      * 获取所有哈希表中的字段
      *
      * @param key
@@ -998,15 +809,6 @@ public class RedisUtils {
     }
 
     /**
-     * @param key
-     * @param value
-     * @return
-     */
-    public Long lLeftPushAll(String key, Collection<Object> value) {
-        return redisTemplate.opsForList().leftPushAll(key, value);
-    }
-
-    /**
      * 当list存在的时候才加入
      *
      * @param key
@@ -1044,15 +846,6 @@ public class RedisUtils {
      * @return
      */
     public Long lRightPushAll(String key, Object... value) {
-        return redisTemplate.opsForList().rightPushAll(key, value);
-    }
-
-    /**
-     * @param key
-     * @param value
-     * @return
-     */
-    public Long lRightPushAll(String key, Collection<Object> value) {
         return redisTemplate.opsForList().rightPushAll(key, value);
     }
 
@@ -1135,30 +928,6 @@ public class RedisUtils {
     }
 
     /**
-     * 移除列表的最后一个元素，并将该元素添加到另一个列表并返回
-     *
-     * @param sourceKey
-     * @param destinationKey
-     * @return
-     */
-    public Object lRightPopAndLeftPush(String sourceKey, String destinationKey) {
-        return redisTemplate.opsForList().rightPopAndLeftPush(sourceKey, destinationKey);
-    }
-
-    /**
-     * 从列表中弹出一个值，将弹出的元素插入到另外一个列表中并返回它； 如果列表没有元素会阻塞列表直到等待超时或发现可弹出元素为止
-     *
-     * @param sourceKey
-     * @param destinationKey
-     * @param timeout
-     * @param unit
-     * @return
-     */
-    public Object lBRightPopAndLeftPush(String sourceKey, String destinationKey, long timeout, TimeUnit unit) {
-        return redisTemplate.opsForList().rightPopAndLeftPush(sourceKey, destinationKey, timeout, unit);
-    }
-
-    /**
      * 删除集合中值等于value得元素
      *
      * @param key
@@ -1202,17 +971,7 @@ public class RedisUtils {
         }
     }
 
-    /**
-     * 获取列表长度
-     *
-     * @param key
-     * @return
-     */
-    public Long lLen(String key) {
-        return redisTemplate.opsForList().size(key);
-    }
-
-//    endregion
+    //    endregion
 
 //    region set相关操作
 

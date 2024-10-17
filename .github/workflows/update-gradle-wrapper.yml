@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ macos-latest, macos-12 ]
+        os: [ macos-latest, macos-13 ]
 
     steps:
       - name: checkout

@@ -21,4 +21,4 @@ echo Stopping application
 source ./shutdown.sh
 # sleep 2
 echo Starting application
-source ./start.sh
+source ./startup.sh
