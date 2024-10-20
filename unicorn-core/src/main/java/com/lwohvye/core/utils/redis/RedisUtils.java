@@ -373,42 +373,6 @@ public class RedisUtils {
         return key == null ? null : redisTemplate.opsForValue().get(key);
     }
 
-    /**
-     * 将给定 key 的值设为 value ，并返回 key 的旧值(old value)
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    public Object getAndSet(String key, Object value) {
-        return redisTemplate.opsForValue().getAndSet(key, value);
-    }
-
-    /**
-     * 设置ASCII码, 字符串'a'的ASCII码是97, 转为二进制是'01100001', 此方法是将二进制第offset位值变为value
-     *
-     * @param key
-     * @param offset 位置
-     * @param value  值,true为1, false为0
-     * @return
-     */
-    public boolean setBit(String key, long offset, boolean value) {
-        return Boolean.TRUE.equals(redisTemplate.opsForValue().setBit(key, offset, value));
-    }
-
-    /**
-     * 将值 value 关联到 key ，并将 key 的过期时间设为 timeout
-     *
-     * @param key
-     * @param value
-     * @param timeout 过期时间
-     * @param unit    时间单位, 天:TimeUnit.DAYS 小时:TimeUnit.HOURS 分钟:TimeUnit.MINUTES
-     *                秒:TimeUnit.SECONDS 毫秒:TimeUnit.MILLISECONDS
-     */
-    public void setEx(String key, Object value, long timeout, TimeUnit unit) {
-        redisTemplate.opsForValue().set(key, value, timeout, unit);
-    }
-
     //SET_IF_PRESENT --->NX
     //SET_IF_ABSENT   ---->XX
     //NX – Only set the key if it does not already exist.
@@ -540,16 +504,6 @@ public class RedisUtils {
     }
 
     /**
-     * 获取所有给定字段的值
-     *
-     * @param key
-     * @return
-     */
-    public Map<Object, Object> hEntries(String key) {
-        return redisTemplate.opsForHash().entries(key);
-    }
-
-    /**
      * 向一张hash表中放入数据,如果不存在将创建
      *
      * @param key   键
@@ -625,18 +579,6 @@ public class RedisUtils {
             log.error(e.getMessage(), e);
             return false;
         }
-    }
-
-    /**
-     * 仅当hashKey不存在时才设置
-     *
-     * @param key
-     * @param hashKey
-     * @param value
-     * @return
-     */
-    public Boolean hPutIfAbsent(String key, String hashKey, Object value) {
-        return redisTemplate.opsForHash().putIfAbsent(key, hashKey, value);
     }
 
     /**
@@ -717,18 +659,7 @@ public class RedisUtils {
         return redisTemplate.opsForHash().values(key);
     }
 
-    /**
-     * 迭代哈希表中的键值对
-     *
-     * @param key
-     * @param options
-     * @return
-     */
-    public Cursor<Map.Entry<Object, Object>> hScan(String key, ScanOptions options) {
-        return redisTemplate.opsForHash().scan(key, options);
-    }
-
-//    endregion
+    //    endregion
 
 //    region list相关操作
 
@@ -749,17 +680,6 @@ public class RedisUtils {
     }
 
     /**
-     * 通过索引获取列表中的元素
-     *
-     * @param key
-     * @param index
-     * @return
-     */
-    public Object lIndex(String key, long index) {
-        return redisTemplate.opsForList().index(key, index);
-    }
-
-    /**
      * 获取list缓存的内容
      *
      * @param key   键
@@ -774,18 +694,6 @@ public class RedisUtils {
             log.error(e.getMessage(), e);
             return null;
         }
-    }
-
-    /**
-     * 获取列表指定范围内的元素
-     *
-     * @param key
-     * @param start 开始位置, 0是开始位置
-     * @param end   结束位置, -1返回所有
-     * @return
-     */
-    public List<Object> lRange(String key, long start, long end) {
-        return redisTemplate.opsForList().range(key, start, end);
     }
 
     /**
@@ -804,72 +712,8 @@ public class RedisUtils {
      * @param value
      * @return
      */
-    public Long lLeftPushAll(String key, Object... value) {
-        return redisTemplate.opsForList().leftPushAll(key, value);
-    }
-
-    /**
-     * 当list存在的时候才加入
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    public Long lLeftPushIfPresent(String key, Object value) {
-        return redisTemplate.opsForList().leftPushIfPresent(key, value);
-    }
-
-    /**
-     * 如果pivot存在,再pivot前面添加
-     *
-     * @param key
-     * @param pivot
-     * @param value
-     * @return
-     */
-    public Long lLeftPush(String key, Object pivot, Object value) {
-        return redisTemplate.opsForList().leftPush(key, pivot, value);
-    }
-
-    /**
-     * @param key
-     * @param value
-     * @return
-     */
     public Long lRightPush(String key, Object value) {
         return redisTemplate.opsForList().rightPush(key, value);
-    }
-
-    /**
-     * @param key
-     * @param value
-     * @return
-     */
-    public Long lRightPushAll(String key, Object... value) {
-        return redisTemplate.opsForList().rightPushAll(key, value);
-    }
-
-    /**
-     * 为已存在的列表添加值
-     *
-     * @param key
-     * @param value
-     * @return
-     */
-    public Long lRightPushIfPresent(String key, Object value) {
-        return redisTemplate.opsForList().rightPushIfPresent(key, value);
-    }
-
-    /**
-     * 在pivot元素的右边添加值
-     *
-     * @param key
-     * @param pivot
-     * @param value
-     * @return
-     */
-    public Long lRightPush(String key, Object pivot, Object value) {
-        return redisTemplate.opsForList().rightPush(key, pivot, value);
     }
 
     /**
@@ -1000,7 +844,7 @@ public class RedisUtils {
      * @param values 值 可以是多个
      * @return 成功个数
      */
-    public long sSetAndTime(String key, long time, Object... values) {
+    public long sSet(String key, long time, Object... values) {
         try {
             Long count = redisTemplate.opsForSet().add(key, values);
             if (time > 0) {
@@ -1116,30 +960,6 @@ public class RedisUtils {
     }
 
     /**
-     * key集合与otherKey集合的交集存储到destKey集合中
-     *
-     * @param key
-     * @param otherKey
-     * @param destKey
-     * @return
-     */
-    public Long sIntersectAndStore(String key, String otherKey, String destKey) {
-        return redisTemplate.opsForSet().intersectAndStore(key, otherKey, destKey);
-    }
-
-    /**
-     * key集合与多个集合的交集存储到destKey集合中
-     *
-     * @param key
-     * @param otherKeys
-     * @param destKey
-     * @return
-     */
-    public Long sIntersectAndStore(String key, Collection<String> otherKeys, String destKey) {
-        return redisTemplate.opsForSet().intersectAndStore(key, otherKeys, destKey);
-    }
-
-    /**
      * 获取两个集合的并集
      *
      * @param key
@@ -1159,30 +979,6 @@ public class RedisUtils {
      */
     public Set<Object> sUnion(String key, Collection<String> otherKeys) {
         return redisTemplate.opsForSet().union(key, otherKeys);
-    }
-
-    /**
-     * key集合与otherKey集合的并集存储到destKey中
-     *
-     * @param key
-     * @param otherKey
-     * @param destKey
-     * @return
-     */
-    public Long sUnionAndStore(String key, String otherKey, String destKey) {
-        return redisTemplate.opsForSet().unionAndStore(key, otherKey, destKey);
-    }
-
-    /**
-     * key集合与多个集合的并集存储到destKey中
-     *
-     * @param key
-     * @param otherKeys
-     * @param destKey
-     * @return
-     */
-    public Long sUnionAndStore(String key, Collection<String> otherKeys, String destKey) {
-        return redisTemplate.opsForSet().unionAndStore(key, otherKeys, destKey);
     }
 
     /**
@@ -1208,30 +1004,6 @@ public class RedisUtils {
     }
 
     /**
-     * key集合与otherKey集合的差集存储到destKey中
-     *
-     * @param key
-     * @param otherKey
-     * @param destKey
-     * @return
-     */
-    public Long sDifference(String key, String otherKey, String destKey) {
-        return redisTemplate.opsForSet().differenceAndStore(key, otherKey, destKey);
-    }
-
-    /**
-     * key集合与多个集合的差集存储到destKey中
-     *
-     * @param key
-     * @param otherKeys
-     * @param destKey
-     * @return
-     */
-    public Long sDifference(String key, Collection<String> otherKeys, String destKey) {
-        return redisTemplate.opsForSet().differenceAndStore(key, otherKeys, destKey);
-    }
-
-    /**
      * 获取集合所有元素
      *
      * @param key
@@ -1252,26 +1024,6 @@ public class RedisUtils {
      */
     public Object sRandomMember(String key) {
         return redisTemplate.opsForSet().randomMember(key);
-    }
-
-    /**
-     * 随机获取集合中count个元素
-     *
-     * @param key
-     * @param count
-     */
-    public List<Object> sRandomMembers(String key, long count) {
-        return redisTemplate.opsForSet().randomMembers(key, count);
-    }
-
-    /**
-     * 随机获取集合中count个元素并且去除重复的
-     *
-     * @param key
-     * @param count
-     */
-    public Set<Object> sDistinctRandomMembers(String key, long count) {
-        return redisTemplate.opsForSet().distinctRandomMembers(key, count);
     }
 
     /**
@@ -1482,18 +1234,6 @@ public class RedisUtils {
     }
 
     /**
-     * @param key
-     * @param min
-     * @param max
-     * @param start
-     * @param end
-     * @return
-     */
-    public Set<Object> zReverseRangeByScore(String key, double min, double max, long start, long end) {
-        return redisTemplate.opsForZSet().reverseRangeByScore(key, min, max, start, end);
-    }
-
-    /**
      * 根据score值获取集合元素数量
      *
      * @param key
@@ -1558,52 +1298,6 @@ public class RedisUtils {
      */
     public Long zRemoveRangeByScore(String key, double min, double max) {
         return redisTemplate.opsForZSet().removeRangeByScore(key, min, max);
-    }
-
-    /**
-     * 获取key和otherKey的并集并存储在destKey中
-     *
-     * @param key
-     * @param otherKey
-     * @param destKey
-     * @return
-     */
-    public Long zUnionAndStore(String key, String otherKey, String destKey) {
-        return redisTemplate.opsForZSet().unionAndStore(key, otherKey, destKey);
-    }
-
-    /**
-     * @param key
-     * @param otherKeys
-     * @param destKey
-     * @return
-     */
-    public Long zUnionAndStore(String key, Collection<String> otherKeys, String destKey) {
-        return redisTemplate.opsForZSet().unionAndStore(key, otherKeys, destKey);
-    }
-
-    /**
-     * 交集
-     *
-     * @param key
-     * @param otherKey
-     * @param destKey
-     * @return
-     */
-    public Long zIntersectAndStore(String key, String otherKey, String destKey) {
-        return redisTemplate.opsForZSet().intersectAndStore(key, otherKey, destKey);
-    }
-
-    /**
-     * 交集
-     *
-     * @param key
-     * @param otherKeys
-     * @param destKey
-     * @return
-     */
-    public Long zIntersectAndStore(String key, Collection<String> otherKeys, String destKey) {
-        return redisTemplate.opsForZSet().intersectAndStore(key, otherKeys, destKey);
     }
 
     /**
