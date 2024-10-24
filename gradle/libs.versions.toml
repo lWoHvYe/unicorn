@@ -21,7 +21,6 @@ mapstruct = "1.6.2"
 mapstructSpring = "1.1.2"
 oshiCore = "6.4.2"
 poi = "5.3.0"
-quartz = "2.3.2"
 redisson = "3.37.0"
 springBoot = "3.3.5"
 springCloudVersion = "2023.0.2"
@@ -50,7 +49,6 @@ mapstruct-spring-annotations = {group = "org.mapstruct.extensions.spring", name 
 oshi-core = {group = "com.github.oshi", name = "oshi-core", version.ref = "oshiCore" }
 poi = {group = "org.apache.poi", name = "poi", version.ref = "poi" }
 poi-ooxml = {group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" }
-quartz = {group = "org.quartz-scheduler", name = "quartz", version.ref = "quartz" }
 redisson = {group = "org.redisson", name = "redisson-spring-boot-starter", version.ref = "redisson" }
 springdoc-webflux-ui = {group = "org.springdoc", name = "springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
 springdoc-webmvc-ui = {group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
