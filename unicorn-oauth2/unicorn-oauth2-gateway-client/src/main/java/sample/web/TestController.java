@@ -16,34 +16,47 @@
 
 package sample.web;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import sample.consumer.client.NumberClient;
+import sample.consumer.domian.CustomizeUser;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/test")
 public class TestController {
 
+    @Autowired
+    NumberClient numberClient;
+
+    // TODO not work
     @GetMapping(value = "/testCombineObj", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<String> testCombineObj(ServerHttpRequest request) {
         var users = Flux.just("performer", "unicorn", "test")
                 .map(username -> User.withUsername(username).password("why")
                         .build());
-        var webClient = WebClient.create("http://127.0.0.1:8080/res/res-flux");
+//        var webClient = WebClient.create("http://127.0.0.1:8080/res/res-flux");
 
         var cookies = request.getCookies();
         var jsessionid = cookies.get("JSESSIONID").getFirst();
-        return webClient
-                .post().uri("/api/combineObj")
-                .contentType(MediaType.APPLICATION_NDJSON)
-                .body(users, User.class)
-                .cookie(jsessionid.getName(), jsessionid.getValue())
-                .retrieve()
-                .bodyToFlux(String.class);
+        var authCookie = new HashMap<String, Object>();
+        authCookie.put(jsessionid.getName(), jsessionid.getValue());
+
+        return numberClient.combineObj(users, authCookie).map(CustomizeUser::toString);
+
+//        return webClient
+//                .post().uri("/api/combineObj")
+//                .contentType(MediaType.APPLICATION_NDJSON)
+//                .body(users, User.class)
+//                .cookie(jsessionid.getName(), jsessionid.getValue())
+//                .retrieve()
+//                .bodyToFlux(String.class);
     }
 }

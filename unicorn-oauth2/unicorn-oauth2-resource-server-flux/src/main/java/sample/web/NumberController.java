@@ -18,12 +18,10 @@ package sample.web;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import sample.client.NumberClient;
 import sample.domain.CustomizeUser;
 import sample.dto.UserVO;
 import sample.repo.CustomizeUserRepository;
@@ -33,7 +31,7 @@ import java.time.Duration;
 
 @Slf4j
 @RestController
-public class NumberController {
+public class NumberController implements NumberClient {
 
     @Autowired
     CustomizeUserRepository customizeUserRepository;
@@ -45,7 +43,7 @@ public class NumberController {
     //
     //  在 SSE 中，每个数据项被包含在一个称为事件流（event stream）的数据流中。而每个数据项都以 "data:" 字段开头，然后是实际的数据内容。这样客户端就能够识别数据项，并根据 "data:" 字段来解析数据。
     // 使用 produces = MediaType.TEXT_EVENT_STREAM_VALUE 来指定响应的数据类型为 Server-Sent Events (SSE)，这样客户端可以以流的方式接收数据。
-    @GetMapping(value = "/api/numbers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Override
     public Flux<Integer> generateNumbers() {
         // 创建一个包含 1 到 10 的数字的 Flux
         Flux<Integer> numbers = Flux.range(1, 10);
@@ -55,7 +53,7 @@ public class NumberController {
     }
 
     // http://127.0.0.1:8080/res/res-flux/api/concatNumbers
-    @GetMapping(value = "/api/concatNumbers", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Override
     public Flux<String> generateConcatNumbers() {
         // 创建包含初始字符串 "starting" 的 Flux
         Flux<String> startingFlux = Flux.just("Starting");
@@ -88,7 +86,7 @@ public class NumberController {
 
     // 这个会触发file download
     // http://127.0.0.1:8080/res/res-flux/api/concatObj
-    @GetMapping(value = "/api/concatObj", produces = MediaType.APPLICATION_NDJSON_VALUE) // 如果返回一个对象，用这个返回json格式
+    @Override
     public Flux<CustomizeUser> generateConcatObj() {
 
         // 使用 Flux.concat() 组合多个 Flux
@@ -109,7 +107,7 @@ public class NumberController {
     }
 
     // 如果返回一个对象，用这个返回json格式，同时用consumes指明入参格式
-    @PostMapping(value = "/api/combineObj", consumes = MediaType.APPLICATION_NDJSON_VALUE, produces = MediaType.APPLICATION_NDJSON_VALUE)
+    @Override
     public Flux<CustomizeUser> combineObj(@RequestBody Flux<UserVO> userNames) {
         // 使用 Flux.concat() 组合多个 Flux
         return Flux.concat(customizeUserRepository.findByUsername(ReactiveSecurityUtils.getCurrentUsername()),
