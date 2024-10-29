@@ -24,6 +24,7 @@ import com.lwohvye.core.utils.result.ResultInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -34,30 +35,31 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
+@HttpExchange(url = "/api/sys/menus")
 public interface SysMenuAPI {
 
-    @GetMapping("/api/sys/menus/build")
+    @GetExchange("/build")
     List<MenuVo> buildMenus();
 
-    @GetMapping("/api/sys/menus/lazy")
+    @GetExchange("/lazy")
     List<MenuDto> query(@RequestParam Long pid);
 
-    @GetMapping("/api/sys/menus/child")
+    @GetExchange("/child")
     List<Long> child(@RequestParam Long id);
 
-    @GetMapping("/api/sys/menus")
+    @GetExchange
     Map<String, Object> query(MenuQueryCriteria criteria) throws Exception;
 
-    @PostMapping("/api/sys/menus/superior")
+    @PostExchange("/superior")
     List<MenuDto> getSuperior(@RequestBody List<Long> ids);
 
-    @PostMapping("/api/sys/menus")
+    @PostExchange
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Menu resources);
 
-    @PutMapping("/api/sys/menus")
+    @PutExchange
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Menu resources);
 
-    @DeleteMapping("/api/sys/menus")
+    @DeleteExchange
     ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
 }

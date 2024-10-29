@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -36,32 +37,33 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
+@HttpExchange(url = "/api/sys/roles")
 public interface SysRoleAPI {
 
-    @GetMapping("/api/sys/roles/{id}")
+    @GetExchange("/{id}")
     RoleDto query(@PathVariable Long id);
 
-    @GetMapping("/api/sys/roles/all")
+    @GetExchange("/all")
     List<RoleDto> query();
 
-    @GetMapping("/api/sys/roles")
+    @GetExchange
     Map<String, Object> query(RoleQueryCriteria criteria, Pageable pageable);
 
-    @GetMapping("/api/sys/roles/level")
+    @GetExchange("/level")
     Dict getLevel();
 
-    @PostMapping("/api/sys/roles")
+    @PostExchange
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Role resources);
 
-    @PutMapping("/api/sys/roles")
+    @PutExchange
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Role resources);
 
-    @PutMapping("/api/sys/roles/menu")
+    @PutExchange("/menu")
     ResponseEntity<ResultInfo<String>> updateMenu(@RequestBody Role resources);
 
-    @DeleteMapping("/api/sys/roles")
+    @DeleteExchange
     ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
-    @GetMapping("/api/sys/roles/uid/{userId}")
+    @GetExchange("/uid/{userId}")
     List<RoleSmallDto> queryByUid(@PathVariable Long userId);
 }

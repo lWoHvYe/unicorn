@@ -55,7 +55,7 @@ public class DeptController implements SysDeptAPI {
     private static final String ENTITY_NAME = "dept";
 
     @Operation(summary = "导出部门数据")
-    @GetMapping(value = "/api/sys/dept/download")
+    @GetMapping(value = "/download")
     public void download(HttpServletResponse response, DeptQueryCriteria criteria) throws Exception {
         deptService.download(deptService.queryAll(SecurityUtils.getCurrentUserId(), criteria, false), response);
     }

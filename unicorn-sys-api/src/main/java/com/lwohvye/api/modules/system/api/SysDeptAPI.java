@@ -22,6 +22,7 @@ import com.lwohvye.core.utils.result.ResultInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -32,23 +33,24 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
+@HttpExchange(url = "/api/sys/dept")
 public interface SysDeptAPI {
 
-    @GetMapping("/api/sys/dept")
+    @GetExchange
     Map<String, Object> query(DeptQueryCriteria criteria) throws Exception;
 
-    @PostMapping("/api/sys/dept/superior")
+    @PostExchange("/superior")
     Map<String, Object> getSuperior(@RequestBody List<Long> ids);
 
-    @PostMapping("/api/sys/dept")
+    @PostExchange
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Dept resources);
 
-    @PutMapping("/api/sys/dept")
+    @PutExchange
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Dept resources);
 
-    @DeleteMapping("/api/sys/dept")
+    @DeleteExchange
     ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
-    @GetMapping("/api/sys/dept/enabled/{userId}/{deptId}")
+    @GetExchange("/enabled/{userId}/{deptId}")
     List<Long> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
 }

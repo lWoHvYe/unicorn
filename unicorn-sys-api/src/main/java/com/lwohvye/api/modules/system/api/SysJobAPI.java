@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -32,18 +33,19 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
+@HttpExchange(url = "/api/sys/job")
 public interface SysJobAPI {
 
-    @GetMapping("/api/sys/job")
+    @GetExchange
     Map<String, Object> query(JobQueryCriteria criteria, Pageable pageable);
 
-    @PostMapping("/api/sys/job")
+    @PostExchange
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Job resources);
 
-    @PutMapping("/api/sys/job")
+    @PutExchange
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody Job resources);
 
-    @DeleteMapping("/api/sys/job")
+    @DeleteExchange
     ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
 }

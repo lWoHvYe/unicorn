@@ -52,7 +52,7 @@ public class JobController implements SysJobAPI {
     private static final String ENTITY_NAME = "job";
 
     @Operation(summary = "导出岗位数据")
-    @GetMapping(value = "/api/sys/job/download")
+    @GetMapping(value = "/download")
     public void download(HttpServletResponse response, JobQueryCriteria criteria) throws IOException {
         jobService.download(jobService.queryAll(criteria), response);
     }

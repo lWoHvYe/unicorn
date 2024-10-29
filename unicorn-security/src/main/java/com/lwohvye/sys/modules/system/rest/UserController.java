@@ -77,7 +77,7 @@ public class UserController implements SysUserAPI {
     private final IRoleService roleService;
 
     @Operation(summary = "导出用户数据")
-    @GetMapping(value = "/api/sys/users/download")
+    @GetMapping(value = "/download")
     public void download(HttpServletResponse response, UserQueryCriteria criteria) throws IOException {
         userService.download(userService.queryAll(criteria), response);
     }

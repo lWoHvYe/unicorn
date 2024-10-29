@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -32,21 +33,22 @@ import java.util.Map;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
+@HttpExchange(url = "/api/sys/resources")
 public interface SysResourceAPI {
 
 
-    @GetMapping("/api/sys/resources")
+    @GetExchange
     Map<String, Object> query(ResourceQueryCriteria criteria, Pageable pageable);
 
-    @PostMapping("/api/sys/resources")
+    @PostExchange
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody Resource resources);
 
-    @PutMapping("/api/sys/resources")
+    @PutExchange
     ResponseEntity<ResultInfo<String>> update(@Validated @RequestBody Resource resources);
 
-    @DeleteMapping("/api/sys/resources")
+    @DeleteExchange
     ResultInfo<String> delete(@RequestBody Long[] ids);
 
-    @GetMapping("/api/sys/resources/queryAllRes")
+    @GetExchange("/queryAllRes")
     List<ResourceDto> queryAllRes();
 }

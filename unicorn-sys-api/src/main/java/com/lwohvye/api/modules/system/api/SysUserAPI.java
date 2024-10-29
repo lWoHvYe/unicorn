@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.service.annotation.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import java.util.Set;
  * @website https://lwohvye.com
  * @date 2022-03-20
  **/
+@HttpExchange(url = "/api/sys/users")
 public interface SysUserAPI {
     // feign 中使用Method.getAnnotations()获取方法上注解，这个只能获取方法本身的，无法获取（被重写的）父类的方法上的（Returns annotations that are directly present on this element. This method ignores inherited annotations）
     // 另Spring提供了很强大的 AnnotatedElementUtils, 可以获取到父类方法上的注解
@@ -45,33 +47,33 @@ public interface SysUserAPI {
 
     // FeignClient不支持get方式传递实体类。通过把参数前的@RequestBody替换成@SpringQueryMap可以解决这个问题，但只支持单个实体类参数
     // 解决方案是引入 io.github.openfeign:feign-httpclient 并在配置中 feign.httpclient.enabled = true配置激活，之后即可配合@SpringQueryMap使用，且多个实体只需在第一个上添加。单个实体似乎是不用添加的
-    @GetMapping("/api/sys/users")
+    @GetExchange
     Map<String, Object> query(UserQueryCriteria criteria, Pageable pageable);
 
-    @PostMapping("/api/sys/users")
+    @PostExchange
     ResponseEntity<ResultInfo<String>> create(@Validated @RequestBody User resources);
 
-    @PutMapping("/api/sys/users")
+    @PutExchange
     ResponseEntity<ResultInfo<String>> update(@Validated(Update.class) @RequestBody User resources) throws Exception;
 
-    @PostMapping("/api/sys/users/updateStatus")
+    @PostExchange("/updateStatus")
     ResponseEntity<ResultInfo<String>> updateStatus(@RequestBody UserBaseVo userVo);
 
-    @PutMapping("/api/sys/users/center")
+    @PutExchange("/center")
     ResponseEntity<ResultInfo<String>> center(@Validated(Update.class) @RequestBody User resources);
 
-    @DeleteMapping("/api/sys/users")
+    @DeleteExchange
     ResultInfo<String> delete(@RequestBody Set<Long> ids);
 
-    @PostMapping("/api/sys/users/updatePass")
+    @PostExchange("/updatePass")
     ResultInfo<String> updatePass(@RequestBody UserPassVo passVo) throws Exception;
 
-    @PostMapping("/api/sys/users/updateAvatar")
+    @PostExchange("/updateAvatar")
     Map<String, String> updateAvatar(@RequestParam MultipartFile avatar);
 
-    @PostMapping("/api/sys/users/updateEmail/{code}")
+    @PostExchange("/updateEmail/{code}")
     ResultInfo<String> updateEmail(@PathVariable String code, @RequestBody User user) throws Exception;
 
-    @GetMapping("/api/sys/users/name/{username}")
+    @GetExchange("/name/{username}")
     UserInnerDto queryByName(@PathVariable String username);
 }

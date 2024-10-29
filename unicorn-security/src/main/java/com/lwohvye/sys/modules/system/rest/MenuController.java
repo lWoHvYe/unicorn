@@ -60,7 +60,7 @@ public class MenuController implements SysMenuAPI {
     private static final String ENTITY_NAME = "menu";
 
     @Operation(summary = "导出菜单数据")
-    @GetMapping(value = "/api/sys/menus/download")
+    @GetMapping(value = "/download")
     public void download(HttpServletResponse response, MenuQueryCriteria criteria) throws Exception {
         menuService.download(menuService.queryAll(criteria, false), response);
     }

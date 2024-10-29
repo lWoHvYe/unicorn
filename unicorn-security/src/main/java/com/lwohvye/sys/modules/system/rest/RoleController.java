@@ -65,7 +65,7 @@ public class RoleController implements SysRoleAPI {
     }
 
     @Operation(summary = "导出角色数据")
-    @GetMapping(value = "/api/sys/roles/download")
+    @GetMapping(value = "/download")
     public void download(HttpServletResponse response, RoleQueryCriteria criteria) throws IOException {
         roleService.download(roleService.queryAll(criteria), response);
     }
