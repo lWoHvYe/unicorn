@@ -42,7 +42,7 @@
 
 <project>
 
-    <project.core.version>4.4.0-sigma</project.core.version>
+    <project.core.version>4.5.0-tau</project.core.version>
 
     <!--    system模块    -->
     <dependency>
@@ -65,7 +65,7 @@
 ```groovy
 // 4.x系列基于Java 21, 部分module使用Kotlin, 使用Gradle build
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.4.0-sigma'
+    unicornVersion = '4.5.0-tau'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
