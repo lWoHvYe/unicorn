@@ -111,5 +111,4 @@ kotlin {
             apiVersion = "2.0"
         }
     }
-    jvmToolchain(21)
 }
