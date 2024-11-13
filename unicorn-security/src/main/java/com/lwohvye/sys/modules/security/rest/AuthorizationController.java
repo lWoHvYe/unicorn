@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -232,7 +234,8 @@ public class AuthorizationController {
             //  信号量 -1。当信号量为0时，会阻塞
             semaphore.acquire();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
         }
         // endregion
 
@@ -248,7 +251,8 @@ public class AuthorizationController {
             //  当通过countDown() 减到0时，再执行
             countDownLatch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
         }
         // endregion
 
@@ -260,7 +264,7 @@ public class AuthorizationController {
         // 初始化
         // 最大流速 = 每1秒钟产生10个令牌。令牌与信号量是不同的，信号量包括获取及释放，而令牌定时产生，只需要取即可
         // 分布式的特点就是，一个实例的动作，可以影响到其他的实例
-        rateLimiter.trySetRate(RateType.OVERALL, 10, 1, RateIntervalUnit.SECONDS);
+        rateLimiter.trySetRate(RateType.OVERALL, 10, Duration.ofSeconds(1L));
 
         var rPermits = rateLimiter.availablePermits(); // 可用令牌数
         var rPermitsRFuture = rateLimiter.availablePermitsAsync(); // 异步
@@ -268,7 +272,7 @@ public class AuthorizationController {
         try {
             var res01 = rPermitsRFuture.get(); // 阻塞获取，可加超时
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             Thread.currentThread().interrupt();
         }
 
@@ -341,7 +345,8 @@ public class AuthorizationController {
             try {
                 var aLong = longRFuture.get();
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
+                Thread.currentThread().interrupt();
             }
         }
         // endregion

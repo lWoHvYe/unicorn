@@ -26,13 +26,14 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.redisson.api.RateIntervalUnit;
 import org.redisson.api.RateType;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
 
 /**
  * @author /
@@ -69,7 +70,7 @@ public class LimitAspect {
 
         var rateLimiter = redissonClient.getRateLimiter(key);
 
-        rateLimiter.trySetRate(RateType.OVERALL, limit.count(), limit.period(), RateIntervalUnit.SECONDS);
+        rateLimiter.trySetRate(RateType.OVERALL, limit.count(), Duration.ofSeconds(limit.period()));
         if (rateLimiter.tryAcquire(1)) {
             logger.info("key {}，availablePermits {}", limit.key(), rateLimiter.availablePermits());
             return joinPoint.proceed();
