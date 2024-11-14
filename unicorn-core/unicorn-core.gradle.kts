@@ -26,7 +26,7 @@ plugins {
 description = "系统Core模块"
 
 multiRelease {
-    targetVersions(17, 21, 22)
+    targetVersions(17, 21)
 }
 
 java {
@@ -35,9 +35,6 @@ java {
 
 configurations {
     named("java21Implementation") {
-        extendsFrom(implementation.get())
-    }
-    named("java22Implementation") {
         extendsFrom(implementation.get())
     }
 }

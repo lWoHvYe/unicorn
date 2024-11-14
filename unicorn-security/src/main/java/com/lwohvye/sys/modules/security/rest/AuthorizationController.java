@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.*;
+import org.redisson.api.options.KeysScanOptions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -315,7 +316,7 @@ public class AuthorizationController {
         RKeys keys = redissonClient.getKeys();
 
         Iterable<String> allKeys = keys.getKeys();
-        Iterable<String> foundedKeys = keys.getKeysByPattern("key*");
+        Iterable<String> foundedKeys = keys.getKeys(KeysScanOptions.defaults().pattern("key*"));
         long numOfDeletedKeys = keys.delete("obj1", "obj2", "obj3");
         long deletedKeysAmount = keys.deleteByPattern("test?");
         String randomKey = keys.randomKey();
