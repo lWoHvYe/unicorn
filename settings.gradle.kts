@@ -47,6 +47,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "valentine-p2p"
 
+val javaVersion = JavaVersion.current()
+println("Current Java version: $javaVersion")
+
 val buildFiles = fileTree(rootDir) {
     val excludes = gradle.startParameter.projectProperties["excludeProjects"]?.split(",")
     include("**/*.gradle", "**/*.gradle.kts")
@@ -62,6 +65,12 @@ val buildFiles = fileTree(rootDir) {
         ".*",
         "out"
     )
+
+    // exclude kotlin module when Jvm is not compatible
+    if (javaVersion.isCompatibleWith(JavaVersion.VERSION_23)) {
+        exclude("**/*-kotlin.gradle.kts")
+    }
+
     if (excludes != null) {
         exclude(*excludes.toTypedArray())
     }
