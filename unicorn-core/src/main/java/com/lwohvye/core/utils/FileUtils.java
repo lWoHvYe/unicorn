@@ -29,6 +29,7 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -184,6 +185,7 @@ public class FileUtils extends FileUtil {
     public static File upload(MultipartFile multipartFile, String filePath) {
         Date date = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmssS");
+        verifyFilePath(filePath, null, false);
         String name = getFileNameNoEx(verifyFilename(multipartFile.getOriginalFilename()));
         String suffix = getExtensionName(multipartFile.getOriginalFilename());
         String nowStr = "-" + format.format(date);
@@ -410,10 +412,28 @@ public class FileUtils extends FileUtil {
         fileName = fileName.replaceAll("^\\.+/", "");
 
         // 保留文件名中最后一个 "." 字符，过滤掉其他 "."
-        fileName = fileName.replaceAll("^(.*)(\\.[^.]*)$", "$1").replaceAll("\\.", "") +
+        fileName = fileName.replaceAll("^(.*)(\\.[^.]*)$", "$1").replace("\\.", "") +
                 fileName.replaceAll("^(.*)(\\.[^.]*)$", "$2");
 
         return fileName;
+    }
+
+    public static void verifyFilePath(String filePath, String userName, boolean isPublic) {
+        if (Boolean.TRUE.equals(isPublic)) {
+            Assert.notNull(userName, "Invalid user");
+            var publicFolder = Paths.get("/home/" + userName + "/public").normalize().toAbsolutePath();
+            var path = publicFolder.resolve(filePath).normalize().toAbsolutePath();
+
+            // GOOD: ensure that the path stays within the public folder
+            if (!path.startsWith(publicFolder + File.separator)) {
+                throw new IllegalArgumentException("Invalid filePath");
+            }
+        } else {
+            // GOOD: ensure that the filename has no path separators or parent directory references
+            if (filePath.contains("..") || filePath.contains("/") || filePath.contains("\\")) {
+                throw new IllegalArgumentException("Invalid filePath");
+            }
+        }
     }
 
     /**
