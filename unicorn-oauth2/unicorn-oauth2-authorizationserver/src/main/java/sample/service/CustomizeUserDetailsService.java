@@ -24,7 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sample.domain.CustomizeUser;
-import sample.repo.CustomizeUserInfoRepository;
+import sample.jpa.repo.CustomizeUserInfoRepository;
 
 @Service
 public class CustomizeUserDetailsService implements UserDetailsService {

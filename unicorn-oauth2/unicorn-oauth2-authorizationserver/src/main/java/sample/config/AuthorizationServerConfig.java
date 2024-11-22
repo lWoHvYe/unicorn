@@ -21,17 +21,17 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import sample.jose.Jwks;
 
 /**
@@ -44,19 +44,20 @@ public class AuthorizationServerConfig {
     private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                // The OpenID Connect 1.0 Client Registration endpoint is disabled by default because many deployments do not require dynamic client registration.
-                .oidc(Customizer.withDefaults())    // Enable OpenID Connect 1.0
-                .authorizationEndpoint(authorizationEndpoint ->
-                        authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
-        // @formatter:off
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer();
         http
+                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .with(authorizationServerConfigurer, authorizationServer ->
+                        authorizationServer
+                                // The OpenID Connect 1.0 Client Registration endpoint is disabled by default because many deployments do not require dynamic client registration.
+                                .oidc(Customizer.withDefaults())    // Enable OpenID Connect 1.0
+                                .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI)))
                 .exceptionHandling(exceptions ->
-                        exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-                )
+                        exceptions.defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
                 // Resource server support that allows User Info requests to be authenticated with access tokens
                 .oauth2ResourceServer(httpSecurityOAuth2ResourceServerConfigurer ->
                         httpSecurityOAuth2ResourceServerConfigurer.jwt(Customizer.withDefaults()));

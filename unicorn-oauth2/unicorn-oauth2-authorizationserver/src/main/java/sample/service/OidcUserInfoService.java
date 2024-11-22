@@ -21,9 +21,7 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sample.domain.CustomizeUser;
-import sample.repo.CustomizeUserInfoRepository;
-
-import java.util.stream.Collectors;
+import sample.jpa.repo.CustomizeUserInfoRepository;
 
 /**
  * Example service to perform lookup of user info for customizing an {@code id_token}.

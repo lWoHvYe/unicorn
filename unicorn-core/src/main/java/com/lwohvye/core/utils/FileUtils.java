@@ -385,35 +385,31 @@ public class FileUtils extends FileUtil {
      */
     @Nullable
     public static String verifyFilename(String fileName) {
-        if (Objects.isNull(fileName))
+        if (Objects.isNull(fileName)) {
             return null;
-        // 过滤掉特殊字符
-        fileName = fileName.replaceAll("[\\\\/:*?\"<>|~\\s]", "");
-
-        // 去掉文件名开头和结尾的空格和点
-        fileName = fileName.trim().replaceAll("^[. ]+|[. ]+$", "");
-
-        // 不允许文件名超过255（在Mac和Linux中）或260（在Windows中）个字符
-        int maxFileNameLength = 255;
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            maxFileNameLength = 260;
         }
+
+        // 过滤特殊字符，包括控制字符和不允许的符号，移除多余的空格
+        fileName = fileName.replaceAll("[\\\\/:*?\"<>|~\\s\\p{Cntrl}]", "");
+
+        // 去掉文件名开头和结尾的空格和点，同时过滤掉路径中的连续点 ".."
+        fileName = fileName.trim().replaceAll("^\\.+|\\.+$", "").replaceAll("\\.{2,}", "");
+
+        // 保留文件名中最后一个 "." 字符，移除其他 "."
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex != -1) {
+            String namePart = fileName.substring(0, lastDotIndex).replace(".", "");
+            String extensionPart = fileName.substring(lastDotIndex);
+            fileName = namePart + extensionPart;
+        } else {
+            fileName = fileName.replace(".", ""); // 如果没有后缀，移除所有 "."
+        }
+
+        // 限制文件名长度（Windows 和其他系统不同）
+        int maxFileNameLength = System.getProperty("os.name").startsWith("Windows") ? 260 : 255;
         if (fileName.length() > maxFileNameLength) {
             fileName = fileName.substring(0, maxFileNameLength);
         }
-
-        // 过滤掉控制字符
-        fileName = fileName.replaceAll("[\\p{Cntrl}]", "");
-
-        // 过滤掉 ".." 路径
-        fileName = fileName.replaceAll("\\.{2,}", "");
-
-        // 去掉文件名开头的 ".."
-        fileName = fileName.replaceAll("^\\.+/", "");
-
-        // 保留文件名中最后一个 "." 字符，过滤掉其他 "."
-        fileName = fileName.replaceAll("^(.*)(\\.[^.]*)$", "$1").replace("\\.", "") +
-                fileName.replaceAll("^(.*)(\\.[^.]*)$", "$2");
 
         return fileName;
     }

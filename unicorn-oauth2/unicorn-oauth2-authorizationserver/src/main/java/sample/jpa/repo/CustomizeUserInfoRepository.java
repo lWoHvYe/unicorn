@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package sample.repo;
+package sample.jpa.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

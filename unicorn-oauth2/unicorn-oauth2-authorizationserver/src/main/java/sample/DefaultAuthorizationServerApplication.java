@@ -17,14 +17,16 @@ package sample;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 /**
  * @author Joe Grandja
  * @since 0.0.1
  */
 @SpringBootApplication
-@EnableCaching
+@EnableJpaRepositories("sample.jpa.repo")
+@EnableRedisRepositories("sample.repository")	// <1>
 public class DefaultAuthorizationServerApplication {
 
 	public static void main(String[] args) {
