@@ -48,7 +48,8 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
 		Assert.notNull(authorization, "authorization cannot be null");
 		OAuth2AuthorizationGrantAuthorization authorizationGrantAuthorization = ModelMapper
 			.convertOAuth2AuthorizationGrantAuthorization(authorization);
-		this.authorizationGrantAuthorizationRepository.save(authorizationGrantAuthorization);
+        assert authorizationGrantAuthorization != null;
+        this.authorizationGrantAuthorizationRepository.save(authorizationGrantAuthorization);
 	}
 
 	@Override
@@ -125,7 +126,8 @@ public class RedisOAuth2AuthorizationService implements OAuth2AuthorizationServi
 			OAuth2AuthorizationGrantAuthorization authorizationGrantAuthorization) {
 		RegisteredClient registeredClient = this.registeredClientRepository
 			.findById(authorizationGrantAuthorization.getRegisteredClientId());
-		OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(registeredClient);
+        assert registeredClient != null;
+        OAuth2Authorization.Builder builder = OAuth2Authorization.withRegisteredClient(registeredClient);
 		ModelMapper.mapOAuth2AuthorizationGrantAuthorization(authorizationGrantAuthorization, builder);
 		return builder.build();
 	}
