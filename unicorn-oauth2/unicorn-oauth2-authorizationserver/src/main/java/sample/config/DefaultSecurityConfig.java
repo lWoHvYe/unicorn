@@ -17,36 +17,18 @@ package sample.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * @author Joe Grandja
  * @since 0.1.0
  */
-@EnableWebSecurity
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class DefaultSecurityConfig {
-
-    // @formatter:off
-    @Bean
-    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().authenticated()
-                )
-                .formLogin(withDefaults());
-        return http.build();
-    }
-    // @formatter:on
 
     @Bean
     public PasswordEncoder passwordEncoder() {
