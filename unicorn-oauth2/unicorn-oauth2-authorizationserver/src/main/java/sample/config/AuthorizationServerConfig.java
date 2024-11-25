@@ -40,8 +40,6 @@ import sample.jose.Jwks;
 @EnableWebSecurity
 public class AuthorizationServerConfig {
 
-    private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
-
     @Bean
     @Order(1)
     // Spring Security filter chain for Protocol Endpoints
