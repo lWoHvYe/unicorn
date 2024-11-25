@@ -87,7 +87,8 @@ final class ModelMapper {
 		if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(authorization.getAuthorizationGrantType())) {
 			OAuth2AuthorizationRequest authorizationRequest = authorization
 				.getAttribute(OAuth2AuthorizationRequest.class.getName());
-			return authorizationRequest.getScopes().contains(OidcScopes.OPENID)
+            assert authorizationRequest != null;
+            return authorizationRequest.getScopes().contains(OidcScopes.OPENID)
 					? convertOidcAuthorizationCodeGrantAuthorization(authorization)
 					: convertOAuth2AuthorizationCodeGrantAuthorization(authorization);
 		}
@@ -174,7 +175,8 @@ final class ModelMapper {
 		if (authorization.getToken(OAuth2AuthorizationCode.class) != null) {
 			OAuth2Authorization.Token<OAuth2AuthorizationCode> oauth2AuthorizationCode = authorization
 				.getToken(OAuth2AuthorizationCode.class);
-			authorizationCode = new OAuth2AuthorizationCodeGrantAuthorization.AuthorizationCode(
+            assert oauth2AuthorizationCode != null;
+            authorizationCode = new OAuth2AuthorizationCodeGrantAuthorization.AuthorizationCode(
 					oauth2AuthorizationCode.getToken().getTokenValue(),
 					oauth2AuthorizationCode.getToken().getIssuedAt(), oauth2AuthorizationCode.getToken().getExpiresAt(),
 					oauth2AuthorizationCode.isInvalidated());
@@ -219,7 +221,8 @@ final class ModelMapper {
 		OidcAuthorizationCodeGrantAuthorization.IdToken idToken = null;
 		if (authorization.getToken(OidcIdToken.class) != null) {
 			OAuth2Authorization.Token<OidcIdToken> oidcIdToken = authorization.getToken(OidcIdToken.class);
-			idToken = new OidcAuthorizationCodeGrantAuthorization.IdToken(oidcIdToken.getToken().getTokenValue(),
+            assert oidcIdToken != null;
+            idToken = new OidcAuthorizationCodeGrantAuthorization.IdToken(oidcIdToken.getToken().getTokenValue(),
 					oidcIdToken.getToken().getIssuedAt(), oidcIdToken.getToken().getExpiresAt(),
 					oidcIdToken.isInvalidated(),
 					new OAuth2AuthorizationGrantAuthorization.ClaimsHolder(oidcIdToken.getClaims()));
@@ -232,7 +235,8 @@ final class ModelMapper {
 		if (authorization.getToken(OAuth2DeviceCode.class) != null) {
 			OAuth2Authorization.Token<OAuth2DeviceCode> oauth2DeviceCode = authorization
 				.getToken(OAuth2DeviceCode.class);
-			deviceCode = new OAuth2DeviceCodeGrantAuthorization.DeviceCode(oauth2DeviceCode.getToken().getTokenValue(),
+            assert oauth2DeviceCode != null;
+            deviceCode = new OAuth2DeviceCodeGrantAuthorization.DeviceCode(oauth2DeviceCode.getToken().getTokenValue(),
 					oauth2DeviceCode.getToken().getIssuedAt(), oauth2DeviceCode.getToken().getExpiresAt(),
 					oauth2DeviceCode.isInvalidated());
 		}
@@ -243,7 +247,8 @@ final class ModelMapper {
 		OAuth2DeviceCodeGrantAuthorization.UserCode userCode = null;
 		if (authorization.getToken(OAuth2UserCode.class) != null) {
 			OAuth2Authorization.Token<OAuth2UserCode> oauth2UserCode = authorization.getToken(OAuth2UserCode.class);
-			userCode = new OAuth2DeviceCodeGrantAuthorization.UserCode(oauth2UserCode.getToken().getTokenValue(),
+            assert oauth2UserCode != null;
+            userCode = new OAuth2DeviceCodeGrantAuthorization.UserCode(oauth2UserCode.getToken().getTokenValue(),
 					oauth2UserCode.getToken().getIssuedAt(), oauth2UserCode.getToken().getExpiresAt(),
 					oauth2UserCode.isInvalidated());
 		}
