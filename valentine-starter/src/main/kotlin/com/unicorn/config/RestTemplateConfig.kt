@@ -18,8 +18,8 @@ package com.unicorn.config
 import com.unicorn.handler.SimRestErrorHandler
 import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
 import org.apache.hc.core5.ssl.SSLContexts
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ssl.SslBundles
@@ -58,7 +58,7 @@ class RestTemplateConfig {
     ): RestTemplate =
         builder
             .errorHandler(SimRestErrorHandler())
-            .setSslBundle(sslBundles.getBundle(bundleName))
+            .sslBundle(sslBundles.getBundle(bundleName))
             .build()
 
     // If you have Spring WebFlux on your classpath, you can also choose to use WebClient to call remote REST services
@@ -73,9 +73,9 @@ class RestTemplateConfig {
             // use a custom TrustStrategy that trusts all certs, and also use NoopHostnameVerifier() to disable hostname verification
             .loadTrustMaterial(null) { _, _ -> true }
             .build()
-        val sslSocketFactory = SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE)
+        val clientTlsStrategy = DefaultClientTlsStrategy(sslContext, NoopHostnameVerifier.INSTANCE)
         val connMgr = PoolingHttpClientConnectionManagerBuilder.create()
-            .setSSLSocketFactory(sslSocketFactory)
+            .setTlsSocketStrategy(clientTlsStrategy)
             .build()
         val httpClient = HttpClients.custom()
             .setConnectionManager(connMgr)
