@@ -125,7 +125,7 @@ public class JsonUtils {
 
             return objectMapper.writeValueAsString(obj);
         } catch (Exception e) {
-            log.error(String.format("toJSONString %s", !Objects.isNull(obj) ? obj.toString() : "null"), e);
+            log.error("toJSONString {}", !Objects.isNull(obj) ? obj.toString() : "null", e);
         }
         return defaultSupplier.get();
     }
@@ -142,7 +142,7 @@ public class JsonUtils {
         try {
             return objectMapper.readValue(reader, tClass);
         } catch (IOException e) {
-            log.error(String.format("toJavaObject exception: %n %s%n %s", inputStream.getClass().getSimpleName(), tClass), e);
+            log.error("toJavaObject exception: \n {}\n {}", inputStream.getClass().getSimpleName(), tClass, e);
         }
         return null;
     }
@@ -152,7 +152,7 @@ public class JsonUtils {
         try {
             return objectMapper.readValue(value, valueTypeRef);
         } catch (IOException e) {
-            log.error(String.format("toJavaObject exception: %n %s%n %s", value, valueTypeRef), e);
+            log.error("toJavaObject exception: \n {}\n {}", value, valueTypeRef, e);
         }
         return null;
     }
@@ -178,7 +178,7 @@ public class JsonUtils {
             var str = toJSONString(obj);
             return objectMapper.readValue(str, tClass);
         } catch (Exception e) {
-            log.error(String.format("toJavaObject exception: %n %s%n %s", obj, tClass), e);
+            log.error("toJavaObject exception: \n {}\n {}", obj, tClass, e);
         }
         return defaultSupplier.get();
     }
@@ -233,7 +233,7 @@ public class JsonUtils {
 //            };
             return objectMapper.readValue(str, javaType);
         } catch (Exception e) {
-            log.error(String.format("toJavaObjectList exception %n%s%n%s", obj, tClass), e);
+            log.error("toJavaObjectList exception \n{}\n{}", obj, tClass, e);
         }
         return defaultSupplier.get();
     }
