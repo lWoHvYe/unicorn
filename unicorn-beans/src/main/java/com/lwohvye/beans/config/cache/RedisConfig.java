@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.redisson.api.RedissonClient;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -42,6 +43,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Role;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -61,6 +63,7 @@ import java.util.HashMap;
 @EnableCaching
 @ConditionalOnClass(RedisOperations.class)
 @EnableConfigurationProperties(RedisProperties.class)
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class RedisConfig implements CachingConfigurer {
 
     // 这个是替换原来的RedisCacheManager的。通过该CacheManager，使用Cacheable 注解，缓存数据会被放在一个RMap 中，搞清楚这点后，可以比较精准的清除一些key
@@ -189,6 +192,7 @@ public class RedisConfig implements CachingConfigurer {
     }
 
     @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     @Override
     public CacheErrorHandler errorHandler() {
         // 异常处理，当Redis发生异常时，打印日志，但是程序正常走
