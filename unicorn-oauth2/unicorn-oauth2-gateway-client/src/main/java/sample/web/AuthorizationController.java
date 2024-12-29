@@ -46,6 +46,9 @@ public class AuthorizationController {
         this.messagesBaseUri = messagesBaseUri;
     }
 
+    // @RegisteredOAuth2AuthorizedClient 注解用于将 OAuth 2.0 授权客户端（OAuth2AuthorizedClient）注入到方法参数中
+    // OAuth2AuthorizedClient 对象封装了当前已授权的客户端的相关信息，例如访问令牌（Access Token）和刷新令牌（Refresh Token）。
+    // 这个注解可以用来自动注入当前的 OAuth2AuthorizedClient，方便在控制器或服务中获取相关信息（例如访问令牌），从而进行 API 调用等操作。
     @GetMapping(value = "/authorize", params = "grant_type=authorization_code")
     public String authorizationCodeGrant(Model model,
                                          @RegisteredOAuth2AuthorizedClient("messaging-client-authorization-code")

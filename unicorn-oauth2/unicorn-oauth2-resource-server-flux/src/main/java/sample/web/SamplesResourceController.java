@@ -32,6 +32,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api")
 public class SamplesResourceController {
 
+    // 可以通过@AuthenticationPrincipal这个注解来获取相关信息，只是信息的获取，应该与认证无关
     @GetMapping("/messages")
     public Flux<String> getMessages(@AuthenticationPrincipal Jwt jwt) {
         return Flux.just("Resources-Server-8090", jwt.getSubject(), "Message-1", "Message-2", "Message-3");
