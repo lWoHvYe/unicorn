@@ -50,7 +50,4 @@ public interface SysDeptAPI {
 
     @DeleteExchange
     ResultInfo<String> delete(@RequestBody Set<Long> ids);
-
-    @GetExchange("/enabled/{userId}/{deptId}")
-    List<Long> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId);
 }

@@ -16,7 +16,6 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.enums.DataScopeEnum;
 import com.lwohvye.core.utils.json.JsonUtils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -72,28 +71,5 @@ public class SecurityUtils {
     public static Long getCurrentUserId() {
         UserDetails userDetails = getCurrentUser();
         return JsonUtils.findPath(userDetails, "user", "id", Long.class);
-    }
-
-    /**
-     * 获取当前用户的数据权限
-     *
-     * @return /
-     */
-    public static String getCurrentUserDataScope() {
-        UserDetails userDetails = getCurrentUser();
-        return JsonUtils.findPath(userDetails, "dataScope", null, String.class);
-    }
-
-    /**
-     * 获取数据权限级别
-     *
-     * @return 级别
-     */
-    public static String getDataScopeType() {
-        var dataScope = getCurrentUserDataScope();
-        if (StringUtils.isNotBlank(dataScope)) {
-            return dataScope;
-        }
-        return DataScopeEnum.ALL.getValue();
     }
 }

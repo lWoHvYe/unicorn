@@ -22,7 +22,6 @@ import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
 import com.lwohvye.core.context.CycleAvoidingMappingContext;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.*;
-import com.lwohvye.core.enums.DataScopeEnum;
 import com.lwohvye.sys.modules.system.event.DeptEvent;
 import com.lwohvye.sys.modules.system.repository.DeptRepository;
 import com.lwohvye.sys.modules.system.service.IDeptService;
@@ -68,41 +67,8 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DeptDto> queryAll(Long currentUserId, DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "deptSort");
-        String dataScopeType = SecurityUtils.getDataScopeType();
-        // 下面这块的大致逻辑是，数据权限是全部的，先默认查一级节点。若除了pidIsNull和enabled外其他属性有值，就移除查一级的限制。已改为重写set方法
-//        if (isQuery) {
-        if (Boolean.TRUE.equals(isQuery) && !Objects.equals(dataScopeType, DataScopeEnum.ALL.getValue())) {
-            // 非全部数据权限，移除只查一级节点，与DeptQueryCriteria中的默认值，和重写的set配合
-            criteria.setPidIsNull(null);
-//            }
-//            List<Field> fields = QueryHelp.getAllFields(criteria.getClass(), new ArrayList<>());
-//            List<String> fieldNames = new ArrayList<>() {
-//                {
-//                    add("pidIsNull");
-//                    add("enabled");
-//                }
-//            };
-//            for (Field field : fields) {
-//                //设置对象的访问权限，保证对private的属性的访问
-//                field.setAccessible(true);
-//                Object val = field.get(criteria);
-//                if (fieldNames.contains(field.getName())) {
-//                    continue;
-//                }
-//                // 数据权限为全部
-//                if (ObjectUtil.isNotNull(val)) {
-//                    criteria.setPidIsNull(null);
-//                    break;
-//                }
-//            }
-        }
-        List<DeptDto> list = deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
+        return deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
                 .stream().map(dept -> conversionService.convert(dept, DeptDto.class)).toList();
-        // 如果为空，就代表为自定义权限或者本级权限，就需要去重，不理解可以注释掉，看查询结果
-        if (StringUtils.isBlank(dataScopeType)) {
-            return deduplication(list);
-        }
-        return new ArrayList<>(list);
     }
 
     @Override

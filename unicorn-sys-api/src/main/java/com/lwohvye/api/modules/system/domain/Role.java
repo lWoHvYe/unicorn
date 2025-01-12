@@ -17,7 +17,6 @@ package com.lwohvye.api.modules.system.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.core.base.BaseEntity;
-import com.lwohvye.core.enums.DataScopeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -85,9 +84,6 @@ public class Role extends BaseEntity implements Serializable {
     @NotBlank
     @Schema(description = "标识", accessMode = Schema.AccessMode.READ_ONLY)
     private String code;
-
-    @Schema(description = "数据权限，全部 、 本级 、 自定义")
-    private String dataScope = DataScopeEnum.THIS_LEVEL.getValue();
 
     @Column(name = "level")
     @Schema(description = "级别，数值越小，级别越大")

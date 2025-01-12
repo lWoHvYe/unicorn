@@ -15,7 +15,6 @@
  */
 package com.lwohvye.sys.modules.system.rest;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.modules.system.api.SysUserAPI;
 import com.lwohvye.api.modules.system.domain.User;
@@ -29,13 +28,11 @@ import com.lwohvye.core.annotation.log.OprLog;
 import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.beans.config.RsaProperties;
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.utils.PageUtils;
 import com.lwohvye.core.utils.RsaUtils;
 import com.lwohvye.core.utils.SecurityUtils;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.core.enums.CodeEnum;
 import com.lwohvye.core.utils.result.ResultInfo;
-import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
@@ -48,14 +45,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,7 +67,6 @@ public class UserController implements SysUserAPI {
 
     private final PasswordEncoder passwordEncoder;
     private final IUserService userService;
-    private final IDataService dataService;
     private final IDeptService deptService;
     private final IRoleService roleService;
 
@@ -92,22 +86,7 @@ public class UserController implements SysUserAPI {
             // 然后把子节点的ID都加入到集合中
             criteria.getDeptIds().addAll(deptService.fetchDeptChildByPid(criteria.getDeptId()));
         }
-        // 数据权限
-        var curUser = userService.findByName(SecurityUtils.getCurrentUsername());
-        List<Long> dataScopes = dataService.getDeptIds(curUser.getId(), curUser.getDept().getId());
-        // criteria.getDeptIds() 不为空并且数据权限不为空则取交集
-        if (!CollectionUtils.isEmpty(criteria.getDeptIds()) && !CollectionUtils.isEmpty(dataScopes)) {
-            // 取交集
-            criteria.getDeptIds().retainAll(dataScopes);
-            if (!CollUtil.isEmpty(criteria.getDeptIds())) {
-                return userService.queryAll(criteria, pageable);
-            }
-        } else {
-            // 否则取并集
-            criteria.getDeptIds().addAll(dataScopes);
-            return userService.queryAll(criteria, pageable);
-        }
-        return PageUtils.toPage(null, 0);
+        return userService.queryAll(criteria, pageable);
     }
 
     @OprLog("新增用户")

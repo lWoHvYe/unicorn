@@ -134,7 +134,6 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
         }
         role.setName(resources.getName());
         role.setDescription(resources.getDescription());
-        role.setDataScope(resources.getDataScope());
         role.setDepts(resources.getDepts());
         role.setLevel(resources.getLevel());
         roleRepository.save(role);

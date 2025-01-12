@@ -15,10 +15,8 @@
  */
 package com.lwohvye.sys.modules.security.service;
 
-import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.sys.modules.security.config.bean.LoginProperties;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
-import com.lwohvye.sys.modules.system.service.IDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,6 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserLocalCache userLocalCache;
-    private final IDataService dataService;
     private final LoginProperties loginProperties;
 
     public void setEnableCache(boolean enableCache) {
@@ -46,14 +43,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         JwtUserDto jwtUserDto;
         if (loginProperties.isCacheEnable()) {
             jwtUserDto = userLocalCache.userLRUCache.get(username); // 这个Cache在目标不存在时，会执行定义的获取方法，若方法中抛出异常，会直接抛出
-            var userInner = jwtUserDto.getUser();
-            // 检查dataScope是否修改，若修改则需清除cache
-            var originDataScope = jwtUserDto.getDataScope();
-            var curDataScope = dataService.getDataScope(userInner.getId());
-            if (!StringUtils.equals(originDataScope, curDataScope)) {
-                userLocalCache.cleanUserCache(username, true);
-                jwtUserDto = userLocalCache.userLRUCache.get(username); // 这个Cache在目标不存在时，会执行定义的获取方法，若方法中抛出异常，会直接抛出
-            }
         } else {
             jwtUserDto = userLocalCache.getUserDB(username);
         }

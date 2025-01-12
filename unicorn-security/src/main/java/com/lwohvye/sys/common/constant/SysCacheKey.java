@@ -32,11 +32,6 @@ public interface SysCacheKey {
      */
     // 接口中可以定义属性，默认（指不用加，但也不能改）是 public static final 的
     Map<String, String> USER_ID = Map.of(CACHE_NAME, "user", CACHE_KEY, "id:");
-    /**
-     * 数据
-     */
-    Map<String, String> DATA_USER = Map.of(CACHE_NAME, "data", CACHE_KEY, "user:");
-    Map<String, String> DATA_SCOPE = Map.of(CACHE_NAME, "data", CACHE_KEY, "data_scope4user:");
 
     /**
      * 菜单

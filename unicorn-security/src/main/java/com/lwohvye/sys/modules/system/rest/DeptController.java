@@ -22,7 +22,6 @@ import com.lwohvye.core.base.BaseEntity.Update;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.api.modules.system.api.SysDeptAPI;
 import com.lwohvye.api.modules.system.domain.Dept;
-import com.lwohvye.sys.modules.system.service.IDataService;
 import com.lwohvye.sys.modules.system.service.IDeptService;
 import com.lwohvye.api.modules.system.service.dto.DeptDto;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
@@ -51,7 +50,6 @@ import java.util.*;
 public class DeptController implements SysDeptAPI {
 
     private final IDeptService deptService;
-    private final IDataService dataService;
     private static final String ENTITY_NAME = "dept";
 
     @Operation(summary = "导出部门数据")
@@ -116,7 +114,4 @@ public class DeptController implements SysDeptAPI {
         return ResultInfo.success();
     }
 
-    public List<Long> queryEnabledDeptIds(@PathVariable Long userId, @PathVariable Long deptId) {
-        return dataService.getDeptIds(userId, deptId);
-    }
 }
