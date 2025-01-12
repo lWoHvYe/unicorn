@@ -36,7 +36,7 @@ import java.util.Set;
  * @author Zheng Jie
  * @date 2018-11-22
  */
-@NamedEntityGraph(name = "Role-Details", attributeNodes = {@NamedAttributeNode("menus"), @NamedAttributeNode("depts"), @NamedAttributeNode("resources")})
+@NamedEntityGraph(name = "Role-Details", attributeNodes = {@NamedAttributeNode("menus"), @NamedAttributeNode("resources")})
 @Entity
 @Getter
 @Setter
@@ -62,13 +62,6 @@ public class Role extends BaseEntity implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "menu_id", referencedColumnName = "menu_id")})
     @Schema(description = "菜单", accessMode = Schema.AccessMode.READ_ONLY)
     private Set<Menu> menus;
-
-    @ManyToMany
-    @JoinTable(name = "sys_roles_depts",
-            joinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")},
-            inverseJoinColumns = {@JoinColumn(name = "dept_id", referencedColumnName = "dept_id")})
-    @Schema(description = "部门", accessMode = Schema.AccessMode.READ_ONLY)
-    private Set<Dept> depts;
 
     @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinTable(name = "sys_roles_resources",

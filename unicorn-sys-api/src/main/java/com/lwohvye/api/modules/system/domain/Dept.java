@@ -15,7 +15,6 @@
  */
 package com.lwohvye.api.modules.system.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lwohvye.core.base.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -28,7 +27,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * @author Zheng Jie
@@ -47,11 +45,6 @@ public class Dept extends BaseEntity implements Serializable {
     @Schema(description = "ID", accessMode = Schema.AccessMode.READ_ONLY)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "depts")
-    @Schema(description = "角色")
-    private Set<Role> roles;
 
     @Schema(description = "排序")
     private Integer deptSort;

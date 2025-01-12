@@ -64,8 +64,6 @@ public class UserQueryCriteria implements Serializable {
     @Query(propName = "level", type = Query.Type.GREATER_THAN, joinName = "roles")
     private Long roleLevel;
 
-    @Query(propName = "enabled", type = Query.Type.GREATER_THAN, joinName = "roles>depts")
-    private Boolean roleDeptEnable;
     // endregion
 
     // 库中使用Base64存储，做模糊查询（业务不建议。因为无法使用索引，效率很低，这里只是提供一种调用库函数的方式）

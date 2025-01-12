@@ -61,9 +61,6 @@ class UserQueryCriteria : Serializable {
     @Query(propName = "level", type = Query.Type.GREATER_THAN, joinName = "roles")
     var roleLevel: Long? = null
 
-    @Query(propName = "enabled", type = Query.Type.GREATER_THAN, joinName = "roles>depts")
-    var roleDeptEnable: Boolean? = null
-
     @Query(propName = "status", type = Query.Type.EQUAL, joinName = "roles>resources")
     var roleResourceStatus: Int? = null
 

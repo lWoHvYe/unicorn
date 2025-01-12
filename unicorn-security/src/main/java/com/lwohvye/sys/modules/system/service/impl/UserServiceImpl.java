@@ -404,7 +404,7 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
 
     @EventListener
     public void objUpdate(DeptEvent deptEvent) {
-        userRepository.findByRoleDeptId(deptEvent.getDataId()).forEach(user -> {
+        userRepository.findByDept_Id(deptEvent.getDataId()).forEach(user -> {
             userLocalCache.cleanUserCache(user.getUsername(), true);
             redisUtils.delInRC(SysCacheKey.USER_ID, user.getId());
             publishUserEvent(user);

@@ -19,7 +19,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.service.dto.DeptDto;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
-import com.lwohvye.core.context.CycleAvoidingMappingContext;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.*;
 import com.lwohvye.sys.modules.system.event.DeptEvent;
@@ -67,8 +66,11 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DeptDto> queryAll(Long currentUserId, DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
         Sort sort = Sort.by(Sort.Direction.ASC, "deptSort");
-        return deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
+        var list = deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
                 .stream().map(dept -> conversionService.convert(dept, DeptDto.class)).toList();
+        // 解决放入Cache后的这个异常 Caused by: com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected VALUE_STRING: need String, Number of Boolean value that contains type id (for subtype of java.lang.Object)
+        // at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
+        return new ArrayList<>(list);
     }
 
     @Override
@@ -85,13 +87,6 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<Dept> findByPid(long pid) {
         return deptRepository.findByPid(pid);
-    }
-
-    @Override
-    @Cacheable
-    @Transactional(rollbackFor = Exception.class, readOnly = true)
-    public Set<Dept> findByRoleId(Long id) {
-        return deptRepository.findByRoleId(id);
     }
 
     @Override
@@ -230,16 +225,6 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
         map.put("totalElements", deptDtos.size());
         map.put("content", CollectionUtil.isEmpty(trees) ? deptDtos : trees);
         return map;
-    }
-
-    @Override
-    public void verification(Set<DeptDto> deptDtos) {
-//        dto 2 entity
-        var deptList = deptMapper.toEntity(new ArrayList<>(deptDtos), new CycleAvoidingMappingContext());
-        if (Boolean.TRUE.equals(userService.hasDepts(deptList)))
-            throw new BadRequestException("所选部门存在用户关联，请解除后再试！");
-        if (Boolean.TRUE.equals(roleService.hasDepts(deptList)))
-            throw new BadRequestException("所选部门存在角色关联，请解除后再试！");
     }
 
     private void updateSubCnt(Long deptId) {

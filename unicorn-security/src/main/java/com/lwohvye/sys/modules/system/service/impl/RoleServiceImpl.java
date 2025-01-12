@@ -15,7 +15,6 @@
  */
 package com.lwohvye.sys.modules.system.service.impl;
 
-import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
@@ -134,7 +133,6 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
         }
         role.setName(resources.getName());
         role.setDescription(resources.getDescription());
-        role.setDepts(resources.getDepts());
         role.setLevel(resources.getLevel());
         roleRepository.save(role);
         // 更新相关缓存
@@ -227,11 +225,6 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<Role> findInMenuId(List<Long> menuIds) {
         return roleRepository.findInMenuId(menuIds);
-    }
-
-    @Override
-    public Boolean hasDepts(List<Dept> depts) {
-        return roleRepository.existsByDeptsIn(depts);
     }
 
     /**

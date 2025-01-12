@@ -16,7 +16,6 @@
 package com.lwohvye.sys.modules.system.service;
 
 import com.lwohvye.core.base.BaseService;
-import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import com.lwohvye.api.modules.system.service.dto.RoleQueryCriteria;
@@ -152,12 +151,4 @@ public interface IRoleService extends BaseService {
      */
     List<Role> findInMenuId(List<Long> menuIds);
 
-    /**
-     * 判断是否有角色与给定部门有关联
-     *
-     * @param depts
-     * @return java.lang.Boolean
-     * @date 2022/3/17 11:53 PM
-     */
-    Boolean hasDepts(List<Dept> depts);
 }

@@ -82,14 +82,6 @@ public interface IDeptService extends BaseService {
     List<Dept> findByPid(long pid);
 
     /**
-     * 根据角色ID查询
-     *
-     * @param id /
-     * @return /
-     */
-    Set<Dept> findByRoleId(Long id);
-
-    /**
      * 导出数据
      *
      * @param queryAll 待导出的数据
@@ -133,10 +125,4 @@ public interface IDeptService extends BaseService {
      */
     Map<String, Object> buildTree(List<DeptDto> deptDtos);
 
-    /**
-     * 验证是否被角色或用户关联
-     *
-     * @param deptDtos /
-     */
-    void verification(Set<DeptDto> deptDtos);
 }
