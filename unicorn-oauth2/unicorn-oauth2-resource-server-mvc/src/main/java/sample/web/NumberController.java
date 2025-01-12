@@ -16,6 +16,7 @@
 
 package sample.web;
 
+import com.lwohvye.core.utils.QueryHelp;
 import com.lwohvye.core.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import sample.criteria.CUserQueryCriteria;
 import sample.repo.CustomizeUserRepository;
 
 import java.time.Duration;
@@ -51,6 +53,11 @@ public class NumberController {
         var username = SecurityUtils.getCurrentUsername(); // 这个不能放到下面的fromCallable里，不然拿不到
         var blockingWrapper = Mono.fromCallable(() -> {
             var customizeUser = customizeUserRepository.findByUsername(username);
+            var queryCriteria = new CUserQueryCriteria();
+            queryCriteria.setBlurry(username);
+            var customizeUsers = customizeUserRepository.findAll((root, query, criteriaBuilder)
+                    -> QueryHelp.getPredicate(root, queryCriteria, criteriaBuilder));
+            log.info("q result {}", customizeUsers.getFirst());
             return customizeUser.toString();
         });
         var customizeUserMono = blockingWrapper.subscribeOn(Schedulers.boundedElastic());

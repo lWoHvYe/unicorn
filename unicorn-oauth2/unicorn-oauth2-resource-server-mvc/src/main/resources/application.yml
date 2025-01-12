@@ -34,7 +34,7 @@ spring:
     open-in-view: true
     hibernate:
       ddl-auto: none
-    #show-sql: true
+    show-sql: true
 
   #配置数据源
   datasource:
