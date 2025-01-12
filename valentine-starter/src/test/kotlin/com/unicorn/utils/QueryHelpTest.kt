@@ -38,7 +38,6 @@ class QueryHelpTest {
         criteria.blurry = "ABC"
         criteria.roleCode = "Admin"
         criteria.roleLevel = 2L
-        criteria.roleDeptEnable = true
         val repository = SpringContextHolder.getBean(UserRepository::class.java)
         val page: List<User> =
             repository.findAll { root: Root<User>?, _: CriteriaQuery<*>?, criteriaBuilder: CriteriaBuilder? ->
@@ -57,7 +56,6 @@ class QueryHelpTest {
         criteria2.blurry = "ABC"
         criteria2.roleCode = "Admin"
         criteria2.roleLevel = 2L
-        criteria2.roleDeptEnable = true
         val page2: List<User> =
             repository.findAll { root: Root<User>?, _: CriteriaQuery<*>?, criteriaBuilder: CriteriaBuilder? ->
                 com.lwohvye.core.utils.QueryHelp.getPredicate(
