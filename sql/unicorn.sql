@@ -691,7 +691,6 @@ CREATE TABLE `sys_role`
     `code`        varchar(255)                                            DEFAULT NULL COMMENT '权限标识',
     `level`       int                                                     DEFAULT NULL COMMENT '角色级别',
     `description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '描述',
-    `data_scope`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '数据权限',
     `create_by`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '创建者',
     `update_by`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '更新者',
     `create_time` datetime                                                DEFAULT NULL COMMENT '创建日期',
@@ -708,69 +707,46 @@ CREATE TABLE `sys_role`
 -- ----------------------------
 BEGIN;
 INSERT INTO `sys_role`
-VALUES (1, '超级管理员', 'admin', 1, '- 看起来比较菜', '全部', NULL, 'admin', '2018-11-23 11:04:37',
+VALUES (1, '超级管理员', 'admin', 1, '- 看起来比较菜', NULL, 'admin', '2018-11-23 11:04:37',
         '2023-06-16 20:27:40');
 INSERT INTO `sys_role`
-VALUES (2, '普通用户', 'commin', 2, '普普通通，平平坦坦', '本级', NULL, 'admin', '2018-11-23 13:09:06',
+VALUES (2, '普通用户', 'commin', 2, '普普通通，平平坦坦', NULL, 'admin', '2018-11-23 13:09:06',
         '2022-12-13 09:46:06');
 INSERT INTO `sys_role`
-VALUES (3, '产品运营', 'product', 2, '产品运营及输出，瑞star', '本级', 'admin', 'admin', '2021-11-05 22:40:03',
+VALUES (3, '产品运营', 'product', 2, '产品运营及输出，瑞star', 'admin', 'admin', '2021-11-05 22:40:03',
         '2022-10-09 20:02:21');
 INSERT INTO `sys_role`
-VALUES (4, '大佬', 'dalao', 4, NULL, '自定义', 'admin', 'admin', '2021-11-06 19:57:46', '2021-11-09 21:03:27');
+VALUES (4, '大佬', 'dalao', 4, NULL, 'admin', 'admin', '2021-11-06 19:57:46', '2021-11-09 21:03:27');
 INSERT INTO `sys_role`
-VALUES (5, 'Java 从精通到陌生', 'java', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:25:28',
+VALUES (5, 'Java 从精通到陌生', 'java', 3, NULL, 'admin', 'admin', '2021-11-08 12:25:28',
         '2022-12-13 09:12:02');
 INSERT INTO `sys_role`
-VALUES (6, 'C语言 从看懂到看开', 'c', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:25:58', '2022-12-13 09:40:02');
+VALUES (6, 'C语言 从看懂到看开', 'c', 3, NULL, 'admin', 'admin', '2021-11-08 12:25:58', '2022-12-13 09:40:02');
 INSERT INTO `sys_role`
-VALUES (7, 'Python', 'python', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:26:08', '2021-11-08 12:26:08');
+VALUES (7, 'Python', 'python', 3, NULL, 'admin', 'admin', '2021-11-08 12:26:08', '2021-11-08 12:26:08');
 INSERT INTO `sys_role`
-VALUES (8, 'IOS', 'ios', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:26:31', '2021-11-08 12:26:31');
+VALUES (8, 'IOS', 'ios', 3, NULL, 'admin', 'admin', '2021-11-08 12:26:31', '2021-11-08 12:26:31');
 INSERT INTO `sys_role`
-VALUES (9, 'Android 从入门到改行', 'android', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:26:49',
+VALUES (9, 'Android 从入门到改行', 'android', 3, NULL, 'admin', 'admin', '2021-11-08 12:26:49',
         '2021-11-24 18:50:08');
 INSERT INTO `sys_role`
-VALUES (10, 'C++', 'c++', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:27:02', '2021-11-08 12:27:02');
+VALUES (10, 'C++', 'c++', 3, NULL, 'admin', 'admin', '2021-11-08 12:27:02', '2021-11-08 12:27:02');
 INSERT INTO `sys_role`
-VALUES (11, 'JavaScript全栈开发 从入门到单身狗', 'js', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:27:28',
+VALUES (11, 'JavaScript全栈开发 从入门到单身狗', 'js', 3, NULL, 'admin', 'admin', '2021-11-08 12:27:28',
         '2021-11-24 18:53:11');
 INSERT INTO `sys_role`
-VALUES (12, 'Golang', 'go', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:28:04', '2022-03-13 21:59:41');
+VALUES (12, 'Golang', 'go', 3, NULL, 'admin', 'admin', '2021-11-08 12:28:04', '2022-03-13 21:59:41');
 INSERT INTO `sys_role`
-VALUES (13, 'PHP 从放弃到坚持放弃', 'php', 3, NULL, '本级', 'admin', 'admin', '2021-11-08 12:28:13',
+VALUES (13, 'PHP 从放弃到坚持放弃', 'php', 3, NULL, 'admin', 'admin', '2021-11-08 12:28:13',
         '2021-11-24 18:51:15');
 INSERT INTO `sys_role`
-VALUES (14, 'C# 从入门到放弃', 'c#', 3, NULL, '全部', 'admin', 'admin', '2021-11-24 18:50:45', '2021-11-24 18:50:45');
+VALUES (14, 'C# 从入门到放弃', 'c#', 3, NULL, 'admin', 'admin', '2021-11-24 18:50:45', '2021-11-24 18:50:45');
 INSERT INTO `sys_role`
-VALUES (15, 'SQL Server 没入门就放弃', 'sql_server', 3, NULL, '全部', 'admin', 'admin', '2021-11-24 18:53:44',
+VALUES (15, 'SQL Server 没入门就放弃', 'sql_server', 3, NULL, 'admin', 'admin', '2021-11-24 18:53:44',
         '2021-11-24 18:53:44');
 INSERT INTO `sys_role`
-VALUES (16, '匿名', 'anonymous', 4, '五彩斑斓的透明', '本级', 'admin', 'admin', '2021-11-30 10:10:20',
+VALUES (16, '匿名', 'anonymous', 4, '五彩斑斓的透明', 'admin', 'admin', '2021-11-30 10:10:20',
         '2022-03-20 00:19:38');
-COMMIT;
-
--- ----------------------------
--- Table structure for sys_roles_depts
--- ----------------------------
-DROP TABLE IF EXISTS `sys_roles_depts`;
-CREATE TABLE `sys_roles_depts`
-(
-    `role_id` bigint NOT NULL,
-    `dept_id` bigint NOT NULL,
-    PRIMARY KEY (`role_id`, `dept_id`) USING BTREE,
-    KEY `FK7qg6itn5ajdoa9h9o78v9ksur` (`dept_id`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3 COMMENT ='角色部门关联';
-
--- ----------------------------
--- Records of sys_roles_depts
--- ----------------------------
-BEGIN;
-INSERT INTO `sys_roles_depts`
-VALUES (4, 2);
-INSERT INTO `sys_roles_depts`
-VALUES (4, 6);
 COMMIT;
 
 -- ----------------------------

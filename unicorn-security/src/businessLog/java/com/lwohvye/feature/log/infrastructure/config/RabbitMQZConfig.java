@@ -18,7 +18,9 @@ package com.lwohvye.feature.log.infrastructure.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class RabbitMQZConfig {
 
     public static final String DIRECT_SYNC_EXCHANGE = "sync_direct_exchange";
