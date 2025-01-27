@@ -26,17 +26,17 @@ public class DateUtilsTest {
     public void test1() {
         long l = System.currentTimeMillis() / 1000;
         LocalDateTime localDateTime = DateUtils.fromTimeStamp(l);
-        System.out.print(DateUtils.localDateTimeFormatyMdHms(localDateTime));
+        System.out.print(DateUtils.localDateTimeFormatMdHms(localDateTime));
     }
 
     @Test
     public void test2() {
         LocalDateTime now = LocalDateTime.now();
-        System.out.println(DateUtils.localDateTimeFormatyMdHms(now));
+        System.out.println(DateUtils.localDateTimeFormatMdHms(now));
         Date date = DateUtils.toDate(now);
         LocalDateTime localDateTime = DateUtils.toLocalDateTime(date);
-        System.out.println(DateUtils.localDateTimeFormatyMdHms(localDateTime));
+        System.out.println(DateUtils.localDateTimeFormatMdHms(localDateTime));
         LocalDateTime localDateTime1 = DateUtils.fromTimeStamp(date.getTime() / 1000);
-        System.out.println(DateUtils.localDateTimeFormatyMdHms(localDateTime1));
+        System.out.println(DateUtils.localDateTimeFormatMdHms(localDateTime1));
     }
 }

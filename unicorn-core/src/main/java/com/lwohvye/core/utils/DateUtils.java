@@ -40,7 +40,7 @@ public class DateUtils {
      * @param localDateTime /
      * @return /
      */
-    public static Long getTimeStamp(LocalDateTime localDateTime) {
+    public static Long toTimeStamp(LocalDateTime localDateTime) {
         return localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
     }
 
@@ -117,7 +117,7 @@ public class DateUtils {
      * @param localDateTime /
      * @return /
      */
-    public static String localDateTimeFormatyMdHms(LocalDateTime localDateTime) {
+    public static String localDateTimeFormatMdHms(LocalDateTime localDateTime) {
         return DFY_MD_HMS.format(localDateTime);
     }
 
@@ -127,7 +127,7 @@ public class DateUtils {
      * @param localDateTime /
      * @return /
      */
-    public String localDateTimeFormatyMd(LocalDateTime localDateTime) {
+    public String localDateTimeFormatMd(LocalDateTime localDateTime) {
         return DFY_MD.format(localDateTime);
     }
 
@@ -158,7 +158,7 @@ public class DateUtils {
      * @param localDateTime /
      * @return /
      */
-    public static LocalDateTime parseLocalDateTimeFormatyMdHms(String localDateTime) {
+    public static LocalDateTime parseLocalDateTimeFormatMdHms(String localDateTime) {
         return LocalDateTime.from(DFY_MD_HMS.parse(localDateTime));
     }
 
@@ -182,5 +182,30 @@ public class DateUtils {
     public static @NotNull ZonedDateTime startOfNextMonth() {
         var now = LocalDate.now(); // 直接用LocalDate更好一些的样子
         return now.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay().atZone(ZoneId.systemDefault());
+    }
+
+    // 获取指定日期所在月份的第一天
+    public static LocalDate firstDayOfMonth(LocalDate date) {
+        return date.withDayOfMonth(1);
+    }
+
+    // 获取指定日期所在月份的最后一天
+    public static LocalDate lastDayOfMonth(LocalDate date) {
+        return date.withDayOfMonth(date.lengthOfMonth());
+    }
+
+    // 判断是否为闰年
+    public static boolean isLeapYear(int year) {
+        return Year.of(year).isLeap();
+    }
+
+    // 判断指定日期是否为工作日（周一至周五）
+    public static boolean isWeekday(LocalDate date) {
+        return date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY;
+    }
+
+    // 判断指定日期是否为周末（周六或周日）
+    public static boolean isWeekend(LocalDate date) {
+        return date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
     }
 }
