@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.lwohvye"
-version = "4.6.0-upsilon-RC"
+version = "4.6.0-upsilon-RC2"
 
 java {
     withSourcesJar()

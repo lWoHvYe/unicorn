@@ -25,7 +25,7 @@ public class AnyExtensionMethod {
     /**
      * 构建一个Comparable Type 的 fieldType，跟fieldType一样或者为null（这里返回null是因为如果不是Comparable，那些比较类的Query是无法invoke的）
      * 这个参数只是为了解决几个警告，因为fieldType不一定extends Comparable，所以加了这个，来限定需要能够比较才行。
-     * 因为cb.lessThan,greaterThan,between的返回值 <Y extends Comparable<? super Y>>， 入参 （Expression<? extends Y> var1, Y var2, Y var3），含义:类型 Y 必须实现 Comparable 接口，并且这个接口的类型是 Y 或 Y 的任一父类
+     * 因为cb.lessThan,greaterThan,between的返回值和入参通过泛型进行了限制，含义:类型 Y 必须实现 Comparable 接口，并且这个接口的类型是 Y 或 Y 的任一父类
      * https://www.lwohvye.com/2021/12/04/t%e3%80%81-super-t%e3%80%81-extends-t/
      *
      * @param value /
