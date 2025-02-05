@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.lwohvye"
-version = "4.6.0-upsilon"
+version = "4.7.0-phi-Beta"
 
 java {
     withSourcesJar()
