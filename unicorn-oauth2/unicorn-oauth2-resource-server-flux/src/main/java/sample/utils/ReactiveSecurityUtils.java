@@ -41,7 +41,7 @@ public class ReactiveSecurityUtils {
                 .as(authenticationMono ->
                         //5. 在 `authenticationMono` 上使用 `handle` 处理操作，它接收一个 `BiConsumer`，可以根据 `authentication` 的类型进行处理。
                         //
-                        // 这段代码使用了 Java 8 中的新特性之一，称为目标类型推断（Target Type Inference）。
+                        // 这段代码使用了 Java 8 中的新特性之一，称为目标类型推断（Target Type Inference）。https://openjdk.org/jeps/101 这个JEP支持的<String>handle(...)这种语法结构
                         //在这里，`authenticationMono` 是一个泛型类型为 `Mono<Authentication>` 的变量。通过使用目标类型推断，可以省略 `handle` 方法的泛型类型参数，因为编译器可以根据上下文推断出泛型类型为 `String`。
                         //在旧版本的 Java 中，需要显式指定 `handle` 方法的泛型类型参数，如 `authenticationMono.handle((Authentication authentication, SynchronousSink<String> sink) -> { ... })`。
                         // 但是在 Java 8 之后，引入了目标类型推断，允许编译器根据上下文推断泛型类型，从而简化代码。

@@ -17,6 +17,7 @@
 package com.lwohvye.core.utils;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import sun.misc.Unsafe;
 
 /**
@@ -24,6 +25,7 @@ import sun.misc.Unsafe;
  */
 @UtilityClass
 @SuppressWarnings("unused")
+@Slf4j
 public class UnsafeUtils {
     public static final Unsafe UNSAFE;
     public static final long ARRAY_BYTE_BASE_OFFSET;
@@ -37,9 +39,9 @@ public class UnsafeUtils {
 //            var theUnsafeField = Unsafe.class.getDeclaredFields()[0];
             theUnsafeField.trySetAccessible();
             unsafe = (Unsafe) theUnsafeField.get(null);
-            offset = Unsafe.ARRAY_BYTE_BASE_OFFSET;
-        } catch (Exception ignored) {
-            // ignored
+            offset = unsafe.arrayBaseOffset(byte[].class);
+        } catch (Exception e) {
+            log.error("error occurred while try to get unsafe -> {}", e.getMessage());
         }
         UNSAFE = unsafe;
         ARRAY_BYTE_BASE_OFFSET = offset;
