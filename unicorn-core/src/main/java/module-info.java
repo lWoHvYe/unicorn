@@ -53,6 +53,7 @@ module lwohvye.unicorn.core {
     requires net.coobird.thumbnailator;
     requires reactor.core;
     requires spring.security.oauth2.jose;
+    requires context.propagation;
 
     exports com.lwohvye.core.annotation;
     exports com.lwohvye.core.annotation.log;

@@ -125,6 +125,8 @@ dependencies {
     api("org.bouncycastle:bcpkix-jdk18on:1.72")
     api(libs.thumbnailator)
     api("org.jetbrains:annotations:24.1.0")
+    api("org.springframework.boot:spring-boot-starter-actuator")
+    api("io.micrometer:micrometer-tracing-bridge-brave")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("com.mysql:mysql-connector-j")
 }

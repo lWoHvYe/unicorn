@@ -28,13 +28,13 @@
     <springProfile name="!prod">
         <!-- configuration to be enabled when the "production" profile is not active -->
         <property name="log.pattern"
-                  value="%black(%contextName-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}) - %blue(%msg%n)"/>
+                  value="%black(%contextName-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %X{traceId:-NONE} %highlight(%-5level) %boldMagenta(%logger{36}) - %blue(%msg%n)"/>
     </springProfile>
 
     <springProfile name="prod">
         <!-- configuration to be enabled when the "prod" profile is active -->
         <property name="log.pattern"
-                  value="%black(%contextName-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}) - %blue(%replace(%msg){'[\r\n]', ''}%n)"/>
+                  value="%black(%contextName-) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %X{traceId:-NONE} %highlight(%-5level) %boldMagenta(%logger{36}) - %blue(%replace(%msg){'[\r\n]', ''}%n)"/>
     </springProfile>
 
     <!--输出到控制台-->

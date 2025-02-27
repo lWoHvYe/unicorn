@@ -16,6 +16,8 @@
 
 package com.lwohvye.core.utils;
 
+import io.micrometer.context.ContextExecutorService;
+import io.micrometer.context.ContextSnapshotFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutorService;
@@ -36,4 +38,8 @@ public abstract class UnicornAbstractThreadUtils {
     static final ThreadFactory virtualFactory = Thread.ofVirtual().name("Virtual-Concurrency").factory();
     public static final ExecutorService TASK_EXECUTOR = Executors.newThreadPerTaskExecutor(virtualFactory);
 
+    // https://stackoverflow.com/questions/78122797/how-to-propagate-traceid-to-other-threads-in-one-transaction-for-spring-boot-3-x
+    public static ExecutorService wrap(ExecutorService executor) {
+        return ContextExecutorService.wrap(executor, () -> ContextSnapshotFactory.builder().build().captureAll());
+    }
 }

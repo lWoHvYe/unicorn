@@ -16,6 +16,8 @@
 
 package com.lwohvye.core.utils;
 
+import io.micrometer.context.ContextExecutorService;
+import io.micrometer.context.ContextSnapshotFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutorService;
@@ -30,4 +32,7 @@ public abstract class UnicornAbstractThreadUtils {
 
     public static final ExecutorService TASK_EXECUTOR = Executors.newFixedThreadPool(8);
 
+    public static ExecutorService wrap(ExecutorService executor) {
+        return ContextExecutorService.wrap(executor, () -> ContextSnapshotFactory.builder().build().captureAll());
+    }
 }
