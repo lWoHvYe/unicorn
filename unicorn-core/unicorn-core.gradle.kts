@@ -126,6 +126,7 @@ dependencies {
     api(libs.thumbnailator)
     api("org.jetbrains:annotations:24.1.0")
     api("org.springframework.boot:spring-boot-starter-actuator")
+    //    For Tracing Context Propagation with Micrometer Tracing, we need to pick a tracer bridge
     api("io.micrometer:micrometer-tracing-bridge-brave")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("com.mysql:mysql-connector-j")
