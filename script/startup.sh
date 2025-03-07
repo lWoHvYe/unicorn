@@ -24,6 +24,6 @@ cd /opt/app
 echo '授权当前用户'
 chmod 555 ./*.jar
 echo '执行....'
-nohup ${JAVA_HOME}/bin/java -Xms500m -Xmx1024m --enable-preview -XX:+UseZGC \
+nohup ${JAVA_HOME}/bin/java -Xms500m -Xmx1024m --enable-preview -XX:+UseZGC -XX:+ZGenerational \
   -jar valentine-starter.jar >elog.out 2>&1 &
 echo '启动成功'

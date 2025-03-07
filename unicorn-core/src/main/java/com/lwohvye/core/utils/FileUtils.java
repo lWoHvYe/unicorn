@@ -513,7 +513,7 @@ public class FileUtils extends FileUtil {
      * @date 2022/2/7 12:27 PM
      */
     @SneakyThrows
-    public static void mappedFile(String source) {
+    public void mappedFile(String source) {
         var path = Paths.get(source);
         try (var fileChannel = FileChannel.open(path)) {
             // try (var fileChannel = new RandomAccessFile(source, "rw").getChannel()) {
