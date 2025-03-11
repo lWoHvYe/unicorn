@@ -202,10 +202,6 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 特别鸣谢
 
-- [![JetBrains Logo (Main) logo](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://jb.gg/OpenSourceSupport)
-
-- 感谢 [JetBrains](https://www.jetbrains.com/) 提供的非商业开源软件开发授权。
-
 - 感谢 [PanJiaChen](https://github.com/PanJiaChen/vue-element-admin) 大佬提供的前端模板
 
 - 感谢 [Moxun](https://github.com/moxun1639) 大佬提供的前端 Curd 通用组件

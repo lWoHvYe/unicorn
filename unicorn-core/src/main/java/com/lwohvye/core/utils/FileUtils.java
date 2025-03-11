@@ -43,9 +43,9 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -183,14 +183,13 @@ public class FileUtils extends FileUtil {
      * 将文件名解析成文件的上传路径
      */
     public static File upload(MultipartFile multipartFile, String filePath) {
-        Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmmssS");
+        var dateTime = LocalDateTime.now();
+        var dateTimeStr = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(dateTime);
         verifyFilePath(filePath, null, false);
         String name = getFileNameNoEx(verifyFilename(multipartFile.getOriginalFilename()));
         String suffix = getExtensionName(multipartFile.getOriginalFilename());
-        String nowStr = "-" + format.format(date);
         try {
-            String fileName = name + nowStr + "." + suffix;
+            String fileName = name + "-" + dateTimeStr + "." + suffix;
             String path = filePath + fileName;
             // getCanonicalFile 可解析正确各种路径
             File dest = new File(path).getCanonicalFile();

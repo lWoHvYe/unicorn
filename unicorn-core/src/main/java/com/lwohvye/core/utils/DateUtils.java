@@ -186,12 +186,12 @@ public class DateUtils {
 
     // 获取指定日期所在月份的第一天
     public static LocalDate firstDayOfMonth(LocalDate date) {
-        return date.withDayOfMonth(1);
+        return date.with(TemporalAdjusters.firstDayOfMonth());
     }
 
     // 获取指定日期所在月份的最后一天
     public static LocalDate lastDayOfMonth(LocalDate date) {
-        return date.withDayOfMonth(date.lengthOfMonth());
+        return date.with(TemporalAdjusters.lastDayOfMonth());
     }
 
     // 判断是否为闰年
@@ -207,5 +207,10 @@ public class DateUtils {
     // 判断指定日期是否为周末（周六或周日）
     public static boolean isWeekend(LocalDate date) {
         return date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+    }
+
+    public static LocalDate lastSundayInMonth(int year, Month month) {
+       return YearMonth.of(year, month).atEndOfMonth() // 任意天，比如最后一天
+               .with(TemporalAdjusters.lastInMonth(DayOfWeek.SUNDAY));
     }
 }
