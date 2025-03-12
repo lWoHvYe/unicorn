@@ -31,7 +31,7 @@ plugins {
     //主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
     alias(libs.plugins.spring.boot) apply false
     // This plugin simplifies the use of Lombok in Gradle
-    id("io.freefair.lombok") version "8.12.2.1"
+    id("io.freefair.lombok") version "8.13"
     id("me.champeau.mrjar") version "0.1.1"
     id("org.gradlex.extra-java-module-info") version "1.11"
     // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
