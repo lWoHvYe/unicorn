@@ -28,6 +28,7 @@ import java.util.Objects;
 
 /**
  * <a href="https://blog.csdn.net/weixin_39255905/article/details/110391515">...</a>
+ * <a href="https://github.com/spring-projects/spring-framework/issues/34566">Spring 7.0 Support API Versioning </a>
  * 自定义匹配的处理器
  * 这里用了JDK 18的一个特性：JEP 413:	Code Snippets in Java API Documentation
  * {@snippet :
