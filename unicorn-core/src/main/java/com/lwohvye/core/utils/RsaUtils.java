@@ -31,7 +31,13 @@ import java.security.spec.X509EncodedKeySpec;
 
 /**
  * Rsa 工具类，公钥私钥生成，加解密
- *
+ * 选取n = p * q p,q为素数
+ * 欧拉公式 φ(n) = (p - 1) * (q - 1)  欧拉定理：m^φ(n) ≡ 1 (mod n) 对于任何一个与 n 互质的正整数 m，的 φ(n) 次幂并除以 n 取模，结果永远等于1。φ(n) 代表着在小于等于 n 的正整数中，有多少个与 n 互质的数
+ * 选取公钥 1 < e < φ(n)
+ * 选取私钥 d = (kφ(n) + 1) / e
+ * 加密 c = m^e mod n
+ * 解密 m = c^d mod n
+ *  a ≡ b (mod m) a与b模m同余
  * @author https://www.cnblogs.com/nihaorz/p/10690643.html
  * @date 2020-05-18
  **/

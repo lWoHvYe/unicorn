@@ -95,7 +95,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 21(Core Module Support 17-21)、Spring Boot 3.4。
+- 使用最新技术栈，社区资源丰富，基于Java 21(Core Module Support 17-21,24)、Spring Boot 3.4。
   (Support Virtual Threads/fibre/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持接口级别的功能权限，动态权限控制

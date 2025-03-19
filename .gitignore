@@ -2,6 +2,7 @@ upload
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
+!ex-lib/*.jar
 
 ### Java template
 # Compiled class file
