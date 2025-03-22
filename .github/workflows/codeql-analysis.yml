@@ -35,7 +35,7 @@ jobs:
       matrix:
         language: [ 'java' ]
         distribution: [ 'temurin', 'oracle' ]
-        java: [ '21', '24' ]
+        java: [ '21', '23' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'swift' ]
         # Use only 'java' to analyze code written in Java, Kotlin or both
         # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
