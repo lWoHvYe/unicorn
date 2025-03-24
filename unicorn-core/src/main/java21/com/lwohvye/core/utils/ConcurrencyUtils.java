@@ -111,10 +111,12 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
 //        // 使用下面这两种方式，可以将traceId等ThreadLocal传到子线程，且ThreadPool的复用不受影响
 //        ExecutorService executor = ContextExecutorService.wrap(Executors.newSingleThreadExecutor());
 //        var executorService = wrap(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
+//          配合下面这个传递custom MDC，另外可以考虑TaskDecorator
+//        ContextRegistry.getInstance().registerThreadLocalAccessor("MDC",MDC::getCopyOfContextMap, MDC::setContextMap, MDC::clear);
 //    }
 
     // 下面这俩采用类似的思想
-    public static Runnable withMdc(Runnable runnable) {
+    public static Runnable decorateMdc(Runnable runnable) {
         var mdc = MDC.getCopyOfContextMap();
         return () -> {
             MDC.setContextMap(mdc);
@@ -122,7 +124,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         };
     }
 
-    public static <U> Supplier<U> withMdc(Supplier<U> supplier) {
+    public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
         var mdc = MDC.getCopyOfContextMap();
         return () -> {
             MDC.setContextMap(mdc);

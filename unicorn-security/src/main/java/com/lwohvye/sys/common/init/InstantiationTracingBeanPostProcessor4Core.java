@@ -19,7 +19,9 @@ import com.lwohvye.core.utils.JDKUtils;
 import com.lwohvye.core.utils.SpringContextHolder;
 import com.lwohvye.sys.modules.system.service.ITerminalService;
 import com.lwohvye.sys.modules.system.strategy.NormalUserTypeStrategy;
+import io.micrometer.context.ContextRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -55,6 +57,8 @@ public class InstantiationTracingBeanPostProcessor4Core implements ApplicationLi
             } catch (BeansException e) {
                 log.warn("获取bean出错，beanName: {} || errMsg: {} ", terminalClazz.getSimpleName(), e.getMessage());
             }
+            // propagate custom MDC value to new thread, work with com.lwohvye.core.utils.UnicornAbstractThreadUtils.wrap()
+            ContextRegistry.getInstance().registerThreadLocalAccessor("MDC", MDC::getCopyOfContextMap, MDC::setContextMap, MDC::clear);
         }
     }
 }

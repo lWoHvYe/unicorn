@@ -87,7 +87,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
             eventual.run();
     }
 
-    public static Runnable withMdc(Runnable runnable) {
+    public static Runnable decorateMdc(Runnable runnable) {
         var mdc = MDC.getCopyOfContextMap();
         return () -> {
             MDC.setContextMap(mdc);
@@ -95,7 +95,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         };
     }
 
-    public static <U> Supplier<U> withMdc(Supplier<U> supplier) {
+    public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
         var mdc = MDC.getCopyOfContextMap();
         return () -> {
             MDC.setContextMap(mdc);

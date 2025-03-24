@@ -22,6 +22,7 @@ module lwohvye.unicorn.security {
     requires transitive jjwt.api;
     requires transitive org.apache.commons.io;
     requires transitive quartz;
+    requires context.propagation;
 
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
