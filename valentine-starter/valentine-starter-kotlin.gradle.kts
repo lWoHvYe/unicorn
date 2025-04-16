@@ -19,7 +19,6 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
     id("org.springframework.boot") // 通过引入这个，使该subModule有了相关的Task
-    id("io.spring.dependency-management")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
@@ -31,12 +30,7 @@ val graalvmVersion = "23.1.0"
 dependencies {
     implementation(project(":unicorn-security"))
     implementation(project(":unicorn-logging"))
-    implementation("org.springframework.boot:spring-boot-starter-web") {
-        exclude(group = "org.apache.tomcat.embed", module = "tomcat-embed-core")
-        exclude(group = "org.apache.tomcat.embed", module = "tomcat-embed-websocket")
-    }
-    val tomcatVersion = dependencyManagement.importedProperties["tomcat.version"]
-    implementation("org.apache.tomcat.experimental:tomcat-embed-programmatic:$tomcatVersion")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation(project(":unicorn-tp-tools-kotlin")) // kotlin as well
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
