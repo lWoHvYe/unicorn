@@ -127,7 +127,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17 - 21), 
+- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17-21,24), 
   baseline 为Java 17, 在Runtime = 17 时使用传统threadPool，在Runtime >= 21时使用Virtual Threads
 
 - `unicorn-beans` 基础Beans的Definition及Configuration，To C业务可只引入该dependency
@@ -162,6 +162,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
         - XRabbitAbstractProducer, YRabbitAbstractConsumer
         - SecurityUtils, ReactiveSecurityUtils
     - java21/utils Virtual Threads for Java Runtime 21+ (Multi-Release Jar)
+    - java24/utils Virtual Threads for Java Runtime 24+ (Multi-Release Jar)
 - unicorn-beans 基础Bean
     - advice 统一数据返回及异常处理
     - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
