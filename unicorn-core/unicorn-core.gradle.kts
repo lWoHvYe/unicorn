@@ -131,6 +131,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-actuator")
     //    For Tracing Context Propagation with Micrometer Tracing, we need to pick a tracer bridge
     api("io.micrometer:micrometer-tracing-bridge-brave")
+    implementation("io.projectreactor.netty:reactor-netty-http")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("com.mysql:mysql-connector-j")
 }
