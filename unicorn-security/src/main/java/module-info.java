@@ -21,7 +21,7 @@ module lwohvye.unicorn.security {
     requires transitive org.apache.tomcat.embed.websocket;
     requires transitive jjwt.api;
     requires transitive org.apache.commons.io;
-    requires transitive quartz;
+    requires transitive org.quartz;
     requires context.propagation;
 
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
