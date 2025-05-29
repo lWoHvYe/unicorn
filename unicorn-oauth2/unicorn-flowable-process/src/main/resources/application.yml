@@ -1,9 +1,0 @@
-
-spring:
-  application:
-    name: unicorn-flowable-process
-  threads:
-    virtual:
-      enabled: true
-server:
-  port: 8082
