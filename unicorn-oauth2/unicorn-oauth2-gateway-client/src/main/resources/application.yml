@@ -59,53 +59,54 @@ spring:
 
   cloud:
     gateway:
-      httpclient:
-        ssl:
-          # trust all downstream certificates
-          useInsecureTrustManager: true
-          handshake-timeout: 5000ms
-      x-forwarded:
-        prefix-enabled: false # need to disable & add manually。这个在下面各种filter之后，这个是个list
-      routes:
-        - id: resource-service
-          uri: http://localhost:8090
-          predicates:
-            - Path=/res/res-mvc/**
-          filters:
-            - TokenRelay=
-            # 下面这俩的顺序是有影响的，要注意
-            # 剥去一段，/res/some-resource变为/some-resource
-            - StripPrefix=1
-            # 添加prefix，从/some-resource变为/api/some-resource
-            #- PrefixPath=/api
-            - AddRequestHeader=X-Forwarded-Prefix, /res/res-mvc
-        - id: resource-service-flux
-          uri: http://localhost:8091
-          predicates:
-            - Path=/res/res-flux/**
-          filters:
-            - TokenRelay=
-            # 下面这俩的顺序是有影响的，要注意
-            # 剥去一段，/res/some-resource变为/some-resource
-            - StripPrefix=2
-            # 添加prefix，从/some-resource变为/api/some-resource
-            #- PrefixPath=/api
-            - AddRequestHeader=X-Forwarded-Prefix, /res/res-flux
-        - id: security-service
-          uri:
-            https://localhost:8081
-          predicates:
-            - Path=/security/**, /unicorn/security/**
-          filters:
-            - ContextPathRewritePath=/unicorn/security/(?<path>.*), /$\{path}
-            - RewritePath=/security/(?<path>.*), /$\{path}
-            - AddRequestHeader=X-Forwarded-Prefix, /security
-        - id: openapi
-          uri: http://localhost:${server.port}
-          predicates:
-            - Path=/v3/api-docs/**
-          filters:
-            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+      server:
+        webflux:
+          httpclient:
+            ssl:
+              # trust all downstream certificates
+              use-insecure-trust-manager: true
+              handshake-timeout: 5000ms
+          x-forwarded:
+            prefix-enabled: false # need to disable & add manually。这个在下面各种filter之后，这个是个list
+          routes:
+            - id: resource-service
+              uri: http://localhost:8090
+              predicates:
+                - Path=/res/res-mvc/**
+              filters:
+                - TokenRelay=
+                # 下面这俩的顺序是有影响的，要注意
+                # 剥去一段，/res/some-resource变为/some-resource
+                - StripPrefix=1
+                # 添加prefix，从/some-resource变为/api/some-resource
+                #- PrefixPath=/api
+                - AddRequestHeader=X-Forwarded-Prefix, /res/res-mvc
+            - id: resource-service-flux
+              uri: http://localhost:8091
+              predicates:
+                - Path=/res/res-flux/**
+              filters:
+                - TokenRelay=
+                # 下面这俩的顺序是有影响的，要注意
+                # 剥去一段，/res/some-resource变为/some-resource
+                - StripPrefix=2
+                # 添加prefix，从/some-resource变为/api/some-resource
+                #- PrefixPath=/api
+                - AddRequestHeader=X-Forwarded-Prefix, /res/res-flux
+            - id: security-service
+              uri: https://localhost:8081
+              predicates:
+                - Path=/security/**, /unicorn/security/**
+              filters:
+                - ContextPathRewritePath=/unicorn/security/(?<path>.*), /$\{path}
+                - RewritePath=/security/(?<path>.*), /$\{path}
+                - AddRequestHeader=X-Forwarded-Prefix, /security
+            - id: openapi
+              uri: http://localhost:${server.port}
+              predicates:
+                - Path=/v3/api-docs/**
+              filters:
+                - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
 
   session:
     store-type: redis
