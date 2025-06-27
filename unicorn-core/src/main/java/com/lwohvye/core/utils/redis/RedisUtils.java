@@ -1139,7 +1139,7 @@ public class RedisUtils {
 
     /**
      * 获取集合元素, 并且把score值也获取
-     *
+     * 返回的Set是有序的LinkedHashSet
      * @param key
      * @param start
      * @param end

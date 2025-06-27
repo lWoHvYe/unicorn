@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.lwohvye"
-version = "4.7.0-phi-RC2"
+version = "4.7.0-phi"
 
 java {
     withSourcesJar()
