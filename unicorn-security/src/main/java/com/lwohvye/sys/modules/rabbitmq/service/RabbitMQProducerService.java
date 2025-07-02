@@ -94,4 +94,8 @@ public class RabbitMQProducerService extends ExtensionProducerService {
         commonEntity.setExpire(500L).setTimeUnit(TimeUnit.MILLISECONDS);
         sendDelayMsgEntity(RabbitMQConfig.TOPIC_SYNC_DELAY_EXCHANGE, routeKey, commonEntity);
     }
+
+    public void sendSyncFanoutMsg(AmqpMsgEntity commonEntity) {
+        sendMsgEntity(RabbitMQConfig.FANOUT_SYNC_EXCHANGE, "", commonEntity);
+    }
 }

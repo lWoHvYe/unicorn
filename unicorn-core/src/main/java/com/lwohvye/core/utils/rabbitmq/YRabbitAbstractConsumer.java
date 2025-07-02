@@ -90,31 +90,20 @@ public abstract class YRabbitAbstractConsumer {
     /**
      * @param message          消息
      * @param allowedMsgType   支持的消息类型
-     * @param curOrigin        当前实例标识
-     * @param checkedCache     重复消费校验用key。不传则不做校验
      * @param consumerFunction 具体的消费方法
      * @param consumerFailed   消费失败回调
      * @date 2022/3/25 3:59 PM
      */
-    public Object baseMessageConsumer(Message message, String allowedMsgType, String curOrigin, String checkedCache, Function<AmqpMsgEntity, Object> consumerFunction, Consumer<String> consumerFailed) {
+    public Object baseMessageConsumer(Message message, String allowedMsgType, Function<AmqpMsgEntity, Object> consumerFunction, Consumer<String> consumerFailed) {
 
         var messageId = message.getMessageProperties().getMessageId();
         var msgBody = new String(message.getBody());
         var amqpMsgEntity = JsonUtils.toJavaObject(msgBody, AmqpMsgEntity.class);
         var msgType = amqpMsgEntity.getMsgType();
-        var origin = amqpMsgEntity.getOrigin();
 
         try {
             // 当限制消息类型时，类型不符则不消费
             if (StringUtils.hasText(allowedMsgType) && !Objects.equals(msgType, allowedMsgType))
-                return null;
-            // 本实例产生的事件，忽略即可
-            if (StringUtils.hasText(curOrigin) && Objects.equals(origin, curOrigin))
-                return null;
-            // 通过messageId判断是否重复消费，因为事件可能会有广播类的，所以这里的cacheKey需根据情况确定是通用类、服务色彩、单个实例色彩
-            var noConsumer = !StringUtils.hasText(checkedCache) || redissonClient.getMapCache(checkedCache + curOrigin).fastPutIfAbsent(messageId, "", 5L, TimeUnit.MINUTES);
-            // 已经消费过，则跳过
-            if (Boolean.FALSE.equals(noConsumer))
                 return null;
             baseBeforeMessageConsumer(amqpMsgEntity);
             return consumerFunction.apply(amqpMsgEntity);
@@ -123,7 +112,7 @@ public abstract class YRabbitAbstractConsumer {
             consumerFailed.accept(e.getMessage());
             return null;
         } finally {
-            log.info("Consume Msg,Msg type: {}, -+- ,Msg detail: {}", msgType, msgBody);
+            log.info("Consume Msg,Msg type: {} MsgId: {}, -+- ,Msg detail: {}", msgType, messageId, msgBody);
         }
     }
 

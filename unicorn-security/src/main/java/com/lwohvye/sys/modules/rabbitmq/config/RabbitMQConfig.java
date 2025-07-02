@@ -15,7 +15,6 @@
  */
 package com.lwohvye.sys.modules.rabbitmq.config;
 
-import com.lwohvye.beans.config.LocalPropertyConfig;
 import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +32,8 @@ public class RabbitMQConfig {
     public static final String TOPIC_SYNC_EXCHANGE = "sync_topic_exchange";
     // fanout交换机
     public static final String FANOUT_SIMPLE_EXCHANGE = "simple_fanout_exchange";
+    public static final String FANOUT_SYNC_EXCHANGE = "sync_fanout_exchange";
+
     // 延迟队列交换机
     public static final String DIRECT_SYNC_TTL_EXCHANGE = "sync_direct_ttl_exchange";
     // 延迟队列交换机-插件版
@@ -50,7 +51,6 @@ public class RabbitMQConfig {
     // 认证日志
     public static final String AUTH_LOCAL_ROUTE_KEY = "auth.local";
 
-    public static final String SP_SYNC_ROUTE_KEY = "sp.sync.x0x"; // 对应topic   sp.sync.*
     // endregion
 
     // region 队列
@@ -216,25 +216,23 @@ public class RabbitMQConfig {
         return new CustomExchange(TOPIC_SYNC_DELAY_EXCHANGE, "x-delayed-message", true, false, args);
     }
 
-    /**
-     * 该队列，集群各实例配置不相同，实现同一事件被各实例都消费，比如更新本地缓存
-     *
-     * @return org.springframework.amqp.core.Queue
-     * @date 2022/3/8 10:22 AM
-     */
+    // 这里用Fanout + AnonymousQueue实现集群广播事件，比原topic的方式更灵活简单，注意广播后还是同一消息id
     @Bean
-    public Queue spSyncQueue() {
-        return QueueBuilder
-                .durable(LocalPropertyConfig.SP_SYNC_DELAY_QUEUE)
-                // 满足要求后转发的死信交换机及路由键
-                .withArgument("x-dead-letter-exchange", DEAD_INFO_EXCHANGE)
-                .withArgument("x-dead-letter-routing-key", DEAD_ROUTE_KEY)
+    public FanoutExchange syncFanoutExchange() {
+        return ExchangeBuilder
+                .fanoutExchange(FANOUT_SYNC_EXCHANGE)
+                .durable(true)
                 .build();
     }
 
     @Bean
-    public Binding spSyncBinding(CustomExchange topicDelayExchange, Queue spSyncQueue) {
-        return BindingBuilder.bind(spSyncQueue).to(topicDelayExchange).with("sp.sync.*").noargs();
+    public Queue syncFanoutAnonymousQueue() {
+        return new AnonymousQueue();
+    }
+
+    @Bean
+    public Binding FanoutAnonymousBinding(FanoutExchange  syncFanoutExchange, Queue syncFanoutAnonymousQueue) {
+        return BindingBuilder.bind(syncFanoutAnonymousQueue).to(syncFanoutExchange);
     }
 
     // region 认证相关log

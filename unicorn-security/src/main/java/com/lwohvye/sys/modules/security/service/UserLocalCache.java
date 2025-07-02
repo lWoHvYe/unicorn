@@ -35,6 +35,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import jakarta.persistence.EntityNotFoundException;
+
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -110,8 +111,8 @@ public class UserLocalCache {
     public void cleanUserCache(String userName, Boolean doSync) {
         if (StringUtils.isNotEmpty(userName)) {
             if (Boolean.TRUE.equals(doSync)) { // 广播事件
-                var amqpMsg = new AmqpMsgEntity().setMsgType("sp").setMsgData(userName).setExtraData("cleanUserCache").setOrigin(LocalPropertyConfig.ORIGIN);
-                rabbitMQProducerService.sendSyncDelayMsgEntity(RabbitMQConfig.SP_SYNC_ROUTE_KEY, amqpMsg);
+                var amqpMsg = new AmqpMsgEntity().setMsgType("sp").setMsgData(userName).setExtraData("cleanUserCache");
+                rabbitMQProducerService.sendSyncFanoutMsg(amqpMsg);
             }
             userLRUCache.invalidate(userName); // 清除单个key
         }

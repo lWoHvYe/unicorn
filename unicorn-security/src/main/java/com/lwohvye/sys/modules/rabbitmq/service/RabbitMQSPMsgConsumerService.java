@@ -16,7 +16,6 @@
 
 package com.lwohvye.sys.modules.rabbitmq.service;
 
-import com.lwohvye.beans.config.LocalPropertyConfig;
 import com.lwohvye.core.exception.UtilsException;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
 import com.lwohvye.core.utils.rabbitmq.YRabbitAbstractConsumer;
@@ -53,11 +52,9 @@ public class RabbitMQSPMsgConsumerService extends YRabbitAbstractConsumer {
     }
 
     @RabbitHandler
-    @RabbitListener(queues = "#{localPropertyConfig.SP_SYNC_DELAY_QUEUE}") // 可以通过SpEL从别处获取监听的队列名
+    @RabbitListener(queues = "#{syncFanoutAnonymousQueue.name}") // 可以通过SpEL从别处获取监听的队列名
     public void spMsgConsumer(Message message) {
-        var curOrigin = LocalPropertyConfig.ORIGIN;
-        var checkedCache = "ConsumerSpMsgId";
-        baseMessageConsumer(message, "sp", curOrigin, checkedCache, msgEntity -> {
+        baseMessageConsumer(message, "sp", msgEntity -> {
             var extraData = msgEntity.getExtraData();
             if (StringUtils.hasText(extraData))
                 // 这里的逻辑比较简单，首先内部已经做了忽略本实例产生的消息的逻辑。视情况可能还要做：有时需要忽略本集群产生的事件，有时需要向内部传递调用方为MQ消费者从而视情况不进行事件的扩散（虽然一般都是来自消费者的调用不做数据及事件的同步）
@@ -70,8 +67,6 @@ public class RabbitMQSPMsgConsumerService extends YRabbitAbstractConsumer {
                 }
             return null;
         }, s -> {
-            // 先移除消费过的标志，再主动重新消费一下。考虑了一下，这种cancel还是交给子类，否则要额外传个Consumer进去了
-            redissonClient.getMapCache(checkedCache + curOrigin).remove(message.getMessageProperties().getMessageId());
             reConsumeMsg(this::spMsgConsumer, message);
         });
     }
