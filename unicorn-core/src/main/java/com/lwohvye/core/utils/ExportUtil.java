@@ -102,6 +102,17 @@ public class ExportUtil {
         }
     }
 
+    private void mergeFile(String fileName, String filePrefix, int fileCount) throws IOException {
+        try (var fos = new FileOutputStream(fileName)) {
+            for (int i = 0; i < fileCount; i++) {
+                try (var fis = new FileInputStream(filePrefix + i + ".xlsx")) {
+                    // 这里直接合并文件流，避免加载到内存
+                    fis.getChannel().transferTo(0, fis.available(), fos.getChannel());
+                }
+            }
+        }
+    }
+
     // 压缩图片方法，大文件分卷压缩
     private File compressImages(List<DataRecord> records) throws IOException {
         var zipFile = File.createTempFile("images_", ".zip");

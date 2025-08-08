@@ -16,21 +16,48 @@
 
 package com.lwohvye.unicornopenai.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.deepseek.DeepSeekAssistantMessage;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 @RestController
 public class WebController {
 
     private final ChatClient chatClient;
 
+    @Autowired
+    private DeepSeekChatModel chatModel;
+
+    @Autowired
+    ChatMemory chatMemory;
+
+    @Autowired
+    ChatMemoryRepository chatMemoryRepository;
+
+    // 有时用chatClient，针对特定模型又常用对应的chatModel
     WebController(ChatClient.Builder clientBuilder) {
         this.chatClient = clientBuilder.build();
     }
@@ -61,6 +88,33 @@ public class WebController {
             }
         });
         return sink.asFlux();
+    }
+
+    @GetMapping("/reasoner")
+    public String deepSeekReasonerMultiRoundExample() {
+        List<Message> messages = new ArrayList<>();
+        messages.add(new UserMessage("9.11 and 9.8, which is greater?"));
+        DeepSeekChatOptions promptOptions = DeepSeekChatOptions.builder()
+                .model(DeepSeekApi.ChatModel.DEEPSEEK_REASONER.getValue())
+                .build();
+
+        Prompt prompt = new Prompt(messages, promptOptions);
+        ChatResponse response = chatModel.call(prompt);
+
+        DeepSeekAssistantMessage deepSeekAssistantMessage = (DeepSeekAssistantMessage) response.getResult().getOutput();
+        String reasoningContent = deepSeekAssistantMessage.getReasoningContent(); // 推理过程
+        log.info("reasoningContent: {}", reasoningContent);
+        String text = deepSeekAssistantMessage.getText(); // 结果输出
+
+        messages.add(new AssistantMessage(Objects.requireNonNull(text)));
+        messages.add(new UserMessage("How many Rs are there in the word 'strawberry'?"));
+        Prompt prompt2 = new Prompt(messages, promptOptions);
+        ChatResponse response2 = chatModel.call(prompt2);
+
+        DeepSeekAssistantMessage deepSeekAssistantMessage2 = (DeepSeekAssistantMessage) response2.getResult().getOutput();
+        String reasoningContent2 = deepSeekAssistantMessage2.getReasoningContent();
+        log.info("reasoningContent2: {}", reasoningContent2);
+        return deepSeekAssistantMessage2.getText();
     }
 }
 
