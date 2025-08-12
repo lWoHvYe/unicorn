@@ -65,24 +65,34 @@
         <result column="updated_time" property="updatedTime"/>
     </resultMap>
 
-<!--    &lt;!&ndash; 订单及详情完整结果映射（一对多） &ndash;&gt;-->
-<!--    <resultMap id="OrderWithDetailsMap" type="Order" extends="BaseOrderMap">-->
-<!--        &lt;!&ndash; collection标签用于一对多关系映射 &ndash;&gt;-->
-<!--        <collection property="orderDetails" ofType="OrderDetail" resultMap="BaseOrderDetailMap"/>-->
-<!--    </resultMap>-->
+    <!-- 订单及详情完整结果映射（一对多） -->
+    <resultMap id="OrderWithDetailsMap" type="Order" extends="BaseOrderMap">
+        <!-- collection标签用于一对多关系映射 -->
+        <collection property="orderDetails" ofType="OrderDetail" resultMap="BaseOrderDetailMap"/>
+    </resultMap>
 
-<!--    &lt;!&ndash; 根据订单ID查询订单及详情 &ndash;&gt;-->
-<!--    <select id="selectOrderWithDetailsById" resultMap="OrderWithDetailsMap">-->
-<!--        SELECT o.*,-->
-<!--               od.*-->
-<!--        FROM orders o-->
-<!--                 LEFT JOIN-->
-<!--             order_detail od ON o.order_id = od.order_id-->
-<!--        WHERE o.order_id = #{orderId}-->
-<!--    </select>-->
+    <!-- 根据订单ID查询订单及详情 -->
+    <select id="selectDetailsByCondition" resultMap="OrderWithDetailsMap">
+        SELECT o.*,
+        od.*
+        FROM orders o
+        LEFT JOIN
+        order_detail od ON o.order_id = od.order_id
+        <where>
+            <if test="orderId != null">
+                and o.order_id = #{orderId}
+            </if>
+            <if test="customerId != null">
+                and o.customer_id = #{customerId}
+            </if>
+            <if test="orderStatus != null">
+                and o.order_status = #{orderStatus}
+            </if>
+        </where>
+    </select>
 
 <!--  下面的配置有N+1问题，建议使用上面的的join  -->
-    <resultMap id="OrderWithDetailsMap" type="com.demo.dao.entity.Order" extends="BaseOrderMap">
+<!--    <resultMap id="OrderWithDetailsMap" type="com.demo.dao.entity.Order" extends="BaseOrderMap">
         <collection property="orderDetails" ofType="com.demo.dao.entity.OrderDetail"
                     select="selectDetailsByOrderId" column="order_id"/>
     </resultMap>
@@ -104,5 +114,5 @@
 
     <select id="selectDetailsByOrderId" resultMap="BaseOrderDetailMap">
         SELECT * FROM order_detail WHERE order_id = #{orderId}
-    </select>
+    </select>-->
 </mapper>
