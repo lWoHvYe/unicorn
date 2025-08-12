@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~    Copyright (c) 2025.  lWoHvYe(Hongyan Wang)
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.demo.dao.mapper.OrderMapper">
+
+    <!-- 订单基础结果映射 -->
+    <resultMap id="BaseOrderMap" type="com.demo.dao.entity.Order">
+        <id column="order_id" property="orderId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="customer_id" property="customerId"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="total_amount" property="totalAmount"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="discount_amount" property="discountAmount"/>
+        <result column="payment_method" property="paymentMethod"/>
+        <result column="payment_time" property="paymentTime"/>
+        <result column="shipping_address" property="shippingAddress"/>
+        <result column="shipping_name" property="shippingName"/>
+        <result column="shipping_phone" property="shippingPhone"/>
+        <result column="shipping_code" property="shippingCode"/>
+        <result column="shipping_company" property="shippingCompany"/>
+        <result column="shipping_time" property="shippingTime"/>
+        <result column="complete_time" property="completeTime"/>
+        <result column="order_remark" property="orderRemark"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 订单详情基础结果映射 -->
+    <resultMap id="BaseOrderDetailMap" type="com.demo.dao.entity.OrderDetail">
+        <id column="detail_id" property="detailId"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="product_id" property="productId"/>
+        <result column="product_name" property="productName"/>
+        <result column="product_image" property="productImage"/>
+        <result column="product_price" property="productPrice"/>
+        <result column="quantity" property="quantity"/>
+        <result column="subtotal_amount" property="subtotalAmount"/>
+        <result column="discount_amount" property="discountAmount"/>
+        <result column="actual_amount" property="actualAmount"/>
+        <result column="product_spec" property="productSpec"/>
+        <result column="refund_status" property="refundStatus"/>
+        <result column="refund_amount" property="refundAmount"/>
+        <result column="refund_time" property="refundTime"/>
+        <result column="refund_reason" property="refundReason"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+<!--    &lt;!&ndash; 订单及详情完整结果映射（一对多） &ndash;&gt;-->
+<!--    <resultMap id="OrderWithDetailsMap" type="Order" extends="BaseOrderMap">-->
+<!--        &lt;!&ndash; collection标签用于一对多关系映射 &ndash;&gt;-->
+<!--        <collection property="orderDetails" ofType="OrderDetail" resultMap="BaseOrderDetailMap"/>-->
+<!--    </resultMap>-->
+
+<!--    &lt;!&ndash; 根据订单ID查询订单及详情 &ndash;&gt;-->
+<!--    <select id="selectOrderWithDetailsById" resultMap="OrderWithDetailsMap">-->
+<!--        SELECT o.*,-->
+<!--               od.*-->
+<!--        FROM orders o-->
+<!--                 LEFT JOIN-->
+<!--             order_detail od ON o.order_id = od.order_id-->
+<!--        WHERE o.order_id = #{orderId}-->
+<!--    </select>-->
+
+<!--  下面的配置有N+1问题，建议使用上面的的join  -->
+    <resultMap id="OrderWithDetailsMap" type="com.demo.dao.entity.Order" extends="BaseOrderMap">
+        <collection property="orderDetails" ofType="com.demo.dao.entity.OrderDetail"
+                    select="selectDetailsByOrderId" column="order_id"/>
+    </resultMap>
+
+    <select id="selectDetailsByCondition" resultMap="OrderWithDetailsMap">
+        SELECT * FROM orders
+        <where>
+            <if test="orderId != null">
+                and order_id = #{orderId}
+            </if>
+            <if test="customerId != null">
+                and customer_id = #{customerId}
+            </if>
+            <if test="orderStatus != null">
+                and order_status = #{orderStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDetailsByOrderId" resultMap="BaseOrderDetailMap">
+        SELECT * FROM order_detail WHERE order_id = #{orderId}
+    </select>
+</mapper>

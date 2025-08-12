@@ -1,0 +1,26 @@
+# DataSource Config
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: root
+    password: test
+  sql:
+    init:
+      schema-locations: classpath:db/schema-h2.sql
+      data-locations: classpath:db/data-h2.sql
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 打印SQL日志
+  global-config:
+    db-config:
+      id-type: auto # 主键自增
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.demo.dao.entity # 实体类所在包
