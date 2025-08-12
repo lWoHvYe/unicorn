@@ -16,10 +16,7 @@
 
 package com.demo.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -53,4 +50,8 @@ public class Order {
 
     @TableField(exist = false)
     private List<OrderDetail> orderDetails;
+
+    // 逻辑删除对MyBatis提供的方法生效，使用xml的需自行加上条件（即不生效）
+    @TableLogic
+    private Integer deleted;
 }

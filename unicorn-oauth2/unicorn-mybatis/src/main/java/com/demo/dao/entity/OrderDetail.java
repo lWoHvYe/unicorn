@@ -18,6 +18,7 @@ package com.demo.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -47,4 +48,6 @@ public class OrderDetail {
     private String refundReason;
     private Date createdTime;
     private Date updatedTime;
+    @TableLogic
+    private Integer deleted;
 }

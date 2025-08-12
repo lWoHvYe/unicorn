@@ -46,6 +46,7 @@ CREATE TABLE orders
     shipping_time    DATETIME,
     complete_time    DATETIME,
     order_remark     VARCHAR(500),
+    deleted          TINYINT        DEFAULT  0,
     created_time     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_time     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -70,6 +71,7 @@ CREATE TABLE order_detail
     refund_amount   DECIMAL(12, 2)          DEFAULT 0.00,
     refund_time     DATETIME,
     refund_reason   VARCHAR(255),
+    deleted          TINYINT        DEFAULT  0,
     created_time    DATETIME       NULL DEFAULT CURRENT_TIMESTAMP,
     updated_time    DATETIME       NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

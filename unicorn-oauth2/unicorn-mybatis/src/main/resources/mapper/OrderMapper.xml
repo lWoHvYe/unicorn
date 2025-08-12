@@ -78,17 +78,18 @@
         FROM orders o
         LEFT JOIN
         order_detail od ON o.order_id = od.order_id
-        <where>
-            <if test="orderId != null">
-                and o.order_id = #{orderId}
-            </if>
-            <if test="customerId != null">
-                and o.customer_id = #{customerId}
-            </if>
-            <if test="orderStatus != null">
-                and o.order_status = #{orderStatus}
-            </if>
-        </where>
+        <!--        <where>-->
+        where o.deleted = 0 and od.deleted = 0
+        <if test="orderId != null">
+            and o.order_id = #{orderId}
+        </if>
+        <if test="customerId != null">
+            and o.customer_id = #{customerId}
+        </if>
+        <if test="orderStatus != null">
+            and o.order_status = #{orderStatus}
+        </if>
+        <!--        </where>-->
     </select>
 
 <!--  下面的配置有N+1问题，建议使用上面的的join  -->

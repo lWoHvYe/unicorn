@@ -61,6 +61,7 @@ public class OrderService {
             details.forEach(detail -> {
                 detail.setOrderId(orderId);
                 detail.setOrderNo(order.getOrderNo());
+                detail.setDeleted(0); // 数据库默认值未生效，需手动设置（h2）
             });
 
             // 3. 批量保存订单详情

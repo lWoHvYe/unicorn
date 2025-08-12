@@ -25,15 +25,15 @@ VALUES (1, 'Jone', 18, 'test1@baomidou.com'),
        (5, 'Billie', 24, 'test5@baomidou.com');
 
 -- 插入订单数据
-INSERT INTO orders (order_id, order_no, customer_id, order_status, total_amount, payment_amount, created_time)
-VALUES (1, 'ORD20230001', 1001, 1, 4298.00, 4298.00, '2023-01-15 10:00:00'),
-       (2, 'ORD20230002', 1001, 2, 5998.00, 5598.00, '2023-01-16 14:30:00'),
-       (3, 'ORD20230003', 1002, 3, 1299.00, 1199.00, '2023-01-17 09:15:00');
+INSERT INTO orders (order_id, order_no, customer_id, order_status, total_amount, payment_amount, deleted, created_time)
+VALUES (1, 'ORD20230001', 1001, 1, 4298.00, 4298.00, 0, '2023-01-15 10:00:00'),
+       (2, 'ORD20230002', 1001, 2, 5998.00, 5598.00, 0, '2023-01-16 14:30:00'),
+       (3, 'ORD20230003', 1002, 3, 1299.00, 1199.00, 0, '2023-01-17 09:15:00');
 
 -- 插入订单详情数据
 INSERT INTO order_detail (detail_id, order_id, order_no, product_id, product_name, product_price, quantity,
-                          subtotal_amount, actual_amount)
-VALUES (1, 1, 'ORD20230001', 2001, '智能手机X', 2999.00, 1, 2999.00, 2999.00),
-       (2, 2, 'ORD20230002', 2001, '智能手机X', 2999.00, 2, 5998.00, 5598.00),
-       (3, 1, 'ORD20230001', 2002, '无线耳机Pro', 1299.00, 1, 1299.00, 1299.00),
-       (4, 3, 'ORD20230003', 2002, '无线耳机Pro', 1299.00, 1, 1299.00, 1199.00);
+                          subtotal_amount, actual_amount, deleted)
+VALUES (1, 1, 'ORD20230001', 2001, '智能手机X', 2999.00, 1, 2999.00, 2999.00, 0),
+       (2, 2, 'ORD20230002', 2001, '智能手机X', 2999.00, 2, 5998.00, 5598.00, 0),
+       (3, 1, 'ORD20230001', 2002, '无线耳机Pro', 1299.00, 1, 1299.00, 1299.00, 0),
+       (4, 3, 'ORD20230003', 2002, '无线耳机Pro', 1299.00, 1, 1299.00, 1199.00, 0);
