@@ -18,9 +18,12 @@ package com.demo.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.demo.dao.entity.Order;
+import com.demo.dao.entity.OrderDetail;
+import com.demo.dao.mapper.OrderDetailMapper;
 import com.demo.dao.mapper.OrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +31,8 @@ import java.util.List;
 public class OrderService {
     @Autowired
     private OrderMapper orderMapper;
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
 
     // 获取订单及详情
     public List<Order> getOrderWithDetails(Long orderId, Long customerId, Integer orderStatus) {
@@ -40,5 +45,34 @@ public class OrderService {
 
     public List<Order> getAllOrders() {
         return orderMapper.selectList(new QueryWrapper<>());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean saveOrderWithDetails(Order order) {
+        // 1. 保存订单
+        if (orderMapper.insert(order) <= 0) {
+            throw new RuntimeException("订单保存失败");
+        }
+
+        // 2. 设置订单详情中的订单ID
+        Long orderId = order.getOrderId();
+        List<OrderDetail> details = order.getOrderDetails();
+        if (details != null && !details.isEmpty()) {
+            details.forEach(detail -> {
+                detail.setOrderId(orderId);
+                detail.setOrderNo(order.getOrderNo());
+            });
+
+            // 3. 批量保存订单详情
+            if (!saveOrderDetailsBatch(details)) {
+                throw new RuntimeException("订单详情保存失败");
+            }
+        }
+        return true;
+    }
+
+    private boolean saveOrderDetailsBatch(List<OrderDetail> details) {
+        // 使用 MyBatis-Plus 的批量保存（需要配置 SQL 注入器）
+        return orderDetailMapper.insertBatchSomeColumn(details) > 0;
     }
 }

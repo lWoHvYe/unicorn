@@ -17,6 +17,7 @@ package com.demo.init;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.demo.dao.entity.Order;
+import com.demo.dao.entity.OrderDetail;
 import com.demo.dao.entity.User;
 import com.demo.dao.mapper.UserMapper;
 import com.demo.service.OrderService;
@@ -25,6 +26,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -47,8 +50,45 @@ public class InstantiationProcessor4Core implements ApplicationListener<ContextR
             orderService.getOrderWithDetails(1L, 1001L, null).forEach(System.out::println);
 
             System.out.println("----------");
-            orderService.getOrderWithDetails(null, 1001L, null).forEach(System.out::println);
 
+            var order = genNewOrder();
+
+            orderService.saveOrderWithDetails(order);
+
+            System.out.println("插入完成，开始查询");
+
+            orderService.getOrderWithDetails(null, 1001L, null).forEach(System.out::println);
         }
+    }
+
+    private static Order genNewOrder() {
+        Order order = new Order();
+        order.setOrderNo("ORD20230005");
+        order.setCustomerId(1001L);
+        order.setOrderStatus(1);
+        order.setTotalAmount(new BigDecimal("199.99"));
+        order.setPaymentAmount(new BigDecimal("199.99"));
+
+        List<OrderDetail> details = new ArrayList<>();
+        OrderDetail detail1 = new OrderDetail();
+        detail1.setProductId(1001L);
+        detail1.setProductName("iphone");
+        detail1.setQuantity(2);
+        detail1.setProductPrice(new BigDecimal("90.00"));
+        detail1.setSubtotalAmount(new BigDecimal("180.00"));
+        detail1.setActualAmount(new BigDecimal("99.99"));
+
+        OrderDetail detail2 = new OrderDetail();
+        detail2.setProductId(1002L);
+        detail2.setProductName("HUAWEI");
+        detail2.setQuantity(1);
+        detail2.setProductPrice(new BigDecimal("100.00"));
+        detail2.setSubtotalAmount(new BigDecimal("100.00"));
+        detail2.setActualAmount(new BigDecimal("100.00"));
+
+        details.add(detail1);
+        details.add(detail2);
+        order.setOrderDetails(details);
+        return order;
     }
 }

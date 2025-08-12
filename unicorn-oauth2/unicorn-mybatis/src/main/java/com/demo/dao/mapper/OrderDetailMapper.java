@@ -14,19 +14,13 @@
  *    limitations under the License.
  */
 
-package com.demo;
+package com.demo.dao.mapper;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.demo.dao.entity.OrderDetail;
 
-@SpringBootApplication
-@MapperScan("com.demo.dao.mapper")
-@EnableTransactionManagement
-public class Application {
+import java.util.List;
 
-    static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+public interface OrderDetailMapper extends BaseMapper<OrderDetail> {
+    Integer insertBatchSomeColumn(List<OrderDetail> details);
 }

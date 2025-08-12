@@ -70,8 +70,8 @@ CREATE TABLE order_detail
     refund_amount   DECIMAL(12, 2)          DEFAULT 0.00,
     refund_time     DATETIME,
     refund_reason   VARCHAR(255),
-    created_time    DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_time    DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    created_time    DATETIME       NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_time    DATETIME       NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- 创建索引
