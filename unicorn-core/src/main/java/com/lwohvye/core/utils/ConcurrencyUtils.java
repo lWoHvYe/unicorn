@@ -41,9 +41,9 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      * @param eventual      finally execute, consume the res of  composeResult
      * @param tasks         tasks wtd
      */
-    public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
+    public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
         log.warn("In Java 17 Source");
-        List<? extends CompletableFuture<?>> futures = null;
+        List<CompletableFuture<T>> futures = null;
         if (Objects.nonNull(tasks)) {
             futures = Arrays.stream(tasks).map(task -> CompletableFuture.supplyAsync(() -> {
                 try {
@@ -63,7 +63,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
             });
             allCF.join(); // This will still throw an exception if any of the futures failed
         }
-        Object results = null;
+        U results = null;
         if (Objects.nonNull(composeResult))
             results = composeResult.apply(Objects.nonNull(futures) ?
                     futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).toList() : Collections.emptyList());

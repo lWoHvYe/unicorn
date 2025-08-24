@@ -37,9 +37,9 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      * @param eventual      finally execute, consume the res of  composeResult
      * @param tasks         tasks wtd
      */
-    public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
+    public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
         try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            List<? extends Subtask<?>> subtasks = null;
+            List<Subtask<T>> subtasks = null;
             if (Objects.nonNull(tasks))
                 subtasks = Arrays.stream(tasks).map(scope::fork).toList();
 
@@ -47,7 +47,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
                     .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
-            Object results = null;
+            U results = null;
             if (Objects.nonNull(composeResult))
                 results = composeResult.apply(Objects.nonNull(subtasks) ?
                         subtasks.stream().map(Subtask::get).filter(Objects::nonNull).toList() : Collections.emptyList());

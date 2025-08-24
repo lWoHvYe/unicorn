@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022-2025.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2025.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,20 +16,14 @@
 
 package com.lwohvye.core.utils;
 
+import module java.base;
+
 import com.lwohvye.core.exception.UtilsException;
 import lombok.experimental.UtilityClass;
 import org.slf4j.MDC;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import static java.util.concurrent.StructuredTaskScope.Subtask;
+import java.util.concurrent.StructuredTaskScope.Subtask;
+import java.util.concurrent.StructuredTaskScope.Joiner;
 
 /**
  * This class provides utility methods for handling concurrency and executing tasks in a structured manner.
@@ -45,22 +39,20 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      * @param tasks         tasks wtd
      */
     public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+        try (var scope = StructuredTaskScope.open()) { // 使用open默认就是所有的都需要成功
             List<Subtask<T>> subtasks = null;
             if (Objects.nonNull(tasks))
                 subtasks = Arrays.stream(tasks).map(scope::fork).toList();
+            scope.join();         // Join subtasks, propagating exceptions
 
-            scope.join()           // Join both forks
-                    .throwIfFailed();  // ... and propagate errors
-
-            // Here, both forks have succeeded, so compose their results
+            // Both subtasks have succeeded, so compose their results
             U results = null;
             if (Objects.nonNull(composeResult))
                 results = composeResult.apply(Objects.nonNull(subtasks) ?
                         subtasks.stream().map(Subtask::get).filter(Objects::nonNull).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
-        } catch (ExecutionException e) {
+        } catch (StructuredTaskScope.FailedException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());
@@ -74,17 +66,16 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
     // A FutureTask can be used to wrap a Callable or Runnable object. Because FutureTask implements Runnable, a FutureTask can be submitted to an Executor for execution.
     // var futureTask = new FutureTask<T>(Callable/Runnable) // Callable/Runnable 2 Runnable/Future
     public static void structuredExecute(Runnable eventual, Runnable... tasks) {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+        try (var scope = StructuredTaskScope.open(Joiner.<Void>allSuccessfulOrThrow(),
+                cf -> cf.withName("STS-JUC").withThreadFactory(virtualFactory))) {
             if (Objects.nonNull(tasks))
-                Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
-
-            scope.join()           // Join both forks
-                    .throwIfFailed();  // ... and propagate errors
+                Arrays.stream(tasks).forEach(scope::fork);
+            scope.join();         // Join subtasks, propagating exceptions
 
             // Here, both forks have succeeded, so compose their results
             if (Objects.nonNull(eventual))
                 eventual.run();
-        } catch (ExecutionException e) {
+        } catch (StructuredTaskScope.FailedException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());
@@ -93,29 +84,6 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         }
     }
 
-    // 下面这个，就是解决InheritableThreadLocal 和 ThreadPool一起使用时的问题，使用ThreadLocal 然后自行实现值的传递
-    // 因为ITL只在Thread Create时传递，而ThreadPool通常是share的，所以当run CompletableFuture时，ITL会失效，
-    // 对此可以在每次run一批Task时 Create New ThreadPool，且避免Thread的复用，因为若复用Thread仍会有该问题,这有悖Pool的部分初衷了
-    // 当使用Virtual Threads时，虽然也可以定义ThreadPool,但每次都是New Thread，不会复用，是否还有这个问题，待验证，但用VT时，更推荐用ScopedValue
-/*
-    public static final ThreadLocal<Object> threadLocal = new ThreadLocal<>();
-
-    public static Runnable withTLTP(Runnable runnable) {
-        var sharedVar = ConcurrencyUtils.threadLocal.get();
-        return () -> {
-            ConcurrencyUtils.threadLocal.set(sharedVar);
-            runnable.run();
-        };
-    }*/
-//    {
-//        // 使用下面这两种方式，可以将traceId等ThreadLocal传到子线程，且ThreadPool的复用不受影响
-//        ExecutorService executor = ContextExecutorService.wrap(Executors.newSingleThreadExecutor());
-//        var executorService = wrap(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
-//          配合下面这个传递custom MDC，另外可以考虑TaskDecorator
-//        ContextRegistry.getInstance().registerThreadLocalAccessor("MDC",MDC::getCopyOfContextMap, MDC::setContextMap, MDC::clear);
-//    }
-
-    // 下面这俩采用类似的思想
     public static Runnable decorateMdc(Runnable runnable) {
         var mdc = MDC.getCopyOfContextMap();
         return () -> {
