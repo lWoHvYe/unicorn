@@ -26,7 +26,11 @@ import java.util.List;
 public interface OrderMapper extends BaseMapper<Order> {
 
     List<Order> selectDetailsByCondition(@Param("orderId") Long orderId, @Param("customerId") Long customerId,
-                                   @Param("orderStatus") Integer orderStatus);
+                                         @Param("orderStatus") Integer orderStatus);
+
+    /*有N+1问题*/
+    List<Order> selectDetailsNByCondition(@Param("orderId") Long orderId, @Param("customerId") Long customerId,
+                                          @Param("orderStatus") Integer orderStatus);
 
     // 这里不能自动绑定，不要这么用。当存在多条详情时，会返回重复的订单记录
     @Select("SELECT o.*, od.* FROM orders o LEFT JOIN order_detail od ON o.order_id = od.order_id WHERE o.order_id = #{orderId}")

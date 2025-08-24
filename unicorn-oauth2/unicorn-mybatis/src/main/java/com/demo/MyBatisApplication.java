@@ -24,9 +24,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @MapperScan("com.demo.dao.mapper")
 @EnableTransactionManagement
-public class Application {
+public class MyBatisApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(MyBatisApplication.class, args);
     }
 }

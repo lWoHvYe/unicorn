@@ -92,13 +92,13 @@
         <!--        </where>-->
     </select>
 
-<!--  下面的配置有N+1问题，建议使用上面的的join  -->
-<!--    <resultMap id="OrderWithDetailsMap" type="com.demo.dao.entity.Order" extends="BaseOrderMap">
+    <!--  下面的配置有N+1问题，建议使用上面的的join  -->
+    <resultMap id="OrderWithDetailsNMap" type="com.demo.dao.entity.Order" extends="BaseOrderMap">
         <collection property="orderDetails" ofType="com.demo.dao.entity.OrderDetail"
                     select="selectDetailsByOrderId" column="order_id"/>
     </resultMap>
 
-    <select id="selectDetailsByCondition" resultMap="OrderWithDetailsMap">
+    <select id="selectDetailsNByCondition" resultMap="OrderWithDetailsNMap">
         SELECT * FROM orders
         <where>
             <if test="orderId != null">
@@ -114,6 +114,8 @@
     </select>
 
     <select id="selectDetailsByOrderId" resultMap="BaseOrderDetailMap">
-        SELECT * FROM order_detail WHERE order_id = #{orderId}
-    </select>-->
+        SELECT *
+        FROM order_detail
+        WHERE order_id = #{orderId}
+    </select>
 </mapper>
