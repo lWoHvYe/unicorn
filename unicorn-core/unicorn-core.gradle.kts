@@ -26,7 +26,7 @@ plugins {
 description = "系统Core模块"
 
 multiRelease {
-    targetVersions(17, 21, 24)
+    targetVersions(17, 21, 24,25)
 }
 
 java {
