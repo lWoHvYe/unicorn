@@ -27,6 +27,8 @@ import java.util.concurrent.StructuredTaskScope.Joiner;
 
 /**
  * This class provides utility methods for handling concurrency and executing tasks in a structured manner.
+ *
+ * @since 25
  */
 @UtilityClass
 public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
@@ -52,7 +54,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
                         subtasks.stream().map(Subtask::get).filter(Objects::nonNull).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
-        } catch (StructuredTaskScope.FailedException e) {
+        } catch (StructuredTaskScope.FailedException | StructuredTaskScope.TimeoutException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());
@@ -75,7 +77,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
             // Here, both forks have succeeded, so compose their results
             if (Objects.nonNull(eventual))
                 eventual.run();
-        } catch (StructuredTaskScope.FailedException e) {
+        } catch (StructuredTaskScope.FailedException | StructuredTaskScope.TimeoutException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());
