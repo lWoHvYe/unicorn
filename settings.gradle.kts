@@ -40,8 +40,7 @@ dependencyResolutionManagement {
     }
 
     versionCatalogs {
-        create("libs") {
-        }
+        create("libs")
     }
 }
 

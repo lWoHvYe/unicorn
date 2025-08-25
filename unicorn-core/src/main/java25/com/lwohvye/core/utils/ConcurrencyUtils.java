@@ -23,9 +23,12 @@ import lombok.experimental.UtilityClass;
 import org.slf4j.MDC;
 
 import java.util.concurrent.StructuredTaskScope.Subtask;
+import java.util.concurrent.StructuredTaskScope.Joiner;
 
 /**
  * This class provides utility methods for handling concurrency and executing tasks in a structured manner.
+ *
+ * @since 25
  */
 @UtilityClass
 public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
@@ -37,23 +40,21 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      * @param eventual      finally execute, consume the res of  composeResult
      * @param tasks         tasks wtd
      */
-    public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            List<? extends Subtask<?>> subtasks = null;
+    public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
+        try (var scope = StructuredTaskScope.open()) { // 使用open默认就是所有的都需要成功
+            List<Subtask<T>> subtasks = null;
             if (Objects.nonNull(tasks))
                 subtasks = Arrays.stream(tasks).map(scope::fork).toList();
+            scope.join();         // Join subtasks, propagating exceptions
 
-            scope.join()           // Join both forks
-                    .throwIfFailed();  // ... and propagate errors
-
-            // Here, both forks have succeeded, so compose their results
-            Object results = null;
+            // Both subtasks have succeeded, so compose their results
+            U results = null;
             if (Objects.nonNull(composeResult))
                 results = composeResult.apply(Objects.nonNull(subtasks) ?
                         subtasks.stream().map(Subtask::get).filter(Objects::nonNull).toList() : Collections.emptyList());
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
-        } catch (ExecutionException e) {
+        } catch (StructuredTaskScope.FailedException | StructuredTaskScope.TimeoutException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());
@@ -67,17 +68,16 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
     // A FutureTask can be used to wrap a Callable or Runnable object. Because FutureTask implements Runnable, a FutureTask can be submitted to an Executor for execution.
     // var futureTask = new FutureTask<T>(Callable/Runnable) // Callable/Runnable 2 Runnable/Future
     public static void structuredExecute(Runnable eventual, Runnable... tasks) {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+        try (var scope = StructuredTaskScope.open(Joiner.<Void>allSuccessfulOrThrow(),
+                cf -> cf.withName("STS-JUC").withThreadFactory(virtualFactory))) {
             if (Objects.nonNull(tasks))
-                Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
-
-            scope.join()           // Join both forks
-                    .throwIfFailed();  // ... and propagate errors
+                Arrays.stream(tasks).forEach(scope::fork);
+            scope.join();         // Join subtasks, propagating exceptions
 
             // Here, both forks have succeeded, so compose their results
             if (Objects.nonNull(eventual))
                 eventual.run();
-        } catch (ExecutionException e) {
+        } catch (StructuredTaskScope.FailedException | StructuredTaskScope.TimeoutException e) {
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());

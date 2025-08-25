@@ -25,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Represents a utility class for handling threads in a virtualized environment.
  * This abstract class provides a thread factory and an executor service for executing tasks.
+ *
+ * @since 21
  */
 @Slf4j
 public abstract class UnicornAbstractThreadUtils {
