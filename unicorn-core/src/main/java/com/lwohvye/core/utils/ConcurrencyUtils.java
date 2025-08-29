@@ -19,7 +19,6 @@ package com.lwohvye.core.utils;
 import com.lwohvye.core.exception.UtilsException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +27,6 @@ import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Slf4j
 @UtilityClass
@@ -41,9 +39,9 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      * @param eventual      finally execute, consume the res of  composeResult
      * @param tasks         tasks wtd
      */
-    public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
+    public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
         log.warn("In Java 17 Source");
-        List<? extends CompletableFuture<?>> futures = null;
+        List<CompletableFuture<T>> futures = null;
         if (Objects.nonNull(tasks)) {
             futures = Arrays.stream(tasks).map(task -> CompletableFuture.supplyAsync(() -> {
                 try {
@@ -63,7 +61,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
             });
             allCF.join(); // This will still throw an exception if any of the futures failed
         }
-        Object results = null;
+        U results = null;
         if (Objects.nonNull(composeResult))
             results = composeResult.apply(Objects.nonNull(futures) ?
                     futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).toList() : Collections.emptyList());
@@ -85,21 +83,5 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         // Here, both forks have succeeded, so compose their results
         if (Objects.nonNull(eventual))
             eventual.run();
-    }
-
-    public static Runnable decorateMdc(Runnable runnable) {
-        var mdc = MDC.getCopyOfContextMap();
-        return () -> {
-            MDC.setContextMap(mdc);
-            runnable.run();
-        };
-    }
-
-    public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
-        var mdc = MDC.getCopyOfContextMap();
-        return () -> {
-            MDC.setContextMap(mdc);
-            return supplier.get();
-        };
     }
 }

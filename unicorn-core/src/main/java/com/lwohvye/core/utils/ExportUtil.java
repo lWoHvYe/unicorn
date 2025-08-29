@@ -27,6 +27,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.Deflater;
@@ -93,13 +94,16 @@ public class ExportUtil {
     }
 
     private static void setCellValue(Cell cell, Object value) {
-        switch (value) {
-            case null -> cell.setCellValue("");
-            case Number number -> cell.setCellValue(number.doubleValue());
-            case Date date -> cell.setCellValue(date);
-            case Boolean b -> cell.setCellValue(b);
-            default -> cell.setCellValue(value.toString());
-        }
+        if (Objects.isNull(value))
+            cell.setCellValue("");
+        else  if (value instanceof Number number)
+            cell.setCellValue(number.doubleValue());
+        else if (value instanceof Boolean b)
+            cell.setCellValue(b);
+        else if (value instanceof Date d)
+            cell.setCellValue(d);
+        else
+            cell.setCellValue(value.toString());
     }
 
     private void mergeFile(String fileName, String filePrefix, int fileCount) throws IOException {

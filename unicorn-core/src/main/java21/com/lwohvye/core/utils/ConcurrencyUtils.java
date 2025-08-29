@@ -18,7 +18,6 @@ package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.UtilsException;
 import lombok.experimental.UtilityClass;
-import org.slf4j.MDC;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,7 +26,6 @@ import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static java.util.concurrent.StructuredTaskScope.Subtask;
 
@@ -44,9 +42,9 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
      * @param eventual      finally execute, consume the res of  composeResult
      * @param tasks         tasks wtd
      */
-    public static void structuredExecute(Function<List<?>, ?> composeResult, Consumer<Object> eventual, Callable<?>... tasks) {
+    public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
         try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            List<? extends Subtask<?>> subtasks = null;
+            List<Subtask<T>> subtasks = null;
             if (Objects.nonNull(tasks))
                 subtasks = Arrays.stream(tasks).map(scope::fork).toList();
 
@@ -54,7 +52,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
                     .throwIfFailed();  // ... and propagate errors
 
             // Here, both forks have succeeded, so compose their results
-            Object results = null;
+            U results = null;
             if (Objects.nonNull(composeResult))
                 results = composeResult.apply(Objects.nonNull(subtasks) ?
                         subtasks.stream().map(Subtask::get).filter(Objects::nonNull).toList() : Collections.emptyList());
@@ -91,44 +89,5 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-    }
-
-    // 下面这个，就是解决InheritableThreadLocal 和 ThreadPool一起使用时的问题，使用ThreadLocal 然后自行实现值的传递
-    // 因为ITL只在Thread Create时传递，而ThreadPool通常是share的，所以当run CompletableFuture时，ITL会失效，
-    // 对此可以在每次run一批Task时 Create New ThreadPool，且避免Thread的复用，因为若复用Thread仍会有该问题,这有悖Pool的部分初衷了
-    // 当使用Virtual Threads时，虽然也可以定义ThreadPool,但每次都是New Thread，不会复用，是否还有这个问题，待验证，但用VT时，更推荐用ScopedValue
-/*
-    public static final ThreadLocal<Object> threadLocal = new ThreadLocal<>();
-
-    public static Runnable withTLTP(Runnable runnable) {
-        var sharedVar = ConcurrencyUtils.threadLocal.get();
-        return () -> {
-            ConcurrencyUtils.threadLocal.set(sharedVar);
-            runnable.run();
-        };
-    }*/
-//    {
-//        // 使用下面这两种方式，可以将traceId等ThreadLocal传到子线程，且ThreadPool的复用不受影响
-//        ExecutorService executor = ContextExecutorService.wrap(Executors.newSingleThreadExecutor());
-//        var executorService = wrap(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
-//          配合下面这个传递custom MDC，另外可以考虑TaskDecorator
-//        ContextRegistry.getInstance().registerThreadLocalAccessor("MDC",MDC::getCopyOfContextMap, MDC::setContextMap, MDC::clear);
-//    }
-
-    // 下面这俩采用类似的思想
-    public static Runnable decorateMdc(Runnable runnable) {
-        var mdc = MDC.getCopyOfContextMap();
-        return () -> {
-            MDC.setContextMap(mdc);
-            runnable.run();
-        };
-    }
-
-    public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
-        var mdc = MDC.getCopyOfContextMap();
-        return () -> {
-            MDC.setContextMap(mdc);
-            return supplier.get();
-        };
     }
 }
