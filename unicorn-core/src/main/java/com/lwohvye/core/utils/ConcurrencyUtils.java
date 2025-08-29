@@ -19,7 +19,6 @@ package com.lwohvye.core.utils;
 import com.lwohvye.core.exception.UtilsException;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +27,6 @@ import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Slf4j
 @UtilityClass
@@ -85,21 +83,5 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
         // Here, both forks have succeeded, so compose their results
         if (Objects.nonNull(eventual))
             eventual.run();
-    }
-
-    public static Runnable decorateMdc(Runnable runnable) {
-        var mdc = MDC.getCopyOfContextMap();
-        return () -> {
-            MDC.setContextMap(mdc);
-            runnable.run();
-        };
-    }
-
-    public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
-        var mdc = MDC.getCopyOfContextMap();
-        return () -> {
-            MDC.setContextMap(mdc);
-            return supplier.get();
-        };
     }
 }

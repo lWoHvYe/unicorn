@@ -19,9 +19,11 @@ package com.lwohvye.core.utils;
 import io.micrometer.context.ContextExecutorService;
 import io.micrometer.context.ContextSnapshotFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 @Slf4j
 public abstract class UnicornAbstractThreadUtils {
@@ -34,5 +36,29 @@ public abstract class UnicornAbstractThreadUtils {
 
     public static ExecutorService wrap(ExecutorService executor) {
         return ContextExecutorService.wrap(executor, () -> ContextSnapshotFactory.builder().build().captureAll());
+    }
+
+    public static Runnable decorateMdc(Runnable runnable) {
+        var mdc = MDC.getCopyOfContextMap();
+        return () -> {
+            try {
+                MDC.setContextMap(mdc);
+                runnable.run();
+            } finally {
+                MDC.clear();
+            }
+        };
+    }
+
+    public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
+        var mdc = MDC.getCopyOfContextMap();
+        return () -> {
+            try {
+                MDC.setContextMap(mdc);
+                return supplier.get();
+            } finally {
+                MDC.clear();
+            }
+        };
     }
 }
