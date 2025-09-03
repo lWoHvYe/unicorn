@@ -19,15 +19,16 @@ package com.lwohvye.core.utils;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import javax.sql.DataSource;
 import java.io.*;
 import java.net.URL;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.sql.Date;
+import java.util.*;
+import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.Deflater;
@@ -40,29 +41,41 @@ public class ExportUtil {
     }
 
     // 数据库查询方法，针对大数据量，分页查询处理。这里只是示例
-    private List<DataRecord> queryDataFromDB(String query) throws SQLException {
-        List<DataRecord> records = new ArrayList<>();
+    public void queryDataFromDB(String query, List<String> headers, FileOutputStream fos) throws SQLException, IOException {
         try (var conn = dataSource.getConnection();
-             var stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
+             var stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+             var workbook = new SXSSFWorkbook(2000)) {
+            var sheet = workbook.createSheet();
+            int rowNum = 0;
+            var headerRow = sheet.createRow(rowNum++);
+            int colNum = 0;
+            for (var header : headers) {
+                var cell = headerRow.createCell(colNum++);
+                cell.setCellValue(header);
+            }
             stmt.setFetchSize(1000); // 流式读取设置
             var rs = stmt.executeQuery(query);
             while (rs.next()) {
-                records.add(new DataRecord(
-                        rs.getString("id"),
-                        rs.getString("imageUrl"),
-                        rs.getTimestamp("createTime")
-                ));
+                var row = sheet.createRow(rowNum++);
+                colNum = 0;
+                for (var header : headers) {
+                    var cell = row.createCell(colNum++);
+                    setCellValue(cell, rs.getObject(header));
+                }
+                if (rowNum % 1000 == 0)
+                    sheet.flushRows(1000);
             }
+            workbook.write(fos);
         }
-        return records;
     }
 
     // 生成Excel文件，采用流式写入，减少内存占用
-    public static File generateTempExcel(List<Map<String, Object>> data) throws IOException {
+    public static <R extends List<Map<String, Object>>> File generateTempExcel(Function<Pageable, R> fetchDataFunc) throws IOException {
         var excelFile = File.createTempFile("export_", ".xlsx");
-        try (var workbook = new SXSSFWorkbook(1000)) { // 在close前是可以不断写入的，所以大数据量下可以与查询结合起来，比如一次查1000条、处理完再查询
+        try (var workbook = new SXSSFWorkbook(2000)) { // 在close前是可以不断写入的，所以大数据量下可以与查询结合起来，比如一次查1000条、处理完再查询
             var sheet = workbook.createSheet();
-
+            var pageRequest = PageRequest.of(1, 1000);
+            var data = fetchDataFunc.apply(pageRequest);
             // 创建标题行（取第一个Map的keySet）
             if (!data.isEmpty()) {
                 var headerRow = sheet.createRow(0);
@@ -72,21 +85,20 @@ public class ExportUtil {
                     cell.setCellValue(key);
                 }
             }
-
-            // 填充数据行
-            for (int i = 0; i < data.size(); i++) {
-                var row = sheet.createRow(i + 1);
-                var rowData = data.get(i);
-                int colIdx = 0;
-
-                for (var value : rowData.values()) {
-                    var cell = row.createCell(colIdx++);
-                    setCellValue(cell, value);
+            int rowNum = 1;
+            while (!data.isEmpty()) {
+                // 填充数据行
+                for (Map<String, Object> rowData : data) {
+                    var row = sheet.createRow(++rowNum);
+                    int colIdx = 0;
+                    for (var value : rowData.values()) {
+                        var cell = row.createCell(colIdx++);
+                        setCellValue(cell, value);
+                    }
                 }
-
-                if (i % 1000 == 0) {
-                    sheet.flushRows(1000);
-                }
+                sheet.flushRows(1000);
+                pageRequest = pageRequest.next();
+                data = fetchDataFunc.apply(pageRequest);
             }
             workbook.write(new FileOutputStream(excelFile));
         }
@@ -96,7 +108,7 @@ public class ExportUtil {
     private static void setCellValue(Cell cell, Object value) {
         if (Objects.isNull(value))
             cell.setCellValue("");
-        else  if (value instanceof Number number)
+        else if (value instanceof Number number)
             cell.setCellValue(number.doubleValue());
         else if (value instanceof Boolean b)
             cell.setCellValue(b);

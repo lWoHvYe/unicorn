@@ -20,6 +20,7 @@ import io.micrometer.context.ContextExecutorService;
 import io.micrometer.context.ContextSnapshotFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,4 +62,30 @@ public abstract class UnicornAbstractThreadUtils {
             }
         };
     }
+
+    // 将HttpRequest传递到子线程，使用线程池时可以这样做，但也需要考虑性能问题。如果是直接创建子线程就不用这么麻烦，想办法像下面将inheritable设置为true就行
+    public static Runnable decorateRequest(Runnable runnable) {
+        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        return () -> {
+            try {
+                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                runnable.run();
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        };
+    }
+
+    public static <U> Supplier<U> decorateRequest(Supplier<U> supplier) {
+        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        return () -> {
+            try {
+                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                return supplier.get();
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        };
+    }
+
 }

@@ -20,6 +20,7 @@ import io.micrometer.context.ContextExecutorService;
 import io.micrometer.context.ContextSnapshotFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -90,6 +91,30 @@ public abstract class UnicornAbstractThreadUtils {
                 return supplier.get();
             } finally {
                 MDC.clear();
+            }
+        };
+    }
+
+    public static Runnable decorateRequest(Runnable runnable) {
+        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        return () -> {
+            try {
+                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                runnable.run();
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        };
+    }
+
+    public static <U> Supplier<U> decorateRequest(Supplier<U> supplier) {
+        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        return () -> {
+            try {
+                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                return supplier.get();
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
             }
         };
     }
