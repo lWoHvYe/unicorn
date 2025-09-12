@@ -54,7 +54,7 @@ subprojects {
 
     // Setting a custom Lombok version when use plugin io.freefair.lombok
     lombok {
-        version = "1.18.39"
+        version = "1.18.40"
     }
 
     dependencies {
@@ -91,10 +91,10 @@ allprojects {
         if (JavaVersion.current().isJava9Compatible) {
             (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
         }
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
+        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_25)) {
             (options as StandardJavadocDocletOptions).apply {
                 addBooleanOption("-enable-preview", true)
-                addStringOption("-release", "21")
+                addStringOption("-release", "25")
             }
         }
     }
@@ -133,7 +133,7 @@ publishing {
                 url.set("https://github.com/lWoHvYe/unicorn.git")
                 properties = mapOf(
                     "myProp" to "chaste unicorn",
-                    "spring-boot.version" to "${libs.versions.springBoot.get()}",
+                    "spring-boot.version" to libs.versions.springBoot.get(),
                     "project.core.version" to version
                 )
                 licenses {
@@ -164,9 +164,10 @@ publishing {
 // this is the equivalent of the `nexusPublishing` block
 nexusPublishing {
     repositories {
+        // see https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#configuration
         sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
             username.set(findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME"))
             password.set(findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD"))
         }

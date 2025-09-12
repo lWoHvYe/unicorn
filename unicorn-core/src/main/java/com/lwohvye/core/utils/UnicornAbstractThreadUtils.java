@@ -19,9 +19,12 @@ package com.lwohvye.core.utils;
 import io.micrometer.context.ContextExecutorService;
 import io.micrometer.context.ContextSnapshotFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 @Slf4j
 public abstract class UnicornAbstractThreadUtils {
@@ -35,4 +38,54 @@ public abstract class UnicornAbstractThreadUtils {
     public static ExecutorService wrap(ExecutorService executor) {
         return ContextExecutorService.wrap(executor, () -> ContextSnapshotFactory.builder().build().captureAll());
     }
+
+    public static Runnable decorateMdc(Runnable runnable) {
+        var mdc = MDC.getCopyOfContextMap();
+        return () -> {
+            try {
+                MDC.setContextMap(mdc);
+                runnable.run();
+            } finally {
+                MDC.clear();
+            }
+        };
+    }
+
+    public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
+        var mdc = MDC.getCopyOfContextMap();
+        return () -> {
+            try {
+                MDC.setContextMap(mdc);
+                return supplier.get();
+            } finally {
+                MDC.clear();
+            }
+        };
+    }
+
+    // 将HttpRequest传递到子线程，使用线程池时可以这样做，但也需要考虑性能问题。如果是直接创建子线程就不用这么麻烦，想办法像下面将inheritable设置为true就行
+    public static Runnable decorateRequest(Runnable runnable) {
+        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        return () -> {
+            try {
+                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                runnable.run();
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        };
+    }
+
+    public static <U> Supplier<U> decorateRequest(Supplier<U> supplier) {
+        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        return () -> {
+            try {
+                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                return supplier.get();
+            } finally {
+                RequestContextHolder.resetRequestAttributes();
+            }
+        };
+    }
+
 }
