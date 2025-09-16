@@ -167,15 +167,13 @@ public class FileUtils extends FileUtil {
      * inputStream 转 File
      */
     static File inputStreamToFile(InputStream ins, String name) {
-        try {
+        try (ins) {
             var path = Path.of(SYS_TEM_DIR + name);
             Files.copy(ins, path);
             return path.toFile();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            CloseUtils.close(ins);
         }
     }
 

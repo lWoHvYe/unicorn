@@ -72,7 +72,7 @@ tasks.withType<BootBuildImage> {
     environment.set(
         mapOf(
             "BP_JVM_TYPE" to "JDK",
-            "BP_JVM_VERSION" to "21",
+            "BP_JVM_VERSION" to "25",
             "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
             "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:+UseZGC --enable-preview"
         )

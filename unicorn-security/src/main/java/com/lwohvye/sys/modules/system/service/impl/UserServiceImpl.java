@@ -229,11 +229,10 @@ public class UserServiceImpl implements IUserService, ApplicationEventPublisherA
                     var user1 = users.get(0);
                     var user2 = users.get(1);
                     // 两个都存在，且id不相同，则为已存在
-                    if (Objects.nonNull(user1) && Objects.nonNull(user2) && !Objects.equals(((User) user1).getId(), ((User) user2).getId()))
+                    if (Objects.nonNull(user1) && Objects.nonNull(user2) && !Objects.equals(user1.getId(), user2.getId()))
                         throw new EntityExistsException(ExceptionMsgUtils.generateExcMsg(User.class, "phone", resources.getPhone(), "existed"));
                     return Objects.nonNull(user1) ? user1 : user2;
-                }, obj -> {
-                    var user = (User) obj;
+                }, user -> {
                     user.setNickName(resources.getNickName());
                     user.setPhone(resources.getPhone());
                     user.setGender(resources.getGender());
