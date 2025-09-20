@@ -9,11 +9,12 @@ pipeline {
 
     stage('Gradle Build ') {
       steps {
-        withGradle() {
-            tasks: ['clean', 'build'],
-            switches: ['--stacktrace']
+        withGradle {
+        environment {
+          GRADLE_USER_HOME = "${env.WORKSPACE}/.gradle"
         }
-
+        sh './gradlew build --add-opens java.base/java.lang=ALL-UNNAMED'
+        }
       }
     }
 
