@@ -10,7 +10,7 @@ pipeline {
     stage('Gradle Build ') {
       steps {
         withGradle() {
-          sh './gradlew build --add-opens java.base/java.lang=ALL-UNNAMED'
+          sh './gradlew clean build --add-opens java.base/java.lang=ALL-UNNAMED'
         }
 
       }
