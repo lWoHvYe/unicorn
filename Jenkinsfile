@@ -10,8 +10,8 @@ pipeline {
     stage('Gradle Build ') {
       steps {
         withGradle() {
-          build 'clean'
-          build 'build'
+            tasks: ['clean', 'build'],
+            switches: ['--stacktrace']
         }
 
       }
