@@ -26,16 +26,21 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       #  https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Installing-custom-Java-package-type
-      - name: Download JDK
-        run: |
-          download_url="https://download.java.net/java/GA/jdk25/bd75d5f9689641da8e1daabeccb5528b/36/GPL/openjdk-25_macos-x64_bin.tar.gz"
-          wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
-      - uses: actions/setup-java@v5
+      # - name: Download JDK
+        # run: |
+          # download_url="https://download.java.net/java/GA/jdk25/bd75d5f9689641da8e1daabeccb5528b/36/GPL/openjdk-25_macos-x64_bin.tar.gz"
+          # wget -O $RUNNER_TEMP/java_package.tar.gz $download_url
+      # - uses: actions/setup-java@v5
+        # with:
+          # distribution: 'jdkfile'
+          # jdkFile: ${{ runner.temp }}/java_package.tar.gz
+          # java-version: '25'
+          # architecture: x64
+      - uses: graalvm/setup-graalvm@v1
         with:
-          distribution: 'jdkfile'
-          jdkFile: ${{ runner.temp }}/java_package.tar.gz
           java-version: '25'
-          architecture: x64
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
