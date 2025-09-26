@@ -57,7 +57,7 @@ public class InstantiationProcessor4Core implements ApplicationListener<ContextR
 
             System.out.println("插入完成，开始查询");
 
-            orderService.getOrderWithDetails(null, 1001L, null).forEach(System.out::println);
+            orderService.getOrderWithDetailsN(List.of("1001_1", "1001_2")).forEach(System.out::println);
         }
     }
 

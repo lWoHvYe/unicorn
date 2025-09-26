@@ -15,7 +15,8 @@
 */
 
 SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
+SET
+FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for code_column_config
@@ -38,11 +39,14 @@ CREATE TABLE `code_column_config`
     `remark`          varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
     `date_annotation` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
     PRIMARY KEY (`column_id`) USING BTREE,
-    KEY `idx_table_name` (`table_name`) USING BTREE
+    KEY               `idx_table_name` (`table_name`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 215
   DEFAULT CHARSET = utf8mb3
   ROW_FORMAT = COMPACT COMMENT ='代码生成字段信息存储';
+
+-- 函数索引 SELECT * FROM sys_user where CONCAT(username,'_',dept_id) in ('admin_2','admin_6');
+CREATE INDEX idx_user_dept ON sys_user ((CONCAT(username, '_', dept_id)) );
 
 -- ----------------------------
 -- Records of code_column_config
@@ -117,7 +121,7 @@ CREATE TABLE `code_gen_config`
     `prefix`      varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '表前缀',
     `api_alias`   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '接口名称',
     PRIMARY KEY (`config_id`) USING BTREE,
-    KEY `idx_table_name` (`table_name`(100)) USING BTREE
+    KEY           `idx_table_name` (`table_name`(100)) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3
   ROW_FORMAT = COMPACT COMMENT ='代码生成器配置';
@@ -145,8 +149,8 @@ CREATE TABLE `sys_dept`
     `create_time` datetime                                                DEFAULT NULL COMMENT '创建日期',
     `update_time` datetime                                                DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`dept_id`) USING BTREE,
-    KEY `inx_pid` (`pid`) USING BTREE,
-    KEY `inx_enabled` (`enabled`) USING BTREE
+    KEY           `inx_pid` (`pid`) USING BTREE,
+    KEY           `inx_enabled` (`enabled`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 25
   DEFAULT CHARSET = utf8mb3 COMMENT ='部门';
@@ -231,7 +235,7 @@ CREATE TABLE `sys_dict_detail`
     `create_time` datetime                                                DEFAULT NULL COMMENT '创建日期',
     `update_time` datetime                                                DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`detail_id`) USING BTREE,
-    KEY `FK5tpkputc6d9nboxojdbgnpmyb` (`dict_id`) USING BTREE
+    KEY           `FK5tpkputc6d9nboxojdbgnpmyb` (`dict_id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 10
   DEFAULT CHARSET = utf8mb3 COMMENT ='数据字典详情';
@@ -276,7 +280,7 @@ CREATE TABLE `sys_job`
     `update_time` datetime                                                DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`job_id`) USING BTREE,
     UNIQUE KEY `uniq_name` (`name`) USING BTREE,
-    KEY `inx_enabled` (`enabled`) USING BTREE
+    KEY           `inx_enabled` (`enabled`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 16
   DEFAULT CHARSET = utf8mb3 COMMENT ='岗位';
@@ -320,8 +324,8 @@ CREATE TABLE `sys_log`
     `exception_detail` text CHARACTER SET utf8 COLLATE utf8_general_ci,
     `create_time`      datetime                                                DEFAULT NULL,
     PRIMARY KEY (`log_id`) USING BTREE,
-    KEY `log_create_time_index` (`create_time`) USING BTREE,
-    KEY `inx_log_type` (`log_type`) USING BTREE
+    KEY                `log_create_time_index` (`create_time`) USING BTREE,
+    KEY                `inx_log_type` (`log_type`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 3898
   DEFAULT CHARSET = utf8mb3 COMMENT ='系统日志';
@@ -359,7 +363,7 @@ CREATE TABLE `sys_menu`
     PRIMARY KEY (`menu_id`) USING BTREE,
     UNIQUE KEY `uniq_title` (`title`) USING BTREE,
     UNIQUE KEY `uniq_name` (`name`) USING BTREE,
-    KEY `inx_pid` (`pid`) USING BTREE
+    KEY           `inx_pid` (`pid`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 30117
   DEFAULT CHARSET = utf8mb3 COMMENT ='系统菜单';
@@ -561,7 +565,7 @@ CREATE TABLE `sys_quartz_job`
     `create_time`         datetime                                                DEFAULT NULL COMMENT '创建日期',
     `update_time`         datetime                                                DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`job_id`) USING BTREE,
-    KEY `inx_is_pause` (`is_pause`) USING BTREE
+    KEY                   `inx_is_pause` (`is_pause`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 7
   DEFAULT CHARSET = utf8mb3 COMMENT ='定时任务';
@@ -626,7 +630,7 @@ CREATE TABLE `sys_resource`
     `rest_name`   varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '所在类名',
     `remark`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '备注',
     PRIMARY KEY (`resource_id`),
-    KEY `pattern` (`pattern`)
+    KEY           `pattern` (`pattern`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 30021
   DEFAULT CHARSET = utf8mb4
@@ -697,7 +701,7 @@ CREATE TABLE `sys_role`
     `update_time` datetime                                                DEFAULT NULL COMMENT '更新时间',
     PRIMARY KEY (`role_id`) USING BTREE,
     UNIQUE KEY `uniq_name` (`name`) USING BTREE,
-    KEY `role_name_index` (`name`) USING BTREE
+    KEY           `role_name_index` (`name`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 17
   DEFAULT CHARSET = utf8mb3 COMMENT ='角色表';
@@ -758,7 +762,7 @@ CREATE TABLE `sys_roles_menus`
     `menu_id` bigint NOT NULL COMMENT '菜单ID',
     `role_id` bigint NOT NULL COMMENT '角色ID',
     PRIMARY KEY (`menu_id`, `role_id`) USING BTREE,
-    KEY `FKcngg2qadojhi3a651a5adkvbq` (`role_id`) USING BTREE
+    KEY       `FKcngg2qadojhi3a651a5adkvbq` (`role_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3 COMMENT ='角色菜单关联';
 
@@ -999,8 +1003,8 @@ CREATE TABLE `sys_roles_resources`
     `role_id`     bigint NOT NULL,
     `resource_id` bigint NOT NULL,
     PRIMARY KEY (`role_id`, `resource_id`),
-    KEY `role_id` (`role_id`),
-    KEY `resource_id` (`resource_id`)
+    KEY           `role_id` (`role_id`),
+    KEY           `resource_id` (`resource_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
@@ -1068,9 +1072,9 @@ CREATE TABLE `sys_user`
     UNIQUE KEY `username` (`username`) USING BTREE,
     UNIQUE KEY `uniq_username` (`username`) USING BTREE,
     UNIQUE KEY `uniq_email` (`email`) USING BTREE,
-    KEY `FK5rwmryny6jthaaxkogownknqp` (`dept_id`) USING BTREE,
-    KEY `FKpq2dhypk2qgt68nauh2by22jb` (`avatar_name`) USING BTREE,
-    KEY `inx_enabled` (`enabled`) USING BTREE
+    KEY              `FK5rwmryny6jthaaxkogownknqp` (`dept_id`) USING BTREE,
+    KEY              `FKpq2dhypk2qgt68nauh2by22jb` (`avatar_name`) USING BTREE,
+    KEY              `inx_enabled` (`enabled`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 4
   DEFAULT CHARSET = utf8mb3 COMMENT ='系统用户';
@@ -1130,8 +1134,8 @@ CREATE TABLE `sys_users_roles`
     `role_id` bigint NOT NULL COMMENT '角色ID',
     `id`      int    NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (`id`, `user_id`, `role_id`) USING BTREE,
-    KEY `FKq4eq273l04bpu4efj0jd0jb98` (`role_id`) USING BTREE,
-    KEY `user_id` (`user_id`)
+    KEY       `FKq4eq273l04bpu4efj0jd0jb98` (`role_id`) USING BTREE,
+    KEY       `user_id` (`user_id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 8
   DEFAULT CHARSET = utf8mb3 COMMENT ='用户角色关联';
@@ -1206,7 +1210,8 @@ COMMIT;
 -- View structure for sys_menu_view
 -- ----------------------------
 DROP VIEW IF EXISTS `sys_menu_view`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `sys_menu_view` AS
+CREATE
+ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `sys_menu_view` AS
 select `sys_menu`.`menu_id`        AS `menu_id`,
        `sys_menu`.`title`          AS `title`,
        `sys_menu`.`name`           AS `name`,
@@ -1214,8 +1219,8 @@ select `sys_menu`.`menu_id`        AS `menu_id`,
        `sys_menu`.`pid`            AS `pid`,
        `sys_roles_menus`.`role_id` AS `role_id`
 from (`sys_menu` join `sys_roles_menus`)
-where (`sys_menu`.`menu_id` = `sys_roles_menus`.`menu_id`)
-WITH CASCADED CHECK OPTION;
+where (`sys_menu`.`menu_id` = `sys_roles_menus`.`menu_id`) WITH CASCADED CHECK
+OPTION;
 
 /*
  *    Copyright (c) 2024.  lWoHvYe(Hongyan Wang)
@@ -1237,13 +1242,14 @@ WITH CASCADED CHECK OPTION;
 -- View structure for sys_role_view
 -- ----------------------------
 DROP VIEW IF EXISTS `sys_role_view`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `sys_role_view` AS
+CREATE
+ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `sys_role_view` AS
 select `sys_role`.`role_id`     AS `role_id`,
        `sys_role`.`name`        AS `name`,
        `sys_role`.`code`        AS `code`,
        `sys_role`.`description` AS `description`
-from `sys_role`
-WITH CASCADED CHECK OPTION;
+from `sys_role` WITH CASCADED CHECK
+OPTION;
 
 /*
  *    Copyright (c) 2025.  lWoHvYe(Hongyan Wang)
@@ -1265,13 +1271,15 @@ WITH CASCADED CHECK OPTION;
 -- View structure for sys_user_view
 -- ----------------------------
 DROP VIEW IF EXISTS `sys_user_view`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `sys_user_view` AS
+CREATE
+ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `sys_user_view` AS
 select `sys_user`.`user_id`  AS `user_id`,
        `sys_user`.`username` AS `username`,
        `sys_user`.`phone`    AS `phone`,
        `sys_user`.`password` AS `password`,
        `sys_user`.`enabled`  AS `enabled`
-from `sys_user`
-WITH CASCADED CHECK OPTION;
+from `sys_user` WITH CASCADED CHECK
+OPTION;
 
-SET FOREIGN_KEY_CHECKS = 1;
+SET
+FOREIGN_KEY_CHECKS = 1;

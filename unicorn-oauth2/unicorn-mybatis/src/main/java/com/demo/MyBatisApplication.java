@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class MyBatisApplication {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(MyBatisApplication.class, args);
     }
 }

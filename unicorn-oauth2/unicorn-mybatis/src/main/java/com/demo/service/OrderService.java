@@ -28,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,10 +48,18 @@ public class OrderService {
      *
      * @date 2025/8/24 08:15
      */
-    public List<Order> getOrderWithDetailsN(Long customerId, Integer orderStatus) {
+    public List<Order> getOrderWithDetailsN(List<String> customerId_orderStatus) {
         var queryWrapper = Wrappers.lambdaQuery(Order.class);
-        queryWrapper.eq(Order::getCustomerId, customerId);
-        queryWrapper.eq(Order::getOrderStatus, orderStatus);
+//        queryWrapper.eq(Order::getCustomerId, customerId);
+//        queryWrapper.eq(Order::getOrderStatus, orderStatus);
+        queryWrapper.apply(" customer_id || '_' || order_status in " + "('" + String.join("','", customerId_orderStatus) + "')"); // 无参直接sql注入
+        var strictSQL = new StringBuilder(" customer_id || '_' || order_status in ").append("(");
+        for (int i = 0; i < customerId_orderStatus.size(); i++)
+            strictSQL.append("{").append(i).append("}").append(",");
+        if (!customerId_orderStatus.isEmpty())
+            strictSQL.deleteCharAt(strictSQL.length() - 1);
+        strictSQL.append(")");
+        queryWrapper.apply(strictSQL.toString(), customerId_orderStatus.toArray()); // 有参时会防止参数部份的sql注入。传的参数需要是数组
         var orders = orderMapper.selectList(queryWrapper);
         var orderIds = orders.stream().map(Order::getOrderId).collect(Collectors.toSet());
         var orderDetailsMap = orderDetailMapper.selectList(new LambdaQueryWrapper<OrderDetail>().in(OrderDetail::getOrderId, orderIds))
