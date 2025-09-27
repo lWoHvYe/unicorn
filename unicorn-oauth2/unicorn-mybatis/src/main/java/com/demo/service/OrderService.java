@@ -43,7 +43,7 @@ public class OrderService {
     }
 
     /**
-     * 这里采用先只查Order，再用in查询相关detail，最终内存过滤的方式，多了次查询，但在单个ordr有很多detail时，可能会好一些，尤其是order需要分页等操作时
+     * 这里采用先只查Order，再用in查询相关detail，最终内存过滤的方式，多了次查询，但在单个order有很多detail时，可能会好一些，尤其是order需要分页等操作时
      * 当然另一方面就是，若条件主要在order表，想多表join只能写sql了，这里提供了另一种实现方式。但若很多条件在orderDetails表，这种方法不是很好，因为第一步order查询会有很多不相关数据。
      *
      * @date 2025/8/24 08:15
@@ -59,7 +59,9 @@ public class OrderService {
         if (!customerId_orderStatus.isEmpty())
             strictSQL.deleteCharAt(strictSQL.length() - 1);
         strictSQL.append(")");
-        queryWrapper.apply(strictSQL.toString(), customerId_orderStatus.toArray()); // 有参时会防止参数部份的sql注入。传的参数需要是数组
+        queryWrapper.apply(strictSQL.toString(), customerId_orderStatus.toArray()); // 有参时会防止参数部份的sql注入。传的参数需要是数组，并且每个元素都要在sql中有对应，传个list是不行的。这是不方便的点
+//        exists适合于主表小，子表大的情况。 in适合于主表大，子查询结果集小的情况。not exists一般比not in性能好。join建议小表驱动大表
+        queryWrapper.exists(" select 1 from order_detail od where od.order_no = orders.order_no and od.product_id = {0} ", 2001);
         var orders = orderMapper.selectList(queryWrapper);
         var orderIds = orders.stream().map(Order::getOrderId).collect(Collectors.toSet());
         var orderDetailsMap = orderDetailMapper.selectList(new LambdaQueryWrapper<OrderDetail>().in(OrderDetail::getOrderId, orderIds))
