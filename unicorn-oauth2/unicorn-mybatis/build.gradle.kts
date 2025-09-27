@@ -14,4 +14,6 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-
+tasks.bootJar {
+    mainClass = "com.demo.MyBatisApplication"
+}
