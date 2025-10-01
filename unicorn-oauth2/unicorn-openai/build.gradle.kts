@@ -3,7 +3,7 @@ plugins {
 	id("io.spring.dependency-management")
 }
 
-extra["springAiVersion"] = "1.0.0"
+extra["springAiVersion"] = "1.0.2"
 
 dependencies {
 	implementation("org.springframework.ai:spring-ai-starter-model-deepseek")

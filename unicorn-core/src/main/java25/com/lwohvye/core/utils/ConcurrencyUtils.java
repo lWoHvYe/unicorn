@@ -20,6 +20,8 @@ import module java.base;
 
 import com.lwohvye.core.exception.UtilsException;
 import lombok.experimental.UtilityClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.StructuredTaskScope.Subtask;
 import java.util.concurrent.StructuredTaskScope.Joiner;
@@ -31,6 +33,10 @@ import java.util.concurrent.StructuredTaskScope.Joiner;
  */
 @UtilityClass
 public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
+
+    //    private static final StableValue<Logger> log = StableValue.of();
+    private static final Supplier<Logger> log =
+            StableValue.supplier(() -> LoggerFactory.getLogger(ConcurrencyUtils.class));
 
     /**
      * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
@@ -54,6 +60,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
             if (Objects.nonNull(eventual))
                 eventual.accept(results);
         } catch (StructuredTaskScope.FailedException | StructuredTaskScope.TimeoutException e) {
+            log.get().info("error occurred in 25 Callable util {}", e.getMessage());
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());
@@ -77,6 +84,7 @@ public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
             if (Objects.nonNull(eventual))
                 eventual.run();
         } catch (StructuredTaskScope.FailedException | StructuredTaskScope.TimeoutException e) {
+            log.get().info("error occurred in 25 Runnable util {}", e.getMessage());
             if (e.getCause() instanceof RuntimeException re)
                 throw re;
             throw new UtilsException(e.getMessage());
