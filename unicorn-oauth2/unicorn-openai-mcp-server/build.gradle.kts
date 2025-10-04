@@ -6,9 +6,8 @@ plugins {
 extra["springAiVersion"] = "1.0.2"
 
 dependencies {
-	implementation("org.springframework.ai:spring-ai-starter-model-deepseek")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.ai:spring-ai-starter-mcp-server-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

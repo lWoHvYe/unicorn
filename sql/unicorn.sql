@@ -45,9 +45,6 @@ CREATE TABLE `code_column_config`
   DEFAULT CHARSET = utf8mb3
   ROW_FORMAT = COMPACT COMMENT ='代码生成字段信息存储';
 
--- 函数索引 SELECT * FROM sys_user where CONCAT(username,'_',dept_id) in ('admin_2','admin_6');
-CREATE INDEX idx_user_dept ON sys_user ((CONCAT(username, '_', dept_id)) );
-
 -- ----------------------------
 -- Records of code_column_config
 -- ----------------------------
@@ -1078,6 +1075,9 @@ CREATE TABLE `sys_user`
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 4
   DEFAULT CHARSET = utf8mb3 COMMENT ='系统用户';
+
+-- 函数索引 SELECT * FROM sys_user where CONCAT(username,'_',dept_id) in ('admin_2','admin_6');
+CREATE INDEX idx_user_dept ON sys_user ((CONCAT(username, '_', dept_id)) );
 
 -- ----------------------------
 -- Records of sys_user

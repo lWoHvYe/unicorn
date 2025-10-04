@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: unicorn-openai
+  ai:
+    mcp:
+      client:
+        sse:
+          connections:
+            weather-server:
+              url: http://localhost:8082
+#        stdio: # 这种模式是直接执行server.jar和langchain中一样
+#          root-change-notification: true
+#          connections:
+#            server1:
+#              command: /path/to/server
+#              args:
+#                - --port=8082
+#                - --mode=production
+#              env:
+#                API_KEY: your-api-key
+#                DEBUG: "true"
+#       Enable the MCP client tool-callback auto-configuration (by default enable)
+#        toolcallback:
+#          enabled: true
+    deepseek:
+      api-key: ${API-KEY}
+      base-url: "https://api.deepseek.com"
+      chat:
+        options:
+          model: "deepseek-chat"

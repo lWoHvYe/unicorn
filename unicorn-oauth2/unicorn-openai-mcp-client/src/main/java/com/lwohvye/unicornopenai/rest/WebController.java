@@ -16,6 +16,7 @@
 
 package com.lwohvye.unicornopenai.rest;
 
+import com.lwohvye.unicornopenai.tools.DateTimeWeatherTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -38,6 +39,7 @@ import reactor.core.publisher.Sinks;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,8 +65,11 @@ public class WebController {
     }
 
     @GetMapping("/hello")
-    public String hello(@RequestParam(value = "input", defaultValue = "讲一个笑话") String input) {
-        return chatClient.prompt(input).call().content();
+    public String hello(@RequestParam(value = "input", defaultValue = "当前时间深圳的天气怎么样") String input) {
+        return chatClient.prompt(input)
+                .tools(new DateTimeWeatherTools())
+                .toolContext(Map.of("tenantId", "acme"))
+                .call().content();
     }
 
     @GetMapping(value = "/hello/stream", produces = "text/html;charset=UTF-8")
@@ -96,6 +101,7 @@ public class WebController {
         messages.add(new UserMessage("9.11 and 9.8, which is greater?"));
         DeepSeekChatOptions promptOptions = DeepSeekChatOptions.builder()
                 .model(DeepSeekApi.ChatModel.DEEPSEEK_REASONER.getValue())
+                .temperature(0.2)
                 .build();
 
         Prompt prompt = new Prompt(messages, promptOptions);
