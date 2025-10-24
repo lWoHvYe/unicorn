@@ -125,7 +125,6 @@ dependencies {
     api(libs.mapstruct)
 //    mapstruct-spring-extensions seems unused
     api(libs.mapstruct.spring.annotations)
-    api("org.hibernate.validator:hibernate-validator")
     api("com.github.ben-manes.caffeine:caffeine")
     implementation(libs.logback.encoder)
     api("org.bouncycastle:bcpkix-jdk18on:1.72")
