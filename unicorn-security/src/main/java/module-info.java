@@ -28,7 +28,6 @@ module lwohvye.unicorn.security {
 
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
-    exports com.lwohvye.sys.common.annotation;
     exports com.lwohvye.sys.common.condition to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
     exports com.lwohvye.sys.modules.quartz.domain;

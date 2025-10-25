@@ -19,7 +19,6 @@ import com.lwohvye.core.annotation.RespResultBody
 import com.lwohvye.core.annotation.log.OprLog
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping
 import com.lwohvye.core.utils.result.ResultInfo
-import com.lwohvye.sys.common.annotation.ApiVersion
 import com.lwohvye.feature.log.infrastructure.constants.LogRecordType
 import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext
 import com.mzt.logapi.starter.annotation.LogRecord
@@ -71,15 +70,15 @@ class RsLogController {
 
     /**
      * 访问首页提示
-     * 因为自定义了处理逻辑，所以下面这俩的RequestCondition是不一样的，所以能共存，且因为定义了优先新版本，所以在v1时走第一个，[v2+ 走第二个
+     * 因为自定义了处理逻辑，所以下面这俩的RequestCondition是不一样的，所以能共存，且因为定义了优先新版本，所以在1时走第一个，[2+ 走第二个
      * 但注意⚠️：这种path上带param是与定义的匿名访问注解AnonymousAccess不兼容的（不生效）
      *
      * @return /
      * @see com.lwohvye.sys.common.handler.ApiVersionRequestMappingHandlerMapping
      */
+    // 任意版本
     @RespResultBody
-    @ApiVersion
-    @AnonymousGetMapping("/valentine/v1/p2p", "/valentine/{version}/p2p")
+    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"])
     fun index(@PathVariable(required = false) version: String?): String {
         val startTime = Instant.now()
         val instance = authHandlerContext!!.getInstance(4)
@@ -88,9 +87,9 @@ class RsLogController {
         //        return "Backend service started successfully"
     }
 
+    // 2 and above
     @RespResultBody
-    @ApiVersion(2)
-    @AnonymousGetMapping("/valentine/{version}/p2p")
+    @AnonymousGetMapping(value = "/rs/valentine/{version}/p2p", version = "2+")
     fun indexCCVer(@PathVariable version: String?): List<String> {
         return java.util.List.of(String.format("CCVer %s Backend service started successfully", version))
     }
@@ -103,8 +102,7 @@ class RsLogController {
         bizNo = "20220920"
     )
     @RespResultBody
-    @ApiVersion(3) // 指定从v3开始
-    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"]) // @RequestMapping的path是支持多个的
+    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"], version = "3+") // @RequestMapping的path是支持多个的
     @Throws(InterruptedException::class)
     fun indexVersion(@PathVariable version: String?): ResultInfo<String> {
         Thread.sleep(Duration.ofSeconds(1L)) // 使用JMeter  500 * 80，使用VisualVM monitor，只增加十几个thread，整体用时81s，也说明了Fibers/Loom较传统Thread的不同之处，
@@ -114,10 +112,10 @@ class RsLogController {
     }
 
     /**
-     * 匹配采用的最佳适配，当传v4时，会匹配到这个方法
+     * 匹配采用的最佳适配，当传4时，会匹配到这个方法
      */
     @RespResultBody
-    @AnonymousGetMapping("/valentine/v4/p2p")
+    @AnonymousGetMapping(value = "/rs/valentine/{version}/p2p", version = "4")
     fun indexClVer(): ResponseEntity<ResultInfo<String>> {
         return ResponseEntity(
             ResultInfo.success("ClVersion v4 Backend service started successfully"),
