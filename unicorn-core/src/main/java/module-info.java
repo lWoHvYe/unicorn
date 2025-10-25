@@ -37,6 +37,7 @@ module lwohvye.unicorn.core {
     requires mica.ip2region;
     requires transitive org.apache.commons.codec;
     requires org.apache.commons.lang3;
+    requires transitive org.apache.commons.logging;
     requires transitive org.apache.poi.poi;
     requires transitive org.apache.poi.ooxml;
     requires transitive org.aspectj.weaver;
