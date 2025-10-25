@@ -18,8 +18,8 @@ package com.lwohvye.sys.common.orm;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
 import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +34,13 @@ import org.springframework.stereotype.Component;
 
 /**
  * Jpa在映射实体和表的关系时，提供了一个入口，用于对绑定做一些操作。SpringPhysicalNamingStrategy标记了过期，
- * 可考虑继承hibernate侧的相关实现 {@link org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy}，未验证
+ * 可考虑继承hibernate侧的相关实现 {@link PhysicalNamingStrategySnakeCaseImpl}，未验证
  *
  * @author Hongyan Wang
  */
 @Slf4j
 @Component
-public class ServerAwareNamingStrategy extends CamelCaseToUnderscoresNamingStrategy implements ApplicationContextAware {
+public class ServerAwareNamingStrategy extends PhysicalNamingStrategySnakeCaseImpl implements ApplicationContextAware {
 
     @Autowired
     private Environment env;

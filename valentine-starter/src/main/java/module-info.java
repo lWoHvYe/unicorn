@@ -6,7 +6,6 @@ module lwohvye.valentine.starter {
     // 如果使用3rd-tools，需要加入下面这两个，不清楚为何在tools中加没生效。mail works well under unnamed module
     requires jakarta.mail;
     requires jakarta.activation;
-    requires spring.retry;
     requires bizlog.sdk;
     requires kotlin.stdlib;
     requires kotlin.reflect;

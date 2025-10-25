@@ -25,7 +25,6 @@ module lwohvye.unicorn.core {
     requires transitive spring.security.config;
     requires transitive spring.security.core;
     requires transitive spring.security.crypto;
-    requires transitive spring.security.web;
     requires transitive spring.boot;
     requires transitive spring.boot.autoconfigure;
     requires transitive com.fasterxml.jackson.annotation;
