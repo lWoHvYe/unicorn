@@ -6,7 +6,7 @@ plugins {
 extra["MyBatisPlusVersion"] = "3.5.12"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("com.baomidou:mybatis-plus-spring-boot3-starter:${property("MyBatisPlusVersion")}")
     implementation("com.baomidou:mybatis-plus-jsqlparser:${property("MyBatisPlusVersion")}")
     runtimeOnly("com.h2database:h2")

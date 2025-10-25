@@ -107,7 +107,7 @@ dependencies {
     api(platform(SpringBootPlugin.BOM_COORDINATES))
     // java21TestImplementation("") // it is possible to add a dependency only used to compile the sources found in src/main/java21
     api("org.springframework.boot:spring-boot-starter-data-jpa")
-    api("org.springframework.boot:spring-boot-starter-web")
+    api("org.springframework.boot:spring-boot-starter-webmvc")
     api("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     api("org.springframework.boot:spring-boot-starter-amqp")
