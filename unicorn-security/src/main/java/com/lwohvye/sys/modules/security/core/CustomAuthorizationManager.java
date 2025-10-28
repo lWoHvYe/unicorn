@@ -22,6 +22,7 @@ import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.authorization.AuthorizationResult;
 import org.springframework.security.core.Authentication;
 
 import java.util.function.Supplier;
@@ -33,8 +34,9 @@ public final class CustomAuthorizationManager<T> implements AuthorizationManager
         this.metadata = securityMetadataSource;
     }
 
-    public AuthorizationDecision check(Supplier<Authentication> authentication, T invocation) {
-        var attributes = this.metadata.getAttributes(invocation);
+    @Override
+    public AuthorizationResult authorize(Supplier<? extends Authentication> authentication, T object) {
+        var attributes = this.metadata.getAttributes(object);
 
         for (ConfigAttribute configAttribute : attributes) {
             // 使用凭证。访问登录即可访问的资源
@@ -53,6 +55,5 @@ public final class CustomAuthorizationManager<T> implements AuthorizationManager
             }
         }
         return new AuthorizationDecision(false);
-        // return null; // abstain
     }
 }

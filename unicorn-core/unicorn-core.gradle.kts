@@ -107,8 +107,11 @@ dependencies {
     api(platform(SpringBootPlugin.BOM_COORDINATES))
     // java21TestImplementation("") // it is possible to add a dependency only used to compile the sources found in src/main/java21
     api("org.springframework.boot:spring-boot-starter-data-jpa")
-    api("org.springframework.boot:spring-boot-starter-web")
+    api("org.springframework.boot:spring-boot-starter-webmvc")
     api("org.springframework.boot:spring-boot-starter-security")
+    api("org.springframework.boot:spring-boot-starter-restclient")
+    // add legacy module in Spring Security 7
+    implementation("org.springframework.security:spring-security-access")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     api("org.springframework.boot:spring-boot-starter-amqp")
     api("org.springframework.boot:spring-boot-starter-cache")
@@ -125,7 +128,6 @@ dependencies {
     api(libs.mapstruct)
 //    mapstruct-spring-extensions seems unused
     api(libs.mapstruct.spring.annotations)
-    api("org.hibernate.validator:hibernate-validator")
     api("com.github.ben-manes.caffeine:caffeine")
     implementation(libs.logback.encoder)
     api("org.bouncycastle:bcpkix-jdk18on:1.72")

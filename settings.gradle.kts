@@ -66,7 +66,7 @@ val buildFiles = fileTree(rootDir) {
     )
 
     // exclude kotlin module when Jvm is not compatible
-    if (javaVersion.isCompatibleWith(JavaVersion.VERSION_25)) {
+    if (javaVersion.isCompatibleWith(JavaVersion.VERSION_26)) {
         exclude("**/*-kotlin.gradle.kts")
     }
 
