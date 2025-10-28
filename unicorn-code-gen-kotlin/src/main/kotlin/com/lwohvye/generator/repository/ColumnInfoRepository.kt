@@ -22,11 +22,11 @@ import org.springframework.data.jpa.repository.JpaRepository
  * @author Zheng Jie
  * @date 2019-01-14
  */
-interface ColumnInfoRepository : JpaRepository<ColumnInfo?, Long?> {
+interface ColumnInfoRepository : JpaRepository<ColumnInfo, Long> {
     /**
      * 查询表信息
      * @param tableName 表格名
      * @return 表信息
      */
-    fun findByTableNameOrderByIdAsc(tableName: String): List<ColumnInfo?>?
+    fun findByTableNameOrderByIdAsc(tableName: String): List<ColumnInfo>?
 }

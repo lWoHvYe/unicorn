@@ -22,8 +22,8 @@ import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier
 import org.apache.hc.core5.ssl.SSLContexts
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.restclient.RestTemplateBuilder
 import org.springframework.boot.ssl.SslBundles
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.ClientHttpRequestFactory

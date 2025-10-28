@@ -59,7 +59,6 @@ module lwohvye.unicorn.security {
 
     opens com.lwohvye.sys.common.condition;
     opens com.lwohvye.sys.common.config;
-    opens com.lwohvye.sys.common.handler;
     opens com.lwohvye.sys.common.init;
     opens com.lwohvye.sys.common.orm;
     opens com.lwohvye.sys.common.web;

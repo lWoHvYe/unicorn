@@ -89,7 +89,7 @@ class RsLogController {
 
     // 2 and above
     @RespResultBody
-    @AnonymousGetMapping(value = "/rs/valentine/{version}/p2p", version = "2+")
+    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p"], version = "2+")
     fun indexCCVer(@PathVariable version: String?): List<String> {
         return java.util.List.of(String.format("CCVer %s Backend service started successfully", version))
     }
@@ -102,7 +102,10 @@ class RsLogController {
         bizNo = "20220920"
     )
     @RespResultBody
-    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"], version = "3+") // @RequestMapping的path是支持多个的
+    @AnonymousGetMapping(
+        value = ["/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"],
+        version = "3+"
+    ) // @RequestMapping的path是支持多个的
     @Throws(InterruptedException::class)
     fun indexVersion(@PathVariable version: String?): ResultInfo<String> {
         Thread.sleep(Duration.ofSeconds(1L)) // 使用JMeter  500 * 80，使用VisualVM monitor，只增加十几个thread，整体用时81s，也说明了Fibers/Loom较传统Thread的不同之处，
@@ -115,7 +118,7 @@ class RsLogController {
      * 匹配采用的最佳适配，当传4时，会匹配到这个方法
      */
     @RespResultBody
-    @AnonymousGetMapping(value = "/rs/valentine/{version}/p2p", version = "4")
+    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p"], version = "4")
     fun indexClVer(): ResponseEntity<ResultInfo<String>> {
         return ResponseEntity(
             ResultInfo.success("ClVersion v4 Backend service started successfully"),
