@@ -19,6 +19,7 @@ package com.lwohvye.beans.config.cache;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lwohvye.beans.config.LocalPropertyConfig;
 import com.lwohvye.core.custom.ConcurrentFreshCacheManager;
 import com.lwohvye.core.utils.json.JsonUtils;
@@ -44,12 +45,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import tools.jackson.databind.DefaultTyping;
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -107,16 +107,16 @@ public class RedisConfig implements CachingConfigurer {
     }
 
 
-    private JacksonJsonRedisSerializer<Object> jacksonJsonRedisSerializer() {
+    private Jackson2JsonRedisSerializer<Object> jacksonJsonRedisSerializer() {
         var objectMapper = JsonMapper.builder()
                 // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
-                .changeDefaultVisibility(vc -> vc.withVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY))
+                .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
                 // todo 需要看一下怎么配置下面这个，不然有的功能可能报错
-                 .activateDefaultTyping(BasicPolymorphicTypeValidator.builder().build(), DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
+                 .activateDefaultTyping(BasicPolymorphicTypeValidator.builder().build(), ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
                 .build();
-        return new JacksonJsonRedisSerializer<>(objectMapper, Object.class);
+        return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
     }
 
     /**
