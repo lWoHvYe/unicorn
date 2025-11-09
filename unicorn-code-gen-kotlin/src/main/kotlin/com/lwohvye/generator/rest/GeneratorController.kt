@@ -45,7 +45,7 @@ class GeneratorController(val generatorService: IGeneratorService, val genConfig
 
     @Operation(summary = "查询数据库数据")
     @GetMapping(value = ["/tables/all"])
-    fun queryTables(): ResponseEntity<List<*>?> {
+    fun queryTables(): ResponseEntity<List<*>> {
         return ResponseEntity(generatorService.tables, HttpStatus.OK)
     }
 
@@ -72,7 +72,7 @@ class GeneratorController(val generatorService: IGeneratorService, val genConfig
     @Operation(summary = "保存字段数据")
     @RespResultBody
     @PutMapping
-    fun save(@RequestBody columnInfos: List<ColumnInfo?>): ResponseEntity<ResultInfo<String>> {
+    fun save(@RequestBody columnInfos: List<ColumnInfo>): ResponseEntity<ResultInfo<String>> {
         generatorService.save(columnInfos)
         return ResponseEntity(HttpStatus.CREATED)
     }

@@ -12,7 +12,6 @@ module lwohvye.unicorn.security {
     requires transitive spring.webmvc;
     requires spring.websocket;
     requires transitive spring.rabbit;
-    requires transitive spring.retry;
     requires captcha.core;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
@@ -23,10 +22,12 @@ module lwohvye.unicorn.security {
     requires transitive org.apache.commons.io;
     requires transitive org.quartz;
     requires context.propagation;
+    requires spring.boot.webmvc;
+    requires org.jspecify;
+    requires spring.security.core;
 
     provides com.anji.captcha.service.CaptchaCacheService with com.lwohvye.sys.modules.security.service.CaptchaCacheServiceRedisImpl;
 
-    exports com.lwohvye.sys.common.annotation;
     exports com.lwohvye.sys.common.condition to spring.beans, spring.aop;
     exports com.lwohvye.sys.modules.mnt.websocket; // 这个需要export to spring.beans和unnamed module
     exports com.lwohvye.sys.modules.quartz.domain;
@@ -58,7 +59,6 @@ module lwohvye.unicorn.security {
 
     opens com.lwohvye.sys.common.condition;
     opens com.lwohvye.sys.common.config;
-    opens com.lwohvye.sys.common.handler;
     opens com.lwohvye.sys.common.init;
     opens com.lwohvye.sys.common.orm;
     opens com.lwohvye.sys.common.web;

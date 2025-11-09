@@ -88,4 +88,6 @@ public @interface AnonymousDeleteMapping {
     @AliasFor(annotation = RequestMapping.class)
     String[] produces() default {};
 
+    @AliasFor(annotation = RequestMapping.class)
+    String version() default "";
 }

@@ -22,4 +22,4 @@ import org.springframework.data.jpa.repository.JpaRepository
  * @author Zheng Jie
  * @date 2018-12-26
  */
-interface EmailRepository : JpaRepository<EmailConfig?, Long?>
+interface EmailRepository : JpaRepository<EmailConfig, Long>

@@ -15,12 +15,11 @@
  */
 package com.lwohvye.beans.config.cache;
 
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.lwohvye.beans.config.LocalPropertyConfig;
 import com.lwohvye.core.custom.ConcurrentFreshCacheManager;
 import com.lwohvye.core.utils.json.JsonUtils;
@@ -32,8 +31,6 @@ import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
@@ -50,6 +47,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -62,7 +62,6 @@ import java.util.HashMap;
 @Configuration
 @EnableCaching
 @ConditionalOnClass(RedisOperations.class)
-@EnableConfigurationProperties(RedisProperties.class)
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class RedisConfig implements CachingConfigurer {
 
@@ -93,13 +92,13 @@ public class RedisConfig implements CachingConfigurer {
         // 序列化
         var stringRedisSerializer = new StringRedisSerializer();
         // 使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
-        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
+        var jacksonJsonRedisSerializer = jacksonJsonRedisSerializer();
         // key的序列化采用StringRedisSerializer
         template.setKeySerializer(stringRedisSerializer);
         template.setHashKeySerializer(stringRedisSerializer);
         // value值的序列化采用jackson2JsonRedisSerializer
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+        template.setValueSerializer(jacksonJsonRedisSerializer);
+        template.setHashValueSerializer(jacksonJsonRedisSerializer);
 
         template.setConnectionFactory(redisConnectionFactory);
         //执行afterPropertiesSet方法，完成属性的设置
@@ -108,44 +107,15 @@ public class RedisConfig implements CachingConfigurer {
     }
 
 
-    private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
-        var objectMapper = new ObjectMapper();
-        // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
-        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        // enableDefaultTyping 可以认为是序列化是，添加复杂类型的默认类型，以便反序列化时可以精确类型。有下面五种选型
-        // - JAVA_LANG_OBJECT：表示将Object类型作为声明类型的属性 设置默认类型。但尽管设置Object，一般都为复杂类型的值，像基本类型和其包装类型的值(String、Boolean、Integer、Double)不会添加默认类型。像自定义对象，List，map等实际对象的都会被添加。
-        // - OBJECT_AND_NON_CONCRETE：当属性为Object或非具体类型(抽象类或接口)，但不包括数组类型。当我们定义一个含有接口类的属性时，会设置默认类型，包含了ArrayList这种(List接口的具体实现)，
-        // - NON_CONCRETE_AND_ARRAYS：OBJECT_AND_NON_CONCRETE值说明了不包含array类型。此属性专门添加了array类型
-        // - NON_FINAL：表示将应用与除final修饰外的所有属性，以及所有非final的数组。基本上Object类型和array类型及interface、abstract修饰的类。这些都足以进行序列化。包含了极其详细的类型信息
-        // - EVERYTHING：在新版本添加的，如其名
-        // 其重载方法包含了两个参数DefaultTyping类型和JsonTypeInfo.As类型
-        // JsonTypeInfo.As
-        // PROPERTY
-        // 它将包含@class属性，作为序列化的一个属性，值就是完全限定名类型。当前类及其属性都会添加这个名为@class的属性。
-        // WRAPPER_OBJECT
-        // 将完全限定名类型直接作为key，将值作为序列化值
-        // WRAPPER_ARRAY
-        // 将序列化的结果变为array类型，格式与不加JsonTypeInfo.As一致
-        // EXISTING_PROPERTY
-        // 仅包含序列化内容，TypeSerializer将不会执行任何操作。与@JsonTypeId注解相似
-        //
-        // JsonTypeInfo.Id
-        // NONE
-        // 不包括类型，仅为标准的json序列化值
-        // CLASS
-        // 使用@class属性标注类型
-        // MINIMAL_CLASS
-        // 使用@c属性标注类型
-        // NAME
-        // 使用@type属性标注类型，但只有类名，不是完全限定名，需要将名称单独解析为实际的具体类型（类）。
-        // CUSTOM
-        //
-        // 使用自定义的实现TypeSerializer和TypeDeserializer
-        // 必须设置，否则无法将JSON转化为对象，会反序列化成Map类型(LinkedHashMap)。指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会抛出异常（使用NON_FINAL时）
-        // 大部分时候，应该JAVA_LANG_OBJECT就可以了，当结果是集合时，会保存集合元素的类型，这对反序列化来说足够了
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY);
+    private Jackson2JsonRedisSerializer<Object> jacksonJsonRedisSerializer() {
+        var objectMapper = JsonMapper.builder()
+                // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
+                .visibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY)
+                // todo 需要看一下怎么配置下面这个，不然有的功能可能报错
+                 .activateDefaultTyping(BasicPolymorphicTypeValidator.builder().build(), ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
+                .build();
         return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
     }
 

@@ -18,6 +18,10 @@ spring:
     active: dev
   jackson:
     time-zone: GMT+8
+    use-jackson2-defaults: true
+  jackson2:
+    time-zone: GMT+8
+    date-format: "yyyy-MM-dd HH:mm:ss"
   data:
     redis:
       repositories:
@@ -39,6 +43,7 @@ spring:
   # autoconfigure:
     # to use VT for Async, should exclude this
     # exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
+
 management:
   tracing:
     baggage:

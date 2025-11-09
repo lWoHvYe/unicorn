@@ -78,10 +78,14 @@ subprojects {
         // deriveAutomaticModuleNamesFromFileNames = true //  failed due to split package issue
         // legacy configure start
         failOnMissingModuleInfo.set(false)
+        // split package
+        automaticModule("org.springframework.security:spring-security-core", "spring.security.core") {
+            mergeJar("org.springframework.security:spring-security-web")
+            mergeJar("org.springframework.security:spring-security-access")
+        }
         automaticModule("io.github.mouzt:bizlog-sdk", "bizlog.sdk")
         automaticModule("com.github.whvcse:easy-captcha", "easy.captcha")
         automaticModule("io.jsonwebtoken:jjwt-api", "jjwt.api")
-        automaticModule("org.springframework.retry:spring-retry", "spring.retry")
         // end
     }
 }

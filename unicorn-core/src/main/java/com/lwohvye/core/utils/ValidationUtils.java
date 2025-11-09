@@ -17,7 +17,6 @@ package com.lwohvye.core.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.lwohvye.core.exception.BadRequestException;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 
 /**
  * 验证工具
@@ -34,12 +33,5 @@ public class ValidationUtils {
             String msg = entity + " 不存在: "+ parameter +" is "+ value;
             throw new BadRequestException(msg);
         }
-    }
-
-    /**
-     * 验证是否为邮箱
-     */
-    public static boolean isEmail(String email) {
-        return new EmailValidator().isValid(email, null);
     }
 }
