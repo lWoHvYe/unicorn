@@ -78,7 +78,7 @@ class RsLogController {
      */
     // 任意版本
     @RespResultBody
-    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"])
+    @AnonymousGetMapping(value = ["/rs/valentine/p2p", "/rs/valentine/default"])
     fun index(@PathVariable(required = false) version: String?): String {
         val startTime = Instant.now()
         val instance = authHandlerContext!!.getInstance(4)
@@ -89,7 +89,7 @@ class RsLogController {
 
     // 2 and above
     @RespResultBody
-    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p"], version = "2+")
+    @AnonymousGetMapping(value = ["/rs/valentine/p2p"], version = "2+")
     fun indexCCVer(@PathVariable version: String?): List<String> {
         return java.util.List.of(String.format("CCVer %s Backend service started successfully", version))
     }
@@ -103,7 +103,7 @@ class RsLogController {
     )
     @RespResultBody
     @AnonymousGetMapping(
-        value = ["/rs/valentine/{version}/p2p", "/rs/valentine/{version}/default"],
+        value = ["/rs/valentine/p2p", "/rs/valentine/default"],
         version = "3+"
     ) // @RequestMapping的path是支持多个的
     @Throws(InterruptedException::class)
@@ -118,7 +118,7 @@ class RsLogController {
      * 匹配采用的最佳适配，当传4时，会匹配到这个方法
      */
     @RespResultBody
-    @AnonymousGetMapping(value = ["/rs/valentine/{version}/p2p"], version = "4")
+    @AnonymousGetMapping(value = ["/rs/valentine/p2p"], version = "4")
     fun indexClVer(): ResponseEntity<ResultInfo<String>> {
         return ResponseEntity(
             ResultInfo.success("ClVersion v4 Backend service started successfully"),

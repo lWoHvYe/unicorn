@@ -26,11 +26,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class ApiVersionWebMvcConfigurer implements WebMvcConfigurer {
-
+    // 这里可通过配置文件配置，当前pathSegment需要所有api都适配，还是先用header吧
     @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
+        configurer.setVersionRequired(false);
         configurer.useRequestHeader("API-Version");
-        // "/api/xxx/{version}/"
-        configurer.usePathSegment(2);
+        // "/api/{version}/xxx" version是1.2.3 major.minor.patch、2.0、3 这种格式，解析时会移除非数字部分
+//        configurer.usePathSegment(1);
     }
 }
