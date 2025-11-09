@@ -24,7 +24,7 @@ poi = "5.4.0"
 redisson = "3.50.0"
 springBoot = "3.5.5"
 springCloudVersion = "2025.0.0"
-springdoc = "2.8.13"
+springdoc = "2.8.14"
 thumbnailator = "0.4.21"
 xerces = "2.12.2"
 
