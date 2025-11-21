@@ -15,10 +15,8 @@
  */
 package com.unicorn;
 
-import cn.hutool.core.util.RandomUtil;
 import com.lwohvye.core.annotation.rest.AnonymousGetMapping;
 import com.lwohvye.core.utils.SpringContextHolder;
-import com.lwohvye.sys.modules.system.service.local.AuthRetryService;
 import com.mzt.logapi.starter.annotation.EnableLogRecord;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
@@ -26,16 +24,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.resilience.annotation.EnableResilientMethods;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * App启动入口
@@ -46,7 +38,7 @@ import java.util.concurrent.locks.LockSupport;
 @Hidden
 @SpringBootApplication // 核心配置类
 @EnableTransactionManagement // 开启事务
-@EnableRetry //开启重试机制
+@EnableResilientMethods //开启重试机制
 @EnableConfigurationProperties //开启 @ConfigurationProperties 注解
 @EnableLogRecord(tenant = "com.unicorn.valentineP2P")
 public class UnicornAppRun {
@@ -77,29 +69,7 @@ public class UnicornAppRun {
      * @return /
      */
     @AnonymousGetMapping("/")
-    public String index() throws IllegalAccessException, ExecutionException, InterruptedException {
-        var retryService = SpringContextHolder.getBean(AuthRetryService.class);
-        var seed = "Seed";
-        var taskPro = CompletableFuture.supplyAsync(() -> retryService.retryServicePro(
-                () -> {
-                    log.info("In Pro - {}", seed);
-                    if (RandomUtil.randomInt(0, 4) < 3)
-                        throw new RuntimeException("Error Pro");
-                    return "Pro Done";
-                },
-                () -> {
-                    log.info("In fallback Pro - {}", seed);
-                    return "Error Pro";
-                }));
-        var taskPlus = CompletableFuture.supplyAsync(() -> retryService.retryServicePlus(seed, new ArrayList<>()));
-        // another task
-        retryService.retryService("Normal");
-        var anied = CompletableFuture.anyOf(taskPro, taskPlus); // 如果有一个成功，则另一个会被cancel（但如果另一个已经进入retry，则会继续执行）
-        while (!anied.isDone()) {
-            log.info("Waiting for TaskPro/Plus - {}", seed);
-            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1L));
-        }
-        log.info("Pro/Plus result {}", anied.get());
+    public String index() {
         return "Unicorn is Running!!";
     }
 }

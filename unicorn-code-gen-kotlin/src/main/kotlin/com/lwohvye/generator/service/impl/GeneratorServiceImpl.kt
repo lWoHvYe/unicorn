@@ -104,7 +104,7 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
         }
     }
 
-    override fun query(table: String): List<ColumnInfo?> {
+    override fun query(table: String): List<ColumnInfo> {
         // 使用预编译防止sql注入
         val sql = """
                select column_name, is_nullable, data_type, column_comment, column_key, extra from information_schema.columns 
@@ -113,7 +113,7 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
         val query = em.createNativeQuery(sql)
         query.setParameter(1, table)
         val result = query.resultList
-        val columnInfos: MutableList<ColumnInfo?> = ArrayList()
+        val columnInfos: MutableList<ColumnInfo> = ArrayList()
         for (obj in result) {
             val arr = obj as Array<Any>
             columnInfos.add(
@@ -165,7 +165,7 @@ class GeneratorServiceImpl(@PersistenceContext val em: EntityManager, val column
         }
     }
 
-    override fun save(columnInfos: List<ColumnInfo?>) {
+    override fun save(columnInfos: List<ColumnInfo>) {
         columnInfoRepository.saveAll(columnInfos)
     }
 

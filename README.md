@@ -82,7 +82,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 项目简介
 
-一个基于最新的Java 25(17, 21) 版本、 Spring Boot 3.4、 Jpa、 Spring Security、RabbitMQ、Vue的前后端分离的脚手架。
+一个基于最新的Java 25(17, 21) 版本、 Spring Boot 4.x、 Jpa、 Spring Security、Redis、RabbitMQ、Vue的前后端分离的脚手架。
 在各模块基本解耦之后，可根据需要只引入部分模块实现相关职能。
 
 #### 项目源码
@@ -95,7 +95,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 25(Core Module Support 17-21,24,25)、Spring Boot 3.4。
+- 使用最新技术栈，社区资源丰富，基于Java 25(Core Module Support 17-21,24,25)、Spring Boot 4。
   (Support Virtual Threads/fibre/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持接口级别的功能权限，动态权限控制
@@ -127,7 +127,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17-21,24), 
+- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17-21,24,25), 
   baseline 为Java 17, 在Runtime = 17 时使用传统threadPool，在Runtime >= 21时使用Virtual Threads
 
 - `unicorn-beans` 基础Beans的Definition及Configuration，To C业务可只引入该dependency
@@ -163,6 +163,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
         - SecurityUtils, ReactiveSecurityUtils
     - java21/utils Virtual Threads for Java Runtime 21+ (Multi-Release Jar)
     - java24/utils Virtual Threads for Java Runtime 24+ (Multi-Release Jar)
+    - java25/utils Virtual Threads for Java Runtime 25+ (Multi-Release Jar)
 - unicorn-beans 基础Bean
     - advice 统一数据返回及异常处理
     - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等
@@ -193,7 +194,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 运行环境
 
-- Java 21 基础运行环境
+- Java 25 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
 - Redis 7.2 缓存
 - RabbitMQ 发布-订阅（解耦、异步）
