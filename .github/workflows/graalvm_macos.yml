@@ -24,7 +24,7 @@ jobs:
         os: [ macos-latest ]
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       #  https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Installing-custom-Java-package-type
       # - name: Download JDK
         # run: |
