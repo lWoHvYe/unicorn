@@ -58,7 +58,7 @@ spring:
           password: redis-psd
           subscriptionsPerConnection: 5
           clientName: null
-          address: redis://10.211.55.140:${CACHE_PORT:6379}
+          address: redis://10.211.55.29:${CACHE_PORT:6379}
           subscriptionConnectionMinimumIdleSize: 2
           subscriptionConnectionPoolSize: 16
           connectionMinimumIdleSize: 8

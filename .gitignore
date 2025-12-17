@@ -291,3 +291,5 @@ build/
 ### Temp File
 settings.xml
 toolchains.xml
+
+build-logic/.kotlin

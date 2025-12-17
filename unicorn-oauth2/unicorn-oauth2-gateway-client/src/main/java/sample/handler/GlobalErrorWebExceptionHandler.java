@@ -16,8 +16,6 @@
 
 package sample.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import sample.result.ResultInfo;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * 全局异常处理，这是另一种方式，常用的是另一种即extends AbstractErrorWebExceptionHandler
@@ -54,12 +53,7 @@ public class GlobalErrorWebExceptionHandler implements ErrorWebExceptionHandler 
 
         return response.writeWith(Mono.fromSupplier(() -> {
             var bufferFactory = response.bufferFactory();
-            try {
-                return bufferFactory.wrap(objectMapper.writeValueAsBytes(ResultInfo.failed(ex.getMessage())));
-            } catch (JsonProcessingException e) {
-                log.error("Error writing response", e);
-                return bufferFactory.wrap(new byte[0]);
-            }
+            return bufferFactory.wrap(objectMapper.writeValueAsBytes(ResultInfo.failed(ex.getMessage())));
         }));
     }
 }

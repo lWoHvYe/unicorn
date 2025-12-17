@@ -37,27 +37,32 @@ spring:
           idleConnectionTimeout: 10000
           connectTimeout: 10000
           timeout: 3000
-          retryAttempts: 3
-          retryInterval: 1500
+          retryAttempts: 4
+          retryDelay: !<org.redisson.config.EqualJitterDelay> {baseDelay: PT1S, maxDelay: PT2S}
+          reconnectionDelay: !<org.redisson.config.EqualJitterDelay> {baseDelay: PT0.1S, maxDelay: PT10S}
+          failedSlaveReconnectionInterval: 3000
+          failedSlaveNodeDetector: !<org.redisson.client.FailedConnectionDetector> {}
           password: redis-psd
           subscriptionsPerConnection: 5
           clientName: null
-          loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> { }
+          loadBalancer: !<org.redisson.connection.balancer.RoundRobinLoadBalancer> {}
           subscriptionConnectionMinimumIdleSize: 1
           subscriptionConnectionPoolSize: 50
-          slaveConnectionMinimumIdleSize: 32
+          slaveConnectionMinimumIdleSize: 24
           slaveConnectionPoolSize: 64
-          masterConnectionMinimumIdleSize: 32
+          masterConnectionMinimumIdleSize: 24
           masterConnectionPoolSize: 64
           readMode: "SLAVE"
+          subscriptionMode: "SLAVE"
           slaveAddresses:
-            - "redis://10.211.55.140:6378"
-            - "redis://10.211.55.140:6380"
-          masterAddress: "redis://10.211.55.140:6379"
-          database: 6
-          dnsMonitoringInterval: 5000
-        codec: !<org.redisson.codec.JsonJacksonCodec> { }
-        "transportMode": "NIO"
+            - "redis://127.0.0.1:6381"
+            - "redis://127.0.0.1:6380"
+          masterAddress: "redis://127.0.0.1:6379"
+          database: 0
+        threads: 16
+        nettyThreads: 32
+        codec: !<org.redisson.codec.Kryo5Codec> {}
+        transportMode: "NIO"
 
   ##### RabbitMQ ####
   rabbitmq:
