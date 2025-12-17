@@ -22,7 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository
  * @author Zheng Jie
  * @date 2019-01-14
  */
-interface GenConfigRepository : JpaRepository<GenConfig?, Long?> {
+interface GenConfigRepository : JpaRepository<GenConfig, Long> {
     /**
      * 查询表配置
      * @param tableName 表名

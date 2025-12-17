@@ -25,7 +25,6 @@ module lwohvye.unicorn.core {
     requires transitive spring.security.config;
     requires transitive spring.security.core;
     requires transitive spring.security.crypto;
-    requires transitive spring.security.web;
     requires transitive spring.boot;
     requires transitive spring.boot.autoconfigure;
     requires transitive com.fasterxml.jackson.annotation;
@@ -38,11 +37,11 @@ module lwohvye.unicorn.core {
     requires mica.ip2region;
     requires transitive org.apache.commons.codec;
     requires org.apache.commons.lang3;
+    requires transitive org.apache.commons.logging;
     requires transitive org.apache.poi.poi;
     requires transitive org.apache.poi.ooxml;
     requires transitive org.aspectj.weaver;
     requires transitive org.hibernate.orm.core;
-    requires transitive org.hibernate.validator;
     requires transitive org.jetbrains.annotations;
     requires transitive org.mapstruct;
     requires transitive org.slf4j;

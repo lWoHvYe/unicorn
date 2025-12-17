@@ -87,4 +87,7 @@ public @interface AnonymousGetMapping {
     @AliasFor(annotation = RequestMapping.class)
     String[] produces() default {};
 
+    @AliasFor(annotation = RequestMapping.class)
+    String version() default "";
+
 }

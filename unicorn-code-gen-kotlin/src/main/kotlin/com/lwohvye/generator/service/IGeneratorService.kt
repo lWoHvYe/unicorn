@@ -55,7 +55,7 @@ interface IGeneratorService {
      *
      * @param columnInfos /
      */
-    fun save(columnInfos: List<ColumnInfo?>)
+    fun save(columnInfos: List<ColumnInfo>)
 
     /**
      * 获取所有table

@@ -36,7 +36,6 @@ import org.springframework.security.web.SecurityFilterChain;
  *
  * @author Hongyan Wang
  * @date 2021/11/28 10:24 上午
- * @see org.springframework.boot.autoconfigure.security.servlet.SpringBootWebSecurityConfiguration
  */
 @ConditionalOnProperty(prefix = "local.sys", name = "multi-security")
 @Slf4j
@@ -75,9 +74,7 @@ public class CustomSpringBootWebSecurityConfiguration {
     //   http.authenticationProvider(xxxAuthenticationProvider) 注入
     @Bean("daoAuthenticationProvider4Admin")
     DaoAuthenticationProvider daoAuthenticationProvider4Admin() {
-        var daoAuthenticationProvider = new DaoAuthenticationProvider();
-        //用户详情服务个性化
-        daoAuthenticationProvider.setUserDetailsService(username -> {
+        var daoAuthenticationProvider = new DaoAuthenticationProvider(_ -> {
             // 自行实现获取UserDetails逻辑。若在其他处实现，这里注入一下
             log.warn("Admin-Api is in use");
             return null;
@@ -109,9 +106,7 @@ public class CustomSpringBootWebSecurityConfiguration {
 
     @Bean("daoAuthenticationProvider4App")
     DaoAuthenticationProvider daoAuthenticationProvider4App() {
-        var daoAuthenticationProvider = new DaoAuthenticationProvider();
-        //用户详情服务个性化
-        daoAuthenticationProvider.setUserDetailsService(username -> {
+        var daoAuthenticationProvider = new DaoAuthenticationProvider(_ -> {
             // 自行实现获取UserDetails逻辑
             log.warn("App-Api is in use");
             return null;

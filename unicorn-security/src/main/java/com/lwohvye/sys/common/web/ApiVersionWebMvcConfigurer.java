@@ -16,20 +16,22 @@
 
 package com.lwohvye.sys.common.web;
 
-import com.lwohvye.sys.common.handler.ApiVersionRequestMappingHandlerMapping;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * 注册自己实现的mapping匹配规则，这个是在启动时对所有的api进行match（ApiVersionRequestMappingHandlerMapping），满足条件的注入ApiVersionCondition对象，这部分会step into 相关逻辑
  */
 
 @Configuration
-public class ApiVersionWebMvcRegistrations implements WebMvcRegistrations {
-
+public class ApiVersionWebMvcConfigurer implements WebMvcConfigurer {
+    // 这里可通过配置文件配置，当前pathSegment需要所有api都适配，还是先用header吧
     @Override
-    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
-        return new ApiVersionRequestMappingHandlerMapping();
+    public void configureApiVersioning(ApiVersionConfigurer configurer) {
+        configurer.setVersionRequired(false);
+        configurer.useRequestHeader("API-Version");
+        // "/api/{version}/xxx" version是1.2.3 major.minor.patch、2.0、3 这种格式，解析时会移除非数字部分
+//        configurer.usePathSegment(1);
     }
 }

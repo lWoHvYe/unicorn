@@ -33,9 +33,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,7 +118,7 @@ public class BzLogServiceImpl implements IBzLogService {
     }
 
     @Async
-    @Retryable(retryFor = RuntimeException.class, backoff = @Backoff(delay = 3200, multiplier = 2))
+    @Retryable(includes = RuntimeException.class, delay = 3200, multiplier = 2)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(BzLog resource) {
@@ -197,8 +195,4 @@ public class BzLogServiceImpl implements IBzLogService {
         bzLogRepository.deleteByLogType("INFO");
     }
 
-    @Recover
-    public void saveRecover(RuntimeException e, BzLog resource) {
-        log.error("Error [{}] occurred while save op log [{}] ", e.getMessage(), resource);
-    }
 }
