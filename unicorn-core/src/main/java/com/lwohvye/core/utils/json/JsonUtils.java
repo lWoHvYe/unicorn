@@ -15,21 +15,21 @@
  */
 package com.lwohvye.core.utils.json;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.core.json.JsonWriteFeature;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DefaultTyping;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.lwohvye.core.utils.StringUtils;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -68,12 +68,12 @@ public class JsonUtils {
         // Option 3: defining when creating ObjectReader instance
         ObjectReader r = mapper.readerFor(MyType.class).with(JsonReadFeature.ALLOW_JAVA_COMMENTS);
          */
+
         objectMapper = JsonMapper.builder()
                 // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
                 // ones that do not map to a property, and there is no "any setter" or handler that can handle it
+                .enable(JsonWriteFeature.ESCAPE_NON_ASCII) // configure streaming JSON-escaping
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                // 允许key没有双引号
-                .enable(JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES)
                 // 允许key有单引号
                 .enable(JsonReadFeature.ALLOW_SINGLE_QUOTES)
                 // 允许整数以0开头
@@ -84,9 +84,16 @@ public class JsonUtils {
                 .enable(JsonReadFeature.ALLOW_JAVA_COMMENTS)
                 .build();
 
+        var typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.lwohvye.")
+                .allowIfSubType("java.util.concurrent.")
+                .allowIfSubTypeIsArray()
+                // ...
+                .build();
         objectMapper5Details = JsonMapper.builder()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
+                .activateDefaultTypingAsProperty(typeValidator, DefaultTyping.JAVA_LANG_OBJECT, "@class")
+//                .activateDefaultTyping(LaissezFaireSubTypeValidator.instance, DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
                 .build();
     }
 
@@ -139,22 +146,12 @@ public class JsonUtils {
 
     public static <T> T toJavaObject(InputStream inputStream, Class<T> tClass) {
         Reader reader = new InputStreamReader(inputStream);
-        try {
-            return objectMapper.readValue(reader, tClass);
-        } catch (IOException e) {
-            log.error("toJavaObject exception: \n {}\n {}", inputStream.getClass().getSimpleName(), tClass, e);
-        }
-        return null;
+        return objectMapper.readValue(reader, tClass);
     }
 
     // 这里的TypeReference和Gson中的TypeToken，都是为了解决Java的类型擦除问题
     public static <T> T toJavaObject(String value, TypeReference<T> valueTypeRef) {
-        try {
-            return objectMapper.readValue(value, valueTypeRef);
-        } catch (IOException e) {
-            log.error("toJavaObject exception: \n {}\n {}", value, valueTypeRef, e);
-        }
-        return null;
+        return objectMapper.readValue(value, valueTypeRef);
     }
 
     /**
@@ -296,15 +293,11 @@ public class JsonUtils {
     // endregion
 
     public static <T> T findPath(Object obj, String path, String subPath, Class<T> tClass) {
-        try {
-            var jsonString = toJSONString(obj);
-            var pathNode = objectMapper.readTree(jsonString).findPath(path);
-            if (StringUtils.isNotBlank(subPath))
-                pathNode = pathNode.path(subPath);
-            return objectMapper.convertValue(pathNode, tClass);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
+        var jsonString = toJSONString(obj);
+        var pathNode = objectMapper.readTree(jsonString).findPath(path);
+        if (StringUtils.isNotBlank(subPath))
+            pathNode = pathNode.path(subPath);
+        return objectMapper.convertValue(pathNode, tClass);
     }
 }
 

@@ -24,8 +24,8 @@ import java.math.BigDecimal;
 </#if>
 import java.io.Serializable;
 <#if !auto && pkColumnType = 'Long'>
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.ToStringSerializer;
 </#if>
 
 /**
