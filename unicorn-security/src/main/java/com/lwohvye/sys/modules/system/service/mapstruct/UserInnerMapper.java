@@ -20,7 +20,6 @@ import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.domain.User;
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
 import com.lwohvye.core.base.BaseMapper;
-import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -40,7 +39,7 @@ public interface UserInnerMapper extends BaseMapper<UserInnerDto, User> {
     @Mapping(target = "roleIds", expression = "java(entity.getRoles().stream().map(this::getRoleId).toList())")
     @Mapping(target = "jobIds", expression = "java(this.getJobIds(entity.getJobs()))")
     @Mapping(target = "deptId", source = "dept.id")
-    UserInnerDto convert(@NotNull User entity);
+    UserInnerDto convert(User entity);
 
     default Long getRoleId(Role role) {
         return role.getId();

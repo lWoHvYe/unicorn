@@ -18,7 +18,6 @@ package com.lwohvye.sys.common.web;
 import com.lwohvye.beans.config.FileProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -94,7 +93,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void addInterceptors(@NotNull InterceptorRegistry registry) {
+    public void addInterceptors(InterceptorRegistry registry) {
         try {
             var registrationsVarHandle = MethodHandles.privateLookupIn(InterceptorRegistry.class,
                     MethodHandles.lookup()).findVarHandle(InterceptorRegistry.class, "registrations", List.class);
@@ -106,7 +105,7 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
             }
             registry.addInterceptor(new HandlerInterceptor() {
                 @Override
-                public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+                public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
                     if ("GET".equals(request.getMethod())) {
                         // ignore Get /favicon.ico
                         response.setStatus(HttpServletResponse.SC_NO_CONTENT); // 204 No Content

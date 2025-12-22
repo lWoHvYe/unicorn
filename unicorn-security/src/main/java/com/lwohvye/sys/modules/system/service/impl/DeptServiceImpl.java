@@ -29,7 +29,6 @@ import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.sys.modules.system.service.mapstruct.DeptMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -262,7 +261,7 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     }
 
     @Override
-    public void setApplicationEventPublisher(@NotNull ApplicationEventPublisher applicationEventPublisher) {
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.eventPublisher = applicationEventPublisher;
     }
 

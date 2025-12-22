@@ -19,15 +19,12 @@ package com.lwohvye.sys.modules.security.service;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.lwohvye.api.modules.system.service.dto.UserInnerDto;
-import com.lwohvye.beans.config.LocalPropertyConfig;
-import com.lwohvye.sys.modules.rabbitmq.config.RabbitMQConfig;
 import com.lwohvye.sys.modules.rabbitmq.service.RabbitMQProducerService;
 import com.lwohvye.sys.modules.security.service.dto.JwtUserDto;
 import com.lwohvye.sys.modules.system.service.IRoleService;
 import com.lwohvye.sys.modules.system.service.IUserService;
 import com.lwohvye.core.utils.StringUtils;
 import com.lwohvye.core.utils.rabbitmq.AmqpMsgEntity;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -79,7 +76,6 @@ public class UserLocalCache {
             .build(this::getUserDB); // 数据不存在时，会调用load方法来获取
 
 
-    @NotNull
     protected JwtUserDto getUserDB(String username) {
         JwtUserDto jwtUserDto;
         UserInnerDto user;

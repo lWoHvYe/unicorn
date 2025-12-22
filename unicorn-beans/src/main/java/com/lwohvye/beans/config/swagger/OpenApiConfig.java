@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -137,14 +136,14 @@ public class OpenApiConfig {
         return new BeanPostProcessor() {
 
             @Override
-            public Object postProcessBeforeInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
+            public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
                 if (bean instanceof RedisUtils ru)
                     log.info("The module of the RedisUtils is {}", ru.getClass().getModule());
                 return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
             }
 
             @Override
-            public Object postProcessAfterInitialization(@NotNull Object bean, @NotNull String beanName) throws BeansException {
+            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
                 if (bean instanceof RedissonClient rc)
                     log.info("The id of the RedissonClient is {}", rc.getId());
                 return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);

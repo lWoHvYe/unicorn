@@ -33,7 +33,6 @@ import com.lwohvye.sys.modules.system.service.mapstruct.RoleMapper;
 import com.lwohvye.sys.modules.system.strategy.AuthHandlerContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -238,7 +237,7 @@ public class RoleServiceImpl implements IRoleService, ApplicationEventPublisherA
     }
 
     @Override
-    public void setApplicationEventPublisher(@NotNull ApplicationEventPublisher applicationEventPublisher) {
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.eventPublisher = applicationEventPublisher;
     }
 

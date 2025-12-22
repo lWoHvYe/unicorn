@@ -16,7 +16,6 @@
 package com.lwohvye.beans.config;
 
 import com.lwohvye.core.utils.SecurityUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +36,7 @@ public class AuditorConfig implements AuditorAware<String> {
      * @return /
      */
     @Override
-    public @NotNull Optional<String> getCurrentAuditor() {
+    public Optional<String> getCurrentAuditor() {
         try {
             // 这里应根据实际业务情况获取具体信息
             return Optional.of(SecurityUtils.getCurrentUsername());

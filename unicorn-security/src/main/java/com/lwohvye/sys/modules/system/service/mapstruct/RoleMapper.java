@@ -20,7 +20,6 @@ import com.lwohvye.api.modules.system.domain.Role;
 import com.lwohvye.api.modules.system.domain.vo.ResourceVo;
 import com.lwohvye.api.modules.system.service.dto.RoleDto;
 import com.lwohvye.core.base.BaseMapper;
-import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -37,7 +36,7 @@ public interface RoleMapper extends BaseMapper<RoleDto, Role> {
 
     @Override
     @Mapping(target = "resourcesOt", expression = "java(toRVo(entity.getResources()))")
-    RoleDto convert(@NotNull Role entity);
+    RoleDto convert(Role entity);
 
     default Set<ResourceVo> toRVo(Set<Resource> resources) {
         return resources.stream().map(ResourceVo::toVo).collect(Collectors.toSet());
