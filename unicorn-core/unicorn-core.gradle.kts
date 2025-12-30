@@ -117,6 +117,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-cache")
     api("org.springframework.boot:spring-boot-starter-data-redis")
     api(libs.redisson)
+    api(libs.redisson.cache)
     api("org.apache.commons:commons-pool2")
     api("org.apache.commons:commons-lang3")
     api(libs.springdoc.webmvc.ui)

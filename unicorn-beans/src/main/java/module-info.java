@@ -3,6 +3,7 @@ module lwohvye.unicorn.beans {
     requires spring.webmvc;
     requires spring.boot.persistence;
     requires spring.boot.tomcat;
+    requires redisson.spring.cache;
 
     exports com.lwohvye.beans.advice;
     exports com.lwohvye.beans.aspect to spring.beans, spring.aop;

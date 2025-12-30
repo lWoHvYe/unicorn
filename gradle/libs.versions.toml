@@ -29,39 +29,40 @@ thumbnailator = "0.4.21"
 xerces = "2.12.2"
 
 [libraries]
-asm = {group = "org.ow2.asm", name = "asm", version.ref = "asm" }
-bizlog = {group = "io.github.mouzt", name = "bizlog-sdk", version.ref = "bizlog" }
-captcha = {group = "com.lwohvye.captcha", name = "captcha-spring-boot-starter", version.ref = "captcha" }
-commons-beanutils = {group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutils" }
-commons-configuration = {group = "org.apache.commons", name = "commons-configuration2", version.ref = "commonsConfiguration" }
-coroutines-core = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-coroutines-jdk8 = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutines" }
-coroutines-jdk9 = {group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk9", version.ref = "kotlinxCoroutines" }
-easy-captcha = {group = "com.github.whvcse", name = "easy-captcha", version.ref = "easyCaptcha" }
-hutool = {group = "cn.hutool", name = "hutool-all", version.ref = "hutool" }
-ip2region = {group = "net.dreamlu", name = "mica-ip2region", version.ref = "ip2region" }
-jjwt = {group = "io.jsonwebtoken", name = "jjwt", version.ref = "jjwt" }
-logback-encoder = {group = "net.logstash.logback", name = "logstash-logback-encoder", version.ref = "logstash" }
-mapstruct = {group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
-mapstruct-processor = {group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
-mapstruct-spring = {group = "org.mapstruct.extensions.spring", name = "mapstruct-spring-extensions", version.ref = "mapstructSpring" }
-mapstruct-spring-annotations = {group = "org.mapstruct.extensions.spring", name = "mapstruct-spring-annotations", version.ref = "mapstructSpring" }
-oshi-core = {group = "com.github.oshi", name = "oshi-core", version.ref = "oshiCore" }
-poi = {group = "org.apache.poi", name = "poi", version.ref = "poi" }
-poi-ooxml = {group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" }
-redisson = {group = "org.redisson", name = "redisson-spring-boot-starter", version.ref = "redisson" }
-springdoc-webflux-ui = {group = "org.springdoc", name = "springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
-springdoc-webmvc-ui = {group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
-thumbnailator = {group = "net.coobird", name = "thumbnailator", version.ref = "thumbnailator" }
-xerces = {group = "xerces", name = "xercesImpl", version.ref = "xerces" }
+asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
+bizlog = { group = "io.github.mouzt", name = "bizlog-sdk", version.ref = "bizlog" }
+captcha = { group = "com.lwohvye.captcha", name = "captcha-spring-boot-starter", version.ref = "captcha" }
+commons-beanutils = { group = "commons-beanutils", name = "commons-beanutils", version.ref = "commonsBeanutils" }
+commons-configuration = { group = "org.apache.commons", name = "commons-configuration2", version.ref = "commonsConfiguration" }
+coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutines" }
+coroutines-jdk9 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk9", version.ref = "kotlinxCoroutines" }
+easy-captcha = { group = "com.github.whvcse", name = "easy-captcha", version.ref = "easyCaptcha" }
+hutool = { group = "cn.hutool", name = "hutool-all", version.ref = "hutool" }
+ip2region = { group = "net.dreamlu", name = "mica-ip2region", version.ref = "ip2region" }
+jjwt = { group = "io.jsonwebtoken", name = "jjwt", version.ref = "jjwt" }
+logback-encoder = { group = "net.logstash.logback", name = "logstash-logback-encoder", version.ref = "logstash" }
+mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
+mapstruct-spring = { group = "org.mapstruct.extensions.spring", name = "mapstruct-spring-extensions", version.ref = "mapstructSpring" }
+mapstruct-spring-annotations = { group = "org.mapstruct.extensions.spring", name = "mapstruct-spring-annotations", version.ref = "mapstructSpring" }
+oshi-core = { group = "com.github.oshi", name = "oshi-core", version.ref = "oshiCore" }
+poi = { group = "org.apache.poi", name = "poi", version.ref = "poi" }
+poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" }
+redisson = { group = "org.redisson", name = "redisson-spring-boot-starter", version.ref = "redisson" }
+redisson-cache = { group = "org.redisson", name = "redisson-spring-cache", version.ref = "redisson" }
+springdoc-webflux-ui = { group = "org.springdoc", name = "springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
+springdoc-webmvc-ui = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
+thumbnailator = { group = "net.coobird", name = "thumbnailator", version.ref = "thumbnailator" }
+xerces = { group = "xerces", name = "xercesImpl", version.ref = "xerces" }
 
 [bundles]
 coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-jdk9"]
 
 [plugins]
-kotlin-jpa = {id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
-kotlin-jvm = {id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-lombok = {id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
-kotlin-spring = {id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
-spring-boot = {id = "org.springframework.boot", version.ref = "springBoot" }
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 
