@@ -4,6 +4,7 @@ module lwohvye.valentine.starter {
     requires lwohvye.unicorn.tp.tools.kotlin;
     requires lombok;
     // 如果使用3rd-tools，需要加入下面这两个，不清楚为何在tools中加没生效。mail works well under unnamed module
+    requires jdk.net; // https://lists.apache.org/thread/5pmyy8xclqwht49gccy3xvnd2pmv2pz4
     requires jakarta.mail;
     requires jakarta.activation;
     requires bizlog.sdk;
