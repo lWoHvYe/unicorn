@@ -41,7 +41,7 @@
 
 <project>
 
-    <project.core.version>4.8.0-chi</project.core.version>
+    <project.core.version>4.8.1-chi</project.core.version>
 
     <!--    system模块    -->
     <dependency>
@@ -64,7 +64,7 @@
 ```groovy
 // 4.x系列基于Java 21，4.8开始基于Java 25, 部分module使用Kotlin, 使用Gradle build
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.8.0-chi'
+    unicornVersion = '4.8.1-chi'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
