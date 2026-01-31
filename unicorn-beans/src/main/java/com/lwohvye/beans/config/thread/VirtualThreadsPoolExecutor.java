@@ -18,19 +18,19 @@ package com.lwohvye.beans.config.thread;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
+import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @AutoConfiguration
 public class VirtualThreadsPoolExecutor {
 
     @Bean(name = "taskVTExecutor")
-    public ThreadPoolTaskExecutor taskExecutor() {
+    public ThreadPoolTaskExecutor taskExecutor(TaskDecorator contextPropagatingTaskDecorator) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         // 启用虚拟线程（Java 21 特性）
         executor.setVirtualThreads(true);
         // 使用内置装饰器，它会利用 Context Propagation 库，但更符合 Spring 生命周期
-        executor.setTaskDecorator(new ContextPropagatingTaskDecorator());
+        executor.setTaskDecorator(contextPropagatingTaskDecorator);
 //        executor.initialize();   // 被Spring管理的Bean可以不写这个
         return executor;
     }
