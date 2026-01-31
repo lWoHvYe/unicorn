@@ -17,9 +17,13 @@
 package com.lwohvye.core.utils;
 
 import io.micrometer.context.ContextExecutorService;
+import io.micrometer.context.ContextRegistry;
 import io.micrometer.context.ContextSnapshotFactory;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.web.context.request.RequestAttributesThreadLocalAccessor;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.concurrent.ExecutorService;
@@ -44,8 +48,41 @@ public abstract class UnicornAbstractThreadUtils {
     public static final ExecutorService TASK_EXECUTOR = Executors.newThreadPerTaskExecutor(virtualFactory);
 
     // https://stackoverflow.com/questions/78122797/how-to-propagate-traceid-to-other-threads-in-one-transaction-for-spring-boot-3-x
+    // 1. 创建一个只包含特定 Accessor 的 Registry
+    static ContextRegistry limitedRegistry = new ContextRegistry()
+            .registerThreadLocalAccessor(new ObservationThreadLocalAccessor())         // 只传 Observation
+            .registerThreadLocalAccessor(new RequestAttributesThreadLocalAccessor());  // 或自定义字段
+
+    // 2. 使用这个受限的 Registry 创建工厂
+    static ContextSnapshotFactory selectiveFactory = ContextSnapshotFactory.builder()
+            .contextRegistry(limitedRegistry)
+            .build();
+
+    // 使用自定义工厂
     public static ExecutorService wrap(ExecutorService executor) {
-        return ContextExecutorService.wrap(executor, () -> ContextSnapshotFactory.builder().build().captureAll());
+        return ContextExecutorService.wrap(executor, () -> selectiveFactory.captureAll());
+    }
+
+    public static Runnable decorateObservation(Runnable runnable) {
+        // 获取当前 Observation 并包装任务
+        var currentObservation = SpringContextHolder.getBean(ObservationRegistry.class).getCurrentObservation();
+        if (currentObservation != null) {
+            // 包装后的任务在执行时会自动恢复并清理 Trace 上下文
+            return currentObservation.wrap(runnable);
+        } else {
+            return runnable;
+        }
+    }
+
+    public static <U> Supplier<U> decorateObservation(Supplier<U> supplier) {
+        // 获取当前 Observation 并包装任务
+        var currentObservation = SpringContextHolder.getBean(ObservationRegistry.class).getCurrentObservation();
+        if (currentObservation != null) {
+            // 包装后的任务在执行时会自动恢复并清理 Trace 上下文
+            return currentObservation.wrap(supplier);
+        } else {
+            return supplier;
+        }
     }
 
     // 下面这个，就是解决InheritableThreadLocal 和 ThreadPool一起使用时的问题，使用ThreadLocal 然后自行实现值的传递

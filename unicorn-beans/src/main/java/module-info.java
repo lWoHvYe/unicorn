@@ -19,4 +19,6 @@ module lwohvye.unicorn.beans {
     opens com.lwohvye.beans.rabbitmq to spring.core;
     opens com.lwohvye.beans.config.security; // 这里应该能细化，先这样粗化，后续再说
     opens com.lwohvye.beans.config.swagger to spring.core;
+    exports com.lwohvye.beans.config.thread;
+    opens com.lwohvye.beans.config.thread to spring.core;
 }

@@ -52,6 +52,7 @@ module lwohvye.unicorn.core {
     requires reactor.core;
     requires spring.security.oauth2.jose;
     requires context.propagation;
+    requires micrometer.observation;
 
     exports com.lwohvye.core.annotation;
     exports com.lwohvye.core.annotation.log;

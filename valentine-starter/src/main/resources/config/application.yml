@@ -45,7 +45,12 @@ spring:
     # exclude: org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration
 
 management:
+#  observation:
+#    enabled: true
   tracing:
+#    enabled: true
+    propagation:
+      type: b3
     baggage:
       remote-fields: Authorization
 
