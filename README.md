@@ -95,7 +95,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 #### 主要特性
 
-- 使用最新技术栈，社区资源丰富，基于Java 25(Core Module Support 17-21,24,25)、Spring Boot 4。
+- 使用最新技术栈，社区资源丰富，基于Java 25(Core Module Support 17-21,24,25,26)、Spring Boot 4。
   (Support Virtual Threads/fibre/loom)
 - 基于注解的动态查询（Specification），可根据需要扩充查询注解。
 - 支持接口级别的功能权限，动态权限控制
@@ -164,6 +164,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - java21/utils Virtual Threads for Java Runtime 21+ (Multi-Release Jar)
     - java24/utils Virtual Threads for Java Runtime 24+ (Multi-Release Jar)
     - java25/utils Virtual Threads for Java Runtime 25+ (Multi-Release Jar)
+    - java26/utils Virtual Threads for Java Runtime 26+ (Multi-Release Jar)
 - unicorn-beans 基础Bean
     - advice 统一数据返回及异常处理
     - config 基础配置，Security配置，redis配置，openApi配置，Rsa配置等

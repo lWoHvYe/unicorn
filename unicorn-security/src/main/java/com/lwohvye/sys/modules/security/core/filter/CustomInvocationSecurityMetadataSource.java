@@ -32,8 +32,6 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
@@ -106,9 +104,6 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
     public void initAnonymousPaths() {
         RequestMappingHandlerMapping requestMappingHandlerMapping = SpringContextHolder.getBean("requestMappingHandlerMapping");
         Map<RequestMappingInfo, HandlerMethod> handlerMethodMap = requestMappingHandlerMapping.getHandlerMethods();
-        // 不能用instanceof，只能用isInstance()和cast()了
-        var pathPatternsClass = PathPatternsRequestCondition.class;
-        var patternsClass = PatternsRequestCondition.class;
         PathPatternParser parser = new PathPatternParser();
         // Local record classes。A record class with components is clearer and safer than an anonymous tuple of implicitly params.
         record PatternMatchCarrier(String methodType, PathPattern pathPattern) {
@@ -118,28 +113,25 @@ public final class CustomInvocationSecurityMetadataSource implements SecurityMet
         // when using parallelStream + flatMap()，flatMap will reset stream to sequential, so we should use map() + reduce() to concat the stream
         // 根据方法类型分组。值为pattern的集合
         anonymousPaths = handlerMethodMap.entrySet().parallelStream()
-                // 有匿名访问注解
-                .filter(infoEntry -> !Objects.isNull(infoEntry.getValue().getMethodAnnotation(AnonymousAccess.class)))
-                .map(infoEntry -> {
+                .filter(e -> Objects.nonNull(e.getValue().getMethodAnnotation(AnonymousAccess.class)))
+                .flatMap(entry -> {
+                    var info = entry.getKey();
                     // 先拿到方法类型
-                    var requestMethods = new ArrayList<>(infoEntry.getKey().getMethodsCondition().getMethods());
+                    var requestMethods = new ArrayList<>(info.getMethodsCondition().getMethods());
                     var request = RequestMethodEnum.find(requestMethods.isEmpty() ? RequestMethodEnum.ALL.getType() : requestMethods.getFirst().name());
+
+                    Collection<PathPattern> patterns;
                     // 获取pathPatternsCondition
-                    var activePatternsCondition = infoEntry.getKey().getActivePatternsCondition();
-                    Set<String> patterns;
-                    if (pathPatternsClass.isInstance(activePatternsCondition))
-                        patterns = pathPatternsClass.cast(activePatternsCondition).getDirectPaths();
-                    else if (patternsClass.isInstance(activePatternsCondition))
-                        patterns = patternsClass.cast(activePatternsCondition).getPatterns();
-                    else
-                        throw new IllegalStateException("系统错误，请联系相关人员排查");
-                    // 返回一个Stream流，由flatMap进行合并
-                    return patterns.stream().map(pattern ->
-                            // 二元组。first为methodType，second为pattern
-                            // Pair.of(request.getType(), parser.parse(pattern))
-                            new PatternMatchCarrier(request.getType(), parser.parse(pattern))
-                    );
-                }).reduce(Stream::concat).orElse(Stream.empty())
+                    var pathPatterns = info.getPathPatternsCondition();
+                    if (pathPatterns != null) {
+                        patterns = pathPatterns.getPatterns();
+                    } else {
+                        // Spring 6 fallback
+                        patterns = info.getPatternsCondition().getPatterns().stream().map(parser::parse).toList();
+                    }
+
+                    return patterns.stream().map(p -> new PatternMatchCarrier(request.getType(), p));
+                })
                 .collect(Collectors.groupingBy(PatternMatchCarrier::methodType, Collectors.mapping(PatternMatchCarrier::pathPattern, Collectors.toUnmodifiableList())));
     }
 
