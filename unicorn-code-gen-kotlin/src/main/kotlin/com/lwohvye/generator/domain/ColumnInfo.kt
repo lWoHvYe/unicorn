@@ -43,7 +43,7 @@ class ColumnInfo(
     var id: Long? = null
 
     @Schema(description = "数据库字段描述")
-    var remark: String?
+    var remark: String? = null
 
     @Schema(description = "是否在列表显示")
     var listShow: Boolean
