@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.lwohvye"
-version = "4.8.2-chi"
+version = "4.8.3-chi"
 
 java {
     withSourcesJar()
