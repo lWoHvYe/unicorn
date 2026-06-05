@@ -46,10 +46,10 @@ class ColumnInfo(
     var remark: String? = null
 
     @Schema(description = "是否在列表显示")
-    var listShow: Boolean
+    var listShow: Boolean = false
 
     @Schema(description = "是否表单显示")
-    var formShow: Boolean
+    var formShow: Boolean = false
 
     @Schema(description = "表单类型")
     var formType: String? = null
