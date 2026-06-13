@@ -54,12 +54,12 @@ subprojects {
 
     // Setting a custom Lombok version when use plugin io.freefair.lombok
     lombok {
-        version = "1.18.42"
+        version = "1.18.46"
     }
 
     dependencies {
-        annotationProcessor("org.mapstruct", "mapstruct-processor", "1.6.2")
-        annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "1.1.2")
+        annotationProcessor("org.mapstruct", "mapstruct-processor", "1.6.3")
+        annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "2.0.0")
     }
 
     tasks.withType<Javadoc>().configureEach {

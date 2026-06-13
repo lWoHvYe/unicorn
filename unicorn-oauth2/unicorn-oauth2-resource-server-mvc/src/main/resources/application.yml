@@ -62,7 +62,6 @@ spring:
           connectTimeout: 10000
           timeout: 3000
           retryAttempts: 3
-          retryInterval: 1500
           password: redis-psd
           subscriptionsPerConnection: 5
           clientName: null
