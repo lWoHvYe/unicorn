@@ -53,6 +53,7 @@ subprojects {
             charSet = "UTF-8"
             docEncoding = "UTF-8"
             addBooleanOption("Xdoclint:none", true)
+            addBooleanOption("enable-preview", true)
             addStringOption("tag", "date:a:Init Date:")
             addStringOption("tag", "author:a:Major Contributor:")
         }
@@ -72,8 +73,9 @@ subprojects {
 
 allprojects {
     tasks.withType<Javadoc>().configureEach {
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_25)) {
-            (options as StandardJavadocDocletOptions).addStringOption("-release", "25")
+        val currentJava = JavaVersion.current()
+        if (currentJava.isCompatibleWith(JavaVersion.VERSION_25)) {
+            (options as StandardJavadocDocletOptions).addStringOption("-release", currentJava.majorVersion)
         }
     }
 }
