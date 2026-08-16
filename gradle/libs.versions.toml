@@ -17,8 +17,11 @@ jjwt = "0.13.0"
 kotlin = "2.4.0"
 kotlinxCoroutines = "1.11.0"
 logstash = "9.0"
+lombok = "1.18.46"
 mapstruct = "1.6.3"
 mapstructSpring = "2.0.0"
+mrjar = "0.1.1"
+nexusPublish = "2.0.0"
 oshiCore = "6.4.2"
 poi = "5.5.1"
 redisson = "4.7.0"
@@ -29,6 +32,8 @@ thumbnailator = "0.4.21"
 xerces = "2.12.2"
 bouncycastle = "1.84"
 jetbrainsAnnotations = "26.1.0"
+freefairLombok = "9.5.0"
+extraJavaModuleInfo = "1.14.2"
 
 [libraries]
 asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
@@ -44,6 +49,7 @@ hutool = { group = "cn.hutool", name = "hutool-all", version.ref = "hutool" }
 ip2region = { group = "net.dreamlu", name = "mica-ip2region", version.ref = "ip2region" }
 jjwt = { group = "io.jsonwebtoken", name = "jjwt", version.ref = "jjwt" }
 logback-encoder = { group = "net.logstash.logback", name = "logstash-logback-encoder", version.ref = "logstash" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
 mapstruct-spring = { group = "org.mapstruct.extensions.spring", name = "mapstruct-spring-extensions", version.ref = "mapstructSpring" }
@@ -69,4 +75,8 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+freefair-lombok = { id = "io.freefair.lombok", version.ref = "freefairLombok" }
+mrjar = { id = "me.champeau.mrjar", version.ref = "mrjar" }
+extra-java-module-info = { id = "org.gradlex.extra-java-module-info", version.ref = "extraJavaModuleInfo" }
+nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexusPublish" }
 
