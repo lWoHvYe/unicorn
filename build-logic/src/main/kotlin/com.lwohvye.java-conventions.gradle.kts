@@ -36,8 +36,10 @@ publishing {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/lWoHvYe/unicorn")
         credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+            username = providers.gradleProperty("gpr.user")
+                .orElse(providers.environmentVariable("USERNAME"))
+            password = providers.gradleProperty("gpr.key")
+                .orElse(providers.environmentVariable("TOKEN"))
         }
     }
 }
@@ -50,4 +52,15 @@ signing {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.compilerArgs.addAll(listOf("--enable-preview", "-parameters"))
+}
+
+// Preview features affect both compilation and execution. Keep the runtime
+// configuration aligned with JavaCompile so tests and JavaExec tasks can load
+// classes compiled with --enable-preview.
+tasks.withType<Test>().configureEach {
+    jvmArgs("--enable-preview")
+}
+
+tasks.withType<JavaExec>().configureEach {
+    jvmArgs("--enable-preview")
 }
