@@ -49,8 +49,6 @@ tasks.withType<JavaExec>().configureEach {
 tasks.withType<Javadoc>().configureEach {
     isFailOnError = false
     options.encoding = "UTF-8"
-    options.charSet = "UTF-8"
-    options.docEncoding = "UTF-8"
     (options as StandardJavadocDocletOptions).apply {
         addBooleanOption("Xdoclint:none", true)
         addBooleanOption("enable-preview", true)
