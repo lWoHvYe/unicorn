@@ -27,10 +27,6 @@ java {
     withJavadocJar()
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {
@@ -43,7 +39,7 @@ tasks.jar {
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
-        from({ tasks["generatePomFileForMavenJavaCodeGenPublication"] })
+        from({ tasks.named("generatePomFileForMavenJavaCodeGenPublication") })
         rename(".*", "pom.xml")
     }
 }
@@ -67,7 +63,7 @@ publishing {
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
                 developers {
