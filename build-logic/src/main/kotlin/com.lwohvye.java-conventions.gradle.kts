@@ -20,8 +20,6 @@
 
 plugins {
     `java-library`
-    `maven-publish`
-    signing
 }
 
 group = "com.lwohvye"
@@ -29,22 +27,6 @@ version = "4.8.4-chi"
 
 java {
     withSourcesJar()
-}
-
-publishing {
-    repositories.maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/lWoHvYe/unicorn")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
-        }
-    }
-}
-
-signing {
-    isRequired = !version.toString().endsWith("-SNAPSHOT") && System.getenv("CI") == null
-    sign(publishing.publications)
 }
 
 tasks.withType<JavaCompile>().configureEach {

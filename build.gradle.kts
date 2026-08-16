@@ -16,6 +16,7 @@
 
 plugins {
     id("com.lwohvye.java-conventions")
+    id("com.lwohvye.publishing-conventions")
     alias(libs.plugins.spring.boot) apply false
     alias(libs.plugins.freefair.lombok)
     alias(libs.plugins.mrjar)
@@ -38,6 +39,7 @@ val mapstructSpring = libs.mapstruct.spring
 
 subprojects {
     apply(plugin = "com.lwohvye.java-conventions")
+    apply(plugin = "com.lwohvye.publishing-conventions")
     apply(plugin = "org.gradlex.extra-java-module-info")
     apply(plugin = "io.freefair.lombok")
 
