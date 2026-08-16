@@ -45,8 +45,13 @@ rootProject.name = "valentine-p2p"
 val javaVersion = JavaVersion.current()
 println("Current Java version: $javaVersion")
 
+val excludedProjects = gradle.startParameter.projectProperties["excludeProjects"]
+    ?.split(",")
+    ?.filter(String::isNotBlank)
+    ?.toSet()
+    .orEmpty()
+
 val buildFiles = fileTree(rootDir) {
-    val excludes = gradle.startParameter.projectProperties["excludeProjects"]?.split(",")
     include("**/*.gradle", "**/*.gradle.kts")
     exclude(
         "build",
@@ -66,9 +71,7 @@ val buildFiles = fileTree(rootDir) {
         exclude("**/*-kotlin.gradle.kts")
     }
 
-    if (excludes != null) {
-        exclude(*excludes.toTypedArray())
-    }
+    excludedProjects.forEach { exclude(it) }
 }
 
 buildFiles.forEach { buildFile ->
@@ -77,7 +80,9 @@ buildFiles.forEach { buildFile ->
 
     if (isDefaultName) {
         val buildFilePath = buildFile.parentFile.absolutePath
-        val projectPath = buildFilePath.replace(rootDir.absolutePath, "").replace(File.separator, ":")
+        val projectPath = buildFilePath.removePrefix(rootDir.absolutePath)
+            .replace(File.separator, ":")
+            .let { if (it.isEmpty()) ":" else it }
         include(projectPath)
     } else {
         val projectName = if (isKotlin) {
@@ -89,10 +94,11 @@ buildFiles.forEach { buildFile ->
         val projectPath = ":$projectName"
         include(projectPath)
 
-        val project = findProject(projectPath)
-        project?.name = projectName
-        project?.projectDir = buildFile.parentFile
-        project?.buildFileName = buildFile.name
+        project(projectPath).apply {
+            name = projectName
+            projectDir = buildFile.parentFile
+            buildFileName = buildFile.name
+        }
     }
 }
 
