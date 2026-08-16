@@ -75,15 +75,6 @@ subprojects {
     }
 }
 
-allprojects {
-    tasks.withType<Javadoc>().configureEach {
-        val currentJava = JavaVersion.current()
-        if (currentJava.isCompatibleWith(JavaVersion.VERSION_25)) {
-            (options as StandardJavadocDocletOptions).addStringOption("-release", currentJava.majorVersion)
-        }
-    }
-}
-
 tasks.withType<Checkstyle>().configureEach {
     reports {
         xml.required.set(false)
