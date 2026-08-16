@@ -26,10 +26,6 @@ multiRelease {
     targetVersions(17, 21, 24, 25, 26)
 }
 
-java {
-    withJavadocJar()
-}
-
 configurations {
     named<Configuration>("java21Implementation") {
         extendsFrom(implementation.get())

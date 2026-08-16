@@ -27,6 +27,7 @@ version = "4.8.4-chi"
 
 java {
     withSourcesJar()
+    withJavadocJar()
 }
 
 tasks.withType<JavaCompile>().configureEach {

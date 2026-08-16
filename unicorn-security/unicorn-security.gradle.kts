@@ -23,7 +23,6 @@ sourceSets {
 }
 
 java {
-    withJavadocJar()
     registerFeature("businessLog") {
         usingSourceSet(sourceSets["businessLog"])
     }

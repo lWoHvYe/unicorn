@@ -16,10 +16,6 @@
 
 description = "日志收集模块"
 
-java {
-    withJavadocJar()
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {

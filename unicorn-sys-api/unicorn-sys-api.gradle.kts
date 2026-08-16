@@ -16,10 +16,6 @@
 
 description = "权限基础模块"
 
-java {
-    withJavadocJar()
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {

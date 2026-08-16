@@ -23,10 +23,6 @@ plugins {
 
 description = "3rd工具模块"
 
-java {
-    withJavadocJar()
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {
@@ -39,7 +35,7 @@ tasks.jar {
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
-        from({ tasks["generatePomFileForMavenJava3rdToolPublication"] })
+        from({ tasks.named("generatePomFileForMavenJava3rdToolPublication") })
         rename(".*", "pom.xml")
     }
 }

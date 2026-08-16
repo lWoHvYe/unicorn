@@ -16,10 +16,6 @@
 
 description = "Beans模块"
 
-java {
-    withJavadocJar()
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {

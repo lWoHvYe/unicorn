@@ -23,10 +23,6 @@ plugins {
 
 description = "代码生成模块"
 
-java {
-    withJavadocJar()
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {
