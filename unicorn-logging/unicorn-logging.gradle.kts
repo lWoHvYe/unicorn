@@ -32,7 +32,7 @@ tasks.jar {
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
-        from({ tasks["generatePomFileForMavenJavaLogPublication"] })
+        from({ tasks.named("generatePomFileForMavenJavaLogPublication") })
         rename(".*", "pom.xml")
     }
 }
