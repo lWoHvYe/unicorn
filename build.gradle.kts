@@ -32,18 +32,22 @@ extra["sharedManifest"] = java.manifest {
     )
 }
 
+val lombokVersion = libs.versions.lombok.get()
+val mapstructProcessor = libs.mapstruct.processor
+val mapstructSpring = libs.mapstruct.spring
+
 subprojects {
     apply(plugin = "com.lwohvye.java-conventions")
     apply(plugin = "org.gradlex.extra-java-module-info")
     apply(plugin = "io.freefair.lombok")
 
     lombok {
-        version = libs.versions.lombok.get()
+        version = lombokVersion
     }
 
     dependencies {
-        annotationProcessor(libs.mapstruct.processor)
-        annotationProcessor(libs.mapstruct.spring)
+        annotationProcessor(mapstructProcessor)
+        annotationProcessor(mapstructSpring)
     }
 
     tasks.withType<Javadoc>().configureEach {
