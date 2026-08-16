@@ -28,8 +28,8 @@ extra["sharedManifest"] = java.manifest {
     attributes(
         "Developer" to "lWoHvYe",
         "Created-By" to "Gradle",
-        "Built-By" to providers.systemProperty("user.name").orNull,
-        "Build-Jdk-Spec" to providers.systemProperty("java.version").orNull
+        "Built-By" to System.getProperty("user.name"),
+        "Build-Jdk-Spec" to System.getProperty("java.version")
     )
 }
 
