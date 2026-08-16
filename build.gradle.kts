@@ -138,8 +138,14 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
             snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
-            username.set(findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME"))
-            password.set(findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD"))
+            username.set(
+                providers.gradleProperty("ossrhUsername")
+                    .orElse(providers.environmentVariable("OSSRH_USERNAME"))
+            )
+            password.set(
+                providers.gradleProperty("ossrhPassword")
+                    .orElse(providers.environmentVariable("OSSRH_PASSWORD"))
+            )
         }
     }
 }
