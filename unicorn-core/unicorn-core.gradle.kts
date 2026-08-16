@@ -51,7 +51,7 @@ configurations {
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {
-    enabled = true // separates boot jar from normal jar
+    enabled = true
     manifest {
         from(sharedManifest)
         attributes(
@@ -85,7 +85,7 @@ publishing {
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
                 developers {
@@ -108,13 +108,10 @@ publishing {
 
 dependencies {
     api(platform(SpringBootPlugin.BOM_COORDINATES))
-//    api(platform("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom:2.24.0"))
-    // java21TestImplementation("") // it is possible to add a dependency only used to compile the sources found in src/main/java21
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     api("org.springframework.boot:spring-boot-starter-webmvc")
     api("org.springframework.boot:spring-boot-starter-security")
     api("org.springframework.boot:spring-boot-starter-restclient")
-    // add legacy module in Spring Security 7
     implementation("org.springframework.security:spring-security-access")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     api("org.springframework.boot:spring-boot-starter-amqp")
@@ -131,26 +128,23 @@ dependencies {
     api(libs.poi.ooxml)
     implementation(libs.xerces)
     api(libs.mapstruct)
-//    mapstruct-spring-extensions seems unused
     api(libs.mapstruct.spring.annotations)
     api("com.github.ben-manes.caffeine:caffeine")
     implementation(libs.logback.encoder)
-    api("org.bouncycastle:bcpkix-jdk18on:1.72")
+    api(libs.bouncycastle.pkix)
     api(libs.thumbnailator)
-    api("org.jetbrains:annotations:24.1.0")
+    api(libs.jetbrains.annotations)
     api("org.springframework.boot:spring-boot-starter-actuator")
-    //    For Tracing Context Propagation with Micrometer Tracing, we need to pick a tracer bridge
-//    api("io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter")
     api("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.projectreactor.netty:reactor-netty-http")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     runtimeOnly("com.mysql:mysql-connector-j")
 }
 
-tasks.named("compileJava") {
-    (this as JavaCompile).options.javaModuleVersion = project.version.toString()
+tasks.named<JavaCompile>("compileJava") {
+    options.javaModuleVersion = project.version.toString()
 }
 
 tasks.javadoc {
-    (this.options as StandardJavadocDocletOptions).addStringOption("-release", "17")
+    (options as StandardJavadocDocletOptions).addStringOption("-release", "17")
 }
