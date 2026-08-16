@@ -32,7 +32,7 @@ tasks.jar {
         )
     }
     into("META-INF/maven/${project.group}/${project.name}") {
-        from({ tasks["generatePomFileForMavenJavaSysApiPublication"] })
+        from({ tasks.named("generatePomFileForMavenJavaSysApiPublication") })
         rename(".*", "pom.xml")
     }
 }
@@ -64,7 +64,7 @@ publishing {
                         id.set("lWoHvYe")
                         name.set("王红岩(lWoHvYe)")
                         email.set("lWoHvYe@outlook.com")
-                        url.set("https://www.lwohvye.com")
+                        url.set("https://www.lwohvye.com/tree/main")
                     }
                 }
                 scm {
