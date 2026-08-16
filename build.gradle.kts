@@ -14,27 +14,12 @@
  *    limitations under the License.
  */
 
-// 这种是legacy的configuration，但针对未publish到maven central的，还是要这种方式才行(dependencies部分)
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        // Should in hierarchy
-        maven {
-            name = "extra-repo"
-            url = uri("$rootProject.projectDir/ex-lib")
-        }
-    }
-}
-
 plugins {
     id("com.lwohvye.java-conventions")
-    //主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
     alias(libs.plugins.spring.boot) apply false
-    // This plugin simplifies the use of Lombok in Gradle
     id("io.freefair.lombok") version "9.5.0"
     id("me.champeau.mrjar") version "0.1.1"
     id("org.gradlex.extra-java-module-info") version "1.14.2"
-    // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
@@ -52,7 +37,6 @@ subprojects {
     apply(plugin = "org.gradlex.extra-java-module-info")
     apply(plugin = "io.freefair.lombok")
 
-    // Setting a custom Lombok version when use plugin io.freefair.lombok
     lombok {
         version = "1.18.46"
     }
@@ -65,20 +49,17 @@ subprojects {
     tasks.withType<Javadoc>().configureEach {
         isFailOnError = false
         (options as StandardJavadocDocletOptions).apply {
-            addStringOption("Xdoclint:none", "-quiet")
-            addStringOption("encoding", "UTF-8")
-            addStringOption("charSet", "UTF-8")
-            // Add support for custom tag
+            encoding = "UTF-8"
+            charSet = "UTF-8"
+            docEncoding = "UTF-8"
+            addBooleanOption("Xdoclint:none", true)
             addStringOption("tag", "date:a:Init Date:")
             addStringOption("tag", "author:a:Major Contributor:")
         }
     }
 
     extraJavaModuleInfo {
-        // deriveAutomaticModuleNamesFromFileNames = true //  failed due to split package issue
-        // legacy configure start
         failOnMissingModuleInfo.set(false)
-        // split package
         automaticModule("org.springframework.security:spring-security-core", "spring.security.core") {
             mergeJar("org.springframework.security:spring-security-web")
             mergeJar("org.springframework.security:spring-security-access")
@@ -86,20 +67,13 @@ subprojects {
         automaticModule("io.github.mouzt:bizlog-sdk", "bizlog.sdk")
         automaticModule("com.github.whvcse:easy-captcha", "easy.captcha")
         automaticModule("io.jsonwebtoken:jjwt-api", "jjwt.api")
-        // end
     }
 }
 
 allprojects {
-    tasks.withType<Javadoc> {
-        if (JavaVersion.current().isJava9Compatible) {
-            (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-        }
+    tasks.withType<Javadoc>().configureEach {
         if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_25)) {
-            (options as StandardJavadocDocletOptions).apply {
-                addBooleanOption("-enable-preview", true)
-                addStringOption("-release", "25")
-            }
+            (options as StandardJavadocDocletOptions).addStringOption("-release", "25")
         }
     }
 }
@@ -109,7 +83,6 @@ tasks.withType<Checkstyle>().configureEach {
         xml.required.set(false)
     }
 }
-
 
 java {
     withJavadocJar()
@@ -131,8 +104,6 @@ publishing {
             }
             pom {
                 name.set("Valentine Unicorn")
-                packaging = "pom"
-                // optionally artifactId can be defined here
                 description.set("A Spring Boot Project With Jpa JWT Security and so on")
                 url.set("https://github.com/lWoHvYe/unicorn.git")
                 properties = mapOf(
@@ -143,7 +114,7 @@ publishing {
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
                 developers {
@@ -165,10 +136,8 @@ publishing {
     }
 }
 
-// this is the equivalent of the `nexusPublishing` block
 nexusPublishing {
     repositories {
-        // see https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#configuration
         sonatype {
             nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
             snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
