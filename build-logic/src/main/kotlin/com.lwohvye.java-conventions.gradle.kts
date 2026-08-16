@@ -45,3 +45,16 @@ tasks.withType<Test>().configureEach {
 tasks.withType<JavaExec>().configureEach {
     jvmArgs("--enable-preview")
 }
+
+tasks.withType<Javadoc>().configureEach {
+    isFailOnError = false
+    options.encoding = "UTF-8"
+    options.charSet = "UTF-8"
+    options.docEncoding = "UTF-8"
+    (options as StandardJavadocDocletOptions).apply {
+        addBooleanOption("Xdoclint:none", true)
+        addBooleanOption("enable-preview", true)
+        addStringOption("tag", "date:a:Init Date:")
+        addStringOption("tag", "author:a:Major Contributor:")
+    }
+}
