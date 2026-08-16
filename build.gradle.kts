@@ -52,19 +52,6 @@ subprojects {
         annotationProcessor(mapstructSpring)
     }
 
-    tasks.withType<Javadoc>().configureEach {
-        isFailOnError = false
-        (options as StandardJavadocDocletOptions).apply {
-            encoding = "UTF-8"
-            charSet = "UTF-8"
-            docEncoding = "UTF-8"
-            addBooleanOption("Xdoclint:none", true)
-            addBooleanOption("enable-preview", true)
-            addStringOption("tag", "date:a:Init Date:")
-            addStringOption("tag", "author:a:Major Contributor:")
-        }
-    }
-
     extraJavaModuleInfo {
         failOnMissingModuleInfo.set(false)
         automaticModule("org.springframework.security:spring-security-core", "spring.security.core") {
