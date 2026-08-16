@@ -38,14 +38,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "valentine-p2p"
 
-val javaVersion = JavaVersion.current()
-println("Current Java version: $javaVersion")
-
-val excludedProjects = gradle.startParameter.projectProperties["excludeProjects"]
-    ?.split(",")
-    ?.filter(String::isNotBlank)
-    ?.toSet()
-    .orEmpty()
+val excludedProjects = providers.gradleProperty("excludeProjects")
+    .map { it.split(",") }
+    .map { names -> names.filter(String::isNotBlank).toSet() }
+    .getOrElse(emptySet())
 
 val buildFiles = fileTree(rootDir) {
     include("**/*.gradle", "**/*.gradle.kts")
