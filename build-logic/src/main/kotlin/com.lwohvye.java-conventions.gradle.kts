@@ -28,9 +28,6 @@ group = "com.lwohvye"
 version = "4.8.4-chi"
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
     withSourcesJar()
 }
 
