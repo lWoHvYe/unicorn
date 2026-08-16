@@ -34,10 +34,6 @@ dependencyResolutionManagement {
             dirs(rootProject.projectDir.resolve("ex-lib"))
         }
     }
-
-    versionCatalogs {
-        create("libs")
-    }
 }
 
 rootProject.name = "valentine-p2p"
@@ -71,29 +67,20 @@ val buildFiles = fileTree(rootDir) {
         exclude("**/*-kotlin.gradle.kts")
     }
 
-    excludedProjects.forEach { exclude(it) }
+    excludedProjects.forEach(::exclude)
 }
 
 buildFiles.forEach { buildFile ->
     val isDefaultName = buildFile.name == "build.gradle" || buildFile.name == "build.gradle.kts"
-    val isKotlin = buildFile.name.endsWith(".kts")
+    val projectName = buildFile.name
+        .removeSuffix(if (buildFile.name.endsWith(".gradle.kts")) ".gradle.kts" else ".gradle")
 
     if (isDefaultName) {
-        val buildFilePath = buildFile.parentFile.absolutePath
-        val projectPath = buildFilePath.removePrefix(rootDir.absolutePath)
-            .replace(File.separator, ":")
-            .let { if (it.isEmpty()) ":" else it }
+        val projectPath = ":${buildFile.parentFile.relativeTo(rootDir).path.replace(File.separator, ":")}"
         include(projectPath)
     } else {
-        val projectName = if (isKotlin) {
-            buildFile.name.removeSuffix(".gradle.kts")
-        } else {
-            buildFile.name.removeSuffix(".gradle")
-        }
-
         val projectPath = ":$projectName"
         include(projectPath)
-
         project(projectPath).apply {
             name = projectName
             projectDir = buildFile.parentFile
