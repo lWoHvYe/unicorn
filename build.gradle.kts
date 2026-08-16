@@ -18,9 +18,9 @@ plugins {
     id("com.lwohvye.java-conventions")
     id("com.lwohvye.publishing-conventions")
     alias(libs.plugins.spring.boot) apply false
-    alias(libs.plugins.freefair.lombok)
-    alias(libs.plugins.mrjar)
-    alias(libs.plugins.extra.java.module.info)
+    alias(libs.plugins.freefair.lombok) apply false
+    alias(libs.plugins.mrjar) apply false
+    alias(libs.plugins.extra.java.module.info) apply false
     alias(libs.plugins.nexus.publish)
 }
 
