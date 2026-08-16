@@ -15,6 +15,8 @@
  */
 
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
+import org.gradle.jvm.tasks.Jar
 
 plugins {
     `maven-publish`
@@ -61,6 +63,18 @@ publishing {
                 connection.set("scm:git:git://github.com/lWoHvYe/unicorn.git")
                 developerConnection.set("scm:git:ssh://github.com/lWoHvYe/unicorn.git")
                 url.set("https://github.com/lWoHvYe/unicorn/tree/main")
+            }
+        }
+
+        if (project != rootProject) {
+            val pomTask = tasks.named<GenerateMavenPom>(
+                "generatePomFileFor${name.replaceFirstChar(Char::uppercaseChar)}Publication"
+            )
+            tasks.named<Jar>("jar") {
+                into("META-INF/maven/${project.group}/${project.name}") {
+                    from(pomTask)
+                    rename(".*", "pom.xml")
+                }
             }
         }
     }

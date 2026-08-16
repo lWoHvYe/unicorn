@@ -34,10 +34,6 @@ tasks.jar {
             "Automatic-Module-Name" to "lwohvye.${project.name.replace("-", ".")}"
         )
     }
-    into("META-INF/maven/${project.group}/${project.name}") {
-        from({ tasks.named("generatePomFileForMavenJava3rdToolPublication") })
-        rename(".*", "pom.xml")
-    }
 }
 
 publishing {
