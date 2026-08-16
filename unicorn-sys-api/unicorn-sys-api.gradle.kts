@@ -64,7 +64,7 @@ publishing {
                         id.set("lWoHvYe")
                         name.set("王红岩(lWoHvYe)")
                         email.set("lWoHvYe@outlook.com")
-                        url.set("https://www.lwohvye.com/tree/main")
+                        url.set("https://www.lwohvye.com")
                     }
                 }
                 scm {
