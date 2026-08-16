@@ -11,7 +11,7 @@ captcha = "2.1.0"
 commonsBeanutils = "1.11.0"
 commonsConfiguration = "2.15.1"
 easyCaptcha = "1.6.2"
-hutool = "5.8.28"
+hutool = "5.8.46"
 ip2region = "3.0.4"
 jjwt = "0.13.0"
 kotlin = "2.4.0"
@@ -20,13 +20,15 @@ logstash = "9.0"
 mapstruct = "1.6.3"
 mapstructSpring = "2.0.0"
 oshiCore = "6.4.2"
-poi = "5.5.0"
+poi = "5.5.1"
 redisson = "4.7.0"
 springBoot = "4.1.0"
 springCloudVersion = "2025.1.2"
 springdoc = "3.1.0"
 thumbnailator = "0.4.21"
 xerces = "2.12.2"
+bouncycastle = "1.84"
+jetbrainsAnnotations = "26.1.0"
 
 [libraries]
 asm = { group = "org.ow2.asm", name = "asm", version.ref = "asm" }
@@ -55,6 +57,8 @@ springdoc-webflux-ui = { group = "org.springdoc", name = "springdoc-openapi-star
 springdoc-webmvc-ui = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 thumbnailator = { group = "net.coobird", name = "thumbnailator", version.ref = "thumbnailator" }
 xerces = { group = "xerces", name = "xercesImpl", version.ref = "xerces" }
+bouncycastle-pkix = { group = "org.bouncycastle", name = "bcpkix-jdk18on", version.ref = "bouncycastle" }
+jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrainsAnnotations" }
 
 [bundles]
 coroutines = ["coroutines-core", "coroutines-jdk8", "coroutines-jdk9"]
