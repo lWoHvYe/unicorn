@@ -14,28 +14,14 @@
  *    limitations under the License.
  */
 
-// 这种是legacy的configuration，但针对未publish到maven central的，还是要这种方式才行(dependencies部分)
-buildscript {
-    repositories {
-        gradlePluginPortal()
-        // Should in hierarchy
-        maven {
-            name = "extra-repo"
-            url = uri("$rootProject.projectDir/ex-lib")
-        }
-    }
-}
-
 plugins {
     id("com.lwohvye.java-conventions")
-    //主要是定义了这个，定义了SpringBoot的Version相关，并提供了application, bootJar, bootBuildImage这些Task
+    id("com.lwohvye.publishing-conventions")
     alias(libs.plugins.spring.boot) apply false
-    // This plugin simplifies the use of Lombok in Gradle
-    id("io.freefair.lombok") version "9.5.0"
-    id("me.champeau.mrjar") version "0.1.1"
-    id("org.gradlex.extra-java-module-info") version "1.14.2"
-    // 在parent root执行Task，会同步执行sub project的Task，比如执行了bootJar，那会执行subPro的bootJar(若其中没有该Task会ignore)
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
+    alias(libs.plugins.freefair.lombok) apply false
+    alias(libs.plugins.mrjar) apply false
+    alias(libs.plugins.extra.java.module.info) apply false
+    alias(libs.plugins.nexus.publish)
 }
 
 extra["sharedManifest"] = java.manifest {
@@ -47,38 +33,27 @@ extra["sharedManifest"] = java.manifest {
     )
 }
 
+val lombokVersion = libs.versions.lombok.get()
+val mapstructProcessor = libs.mapstruct.processor
+val mapstructSpring = libs.mapstruct.spring
+
 subprojects {
     apply(plugin = "com.lwohvye.java-conventions")
+    apply(plugin = "com.lwohvye.publishing-conventions")
     apply(plugin = "org.gradlex.extra-java-module-info")
     apply(plugin = "io.freefair.lombok")
 
-    // Setting a custom Lombok version when use plugin io.freefair.lombok
     lombok {
-        version = "1.18.46"
+        version = lombokVersion
     }
 
     dependencies {
-        annotationProcessor("org.mapstruct", "mapstruct-processor", "1.6.3")
-        annotationProcessor("org.mapstruct.extensions.spring", "mapstruct-spring-extensions", "2.0.0")
-    }
-
-    tasks.withType<Javadoc>().configureEach {
-        isFailOnError = false
-        (options as StandardJavadocDocletOptions).apply {
-            addStringOption("Xdoclint:none", "-quiet")
-            addStringOption("encoding", "UTF-8")
-            addStringOption("charSet", "UTF-8")
-            // Add support for custom tag
-            addStringOption("tag", "date:a:Init Date:")
-            addStringOption("tag", "author:a:Major Contributor:")
-        }
+        annotationProcessor(mapstructProcessor)
+        annotationProcessor(mapstructSpring)
     }
 
     extraJavaModuleInfo {
-        // deriveAutomaticModuleNamesFromFileNames = true //  failed due to split package issue
-        // legacy configure start
         failOnMissingModuleInfo.set(false)
-        // split package
         automaticModule("org.springframework.security:spring-security-core", "spring.security.core") {
             mergeJar("org.springframework.security:spring-security-web")
             mergeJar("org.springframework.security:spring-security-access")
@@ -86,21 +61,6 @@ subprojects {
         automaticModule("io.github.mouzt:bizlog-sdk", "bizlog.sdk")
         automaticModule("com.github.whvcse:easy-captcha", "easy.captcha")
         automaticModule("io.jsonwebtoken:jjwt-api", "jjwt.api")
-        // end
-    }
-}
-
-allprojects {
-    tasks.withType<Javadoc> {
-        if (JavaVersion.current().isJava9Compatible) {
-            (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
-        }
-        if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_25)) {
-            (options as StandardJavadocDocletOptions).apply {
-                addBooleanOption("-enable-preview", true)
-                addStringOption("-release", "25")
-            }
-        }
     }
 }
 
@@ -110,54 +70,20 @@ tasks.withType<Checkstyle>().configureEach {
     }
 }
 
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             artifactId = "unicorn"
             from(components["java"])
-            versionMapping {
-                usage("java-api") {
-                    fromResolutionOf("runtimeClasspath")
-                }
-                usage("java-runtime") {
-                    fromResolutionResult()
-                }
-            }
             pom {
                 name.set("Valentine Unicorn")
-                packaging = "pom"
-                // optionally artifactId can be defined here
                 description.set("A Spring Boot Project With Jpa JWT Security and so on")
-                url.set("https://github.com/lWoHvYe/unicorn.git")
                 properties = mapOf(
                     "myProp" to "chaste unicorn",
                     "spring-boot.version" to libs.versions.springBoot.get(),
                     "project.core.version" to version
                 )
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("lWoHvYe")
-                        name.set("王红岩(lWoHvYe)")
-                        email.set("lWoHvYe@outlook.com")
-                        url.set("https://www.lwohvye.com")
-                    }
-                }
                 scm {
-                    connection.set("scm:git:git://github.com/lWoHvYe/unicorn.git")
-                    developerConnection.set("scm:git:ssh://github.com/lWoHvYe/unicorn.git")
-                    url.set("https://github.com/lWoHvYe/unicorn/tree/main")
                     tag.set("unicorn-v$version")
                 }
             }
@@ -165,15 +91,19 @@ publishing {
     }
 }
 
-// this is the equivalent of the `nexusPublishing` block
 nexusPublishing {
     repositories {
-        // see https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#configuration
         sonatype {
             nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
             snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
-            username.set(findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME"))
-            password.set(findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD"))
+            username.set(
+                providers.gradleProperty("ossrhUsername")
+                    .orElse(providers.environmentVariable("OSSRH_USERNAME"))
+            )
+            password.set(
+                providers.gradleProperty("ossrhPassword")
+                    .orElse(providers.environmentVariable("OSSRH_PASSWORD"))
+            )
         }
     }
 }
