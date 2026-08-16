@@ -36,10 +36,8 @@ publishing {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/lWoHvYe/unicorn")
         credentials {
-            username = providers.gradleProperty("gpr.user")
-                .orElse(providers.environmentVariable("USERNAME"))
-            password = providers.gradleProperty("gpr.key")
-                .orElse(providers.environmentVariable("TOKEN"))
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
         }
     }
 }
