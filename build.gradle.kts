@@ -17,10 +17,10 @@
 plugins {
     id("com.lwohvye.java-conventions")
     alias(libs.plugins.spring.boot) apply false
-    id("io.freefair.lombok") version "9.5.0"
-    id("me.champeau.mrjar") version "0.1.1"
-    id("org.gradlex.extra-java-module-info") version "1.14.2"
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
+    alias(libs.plugins.freefair.lombok)
+    alias(libs.plugins.mrjar)
+    alias(libs.plugins.extra.java.module.info)
+    alias(libs.plugins.nexus.publish)
 }
 
 extra["sharedManifest"] = java.manifest {
@@ -38,12 +38,12 @@ subprojects {
     apply(plugin = "io.freefair.lombok")
 
     lombok {
-        version = "1.18.46"
+        version = libs.versions.lombok.get()
     }
 
     dependencies {
-        annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
-        annotationProcessor("org.mapstruct.extensions.spring:mapstruct-spring-extensions:2.0.0")
+        annotationProcessor(libs.mapstruct.processor)
+        annotationProcessor(libs.mapstruct.spring)
     }
 
     tasks.withType<Javadoc>().configureEach {
