@@ -29,14 +29,9 @@ java {
     }
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-}
-
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
 
 tasks.jar {
-    enabled = true
     manifest {
         from(sharedManifest)
         attributes(
