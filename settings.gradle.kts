@@ -68,24 +68,27 @@ val buildFiles = fileTree(rootDir) {
     excludedProjects.forEach(::exclude)
 }
 
-buildFiles.forEach { buildFile ->
-    val isDefaultName = buildFile.name == "build.gradle" || buildFile.name == "build.gradle.kts"
-    val projectName = buildFile.name
-        .removeSuffix(if (buildFile.name.endsWith(".gradle.kts")) ".gradle.kts" else ".gradle")
+buildFiles
+    .sortedBy { it.absolutePath }
+    .forEach { buildFile ->
+        val isDefaultName = buildFile.name == "build.gradle" || buildFile.name == "build.gradle.kts"
+        val projectName = buildFile.name
+            .removeSuffix(if (buildFile.name.endsWith(".gradle.kts")) ".gradle.kts" else ".gradle")
 
-    if (isDefaultName) {
-        val projectPath = ":${buildFile.parentFile.relativeTo(rootDir).path.replace(File.separator, ":")}"
-        include(projectPath)
-    } else {
-        val projectPath = ":$projectName"
-        include(projectPath)
-        project(projectPath).apply {
-            name = projectName
-            projectDir = buildFile.parentFile
-            buildFileName = buildFile.name
+        if (isDefaultName) {
+            val relativePath = buildFile.parentFile.relativeTo(rootDir).path
+            val projectPath = ":${relativePath.replace(File.separator, ":")}"
+            include(projectPath)
+        } else {
+            val projectPath = ":$projectName"
+            include(projectPath)
+            project(projectPath).apply {
+                name = projectName
+                projectDir = buildFile.parentFile
+                buildFileName = buildFile.name
+            }
         }
     }
-}
 
 develocity {
     buildScan {
