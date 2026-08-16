@@ -83,51 +83,20 @@ tasks.withType<Checkstyle>().configureEach {
     }
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             artifactId = "unicorn"
             from(components["java"])
-            versionMapping {
-                usage("java-api") {
-                    fromResolutionOf("runtimeClasspath")
-                }
-                usage("java-runtime") {
-                    fromResolutionResult()
-                }
-            }
             pom {
                 name.set("Valentine Unicorn")
                 description.set("A Spring Boot Project With Jpa JWT Security and so on")
-                url.set("https://github.com/lWoHvYe/unicorn.git")
                 properties = mapOf(
                     "myProp" to "chaste unicorn",
                     "spring-boot.version" to libs.versions.springBoot.get(),
                     "project.core.version" to version
                 )
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("lWoHvYe")
-                        name.set("王红岩(lWoHvYe)")
-                        email.set("lWoHvYe@outlook.com")
-                        url.set("https://www.lwohvye.com")
-                    }
-                }
                 scm {
-                    connection.set("scm:git:git://github.com/lWoHvYe/unicorn.git")
-                    developerConnection.set("scm:git:ssh://github.com/lWoHvYe/unicorn.git")
-                    url.set("https://github.com/lWoHvYe/unicorn/tree/main")
                     tag.set("unicorn-v$version")
                 }
             }
