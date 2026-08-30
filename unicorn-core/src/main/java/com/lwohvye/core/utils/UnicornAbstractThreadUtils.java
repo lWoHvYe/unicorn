@@ -23,9 +23,11 @@ import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestAttributesThreadLocalAccessor;
 import org.springframework.web.context.request.RequestContextHolder;
 
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
@@ -39,90 +41,86 @@ public abstract class UnicornAbstractThreadUtils {
 
     public static final ExecutorService TASK_EXECUTOR = Executors.newFixedThreadPool(8);
 
-    // 1. 创建一个只包含特定 Accessor 的 Registry
-    static ContextRegistry limitedRegistry = new ContextRegistry()
-            .registerThreadLocalAccessor(new ObservationThreadLocalAccessor())         // 只传 Observation
-            .registerThreadLocalAccessor(new RequestAttributesThreadLocalAccessor());  // 或自定义字段
+    private static final ContextRegistry limitedRegistry = new ContextRegistry()
+            .registerThreadLocalAccessor(new ObservationThreadLocalAccessor())
+            .registerThreadLocalAccessor(new RequestAttributesThreadLocalAccessor());
 
-    // 2. 使用这个受限的 Registry 创建工厂
-    static ContextSnapshotFactory selectiveFactory = ContextSnapshotFactory.builder()
+    private static final ContextSnapshotFactory selectiveFactory = ContextSnapshotFactory.builder()
             .contextRegistry(limitedRegistry)
             .build();
 
-    // 使用自定义工厂
     public static ExecutorService wrap(ExecutorService executor) {
         return ContextExecutorService.wrap(executor, () -> selectiveFactory.captureAll());
     }
 
     public static Runnable decorateObservation(Runnable runnable) {
-        // 获取当前 Observation 并包装任务
         var currentObservation = SpringContextHolder.getBean(ObservationRegistry.class).getCurrentObservation();
-        if (currentObservation != null) {
-            // 包装后的任务在执行时会自动恢复并清理 Trace 上下文
-            return currentObservation.wrap(runnable);
-        } else {
-            return runnable;
-        }
+        return currentObservation != null ? currentObservation.wrap(runnable) : runnable;
     }
 
     public static <U> Supplier<U> decorateObservation(Supplier<U> supplier) {
-        // 获取当前 Observation 并包装任务
         var currentObservation = SpringContextHolder.getBean(ObservationRegistry.class).getCurrentObservation();
-        if (currentObservation != null) {
-            // 包装后的任务在执行时会自动恢复并清理 Trace 上下文
-            return currentObservation.wrap(supplier);
-        } else {
-            return supplier;
-        }
+        return currentObservation != null ? currentObservation.wrap(supplier) : supplier;
     }
 
     public static Runnable decorateMdc(Runnable runnable) {
-        var mdc = MDC.getCopyOfContextMap();
+        Map<String, String> capturedMdc = MDC.getCopyOfContextMap();
         return () -> {
+            Map<String, String> previousMdc = MDC.getCopyOfContextMap();
             try {
-                MDC.setContextMap(mdc);
+                restoreMdc(capturedMdc);
                 runnable.run();
             } finally {
-                MDC.clear();
+                restoreMdc(previousMdc);
             }
         };
     }
 
     public static <U> Supplier<U> decorateMdc(Supplier<U> supplier) {
-        var mdc = MDC.getCopyOfContextMap();
+        Map<String, String> capturedMdc = MDC.getCopyOfContextMap();
         return () -> {
+            Map<String, String> previousMdc = MDC.getCopyOfContextMap();
             try {
-                MDC.setContextMap(mdc);
+                restoreMdc(capturedMdc);
                 return supplier.get();
             } finally {
-                MDC.clear();
+                restoreMdc(previousMdc);
             }
         };
     }
 
-    // 将HttpRequest传递到子线程，使用线程池时可以这样做，但也需要考虑性能问题。如果是直接创建子线程就不用这么麻烦，想办法像下面将inheritable设置为true就行
     public static Runnable decorateRequest(Runnable runnable) {
-        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        RequestAttributes capturedAttributes = RequestContextHolder.currentRequestAttributes();
         return () -> {
+            RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
             try {
-                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                RequestContextHolder.setRequestAttributes(capturedAttributes, false);
                 runnable.run();
             } finally {
-                RequestContextHolder.resetRequestAttributes();
+                RequestContextHolder.setRequestAttributes(previousAttributes, false);
             }
         };
     }
 
     public static <U> Supplier<U> decorateRequest(Supplier<U> supplier) {
-        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+        RequestAttributes capturedAttributes = RequestContextHolder.currentRequestAttributes();
         return () -> {
+            RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
             try {
-                RequestContextHolder.setRequestAttributes(requestAttributes, true);
+                RequestContextHolder.setRequestAttributes(capturedAttributes, false);
                 return supplier.get();
             } finally {
-                RequestContextHolder.resetRequestAttributes();
+                RequestContextHolder.setRequestAttributes(previousAttributes, false);
             }
         };
+    }
+
+    private static void restoreMdc(Map<String, String> contextMap) {
+        if (contextMap == null || contextMap.isEmpty()) {
+            MDC.clear();
+        } else {
+            MDC.setContextMap(contextMap);
+        }
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022-2025.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2026.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -33,55 +33,57 @@ import java.util.function.Function;
 public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
 
     /**
-     * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
+     * Execute all tasks concurrently, compose their results, and optionally consume the composed result.
      *
-     * @param composeResult consume the task res
-     * @param eventual      finally execute, consume the res of  composeResult
-     * @param tasks         tasks wtd
+     * <p>All task failures are propagated and the compose/eventual callbacks are invoked only after every
+     * task has completed successfully. A task returning {@code null} keeps its position in the result list.</p>
+     *
+     * @param composeResult consume the task results
+     * @param eventual finally execute, consuming the composed result
+     * @param tasks tasks to execute concurrently
      */
     public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
-        log.warn("In Java 17 Source");
-        List<CompletableFuture<T>> futures = null;
-        if (Objects.nonNull(tasks)) {
-            futures = Arrays.stream(tasks).map(task -> CompletableFuture.supplyAsync(() -> {
-                try {
-                    return task.call();
-                } catch (Exception e) {
-                    throw new UtilsException(e.getMessage());
-                }
-            }, TASK_EXECUTOR)).toList();
-            var allCF = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-            // whenComplete 只是一个处理完成状态的方法，它不会吞掉异常，也不会改变 CompletableFuture 的状态。
-            allCF.whenComplete((voidResult, throwable) -> {
-                if (throwable == null) {
-                    log.info("All tasks completed successfully");
-                } else {
-                    log.warn("Exception occurred when execute task: {} ", throwable.getMessage());
-                }
-            });
-            allCF.join(); // This will still throw an exception if any of the futures failed
-        }
-        U results = null;
-        if (Objects.nonNull(composeResult))
-            results = composeResult.apply(Objects.nonNull(futures) ?
-                    futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).toList() : Collections.emptyList());
-        if (Objects.nonNull(eventual))
-            eventual.accept(results);
+        log.debug("Executing tasks with Java 17 concurrency implementation");
+        List<CompletableFuture<T>> futures = tasks == null
+                ? Collections.emptyList()
+                : Arrays.stream(tasks)
+                .map(Objects::requireNonNull)
+                .map(task -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return task.call();
+                    } catch (Exception e) {
+                        throw new UtilsException("Task execution failed", e);
+                    }
+                }, TASK_EXECUTOR))
+                .toList();
 
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        U results = null;
+        if (composeResult != null) {
+            results = composeResult.apply(futures.isEmpty()
+                    ? Collections.emptyList()
+                    : futures.stream().map(CompletableFuture::join).toList());
+        }
+        if (eventual != null) {
+            eventual.accept(results);
+        }
     }
 
-    // Returns a Callable object that, when called, runs the given task and returns null.
-    // var callable = Executors.callable(runnable) // Runnable 2 Callable
-    // A FutureTask can be used to wrap a Callable or Runnable object. Because FutureTask implements Runnable, a FutureTask can be submitted to an Executor for execution.
-    // var futureTask = new FutureTask<T>(Callable/Runnable) // Callable/Runnable 2 Runnable/Future
+    /**
+     * Execute all tasks concurrently and invoke {@code eventual} after successful completion.
+     */
     public static void structuredExecute(Runnable eventual, Runnable... tasks) {
-        log.warn("In Java 17 Source");
-        if (Objects.nonNull(tasks)) {
-            var futureTasks = Arrays.stream(tasks).map(task -> CompletableFuture.runAsync(task, TASK_EXECUTOR)).toList();
-            CompletableFuture.allOf(futureTasks.toArray(new CompletableFuture[0])).join();
+        log.debug("Executing tasks with Java 17 concurrency implementation");
+        if (tasks != null) {
+            var futures = Arrays.stream(tasks)
+                    .map(Objects::requireNonNull)
+                    .map(task -> CompletableFuture.runAsync(task, TASK_EXECUTOR))
+                    .toList();
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         }
-        // Here, both forks have succeeded, so compose their results
-        if (Objects.nonNull(eventual))
+        if (eventual != null) {
             eventual.run();
+        }
     }
 }

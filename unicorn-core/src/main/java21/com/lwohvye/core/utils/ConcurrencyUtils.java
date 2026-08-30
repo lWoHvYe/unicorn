@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022-2025.  lWoHvYe(Hongyan Wang)
+ *    Copyright (c) 2022-2026.  lWoHvYe(Hongyan Wang)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,71 +23,85 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.concurrent.StructuredTaskScope.Subtask;
 
 /**
- * This class provides utility methods for handling concurrency and executing tasks in a structured manner.
+ * Utilities for executing tasks with structured concurrency on Java 21+ runtimes.
  */
 @UtilityClass
 public class ConcurrencyUtils extends UnicornAbstractThreadUtils {
 
     /**
-     * Basic flow : execute tasks, the result as the input of composeResult, the previous res as the input of eventual
+     * Execute all tasks in a {@link java.util.concurrent.StructuredTaskScope.ShutdownOnFailure}, compose their
+     * results, and optionally consume the composed result. If one task fails, sibling tasks are cancelled.
      *
-     * @param composeResult consume the task res
-     * @param eventual      finally execute, consume the res of  composeResult
-     * @param tasks         tasks wtd
+     * @param composeResult consume the task results
+     * @param eventual finally execute, consuming the composed result
+     * @param tasks tasks to execute concurrently
      */
     public static <T, U> void structuredExecute(Function<List<T>, U> composeResult, Consumer<U> eventual, Callable<T>... tasks) {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            List<Subtask<T>> subtasks = null;
-            if (Objects.nonNull(tasks))
-                subtasks = Arrays.stream(tasks).map(scope::fork).toList();
+        try (var scope = new java.util.concurrent.StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+            List<Subtask<T>> subtasks = tasks == null
+                    ? Collections.emptyList()
+                    : Arrays.stream(tasks)
+                    .map(Objects::requireNonNull)
+                    .map(scope::fork)
+                    .toList();
 
-            scope.join()           // Join both forks
-                    .throwIfFailed();  // ... and propagate errors
+            scope.join().throwIfFailed();
 
-            // Here, both forks have succeeded, so compose their results
             U results = null;
-            if (Objects.nonNull(composeResult))
-                results = composeResult.apply(Objects.nonNull(subtasks) ?
-                        subtasks.stream().map(Subtask::get).filter(Objects::nonNull).toList() : Collections.emptyList());
-            if (Objects.nonNull(eventual))
+            if (composeResult != null) {
+                results = composeResult.apply(subtasks.stream().map(Subtask::get).toList());
+            }
+            if (eventual != null) {
                 eventual.accept(results);
+            }
         } catch (ExecutionException e) {
-            if (e.getCause() instanceof RuntimeException re)
-                throw re;
-            throw new UtilsException(e.getMessage());
+            rethrowTaskFailure(e.getCause());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new UtilsException("Structured task execution was interrupted", e);
         }
     }
 
-    // Returns a Callable object that, when called, runs the given task and returns null.
-    // var callable = Executors.callable(runnable) // Runnable 2 Callable
-    // A FutureTask can be used to wrap a Callable or Runnable object. Because FutureTask implements Runnable, a FutureTask can be submitted to an Executor for execution.
-    // var futureTask = new FutureTask<T>(Callable/Runnable) // Callable/Runnable 2 Runnable/Future
+    /**
+     * Execute all tasks concurrently and invoke {@code eventual} after successful completion.
+     */
     public static void structuredExecute(Runnable eventual, Runnable... tasks) {
-        try (var scope = new StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
-            if (Objects.nonNull(tasks))
-                Arrays.stream(tasks).forEach(runnable -> scope.fork(Executors.callable(runnable)));
+        try (var scope = new java.util.concurrent.StructuredTaskScope.ShutdownOnFailure("STS-JUC", virtualFactory)) {
+            if (tasks != null) {
+                Arrays.stream(tasks)
+                        .map(Objects::requireNonNull)
+                        .forEach(task -> scope.fork(Executors.callable(task)));
+            }
 
-            scope.join()           // Join both forks
-                    .throwIfFailed();  // ... and propagate errors
+            scope.join().throwIfFailed();
 
-            // Here, both forks have succeeded, so compose their results
-            if (Objects.nonNull(eventual))
+            if (eventual != null) {
                 eventual.run();
+            }
         } catch (ExecutionException e) {
-            if (e.getCause() instanceof RuntimeException re)
-                throw re;
-            throw new UtilsException(e.getMessage());
+            rethrowTaskFailure(e.getCause());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new UtilsException("Structured task execution was interrupted", e);
         }
+    }
+
+    private static void rethrowTaskFailure(Throwable cause) {
+        if (cause instanceof RuntimeException runtimeException) {
+            throw runtimeException;
+        }
+        if (cause instanceof Error error) {
+            throw error;
+        }
+        throw new UtilsException("Structured task execution failed", cause);
     }
 }
