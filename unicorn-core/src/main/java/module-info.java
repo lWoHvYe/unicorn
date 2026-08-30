@@ -1,6 +1,6 @@
 // 暂作为open module。允许其他模块通过反射访问，后续缩小范围
 @SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
-        // 抑制compile warn: requires transitive directive for an automatic module
+// 抑制compile warn: requires transitive directive for an automatic module
 module lwohvye.unicorn.core {
     requires transitive java.compiler;
     requires java.desktop;
@@ -28,26 +28,26 @@ module lwohvye.unicorn.core {
     requires transitive spring.boot;
     requires transitive spring.boot.autoconfigure;
     requires transitive tools.jackson.databind;
-    requires transitive com.github.benmanes.caffeine;
-    requires transitive cn.hutool;
-    requires transitive io.swagger.v3.oas.models;
-    requires transitive io.swagger.v3.oas.annotations;
+    requires com.github.benmanes.caffeine;
+    requires cn.hutool;
+    requires io.swagger.v3.oas.models;
+    requires io.swagger.v3.oas.annotations;
     requires transitive lombok;
     requires mica.ip2region;
     requires transitive org.apache.commons.codec;
     requires org.apache.commons.lang3;
     requires transitive org.apache.commons.logging;
-    requires transitive org.apache.poi.poi;
-    requires transitive org.apache.poi.ooxml;
+    requires org.apache.poi.poi;
+    requires org.apache.poi.ooxml;
     requires transitive org.aspectj.weaver;
     requires transitive org.hibernate.orm.core;
     requires org.jetbrains.annotations;
     requires transitive org.mapstruct;
-    requires transitive org.slf4j;
-    requires transitive org.springdoc.openapi.common;
+    requires org.slf4j;
+    requires org.springdoc.openapi.common;
     requires transitive redisson;
-    requires transitive org.bouncycastle.pkix;
-    requires transitive org.bouncycastle.provider;
+    requires org.bouncycastle.pkix;
+    requires org.bouncycastle.provider;
     requires net.coobird.thumbnailator;
     requires reactor.core;
     requires spring.security.oauth2.jose;

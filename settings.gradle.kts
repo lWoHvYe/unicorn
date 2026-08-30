@@ -36,7 +36,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "valentine-p2p"
+rootProject.name = "unicorn"
 
 val excludedProjects = providers.gradleProperty("excludeProjects")
     .map { it.split(",") }

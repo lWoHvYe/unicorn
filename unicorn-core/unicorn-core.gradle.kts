@@ -67,11 +67,13 @@ publishing {
 }
 
 dependencies {
-    api(platform(SpringBootPlugin.BOM_COORDINATES))
+    implementation(platform(SpringBootPlugin.BOM_COORDINATES))
+
+    // Spring Boot capabilities that form Unicorn Core's runtime surface.
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     api("org.springframework.boot:spring-boot-starter-webmvc")
     api("org.springframework.boot:spring-boot-starter-security")
-    api("org.springframework.boot:spring-boot-starter-restclient")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.security:spring-security-access")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     api("org.springframework.boot:spring-boot-starter-amqp")
@@ -79,20 +81,23 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-data-redis")
     api(libs.redisson)
     api(libs.redisson.cache)
-    api("org.apache.commons:commons-pool2")
-    api("org.apache.commons:commons-lang3")
-    api(libs.springdoc.webmvc.ui)
-    api(libs.hutool)
-    api(libs.ip2region)
-    api(libs.poi)
-    api(libs.poi.ooxml)
+
+    // Implementation details: these are used by Core itself but are not part of
+    // the public type surface and should not leak through published API metadata.
+    implementation("org.apache.commons:commons-pool2")
+    implementation("org.apache.commons:commons-lang3")
+    implementation(libs.springdoc.webmvc.ui)
+    implementation(libs.hutool)
+    implementation(libs.ip2region)
+    implementation(libs.poi)
+    implementation(libs.poi.ooxml)
     implementation(libs.xerces)
     api(libs.mapstruct)
     api(libs.mapstruct.spring.annotations)
-    api("com.github.ben-manes.caffeine:caffeine")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation(libs.logback.encoder)
-    api(libs.bouncycastle.pkix)
-    api(libs.thumbnailator)
+    implementation(libs.bouncycastle.pkix)
+    implementation(libs.thumbnailator)
     api(libs.jetbrains.annotations)
     api("org.springframework.boot:spring-boot-starter-actuator")
     api("io.micrometer:micrometer-tracing-bridge-brave")
