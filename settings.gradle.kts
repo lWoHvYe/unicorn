@@ -58,10 +58,10 @@ val buildFiles = fileTree(rootDir) {
         "out"
     )
 
-    // Kotlin 2.x did not support Java 26 yet when this workaround was introduced.
+    // Kotlin 2.x did not support Java 27 yet when this workaround was introduced.
     // Keep this disabled for now; re-enable it only if a supported JDK requires
     // excluding the Kotlin modules again.
-    // if (!javaVersion.isCompatibleWith(JavaVersion.VERSION_26)) {
+    // if (!javaVersion.isCompatibleWith(JavaVersion.VERSION_27)) {
     //     exclude("**/*-kotlin.gradle.kts")
     // }
 
