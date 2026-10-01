@@ -32,7 +32,7 @@ thumbnailator = "0.4.21"
 xerces = "2.12.2"
 bouncycastle = "1.84"
 jetbrainsAnnotations = "26.1.0"
-freefairLombok = "9.5.0"
+freefairLombok = "9.7.0"
 extraJavaModuleInfo = "1.14.2"
 
 [libraries]
