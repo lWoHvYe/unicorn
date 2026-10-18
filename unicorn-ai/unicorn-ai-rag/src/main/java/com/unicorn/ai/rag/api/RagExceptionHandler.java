@@ -31,6 +31,12 @@ public class RagExceptionHandler {
         return ResponseEntity.badRequest().body(new RagError("BAD_REQUEST", exception.getMessage()));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<RagError> unavailable(IllegalStateException exception) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new RagError("FEATURE_UNAVAILABLE", exception.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<RagError> failed(Exception exception) {
         log.error("RAG 调用失败", exception);

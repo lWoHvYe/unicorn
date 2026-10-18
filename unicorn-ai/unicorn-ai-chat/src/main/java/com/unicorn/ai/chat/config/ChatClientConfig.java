@@ -20,7 +20,9 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,13 +33,15 @@ import org.springframework.context.annotation.Primary;
 public class ChatClientConfig {
 
     /**
-     * 默认使用内存版滑动窗口；生产可换成 Redis/JDBC 的 ChatMemoryRepository。
+     * 默认使用内存版滑动窗口；启用 infra profile 时由 RedisChatMemoryConfig 提供
+     * Redis 版 ChatMemoryRepository，实现跨重启的对话记忆。
      */
     @Bean
-    ChatMemory chatMemory(AiChatProperties properties) {
-        return MessageWindowChatMemory.builder()
-                .maxMessages(properties.memoryWindow())
-                .build();
+    ChatMemory chatMemory(AiChatProperties properties, ObjectProvider<ChatMemoryRepository> repository) {
+        var builder = MessageWindowChatMemory.builder()
+                .maxMessages(properties.memoryWindow());
+        repository.ifAvailable(builder::chatMemoryRepository);
+        return builder.build();
     }
 
     /**

@@ -25,6 +25,7 @@ dependencies {
     implementation(platform(libs.spring.ai.bom))
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

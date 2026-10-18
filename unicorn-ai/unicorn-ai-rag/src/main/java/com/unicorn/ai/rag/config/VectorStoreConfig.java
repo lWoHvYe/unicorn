@@ -19,16 +19,19 @@ package com.unicorn.ai.rag.config;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.RedisClient;
 
 @Configuration
-@EnableConfigurationProperties(RagProperties.class)
+@EnableConfigurationProperties({RagProperties.class, PgVectorProperties.class})
 public class VectorStoreConfig {
 
     /**
@@ -42,6 +45,7 @@ public class VectorStoreConfig {
 
     /**
      * Redis Stack（Redis Query Engine + RediSearch）方案；需要 redis/redis-stack 镜像。
+     * 注意：普通 Redis 不支持 FT._LIST，会启动失败。
      */
     @Bean
     @ConditionalOnProperty(name = "demo.ai.rag.vector-store", havingValue = "redis")
@@ -57,6 +61,26 @@ public class VectorStoreConfig {
                         RedisVectorStore.MetadataField.tag("source"),
                         RedisVectorStore.MetadataField.tag("tenant"),
                         RedisVectorStore.MetadataField.tag("docType"))
+                .initializeSchema(true)
+                .build();
+    }
+
+    /**
+     * pgvector 方案：compose 中已提供 pgvector/pgvector:pg17（5434）。
+     * 显式传入 dimensions，避免启动时为了探测维度而调用 embedding API。
+     */
+    @Bean
+    @ConditionalOnProperty(name = "demo.ai.rag.vector-store", havingValue = "pgvector")
+    VectorStore pgVectorStore(EmbeddingModel embeddingModel, PgVectorProperties properties) {
+        var dataSource = new DriverManagerDataSource(
+                properties.url(), properties.username(), properties.password());
+        var jdbcTemplate = new JdbcTemplate(dataSource);
+        return PgVectorStore.builder(jdbcTemplate, embeddingModel)
+                .schemaName(properties.schemaName())
+                .vectorTableName(properties.tableName())
+                .dimensions(properties.dimensions())
+                .distanceType(PgVectorStore.PgDistanceType.COSINE_DISTANCE)
+                .indexType(PgVectorStore.PgIndexType.HNSW)
                 .initializeSchema(true)
                 .build();
     }

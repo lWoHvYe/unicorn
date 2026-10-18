@@ -9,7 +9,7 @@ Spring AI **2.0.1** 的示例工程集合，运行在 Spring Boot **4.1.x** / Ja
 | 目录 | Gradle 工程 | 端口 | 内容 |
 | --- | --- | --- | --- |
 | `unicorn-ai-chat` | `:unicorn-ai-chat` | 8092 | ChatClient、SSE 流式、对话记忆、结构化输出、`@Tool` 工具调用、Agent 两步编排 |
-| `unicorn-ai-rag` | `:unicorn-ai-rag` | 8093 | ETL/切分、Simple/Redis 向量库、显式 RAG、Advisor RAG、Query Rewrite、Multi-Query |
+| `unicorn-ai-rag` | `:unicorn-ai-rag` | 8093 | ETL/切分、Simple/pgvector/Redis Stack 向量库、显式 RAG、Advisor RAG、Query Rewrite、Multi-Query、RabbitMQ 异步入库 |
 | `unicorn-ai-mcp-server` | `:unicorn-ai-mcp-server` | 8094 | `@McpTool` / `@McpResource` / `@McpPrompt`，Streamable-HTTP |
 | `unicorn-ai-mcp-client` | `:unicorn-ai-mcp-client` | 8095 | 通过 MCP 发现工具并注入 ChatClient |
 
@@ -38,6 +38,35 @@ MCP_CLIENT_ENABLED=true ./gradlew :unicorn-ai-mcp-client:bootRun
 ```
 
 所有应用都暴露 actuator：`/actuator/health`、`/actuator/metrics`。Spring AI 的 chat/embedding/tool 调用会产生 Micrometer observations，接入 tracing 后可在链路系统中查看。
+
+## 复用 Unicorn 现有基础设施（infra profile）
+
+默认 profile 是零依赖 demo（`SimpleVectorStore` + 内存记忆 + 内存任务表）。如果要连接现有 dev 环境，使用 `infra` profile：
+
+```bash
+# Chat：Redis 持久化对话记忆
+./gradlew :unicorn-ai-chat:bootRun --args='--spring.profiles.active=infra'
+
+# RAG：pgvector 向量库 + RabbitMQ 异步入库 + MySQL 任务审计
+./gradlew :unicorn-ai-rag:bootRun --args='--spring.profiles.active=infra'
+```
+
+连接信息与 `valentine-starter/src/main/resources/config/application-dev.yml`、`document/docker/docker-compose-env-sim.yml` 对齐：
+
+| 服务 | 地址 | 认证 | 用途 |
+| --- | --- | --- | --- |
+| Redis | `10.211.55.29:6379` | `redis-psd` | Chat 对话记忆（db 6，key 前缀 `unicorn-ai:chat-memory:`，TTL 24h） |
+| pgvector | `10.211.55.29:5434/vectordb` | `postgres/postgres` | RAG 向量库（表 `unicorn_ai_rag`，自动建表） |
+| MySQL | `10.211.55.29:3306/unicorn` | `root/root` | RAG 异步任务审计（表 `ai_rag_ingest_job`） |
+| RabbitMQ | `10.211.55.29:5672`，vhost `/unicorn` | `admin/admin` | RAG 异步入库队列 |
+
+说明：
+
+- **Redis 实例没有加载 RediSearch**（`FT._LIST` 不可用），所以 RAG 向量库使用 compose 中的 pgvector，而不是 Redis Stack。Chat 只用普通 Redis 的 List，不依赖 RediSearch。
+- 若要改用 Redis Stack，可设置 `RAG_VECTOR_STORE=redis` 并指向带 RediSearch 的实例；否则 RAG 启动会报 `ERR unknown command 'FT._LIST'`。
+- `infra` 启动时会主动连接这些服务；默认 profile 不会。
+- compose sim 的 RabbitMQ 默认是 `guest/guest`，如果未创建 `admin/admin`，用 `MQ_USER=guest MQ_PWD=guest` 覆盖。
+- MySQL 需要先有 `unicorn` 库（可导入 `sql/unicorn.sql`）；`ai_rag_ingest_job` 表由 `schema.sql` 自动创建。
 
 ## 测试
 
@@ -98,6 +127,7 @@ curl -s localhost:8092/api/ai/chat/agent \
 - 工具通过 `@Tool` / `@ToolParam` 声明，`ToolContext` 传递 tenant 等非模型上下文；`@Tool(returnDirect = true)` 演示“工具结果直接返回”。
 - `spring.ai.tools.limits.max-total-tool-calls=8` 限制单轮工具调用总数，防止循环失控。
 - `SimpleLoggerAdvisor` 需要把 `org.springframework.ai.chat.client.advisor` 调到 DEBUG 才能看到请求/响应。
+- `infra` profile 下 `MessageWindowChatMemory` 使用 `RedisChatMemoryRepository`，对话可跨重启恢复；key 前缀和 TTL 见上表。
 
 ## RAG Demo（8093）
 
@@ -137,12 +167,21 @@ curl -s localhost:8093/api/ai/rag/query/expand \
 # 查看/删除某个来源
 curl -s localhost:8093/api/ai/rag/stats
 curl -s -X DELETE 'localhost:8093/api/ai/rag/documents?source=sample/faq.md'
+
+# infra profile：异步入库（RabbitMQ），立即返回 jobId
+curl -s -X POST localhost:8093/api/ai/rag/documents/text/async \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"异步入库的内容","source":"infra/demo","tenant":"demo","docType":"text"}'
+
+# 查询任务状态（MySQL）
+curl -s localhost:8093/api/ai/rag/jobs/<jobId>
 ```
 
 向量库：
 
 - 默认 `demo.ai.rag.vector-store=simple`，使用进程内 `SimpleVectorStore`，零外部依赖，重启丢数据。
-- 切换 Redis Stack：`RAG_VECTOR_STORE=redis`，并设置 `REDIS_HOST` / `REDIS_PORT`。需要 Redis Stack（RediSearch + RedisJSON），普通 Redis 不够。
+- `infra` profile 使用 `pgvector`：`jdbc:postgresql://10.211.55.29:5434/vectordb`，自动创建 `unicorn_ai_rag` 表和 HNSW 索引；显式设置 `dimensions=1536`，避免启动时调用 embedding 探测维度。
+- 也可切换 Redis Stack：`RAG_VECTOR_STORE=redis`，但必须是有 RediSearch 的 Redis Stack，普通 Redis 会报 `FT._LIST` 不存在。
 - 文档 metadata 会补齐 `source`、`tenant`、`docType`、`ingestedAt`、`contentHash`，可用于 `filter` 表达式。
 - 切分使用 `TokenTextSplitter`，中文标点参与断句；chunk 大小、阈值、topK 都在 `application.yml` 中可调。
 
@@ -198,7 +237,7 @@ OPENAI_API_KEY=ollama
 
 ## 设计取舍
 
-- **Demo 不等于生产**：对话记忆用进程内 `MessageWindowChatMemory`，向量库默认 `SimpleVectorStore`，MCP 无认证。生产要换持久化 memory、Redis/PGVector 等向量库，并加安全边界。
+- **Demo 不等于生产**：默认 profile 用进程内对话记忆、`SimpleVectorStore` 和内存任务表；`infra` profile 已接入现有 Redis、pgvector、MySQL、RabbitMQ，但仍是演示级实现（无鉴权、无重试/死信治理、无多租户隔离）。
 - **显式 RAG vs Advisor RAG**：显式 RAG 便于返回 citations、分数、trace；Advisor RAG 代码更少，但来源等中间结果需要从 advisor context 里取。Demo 同时保留两者。
 - **结构化输出双路径**：prompt 约束兼容性最好；provider 原生 schema 更可靠，但依赖模型能力。
 - **模板安全**：用户输入与检索到的文档通过 `{message}` / `{prompt}` 参数传入，避免内容里的 `{}` 被 StringTemplate 当成占位符（既防报错，也减少 prompt 注入面）。
@@ -210,5 +249,7 @@ OPENAI_API_KEY=ollama
 - **401 / 模型不存在**：检查 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_CHAT_MODEL`；兼容服务的 base URL 通常需要带 `/v1`。
 - **MCP client 启动失败**：确认 server 已启动，或保持 `MCP_CLIENT_ENABLED=false`。客户端启动时会初始化连接。
 - **RAG 启动失败**：不要开启 `demo.ai.rag.ingest-on-startup`，除非 embedding key 与额度已就绪。
-- **Redis 向量检索失败**：需要 Redis Stack，不是普通 Redis；确认 `initialize-schema=true` 且索引名/前缀没有冲突。
+- **Redis 向量检索失败（`ERR unknown command 'FT._LIST'`）**：当前 dev Redis 未加载 RediSearch，不要用 `RAG_VECTOR_STORE=redis`；请用 `infra` profile 的 pgvector，或换成 Redis Stack。
+- **`infra` 启动失败**：依次检查 Redis 密码、pgvector 的 5434 端口、MySQL `unicorn` 库是否存在、RabbitMQ 的 `admin/admin` 与 `/unicorn` vhost；compose sim 默认 RabbitMQ 是 `guest/guest`，可用 `MQ_USER` / `MQ_PWD` 覆盖。
+- **异步接口返回 503**：说明 `async-ingest` 未启用；用 `--spring.profiles.active=infra`，默认 profile 只支持同步入库。
 - **工具没有被调用**：模型需支持 tool calling；`@Tool` 描述要明确；参数类型要可 JSON Schema 化（不要用 `Optional`/`Mono`/`Flux`）。

@@ -3,8 +3,8 @@ spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${DB_HOST:10.211.55.29}:${DB_PORT:3306}/${DB_NAME:unicorn}
-    username: ${DB_USER:}
-    password: ${DB_PWD:}
+    username: ${DB_USER:root}
+    password: ${DB_PWD:root}
 
     hikari:
       ############################################################

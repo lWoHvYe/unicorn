@@ -25,6 +25,9 @@ dependencies {
     implementation(platform(libs.spring.ai.bom))
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    runtimeOnly("com.mysql:mysql-connector-j")
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
     implementation("org.springframework.ai:spring-ai-vector-store")
     implementation("org.springframework.ai:spring-ai-vector-store-advisor")
@@ -32,6 +35,8 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-markdown-document-reader")
     implementation("org.springframework.ai:spring-ai-tika-document-reader")
     implementation("org.springframework.ai:spring-ai-redis-store")
+    implementation("org.springframework.ai:spring-ai-pgvector-store")
+    runtimeOnly("org.postgresql:postgresql")
     implementation("redis.clients:jedis")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

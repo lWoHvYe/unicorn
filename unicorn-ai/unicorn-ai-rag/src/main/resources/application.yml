@@ -12,6 +12,24 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 50MB
+  # 以下连接信息与 valentine-starter application-dev.yml 对齐；默认不主动连接，
+  # 只有 infra profile 才启用 JDBC 任务审计 / RabbitMQ 异步入库 / Redis 向量库。
+  datasource:
+    url: jdbc:mysql://${DB_HOST:10.211.55.29}:${DB_PORT:3306}/${DB_NAME:unicorn}
+    username: ${DB_USER:root}
+    password: ${DB_PWD:root}
+    hikari:
+      # DB 未启动时也允许应用启动；默认 job-store=memory 不会访问数据库
+      initialization-fail-timeout: -1
+  sql:
+    init:
+      mode: never
+  rabbitmq:
+    host: ${MQ_HOST:10.211.55.29}
+    port: ${MQ_PORT:5672}
+    username: ${MQ_USER:admin}
+    password: ${MQ_PWD:admin}
+    virtual-host: ${MQ_VHOST:/unicorn}
   ai:
     openai:
       api-key: ${OPENAI_API_KEY:demo-key-not-configured}
@@ -32,11 +50,18 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    # 默认不检查 DB，避免未启用 infra 时 health 变 DOWN
+    db:
+      enabled: false
+    # 默认不检查 RabbitMQ；infra profile 再启用
+    rabbit:
+      enabled: false
 
 demo:
   ai:
     rag:
-      # simple: 进程内 SimpleVectorStore；redis: Redis Stack + RediSearch
+      # simple: 进程内 SimpleVectorStore；pgvector: compose 中的 pgvector；redis: 需要 Redis Stack
       vector-store: ${RAG_VECTOR_STORE:simple}
       similarity-threshold: 0.35
       top-k: 5
@@ -44,14 +69,29 @@ demo:
       min-chunk-size-chars: 350
       max-chunks: 10000
       ingest-on-startup: false
+      # 默认内存任务表；infra profile 切换为 jdbc
+      job-store: ${RAG_JOB_STORE:memory}
+      # 默认关闭 RabbitMQ 异步入库；infra profile 打开
+      async-ingest:
+        enabled: ${RAG_ASYNC_INGEST_ENABLED:false}
+        exchange: unicorn.ai.rag
+        queue: unicorn.ai.rag.ingest
+        routing-key: ingest
+      pgvector:
+        url: ${PGVECTOR_URL:jdbc:postgresql://10.211.55.29:5434/vectordb}
+        username: ${PGVECTOR_USER:postgres}
+        password: ${PGVECTOR_PWD:postgres}
+        table-name: unicorn_ai_rag
+        schema-name: public
+        dimensions: ${EMBEDDING_DIMENSIONS:1536}
       system-prompt: |
         你是一个严格基于给定资料回答问题的助手。
         只能使用 <context> 中的信息；如果资料不足，直接说明“资料中没有足够信息”，不要编造。
         回答后列出实际使用到的来源（source）。
       redis:
-        host: ${REDIS_HOST:localhost}
+        host: ${REDIS_HOST:10.211.55.29}
         port: ${REDIS_PORT:6379}
-        password: ${REDIS_PASSWORD:}
+        password: ${REDIS_PASSWORD:redis-psd}
         index-name: unicorn-ai-rag
         prefix: "unicorn-ai-rag:"
 

@@ -30,6 +30,10 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    # 默认 profile 不依赖 Redis；infra profile 再启用
+    redis:
+      enabled: false
 
 demo:
   ai:

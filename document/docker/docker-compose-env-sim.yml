@@ -28,7 +28,20 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+  pgvector:
+    image: pgvector/pgvector:pg17
+    container_name: pgvector-unicorn
+    restart: always
+    environment:
+      POSTGRES_DB: vectordb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"   # 与宿主 MySQL 3306 错开
+    volumes:
+      - pgvector-data:/var/lib/postgresql/data
 volumes:
   mysql-db:
   redis-data:
   rabbitmq-data:
+  pgvector-data:

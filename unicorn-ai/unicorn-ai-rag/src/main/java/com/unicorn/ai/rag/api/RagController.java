@@ -16,7 +16,11 @@
 
 package com.unicorn.ai.rag.api;
 
+import com.unicorn.ai.rag.async.AsyncIngestPublisher;
 import com.unicorn.ai.rag.ingestion.DocumentIngestionService;
+import com.unicorn.ai.rag.job.IngestJob;
+import com.unicorn.ai.rag.job.IngestJobRepository;
+import com.unicorn.ai.rag.model.AsyncIngestResponse;
 import com.unicorn.ai.rag.model.IngestResult;
 import com.unicorn.ai.rag.model.QueryExpansion;
 import com.unicorn.ai.rag.model.RagAnswer;
@@ -27,9 +31,12 @@ import com.unicorn.ai.rag.model.SourceStat;
 import com.unicorn.ai.rag.model.TextIngestRequest;
 import com.unicorn.ai.rag.service.RagService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +54,8 @@ public class RagController {
 
     private final DocumentIngestionService ingestionService;
     private final RagService ragService;
+    private final IngestJobRepository ingestJobRepository;
+    private final ObjectProvider<AsyncIngestPublisher> asyncIngestPublisher;
 
     @PostMapping(value = "/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public IngestResult upload(@RequestPart("file") MultipartFile file,
@@ -58,6 +67,25 @@ public class RagController {
     @PostMapping("/documents/text")
     public IngestResult ingestText(@RequestBody TextIngestRequest request) {
         return ingestionService.ingestText(request);
+    }
+
+    /**
+     * 异步入库：把任务投递到 RabbitMQ，立即返回 jobId；结果落 MySQL（infra profile）。
+     */
+    @PostMapping("/documents/text/async")
+    public AsyncIngestResponse ingestTextAsync(@RequestBody TextIngestRequest request) {
+        var publisher = asyncIngestPublisher.getIfAvailable();
+        if (publisher == null) {
+            throw new IllegalStateException("async ingest 未启用，请使用 --spring.profiles.active=infra");
+        }
+        return publisher.publish(request);
+    }
+
+    @GetMapping("/jobs/{jobId}")
+    public ResponseEntity<IngestJob> job(@PathVariable String jobId) {
+        return ingestJobRepository.find(jobId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/ingest/sample")

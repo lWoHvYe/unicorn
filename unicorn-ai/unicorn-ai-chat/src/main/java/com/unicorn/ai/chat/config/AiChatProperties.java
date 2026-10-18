@@ -22,5 +22,6 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @ConfigurationProperties("demo.ai.chat")
 public record AiChatProperties(
         @DefaultValue("你是 Unicorn 的 AI 助手。回答要简洁、可执行，并明确区分事实与推测。") String systemPrompt,
-        @DefaultValue("20") int memoryWindow) {
+        @DefaultValue("20") int memoryWindow,
+        @DefaultValue("24") int memoryTtlHours) {
 }

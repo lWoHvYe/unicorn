@@ -1,0 +1,51 @@
+# 使用 Unicorn 现有基础设施：
+# - pgvector:   10.211.55.29:5434/vectordb / postgres:postgres（RAG 向量库）
+# - MySQL:      10.211.55.29:3306/unicorn / root:root（异步任务审计）
+# - RabbitMQ:   10.211.55.29:5672 / admin:admin，vhost /unicorn（异步入库）
+# - Redis:      10.211.55.29:6379 / redis-psd（Chat 模块对话记忆；本 RAG 模块不强依赖）
+#
+# 用法：--spring.profiles.active=infra
+# 注意：infra 启动时会连接上述服务；默认 profile 仍是零依赖 demo。
+spring:
+  config:
+    activate:
+      on-profile: infra
+  sql:
+    init:
+      mode: always
+  rabbitmq:
+    host: ${MQ_HOST:10.211.55.29}
+    port: ${MQ_PORT:5672}
+    username: ${MQ_USER:admin}
+    password: ${MQ_PWD:admin}
+    virtual-host: ${MQ_VHOST:/unicorn}
+    listener:
+      simple:
+        default-requeue-rejected: false
+
+management:
+  health:
+    db:
+      enabled: true
+    rabbit:
+      enabled: true
+
+demo:
+  ai:
+    rag:
+      # 实际 Redis 实例未加载 RediSearch 模块，向量库改用 compose 中的 pgvector。
+      # 如果换成 Redis Stack，可把这里改为 redis。
+      vector-store: pgvector
+      job-store: jdbc
+      pgvector:
+        url: ${PGVECTOR_URL:jdbc:postgresql://10.211.55.29:5434/vectordb}
+        username: ${PGVECTOR_USER:postgres}
+        password: ${PGVECTOR_PWD:postgres}
+        table-name: unicorn_ai_rag
+        schema-name: public
+        dimensions: ${EMBEDDING_DIMENSIONS:1536}
+      async-ingest:
+        enabled: true
+        exchange: unicorn.ai.rag
+        queue: unicorn.ai.rag.ingest
+        routing-key: ingest
