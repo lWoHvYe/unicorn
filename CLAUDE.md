@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+> **Note**: This file is retained for historical context. The authoritative agent guide for this repository is [AGENTS.md](AGENTS.md). Where this file and AGENTS.md disagree, AGENTS.md and the actual build scripts win. Tests are not actively maintained, so `test` / `build` / `check` failures are expected and can be ignored; use `./gradlew assemble` as the build gate.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview

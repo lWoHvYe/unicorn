@@ -1,0 +1,46 @@
+server:
+  port: 8092
+  shutdown: graceful
+
+spring:
+  application:
+    name: unicorn-ai-chat
+  threads:
+    virtual:
+      enabled: true
+  ai:
+    tools:
+      limits:
+        # 防止工具循环失控；Spring AI 2.0 默认 40/150，这里收紧到 8
+        max-total-tool-calls: 8
+    openai:
+      # 没有配置 key 时仍允许应用启动；真正调用模型时会由 OpenAI 返回 401。
+      api-key: ${OPENAI_API_KEY:demo-key-not-configured}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.7
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+demo:
+  ai:
+    chat:
+      system-prompt: |
+        你是 Unicorn 的 AI 助手。回答要简洁、可执行，并明确区分事实与推测。
+        如果用户要求调用工具，请优先使用工具返回的结果，不要编造。
+      memory-window: 20
+      max-tool-calls: 8
+
+logging:
+  level:
+    com.unicorn.ai: INFO
+    org.springframework.ai: INFO

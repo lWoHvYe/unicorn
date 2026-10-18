@@ -1,0 +1,61 @@
+server:
+  port: 8093
+  shutdown: graceful
+
+spring:
+  application:
+    name: unicorn-ai-rag
+  threads:
+    virtual:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:demo-key-not-configured}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.2
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+demo:
+  ai:
+    rag:
+      # simple: 进程内 SimpleVectorStore；redis: Redis Stack + RediSearch
+      vector-store: ${RAG_VECTOR_STORE:simple}
+      similarity-threshold: 0.35
+      top-k: 5
+      chunk-size: 800
+      min-chunk-size-chars: 350
+      max-chunks: 10000
+      ingest-on-startup: false
+      system-prompt: |
+        你是一个严格基于给定资料回答问题的助手。
+        只能使用 <context> 中的信息；如果资料不足，直接说明“资料中没有足够信息”，不要编造。
+        回答后列出实际使用到的来源（source）。
+      redis:
+        host: ${REDIS_HOST:localhost}
+        port: ${REDIS_PORT:6379}
+        password: ${REDIS_PASSWORD:}
+        index-name: unicorn-ai-rag
+        prefix: "unicorn-ai-rag:"
+
+logging:
+  level:
+    com.unicorn.ai: INFO
+    org.springframework.ai: INFO

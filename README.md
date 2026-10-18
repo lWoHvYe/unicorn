@@ -107,6 +107,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
   [unicorn-starter](https://github.com/lWoHvYe/unicorn-starter)。
 - 整合Redisson拓展Redis的功能，读写分离
 - 整合消息队列RabbitMQ，实现消息通知、延迟消息，服务解耦。
+- 集成 Spring AI 2.0 示例（Chat/RAG/MCP）：流式对话、对话记忆、结构化输出、工具调用、ETL/向量检索、MCP Server/Client。
 - 各模块独立，基本可插拔：若只需查询注解等基础功能，只需引入Core模块即可，Beans, Security, Logging, 3rd Tools, Code Gen
   模块可插拔， 除了传统To B业务，还可用于To C业务（see [OAuth2.0 part](unicorn-oauth2) ）
 
@@ -147,6 +148,8 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - `valentine-starter` 启动配置示例(Gradle)，尝试Kotlin/Kotlinx
 
 - `unicorn-oauth2` OAuth2 Sample，AuthorizationServer, OAuth2Client + Gateway, ResourceServer(Web MVC & WebFlux)
+
+- `unicorn-ai` Spring AI 2.0 示例集合：Chat（流式/记忆/结构化输出/工具/Agent）、RAG（ETL/向量检索/Query Rewrite）、MCP Server/Client，详见 [unicorn-ai/README.md](unicorn-ai/README.md)
 
 #### 详细结构
 
@@ -191,6 +194,11 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
     - rabbitmq Async log
 - unicorn-tp-tools-kotlin 系统第三方工具模块(kotlin)
 - unicorn-code-gen-kotlin 系统代码生成模块(kotlin)
+- unicorn-ai Spring AI 2.0 示例集合(Boot 4.1 / Java 25)
+    - unicorn-ai-chat ChatClient、SSE 流式、对话记忆、结构化输出、工具调用、Agent 编排 (8092)
+    - unicorn-ai-rag ETL/切分、Simple/Redis Stack 向量库、显式 RAG、Advisor RAG、Query Rewrite/Expand (8093)
+    - unicorn-ai-mcp-server @McpTool / @McpResource / @McpPrompt，Streamable-HTTP (8094)
+    - unicorn-ai-mcp-client MCP 工具发现并注入 ChatClient (8095)
 ```
 
 #### 运行环境

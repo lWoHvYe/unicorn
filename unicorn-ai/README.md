@@ -1,0 +1,214 @@
+# unicorn-ai
+
+Spring AI **2.0.1** 的示例工程集合，运行在 Spring Boot **4.1.x** / Java **25** 上，风格与 `unicorn-oauth2` 一致：每个子目录是一个可独立启动的 demo，而不是框架库。
+
+> Spring AI 2.0.x 官方支持 Spring Boot 4.0.x / 4.1.x；制品在 Maven Central，BOM 为 `org.springframework.ai:spring-ai-bom:2.0.1`。
+
+## 模块与端口
+
+| 目录 | Gradle 工程 | 端口 | 内容 |
+| --- | --- | --- | --- |
+| `unicorn-ai-chat` | `:unicorn-ai-chat` | 8092 | ChatClient、SSE 流式、对话记忆、结构化输出、`@Tool` 工具调用、Agent 两步编排 |
+| `unicorn-ai-rag` | `:unicorn-ai-rag` | 8093 | ETL/切分、Simple/Redis 向量库、显式 RAG、Advisor RAG、Query Rewrite、Multi-Query |
+| `unicorn-ai-mcp-server` | `:unicorn-ai-mcp-server` | 8094 | `@McpTool` / `@McpResource` / `@McpPrompt`，Streamable-HTTP |
+| `unicorn-ai-mcp-client` | `:unicorn-ai-mcp-client` | 8095 | 通过 MCP 发现工具并注入 ChatClient |
+
+这些 build 文件使用了非默认名（如 `unicorn-ai-chat.gradle.kts`），所以工程路径被拍平到根，**不是** `:unicorn-ai:unicorn-ai-chat`。
+
+## 快速开始
+
+```bash
+export OPENAI_API_KEY=sk-...
+# 可选：兼容 OpenAI 的服务
+# export OPENAI_BASE_URL=https://api.deepseek.com
+# export OPENAI_CHAT_MODEL=deepseek-chat
+# export OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+
+./gradlew :unicorn-ai-chat:bootRun
+./gradlew :unicorn-ai-rag:bootRun
+./gradlew :unicorn-ai-mcp-server:bootRun
+```
+
+没有 API Key 时应用也能启动：`api-key` 使用占位值，真正调用模型/embedding 时才会失败。RAG 的启动导入默认关闭，避免启动阶段调用 embedding。
+
+MCP 客户端默认关闭。先启动 server，再：
+
+```bash
+MCP_CLIENT_ENABLED=true ./gradlew :unicorn-ai-mcp-client:bootRun
+```
+
+所有应用都暴露 actuator：`/actuator/health`、`/actuator/metrics`。Spring AI 的 chat/embedding/tool 调用会产生 Micrometer observations，接入 tracing 后可在链路系统中查看。
+
+## 测试
+
+AI demo 模块单独配置了 `useJUnitPlatform()`，以下测试不依赖模型 API Key：
+
+```bash
+./gradlew :unicorn-ai-chat:test
+./gradlew :unicorn-ai-rag:test
+./gradlew :unicorn-ai-mcp-server:test
+```
+
+覆盖内容：工具调用的租户上下文/退款规则/商品搜索、MCP 订单与库存领域逻辑、RAG 文本切分与 metadata 注入。
+
+## Chat Demo（8092）
+
+```bash
+# 普通对话
+curl -s localhost:8092/api/ai/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"用三句话解释什么是 RAG","conversationId":"c1"}'
+
+# 流式（SSE）
+curl -N 'localhost:8092/api/ai/chat/stream?message=写一首关于秋天的短诗&conversationId=c1'
+
+# 查看对话记忆（窗口默认 20 条）
+curl -s localhost:8092/api/ai/chat/memory/c1
+
+# 工具调用：订单查询/退款判断/商品搜索
+curl -s localhost:8092/api/ai/chat/tools \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"帮我查 A1001 的状态，并判断能不能退款","conversationId":"tools-1"}'
+
+# A1004 是签收 1 天内的订单，可用于验证“可退款”分支
+curl -s localhost:8092/api/ai/chat/tools \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"A1004 能退款吗？","conversationId":"tools-2"}'
+
+# 结构化输出（默认走 prompt 约束）
+curl -s localhost:8092/api/ai/chat/structured \
+  -H 'Content-Type: application/json' \
+  -d '{"topic":"Spring AI 2.0 在企业的落地","providerNative":false}'
+
+# 结构化输出 + provider 原生 JSON Schema + 本地校验
+curl -s localhost:8092/api/ai/chat/structured \
+  -H 'Content-Type: application/json' \
+  -d '{"topic":"Spring AI 2.0 在企业的落地","providerNative":true}'
+
+# 两步 Agent：先规划，再带工具执行
+curl -s localhost:8092/api/ai/chat/agent \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"A1002 能不能退款？如果不能，推荐一个库存充足的替代品"}'
+```
+
+实现要点：
+
+- `MessageChatMemoryAdvisor` + `MessageWindowChatMemory` 负责对话记忆；每次调用都必须传 `ChatMemory.CONVERSATION_ID`。
+- 记忆 advisor 默认位于工具循环之外：只持久化最终 user/assistant 消息，不保存中间 tool call；需要完整工具轨迹时可把 advisor order 调到 `ToolCallingAdvisor` 之后。
+- 工具通过 `@Tool` / `@ToolParam` 声明，`ToolContext` 传递 tenant 等非模型上下文；`@Tool(returnDirect = true)` 演示“工具结果直接返回”。
+- `spring.ai.tools.limits.max-total-tool-calls=8` 限制单轮工具调用总数，防止循环失控。
+- `SimpleLoggerAdvisor` 需要把 `org.springframework.ai.chat.client.advisor` 调到 DEBUG 才能看到请求/响应。
+
+## RAG Demo（8093）
+
+```bash
+# 导入 classpath:docs/*.md（需要 embedding key）
+curl -s -X POST localhost:8093/api/ai/rag/ingest/sample
+
+# 上传文件：md/txt/pdf/docx 等
+curl -s -X POST localhost:8093/api/ai/rag/documents \
+  -F 'file=@README.md' -F 'tenant=demo' -F 'docType=markdown'
+
+# 直接导入一段文本
+curl -s localhost:8093/api/ai/rag/documents/text \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Unicorn 的默认端口是 8081。","source":"inline/port","tenant":"demo"}'
+
+# 只检索，不调用 chat
+curl -s 'localhost:8093/api/ai/rag/search?q=Spring%20AI%20支持哪些版本&topK=3'
+
+# 显式 RAG：返回 answer + sources + token usage
+curl -s localhost:8093/api/ai/rag/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"Spring AI 2.0 支持哪些 Spring Boot 版本？","topK":3}'
+
+# Advisor RAG：由 RetrievalAugmentationAdvisor 完成检索与上下文增强
+curl -s localhost:8093/api/ai/rag/ask/advisor \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"MCP 的 HTTP 端点默认有认证吗？","filter":"tenant == '\''sample'\''"}'
+
+# Query Rewrite / Multi-Query
+curl -s localhost:8093/api/ai/rag/query/rewrite \
+  -H 'Content-Type: application/json' -d '{"question":"它支持 4.1 吗"}'
+
+curl -s localhost:8093/api/ai/rag/query/expand \
+  -H 'Content-Type: application/json' -d '{"question":"怎么提高 RAG 召回率"}'
+
+# 查看/删除某个来源
+curl -s localhost:8093/api/ai/rag/stats
+curl -s -X DELETE 'localhost:8093/api/ai/rag/documents?source=sample/faq.md'
+```
+
+向量库：
+
+- 默认 `demo.ai.rag.vector-store=simple`，使用进程内 `SimpleVectorStore`，零外部依赖，重启丢数据。
+- 切换 Redis Stack：`RAG_VECTOR_STORE=redis`，并设置 `REDIS_HOST` / `REDIS_PORT`。需要 Redis Stack（RediSearch + RedisJSON），普通 Redis 不够。
+- 文档 metadata 会补齐 `source`、`tenant`、`docType`、`ingestedAt`、`contentHash`，可用于 `filter` 表达式。
+- 切分使用 `TokenTextSplitter`，中文标点参与断句；chunk 大小、阈值、topK 都在 `application.yml` 中可调。
+
+## MCP Demo
+
+Server（8094）暴露：
+
+- Tools：`get_order`、`refund_eligibility`、`refund_order`、`check_inventory`、`reserve_inventory`
+- Resources：`unicorn://orders/{orderId}`、`unicorn://inventory/{sku}`、`unicorn://runbook/deploy`
+- Prompt：`order-support`
+
+Client（8095）启动后：
+
+```bash
+curl -s localhost:8095/api/ai/mcp/status
+curl -s localhost:8095/api/ai/mcp/tools
+curl -s localhost:8095/api/ai/mcp/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"查一下 A1001 的状态，并看看 SKU-1 还有多少库存"}'
+```
+
+MCP 端点默认是 `/mcp`（Streamable-HTTP）。**该端点默认没有认证**，能访问端口的客户端可以枚举和调用全部工具。Demo 只用于本地；部署前必须在网关或 Spring Security 层加认证、授权、限流。
+
+## 切换模型 / Provider
+
+OpenAI 官方：
+
+```bash
+OPENAI_API_KEY=sk-...
+OPENAI_BASE_URL=https://api.openai.com
+OPENAI_CHAT_MODEL=gpt-4o-mini
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+```
+
+DeepSeek（注意它主要提供 chat，不一定提供 embedding）：
+
+```bash
+OPENAI_API_KEY=sk-...
+OPENAI_BASE_URL=https://api.deepseek.com
+OPENAI_CHAT_MODEL=deepseek-chat
+```
+
+Ollama（OpenAI 兼容端点）：
+
+```bash
+OPENAI_BASE_URL=http://localhost:11434/v1
+OPENAI_CHAT_MODEL=llama3.1
+OPENAI_EMBEDDING_MODEL=nomic-embed-text
+OPENAI_API_KEY=ollama
+```
+
+不同模型对 tool calling、JSON Schema structured output 的支持不同。`/structured` 的 `providerNative=true` 需要 provider 支持 JSON Schema；不支持时用 `false` 走 prompt 约束 + 本地转换。
+
+## 设计取舍
+
+- **Demo 不等于生产**：对话记忆用进程内 `MessageWindowChatMemory`，向量库默认 `SimpleVectorStore`，MCP 无认证。生产要换持久化 memory、Redis/PGVector 等向量库，并加安全边界。
+- **显式 RAG vs Advisor RAG**：显式 RAG 便于返回 citations、分数、trace；Advisor RAG 代码更少，但来源等中间结果需要从 advisor context 里取。Demo 同时保留两者。
+- **结构化输出双路径**：prompt 约束兼容性最好；provider 原生 schema 更可靠，但依赖模型能力。
+- **模板安全**：用户输入与检索到的文档通过 `{message}` / `{prompt}` 参数传入，避免内容里的 `{}` 被 StringTemplate 当成占位符（既防报错，也减少 prompt 注入面）。
+- **MCP 与本地工具同构**：两者最终都是 `ToolCallback`，可以混用；Demo 拆成 server/client 两个应用，避免同进程启动时序问题。
+- **可观测性**：actuator + Micrometer observations，Spring AI 会自动为 chat、embedding、tool、vector store 生成 observation。
+
+## 常见问题
+
+- **401 / 模型不存在**：检查 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_CHAT_MODEL`；兼容服务的 base URL 通常需要带 `/v1`。
+- **MCP client 启动失败**：确认 server 已启动，或保持 `MCP_CLIENT_ENABLED=false`。客户端启动时会初始化连接。
+- **RAG 启动失败**：不要开启 `demo.ai.rag.ingest-on-startup`，除非 embedding key 与额度已就绪。
+- **Redis 向量检索失败**：需要 Redis Stack，不是普通 Redis；确认 `initialize-schema=true` 且索引名/前缀没有冲突。
+- **工具没有被调用**：模型需支持 tool calling；`@Tool` 描述要明确；参数类型要可 JSON Schema 化（不要用 `Optional`/`Mono`/`Flux`）。

@@ -1,0 +1,56 @@
+server:
+  port: 8095
+  shutdown: graceful
+
+spring:
+  application:
+    name: unicorn-ai-mcp-client
+  threads:
+    virtual:
+      enabled: true
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:demo-key-not-configured}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.3
+    mcp:
+      client:
+        # 默认关闭：先启动 unicorn-ai-mcp-server，再用 MCP_CLIENT_ENABLED=true 启动本应用
+        enabled: ${MCP_CLIENT_ENABLED:false}
+        name: unicorn-mcp-client
+        version: 1.0.0
+        type: SYNC
+        request-timeout: 30s
+        initialized: true
+        toolcallback:
+          enabled: true
+        streamable-http:
+          connections:
+            unicorn:
+              url: ${MCP_SERVER_URL:http://localhost:8094}
+              endpoint: /mcp
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+demo:
+  ai:
+    mcp:
+      client:
+        system-prompt: |
+          你是 Unicorn 的运维/订单助手。可用的远程工具通过 MCP 动态发现。
+          需要实时数据时必须调用 MCP 工具，不要凭记忆回答。
+
+logging:
+  level:
+    com.unicorn.ai: INFO
+    org.springframework.ai: INFO

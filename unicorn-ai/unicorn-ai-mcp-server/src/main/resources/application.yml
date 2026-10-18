@@ -1,0 +1,34 @@
+server:
+  port: 8094
+  shutdown: graceful
+
+spring:
+  application:
+    name: unicorn-ai-mcp-server
+  threads:
+    virtual:
+      enabled: true
+  ai:
+    mcp:
+      server:
+        name: unicorn-mcp-server
+        version: 1.0.0
+        # SSE 在 2.0 已弃用，这里使用 Streamable-HTTP（默认端点 /mcp）
+        protocol: STREAMABLE
+        type: SYNC
+        annotation-scanner:
+          enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.unicorn.ai: INFO
+    org.springframework.ai.mcp: INFO
