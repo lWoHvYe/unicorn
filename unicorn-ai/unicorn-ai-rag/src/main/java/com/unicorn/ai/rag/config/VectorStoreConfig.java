@@ -16,6 +16,7 @@
 
 package com.unicorn.ai.rag.config;
 
+import com.unicorn.ai.rag.embedding.FixedDimensionEmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -54,7 +55,8 @@ public class VectorStoreConfig {
         var client = StringUtils.hasText(redis.password())
                 ? RedisClient.create(redis.host(), redis.port(), null, redis.password())
                 : RedisClient.create(redis.host(), redis.port());
-        return RedisVectorStore.builder(client, embeddingModel)
+        var embedding = new FixedDimensionEmbeddingModel(embeddingModel, redis.dimensions());
+        return RedisVectorStore.builder(client, embedding)
                 .indexName(redis.indexName())
                 .prefix(redis.prefix())
                 .metadataFields(

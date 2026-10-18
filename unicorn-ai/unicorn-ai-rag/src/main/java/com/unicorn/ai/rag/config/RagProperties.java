@@ -40,6 +40,7 @@ public record RagProperties(
             @DefaultValue("6379") int port,
             @DefaultValue("") String password,
             @DefaultValue("unicorn-ai-rag") String indexName,
-            @DefaultValue("unicorn-ai-rag:") String prefix) {
+            @DefaultValue("unicorn-ai-rag:") String prefix,
+            @DefaultValue("1536") int dimensions) {
     }
 }

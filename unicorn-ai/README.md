@@ -55,15 +55,16 @@ MCP_CLIENT_ENABLED=true ./gradlew :unicorn-ai-mcp-client:bootRun
 
 | 服务 | 地址 | 认证 | 用途 |
 | --- | --- | --- | --- |
-| Redis | `10.211.55.29:6379` | `redis-psd` | Chat 对话记忆（db 6，key 前缀 `unicorn-ai:chat-memory:`，TTL 24h） |
-| pgvector | `10.211.55.29:5434/vectordb` | `postgres/postgres` | RAG 向量库（表 `unicorn_ai_rag`，自动建表） |
+| Redis Stack | `10.211.55.29:6379` | `redis-psd` | Chat 对话记忆（db 6）+ RAG 向量库（索引 `unicorn-ai-rag`，db 0） |
+| pgvector | `10.211.55.29:5434/vectordb` | `postgres/postgres` | 备选 RAG 向量库（表 `unicorn_ai_rag`） |
 | MySQL | `10.211.55.29:3306/unicorn` | `root/root` | RAG 异步任务审计（表 `ai_rag_ingest_job`） |
 | RabbitMQ | `10.211.55.29:5672`，vhost `/unicorn` | `admin/admin` | RAG 异步入库队列 |
 
 说明：
 
-- **Redis 实例没有加载 RediSearch**（`FT._LIST` 不可用），所以 RAG 向量库使用 compose 中的 pgvector，而不是 Redis Stack。Chat 只用普通 Redis 的 List，不依赖 RediSearch。
-- 若要改用 Redis Stack，可设置 `RAG_VECTOR_STORE=redis` 并指向带 RediSearch 的实例；否则 RAG 启动会报 `ERR unknown command 'FT._LIST'`。
+- Redis Stack 已加载 **search + ReJSON** 模块，RAG infra 默认使用 Redis 向量库；索引 `unicorn-ai-rag` 的维度由 `EMBEDDING_DIMENSIONS` 控制（默认 1536）。
+- 启动时不会调用 embedding 探测维度：Redis 分支使用了固定维度的 `EmbeddingModel` 包装，只有真正入库/检索时才请求模型。
+- 如果 Redis 换成普通镜像（无 RediSearch），可切换 pgvector：`--demo.ai.rag.vector-store=pgvector`；否则启动会报 `ERR unknown command 'FT._LIST'`。
 - `infra` 启动时会主动连接这些服务；默认 profile 不会。
 - compose sim 的 RabbitMQ 默认是 `guest/guest`，如果未创建 `admin/admin`，用 `MQ_USER=guest MQ_PWD=guest` 覆盖。
 - MySQL 需要先有 `unicorn` 库（可导入 `sql/unicorn.sql`）；`ai_rag_ingest_job` 表由 `schema.sql` 自动创建。
@@ -180,8 +181,8 @@ curl -s localhost:8093/api/ai/rag/jobs/<jobId>
 向量库：
 
 - 默认 `demo.ai.rag.vector-store=simple`，使用进程内 `SimpleVectorStore`，零外部依赖，重启丢数据。
-- `infra` profile 使用 `pgvector`：`jdbc:postgresql://10.211.55.29:5434/vectordb`，自动创建 `unicorn_ai_rag` 表和 HNSW 索引；显式设置 `dimensions=1536`，避免启动时调用 embedding 探测维度。
-- 也可切换 Redis Stack：`RAG_VECTOR_STORE=redis`，但必须是有 RediSearch 的 Redis Stack，普通 Redis 会报 `FT._LIST` 不存在。
+- `infra` profile 使用 Redis Stack：索引 `unicorn-ai-rag`，HNSW + COSINE，维度 1536；启动时用固定维度包装避免调用 embedding。
+- 备选 pgvector：`--demo.ai.rag.vector-store=pgvector`，连接 `jdbc:postgresql://10.211.55.29:5434/vectordb`，自动创建 `unicorn_ai_rag` 表。
 - 文档 metadata 会补齐 `source`、`tenant`、`docType`、`ingestedAt`、`contentHash`，可用于 `filter` 表达式。
 - 切分使用 `TokenTextSplitter`，中文标点参与断句；chunk 大小、阈值、topK 都在 `application.yml` 中可调。
 
@@ -249,7 +250,7 @@ OPENAI_API_KEY=ollama
 - **401 / 模型不存在**：检查 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_CHAT_MODEL`；兼容服务的 base URL 通常需要带 `/v1`。
 - **MCP client 启动失败**：确认 server 已启动，或保持 `MCP_CLIENT_ENABLED=false`。客户端启动时会初始化连接。
 - **RAG 启动失败**：不要开启 `demo.ai.rag.ingest-on-startup`，除非 embedding key 与额度已就绪。
-- **Redis 向量检索失败（`ERR unknown command 'FT._LIST'`）**：当前 dev Redis 未加载 RediSearch，不要用 `RAG_VECTOR_STORE=redis`；请用 `infra` profile 的 pgvector，或换成 Redis Stack。
+- **Redis 向量检索失败（`ERR unknown command 'FT._LIST'`）**：说明当前 Redis 不是 Redis Stack；用 `infra` profile 的默认 Redis 向量库需要 `redis/redis-stack` 镜像，或改用 `--demo.ai.rag.vector-store=pgvector`。
 - **`infra` 启动失败**：依次检查 Redis 密码、pgvector 的 5434 端口、MySQL `unicorn` 库是否存在、RabbitMQ 的 `admin/admin` 与 `/unicorn` vhost；compose sim 默认 RabbitMQ 是 `guest/guest`，可用 `MQ_USER` / `MQ_PWD` 覆盖。
 - **异步接口返回 503**：说明 `async-ingest` 未启用；用 `--spring.profiles.active=infra`，默认 profile 只支持同步入库。
 - **工具没有被调用**：模型需支持 tool calling；`@Tool` 描述要明确；参数类型要可 JSON Schema 化（不要用 `Optional`/`Mono`/`Flux`）。

@@ -4,7 +4,7 @@
 
 `CLAUDE.md` 是早期说明，已在顶部标注以本文件为准；发生冲突时，以本文件、`settings.gradle.kts`、`build-logic/` 和实际构建结果为准。
 
-> 最近核对：2026-10-18（commit `98d7fc8b`）。`./gradlew assemble` 通过；四个 AI demo 已编译并启动验证（MCP 工具发现、RAG infra profile 的 pgvector/MySQL/RabbitMQ 连通均验证通过）；测试未专门维护，`./gradlew test` 失败属于预期，见 §8。
+> 最近核对：2026-10-18（commit `98d7fc8b`）。`./gradlew assemble` 通过；四个 AI demo 已编译并启动验证（MCP 工具发现、RAG infra profile 的 Redis Stack/pgvector/MySQL/RabbitMQ 连通均验证通过；Redis 向量索引 `unicorn-ai-rag` 已创建）；测试未专门维护，`./gradlew test` 失败属于预期，见 §8。
 
 ## 1. 项目速览
 
@@ -199,8 +199,9 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 - **基础设施**：`document/docker/docker-compose-env.yml`（MySQL 主 + 2 从、Redis 主从、RabbitMQ 集群）或 `docker-compose-env-sim.yml`（单机）。RabbitMQ 需安装延迟插件。
 - **OAuth2 样例拓扑**：`authorizationserver:9000`（授权状态存 Redis db4）→ `gateway-client:8080`（Session + TokenRelay）→ `resource-server-mvc:8090` / `resource-server-flux:8091`。
 - **AI Demo（Spring AI 2.0.1）**：`unicorn-ai/` 下 4 个独立应用，Chat 8092、RAG 8093、MCP Server 8094、MCP Client 8095。模型通过 `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_CHAT_MODEL` 配置；没有 key 时用占位值仍可启动。默认 profile 为零依赖 demo（SimpleVectorStore + 内存记忆 + 内存任务表）。
-  - `--spring.profiles.active=infra` 连接现有 dev 基础设施：Chat 用 Redis（10.211.55.29:6379 / redis-psd，db 6）持久化对话记忆；RAG 用 pgvector（10.211.55.29:5434/vectordb，postgres/postgres）、MySQL（10.211.55.29:3306/unicorn，root/root）做异步入库任务审计、RabbitMQ（10.211.55.29:5672，admin/admin，vhost /unicorn）做异步入库。
-  - 实际 dev Redis **没有 RediSearch**（`FT._LIST` 不可用），所以 RAG 向量库用 pgvector；`RAG_VECTOR_STORE=redis` 只适用于 Redis Stack。
+  - `--spring.profiles.active=infra` 连接现有 dev 基础设施：Chat 用 Redis（10.211.55.29:6379 / redis-psd，db 6）持久化对话记忆；RAG 用 Redis Stack 向量库（索引 `unicorn-ai-rag`，维度 1536）、MySQL（10.211.55.29:3306/unicorn，root/root）做异步入库任务审计、RabbitMQ（10.211.55.29:5672，admin/admin，vhost /unicorn）做异步入库。
+  - RAG 向量库可选 `simple` / `redis` / `pgvector`；infra 默认 `redis`，备选 pgvector 用 `--demo.ai.rag.vector-store=pgvector`。RedisVectorStore 启动时通过固定维度包装避免调用 embedding API。
+  - 当前 Redis Stack 已加载 search/ReJSON；若换成普通 Redis，需改用 pgvector 或 simple，否则会报 `FT._LIST` 不存在。
   - MCP 场景先启动 server，再以 `MCP_CLIENT_ENABLED=true` 启动 client。MCP 的 `/mcp` 端点默认无认证，只能本地演示。完整 curl 示例见 `unicorn-ai/README.md`。
 - **密钥**：RSA、JWT、Redis、RabbitMQ 口令目前明文写在 `application*.yml` 中；不要新增明文密钥，优先用环境变量，也不要把这些值复制到文档/日志。
 - **脚本**：`script/*.sh` 仍使用 `valentine-starter.jar` 和 `JAVA_HOME=jdk-21`，与当前产物 `valentine-starter-kotlin-4.8.4-chi.jar` 和 JDK 25 不一致；只能当模板改后使用。`docker-compose.yml` 的 `valentine-starter:3.0.0` 同样过时。

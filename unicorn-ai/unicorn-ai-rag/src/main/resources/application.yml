@@ -94,6 +94,7 @@ demo:
         password: ${REDIS_PASSWORD:redis-psd}
         index-name: unicorn-ai-rag
         prefix: "unicorn-ai-rag:"
+        dimensions: ${EMBEDDING_DIMENSIONS:1536}
 
 logging:
   level:

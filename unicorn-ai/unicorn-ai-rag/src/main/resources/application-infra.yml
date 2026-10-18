@@ -1,8 +1,8 @@
 # 使用 Unicorn 现有基础设施：
-# - pgvector:   10.211.55.29:5434/vectordb / postgres:postgres（RAG 向量库）
+# - Redis Stack: 10.211.55.29:6379 / redis-psd（RAG 向量库 + Chat 对话记忆）
 # - MySQL:      10.211.55.29:3306/unicorn / root:root（异步任务审计）
 # - RabbitMQ:   10.211.55.29:5672 / admin:admin，vhost /unicorn（异步入库）
-# - Redis:      10.211.55.29:6379 / redis-psd（Chat 模块对话记忆；本 RAG 模块不强依赖）
+# - pgvector:   10.211.55.29:5434/vectordb / postgres:postgres（备选向量库）
 #
 # 用法：--spring.profiles.active=infra
 # 注意：infra 启动时会连接上述服务；默认 profile 仍是零依赖 demo。
@@ -33,10 +33,17 @@ management:
 demo:
   ai:
     rag:
-      # 实际 Redis 实例未加载 RediSearch 模块，向量库改用 compose 中的 pgvector。
-      # 如果换成 Redis Stack，可把这里改为 redis。
-      vector-store: pgvector
+      # Redis Stack 已加载 RediSearch；如果换回普通 Redis，请改成 pgvector 或 simple。
+      vector-store: redis
       job-store: jdbc
+      redis:
+        host: ${REDIS_HOST:10.211.55.29}
+        port: ${REDIS_PORT:6379}
+        password: ${REDIS_PASSWORD:redis-psd}
+        index-name: unicorn-ai-rag
+        prefix: "unicorn-ai-rag:"
+        dimensions: ${EMBEDDING_DIMENSIONS:1536}
+      # 备选：--demo.ai.rag.vector-store=pgvector
       pgvector:
         url: ${PGVECTOR_URL:jdbc:postgresql://10.211.55.29:5434/vectordb}
         username: ${PGVECTOR_USER:postgres}
