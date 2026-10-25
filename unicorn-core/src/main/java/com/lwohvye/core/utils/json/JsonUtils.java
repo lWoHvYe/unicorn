@@ -86,6 +86,8 @@ public class JsonUtils {
 
         var typeValidator = BasicPolymorphicTypeValidator.builder()
                 .allowIfSubType("com.lwohvye.")
+                .allowIfSubType("java.util.")
+                .allowIfSubType("java.time.")
                 .allowIfSubType("java.util.concurrent.")
                 .allowIfSubTypeIsArray()
                 // ...

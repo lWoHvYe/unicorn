@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+import org.gradle.api.tasks.testing.Test
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
@@ -71,7 +72,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     api("org.springframework.boot:spring-boot-starter-webmvc")
     api("org.springframework.boot:spring-boot-starter-security")
-    api("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.security:spring-security-access")
     implementation("org.springframework.security:spring-security-oauth2-jose")
     api("org.springframework.boot:spring-boot-starter-amqp")
@@ -86,23 +86,24 @@ dependencies {
     api(libs.ip2region)
     api(libs.poi)
     api(libs.poi.ooxml)
-    implementation(libs.xerces)
     api(libs.mapstruct)
     api(libs.mapstruct.spring.annotations)
-    api("com.github.ben-manes.caffeine:caffeine")
-    implementation(libs.logback.encoder)
-    api(libs.bouncycastle.pkix)
     api(libs.thumbnailator)
     api(libs.jetbrains.annotations)
     api("org.springframework.boot:spring-boot-starter-actuator")
-    api("io.micrometer:micrometer-tracing-bridge-brave")
-    implementation("io.projectreactor.netty:reactor-netty-http")
+    api("io.micrometer:context-propagation")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    runtimeOnly("com.mysql:mysql-connector-j")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.named<JavaCompile>("compileJava") {
     options.javaModuleVersion = project.version.toString()
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+    // 历史测试依赖机器磁盘/历史 jar 或演示 MethodHandle 失败，暂不纳入回归
+    exclude("**/FileUtilsTest*", "**/TestVarargs*")
 }
 
 tasks.named<Javadoc>("javadoc") {

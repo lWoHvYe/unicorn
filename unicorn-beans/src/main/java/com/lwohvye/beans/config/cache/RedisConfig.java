@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.redisson.api.RedissonClient;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -107,14 +108,21 @@ public class RedisConfig implements CachingConfigurer {
     }
 
 
-    private JacksonJsonRedisSerializer<Object> jacksonJsonRedisSerializer() {
+    JacksonJsonRedisSerializer<Object> jacksonJsonRedisSerializer() {
+        var typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType("com.lwohvye.")
+                .allowIfSubType("java.util.")
+                .allowIfSubType("java.time.")
+                .allowIfSubTypeIsArray()
+                .build();
         var objectMapper = JsonMapper.builder()
                 // 如果json中有新增的字段并且是实体类类中不存在的，不报错。即允许json串中有，而pojo中没有的属性
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 // 指定要序列化的域，field,get和set,以及修饰符范围，ANY是都有包括private和public
                 .changeDefaultVisibility(vc -> vc.withVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY))
-                // todo 需要看一下怎么配置下面这个，不然有的功能可能报错
-                 .activateDefaultTyping(BasicPolymorphicTypeValidator.builder().build(), DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
+                // Object.class 作为根类型时必须写入类型信息，NON_FINAL 才能覆盖 List/Map 等非 final 类型
+                // 注意：该格式与旧版 JAVA_LANG_OBJECT 不兼容，升级后需清理一次对应缓存
+                .activateDefaultTyping(typeValidator, DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY)
                 .build();
         return new JacksonJsonRedisSerializer<>(objectMapper, Object.class);
     }
@@ -134,14 +142,15 @@ public class RedisConfig implements CachingConfigurer {
             // 因为若x为2的幂，则y%x = y&(x-1)，
             // 默认初始容量为16，负载因子为0.75f。这里指定为8，当put的内容超过6时，将触发扩容，在当下一般一两个参数的情况下，够用了
             var container = new HashMap<String, Object>(8);
-            var targetClassClass = target.getClass();
+            // AOP 代理的 class 名不稳定，使用目标类名，避免同一方法在代理/非代理路径下生成不同 key
+            var targetClass = AopUtils.getTargetClass(target);
             var methodName = method.getName();
             // 类地址。可根据需要决定是否放入摘要中
-            container.put("class", targetClassClass.toGenericString());
+            container.put("class", targetClass.toGenericString());
             // 方法名称。可根据需要决定是否放入摘要中
             container.put("methodName", methodName);
             // 包名称。可根据需要决定是否放入摘要中
-            container.put("package", targetClassClass.getPackage());
+            container.put("package", targetClass.getPackage());
             // 参数列表
             for (int i = 0; i < params.length; i++) {
                 container.put(String.valueOf(i), params[i]);
@@ -150,7 +159,7 @@ public class RedisConfig implements CachingConfigurer {
             String jsonString = JsonUtils.toJSONString(container);
             // 做SHA256 Hash计算，得到一个SHA256摘要作为Key
             var sha256Hex = DigestUtils.sha256Hex(jsonString);
-            var classSimpleName = targetClassClass.getSimpleName();
+            var classSimpleName = targetClass.getSimpleName();
 //            使用类名 + 方法名 + 摘要 做key，便于识别
             return LocalPropertyConfig.SYS_NAME + classSimpleName + "::" + methodName + "::" + sha256Hex;
         };
@@ -175,7 +184,8 @@ public class RedisConfig implements CachingConfigurer {
 
             @Override
             public void handleCachePutError(RuntimeException e, Cache cache, Object key, Object value) {
-                log.error("Redis occur handleCachePutError：key -> [{}]；value -> [{}]", key, value, e);
+                log.error("Redis occur handleCachePutError：key -> [{}]；valueType -> [{}]",
+                        key, value == null ? "null" : value.getClass().getName(), e);
             }
 
             @Override

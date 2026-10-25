@@ -22,4 +22,8 @@ public class UtilsException extends RuntimeException {
 		super(message);
 	}
 
+	public UtilsException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

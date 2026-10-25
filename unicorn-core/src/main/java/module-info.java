@@ -28,7 +28,6 @@ module lwohvye.unicorn.core {
     requires transitive spring.boot;
     requires transitive spring.boot.autoconfigure;
     requires transitive tools.jackson.databind;
-    requires transitive com.github.benmanes.caffeine;
     requires transitive cn.hutool;
     requires transitive io.swagger.v3.oas.models;
     requires transitive io.swagger.v3.oas.annotations;
@@ -46,8 +45,6 @@ module lwohvye.unicorn.core {
     requires transitive org.slf4j;
     requires transitive org.springdoc.openapi.common;
     requires transitive redisson;
-    requires transitive org.bouncycastle.pkix;
-    requires transitive org.bouncycastle.provider;
     requires net.coobird.thumbnailator;
     requires reactor.core;
     requires spring.security.oauth2.jose;

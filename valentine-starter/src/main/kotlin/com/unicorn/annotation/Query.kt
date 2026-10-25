@@ -73,6 +73,8 @@ annotation class Query(
         BETWEEN,
         NOT_NULL,
         IS_NULL,
+        IN_OR_ISNULL,
+        IS_OR_NULL,
         EQUAL_IN_MULTI,
         FUNCTION_FIND_IN_SET,
         FUNCTION_4_EQUAL

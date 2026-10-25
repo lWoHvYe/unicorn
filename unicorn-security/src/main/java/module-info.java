@@ -15,6 +15,7 @@ module lwohvye.unicorn.security {
     requires captcha.core;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.github.oshi;
+    requires com.github.benmanes.caffeine;
     requires easy.captcha;
     requires transitive io.netty.common;
     requires transitive org.apache.tomcat.embed.websocket;

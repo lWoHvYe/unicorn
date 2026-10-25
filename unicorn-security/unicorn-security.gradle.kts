@@ -62,6 +62,7 @@ dependencies {
     api(libs.easy.captcha)
     implementation(libs.captcha)
     api(libs.oshi.core)
+    implementation("com.github.ben-manes.caffeine:caffeine")
 
     add("businessLogApi", libs.bizlog)
     add("businessLogApi", project(":unicorn-beans"))

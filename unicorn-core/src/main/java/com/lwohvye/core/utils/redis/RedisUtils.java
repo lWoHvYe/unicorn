@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.util.Assert;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -86,13 +87,16 @@ public class RedisUtils {
                 boolean result = Boolean.TRUE.equals(redisTemplate.delete(keys[0]));
                 log.debug("删除缓存：{} ，结果：{} ", keys[0], result);
             } else {
-                Set<Object> keySet = new HashSet<>();
+                List<Object> keyList = new ArrayList<>();
                 for (String key : keys) {
-                    keySet.addAll(Objects.requireNonNull(redisTemplate.keys(key)));
+                    // 使用 SCAN，避免 KEYS 在大 key 空间下阻塞 Redis
+                    keyList.addAll(scan(key));
                 }
-                Long count = redisTemplate.delete(keySet);
-                log.debug("成功删除缓存：{}", keySet);
-                log.debug("缓存删除数量：{} 个", count);
+                if (!keyList.isEmpty()) {
+                    Long count = redisTemplate.delete(keyList);
+                    log.debug("成功删除缓存：{}", keyList);
+                    log.debug("缓存删除数量：{} 个", count);
+                }
             }
         }
     }
@@ -199,7 +203,7 @@ public class RedisUtils {
         List<String> result = new ArrayList<>();
         try (var cursor = rc.keyCommands().scan(options)) {
             while (cursor.hasNext()) {
-                result.add(new String(cursor.next()));
+                result.add(new String(cursor.next(), StandardCharsets.UTF_8));
             }
         }
         try {

@@ -31,12 +31,14 @@ dependencies {
     implementation(project(":unicorn-security"))
     implementation(project(":unicorn-logging"))
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation(project(":unicorn-tp-tools-kotlin")) // kotlin as well
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation(libs.bundles.coroutines)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     // add following dependency if using ScriptEngine after Java 15

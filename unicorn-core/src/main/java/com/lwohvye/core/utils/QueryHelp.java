@@ -29,7 +29,9 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -51,6 +53,32 @@ import java.util.Objects;
 public class QueryHelp {
 
     /**
+     * 每个 criteria 类型的 @Query 字段元数据只解析一次，避免每次查询都做字段遍历/注解读取/accessible 切换。
+     */
+    private static final ClassValue<List<QueryField>> QUERY_FIELDS = new ClassValue<>() {
+        @Override
+        protected List<QueryField> computeValue(Class<?> type) {
+            var fields = new ArrayList<QueryField>();
+            for (var field : ReflectUtil.getFields(type)) {
+                var query = field.getAnnotation(Query.class);
+                if (query == null) {
+                    continue;
+                }
+                if (!field.trySetAccessible()) {
+                    // 命名模块下如果没有把所在包 opens 给 lwohvye.unicorn.core，条件会被静默忽略。
+                    throw new UtilsException("无法访问 @Query 字段: " + type.getName() + "#" + field.getName()
+                            + "，请将所在包 opens 给 lwohvye.unicorn.core");
+                }
+                fields.add(new QueryField(field, query));
+            }
+            return List.copyOf(fields);
+        }
+    };
+
+    private record QueryField(Field field, Query query) {
+    }
+
+    /**
      * 解析属性上的查询注解。贫瘠相应的查询
      * 当前已经支持了简单多条件的连表查询，但无法支持复杂的 And, Or 组合查询，这种要么使用QueryDSL要么干脆使用Native SQL。
      * 虽说通过整合Annotation和Reflect 也是可以支持复杂查询的，但既然已经有QueryDSL（虽然用的不多且好久没更新了），个人认为没必要重复造轮子，尤其是JPA跟其还是兼容的
@@ -68,101 +96,110 @@ public class QueryHelp {
             return cb.and(list.toArray(new Predicate[0]));
         }
         try {
-            // 根据Field及上面的Annotation，拼接Query & Join
-            analyzeFieldQuery(root, query, cb, list);
+            // 根据Field及上面的Annotation，拼接Query & Join。joins 只在本次查询内复用。
+            var joins = new HashMap<String, Join<R, ?>>();
+            analyzeFieldQuery(root, query, cb, list, joins);
+        } catch (UtilsException e) {
+            log.error("Fail to analyze query: " + query.getClass().getName(), e);
+            throw e;
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new UtilsException("Fail to analyze Query, error: " + e.getMessage());
+            log.error("Fail to analyze query: " + query.getClass().getName(), e);
+            throw new UtilsException("解析查询失败: " + query.getClass().getName(), e);
         }
         // 各Field的Condition通过And连接，这是比较常见的场景
         return cb.and(list.toArray(new Predicate[0]));
     }
 
-    private static <R, Q> void analyzeFieldQuery(Root<R> root, Q query, CriteriaBuilder cb, ArrayList<Predicate> list) throws IllegalAccessException {
-        for (var field : ReflectUtil.getFields(query.getClass())) {
-            // AccessibleObject 类是 Field、Method 和 Constructor 对象的基类。它提供了将反射的对象标记为在使用时取消默认 Java 语言访问控制检查的能力。
-            // 对于公共成员、默认（打包）访问成员、受保护成员和私有成员，在分别使用 Field、Method 或 Constructor 对象来设置或获得字段、调用方法，或者创建和初始化类的新实例的时候，会执行访问检查。
-            // 在反射对象中设置 accessible 标志允许具有足够特权的复杂应用程序（比如 Java Object Serialization 或其他持久性机制）以某种通常禁止使用的方式来操作对象，
-            // 需注意flag=true：指示反射的对象在使用时应该取消 Java 语言访问检查。flag=false：指示反射的对象应该实施 Java 语言访问检查。
-            // 所以setAccessible只是启用和禁用访问安全检查的开关,并不是为true就能访问，为false就不能访问
-            // ⚠️ Reflect获取的都是副本Duplicate，对其的Modifier理论上不会影响其他地方获取的结果，但有的框架或工具会对Reflect做Cache，所以建议在Use后Reset Accessible
-            // field.canAccess(filed对应的查询器实例)
-            var accessible = field.canAccess(query);
-            // boolean accessible = field.isAccessible(); // 方法已过期，改用canAccess
-            // 设置对象的访问权限，保证对private的属性的访
-            // field.setAccessible(true); // 用下面这种方式
-            if (!field.trySetAccessible()) // 设置成功/或本就是true。会返回true
-                continue; // 若设置失败，则跳过
-            Query q = field.getAnnotation(Query.class);
-            if (q != null) {
-                var blurry = q.blurry();
+    private static <R, Q> void analyzeFieldQuery(Root<R> root, Q query, CriteriaBuilder cb,
+                                                 ArrayList<Predicate> list,
+                                                 Map<String, Join<R, ?>> joins) {
+        for (var meta : QUERY_FIELDS.get(query.getClass())) {
+            try {
+                var field = meta.field();
+                var q = meta.query();
                 var value = field.get(query);
-                if (Objects.isNull(value) || Objects.equals("", value)) {
+                var nullCondition = q.type() == Query.Type.IS_NULL || q.type() == Query.Type.NOT_NULL;
+                if (!nullCondition && (Objects.isNull(value) || Objects.equals("", value))) {
                     continue;
                 }
-                // 模糊多字段
-                if (!blurry.isBlank()) {
-                    var blurrys = blurry.split(",");
+                // 模糊多字段；IS_NULL/NOT_NULL 不使用字段值
+                if (!nullCondition && !q.blurry().isBlank()) {
+                    var blurrys = q.blurry().split(",");
                     var orPredicate = new ArrayList<Predicate>();
                     for (String s : blurrys) {
-                        orPredicate.add(cb.like(root.get(s).as(String.class), "%" + value + "%"));
+                        var name = s.trim();
+                        if (name.isEmpty()) {
+                            continue;
+                        }
+                        orPredicate.add(cb.like(root.get(name).as(String.class), "%" + value + "%"));
                     }
-                    var p = new Predicate[orPredicate.size()];
-                    list.add(cb.or(orPredicate.toArray(p)));
+                    if (!orPredicate.isEmpty()) {
+                        var p = new Predicate[orPredicate.size()];
+                        list.add(cb.or(orPredicate.toArray(p)));
+                    }
                     continue;
                 }
                 // 解析查询类型
-                analyzeQueryType(root, query, cb, list, field);
+                analyzeQueryType(root, query, cb, list, meta, joins);
+            } catch (UtilsException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new UtilsException("解析查询字段失败: " + query.getClass().getName() + "#"
+                        + meta.field().getName(), e);
             }
-            field.setAccessible(accessible); // 该回原来的属性
         }
     }
 
     /**
-     * 解析joinType
+     * 解析 joinType。joins 只在单次查询内复用，避免多个字段重复创建同一路径的 join。
      *
      * @param root  /
      * @param q     /
-     * @param value /
+     * @param joins 单次查询的 join 缓存
      * @return jakarta.persistence.criteria.Join
      * @date 2021/6/24 10:52 上午
      */
     @Nullable
-    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, Object value) {
-        Join<R, ?> join = null;
+    private static <R> Join<R, ?> analyzeJoinType(Root<R> root, Query q, Map<String, Join<R, ?>> joins) {
         var joinName = q.joinName();
         if (joinName.isBlank())
             return null;
-        // 首先获取已经设置的join。只用一次的话，使用聚合会降低性能，所以再次调整为循环的方式
-        // var existJoinNames = root.getJoins().stream().collect(Collectors.toMap(rJoin -> rJoin.getAttribute().getName(), rJoin -> rJoin, (o, o2) -> o2)); 只用一次，聚合不划算
-        // 这里支持属性套属性。比如查User时，配置了连Role表 joinName = "roles"，若需要用Role中的Menus属性做一些过滤，则 joinName = "roles>menus" 这样配置即可，此时会连上sys_roles_menus和sys_menu两张表
-        var joinNames = joinName.split(">");
-        checkJoin:
-        for (var entity : joinNames) {
-            // 若join已经有值了，就不走下面这段逻辑了。这里还保证了如果使用了>，只有第一层会走进来，避免一些问题，比如 roles>dept 和 dept。这俩个dept是不应用同一个join的
-            // 业务中应该没有需要对同一张table多次join，甚至joinType还不同的情形。这里是不支持此类场景的
-            if (Objects.isNull(join)) {
-//                    var rJoin = existJoinNames.get(entity); 同上
+
+        Join<R, ?> join = null;
+        var path = "";
+        for (var entity : joinName.split(">")) {
+            path = path.isEmpty() ? entity : path + ">" + entity;
+            var cached = joins.get(path);
+            if (cached != null) {
+                join = cached;
+                continue;
+            }
+            // 第一层优先复用 root 上已有的 join
+            if (join == null) {
                 for (var rJoin : root.getJoins()) {
-                    // 若已经设置过该joinName，则将已设置的rJoin赋值给join，开启下一循环
                     if (Objects.equals(rJoin.getAttribute().getName(), entity)) {
                         join = rJoin;
-                        continue checkJoin;
+                        break;
                     }
                 }
             }
-            // Switch Expressions。这个只是一个sweets 语法糖
-            var stubJoin = Objects.nonNull(join) && Objects.nonNull(value);
-            join = switch (q.join()) {
-                case LEFT:
-                    yield stubJoin ? join.join(entity, JoinType.LEFT) : root.join(entity, JoinType.LEFT);
-                case RIGHT:
-                    yield stubJoin ? join.join(entity, JoinType.RIGHT) : root.join(entity, JoinType.RIGHT);
-                case INNER:
-                    yield stubJoin ? join.join(entity, JoinType.INNER) : root.join(entity, JoinType.INNER);
-            };
+            if (join == null) {
+                join = root.join(entity, toJoinType(q.join()));
+            } else if (!path.equals(entity)) {
+                // 只有多级路径（roles>menus）才继续向下 join，避免把单级路径重复 join 到自己
+                join = join.join(entity, toJoinType(q.join()));
+            }
+            joins.put(path, join);
         }
         return join;
+    }
+
+    private static JoinType toJoinType(Query.Join join) {
+        return switch (join) {
+            case LEFT -> JoinType.LEFT;
+            case RIGHT -> JoinType.RIGHT;
+            case INNER -> JoinType.INNER;
+        };
     }
 
     /**
@@ -181,13 +218,15 @@ public class QueryHelp {
                                                 Q query,
                                                 CriteriaBuilder cb,
                                                 ArrayList<Predicate> list,
-                                                Field field) throws IllegalAccessException {
-        Query q = field.getAnnotation(Query.class);
+                                                QueryField meta,
+                                                Map<String, Join<R, ?>> joins) throws IllegalAccessException {
+        var field = meta.field();
+        var q = meta.query();
         var attributeName = defineAttrName(field, q);
         var value = field.get(query);
-        var fieldType = field.getType();
+        var fieldType = boxed(field.getType());
         var comparableFieldType = value.castComparableFieldType();
-        var join = analyzeJoinType(root, q, value);
+        var join = analyzeJoinType(root, q, joins);
 
         // switch 的 -> 语法也只是语法糖
         switch (q.type()) {
@@ -214,7 +253,7 @@ public class QueryHelp {
             case LIKE_STR ->
                     list.add(cb.like(getExpression(attributeName, join, root).as(String.class), value.toString()));
             case IN_INNER_LIKE -> {
-                if (value instanceof List<?> objList) {
+                if (value instanceof List<?> objList && !objList.isEmpty()) {
 //                                构建数组
                     var predicates = new Predicate[objList.size()];
                     for (int i = 0; i < objList.size(); i++) {
@@ -237,11 +276,22 @@ public class QueryHelp {
                 }
             }
             case BETWEEN -> {
-                if (value instanceof List<?> col && col.size() == 2 && col.get(0) instanceof Comparable<?> start && col.get(1) instanceof Comparable<?> end) {
+                if (value instanceof List<?> col && !col.isEmpty()) {
+                    if (col.size() != 2) {
+                        throw new UtilsException("BETWEEN 需要两个值: " + attributeName);
+                    }
+                    var startValue = col.get(0);
+                    var endValue = col.get(1);
+                    if (!(startValue instanceof Comparable<?> start) || !(endValue instanceof Comparable<?> end)) {
+                        throw new UtilsException("BETWEEN 的值必须实现 Comparable: " + attributeName);
+                    }
                     var eleType = start.castComparableFieldType();
-                    assert eleType != null;
+                    if (eleType == null) {
+                        throw new UtilsException("BETWEEN 字段不是 Comparable: " + attributeName);
+                    }
                     list.add(cb.between(getExpression(attributeName, join, root).as(eleType),
-                            start.castToComparable(attributeName, eleType), eleType.cast(end)));
+                            start.castToComparable(attributeName, eleType),
+                            end.castToComparable(attributeName, eleType)));
                 }
             }
             case NOT_NULL -> list.add(cb.isNotNull(getExpression(attributeName, join, root)));
@@ -258,9 +308,13 @@ public class QueryHelp {
                     );
                 }
             }
-            case IS_OR_NULL -> list.add((Long) value == -1L ?
-                    cb.isNull(getExpression(attributeName, join, root).as(fieldType)) :
-                    cb.equal(getExpression(attributeName, join, root).as(fieldType), value));
+            case IS_OR_NULL -> {
+                var expression = getExpression(attributeName, join, root);
+                var isNull = value instanceof Number number && number.longValue() == -1L;
+                list.add(isNull
+                        ? cb.isNull(expression.as(fieldType))
+                        : cb.equal(expression.as(fieldType), value));
+            }
             case EQUAL_IN_MULTI -> {
                 var predicates = new Predicate[4];
 //                            like value
@@ -294,8 +348,12 @@ public class QueryHelp {
             // where (from_base64(user0_.description) like '%ABC%') 。已基本可以使用
 //                list.add(cb.like(cb.function("from_base64", fieldType, getExpression(attributeName, join, root)).as(String.class), "%" + value.toString() + "%")); // 这种把调用函数硬编码了
 //                break; 后续移除
-            case FUNCTION_4_EQUAL ->
-                    list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), value));
+            case FUNCTION_4_EQUAL -> {
+                if (q.functionName().isBlank()) {
+                    throw new UtilsException("FUNCTION_4_EQUAL 必须配置 functionName: " + attributeName);
+                }
+                list.add(cb.equal(cb.function(q.functionName(), fieldType, getExpression(attributeName, join, root)), value));
+            }
             default -> {
             }
         }
@@ -315,6 +373,21 @@ public class QueryHelp {
     private static String defineAttrName(Field field, Query q) {
         var propName = q.propName();
         return !propName.isBlank() ? propName : field.getName();
+    }
+
+    private static Class<?> boxed(Class<?> type) {
+        if (!type.isPrimitive()) {
+            return type;
+        }
+        if (type == long.class) return Long.class;
+        if (type == int.class) return Integer.class;
+        if (type == short.class) return Short.class;
+        if (type == byte.class) return Byte.class;
+        if (type == double.class) return Double.class;
+        if (type == float.class) return Float.class;
+        if (type == boolean.class) return Boolean.class;
+        if (type == char.class) return Character.class;
+        return type;
     }
 
     // 2021/11/6 使用JPA 2.1 引入的 CriteriaUpdate 和 CriteriaDelete 进行批量更新/删除。不是很实用，期待后续的使用场景

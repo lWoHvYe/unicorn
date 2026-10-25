@@ -4,7 +4,7 @@
 
 `CLAUDE.md` 是早期说明，已在顶部标注以本文件为准；发生冲突时，以本文件、`settings.gradle.kts`、`build-logic/` 和实际构建结果为准。
 
-> 最近核对：2026-10-18（commit `98d7fc8b`）。`./gradlew assemble` 通过；四个 AI demo 已编译并启动验证（MCP 工具发现、RAG infra profile 的 Redis Stack/pgvector/MySQL/RabbitMQ 连通均验证通过；Redis 向量索引 `unicorn-ai-rag` 已创建）；测试未专门维护，`./gradlew test` 失败属于预期，见 §8。
+> 最近核对：2026-10-25（commit `f431c733` 之后的工作区）。`./gradlew assemble` 通过；四个 AI demo 已编译并启动验证（MCP 工具发现、RAG infra profile 的 Redis Stack/pgvector/MySQL/RabbitMQ 连通均验证通过；Redis 向量索引 `unicorn-ai-rag` 已创建）；核心模块新增 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试，`./gradlew test` 全量仍失败属于预期，见 §8。
 
 ## 1. 项目速览
 
@@ -131,15 +131,18 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 
 - `unicorn-core` 的 `com.lwohvye.core.utils.QueryHelp` 扫描 criteria 字段上的 `@Query`，拼成 JPA `Specification`。
 - 支持 `blurry` 多字段 OR 模糊、`joinName`（`roles>menus` 形式的多级 join）、`propName` 覆盖字段名，以及 20 种 `Type`（`IN`/`BETWEEN`/`LIKE_*`/`FUNCTION_*` 等）。
-- 只支持 **AND** 组合；同一张表不支持多次不同 `join`；`IS_OR_NULL` 仅识别 `-1L`；`FUNCTION_4_EQUAL` 等库函数列无法走索引。
-- Criteria/DTO 放在 `unicorn-sys-api`；`valentine-starter` 另有一份 Kotlin 版 `QueryHelp`，与 core 的 Java 版相互独立。
+- 只支持 **AND** 组合；同一张表不支持多次不同 `join`；`IS_OR_NULL` 支持任意 `Number` 的 `-1`；`BETWEEN` 要求两个可比较值；`FUNCTION_4_EQUAL` 等库函数列无法走索引。
+- `QueryHelp` 用 `ClassValue` 缓存 `@Query` 字段元数据，join 只在单次查询内复用；criteria 所在包必须 `opens` 给 `lwohvye.unicorn.core`，否则会直接报错而不是静默忽略条件。
+- `IS_NULL`/`NOT_NULL` 的字段值允许为 `null`，不会被普通条件的空值跳过逻辑误过滤；`IS_OR_NULL` 的 `-1` 支持任意 `Number`。
+- Criteria/DTO 放在 `unicorn-sys-api`；`valentine-starter` 另有一份 Kotlin 版 `QueryHelp`，已同步 `IS_NULL`/`IS_OR_NULL`/空集合/`BETWEEN`/join 复用等关键修复，并有 `KotlinQueryHelpTest` 覆盖。
 
 ### 5.3 统一返回与异常
 
 - `@RespResultBody` + `ResponseResultBodyAdvice` 把 `ResponseEntity` body 包装成 `ResultInfo`。
 - `ResultInfo` 有三套互斥载体：`result`、`content`、`resultMap`；List 构造器把 `totalElements` 设为 `size()`。
 - advice 的 `@ExceptionHandler` 是**全局**生效的（不依赖 `@RespResultBody`），统一输出 500/400/403/405。
-- 返回 `String` 时实际输出的是 `ResultInfo.toString()`，不是 JSON（历史行为，改动前先确认调用方）。
+- 返回 `String` 时输出 `ResultInfo` 的 JSON 文本，并设置 `application/json`；不再使用 `ResultInfo.toString()`。
+- 兜底异常只返回固定文案 + `traceId`，不暴露 `ex.getMessage()`；`DataIntegrityViolation` 返回固定“数据完整性校验失败”。
 - 在 Filter/Handler 等非 Controller 场景用 `ResultUtils.resultJson(...)`。
 
 ### 5.4 认证与鉴权（最容易踩坑）
@@ -151,12 +154,14 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 - `@AnonymousAccess` / `@AnonymousXxxMapping` 的语义是返回 `ROLE_ANONYMOUS`，**不是 permitAll**；请求仍会经过 JWT 过滤器。
 - **未登记到 `sys_resource` 的接口默认返回 `ROLE_LOGIN`（登录即可访问）**。新增需要权限控制的接口时，必须补资源记录，否则等于向所有登录用户开放。
 - `local.sys.sim-auth=true` 会启用 `SimpleSecurityConfig`；其中 `DRAW = RandomUtil.randomBoolean()` 会在"全部放行"和"x509"两条链间**随机**选择，不要用于可重复环境。
+- `SecurityUtils.getCurrentUser()` 每次 `loadUserByUsername` 是为了拿到最新动态权限，`UserLocalCache` 的 Caffeine 缓存负责降低 DB 压力；不要简单改成只读 JWT principal，否则权限变更会延迟。`getCurrentUsername()` 已优先从 principal 取用户名。
 - 密码编码器为 BCrypt；默认账号与权限数据来自 `sql/unicorn.sql`。
 
 ### 5.5 缓存
 
 - `RedisConfig` 注册 `@Primary` 的 `RedissonSpringCacheManager`，配置文件为 **classpath:`cache-config.yaml`**（由应用提供，starter 已有；beans 模块自身不带）。
-- Key 生成器带 `local.sys.name` 命名空间：`-n_n-<name>-n_n-::类::方法::sha256(参数)`；改 `local.sys.name` 等于整体换缓存命名空间。
+- Redis value 使用 Jackson `DefaultTyping.NON_FINAL` + `@class` 类型信息；该格式与旧版 `JAVA_LANG_OBJECT` 不兼容，升级后需要清理一次对应缓存。`RedisConfigTest` 覆盖 List/Map/POJO 的 round-trip。
+- Key 生成器带 `local.sys.name` 命名空间：`-n_n-<name>-n_n-::类::方法::sha256(参数)`；改 `local.sys.name` 等于整体换缓存命名空间；类名使用 `AopUtils.getTargetClass`，避免代理类名进入 key。
 - `SysCacheKey` 中的前缀必须与 `@Cacheable(key = "...")` 完全一致，`RedisUtils.delInRC(...)` 才能清到；否则会静默清不掉。
 - 放入 Redis 的集合必须是可变且可 JSON 序列化的，使用 `new ArrayList<>(...)`，不要用 `Stream.toList()`。
 - `localCacheManager`（`ConcurrentFreshCacheManager`）会对值做 Jackson 深拷贝，值同样必须可序列化。
@@ -224,16 +229,16 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 ### 8.1 测试未维护，失败属于预期（可忽略）
 
 仓库没有专门维护测试；`./gradlew test --continue` 实测失败，这是已知状态，**不代表业务代码回归，可直接忽略**。原因：
-1. 除 `valentine-starter` 外，各模块**没有配置 `useJUnitPlatform()`**，Gradle 9.8 对"有测试源码但发现不到测试"直接报错：
-   `unicorn-core`、`unicorn-security`、`unicorn-oauth2-resource-server-flux`、`unicorn-oauth2-authorizationserver`。
+1. `unicorn-security`、`unicorn-oauth2-resource-server-flux`、`unicorn-oauth2-authorizationserver` 等模块**没有配置 `useJUnitPlatform()`**，Gradle 9.8 对"有测试源码但发现不到测试"直接报错；`unicorn-core`/`unicorn-beans` 已配置平台与针对性测试，见下方例外。
 2. `valentine-starter` 的测试依赖外部环境：
    - `ScriptEngineTest` 需要可用的 GraalJS ScriptEngine，当前 NPE；
    - `QueryHelpTest` 是 `@SpringBootTest`，需要真实数据库方言，当前 Hibernate `DialectFactoryImpl` 失败。
-3. `unicorn-core` 的 `FileUtilsTest` 还包含机器相关的硬盘容量断言和已不存在的历史 jar 路径。
+3. `unicorn-core` 的 `FileUtilsTest` 还包含机器相关的硬盘容量断言和已不存在的历史 jar 路径；`TestVarargs` 是演示 MethodHandle 失败场景，已从 `test` 任务排除。
 
 因此：**把 `./gradlew assemble` 作为构建门槛**，不要为了让 `test` 变绿去改业务代码；只有在任务明确要求补测试时，再给 Java 模块加 `useJUnitPlatform()`、JUnit 依赖，并移除环境相关断言。
 
-例外：新增的 `unicorn-ai-*` demo 已配置 `useJUnitPlatform()` 与不依赖模型的单元测试，`./gradlew :unicorn-ai-chat:test`、`:unicorn-ai-rag:test`、`:unicorn-ai-mcp-server:test` 可通过；这不改变全量 `test` 仍失败的事实。
+例外：`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
+`./gradlew :unicorn-core:test :unicorn-beans:test`；`valentine-starter` 的 `KotlinQueryHelpTest`（5 个）可通过 `./gradlew :valentine-starter-kotlin:test --tests com.unicorn.utils.KotlinQueryHelpTest`。AI demo 的独立测试同样可通过；这不改变全量 `test` 仍失败的事实。
 
 ### 8.2 文档与脚本漂移
 
@@ -249,8 +254,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 
 - `@AutoConfiguration` 只登记了 `UnicornAutoConfiguration`；`ValentineExecutorConfig`、`VirtualThreadsPoolExecutor` 等虽有注解但未进 `AutoConfiguration.imports`，靠 component scan 生效，排序语义与标准自动配置不同。
 - `SimpleSecurityConfig.DRAW` 的随机分支会让 `sim-auth` 环境的鉴权行为不可重复。
-- `ResponseResultBodyAdvice` 对 `String` 的包装是 `ResultInfo.toString()`，不是 JSON；`DataIntegrityViolation` 的 businessCode 语义错位为 405。
-- `StringUtils` 的静态字段在类初始化时取 `Ip2regionSearcher` bean，早期加载（如 `LimitAspect`）可能抛异常。
+- Redis 缓存序列化从 `JAVA_LANG_OBJECT` 改为 `NON_FINAL` 后，旧格式的缓存值需要清理，避免升级后首次读取反序列化失败。
 - `RedisUtils` 的普通操作走 JSON 序列化的 `RedisTemplate`，Lua 锁走 `StringRedisTemplate`；同一 key 的文本表示不同。
 - `ResultInfo` 的 `content`/`resultMap` 依赖字段命名约定，改造返回结构时要同时检查前端/调用方。
 - `spring-boot-starter-*` 在 Boot 4 中已改名（如 `spring-boot-starter-webmvc`、`spring-boot-starter-restclient`）；JSON 栈为 Jackson 3（`tools.jackson.*`），不要按 Boot 3 的依赖名/包名改代码。

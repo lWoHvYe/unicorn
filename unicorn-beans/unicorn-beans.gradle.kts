@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+import org.gradle.api.tasks.testing.Test
+
 description = "Beans模块"
 
 val sharedManifest = rootProject.extra["sharedManifest"] as? Manifest
@@ -43,4 +45,11 @@ publishing {
 
 dependencies {
     api(project(":unicorn-core"))
+    implementation(libs.bouncycastle.pkix)
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }

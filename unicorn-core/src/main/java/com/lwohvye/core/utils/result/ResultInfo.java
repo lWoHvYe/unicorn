@@ -17,6 +17,7 @@ package com.lwohvye.core.utils.result;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.lwohvye.core.exception.BadRequestException;
 import lombok.Getter;
 import lombok.ToString;
@@ -32,6 +33,7 @@ import java.util.*;
  */
 @Getter
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @SuppressWarnings({"unchecked", "rawtypes", "unused"})
 public class ResultInfo<T> implements IResultInfo<T> {
     @Serial

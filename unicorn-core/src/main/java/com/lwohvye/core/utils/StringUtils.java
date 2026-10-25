@@ -44,9 +44,29 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     private static final String UNKNOWN = "unknown";
 
     /**
-     * 注入bean
+     * 注入bean。延迟获取，避免仅使用 StringUtils 的纯函数时也强依赖 Spring 容器。
      */
-    private static final Ip2regionSearcher IP_SEARCHER = SpringContextHolder.getBean(Ip2regionSearcher.class);
+    private static volatile Ip2regionSearcher ipSearcher;
+
+    private static Ip2regionSearcher ipSearcher() {
+        var searcher = ipSearcher;
+        if (searcher != null) {
+            return searcher;
+        }
+        synchronized (StringUtils.class) {
+            searcher = ipSearcher;
+            if (searcher == null) {
+                try {
+                    searcher = SpringContextHolder.getBean(Ip2regionSearcher.class);
+                    ipSearcher = searcher;
+                } catch (Exception exception) {
+                    log.debug("Ip2regionSearcher is not available: {}", exception.getMessage());
+                    return null;
+                }
+            }
+        }
+        return searcher;
+    }
 
     /**
      * 获取ip地址
@@ -95,7 +115,11 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * 根据ip获取详细地址
      */
     public static String getLocalCityInfo(String ip) {
-        IpInfo ipInfo = IP_SEARCHER.memorySearch(ip);
+        var searcher = ipSearcher();
+        if (searcher == null) {
+            return null;
+        }
+        IpInfo ipInfo = searcher.memorySearch(ip);
         if (ipInfo != null) {
             return ipInfo.getAddress();
         }

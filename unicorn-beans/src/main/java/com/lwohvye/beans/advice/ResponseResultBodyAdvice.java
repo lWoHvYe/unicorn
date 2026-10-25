@@ -18,6 +18,7 @@ package com.lwohvye.beans.advice;
 import com.lwohvye.core.annotation.RespResultBody;
 import com.lwohvye.core.exception.BadRequestException;
 import com.lwohvye.core.utils.ThrowableUtils;
+import com.lwohvye.core.utils.json.JsonUtils;
 import com.lwohvye.core.utils.result.ResultInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -43,6 +44,7 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import org.springframework.web.util.WebUtils;
+import org.slf4j.MDC;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -50,6 +52,7 @@ import jakarta.validation.ConstraintViolationException;
 
 import java.lang.annotation.Annotation;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * 这也是一种统一数据返回的方式。可视情况整合。与{@link RespResultBody}配合使用
@@ -97,11 +100,12 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
         }
         if (body instanceof ResultInfo<?> resInfo) // 如果返回值是标准格式，就不需要再次封装，如果不加该判断的话，异常的结果会被封装两次
             return resInfo;
-        if (body instanceof String str) // String 类型很特殊，不能直接用ResultInfo.success，最后会将其转为String类型，然后出现ClassCastException:
-            // class com.lwohvye.core.utils.result.ResultInfo cannot be cast to class java.lang.String
-            // 主体是因为selectedContentType和selectedConverterType的差异（这个是与方法的returnType有关），String时是: text/html 和 class org.springframework.http.converter.StringHttpMessageConverter，
-            // 其他类型时是："application/json" 和 "class org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
-            return ResultInfo.success(str).toString();
+        if (body instanceof String str) {
+            // String 时 selectedConverterType 是 StringHttpMessageConverter，返回 ResultInfo 会 ClassCastException。
+            // 这里直接返回 ResultInfo 的 JSON 文本，并把 Content-Type 修正为 application/json。
+            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            return JsonUtils.toJSONString(ResultInfo.success(str));
+        }
         return ResultInfo.success(body);
     }
 
@@ -115,11 +119,20 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ResultInfo<?>> handleException(Exception ex, WebRequest request) {
-        log.error(ThrowableUtils.getStackTrace(ex));
-        ResultInfo<?> body = ResultInfo.failed(ex.getMessage());
+        var traceId = traceId();
+        log.error("Unhandled exception, traceId={}", traceId, ex);
+        // 兜底异常不返回内部信息，只返回 traceId 供排查
+        ResultInfo<?> body = ResultInfo.failed("系统繁忙，请稍后重试（traceId: " + traceId + "）");
         var headers = new HttpHeaders();
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         return this.handleExceptionInternal(ex, body, headers, status, request);
+    }
+
+    private static String traceId() {
+        var traceId = MDC.get("traceId");
+        return traceId == null || traceId.isBlank()
+                ? UUID.randomUUID().toString().replace("-", "")
+                : traceId;
     }
 
     /**
@@ -138,7 +151,9 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     })
     public final ResponseEntity<ResultInfo<?>> handleServletException(RuntimeException ex, WebRequest request) {
         log.error(ThrowableUtils.getStackTrace(ex));
-        var body = ResultInfo.failed(ex.getMessage());
+        // 仅自定义业务异常透出 message，其余异常避免泄露内部实现细节
+        var message = ex instanceof BadRequestException ? ex.getMessage() : "请求参数不合法";
+        var body = ResultInfo.validateFailed(message);
         var headers = new HttpHeaders();
         var status = HttpStatus.BAD_REQUEST;
         return this.handleExceptionInternal(ex, body, headers, status, request);
@@ -218,7 +233,8 @@ public class ResponseResultBodyAdvice implements ResponseBodyAdvice<Object> {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public final ResponseEntity<ResultInfo<?>> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
         log.error(ThrowableUtils.getStackTrace(ex));
-        var body = ResultInfo.methodNotAllowed(ex.getMessage());
+        // 数据库异常可能包含表名/字段名，不直接返回给客户端
+        var body = ResultInfo.validateFailed("数据完整性校验失败");
         var headers = new HttpHeaders();
         var status = HttpStatus.BAD_REQUEST;
         return this.handleExceptionInternal(ex, body, headers, status, request);

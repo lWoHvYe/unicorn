@@ -74,7 +74,7 @@ public class ExportUtil {
         var excelFile = File.createTempFile("export_", ".xlsx");
         try (var workbook = new SXSSFWorkbook(2000)) { // 在close前是可以不断写入的，所以大数据量下可以与查询结合起来，比如一次查1000条、处理完再查询
             var sheet = workbook.createSheet();
-            var pageRequest = PageRequest.of(1, 1000);
+            var pageRequest = PageRequest.of(0, 1000);
             var data = fetchDataFunc.apply(pageRequest);
             // 创建标题行（取第一个Map的keySet）
             if (!data.isEmpty()) {
@@ -89,7 +89,7 @@ public class ExportUtil {
             while (!data.isEmpty()) {
                 // 填充数据行
                 for (Map<String, Object> rowData : data) {
-                    var row = sheet.createRow(++rowNum);
+                    var row = sheet.createRow(rowNum++);
                     int colIdx = 0;
                     for (var value : rowData.values()) {
                         var cell = row.createCell(colIdx++);
@@ -100,7 +100,9 @@ public class ExportUtil {
                 pageRequest = pageRequest.next();
                 data = fetchDataFunc.apply(pageRequest);
             }
-            workbook.write(new FileOutputStream(excelFile));
+            try (var out = new FileOutputStream(excelFile)) {
+                workbook.write(out);
+            }
         }
         return excelFile;
     }

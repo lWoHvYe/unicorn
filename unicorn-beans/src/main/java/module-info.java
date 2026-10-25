@@ -4,6 +4,8 @@ module lwohvye.unicorn.beans {
     requires spring.boot.persistence;
     requires spring.boot.tomcat;
     requires redisson.spring.cache;
+    requires org.bouncycastle.pkix;
+    requires org.bouncycastle.provider;
 
     exports com.lwohvye.beans.advice;
     exports com.lwohvye.beans.aspect to spring.beans, spring.aop;
