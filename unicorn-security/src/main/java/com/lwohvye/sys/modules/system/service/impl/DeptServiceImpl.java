@@ -16,6 +16,8 @@
 package com.lwohvye.sys.modules.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.lwohvye.api.modules.system.domain.Dept;
 import com.lwohvye.api.modules.system.service.dto.DeptDto;
 import com.lwohvye.api.modules.system.service.dto.DeptQueryCriteria;
@@ -64,8 +66,29 @@ public class DeptServiceImpl implements IDeptService, ApplicationEventPublisherA
     @Cacheable
     @Transactional(rollbackFor = Exception.class, readOnly = true)
     public List<DeptDto> queryAll(Long currentUserId, DeptQueryCriteria criteria, Boolean isQuery) throws Exception {
+        if (criteria == null) {
+            criteria = new DeptQueryCriteria();
+        }
+        // 与 MenuServiceImpl 保持一致：查询页默认只看一级节点；只要用户传了任意
+        // 其他过滤条件，就取消 pid is null。导出场景（isQuery=false）不强制只看一级。
+        if (Boolean.TRUE.equals(isQuery)) {
+            criteria.setPidIsNull(true);
+            for (var field : ReflectUtil.getFields(criteria.getClass())) {
+                if ("pidIsNull".equals(field.getName())) {
+                    continue;
+                }
+                if (field.trySetAccessible() && ObjectUtil.isNotNull(field.get(criteria))) {
+                    criteria.setPidIsNull(null);
+                    break;
+                }
+            }
+        } else {
+            criteria.setPidIsNull(null);
+        }
+        var effectiveCriteria = criteria;
         Sort sort = Sort.by(Sort.Direction.ASC, "deptSort");
-        var list = deptRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder), sort)
+        var list = deptRepository.findAll((root, criteriaQuery, criteriaBuilder) ->
+                QueryHelp.getPredicate(root, effectiveCriteria, criteriaBuilder), sort)
                 .stream().map(dept -> conversionService.convert(dept, DeptDto.class)).toList();
         // 解决放入Cache后的这个异常 Caused by: com.fasterxml.jackson.databind.exc.MismatchedInputException: Unexpected token (START_OBJECT), expected VALUE_STRING: need String, Number of Boolean value that contains type id (for subtype of java.lang.Object)
         // at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]

@@ -138,6 +138,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 - `QueryHelp` 用 `ClassValue` 缓存 `@Query` 字段元数据，join 只在单次查询内复用；criteria 所在包必须 `opens` 给 `lwohvye.unicorn.core`，否则会直接报错而不是静默忽略条件。
 - `IS_NULL`/`NOT_NULL` 的 **Boolean 字段是开关**：只有 `true` 才追加 `is null`/`is not null`，`null`/`false` 表示本次不限制；非 Boolean 字段保留原有“注解即生效”的语义。因此“先设 true、再置 null”的 `MenuQueryCriteria.pidIsNull` 不会残留条件。`IS_OR_NULL` 的 `-1` 支持任意 `Number`。
 - Criteria/DTO 放在 `unicorn-sys-api`；`valentine-starter` 另有一份 Kotlin 版 `QueryHelp`，已同步 `IS_NULL`/`IS_OR_NULL`/空集合/`BETWEEN`/join 复用等关键修复，并有 `KotlinQueryHelpTest` 覆盖。
+- `MenuServiceImpl.queryAll` 与 `DeptServiceImpl.queryAll` 统一：`isQuery=true` 时默认仅一级节点，传入其他过滤条件后取消 `pid is null`；导出场景不强制一级节点。
 
 ### 5.3 统一返回与异常
 
