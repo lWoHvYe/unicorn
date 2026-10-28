@@ -4,7 +4,7 @@
 
 `CLAUDE.md` 是早期说明，已在顶部标注以本文件为准；发生冲突时，以本文件、`settings.gradle.kts`、`build-logic/` 和实际构建结果为准。
 
-> 最近核对：2026-10-28（工作区）。`./gradlew assemble` 通过；AI 新增生产参考 `unicorn-ai-support`（H2 本地 profile + PostgreSQL/pgvector/Redis/RabbitMQ infra profile、多租户、RAG citations、工具审批、MCP、指标）及 `unicorn-ai-tools` 领域/策略库；核心模块保留 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试；support 已补 ACL、Redis 限流/缓存、JWT、SSE 工具事件、摘要、MMR/rerank、MCP 客户端认证与审批审计。`./gradlew test` 全量仍失败属于预期，见 §8。
+> 最近核对：2026-10-28（工作区）。`./gradlew assemble` 通过；AI 新增生产参考 `unicorn-ai-support`（H2 本地 profile + PostgreSQL/pgvector/Redis/RabbitMQ infra profile、多租户、RAG citations、工具审批、MCP、指标）及 `unicorn-ai-tools` 领域/策略库；核心模块保留 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试；support 已补 ACL、Redis 限流/缓存、JWT、SSE 工具事件、摘要、MMR/rerank、MCP 客户端认证与审批审计；P2 已补 JDBC 订单/库存/商品适配、token 成本、Docker 资产和 Testcontainers 集成测试。`./gradlew test` 全量仍失败属于预期，见 §8。
 
 ## 1. 项目速览
 
@@ -240,7 +240,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 
 因此：**把 `./gradlew assemble` 作为构建门槛**，不要为了让 `test` 变绿去改业务代码；只有在任务明确要求补测试时，再给 Java 模块加 `useJUnitPlatform()`、JUnit 依赖，并移除环境相关断言。
 
-例外：`unicorn-ai-tools:test`（5 个）、`unicorn-ai-support:test`（10 个）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
+例外：`unicorn-ai-tools:test`（5 个）、`unicorn-ai-support:test`（10 个通过 + 1 个 Docker 集成测试无 Docker 时 skip）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
 `./gradlew :unicorn-core:test :unicorn-beans:test`；`valentine-starter` 的 `KotlinQueryHelpTest`（5 个）可通过 `./gradlew :valentine-starter-kotlin:test --tests com.unicorn.utils.KotlinQueryHelpTest`。AI demo 的独立测试同样可通过；这不改变全量 `test` 仍失败的事实。
 
 ### 8.2 文档与脚本漂移

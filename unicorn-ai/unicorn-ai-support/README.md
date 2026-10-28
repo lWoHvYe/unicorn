@@ -54,9 +54,19 @@ export MQ_PWD=admin
 
 `infra` 会：
 - 执行 `db/migration/common` + `db/migration/postgres`（pgvector/pg_trgm）；
-- 使用 PostgreSQL 元数据/chunk + PgVectorStore；
+- 使用 PostgreSQL 元数据/chunk + PgVectorStore + `ai_order`/`ai_inventory`/`ai_product`；
 - 打开 RabbitMQ 异步入库；
-- 关闭本地演示模型（需配置 `OPENAI_API_KEY` / `OPENAI_BASE_URL`）。
+- 默认关闭本地演示模型（需配置 `OPENAI_API_KEY` / `OPENAI_BASE_URL`）；`AI_DEMO_MODEL=true` 可继续使用确定性演示模型。
+
+### Docker
+
+```bash
+# 在仓库根目录构建并启动支持应用 + pgvector + Redis + RabbitMQ
+cd unicorn-ai/unicorn-ai-support
+docker compose up --build
+```
+
+Compose 会设置 `AI_DEMO_SEED=true`、`AI_DEMO_MODEL=true`，默认使用 `X-API-Key: demo-key`。生产部署请覆盖数据库/Redis/MQ 密码和模型 Key。
 
 ## 核心 API
 
@@ -143,7 +153,7 @@ Prompts：`order-support`（按租户订单生成客服回复草稿）。
 - `/actuator/health`、`/actuator/prometheus`（Prometheus 端点同样受 API Key/JWT 保护，抓取端需带 `X-API-Key` 或 Bearer token）。
 - `ai.support.chat` timer、`ai.support.ingest.jobs`、`ai.support.tool.calls`（Chat 与 MCP 工具）。
 - `ai_chat_message.trace_id`、`ai_tool_invocation.trace_id`。
-- `ai_usage_daily` 记录 token/请求数；`cost` 当前写 0，接入定价表后才能计算真实成本。
+- `ai_usage_daily` 记录 token/请求数和成本；`ai.support.pricing.input-per-1k-tokens` / `output-per-1k-tokens` 配置单价（默认 0），按每次调用的 token 计算。
 - 日志默认不打印用户原文和工具完整参数。
 
 ## 测试
@@ -168,5 +178,7 @@ Prompts：`order-support`（按租户订单生成客服回复草稿）。
 - JWT 需显式设置 `ai.security.mode=jwt` 并提供 `JWT_ISSUER_URI` / `JWT_JWK_SET_URI` / `JWT_HMAC_SECRET` 之一。
 - MCP 旧模块 `unicorn-ai-mcp-server` 已加 API Key（默认 `demo-key`），但不具备租户隔离；生产 MCP 以本模块 `/mcp` 为准。
 - MCP client 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。
-- 订单/库存/商品仍是内存适配器；工具审计、审批、文档、会话、任务均已 JDBC 持久化。
-- 完整生产化还需要：对象存储、评测集与 CI 门禁、真实 PostgreSQL/Redis/RabbitMQ 集成测试。
+- 领域数据使用 `ai_order`/`ai_inventory`/`ai_product` JDBC 表；本地 demo 由 `DemoDataInitializer` 写入，生产可替换为外部订单/库存服务适配器。
+- `SupportInfraIntegrationTest` 使用 Testcontainers 启动 PostgreSQL/pgvector + RabbitMQ，验证异步入库、job 状态和 citation；无 Docker 时自动 skip。
+- Docker 资产：`unicorn-ai/unicorn-ai-support/Dockerfile`、`compose.yaml`。
+- 完整生产化还需要：对象存储、评测集与 CI 门禁、真实 Redis/生产数据库 HA 联调。

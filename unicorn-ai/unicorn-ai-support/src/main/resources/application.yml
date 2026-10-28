@@ -101,6 +101,10 @@ ai:
     rerank:
       enabled: false
       model: ${OPENAI_RERANK_MODEL:gpt-4o-mini}
+    pricing:
+      input-per-1k-tokens: ${AI_PRICE_INPUT_PER_1K:0.00}
+      output-per-1k-tokens: ${AI_PRICE_OUTPUT_PER_1K:0.00}
+      currency: ${AI_PRICE_CURRENCY:USD}
     approval:
       refund-threshold: 500.00
     rate-limit:

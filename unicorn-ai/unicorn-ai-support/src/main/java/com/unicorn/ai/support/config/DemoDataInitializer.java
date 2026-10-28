@@ -57,6 +57,8 @@ public class DemoDataInitializer implements ApplicationRunner {
                 VALUES (?, ?, ?, ?, 'ACTIVE')
                 """, "demo-kb", "demo", "Demo Knowledge Base", "Seed knowledge base");
 
+        seedDomain("demo");
+
         jdbcTemplate.update("INSERT INTO ai_tenant (id, name, status) VALUES (?, ?, ?)",
                 "other", "Other Tenant", "ACTIVE");
         jdbcTemplate.update("""
@@ -68,5 +70,48 @@ public class DemoDataInitializer implements ApplicationRunner {
                 INSERT INTO ai_knowledge_base (id, tenant_id, name, description, status)
                 VALUES (?, ?, ?, ?, 'ACTIVE')
                 """, "other-kb", "other", "Other Knowledge Base", "Tenant isolation test");
+    }
+
+    private void seedDomain(String tenantId) {
+        jdbcTemplate.update("""
+                INSERT INTO ai_order (tenant_id, order_id, customer, status, amount, created_at, days_since_purchase)
+                VALUES (?, 'A1001', '张三', 'DELIVERED', 299.00, '2026-10-10', 8)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_order (tenant_id, order_id, customer, status, amount, created_at, days_since_purchase)
+                VALUES (?, 'A1002', '李四', 'SHIPPED', 1299.00, '2026-10-16', 2)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_order (tenant_id, order_id, customer, status, amount, created_at, days_since_purchase)
+                VALUES (?, 'A1003', '王五', 'CREATED', 59.90, '2026-10-18', 0)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_order (tenant_id, order_id, customer, status, amount, created_at, days_since_purchase)
+                VALUES (?, 'A1004', '赵六', 'DELIVERED', 899.00, '2026-10-17', 1)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_inventory (tenant_id, sku, name, available, reserved)
+                VALUES (?, 'SKU-1', '机械键盘', 12, 2)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_inventory (tenant_id, sku, name, available, reserved)
+                VALUES (?, 'SKU-2', '人体工学椅', 3, 0)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_inventory (tenant_id, sku, name, available, reserved)
+                VALUES (?, 'SKU-3', 'USB-C 扩展坞', 30, 5)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_product (tenant_id, sku, name, price, stock)
+                VALUES (?, 'SKU-1', '机械键盘', 499.00, 12)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_product (tenant_id, sku, name, price, stock)
+                VALUES (?, 'SKU-2', '人体工学椅', 1999.00, 3)
+                """, tenantId);
+        jdbcTemplate.update("""
+                INSERT INTO ai_product (tenant_id, sku, name, price, stock)
+                VALUES (?, 'SKU-3', 'USB-C 扩展坞', 299.00, 30)
+                """, tenantId);
     }
 }

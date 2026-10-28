@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: vectordb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - ai-support-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vectordb"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "redis-psd"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis-psd", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_VHOST: /unicorn
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  support:
+    build:
+      context: ../..
+      dockerfile: unicorn-ai/unicorn-ai-support/Dockerfile
+    ports:
+      - "8096:8096"
+    environment:
+      AI_DB_URL: jdbc:postgresql://postgres:5432/vectordb?currentSchema=ai_support
+      AI_DB_USER: postgres
+      AI_DB_PWD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis-psd
+      MQ_HOST: rabbitmq
+      MQ_PORT: 5672
+      MQ_USER: admin
+      MQ_PWD: admin
+      MQ_VHOST: /unicorn
+      AI_DEMO_SEED: "true"
+      AI_DEMO_MODEL: "true"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-demo-key-not-configured}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  ai-support-pg:

@@ -39,6 +39,7 @@ public record SupportProperties(
         Query query,
         Mmr mmr,
         Rerank rerank,
+        Pricing pricing,
         Approval approval,
         RateLimit rateLimit,
         Cache cache) {
@@ -73,6 +74,11 @@ public record SupportProperties(
 
     public record Rerank(@DefaultValue("false") boolean enabled,
                          @DefaultValue("gpt-4o-mini") String model) {
+    }
+
+    public record Pricing(@DefaultValue("0.00") double inputPer1kTokens,
+                          @DefaultValue("0.00") double outputPer1kTokens,
+                          @DefaultValue("USD") String currency) {
     }
 
     public record Approval(@DefaultValue("500.00") BigDecimal refundThreshold) {

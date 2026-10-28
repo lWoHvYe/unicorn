@@ -16,23 +16,21 @@
 
 package com.unicorn.ai.support.tools;
 
-import com.unicorn.ai.tools.domain.InMemoryInventoryRepository;
-import com.unicorn.ai.tools.domain.InMemoryOrderRepository;
-import com.unicorn.ai.tools.domain.InMemoryProductRepository;
 import com.unicorn.ai.tools.domain.SupportToolService;
 import com.unicorn.ai.tools.policy.SupportToolCatalog;
 import com.unicorn.ai.tools.policy.ToolInvocationService;
 import com.unicorn.ai.support.config.SupportProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @Configuration
 public class SupportToolConfig {
 
     @Bean
-    SupportToolService supportToolService() {
-        return new SupportToolService(new InMemoryOrderRepository(), new InMemoryInventoryRepository(),
-                new InMemoryProductRepository());
+    SupportToolService supportToolService(JdbcTemplate jdbc) {
+        return new SupportToolService(new JdbcOrderRepository(jdbc), new JdbcInventoryRepository(jdbc),
+                new JdbcProductRepository(jdbc));
     }
 
     @Bean

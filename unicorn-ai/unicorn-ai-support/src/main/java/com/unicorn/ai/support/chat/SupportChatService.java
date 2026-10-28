@@ -126,7 +126,8 @@ public class SupportChatService {
             var answer = response.getResult().getOutput().getText();
             var usage = usage(response);
             saveAssistant(principal, sessionId, messageId, answer, retrieval.citations(), usage, traceId, "DONE");
-            usageRepository.record(principal.tenantId(), usage.promptTokens(), usage.completionTokens(), 0);
+            usageRepository.record(principal.tenantId(), usage.promptTokens(), usage.completionTokens(),
+                    cost(usage));
             metrics.chat(principal.tenantId(), "DONE", System.nanoTime() - started);
             return new ChatDtos.ChatAnswer(messageId, answer, retrieval.citations(), usage, traceId, "DONE");
         } catch (RuntimeException exception) {
@@ -303,6 +304,12 @@ public class SupportChatService {
 
                 用户问题：%s
                 """.formatted(context, question);
+    }
+
+    private double cost(ChatDtos.TokenUsage usage) {
+        var pricing = properties.pricing();
+        return (usage.promptTokens() / 1000.0) * pricing.inputPer1kTokens()
+                + (usage.completionTokens() / 1000.0) * pricing.outputPer1kTokens();
     }
 
     private ChatDtos.TokenUsage usage(ChatResponse response) {

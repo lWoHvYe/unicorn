@@ -49,7 +49,7 @@ ai:
   support:
     demo:
       seed: ${AI_DEMO_SEED:false}
-      model: false
+      model: ${AI_DEMO_MODEL:false}
     vector-store: pgvector
     async-ingest:
       enabled: true
