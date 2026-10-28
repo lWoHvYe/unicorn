@@ -37,10 +37,10 @@ class KotlinQueryHelpTest {
 
     private class NullConditionCriteria {
         @Query(type = Query.Type.IS_NULL)
-        var name: String? = null
+        var name: Boolean? = null
 
         @Query(type = Query.Type.NOT_NULL)
-        var email: String? = null
+        var email: Boolean? = null
     }
 
     private class IsOrNullCriteria {
@@ -71,7 +71,10 @@ class KotlinQueryHelpTest {
         `when`(cb.isNull(namePath)).thenReturn(predicate)
         `when`(cb.isNotNull(emailPath)).thenReturn(predicate)
 
-        QueryHelp.getPredicate(root, NullConditionCriteria(), cb)
+        QueryHelp.getPredicate(root, NullConditionCriteria().apply {
+            name = true
+            email = true
+        }, cb)
 
         verify(cb).isNull(namePath)
         verify(cb).isNotNull(emailPath)

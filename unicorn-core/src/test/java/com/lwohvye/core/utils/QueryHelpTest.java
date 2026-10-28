@@ -75,10 +75,18 @@ class QueryHelpTest {
 
     static class NullConditionCriteria {
         @Query(type = Query.Type.IS_NULL)
-        String name;
+        Boolean name;
 
         @Query(type = Query.Type.NOT_NULL)
-        String email;
+        Boolean email;
+    }
+
+    static class MenuLikeCriteria {
+        @Query(type = Query.Type.IS_NULL, propName = "pid")
+        Boolean pidIsNull;
+
+        @Query
+        Long pid;
     }
 
     @Test
@@ -182,8 +190,10 @@ class QueryHelpTest {
     }
 
     @Test
-    void nullConditionsWorkWithNullFieldValues() {
+    void nullConditionsUseBooleanFlag() {
         var criteria = new NullConditionCriteria();
+        criteria.name = true;
+        criteria.email = true;
 
         var root = mock(Root.class);
         var cb = mock(CriteriaBuilder.class);
@@ -199,6 +209,31 @@ class QueryHelpTest {
         assertSame(predicate, QueryHelp.getPredicate(root, criteria, cb));
         verify(cb).isNull(namePath);
         verify(cb).isNotNull(emailPath);
+    }
+
+    @Test
+    void nullFlagDoesNotLeakWhenOtherFieldIsPresent() {
+        var criteria = new MenuLikeCriteria();
+        criteria.pid = 1L;
+
+        var root = mock(Root.class);
+        var cb = mock(CriteriaBuilder.class);
+        var pidPath = mock(Path.class);
+        var predicate = mock(Predicate.class);
+        when(root.get("pid")).thenReturn(pidPath);
+        when(pidPath.as(Long.class)).thenReturn(pidPath);
+        when(cb.equal(pidPath, 1L)).thenReturn(predicate);
+        when(cb.and(any(Predicate[].class))).thenReturn(predicate);
+
+        assertSame(predicate, QueryHelp.getPredicate(root, criteria, cb));
+        verify(cb).equal(pidPath, 1L);
+        verify(cb, never()).isNull(any());
+
+        criteria.pid = null;
+        criteria.pidIsNull = true;
+        when(cb.isNull(pidPath)).thenReturn(predicate);
+        QueryHelp.getPredicate(root, criteria, cb);
+        verify(cb).isNull(pidPath);
     }
 
     @Test

@@ -119,7 +119,14 @@ public class QueryHelp {
                 var q = meta.query();
                 var value = field.get(query);
                 var nullCondition = q.type() == Query.Type.IS_NULL || q.type() == Query.Type.NOT_NULL;
-                if (!nullCondition && (Objects.isNull(value) || Objects.equals("", value))) {
+                // IS_NULL/NOT_NULL 使用 Boolean 字段作为开关：true 才追加条件，
+                // null/false 表示“本次不限制”。不能因为字段为 null 就无条件追加，
+                // 否则 MenuQueryCriteria 里 pidIsNull 被置空后仍会生成 pid is null。
+                if (nullCondition) {
+                    if (Objects.isNull(value) || Boolean.FALSE.equals(value)) {
+                        continue;
+                    }
+                } else if (Objects.isNull(value) || Objects.equals("", value)) {
                     continue;
                 }
                 // 模糊多字段；IS_NULL/NOT_NULL 不使用字段值

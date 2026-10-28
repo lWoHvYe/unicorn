@@ -99,7 +99,13 @@ object QueryHelp {
                 val q = javaField.getAnnotation(Query::class.java) ?: return@let
                 val value = javaField.get(query)
                 val nullCondition = q.type == Query.Type.IS_NULL || q.type == Query.Type.NOT_NULL
-                if (nullCondition || value.hasValue()) {
+                // IS_NULL/NOT_NULL 使用 Boolean 字段作为开关：true 才追加条件。
+                val shouldAnalyze = if (nullCondition) {
+                    value != null && value != false
+                } else {
+                    value.hasValue()
+                }
+                if (shouldAnalyze) {
                     analyzeQuery(root, cb, list, this, q, value, joins)
                 }
             } ?: run {
