@@ -1,0 +1,102 @@
+server:
+  port: 8096
+  shutdown: graceful
+
+spring:
+  application:
+    name: unicorn-ai-support
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:ai_support;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/common
+  sql:
+    init:
+      mode: never
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:demo-key-not-configured}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+        temperature: 0.2
+      embedding:
+        model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+    mcp:
+      server:
+        name: unicorn-ai-support
+        version: 1.0.0
+        protocol: STREAMABLE
+        type: SYNC
+        annotation-scanner:
+          enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  health:
+    redis:
+      enabled: false
+    rabbit:
+      enabled: false
+
+ai:
+  security:
+    mode: api-key
+    api-key-header: X-API-Key
+    jwt:
+      enabled: false
+  support:
+    demo:
+      seed: true
+      model: true
+    vector-store: simple
+    top-k: 5
+    candidate-k: 20
+    similarity-threshold: 0.2
+    chunk-size: 800
+    min-chunk-size-chars: 200
+    max-input-chars: 8000
+    memory-window: 20
+    async-ingest:
+      enabled: false
+      exchange: unicorn.ai.support
+      queue: unicorn.ai.support.ingest
+      routing-key: ingest
+    storage:
+      root: ${AI_STORAGE_ROOT:${java.io.tmpdir}/unicorn-ai-support}
+    pgvector:
+      url: ${PGVECTOR_URL:jdbc:postgresql://10.211.55.29:5434/vectordb}
+      username: ${PGVECTOR_USER:postgres}
+      password: ${PGVECTOR_PWD:postgres}
+      schema-name: ai_support
+      table-name: ai_support_chunk_embedding
+      dimensions: ${EMBEDDING_DIMENSIONS:1536}
+    rerank:
+      enabled: false
+      model: ${OPENAI_RERANK_MODEL:gpt-4o-mini}
+    approval:
+      refund-threshold: 500.00
+    rate-limit:
+      chat-per-minute: 60
+      ingest-per-hour: 100
+
+logging:
+  level:
+    com.unicorn.ai: INFO
+    org.springframework.ai: INFO

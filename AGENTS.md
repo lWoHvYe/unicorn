@@ -4,7 +4,7 @@
 
 `CLAUDE.md` 是早期说明，已在顶部标注以本文件为准；发生冲突时，以本文件、`settings.gradle.kts`、`build-logic/` 和实际构建结果为准。
 
-> 最近核对：2026-10-25（commit `f431c733` 之后的工作区）。`./gradlew assemble` 通过；四个 AI demo 已编译并启动验证（MCP 工具发现、RAG infra profile 的 Redis Stack/pgvector/MySQL/RabbitMQ 连通均验证通过；Redis 向量索引 `unicorn-ai-rag` 已创建）；核心模块新增 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试，`./gradlew test` 全量仍失败属于预期，见 §8。
+> 最近核对：2026-10-28（工作区）。`./gradlew assemble` 通过；AI 新增生产参考 `unicorn-ai-support`（H2 本地 profile + PostgreSQL/pgvector/Redis/RabbitMQ infra profile、多租户、RAG citations、工具审批、MCP、指标）及 `unicorn-ai-tools` 领域/策略库；核心模块保留 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试。`./gradlew test` 全量仍失败属于预期，见 §8。
 
 ## 1. 项目速览
 
@@ -27,6 +27,7 @@
 ./gradlew :unicorn-ai-rag:bootRun             # AI RAG demo，8093
 ./gradlew :unicorn-ai-mcp-server:bootRun      # MCP Server，8094
 MCP_CLIENT_ENABLED=true ./gradlew :unicorn-ai-mcp-client:bootRun  # MCP Client，8095
+./gradlew :unicorn-ai-support:bootRun         # 生产参考，8096（默认 local/H2）
 ./gradlew publishToMavenLocal
 ./gradlew :unicorn-security:outgoingVariants  # 查看 business-log capability
 ./gradlew javaToolchains                      # 查看 17/21/25/26/27 toolchain
@@ -78,6 +79,8 @@ MCP_CLIENT_ENABLED=true ./gradlew :unicorn-ai-mcp-client:bootRun  # MCP Client�
 | `unicorn-ai/unicorn-ai-rag` | `:unicorn-ai-rag` | 应用 | Spring AI RAG、ETL、Simple/pgvector/Redis Stack 向量库、RabbitMQ 异步入库、MySQL 任务审计，端口 8093 |
 | `unicorn-ai/unicorn-ai-mcp-server` | `:unicorn-ai-mcp-server` | 应用 | MCP Server：`@McpTool`/`@McpResource`/`@McpPrompt`，端口 8094 |
 | `unicorn-ai/unicorn-ai-mcp-client` | `:unicorn-ai-mcp-client` | 应用 | MCP Client：发现远程工具并注入 ChatClient，端口 8095 |
+| `unicorn-ai/unicorn-ai-support` | `:unicorn-ai-support` | 应用 | **生产参考**：多租户 RAG/会话/工具审批/MCP，端口 8096 |
+| `unicorn-ai/unicorn-ai-tools` | `:unicorn-ai-tools` | 库 | support 的订单/退款/库存领域、工具策略、幂等/审批/审计 |
 | `unicorn-oauth2/unicorn-mybatis` | `:unicorn-oauth2:unicorn-mybatis` | 应用 | MyBatis-Plus 示例，端口 8082 |
 | `unicorn-oauth2/unicorn-oauth2-authorizationserver` | `:unicorn-oauth2-authorizationserver` | 应用 | Spring Authorization Server，端口 9000 |
 | `unicorn-oauth2/unicorn-oauth2-gateway-client` | `:unicorn-oauth2-gateway-client` | 应用 | Gateway + OAuth2 Client + Session，端口 8080 |
@@ -97,7 +100,7 @@ unicorn-core (baseline 17, MR-JAR)
  └── valentine-starter-kotlin ──> unicorn-security + unicorn-logging + unicorn-tp-tools-kotlin
 
 unicorn-oauth2-* / unicorn-mybatis：独立 Boot 样例，不属于框架依赖链
-unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需的 Spring AI starter
+unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-support` 是生产参考并依赖 `unicorn-ai-tools`
 ```
 
 - `unicorn-security` 的 `businessLog` 是 Gradle feature variant：源码在 `src/businessLog/java`，能力坐标为
@@ -203,11 +206,11 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 - **数据库**：`sql/unicorn.sql`（19 张表 + 种子数据，含 admin 用户、角色、菜单、资源、定时任务）。首次启动前先建库导入。
 - **基础设施**：`document/docker/docker-compose-env.yml`（MySQL 主 + 2 从、Redis 主从、RabbitMQ 集群）或 `docker-compose-env-sim.yml`（单机）。RabbitMQ 需安装延迟插件。
 - **OAuth2 样例拓扑**：`authorizationserver:9000`（授权状态存 Redis db4）→ `gateway-client:8080`（Session + TokenRelay）→ `resource-server-mvc:8090` / `resource-server-flux:8091`。
-- **AI Demo（Spring AI 2.0.1）**：`unicorn-ai/` 下 4 个独立应用，Chat 8092、RAG 8093、MCP Server 8094、MCP Client 8095。模型通过 `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_CHAT_MODEL` 配置；没有 key 时用占位值仍可启动。默认 profile 为零依赖 demo（SimpleVectorStore + 内存记忆 + 内存任务表）。
+- **AI Demo（Spring AI 2.0.1）**：`unicorn-ai/` 下 4 个独立 demo，Chat 8092、RAG 8093、MCP Server 8094、MCP Client 8095；`unicorn-ai-support` 8096 是生产参考（多租户、citations、工具审批、审计、MCP）。模型通过 `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_CHAT_MODEL` 配置；support 的 local profile 使用 H2 + SimpleVectorStore + 本地演示模型，无需 key。
   - `--spring.profiles.active=infra` 连接现有 dev 基础设施：Chat 用 Redis（10.211.55.29:6379 / redis-psd，db 6）持久化对话记忆；RAG 用 Redis Stack 向量库（索引 `unicorn-ai-rag`，维度 1536）、MySQL（10.211.55.29:3306/unicorn，root/root）做异步入库任务审计、RabbitMQ（10.211.55.29:5672，admin/admin，vhost /unicorn）做异步入库。
   - RAG 向量库可选 `simple` / `redis` / `pgvector`；infra 默认 `redis`，备选 pgvector 用 `--demo.ai.rag.vector-store=pgvector`。RedisVectorStore 启动时通过固定维度包装避免调用 embedding API。
   - 当前 Redis Stack 已加载 search/ReJSON；若换成普通 Redis，需改用 pgvector 或 simple，否则会报 `FT._LIST` 不存在。
-  - MCP 场景先启动 server，再以 `MCP_CLIENT_ENABLED=true` 启动 client。MCP 的 `/mcp` 端点默认无认证，只能本地演示。完整 curl 示例见 `unicorn-ai/README.md`。
+  - MCP 场景先启动 server，再以 `MCP_CLIENT_ENABLED=true` 启动 client。旧 `unicorn-ai-mcp-server` 的 `/mcp` 仍无认证，只能本地演示；生产 MCP 以 `unicorn-ai-support` 的 `/mcp` 为准（API Key/JWT + 租户隔离）。完整 curl 示例见 `unicorn-ai/README.md` 和 `unicorn-ai/unicorn-ai-support/README.md`。
 - **密钥**：RSA、JWT、Redis、RabbitMQ 口令目前明文写在 `application*.yml` 中；不要新增明文密钥，优先用环境变量，也不要把这些值复制到文档/日志。
 - **脚本**：`script/*.sh` 仍使用 `valentine-starter.jar` 和 `JAVA_HOME=jdk-21`，与当前产物 `valentine-starter-kotlin-4.8.4-chi.jar` 和 JDK 25 不一致；只能当模板改后使用。`docker-compose.yml` 的 `valentine-starter:3.0.0` 同样过时。
 
@@ -237,7 +240,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 
 因此：**把 `./gradlew assemble` 作为构建门槛**，不要为了让 `test` 变绿去改业务代码；只有在任务明确要求补测试时，再给 Java 模块加 `useJUnitPlatform()`、JUnit 依赖，并移除环境相关断言。
 
-例外：`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
+例外：`unicorn-ai-tools:test`（4 个）和 `unicorn-ai-support:test`（4 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
 `./gradlew :unicorn-core:test :unicorn-beans:test`；`valentine-starter` 的 `KotlinQueryHelpTest`（5 个）可通过 `./gradlew :valentine-starter-kotlin:test --tests com.unicorn.utils.KotlinQueryHelpTest`。AI demo 的独立测试同样可通过；这不改变全量 `test` 仍失败的事实。
 
 ### 8.2 文档与脚本漂移
@@ -268,7 +271,8 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；各自引入所需
 - 启动/配置：`valentine-starter/src/main/java/com/unicorn/UnicornAppRun.java`、`valentine-starter/src/main/resources/config/application.yml`、`application-dev.yml`、`application-sit.yml`、`valentine-starter/src/main/resources/cache-config.yaml`
 - 数据：`sql/unicorn.sql`；基础设施：`document/docker/docker-compose-env.yml`
 - OAuth2：`unicorn-oauth2/unicorn-oauth2-authorizationserver/src/main/java/sample/config/AuthorizationServerConfig.java`、`unicorn-oauth2/unicorn-oauth2-gateway-client/src/main/resources/application.yml`
-- AI：`unicorn-ai/README.md`、`unicorn-ai/unicorn-ai-chat/src/main/java/com/unicorn/ai/chat/config/ChatClientConfig.java`、`.../memory/RedisChatMemoryRepository.java`、`.../tools/ShopTools.java`、`unicorn-ai/unicorn-ai-rag/src/main/java/com/unicorn/ai/rag/ingestion/DocumentIngestionService.java`、`.../service/RagService.java`、`unicorn-ai/unicorn-ai-rag/src/main/java/com/unicorn/ai/rag/config/VectorStoreConfig.java`、`.../config/PgVectorProperties.java`、`.../async/AsyncIngestPublisher.java`、`.../job/JdbcIngestJobRepository.java`、`unicorn-ai/unicorn-ai-mcp-server/src/main/java/com/unicorn/ai/mcp/server/tools/OrderMcpTools.java`、`unicorn-ai/unicorn-ai-mcp-client/src/main/java/com/unicorn/ai/mcp/client/config/McpClientConfig.java`
+- AI 生产参考：`unicorn-ai/unicorn-ai-support/README.md`、`.../src/main/java/com/unicorn/ai/support/chat/SupportChatService.java`、`.../knowledge/DocumentIngestionService.java`、`.../retrieval/RetrievalService.java`、`.../tools/SupportToolFacade.java`、`unicorn-ai/unicorn-ai-tools/src/main/java/com/unicorn/ai/tools/policy/ToolInvocationService.java`
+- AI demo：`unicorn-ai/README.md`、`unicorn-ai/unicorn-ai-chat/src/main/java/com/unicorn/ai/chat/config/ChatClientConfig.java`、`.../memory/RedisChatMemoryRepository.java`、`.../tools/ShopTools.java`、`unicorn-ai/unicorn-ai-rag/src/main/java/com/unicorn/ai/rag/ingestion/DocumentIngestionService.java`、`.../service/RagService.java`、`unicorn-ai/unicorn-ai-rag/src/main/java/com/unicorn/ai/rag/config/VectorStoreConfig.java`、`.../config/PgVectorProperties.java`、`.../async/AsyncIngestPublisher.java`、`.../job/JdbcIngestJobRepository.java`、`unicorn-ai/unicorn-ai-mcp-server/src/main/java/com/unicorn/ai/mcp/server/tools/OrderMcpTools.java`、`unicorn-ai/unicorn-ai-mcp-client/src/main/java/com/unicorn/ai/mcp/client/config/McpClientConfig.java`
 
 ---
 

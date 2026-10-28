@@ -31,6 +31,8 @@ import jakarta.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 通用字段， is_del 根据需求自行添加
@@ -43,6 +45,22 @@ import java.sql.Timestamp;
 @MappedSuperclass // @MappedSuperclass 用在父类上面。当这个类肯定是父类时，加此标注。如果改成@Entity，则继承后，多个类继承，只会生成一个表，而不是多个继承，生成多个表
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity implements Serializable {
+
+    /**
+     * toString 只关心当前类的字段，字段访问权限只解析一次。
+     */
+    private static final ClassValue<List<Field>> TO_STRING_FIELDS = new ClassValue<>() {
+        @Override
+        protected List<Field> computeValue(Class<?> type) {
+            var fields = new ArrayList<Field>();
+            for (var field : type.getDeclaredFields()) {
+                if (field.trySetAccessible()) {
+                    fields.add(field);
+                }
+            }
+            return List.copyOf(fields);
+        }
+    };
 
     @CreatedBy
     @Column(name = "create_by", updatable = false)
@@ -83,12 +101,9 @@ public class BaseEntity implements Serializable {
     @Override
     public String toString() { // 通用的ToString方法
         var builder = new ToStringBuilder(this);
-        var fields = this.getClass().getDeclaredFields(); // 这里只获取本类的全部域
         try {
-            for (var f : fields) {
-                // f.setAccessible(true); 用下面的方式更好一些
-                if (f.trySetAccessible())
-                    builder.append(f.getName(), f.get(this)).append("\n");
+            for (var f : TO_STRING_FIELDS.get(this.getClass())) {
+                builder.append(f.getName(), f.get(this)).append("\n");
             }
         } catch (Exception e) {
             builder.append("toString builder encounter an error");

@@ -25,6 +25,7 @@ import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.*;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.util.Assert;
 
 import java.nio.charset.StandardCharsets;
@@ -1338,15 +1339,11 @@ public class RedisUtils {
      * @return boolean
      * @date 2021/7/17 11:52
      */
-    //  当value类型为String时 这里存入的value为 001，通过其他方法存入的为 "001"，是不一样的，这点需特别注意，要想保持一致，lua相关的需要手动在前后拼双引号    "\"" + value + "\""
-    //  当value类型为long时，lua存入的值不带L，但通过其他方法存入的带L。其他类型的也同理，需要进行处理
-    // lua相关的，需要注意引号的问题
+    //  value 使用与 redisTemplate 相同的 value serializer，保证与普通 zAdd 存入的字节一致
     public boolean zAddIfHigherScore(String key, Object value, double score) {
-        Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
-        if (value instanceof String)
-            value = "\"" + value + "\"";
-        // 用StringRedisTemplate，则k v 都要是String
-        Object result = stringRedisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key), String.valueOf(score), String.valueOf(value));
+        Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && Double.isFinite(score), "参数不合法");
+        Object result = stringRedisTemplate.execute(hgScoreRedisScript, Collections.singletonList(key),
+                String.valueOf(score), serializeValue(value));
         return SUCCESS.equals(result);
     }
 
@@ -1363,11 +1360,20 @@ public class RedisUtils {
     private final RedisScript<Long> lwScoreRedisScript = new DefaultRedisScript<>(LUA_LW_SCORE_SCRIPT, Long.class);
 
     public boolean zAddIfLowerScore(String key, Object value, double score) {
-        Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && ObjectUtil.isNotNull(score), "参数不合法");
-        if (value instanceof String)
-            value = "\"" + value + "\"";
-        Object result = stringRedisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key), String.valueOf(score), String.valueOf(value));
+        Assert.state(StrUtil.isNotEmpty(key) && ObjectUtil.isNotNull(value) && Double.isFinite(score), "参数不合法");
+        Object result = stringRedisTemplate.execute(lwScoreRedisScript, Collections.singletonList(key),
+                String.valueOf(score), serializeValue(value));
         return SUCCESS.equals(result);
+    }
+
+    /**
+     * 复用 RedisTemplate 的 value serializer，避免 Lua 参数与普通 zAdd 的字节表示不一致。
+     */
+    @SuppressWarnings("unchecked")
+    private String serializeValue(Object value) {
+        var serializer = (RedisSerializer<Object>) redisTemplate.getValueSerializer();
+        Assert.notNull(serializer, "Redis value serializer is not configured");
+        return new String(serializer.serialize(value), StandardCharsets.UTF_8);
     }
 //       endregion
 
@@ -1401,30 +1407,11 @@ public class RedisUtils {
      *
      * @param key key值
      * @return 是否获取到
+     * @deprecated 非原子实现且没有可用的解锁 value；请使用 {@link #lock(String, String, Long)} + {@link #unlock(String, String)}
      */
+    @Deprecated(forRemoval = true)
     public Boolean lock(String key) {
-        String lock = DISTRIBUTE_LOCK_PREFIX + key;
-        // 利用lambda表达式
-        return (Boolean) redisTemplate.execute((RedisCallback<Object>) redisConnection -> {
-            long expireAt = System.currentTimeMillis() + DISTRIBUTE_LOCK_EXPIRE + 1;
-            Boolean acquire = redisConnection.stringCommands().setNX(lock.getBytes(), String.valueOf(expireAt).getBytes());
-            if (Boolean.TRUE.equals(acquire)) {
-                return true;
-            } else {
-                byte[] value = redisConnection.stringCommands().get(lock.getBytes());
-                if (Objects.nonNull(value) && value.length > 0) {
-                    long expireTime = Long.parseLong(new String(value));
-                    if (expireTime < System.currentTimeMillis()) {
-                        // 如果锁已经过期
-                        byte[] oldValue = redisConnection.stringCommands().getSet(lock.getBytes(), String.valueOf(System.currentTimeMillis() + DISTRIBUTE_LOCK_EXPIRE + 1).getBytes());
-                        // 防止死锁
-                        Assert.notNull(oldValue, "入参有误，原值不可为空");
-                        return Long.parseLong(new String(oldValue)) < System.currentTimeMillis();
-                    }
-                }
-            }
-            return false;
-        });
+        return lock(key, UUID.randomUUID().toString(), DISTRIBUTE_LOCK_EXPIRE);
     }
 
 //      region Redis分布式锁。基于lua脚本 ----
@@ -1474,7 +1461,7 @@ public class RedisUtils {
 
             // 视业务调整sleep时间
             LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(50L));
-            log.info("{}:等待获取锁中...", lockKey);
+            log.debug("{}:等待获取锁中...", lockKey);
         }
         // 到这里一般都是成功了
         return true;

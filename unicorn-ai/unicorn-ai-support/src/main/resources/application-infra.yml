@@ -1,0 +1,53 @@
+# Production-like profile: PostgreSQL/pgvector + Redis + RabbitMQ.
+# Usage: --spring.profiles.active=infra
+spring:
+  config:
+    activate:
+      on-profile: infra
+  datasource:
+    url: ${AI_DB_URL:jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=ai_support}
+    username: ${AI_DB_USER:postgres}
+    password: ${AI_DB_PWD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: ai_support
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/common,classpath:db/migration/postgres
+    schemas: ai_support
+    default-schema: ai_support
+    create-schemas: true
+  data:
+    redis:
+      host: ${REDIS_HOST:10.211.55.29}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:redis-psd}
+      database: ${AI_REDIS_DATABASE:7}
+  rabbitmq:
+    host: ${MQ_HOST:10.211.55.29}
+    port: ${MQ_PORT:5672}
+    username: ${MQ_USER:admin}
+    password: ${MQ_PWD:admin}
+    virtual-host: ${MQ_VHOST:/unicorn}
+    listener:
+      simple:
+        default-requeue-rejected: false
+
+management:
+  health:
+    redis:
+      enabled: true
+    rabbit:
+      enabled: true
+
+ai:
+  support:
+    demo:
+      seed: ${AI_DEMO_SEED:false}
+      model: false
+    vector-store: pgvector
+    async-ingest:
+      enabled: true
+      exchange: unicorn.ai.support
+      queue: unicorn.ai.support.ingest
+      routing-key: ingest

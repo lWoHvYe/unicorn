@@ -16,9 +16,9 @@
 package com.lwohvye.core.utils;
 
 import com.lwohvye.core.exception.BadRequestException;
-import com.lwohvye.core.utils.json.JsonUtils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -69,7 +69,29 @@ public class SecurityUtils {
      * @return 系统用户ID
      */
     public static Long getCurrentUserId() {
-        UserDetails userDetails = getCurrentUser();
-        return JsonUtils.findPath(userDetails, "user", "id", Long.class);
+        return extractUserId(getCurrentUser());
+    }
+
+    /**
+     * 从 UserDetails 中读取嵌套的 user.id，避免把整个对象序列化成 JSON 再取字段。
+     * 使用 BeanWrapper 而不是直接依赖 security 模块的 JwtUserDto，保持 core 模块解耦。
+     */
+    static Long extractUserId(UserDetails userDetails) {
+        var wrapper = new BeanWrapperImpl(userDetails);
+        if (!wrapper.isReadableProperty("user.id")) {
+            throw new BadRequestException(HttpStatus.UNAUTHORIZED, "当前用户信息缺少 user.id");
+        }
+        var value = wrapper.getPropertyValue("user.id");
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        if (value instanceof CharSequence text) {
+            try {
+                return Long.valueOf(text.toString());
+            } catch (NumberFormatException e) {
+                throw new BadRequestException(HttpStatus.UNAUTHORIZED, "当前用户 user.id 格式不正确");
+            }
+        }
+        throw new BadRequestException(HttpStatus.UNAUTHORIZED, "当前用户信息缺少 user.id");
     }
 }

@@ -1,6 +1,6 @@
 # unicorn-ai
 
-Spring AI **2.0.1** 的示例工程集合，运行在 Spring Boot **4.1.x** / Java **25** 上，风格与 `unicorn-oauth2` 一致：每个子目录是一个可独立启动的 demo，而不是框架库。
+Spring AI **2.0.1** 的工程集合，运行在 Spring Boot **4.1.x** / Java **25** 上。其中 `unicorn-ai-support` 是面向中等规模生产场景的多租户客服智能体参考实现；其余子目录保留为最小 demo。
 
 > Spring AI 2.0.x 官方支持 Spring Boot 4.0.x / 4.1.x；制品在 Maven Central，BOM 为 `org.springframework.ai:spring-ai-bom:2.0.1`。
 
@@ -12,8 +12,12 @@ Spring AI **2.0.1** 的示例工程集合，运行在 Spring Boot **4.1.x** / Ja
 | `unicorn-ai-rag` | `:unicorn-ai-rag` | 8093 | ETL/切分、Simple/pgvector/Redis Stack 向量库、显式 RAG、Advisor RAG、Query Rewrite、Multi-Query、RabbitMQ 异步入库 |
 | `unicorn-ai-mcp-server` | `:unicorn-ai-mcp-server` | 8094 | `@McpTool` / `@McpResource` / `@McpPrompt`，Streamable-HTTP |
 | `unicorn-ai-mcp-client` | `:unicorn-ai-mcp-client` | 8095 | 通过 MCP 发现工具并注入 ChatClient |
+| `unicorn-ai-support` | `:unicorn-ai-support` | 8096 | **生产参考**：多租户知识库、混合检索、citations、会话/SSE、工具策略/审批/审计、MCP |
+| `unicorn-ai-tools` | `:unicorn-ai-tools` | - | support 的领域/策略/审批库 |
 
 这些 build 文件使用了非默认名（如 `unicorn-ai-chat.gradle.kts`），所以工程路径被拍平到根，**不是** `:unicorn-ai:unicorn-ai-chat`。
+
+`unicorn-ai-support` 的完整场景、API、数据模型、测试和生产边界见 [unicorn-ai-support/README.md](unicorn-ai-support/README.md)。它默认使用 H2 + 本地演示模型，`infra` profile 使用 PostgreSQL/pgvector + Redis + RabbitMQ。
 
 ## 快速开始
 
@@ -27,6 +31,9 @@ export OPENAI_API_KEY=sk-...
 ./gradlew :unicorn-ai-chat:bootRun
 ./gradlew :unicorn-ai-rag:bootRun
 ./gradlew :unicorn-ai-mcp-server:bootRun
+
+# 生产参考：本地无需 key，H2 + SimpleVectorStore + demo model
+./gradlew :unicorn-ai-support:bootRun
 ```
 
 没有 API Key 时应用也能启动：`api-key` 使用占位值，真正调用模型/embedding 时才会失败。RAG 的启动导入默认关闭，避免启动阶段调用 embedding。
@@ -77,6 +84,8 @@ AI demo 模块单独配置了 `useJUnitPlatform()`，以下测试不依赖模型
 ./gradlew :unicorn-ai-chat:test
 ./gradlew :unicorn-ai-rag:test
 ./gradlew :unicorn-ai-mcp-server:test
+./gradlew :unicorn-ai-tools:test
+./gradlew :unicorn-ai-support:test
 ```
 
 覆盖内容：工具调用的租户上下文/退款规则/商品搜索、MCP 订单与库存领域逻辑、RAG 文本切分与 metadata 注入。
@@ -238,7 +247,7 @@ OPENAI_API_KEY=ollama
 
 ## 设计取舍
 
-- **Demo 不等于生产**：默认 profile 用进程内对话记忆、`SimpleVectorStore` 和内存任务表；`infra` profile 已接入现有 Redis、pgvector、MySQL、RabbitMQ，但仍是演示级实现（无鉴权、无重试/死信治理、无多租户隔离）。
+- **Demo 与生产参考分离**：`unicorn-ai-chat`/`rag`/`mcp-*` 仍是最小 demo；生产参考看 `unicorn-ai-support`（API Key/JWT、多租户、文档版本、citations、审批、审计、指标）。
 - **显式 RAG vs Advisor RAG**：显式 RAG 便于返回 citations、分数、trace；Advisor RAG 代码更少，但来源等中间结果需要从 advisor context 里取。Demo 同时保留两者。
 - **结构化输出双路径**：prompt 约束兼容性最好；provider 原生 schema 更可靠，但依赖模型能力。
 - **模板安全**：用户输入与检索到的文档通过 `{message}` / `{prompt}` 参数传入，避免内容里的 `{}` 被 StringTemplate 当成占位符（既防报错，也减少 prompt 注入面）。

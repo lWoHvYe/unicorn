@@ -1,0 +1,71 @@
+/*
+ *    Copyright (c) 2026.  lWoHvYe(Hongyan Wang)
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package com.unicorn.ai.support.ratelimit;
+
+import com.unicorn.ai.support.config.SupportProperties;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Local token-window limiter. Infra deployments should swap this for a Redis/Lua
+ * implementation with the same interface; the call sites stay unchanged.
+ */
+@Component
+public class RateLimiterService {
+
+    private final SupportProperties properties;
+    private final ConcurrentMap<String, Window> windows = new ConcurrentHashMap<>();
+
+    public RateLimiterService(SupportProperties properties) {
+        this.properties = properties;
+    }
+
+    public void checkChat(String tenantId) {
+        check("chat:" + tenantId, properties.rateLimit().chatPerMinute(), Duration.ofMinutes(1));
+    }
+
+    public void checkIngest(String tenantId) {
+        check("ingest:" + tenantId, properties.rateLimit().ingestPerHour(), Duration.ofHours(1));
+    }
+
+    private void check(String key, int limit, Duration window) {
+        var current = windows.computeIfAbsent(key, ignored -> new Window(System.nanoTime()));
+        synchronized (current) {
+            var now = System.nanoTime();
+            if (now - current.startedAt > window.toNanos()) {
+                current.startedAt = now;
+                current.count.set(0);
+            }
+            if (current.count.incrementAndGet() > limit) {
+                throw new RateLimitException("请求过于频繁，请稍后再试");
+            }
+        }
+    }
+
+    private static final class Window {
+        private long startedAt;
+        private final AtomicInteger count = new AtomicInteger();
+
+        private Window(long startedAt) {
+            this.startedAt = startedAt;
+        }
+    }
+}
