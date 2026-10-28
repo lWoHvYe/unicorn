@@ -32,6 +32,10 @@ public class EvalService {
     }
 
     public EvalReport run(String tenantId, String kbId, List<EvalCase> cases) {
+        return run(tenantId, kbId, cases, java.util.Set.of());
+    }
+
+    public EvalReport run(String tenantId, String kbId, List<EvalCase> cases, java.util.Set<String> roles) {
         if (cases == null || cases.isEmpty()) {
             throw new IllegalArgumentException("cases 不能为空");
         }
@@ -39,7 +43,7 @@ public class EvalService {
         int reciprocalRankNumerator = 0;
         var details = new java.util.ArrayList<EvalCaseResult>();
         for (var evalCase : cases) {
-            var result = retrievalService.retrieve(tenantId, kbId, evalCase.question(), 5);
+            var result = retrievalService.retrieve(tenantId, kbId, evalCase.question(), 5, roles);
             var rank = rankOf(result.citations(), evalCase.expectedSource());
             if (rank > 0) {
                 hit++;

@@ -40,7 +40,7 @@ public class EvalController {
     @PreAuthorize("hasAnyRole('TENANT_ADMIN','SUPPORT_MANAGER')")
     public EvalService.EvalReport run(@AuthenticationPrincipal AiPrincipal principal,
                                       @RequestBody EvalRequest request) {
-        return evalService.run(principal.tenantId(), request.kbId(), request.cases());
+        return evalService.run(principal.tenantId(), request.kbId(), request.cases(), principal.roles());
     }
 
     public record EvalRequest(String kbId, List<EvalService.EvalCase> cases) {

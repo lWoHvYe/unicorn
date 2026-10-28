@@ -19,6 +19,7 @@ package com.unicorn.ai.mcp.client.api;
 import com.unicorn.ai.mcp.client.model.ChatReply;
 import com.unicorn.ai.mcp.client.model.ChatRequest;
 import com.unicorn.ai.mcp.client.model.ToolInfo;
+import com.unicorn.ai.mcp.client.config.McpClientProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
@@ -41,6 +42,7 @@ public class McpClientController {
 
     private final ChatClient chatClient;
     private final ObjectProvider<SyncMcpToolCallbackProvider> mcpTools;
+    private final McpClientProperties properties;
 
     @GetMapping("/tools")
     public List<ToolInfo> tools() {
@@ -49,6 +51,7 @@ public class McpClientController {
             return List.of();
         }
         return Arrays.stream(provider.getToolCallbacks())
+                .filter(this::allowed)
                 .map(callback -> new ToolInfo(
                         callback.getToolDefinition().name(),
                         callback.getToolDefinition().description(),
@@ -59,9 +62,9 @@ public class McpClientController {
     @GetMapping("/status")
     public Map<String, Object> status() {
         var provider = mcpTools.getIfAvailable();
-        return Map.of(
-                "connected", provider != null,
-                "toolCount", provider == null ? 0 : provider.getToolCallbacks().length);
+        var count = provider == null ? 0 : (int) Arrays.stream(provider.getToolCallbacks())
+                .filter(this::allowed).count();
+        return Map.of("connected", provider != null, "toolCount", count);
     }
 
     @PostMapping("/chat")
@@ -74,5 +77,10 @@ public class McpClientController {
                 .call()
                 .content();
         return new ChatReply(answer);
+    }
+
+    private boolean allowed(org.springframework.ai.tool.ToolCallback callback) {
+        return properties.allowlist() == null || properties.allowlist().isEmpty()
+                || properties.allowlist().contains(callback.getToolDefinition().name());
     }
 }

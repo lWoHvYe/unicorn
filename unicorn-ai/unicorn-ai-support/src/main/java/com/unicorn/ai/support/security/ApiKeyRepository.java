@@ -16,6 +16,7 @@
 
 package com.unicorn.ai.support.security;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -31,6 +32,7 @@ public class ApiKeyRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Cacheable(cacheNames = "ai-api-key", key = "#keyHash")
     public Optional<ApiKeyPrincipal> findActiveByHash(String keyHash) {
         return jdbcTemplate.query("""
                         SELECT tenant_id, user_id, roles
@@ -45,6 +47,7 @@ public class ApiKeyRepository {
                 keyHash).stream().findFirst();
     }
 
-    public record ApiKeyPrincipal(String tenantId, String userId, Set<String> roles) {
+    public record ApiKeyPrincipal(String tenantId, String userId, Set<String> roles)
+            implements java.io.Serializable {
     }
 }

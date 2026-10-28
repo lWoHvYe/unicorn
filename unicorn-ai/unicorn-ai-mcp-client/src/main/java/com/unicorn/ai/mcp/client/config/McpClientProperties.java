@@ -19,7 +19,11 @@ package com.unicorn.ai.mcp.client.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
+import java.util.List;
+
 @ConfigurationProperties("demo.ai.mcp.client")
 public record McpClientProperties(
-        @DefaultValue("你是 Unicorn 的运维/订单助手，需要实时数据时必须调用 MCP 工具。") String systemPrompt) {
+        @DefaultValue("你是 Unicorn 的运维/订单助手，需要实时数据时必须调用 MCP 工具。") String systemPrompt,
+        @DefaultValue("demo-key") String apiKey,
+        @DefaultValue List<String> allowlist) {
 }

@@ -41,7 +41,7 @@ export OPENAI_API_KEY=sk-...
 MCP 客户端默认关闭。先启动 server，再：
 
 ```bash
-MCP_CLIENT_ENABLED=true ./gradlew :unicorn-ai-mcp-client:bootRun
+MCP_CLIENT_ENABLED=true MCP_API_KEY=demo-key ./gradlew :unicorn-ai-mcp-client:bootRun
 ```
 
 所有应用都暴露 actuator：`/actuator/health`、`/actuator/metrics`。Spring AI 的 chat/embedding/tool 调用会产生 Micrometer observations，接入 tracing 后可在链路系统中查看。
@@ -213,7 +213,7 @@ curl -s localhost:8095/api/ai/mcp/chat \
   -d '{"message":"查一下 A1001 的状态，并看看 SKU-1 还有多少库存"}'
 ```
 
-MCP 端点默认是 `/mcp`（Streamable-HTTP）。**该端点默认没有认证**，能访问端口的客户端可以枚举和调用全部工具。Demo 只用于本地；部署前必须在网关或 Spring Security 层加认证、授权、限流。
+MCP 端点默认是 `/mcp`（Streamable-HTTP）。`unicorn-ai-mcp-server` 现在要求 `X-API-Key`（默认 `demo-key`），但仍是单租户 demo；生产多租户 MCP 使用 `unicorn-ai-support` 的 `/mcp`。客户端可通过 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST` 配置认证与工具白名单。
 
 ## 切换模型 / Provider
 

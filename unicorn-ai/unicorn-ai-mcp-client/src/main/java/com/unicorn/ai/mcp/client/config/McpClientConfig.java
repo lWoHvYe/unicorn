@@ -38,7 +38,13 @@ public class McpClientConfig {
                           ObjectProvider<SyncMcpToolCallbackProvider> mcpTools,
                           McpClientProperties properties) {
         var clientBuilder = builder.defaultSystem(properties.systemPrompt());
-        mcpTools.ifAvailable(clientBuilder::defaultTools);
+        mcpTools.ifAvailable(provider -> {
+            var callbacks = java.util.Arrays.stream(provider.getToolCallbacks())
+                    .filter(callback -> properties.allowlist() == null || properties.allowlist().isEmpty()
+                            || properties.allowlist().contains(callback.getToolDefinition().name()))
+                    .toArray(org.springframework.ai.tool.ToolCallback[]::new);
+            clientBuilder.defaultTools((Object[]) callbacks);
+        });
         return clientBuilder.build();
     }
 }

@@ -29,7 +29,7 @@ public final class ChatDtos {
     }
 
     public record SessionView(String id, String tenantId, String userId, String channel, String kbId, String title,
-                              String status, String createdAt) {
+                              String status, String summary, String createdAt) {
     }
 
     public record SendMessageRequest(String message, String locale) {

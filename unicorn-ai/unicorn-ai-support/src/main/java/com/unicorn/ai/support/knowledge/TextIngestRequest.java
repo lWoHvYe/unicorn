@@ -16,5 +16,5 @@
 
 package com.unicorn.ai.support.knowledge;
 
-public record TextIngestRequest(String text, String source, String title, String docType) {
+public record TextIngestRequest(String text, String source, String title, String docType, String aclRoles) {
 }

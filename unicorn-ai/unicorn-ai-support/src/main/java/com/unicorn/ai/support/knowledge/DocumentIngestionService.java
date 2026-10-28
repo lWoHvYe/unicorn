@@ -67,12 +67,16 @@ public class DocumentIngestionService {
     }
 
     public IngestResult ingest(MultipartFile file, String tenantId, String kbId, String docType) {
+        return ingest(file, tenantId, kbId, docType, null);
+    }
+
+    public IngestResult ingest(MultipartFile file, String tenantId, String kbId, String docType, String aclRoles) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("文件不能为空");
         }
         var source = StringUtils.hasText(file.getOriginalFilename()) ? file.getOriginalFilename() : "upload.bin";
         var text = read(file.getResource(), source);
-        return create(tenantId, kbId, source, source, docType, text);
+        return create(tenantId, kbId, source, source, docType, text, aclRoles);
     }
 
     public IngestResult ingestText(String tenantId, String kbId, TextIngestRequest request) {
@@ -82,17 +86,23 @@ public class DocumentIngestionService {
         var source = StringUtils.hasText(request.source()) ? request.source() : "inline-" + UUID.randomUUID();
         var title = StringUtils.hasText(request.title()) ? request.title() : source;
         var docType = StringUtils.hasText(request.docType()) ? request.docType() : "text";
-        return create(tenantId, kbId, source, title, docType, request.text());
+        return create(tenantId, kbId, source, title, docType, request.text(), request.aclRoles());
     }
 
     public IngestResult create(String tenantId, String kbId, String source, String title,
                                String docType, String text) {
+        return create(tenantId, kbId, source, title, docType, text, null);
+    }
+
+    public IngestResult create(String tenantId, String kbId, String source, String title,
+                               String docType, String text, String aclRoles) {
         if (!StringUtils.hasText(text)) {
             throw new IllegalArgumentException("文档内容不能为空");
         }
         var hash = Hashing.sha256(text);
+        var normalizedAcl = normalizeAcl(aclRoles);
         var existing = repository.findActiveByHash(tenantId, kbId, hash);
-        if (existing.isPresent()) {
+        if (existing.isPresent() && java.util.Objects.equals(normalizedAcl, existing.get().aclRoles())) {
             var document = existing.get();
             metrics.ingest(tenantId, "DUPLICATE");
             return new IngestResult(document.id(), null, document.source(), 0, "DUPLICATE", vectorStore.getName());
@@ -102,7 +112,7 @@ public class DocumentIngestionService {
         var versionId = UUID.randomUUID().toString();
         var jobId = UUID.randomUUID().toString();
         repository.createDocument(new KnowledgeRecords.Document(documentId, tenantId, kbId, source, title,
-                docType, null, hash, "PROCESSING", null, Instant.now()));
+                docType, normalizedAcl, hash, "PROCESSING", null, Instant.now()));
         repository.createVersion(new KnowledgeRecords.DocumentVersion(versionId, documentId, 1, hash,
                 text, "PENDING", 0, null, Instant.now()));
         repository.createJob(new KnowledgeRecords.IngestJob(jobId, tenantId, documentId, versionId,
@@ -128,7 +138,7 @@ public class DocumentIngestionService {
             var version = repository.findVersion(versionId)
                     .orElseThrow(() -> new IllegalArgumentException("文档版本不存在"));
             var chunks = split(enrich(version.contentText(), tenantId, document.kbId(), documentId, versionId,
-                    document.source()));
+                    document.source(), document.aclRoles()));
             vectorStore.add(chunks);
             repository.saveChunks(toRows(tenantId, documentId, versionId, chunks));
             var previousVersion = document.currentVersionId();
@@ -193,7 +203,7 @@ public class DocumentIngestionService {
     }
 
     private List<Document> enrich(String text, String tenantId, String kbId, String documentId, String versionId,
-                                  String source) {
+                                  String source, String aclRoles) {
         var metadata = new HashMap<String, Object>();
         metadata.put("tenant", tenantId);
         metadata.put("kbId", kbId);
@@ -201,6 +211,9 @@ public class DocumentIngestionService {
         metadata.put("versionId", versionId);
         metadata.put("source", source);
         metadata.put("title", source);
+        if (StringUtils.hasText(aclRoles)) {
+            metadata.put("aclRoles", aclRoles);
+        }
         return List.of(new Document(text, metadata));
     }
 
@@ -268,6 +281,15 @@ public class DocumentIngestionService {
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    private String normalizeAcl(String aclRoles) {
+        if (!StringUtils.hasText(aclRoles)) {
+            return null;
+        }
+        return java.util.Arrays.stream(aclRoles.split(","))
+                .map(String::trim).filter(value -> !value.isBlank()).distinct()
+                .collect(java.util.stream.Collectors.joining(","));
     }
 
     private String writeJson(Object value) {

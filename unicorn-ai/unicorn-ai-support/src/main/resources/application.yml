@@ -63,6 +63,9 @@ ai:
     api-key-header: X-API-Key
     jwt:
       enabled: false
+      issuer-uri: ${JWT_ISSUER_URI:}
+      jwk-set-uri: ${JWT_JWK_SET_URI:}
+      hmac-secret: ${JWT_HMAC_SECRET:}
   support:
     demo:
       seed: true
@@ -89,6 +92,12 @@ ai:
       schema-name: ai_support
       table-name: ai_support_chunk_embedding
       dimensions: ${EMBEDDING_DIMENSIONS:1536}
+    query:
+      rewrite-enabled: false
+      multi-query-count: 2
+    mmr:
+      enabled: true
+      lambda: 0.7
     rerank:
       enabled: false
       model: ${OPENAI_RERANK_MODEL:gpt-4o-mini}
@@ -97,6 +106,9 @@ ai:
     rate-limit:
       chat-per-minute: 60
       ingest-per-hour: 100
+      store: local
+    cache:
+      store: local
 
 logging:
   level:

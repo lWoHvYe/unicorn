@@ -20,22 +20,16 @@ import com.unicorn.ai.support.config.SupportProperties;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Local token-window limiter. Infra deployments should swap this for a Redis/Lua
- * implementation with the same interface; the call sites stay unchanged.
- */
 @Component
 public class RateLimiterService {
 
     private final SupportProperties properties;
-    private final ConcurrentMap<String, Window> windows = new ConcurrentHashMap<>();
+    private final RateLimitStore store;
 
-    public RateLimiterService(SupportProperties properties) {
+    public RateLimiterService(SupportProperties properties, RateLimitStore store) {
         this.properties = properties;
+        this.store = store;
     }
 
     public void checkChat(String tenantId) {
@@ -47,25 +41,8 @@ public class RateLimiterService {
     }
 
     private void check(String key, int limit, Duration window) {
-        var current = windows.computeIfAbsent(key, ignored -> new Window(System.nanoTime()));
-        synchronized (current) {
-            var now = System.nanoTime();
-            if (now - current.startedAt > window.toNanos()) {
-                current.startedAt = now;
-                current.count.set(0);
-            }
-            if (current.count.incrementAndGet() > limit) {
-                throw new RateLimitException("请求过于频繁，请稍后再试");
-            }
-        }
-    }
-
-    private static final class Window {
-        private long startedAt;
-        private final AtomicInteger count = new AtomicInteger();
-
-        private Window(long startedAt) {
-            this.startedAt = startedAt;
+        if (!store.tryAcquire(key, limit, window)) {
+            throw new RateLimitException("请求过于频繁，请稍后再试");
         }
     }
 }

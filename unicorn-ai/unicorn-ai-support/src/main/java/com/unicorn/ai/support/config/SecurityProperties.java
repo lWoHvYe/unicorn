@@ -25,6 +25,9 @@ public record SecurityProperties(
         @DefaultValue("X-API-Key") String apiKeyHeader,
         @DefaultValue Jwt jwt) {
 
-    public record Jwt(@DefaultValue("false") boolean enabled) {
+    public record Jwt(@DefaultValue("false") boolean enabled,
+                      @DefaultValue("") String issuerUri,
+                      @DefaultValue("") String jwkSetUri,
+                      @DefaultValue("") String hmacSecret) {
     }
 }

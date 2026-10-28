@@ -32,4 +32,8 @@ public interface ToolInvocationRepository {
     void save(ToolInvocation invocation);
 
     List<ToolInvocation> findPending(String tenantId);
+
+    default void saveApproval(String invocationId, String tenantId, String status, String decidedBy,
+                              String reason) {
+    }
 }

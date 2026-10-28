@@ -83,6 +83,34 @@ public class JdbcToolInvocationRepository implements ToolInvocationRepository {
                     invocation.approvalStatus() == null ? null : invocation.approvalStatus().name(),
                     invocation.idempotencyKey(), invocation.latencyMs(), invocation.traceId());
         }
+        if (invocation.approvalStatus() == ApprovalStatus.PENDING) {
+            var approvalUpdated = jdbc.update("""
+                    UPDATE ai_approval SET status = 'PENDING', requested_by = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ? AND tenant_id = ?
+                    """, invocation.userId(), invocation.id(), invocation.tenantId());
+            if (approvalUpdated == 0) {
+                jdbc.update("""
+                        INSERT INTO ai_approval (id, invocation_id, tenant_id, status, requested_by)
+                        VALUES (?, ?, ?, 'PENDING', ?)
+                        """, invocation.id(), invocation.id(), invocation.tenantId(), invocation.userId());
+            }
+        }
+    }
+
+    @Override
+    public void saveApproval(String invocationId, String tenantId, String status, String decidedBy,
+                             String reason) {
+        var updated = jdbc.update("""
+                UPDATE ai_approval
+                SET status = ?, decided_by = ?, reason = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND tenant_id = ?
+                """, status, decidedBy, reason, invocationId, tenantId);
+        if (updated == 0) {
+            jdbc.update("""
+                    INSERT INTO ai_approval (id, invocation_id, tenant_id, status, requested_by, decided_by, reason)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, invocationId, invocationId, tenantId, status, decidedBy, decidedBy, reason);
+        }
     }
 
     @Override

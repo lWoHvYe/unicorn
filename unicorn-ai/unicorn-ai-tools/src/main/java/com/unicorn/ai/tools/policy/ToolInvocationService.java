@@ -103,7 +103,10 @@ public class ToolInvocationService {
             return replay(invocation);
         }
         var approved = invocation.withApproval(ApprovalStatus.APPROVED);
-        return runAndSave(approved, executors.get(invocation.toolName()), invocation.args());
+        var result = runAndSave(approved, executors.get(invocation.toolName()), invocation.args());
+        repository.saveApproval(invocationId, tenantId,
+                result.status() == ToolStatus.COMPLETED ? "APPROVED" : "FAILED", approverId, null);
+        return result;
     }
 
     public ToolResult reject(String tenantId, String invocationId, String approverId, String reason,
@@ -119,6 +122,8 @@ public class ToolInvocationService {
         var rejected = invocation.withResult(ToolStatus.REJECTED, ApprovalStatus.REJECTED,
                 Map.of("reason", reason == null ? "" : reason), invocation.latencyMs());
         repository.save(rejected);
+        repository.saveApproval(invocationId, tenantId, "REJECTED", approverId,
+                reason == null ? "" : reason);
         return ToolResult.failed("审批已拒绝: " + (reason == null ? "" : reason));
     }
 

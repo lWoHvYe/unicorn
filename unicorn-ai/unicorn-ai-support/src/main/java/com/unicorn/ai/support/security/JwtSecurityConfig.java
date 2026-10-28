@@ -26,6 +26,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.List;
@@ -36,22 +37,26 @@ import java.util.Set;
 public class JwtSecurityConfig {
 
     @Bean
-    SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain jwtSecurityFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth -> oauth.jwt(jwt ->
-                        jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt
+                        .decoder(jwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .build();
     }
 
-    private Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
+    Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         return jwt -> {
             var tenant = jwt.getClaimAsString("tenant_id");
             var user = jwt.getSubject();
+            if (tenant == null || tenant.isBlank() || user == null || user.isBlank()) {
+                throw new IllegalArgumentException("JWT 必须包含 tenant_id 和 sub");
+            }
             List<String> roleList = jwt.getClaimAsStringList("roles");
             var roles = roleList == null ? Set.<String>of() : Set.copyOf(roleList);
             var principal = new AiPrincipal(tenant, user, roles);

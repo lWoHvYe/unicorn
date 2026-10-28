@@ -81,10 +81,11 @@ public class KnowledgeController {
     public IngestResult upload(@AuthenticationPrincipal AiPrincipal principal,
                                @PathVariable String kbId,
                                @RequestPart("file") MultipartFile file,
-                               @RequestParam(defaultValue = "upload") String docType) {
+                               @RequestParam(defaultValue = "upload") String docType,
+                               @RequestParam(required = false) String aclRoles) {
         requireKb(principal, kbId);
         rateLimiter.checkIngest(principal.tenantId());
-        return ingestionService.ingest(file, principal.tenantId(), kbId, docType);
+        return ingestionService.ingest(file, principal.tenantId(), kbId, docType, aclRoles);
     }
 
     @PostMapping("/knowledge-bases/{kbId}/documents/text")

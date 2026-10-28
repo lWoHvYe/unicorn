@@ -22,6 +22,7 @@ import com.unicorn.ai.tools.policy.ToolInvocationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import tools.jackson.databind.json.JsonMapper;
@@ -52,6 +53,9 @@ class SupportApplicationTests {
     @Autowired
     private ToolInvocationService toolInvocations;
 
+    @Autowired
+    private JdbcTemplate jdbc;
+
     @Test
     void ingestAndChatReturnCitation() {
         var ingest = post("/api/ai/support/v1/knowledge-bases/demo-kb/documents/text", """
@@ -74,6 +78,34 @@ class SupportApplicationTests {
         assertEquals("DONE", body.get("status"));
         assertFalse(((java.util.List<?>) body.get("citations")).isEmpty());
         assertTrue(body.get("answer").toString().contains("本地演示模型"));
+
+        var closed = post("/api/ai/support/v1/sessions/" + sessionId + "/close", "{}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), closed.statusCode());
+        var sessionAfter = get("/api/ai/support/v1/sessions/" + sessionId, "demo-key");
+        var sessionBody = JSON.readValue(sessionAfter.body(), Map.class);
+        assertNotNull(sessionBody.get("summary"));
+        assertEquals("CLOSED", sessionBody.get("status"));
+    }
+
+    @Test
+    void restrictedDocumentIsNotRetrievedByAgent() {
+        var ingest = post("/api/ai/support/v1/knowledge-bases/demo-kb/documents/text", """
+                {"text":"acl-secret-2026 只允许客服经理查看。",
+                 "source":"acl/restricted.md","title":"Restricted","docType":"faq",
+                 "aclRoles":"SUPPORT_MANAGER"}
+                """, "demo-key");
+        assertEquals(HttpStatus.OK.value(), ingest.statusCode());
+
+        var session = post("/api/ai/support/v1/sessions", "{\"channel\":\"web\"}", "agent-key");
+        assertEquals(HttpStatus.OK.value(), session.statusCode());
+        var sessionId = JSON.readValue(session.body(), Map.class).get("id");
+
+        var chat = post("/api/ai/support/v1/sessions/" + sessionId + "/messages",
+                "{\"message\":\"acl-secret-2026\"}", "agent-key");
+        assertEquals(HttpStatus.OK.value(), chat.statusCode());
+        var body = JSON.readValue(chat.body(), Map.class);
+        assertEquals("REFUSED", body.get("status"));
+        assertTrue(((java.util.List<?>) body.get("citations")).isEmpty());
     }
 
     @Test
@@ -119,6 +151,9 @@ class SupportApplicationTests {
 
         var approved = toolInvocations.approve("demo", pending.approvalId(), "manager", Set.of("SUPPORT_MANAGER"));
         assertEquals(ToolStatus.COMPLETED, approved.status());
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM ai_approval WHERE id = ? AND status = 'APPROVED'",
+                Integer.class, pending.approvalId()));
 
         var completed = toolInvocations.execute(context, "refund_order",
                 Map.of("tenantId", "demo", "orderId", "A1004", "amount", new BigDecimal("899.00")));

@@ -8,7 +8,7 @@
 - 客服或客户通过 REST/SSE 提问；助手先检索知识库，再调用订单、退款、库存工具。
 - 退款/库存预留等写操作受角色、金额阈值、幂等和人工审批保护。
 - 外部 Agent 通过 `/mcp` 使用同一套工具策略与审计。
-- 会话、知识库、工具审计按 `tenant_id` 隔离；所有工具调用可追溯。文档级 ACL 过滤尚未落地。
+- 会话、知识库、文档 ACL、工具审计按 `tenant_id` 隔离；所有工具调用可追溯。
 
 ## 模块
 
@@ -66,7 +66,7 @@ Base：`/api/ai/support/v1`
 | --- | --- | --- |
 | POST | `/sessions` | 创建会话，可带 `kbId` |
 | POST | `/sessions/{id}/messages` | 阻塞问答，返回 citations/usage |
-| POST | `/sessions/{id}/messages/stream` | SSE：`meta/token/citation/done/error`（当前流式路径未挂工具） |
+| POST | `/sessions/{id}/messages/stream` | SSE：`meta/token/citation/tool/approval/done/error` |
 | GET | `/sessions/{id}/messages` | 历史消息 |
 | POST | `/sessions/{id}/feedback` | 反馈 |
 | POST | `/sessions/{id}/close` | 关闭 |
@@ -109,10 +109,12 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
 
 ## 混合检索
 
-- 向量：`VectorStore.similaritySearch`，过滤 `tenant/kbId`。
+- 向量：`VectorStore.similaritySearch`，过滤 `tenant/kbId`；再按文档 `aclRoles` 过滤。
 - 词法：`ai_chunk` 的 `LOWER(content) LIKE`；Postgres 额外建 `pg_trgm` GIN 索引。
-- RRF：`1/(60+rank)` 合并，按文档去重。
+- RRF：`1/(60+rank)` 合并；默认 MMR 去冗余，`rerank.enabled=true` 时再走 LLM 重排。
 - 无结果/低于阈值直接拒答，不调用生成模型。
+- `query.rewrite-enabled=true` 时先做 query rewrite + multi-query。
+- 入库时可用 `aclRoles`（逗号分隔）限制文档可见角色；为空表示租户内公开。
 - Citation 包含 `documentId/versionId/chunkId/source/title/snippet/score`。
 
 ## 工具与审批
@@ -126,7 +128,7 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
 - `Idempotency-Key`（或 session/tool/args hash）唯一约束；
 - 金额超过 `ai.support.approval.refund-threshold` 进入 `PENDING_APPROVAL`；
 - 审批后执行（`SUPPORT_MANAGER` / `TENANT_ADMIN`）；
-- `ai_tool_invocation` 审计参数、结果、耗时、traceId。
+- `ai_tool_invocation` 审计参数、结果、耗时、traceId；`ai_approval` 记录审批状态/审批人/原因。
 
 ## MCP
 
@@ -161,6 +163,10 @@ Prompts：`order-support`（按租户订单生成客服回复草稿）。
 - 默认使用 H2 + 进程内向量库，重启丢数据；生产用 `infra`。
 - 中文词法检索用 `LIKE`/`pg_trgm` 近似；接口保留 `LexicalRetriever`，可换 OpenSearch/专用分词。
 - 本地演示模型只用于跑通链路，不用于质量评估。
-- 检索未实现 MMR/LLM rerank/query rewrite；文档 ACL、Redis 分布式限流、JWT decoder、MCP client allowlist/auth、Docker 资产仍未完成。
-- MCP 旧模块 `unicorn-ai-mcp-server` 仍是最小示例；生产 MCP 以本模块 `/mcp` 为准。
-- 完整生产化还需要：分布式限流（当前进程内）、文档 ACL、MMR/rerank、对象存储、评测集与 CI 门禁。
+- 检索默认启用 MMR；`query.rewrite-enabled` 和 `rerank.enabled` 为可选开关，默认关闭以控制成本。
+- `infra` 限流/API Key 缓存使用 Redis；Redis 故障时限流 fail-closed，缓存需要 Redis 可用（生产应配置高可用）。
+- JWT 需显式设置 `ai.security.mode=jwt` 并提供 `JWT_ISSUER_URI` / `JWT_JWK_SET_URI` / `JWT_HMAC_SECRET` 之一。
+- MCP 旧模块 `unicorn-ai-mcp-server` 已加 API Key（默认 `demo-key`），但不具备租户隔离；生产 MCP 以本模块 `/mcp` 为准。
+- MCP client 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。
+- 订单/库存/商品仍是内存适配器；工具审计、审批、文档、会话、任务均已 JDBC 持久化。
+- 完整生产化还需要：对象存储、评测集与 CI 门禁、真实 PostgreSQL/Redis/RabbitMQ 集成测试。

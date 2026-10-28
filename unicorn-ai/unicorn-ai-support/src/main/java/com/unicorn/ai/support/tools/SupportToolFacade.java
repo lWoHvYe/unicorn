@@ -101,8 +101,14 @@ public class SupportToolFacade {
     }
 
     private ToolResult execute(ToolExecutionContext context, String tool, Map<String, Object> args) {
+        ToolEventContext.emit("tool", Map.of("tool", tool, "status", "RUNNING"));
         var result = invocations.execute(context, tool, args);
         metrics.tool(context.tenantId(), tool, result.status().name());
+        ToolEventContext.emit("tool", Map.of("tool", tool, "status", result.status().name()));
+        if (result.status() == com.unicorn.ai.tools.model.ToolStatus.PENDING_APPROVAL) {
+            ToolEventContext.emit("approval", Map.of("tool", tool, "approvalId", result.approvalId(),
+                    "status", "PENDING"));
+        }
         return result;
     }
 

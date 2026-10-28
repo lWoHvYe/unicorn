@@ -49,6 +49,10 @@ public class DemoDataInitializer implements ApplicationRunner {
                 """, "demo-key", "demo", "demo-user", Hashing.sha256("demo-key"),
                 "TENANT_ADMIN,SUPPORT_MANAGER,SUPPORT_AGENT");
         jdbcTemplate.update("""
+                INSERT INTO ai_api_key (id, tenant_id, user_id, key_hash, roles, enabled)
+                VALUES (?, ?, ?, ?, ?, TRUE)
+                """, "agent-key", "demo", "agent-user", Hashing.sha256("agent-key"), "SUPPORT_AGENT");
+        jdbcTemplate.update("""
                 INSERT INTO ai_knowledge_base (id, tenant_id, name, description, status)
                 VALUES (?, ?, ?, ?, 'ACTIVE')
                 """, "demo-kb", "demo", "Demo Knowledge Base", "Seed knowledge base");

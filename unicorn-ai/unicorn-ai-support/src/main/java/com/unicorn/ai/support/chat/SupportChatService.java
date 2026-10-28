@@ -29,10 +29,13 @@ import org.slf4j.MDC;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
+import com.unicorn.ai.support.tools.ToolEventContext;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -81,7 +84,7 @@ public class SupportChatService {
         chatRepository.createSession(new ChatRecords.Session(id, principal.tenantId(), principal.userId(),
                 actualChannel, actualKb, actualTitle, "OPEN", null, Instant.now(), Instant.now()));
         return new ChatDtos.SessionView(id, principal.tenantId(), principal.userId(), actualChannel,
-                actualKb, actualTitle, "OPEN", Instant.now().toString());
+                actualKb, actualTitle, "OPEN", null, Instant.now().toString());
     }
 
     public ChatDtos.ChatAnswer chat(AiPrincipal principal, String sessionId, String message) {
@@ -95,12 +98,12 @@ public class SupportChatService {
         var session = requireSession(principal, sessionId);
         var started = System.nanoTime();
         var traceId = traceId();
-        var history = history(principal.tenantId(), sessionId);
+        var history = history(principal.tenantId(), sessionId, session.summary());
         var userMessageId = UUID.randomUUID().toString();
         chatRepository.saveMessage(new ChatRecords.Message(userMessageId, sessionId, principal.tenantId(),
                 "USER", message, null, null, null, traceId, "DONE", Instant.now()));
 
-        var retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null);
+        var retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null, principal.roles());
         var messageId = UUID.randomUUID().toString();
         if (!retrieval.answerable()) {
             var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
@@ -139,12 +142,12 @@ public class SupportChatService {
         rateLimiter.checkChat(principal.tenantId());
         var session = requireSession(principal, sessionId);
         var traceId = traceId();
-        var history = history(principal.tenantId(), sessionId);
+        var history = history(principal.tenantId(), sessionId, session.summary());
         var messageId = UUID.randomUUID().toString();
         chatRepository.saveMessage(new ChatRecords.Message(UUID.randomUUID().toString(), sessionId,
                 principal.tenantId(), "USER", message, null, null, null, traceId, "DONE", Instant.now()));
 
-        var retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null);
+        var retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null, principal.roles());
         if (!retrieval.answerable()) {
             var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
             saveAssistant(principal, sessionId, messageId, refusal, retrieval.citations(),
@@ -156,17 +159,28 @@ public class SupportChatService {
         }
 
         var answer = new StringBuilder();
-        var tokens = chatClient.prompt()
-                .messages(history)
-                .user(user -> user.text("{prompt}").param("prompt", prompt(message, retrieval)))
-                .stream()
-                .content()
-                .doOnNext(answer::append)
-                .doOnComplete(() -> saveAssistant(principal, sessionId, messageId, answer.toString(),
-                        retrieval.citations(), ChatDtos.TokenUsage.empty(), traceId, "DONE"))
-                .map(delta -> new ChatDtos.StreamEvent("token", java.util.Map.of("delta", delta)))
-                .onErrorResume(exception -> Flux.just(new ChatDtos.StreamEvent("error",
-                        java.util.Map.of("code", "AI_CALL_FAILED", "message", "AI 调用失败，请稍后重试。"))));
+        Sinks.Many<ChatDtos.StreamEvent> toolEvents = Sinks.many().unicast().onBackpressureBuffer();
+        var tokens = Flux.defer(() -> {
+                    ToolEventContext.set(event -> toolEvents.tryEmitNext(event));
+                    return chatClient.prompt()
+                            .messages(history)
+                            .user(user -> user.text("{prompt}").param("prompt", prompt(message, retrieval)))
+                            .tools(toolFacade)
+                            .toolContext(toolContext(principal, sessionId, traceId, null))
+                            .stream()
+                            .content()
+                            .doOnNext(answer::append)
+                            .doOnComplete(() -> saveAssistant(principal, sessionId, messageId, answer.toString(),
+                                    retrieval.citations(), ChatDtos.TokenUsage.empty(), traceId, "DONE"))
+                            .map(delta -> new ChatDtos.StreamEvent("token", java.util.Map.of("delta", delta)))
+                            .doFinally(signal -> {
+                                ToolEventContext.clear();
+                                toolEvents.tryEmitComplete();
+                            })
+                            .onErrorResume(exception -> Flux.just(new ChatDtos.StreamEvent("error",
+                                    java.util.Map.of("code", "AI_CALL_FAILED",
+                                            "message", "AI 调用失败，请稍后重试。"))));
+                });
 
         var prefix = new ArrayList<ChatDtos.StreamEvent>();
         prefix.add(new ChatDtos.StreamEvent("meta",
@@ -175,7 +189,7 @@ public class SupportChatService {
             prefix.add(new ChatDtos.StreamEvent("citation",
                     java.util.Map.of("index", i + 1, "citation", retrieval.citations().get(i))));
         }
-        return Flux.concat(Flux.fromIterable(prefix), tokens,
+        return Flux.concat(Flux.fromIterable(prefix), Flux.<ChatDtos.StreamEvent>merge(toolEvents.asFlux(), tokens),
                 Flux.just(new ChatDtos.StreamEvent("done",
                         java.util.Map.of("messageId", messageId, "status", "DONE"))));
     }
@@ -183,7 +197,8 @@ public class SupportChatService {
     public ChatDtos.SessionView session(AiPrincipal principal, String sessionId) {
         var session = requireSession(principal, sessionId);
         return new ChatDtos.SessionView(session.id(), session.tenantId(), session.userId(), session.channel(),
-                session.kbId(), session.title(), session.status(), session.createdAt().toString());
+                session.kbId(), session.title(), session.status(), session.summary(),
+                session.createdAt().toString());
     }
 
     public List<ChatDtos.MessageView> messages(AiPrincipal principal, String sessionId) {
@@ -203,7 +218,9 @@ public class SupportChatService {
 
     public void close(AiPrincipal principal, String sessionId) {
         requireSession(principal, sessionId);
-        chatRepository.updateSummary(principal.tenantId(), sessionId, null, "CLOSED");
+        var messages = chatRepository.listMessages(principal.tenantId(), sessionId);
+        var summary = summarize(messages);
+        chatRepository.updateSummary(principal.tenantId(), sessionId, summary, "CLOSED");
     }
 
     private ChatRecords.Session requireSession(AiPrincipal principal, String sessionId) {
@@ -235,8 +252,29 @@ public class SupportChatService {
                 "traceId", traceId);
     }
 
-    private List<Message> history(String tenantId, String sessionId) {
+    private String summarize(List<ChatRecords.Message> messages) {
+        if (messages.isEmpty()) {
+            return null;
+        }
+        var transcript = messages.stream()
+                .map(message -> message.role() + ": " + message.content())
+                .collect(java.util.stream.Collectors.joining("\n"));
+        try {
+            return chatClient.prompt()
+                    .system("请把下面的客服会话压缩成不超过 300 字的中文摘要，保留客户目标、订单/商品信息、已执行动作和未决事项。")
+                    .user(transcript)
+                    .call()
+                    .content();
+        } catch (RuntimeException exception) {
+            return transcript.length() <= 300 ? transcript : transcript.substring(0, 300);
+        }
+    }
+
+    private List<Message> history(String tenantId, String sessionId, String summary) {
         var messages = new ArrayList<Message>();
+        if (summary != null && !summary.isBlank()) {
+            messages.add(new SystemMessage("此前会话摘要：" + summary));
+        }
         for (var row : chatRepository.recentMessages(tenantId, sessionId, properties.memoryWindow())) {
             if ("USER".equals(row.role())) {
                 messages.add(new UserMessage(row.content()));

@@ -20,6 +20,7 @@ import com.unicorn.ai.support.config.SupportProperties;
 import com.unicorn.ai.support.knowledge.KnowledgeRecords;
 import com.unicorn.ai.support.knowledge.KnowledgeRepository;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
@@ -28,13 +29,17 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
- * Hybrid retrieval: vector search + tenant-scoped lexical search, merged with reciprocal rank fusion.
+ * Hybrid retrieval: vector + tenant-scoped lexical search, RRF fusion, document ACL,
+ * optional MMR and optional LLM rerank.
  */
 @Service
 public class RetrievalService {
@@ -45,18 +50,44 @@ public class RetrievalService {
     private final VectorStore vectorStore;
     private final KnowledgeRepository knowledgeRepository;
     private final SupportProperties properties;
+    private final QueryPlanService queryPlanService;
+    private final EmbeddingModel embeddingModel;
+    private final RerankService rerankService;
 
     public RetrievalService(VectorStore vectorStore, KnowledgeRepository knowledgeRepository,
-                            SupportProperties properties) {
+                            SupportProperties properties, QueryPlanService queryPlanService,
+                            EmbeddingModel embeddingModel, RerankService rerankService) {
         this.vectorStore = vectorStore;
         this.knowledgeRepository = knowledgeRepository;
         this.properties = properties;
+        this.queryPlanService = queryPlanService;
+        this.embeddingModel = embeddingModel;
+        this.rerankService = rerankService;
     }
 
     public RetrievalResult retrieve(String tenantId, String kbId, String query, Integer topK) {
+        return retrieve(tenantId, kbId, query, topK, Set.of());
+    }
+
+    public RetrievalResult retrieve(String tenantId, String kbId, String query, Integer topK, Set<String> roles) {
         var limit = topK == null || topK <= 0 ? properties.topK() : Math.min(topK, 20);
         var candidateK = Math.max(properties.candidateK(), limit);
 
+        var rankedLists = new ArrayList<List<Document>>();
+        for (var plannedQuery : queryPlanService.plan(query)) {
+            rankedLists.add(search(tenantId, kbId, plannedQuery, candidateK, roles));
+        }
+        var merged = fuse(rankedLists);
+        var selected = select(merged, limit, query);
+        if (properties.rerank().enabled()) {
+            selected = rerankService.rerank(query, selected);
+        }
+
+        var citations = selected.stream().map(this::toCitation).toList();
+        return new RetrievalResult(selected, citations, !citations.isEmpty());
+    }
+
+    private List<Document> search(String tenantId, String kbId, String query, int candidateK, Set<String> roles) {
         var builder = new FilterExpressionBuilder();
         var filter = builder.and(
                 builder.eq("tenant", tenantId),
@@ -68,31 +99,91 @@ public class RetrievalService {
                 .similarityThreshold(properties.similarityThreshold())
                 .filterExpression(filter)
                 .build());
+        var lexicalDocs = knowledgeRepository.lexicalSearch(tenantId, kbId, query, candidateK).stream()
+                .map(this::toDocument)
+                .toList();
 
-        var lexicalChunks = knowledgeRepository.lexicalSearch(tenantId, kbId, query, candidateK);
-        var lexicalDocs = lexicalChunks.stream().map(this::toDocument).toList();
+        vectorDocs = vectorDocs.stream().filter(document -> allowed(document, roles)).toList();
+        lexicalDocs = lexicalDocs.stream().filter(document -> allowed(document, roles)).toList();
+        return rrf(vectorDocs, lexicalDocs);
+    }
 
-        var merged = rrf(vectorDocs, lexicalDocs);
+    private List<Document> fuse(List<List<Document>> lists) {
+        if (lists.size() == 1) {
+            return lists.getFirst();
+        }
+        Map<String, Document> documents = new LinkedHashMap<>();
+        Map<String, Double> scores = new HashMap<>();
+        for (var list : lists) {
+            for (int i = 0; i < list.size(); i++) {
+                var document = list.get(i);
+                documents.putIfAbsent(document.getId(), document);
+                scores.merge(document.getId(), 1.0 / (RRF_K + i + 1), Double::sum);
+            }
+        }
+        return documents.values().stream()
+                .sorted(Comparator.comparingDouble((Document document) ->
+                        scores.getOrDefault(document.getId(), 0.0)).reversed())
+                .toList();
+    }
+
+    private List<Document> select(List<Document> candidates, int limit, String query) {
+        var ordered = properties.mmr().enabled() ? mmr(candidates, limit, query) : candidates;
         var selected = new ArrayList<Document>();
-        var seenDocuments = new java.util.HashSet<String>();
-        for (var document : merged) {
-            var documentId = text(document, "documentId");
-            if (documentId.isBlank() || seenDocuments.add(documentId)) {
+        var seenDocuments = new LinkedHashSet<String>();
+        for (var document : ordered) {
+            if (seenDocuments.add(text(document, "documentId"))) {
                 selected.add(document);
             }
             if (selected.size() >= limit) {
                 break;
             }
         }
+        return selected;
+    }
 
-        var citations = selected.stream().map(this::toCitation).toList();
-        return new RetrievalResult(selected, citations, !citations.isEmpty());
+    private List<Document> mmr(List<Document> candidates, int limit, String query) {
+        if (candidates.size() <= 1) {
+            return candidates;
+        }
+        try {
+            var queryVector = embeddingModel.embed(query);
+            var vectors = new HashMap<String, float[]>();
+            for (var candidate : candidates) {
+                vectors.put(candidate.getId(), embeddingModel.embed(candidate.getText()));
+            }
+            var remaining = new ArrayList<>(candidates);
+            var selected = new ArrayList<Document>();
+            while (selected.size() < limit && !remaining.isEmpty()) {
+                Document best = null;
+                double bestScore = Double.NEGATIVE_INFINITY;
+                for (var candidate : remaining) {
+                    var relevance = cosine(queryVector, vectors.get(candidate.getId()));
+                    var redundancy = selected.stream()
+                            .mapToDouble(chosen -> cosine(vectors.get(candidate.getId()), vectors.get(chosen.getId())))
+                            .max().orElse(0.0);
+                    var score = properties.mmr().lambda() * relevance
+                            - (1 - properties.mmr().lambda()) * redundancy;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        best = candidate;
+                    }
+                }
+                if (best == null) {
+                    break;
+                }
+                selected.add(best);
+                remaining.remove(best);
+            }
+            return selected;
+        } catch (RuntimeException exception) {
+            return candidates;
+        }
     }
 
     private List<Document> rrf(List<Document> vectorDocs, List<Document> lexicalDocs) {
         Map<String, Document> documents = new LinkedHashMap<>();
         Map<String, Double> scores = new LinkedHashMap<>();
-
         for (int i = 0; i < vectorDocs.size(); i++) {
             var document = vectorDocs.get(i);
             documents.put(document.getId(), document);
@@ -107,6 +198,19 @@ public class RetrievalService {
                 .sorted(Comparator.comparingDouble((Document document) ->
                         scores.getOrDefault(document.getId(), 0.0)).reversed())
                 .toList();
+    }
+
+    private boolean allowed(Document document, Set<String> roles) {
+        var acl = text(document, "aclRoles");
+        if (acl.isBlank()) {
+            return true;
+        }
+        if (roles == null || roles.isEmpty()) {
+            return false;
+        }
+        return java.util.Arrays.stream(acl.split(","))
+                .map(String::trim)
+                .anyMatch(roles::contains);
     }
 
     @SuppressWarnings("unchecked")
@@ -139,6 +243,21 @@ public class RetrievalService {
 
     private String text(Document document, String key) {
         return Objects.toString(document.getMetadata().getOrDefault(key, ""), "");
+    }
+
+    private double cosine(float[] left, float[] right) {
+        if (left == null || right == null || left.length != right.length) {
+            return 0.0;
+        }
+        double dot = 0;
+        double leftNorm = 0;
+        double rightNorm = 0;
+        for (int i = 0; i < left.length; i++) {
+            dot += left[i] * right[i];
+            leftNorm += left[i] * left[i];
+            rightNorm += right[i] * right[i];
+        }
+        return leftNorm == 0 || rightNorm == 0 ? 0.0 : dot / (Math.sqrt(leftNorm) * Math.sqrt(rightNorm));
     }
 
     private String truncate(String text, int max) {

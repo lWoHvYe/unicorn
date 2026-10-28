@@ -36,9 +36,12 @@ public record SupportProperties(
         Storage storage,
         Pgvector pgvector,
         AsyncIngest asyncIngest,
+        Query query,
+        Mmr mmr,
         Rerank rerank,
         Approval approval,
-        RateLimit rateLimit) {
+        RateLimit rateLimit,
+        Cache cache) {
 
     public record Demo(@DefaultValue("false") boolean seed, @DefaultValue("false") boolean model) {
     }
@@ -60,6 +63,14 @@ public record SupportProperties(
                               @DefaultValue("ingest") String routingKey) {
     }
 
+    public record Query(@DefaultValue("false") boolean rewriteEnabled,
+                        @DefaultValue("2") int multiQueryCount) {
+    }
+
+    public record Mmr(@DefaultValue("true") boolean enabled,
+                      @DefaultValue("0.7") double lambda) {
+    }
+
     public record Rerank(@DefaultValue("false") boolean enabled,
                          @DefaultValue("gpt-4o-mini") String model) {
     }
@@ -68,6 +79,10 @@ public record SupportProperties(
     }
 
     public record RateLimit(@DefaultValue("60") int chatPerMinute,
-                            @DefaultValue("100") int ingestPerHour) {
+                            @DefaultValue("100") int ingestPerHour,
+                            @DefaultValue("local") String store) {
+    }
+
+    public record Cache(@DefaultValue("local") String store) {
     }
 }

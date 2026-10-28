@@ -41,6 +41,11 @@ management:
       enabled: true
 
 ai:
+  security:
+    jwt:
+      issuer-uri: ${JWT_ISSUER_URI:}
+      jwk-set-uri: ${JWT_JWK_SET_URI:}
+      hmac-secret: ${JWT_HMAC_SECRET:}
   support:
     demo:
       seed: ${AI_DEMO_SEED:false}
@@ -51,3 +56,7 @@ ai:
       exchange: unicorn.ai.support
       queue: unicorn.ai.support.ingest
       routing-key: ingest
+    rate-limit:
+      store: redis
+    cache:
+      store: redis
