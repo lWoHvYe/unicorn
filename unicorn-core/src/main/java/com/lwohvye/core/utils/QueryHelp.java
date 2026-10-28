@@ -119,17 +119,18 @@ public class QueryHelp {
                 var q = meta.query();
                 var value = field.get(query);
                 var nullCondition = q.type() == Query.Type.IS_NULL || q.type() == Query.Type.NOT_NULL;
-                // IS_NULL/NOT_NULL 使用 Boolean 字段作为开关：true 才追加条件，
-                // null/false 表示“本次不限制”。不能因为字段为 null 就无条件追加，
-                // 否则 MenuQueryCriteria 里 pidIsNull 被置空后仍会生成 pid is null。
-                if (nullCondition) {
+                // Boolean 类型的 IS_NULL/NOT_NULL 是开关：true 才追加条件，null/false 表示
+                // 本次不限制。非 Boolean 字段保留原有语义（即使值为 null 也追加 is null /
+                // is not null），避免改变库使用方的行为。
+                var booleanFlag = field.getType() == Boolean.class || field.getType() == boolean.class;
+                if (nullCondition && booleanFlag) {
                     if (Objects.isNull(value) || Boolean.FALSE.equals(value)) {
                         continue;
                     }
-                } else if (Objects.isNull(value) || Objects.equals("", value)) {
+                } else if (!nullCondition && (Objects.isNull(value) || Objects.equals("", value))) {
                     continue;
                 }
-                // 模糊多字段；IS_NULL/NOT_NULL 不使用字段值
+                // 模糊多字段；IS_NULL/NOT_NULL 只作为 Boolean 开关，不走 blurry 分支
                 if (!nullCondition && !q.blurry().isBlank()) {
                     var blurrys = q.blurry().split(",");
                     var orPredicate = new ArrayList<Predicate>();

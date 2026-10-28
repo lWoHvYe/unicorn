@@ -99,9 +99,14 @@ object QueryHelp {
                 val q = javaField.getAnnotation(Query::class.java) ?: return@let
                 val value = javaField.get(query)
                 val nullCondition = q.type == Query.Type.IS_NULL || q.type == Query.Type.NOT_NULL
-                // IS_NULL/NOT_NULL 使用 Boolean 字段作为开关：true 才追加条件。
-                val shouldAnalyze = if (nullCondition) {
+                // Boolean 类型的 IS_NULL/NOT_NULL 是开关：true 才追加条件；非 Boolean
+                // 字段保留原有语义（null 也追加条件），避免改变库使用方行为。
+                val booleanFlag = javaField.type == Boolean::class.javaObjectType ||
+                        javaField.type == Boolean::class.javaPrimitiveType
+                val shouldAnalyze = if (nullCondition && booleanFlag) {
                     value != null && value != false
+                } else if (nullCondition) {
+                    true
                 } else {
                     value.hasValue()
                 }

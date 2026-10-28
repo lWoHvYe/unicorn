@@ -136,7 +136,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 - 支持 `blurry` 多字段 OR 模糊、`joinName`（`roles>menus` 形式的多级 join）、`propName` 覆盖字段名，以及 20 种 `Type`（`IN`/`BETWEEN`/`LIKE_*`/`FUNCTION_*` 等）。
 - 只支持 **AND** 组合；同一张表不支持多次不同 `join`；`IS_OR_NULL` 支持任意 `Number` 的 `-1`；`BETWEEN` 要求两个可比较值；`FUNCTION_4_EQUAL` 等库函数列无法走索引。
 - `QueryHelp` 用 `ClassValue` 缓存 `@Query` 字段元数据，join 只在单次查询内复用；criteria 所在包必须 `opens` 给 `lwohvye.unicorn.core`，否则会直接报错而不是静默忽略条件。
-- `IS_NULL`/`NOT_NULL` 的字段值允许为 `null`，不会被普通条件的空值跳过逻辑误过滤；`IS_OR_NULL` 的 `-1` 支持任意 `Number`。
+- `IS_NULL`/`NOT_NULL` 的 **Boolean 字段是开关**：只有 `true` 才追加 `is null`/`is not null`，`null`/`false` 表示本次不限制；非 Boolean 字段保留原有“注解即生效”的语义。因此“先设 true、再置 null”的 `MenuQueryCriteria.pidIsNull` 不会残留条件。`IS_OR_NULL` 的 `-1` 支持任意 `Number`。
 - Criteria/DTO 放在 `unicorn-sys-api`；`valentine-starter` 另有一份 Kotlin 版 `QueryHelp`，已同步 `IS_NULL`/`IS_OR_NULL`/空集合/`BETWEEN`/join 复用等关键修复，并有 `KotlinQueryHelpTest` 覆盖。
 
 ### 5.3 统一返回与异常
@@ -240,7 +240,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 
 因此：**把 `./gradlew assemble` 作为构建门槛**，不要为了让 `test` 变绿去改业务代码；只有在任务明确要求补测试时，再给 Java 模块加 `useJUnitPlatform()`、JUnit 依赖，并移除环境相关断言。
 
-例外：`unicorn-ai-tools:test`（6 个）、`unicorn-ai-support:test`（11 个通过；Testcontainers 集成测试无 Docker 时 skip；`AI_INFRA_TEST=true` 时外部 PG/Redis/RabbitMQ 测试通过）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
+例外：`unicorn-ai-tools:test`（6 个）、`unicorn-ai-support:test`（11 个通过；Testcontainers 集成测试无 Docker 时 skip；`AI_INFRA_TEST=true` 时外部 PG/Redis/RabbitMQ 测试通过）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（9 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
 `./gradlew :unicorn-core:test :unicorn-beans:test`；`valentine-starter` 的 `KotlinQueryHelpTest`（5 个）可通过 `./gradlew :valentine-starter-kotlin:test --tests com.unicorn.utils.KotlinQueryHelpTest`。AI demo 的独立测试同样可通过；这不改变全量 `test` 仍失败的事实。
 
 ### 8.2 文档与脚本漂移
