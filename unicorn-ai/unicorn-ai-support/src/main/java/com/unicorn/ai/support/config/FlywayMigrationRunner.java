@@ -17,22 +17,20 @@
 package com.unicorn.ai.support.config;
 
 import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
 
 /**
- * Boot 4 no longer auto-configures Flyway through the JDBC starter; run migrations explicitly
- * before demo seeding and before the app is considered ready.
+ * Boot 4 no longer auto-configures Flyway through the JDBC starter. Migrations must run
+ * during bean initialization, before PgVectorStore creates its table (which needs the
+ * pgvector extension); an ApplicationRunner would run too late.
  */
-@Order(0)
 @Component
-public class FlywayMigrationRunner implements ApplicationRunner {
+public class FlywayMigrationRunner implements InitializingBean {
 
     private final DataSource dataSource;
     private final String locations;
@@ -50,7 +48,7 @@ public class FlywayMigrationRunner implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void afterPropertiesSet() {
         var configuration = Flyway.configure()
                 .dataSource(dataSource)
                 .locations(Arrays.stream(locations.split(",")).map(String::trim).toArray(String[]::new))

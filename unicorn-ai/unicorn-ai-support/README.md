@@ -40,7 +40,7 @@ X-API-Key: other-key       # tenant=other，用于隔离测试
 使用现有 PostgreSQL/pgvector、Redis、RabbitMQ：
 
 ```bash
-export AI_DB_URL='jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=ai_support'
+export AI_DB_URL='jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=ai_support,public'
 export AI_DB_USER=postgres
 export AI_DB_PWD=postgres
 export REDIS_HOST=10.211.55.29
@@ -180,5 +180,8 @@ Prompts：`order-support`（按租户订单生成客服回复草稿）。
 - MCP client 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。
 - 领域数据使用 `ai_order`/`ai_inventory`/`ai_product` JDBC 表；本地 demo 由 `DemoDataInitializer` 写入，生产可替换为外部订单/库存服务适配器。
 - `SupportInfraIntegrationTest` 使用 Testcontainers 启动 PostgreSQL/pgvector + RabbitMQ，验证异步入库、job 状态和 citation；无 Docker 时自动 skip。
+- `SupportExternalInfraTest` 可直接连接现有 PostgreSQL/pgvector、Redis、RabbitMQ；显式启用：
+  `AI_INFRA_TEST=true ./gradlew :unicorn-ai-support:test --tests com.unicorn.ai.support.SupportExternalInfraTest`
+  默认使用 `ai_support_p2_test` schema，不影响已有 schema。
 - Docker 资产：`unicorn-ai/unicorn-ai-support/Dockerfile`、`compose.yaml`。
 - 完整生产化还需要：对象存储、评测集与 CI 门禁、真实 Redis/生产数据库 HA 联调。

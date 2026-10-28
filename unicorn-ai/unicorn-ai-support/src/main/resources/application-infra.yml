@@ -5,12 +5,10 @@ spring:
     activate:
       on-profile: infra
   datasource:
-    url: ${AI_DB_URL:jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=ai_support}
+    url: ${AI_DB_URL:jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=ai_support,public}
     username: ${AI_DB_USER:postgres}
     password: ${AI_DB_PWD:postgres}
     driver-class-name: org.postgresql.Driver
-    hikari:
-      schema: ai_support
   flyway:
     enabled: true
     locations: classpath:db/migration/common,classpath:db/migration/postgres

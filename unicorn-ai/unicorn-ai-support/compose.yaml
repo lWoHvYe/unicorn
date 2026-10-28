@@ -48,7 +48,7 @@ services:
     ports:
       - "8096:8096"
     environment:
-      AI_DB_URL: jdbc:postgresql://postgres:5432/vectordb?currentSchema=ai_support
+      AI_DB_URL: jdbc:postgresql://postgres:5432/vectordb?currentSchema=ai_support,public
       AI_DB_USER: postgres
       AI_DB_PWD: postgres
       REDIS_HOST: redis

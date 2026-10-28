@@ -55,11 +55,10 @@ class SupportInfraIntegrationTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> POSTGRES.getJdbcUrl() + "?currentSchema=ai_support");
+        registry.add("spring.datasource.url", () -> POSTGRES.getJdbcUrl() + "?currentSchema=ai_support,public");
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
-        registry.add("spring.datasource.hikari.schema", () -> "ai_support");
         registry.add("spring.flyway.locations",
                 () -> "classpath:db/migration/common,classpath:db/migration/postgres");
         registry.add("spring.flyway.schemas", () -> "ai_support");
