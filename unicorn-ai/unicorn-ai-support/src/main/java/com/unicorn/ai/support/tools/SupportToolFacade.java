@@ -18,6 +18,7 @@ package com.unicorn.ai.support.tools;
 
 import com.unicorn.ai.support.security.AiPrincipal;
 import com.unicorn.ai.support.security.TenantContext;
+import com.unicorn.ai.support.observability.SupportMetrics;
 import com.unicorn.ai.tools.domain.SupportToolService;
 import com.unicorn.ai.tools.model.ToolExecutionContext;
 import com.unicorn.ai.tools.model.ToolResult;
@@ -38,43 +39,45 @@ public class SupportToolFacade {
 
     private final ToolInvocationService invocations;
     private final SupportToolService tools;
+    private final SupportMetrics metrics;
 
-    public SupportToolFacade(ToolInvocationService invocations, SupportToolService tools) {
+    public SupportToolFacade(ToolInvocationService invocations, SupportToolService tools, SupportMetrics metrics) {
         this.invocations = invocations;
         this.tools = tools;
+        this.metrics = metrics;
     }
 
     @Tool(description = "按订单号查询订单详情。订单号示例：A1001")
     public ToolResult getOrder(@ToolParam(description = "订单号") String orderId, ToolContext context) {
         var ctx = context(context);
-        return invocations.execute(ctx, "get_order", Map.of("tenantId", ctx.tenantId(), "orderId", orderId));
+        return execute(ctx, "get_order", Map.of("tenantId", ctx.tenantId(), "orderId", orderId));
     }
 
     @Tool(description = "判断订单是否满足退款条件，并返回判断原因")
     public ToolResult refundEligibility(@ToolParam(description = "订单号") String orderId, ToolContext context) {
         var ctx = context(context);
-        return invocations.execute(ctx, "refund_eligibility",
+        return execute(ctx, "refund_eligibility",
                 Map.of("tenantId", ctx.tenantId(), "orderId", orderId));
     }
 
     @Tool(description = "按关键词搜索商品，返回 SKU、名称、价格和库存")
     public ToolResult searchProducts(@ToolParam(description = "商品关键词") String keyword, ToolContext context) {
         var ctx = context(context);
-        return invocations.execute(ctx, "search_products",
+        return execute(ctx, "search_products",
                 Map.of("tenantId", ctx.tenantId(), "keyword", keyword));
     }
 
     @Tool(description = "按 SKU 查询可用库存与预留库存")
     public ToolResult checkInventory(@ToolParam(description = "SKU") String sku, ToolContext context) {
         var ctx = context(context);
-        return invocations.execute(ctx, "check_inventory",
+        return execute(ctx, "check_inventory",
                 Map.of("tenantId", ctx.tenantId(), "sku", sku));
     }
 
     @Tool(description = "转人工客服，创建人工工单")
     public ToolResult handoff(@ToolParam(description = "转人工原因") String reason, ToolContext context) {
         var ctx = context(context);
-        return invocations.execute(ctx, "create_handoff",
+        return execute(ctx, "create_handoff",
                 Map.of("tenantId", ctx.tenantId(), "reason", reason));
     }
 
@@ -84,7 +87,7 @@ public class SupportToolFacade {
         var amount = tools.getOrder(ctx.tenantId(), orderId)
                 .map(order -> order.amount())
                 .orElse(BigDecimal.ZERO);
-        return invocations.execute(ctx, "refund_order",
+        return execute(ctx, "refund_order",
                 Map.of("tenantId", ctx.tenantId(), "orderId", orderId, "amount", amount));
     }
 
@@ -93,8 +96,14 @@ public class SupportToolFacade {
                                        @ToolParam(description = "预留数量") int quantity,
                                        ToolContext context) {
         var ctx = context(context);
-        return invocations.execute(ctx, "reserve_inventory",
+        return execute(ctx, "reserve_inventory",
                 Map.of("tenantId", ctx.tenantId(), "sku", sku, "quantity", quantity));
+    }
+
+    private ToolResult execute(ToolExecutionContext context, String tool, Map<String, Object> args) {
+        var result = invocations.execute(context, tool, args);
+        metrics.tool(context.tenantId(), tool, result.status().name());
+        return result;
     }
 
     private ToolExecutionContext context(ToolContext context) {

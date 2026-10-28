@@ -27,6 +27,8 @@ public interface ToolInvocationRepository {
 
     Optional<ToolInvocation> findById(String id);
 
+    Optional<ToolInvocation> findById(String tenantId, String id);
+
     void save(ToolInvocation invocation);
 
     List<ToolInvocation> findPending(String tenantId);

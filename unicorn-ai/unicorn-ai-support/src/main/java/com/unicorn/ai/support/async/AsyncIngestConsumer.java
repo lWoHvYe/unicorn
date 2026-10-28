@@ -19,6 +19,7 @@ package com.unicorn.ai.support.async;
 import com.unicorn.ai.support.knowledge.DocumentIngestionService;
 import com.unicorn.ai.support.knowledge.KnowledgeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -49,20 +50,21 @@ public class AsyncIngestConsumer {
             command = JSON.readValue(payload, IngestCommand.class);
         } catch (RuntimeException exception) {
             log.error("Invalid ingest command: {}", payload, exception);
-            return;
+            throw new AmqpRejectAndDontRequeueException("Invalid ingest command", exception);
         }
         try {
             ingestionService.process(command.tenantId(), command.documentId(), command.versionId(), command.jobId());
             log.info("Ingest job {} completed", command.jobId());
         } catch (RuntimeException exception) {
             var attempts = repository.findJob(command.tenantId(), command.jobId())
-                    .map(job -> job.attempts() + 1).orElse(1);
+                    .map(job -> job.attempts()).orElse(1);
             if (attempts < 3) {
                 repository.updateJob(command.jobId(), "PENDING", attempts, exception.getMessage());
                 publisher.publish(command.jobId(), command.tenantId(), command.documentId(), command.versionId());
                 log.warn("Ingest job {} failed, retry {}/3", command.jobId(), attempts);
             } else {
                 repository.updateJob(command.jobId(), "DEAD", attempts, exception.getMessage());
+                publisher.publishDeadLetter(command, exception.getMessage());
                 log.error("Ingest job {} exhausted retries", command.jobId(), exception);
             }
         }

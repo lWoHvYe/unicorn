@@ -63,7 +63,7 @@ class ToolInvocationServiceTest {
         assertEquals(ToolStatus.PENDING_APPROVAL, pending.status());
         assertNotNull(pending.approvalId());
 
-        var approved = service.approve(pending.approvalId(), "manager", Set.of("SUPPORT_MANAGER"));
+        var approved = service.approve("demo", pending.approvalId(), "manager", Set.of("SUPPORT_MANAGER"));
         assertEquals(ToolStatus.COMPLETED, approved.status());
 
         var replay = service.execute(context, "refund_order",
@@ -86,6 +86,15 @@ class ToolInvocationServiceTest {
         var result = service.execute(context, "get_order", Map.of("tenantId", "other", "orderId", "A1001"));
         assertEquals(ToolStatus.COMPLETED, result.status());
         assertTrue(result.data() instanceof Map<?, ?> map && "NOT_FOUND".equals(map.get("status")));
+    }
+
+    @Test
+    void anotherTenantCannotApprove() {
+        var context = context(Set.of("SUPPORT_MANAGER"), "write-3");
+        var pending = service.execute(context, "refund_order",
+                Map.of("tenantId", "demo", "orderId", "A1004", "amount", new BigDecimal("899.00")));
+        org.junit.jupiter.api.Assertions.assertThrows(java.util.NoSuchElementException.class,
+                () -> service.approve("other", pending.approvalId(), "manager", Set.of("SUPPORT_MANAGER")));
     }
 
     private ToolExecutionContext context(Set<String> roles, String idempotencyKey) {

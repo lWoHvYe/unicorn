@@ -8,7 +8,7 @@
 - 客服或客户通过 REST/SSE 提问；助手先检索知识库，再调用订单、退款、库存工具。
 - 退款/库存预留等写操作受角色、金额阈值、幂等和人工审批保护。
 - 外部 Agent 通过 `/mcp` 使用同一套工具策略与审计。
-- 所有数据按 `tenant_id` 隔离，所有工具调用可追溯。
+- 会话、知识库、工具审计按 `tenant_id` 隔离；所有工具调用可追溯。文档级 ACL 过滤尚未落地。
 
 ## 模块
 
@@ -66,7 +66,7 @@ Base：`/api/ai/support/v1`
 | --- | --- | --- |
 | POST | `/sessions` | 创建会话，可带 `kbId` |
 | POST | `/sessions/{id}/messages` | 阻塞问答，返回 citations/usage |
-| POST | `/sessions/{id}/messages/stream` | SSE：`meta/token/citation/tool/approval/done/error` |
+| POST | `/sessions/{id}/messages/stream` | SSE：`meta/token/citation/done/error`（当前流式路径未挂工具） |
 | GET | `/sessions/{id}/messages` | 历史消息 |
 | POST | `/sessions/{id}/feedback` | 反馈 |
 | POST | `/sessions/{id}/close` | 关闭 |
@@ -133,14 +133,15 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
 `/mcp` 与 REST 共用 API Key/JWT 过滤器。工具：
 `get_order`、`refund_eligibility`、`refund_order`、`check_inventory`、`reserve_inventory`、`create_handoff`。
 Resources：`unicorn://orders/{orderId}`、`unicorn://inventory/{sku}`。
+Prompts：`order-support`（按租户订单生成客服回复草稿）。
 外部 Agent 只能看到本租户数据；写工具同样走策略/审批/审计。
 
 ## 可观测性
 
 - `/actuator/health`、`/actuator/prometheus`（Prometheus 端点同样受 API Key/JWT 保护，抓取端需带 `X-API-Key` 或 Bearer token）。
-- `ai.support.chat` timer、`ai.support.ingest.jobs`、`ai.support.tool.calls`。
+- `ai.support.chat` timer、`ai.support.ingest.jobs`、`ai.support.tool.calls`（Chat 与 MCP 工具）。
 - `ai_chat_message.trace_id`、`ai_tool_invocation.trace_id`。
-- `ai_usage_daily` 记录 token/成本/请求数（成本单价可扩展）。
+- `ai_usage_daily` 记录 token/请求数；`cost` 当前写 0，接入定价表后才能计算真实成本。
 - 日志默认不打印用户原文和工具完整参数。
 
 ## 测试
@@ -160,5 +161,6 @@ Resources：`unicorn://orders/{orderId}`、`unicorn://inventory/{sku}`。
 - 默认使用 H2 + 进程内向量库，重启丢数据；生产用 `infra`。
 - 中文词法检索用 `LIKE`/`pg_trgm` 近似；接口保留 `LexicalRetriever`，可换 OpenSearch/专用分词。
 - 本地演示模型只用于跑通链路，不用于质量评估。
+- 检索未实现 MMR/LLM rerank/query rewrite；文档 ACL、Redis 分布式限流、JWT decoder、MCP client allowlist/auth、Docker 资产仍未完成。
 - MCP 旧模块 `unicorn-ai-mcp-server` 仍是最小示例；生产 MCP 以本模块 `/mcp` 为准。
-- 完整生产化还需要：分布式限流（当前为配置骨架）、DLQ 重试策略、对象存储、评测集与 CI 门禁。
+- 完整生产化还需要：分布式限流（当前进程内）、文档 ACL、MMR/rerank、对象存储、评测集与 CI 门禁。

@@ -92,12 +92,13 @@ public class ToolInvocationService {
         return runAndSave(invocation, executors.get(toolName), safeArgs);
     }
 
-    public ToolResult approve(String invocationId, String approverId, java.util.Set<String> approverRoles) {
+    public ToolResult approve(String tenantId, String invocationId, String approverId,
+                              java.util.Set<String> approverRoles) {
         if (approverRoles == null || approverRoles.stream().noneMatch(APPROVER_ROLES::contains)) {
             return ToolResult.failed("当前用户没有审批权限");
         }
-        var invocation = repository.findById(invocationId)
-                .orElseThrow(() -> new IllegalArgumentException("审批单不存在"));
+        var invocation = repository.findById(tenantId, invocationId)
+                .orElseThrow(() -> new java.util.NoSuchElementException("审批单不存在"));
         if (invocation.approvalStatus() != ApprovalStatus.PENDING) {
             return replay(invocation);
         }
@@ -105,13 +106,13 @@ public class ToolInvocationService {
         return runAndSave(approved, executors.get(invocation.toolName()), invocation.args());
     }
 
-    public ToolResult reject(String invocationId, String approverId, String reason,
+    public ToolResult reject(String tenantId, String invocationId, String approverId, String reason,
                              java.util.Set<String> approverRoles) {
         if (approverRoles == null || approverRoles.stream().noneMatch(APPROVER_ROLES::contains)) {
             return ToolResult.failed("当前用户没有审批权限");
         }
-        var invocation = repository.findById(invocationId)
-                .orElseThrow(() -> new IllegalArgumentException("审批单不存在"));
+        var invocation = repository.findById(tenantId, invocationId)
+                .orElseThrow(() -> new java.util.NoSuchElementException("审批单不存在"));
         if (invocation.approvalStatus() != ApprovalStatus.PENDING) {
             return replay(invocation);
         }
@@ -133,16 +134,21 @@ public class ToolInvocationService {
             }
             var result = executor.execute(args);
             var latency = (System.nanoTime() - started) / 1_000_000;
-            var completed = invocation.withResult(result.status(), ApprovalStatus.NOT_REQUIRED,
+            var completed = invocation.withResult(result.status(), approvalStatus(invocation),
                     result.data(), latency);
             repository.save(completed);
             return result;
         } catch (RuntimeException exception) {
             var latency = (System.nanoTime() - started) / 1_000_000;
-            repository.save(invocation.withResult(ToolStatus.FAILED, ApprovalStatus.NOT_REQUIRED,
+            repository.save(invocation.withResult(ToolStatus.FAILED, approvalStatus(invocation),
                     Map.of("error", Objects.toString(exception.getMessage(), "tool failed")), latency));
             return ToolResult.failed(Objects.toString(exception.getMessage(), "工具执行失败"));
         }
+    }
+
+    private ApprovalStatus approvalStatus(ToolInvocation invocation) {
+        return invocation.approvalStatus() == ApprovalStatus.APPROVED
+                ? ApprovalStatus.APPROVED : ApprovalStatus.NOT_REQUIRED;
     }
 
     private ToolResult replay(ToolInvocation invocation) {

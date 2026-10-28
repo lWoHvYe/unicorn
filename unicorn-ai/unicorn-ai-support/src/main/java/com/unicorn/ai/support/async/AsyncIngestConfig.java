@@ -36,8 +36,27 @@ public class AsyncIngestConfig {
     }
 
     @Bean
+    DirectExchange supportIngestDeadLetterExchange(SupportProperties properties) {
+        return new DirectExchange(properties.asyncIngest().exchange() + ".dlx", true, false);
+    }
+
+    @Bean
+    Queue supportIngestDeadLetterQueue(SupportProperties properties) {
+        return QueueBuilder.durable(properties.asyncIngest().queue() + ".dlq").build();
+    }
+
+    @Bean
+    Binding supportIngestDeadLetterBinding(Queue supportIngestDeadLetterQueue,
+                                           DirectExchange supportIngestDeadLetterExchange) {
+        return BindingBuilder.bind(supportIngestDeadLetterQueue).to(supportIngestDeadLetterExchange).with("dead");
+    }
+
+    @Bean
     Queue supportIngestQueue(SupportProperties properties) {
-        return QueueBuilder.durable(properties.asyncIngest().queue()).build();
+        return QueueBuilder.durable(properties.asyncIngest().queue())
+                .deadLetterExchange(properties.asyncIngest().exchange() + ".dlx")
+                .deadLetterRoutingKey("dead")
+                .build();
     }
 
     @Bean

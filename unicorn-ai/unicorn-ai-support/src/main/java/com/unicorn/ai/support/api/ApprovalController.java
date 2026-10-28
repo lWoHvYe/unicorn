@@ -49,14 +49,14 @@ public class ApprovalController {
 
     @PostMapping("/{id}/approve")
     public ToolResult approve(@AuthenticationPrincipal AiPrincipal principal, @PathVariable String id) {
-        return invocations.approve(id, principal.userId(), principal.roles());
+        return invocations.approve(principal.tenantId(), id, principal.userId(), principal.roles());
     }
 
     @PostMapping("/{id}/reject")
     public ToolResult reject(@AuthenticationPrincipal AiPrincipal principal, @PathVariable String id,
                              @RequestBody(required = false) RejectRequest request) {
-        return invocations.reject(id, principal.userId(), request == null ? null : request.reason(),
-                principal.roles());
+        return invocations.reject(principal.tenantId(), id, principal.userId(),
+                request == null ? null : request.reason(), principal.roles());
     }
 
     public record RejectRequest(String reason) {

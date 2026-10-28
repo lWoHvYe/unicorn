@@ -41,12 +41,19 @@ public class AsyncIngestPublisher {
         this.properties = properties;
     }
 
+    public void publishDeadLetter(IngestCommand command, String error) {
+        rabbitTemplate.convertAndSend(properties.asyncIngest().exchange() + ".dlx", "dead",
+                JSON.writeValueAsString(java.util.Map.of("command", command,
+                        "error", error == null ? "" : error)));
+    }
+
     public AsyncIngestResponse publish(String jobId, String tenantId, String documentId, String versionId) {
         var command = new IngestCommand(jobId, tenantId, documentId, versionId);
         try {
             rabbitTemplate.convertAndSend(properties.asyncIngest().exchange(),
                     properties.asyncIngest().routingKey(), JSON.writeValueAsString(command));
-            repository.updateJob(jobId, "QUEUED", 0, null);
+            var attempts = repository.findJob(tenantId, jobId).map(job -> job.attempts()).orElse(0);
+            repository.updateJob(jobId, "QUEUED", attempts, null);
             return new AsyncIngestResponse(jobId, "/api/ai/support/v1/jobs/" + jobId);
         } catch (RuntimeException exception) {
             repository.updateJob(jobId, "FAILED", 0, exception.getMessage());

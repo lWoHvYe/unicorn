@@ -93,6 +93,18 @@ class SupportApplicationTests {
     }
 
     @Test
+    void anotherTenantCannotApproveThroughHttp() {
+        var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
+                "session-cross", "cross-tenant-approval-1", "trace-cross");
+        var pending = toolInvocations.execute(context, "refund_order",
+                Map.of("tenantId", "demo", "orderId", "A1004", "amount", new BigDecimal("899.00")));
+        assertEquals(ToolStatus.PENDING_APPROVAL, pending.status());
+
+        var response = post("/api/ai/support/v1/approvals/" + pending.approvalId() + "/approve", "{}", "other-key");
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.statusCode());
+    }
+
+    @Test
     void writeToolRequiresApprovalAndIsIdempotent() {
         var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
                 "session-1", "idem-refund-1", "trace-1");
@@ -105,7 +117,7 @@ class SupportApplicationTests {
                 Map.of("tenantId", "demo", "orderId", "A1004", "amount", new BigDecimal("899.00")));
         assertEquals(ToolStatus.PENDING_APPROVAL, replay.status());
 
-        var approved = toolInvocations.approve(pending.approvalId(), "manager", Set.of("SUPPORT_MANAGER"));
+        var approved = toolInvocations.approve("demo", pending.approvalId(), "manager", Set.of("SUPPORT_MANAGER"));
         assertEquals(ToolStatus.COMPLETED, approved.status());
 
         var completed = toolInvocations.execute(context, "refund_order",

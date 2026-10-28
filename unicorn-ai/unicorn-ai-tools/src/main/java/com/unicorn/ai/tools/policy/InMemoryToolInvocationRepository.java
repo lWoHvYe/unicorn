@@ -43,6 +43,11 @@ public class InMemoryToolInvocationRepository implements ToolInvocationRepositor
     }
 
     @Override
+    public Optional<ToolInvocation> findById(String tenantId, String id) {
+        return findById(id).filter(invocation -> invocation.tenantId().equals(tenantId));
+    }
+
+    @Override
     public void save(ToolInvocation invocation) {
         invocations.put(invocation.id(), invocation);
     }

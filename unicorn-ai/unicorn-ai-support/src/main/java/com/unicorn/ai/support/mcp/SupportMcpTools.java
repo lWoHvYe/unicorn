@@ -18,6 +18,7 @@ package com.unicorn.ai.support.mcp;
 
 import com.unicorn.ai.support.security.AiPrincipal;
 import com.unicorn.ai.support.security.TenantContext;
+import com.unicorn.ai.support.observability.SupportMetrics;
 import com.unicorn.ai.tools.domain.SupportToolService;
 import com.unicorn.ai.tools.model.ToolExecutionContext;
 import com.unicorn.ai.tools.model.ToolResult;
@@ -39,24 +40,26 @@ public class SupportMcpTools {
 
     private final ToolInvocationService invocations;
     private final SupportToolService tools;
+    private final SupportMetrics metrics;
 
-    public SupportMcpTools(ToolInvocationService invocations, SupportToolService tools) {
+    public SupportMcpTools(ToolInvocationService invocations, SupportToolService tools, SupportMetrics metrics) {
         this.invocations = invocations;
         this.tools = tools;
+        this.metrics = metrics;
     }
 
     @McpTool(name = "get_order", description = "按订单号查询订单详情",
             annotations = @McpTool.McpAnnotations(readOnlyHint = true, destructiveHint = false, openWorldHint = false))
     public ToolResult getOrder(@McpToolParam(description = "订单号", required = true) String orderId) {
         var context = context("");
-        return invocations.execute(context, "get_order", Map.of("tenantId", context.tenantId(), "orderId", orderId));
+        return execute(context, "get_order", Map.of("tenantId", context.tenantId(), "orderId", orderId));
     }
 
     @McpTool(name = "refund_eligibility", description = "判断订单是否满足退款条件",
             annotations = @McpTool.McpAnnotations(readOnlyHint = true, destructiveHint = false, openWorldHint = false))
     public ToolResult refundEligibility(@McpToolParam(description = "订单号", required = true) String orderId) {
         var context = context("");
-        return invocations.execute(context, "refund_eligibility",
+        return execute(context, "refund_eligibility",
                 Map.of("tenantId", context.tenantId(), "orderId", orderId));
     }
 
@@ -66,7 +69,7 @@ public class SupportMcpTools {
         var context = context("");
         var amount = tools.getOrder(context.tenantId(), orderId)
                 .map(order -> order.amount()).orElse(BigDecimal.ZERO);
-        return invocations.execute(context, "refund_order",
+        return execute(context, "refund_order",
                 Map.of("tenantId", context.tenantId(), "orderId", orderId, "amount", amount));
     }
 
@@ -74,7 +77,7 @@ public class SupportMcpTools {
             annotations = @McpTool.McpAnnotations(readOnlyHint = true, destructiveHint = false))
     public ToolResult checkInventory(@McpToolParam(description = "SKU", required = true) String sku) {
         var context = context("");
-        return invocations.execute(context, "check_inventory",
+        return execute(context, "check_inventory",
                 Map.of("tenantId", context.tenantId(), "sku", sku));
     }
 
@@ -83,7 +86,7 @@ public class SupportMcpTools {
     public ToolResult reserveInventory(@McpToolParam(description = "SKU", required = true) String sku,
                                        @McpToolParam(description = "数量", required = true) int quantity) {
         var context = context("");
-        return invocations.execute(context, "reserve_inventory",
+        return execute(context, "reserve_inventory",
                 Map.of("tenantId", context.tenantId(), "sku", sku, "quantity", quantity));
     }
 
@@ -91,8 +94,14 @@ public class SupportMcpTools {
             annotations = @McpTool.McpAnnotations(destructiveHint = true))
     public ToolResult createHandoff(@McpToolParam(description = "原因", required = true) String reason) {
         var context = context("");
-        return invocations.execute(context, "create_handoff",
+        return execute(context, "create_handoff",
                 Map.of("tenantId", context.tenantId(), "reason", reason));
+    }
+
+    private ToolResult execute(ToolExecutionContext context, String tool, Map<String, Object> args) {
+        var result = invocations.execute(context, tool, args);
+        metrics.tool(context.tenantId(), tool, result.status().name());
+        return result;
     }
 
     private ToolExecutionContext context(String idempotencyKey) {

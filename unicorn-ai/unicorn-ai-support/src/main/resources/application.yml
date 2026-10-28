@@ -5,6 +5,8 @@ server:
 spring:
   application:
     name: unicorn-ai-support
+  profiles:
+    default: local
   threads:
     virtual:
       enabled: true

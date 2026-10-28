@@ -18,6 +18,7 @@ package com.unicorn.ai.support.knowledge;
 
 import com.unicorn.ai.support.async.AsyncIngestPublisher;
 import com.unicorn.ai.support.config.SupportProperties;
+import com.unicorn.ai.support.observability.SupportMetrics;
 import com.unicorn.ai.support.util.Hashing;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
@@ -52,14 +53,17 @@ public class DocumentIngestionService {
     private final VectorStore vectorStore;
     private final SupportProperties properties;
     private final ObjectProvider<AsyncIngestPublisher> asyncPublisher;
+    private final SupportMetrics metrics;
 
     public DocumentIngestionService(KnowledgeRepository repository, VectorStore vectorStore,
                                     SupportProperties properties,
-                                    ObjectProvider<AsyncIngestPublisher> asyncPublisher) {
+                                    ObjectProvider<AsyncIngestPublisher> asyncPublisher,
+                                    SupportMetrics metrics) {
         this.repository = repository;
         this.vectorStore = vectorStore;
         this.properties = properties;
         this.asyncPublisher = asyncPublisher;
+        this.metrics = metrics;
     }
 
     public IngestResult ingest(MultipartFile file, String tenantId, String kbId, String docType) {
@@ -90,6 +94,7 @@ public class DocumentIngestionService {
         var existing = repository.findActiveByHash(tenantId, kbId, hash);
         if (existing.isPresent()) {
             var document = existing.get();
+            metrics.ingest(tenantId, "DUPLICATE");
             return new IngestResult(document.id(), null, document.source(), 0, "DUPLICATE", vectorStore.getName());
         }
 
@@ -106,6 +111,7 @@ public class DocumentIngestionService {
         var publisher = asyncPublisher.getIfAvailable();
         if (properties.asyncIngest().enabled() && publisher != null) {
             publisher.publish(jobId, tenantId, documentId, versionId);
+            metrics.ingest(tenantId, "QUEUED");
             return new IngestResult(documentId, jobId, source, 0, "QUEUED", vectorStore.getName());
         }
         process(tenantId, documentId, versionId, jobId);
@@ -114,8 +120,9 @@ public class DocumentIngestionService {
     }
 
     public void process(String tenantId, String documentId, String versionId, String jobId) {
+        var attempts = repository.findJob(tenantId, jobId).map(KnowledgeRecords.IngestJob::attempts).orElse(0);
         try {
-            repository.updateJob(jobId, "RUNNING", 0, null);
+            repository.updateJob(jobId, "RUNNING", attempts, null);
             var document = repository.findDocument(tenantId, documentId)
                     .orElseThrow(() -> new IllegalArgumentException("文档不存在"));
             var version = repository.findVersion(versionId)
@@ -133,9 +140,11 @@ public class DocumentIngestionService {
                 repository.deleteChunksByDocument(tenantId, documentId, previousVersion);
             }
             repository.updateJob(jobId, "COMPLETED", 0, null);
+            metrics.ingest(tenantId, "COMPLETED");
         } catch (RuntimeException exception) {
             repository.updateVersion(versionId, "FAILED", 0, exception.getMessage());
-            repository.updateJob(jobId, "FAILED", 1, exception.getMessage());
+            repository.updateJob(jobId, "FAILED", attempts + 1, exception.getMessage());
+            metrics.ingest(tenantId, "FAILED");
             throw exception;
         }
     }

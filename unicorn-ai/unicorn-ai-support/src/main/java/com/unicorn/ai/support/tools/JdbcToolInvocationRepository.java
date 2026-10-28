@@ -55,6 +55,12 @@ public class JdbcToolInvocationRepository implements ToolInvocationRepository {
     }
 
     @Override
+    public Optional<ToolInvocation> findById(String tenantId, String id) {
+        return jdbc.query("SELECT * FROM ai_tool_invocation WHERE tenant_id = ? AND id = ?",
+                (rs, rowNum) -> map(rs), tenantId, id).stream().findFirst();
+    }
+
+    @Override
     public void save(ToolInvocation invocation) {
         var args = JSON.writeValueAsString(invocation.args());
         var result = invocation.result() == null ? null : JSON.writeValueAsString(invocation.result());
