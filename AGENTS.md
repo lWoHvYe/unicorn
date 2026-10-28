@@ -26,7 +26,7 @@
 ./gradlew :unicorn-ai-chat:bootRun            # AI Chat demo，8092
 ./gradlew :unicorn-ai-rag:bootRun             # AI RAG demo，8093
 ./gradlew :unicorn-ai-mcp-server:bootRun      # MCP Server，8094
-MCP_CLIENT_ENABLED=true MCP_API_KEY=demo-key ./gradlew :unicorn-ai-mcp-client:bootRun  # MCP Client，8095
+MCP_CLIENT_ENABLED=true MCP_API_KEY=demo-key ./gradlew :unicorn-ai-mcp-client:bootRun  # MCP Client，8095（server 需同时设置 MCP_API_KEY）
 ./gradlew :unicorn-ai-support:bootRun         # 生产参考，8096（默认 local/H2）
 ./gradlew publishToMavenLocal
 ./gradlew :unicorn-security:outgoingVariants  # 查看 business-log capability
@@ -210,7 +210,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
   - `--spring.profiles.active=infra` 连接现有 dev 基础设施：Chat 用 Redis（10.211.55.29:6379 / redis-psd，db 6）持久化对话记忆；RAG 用 Redis Stack 向量库（索引 `unicorn-ai-rag`，维度 1536）、MySQL（10.211.55.29:3306/unicorn，root/root）做异步入库任务审计、RabbitMQ（10.211.55.29:5672，admin/admin，vhost /unicorn）做异步入库。
   - RAG 向量库可选 `simple` / `redis` / `pgvector`；infra 默认 `redis`，备选 pgvector 用 `--demo.ai.rag.vector-store=pgvector`。RedisVectorStore 启动时通过固定维度包装避免调用 embedding API。
   - 当前 Redis Stack 已加载 search/ReJSON；若换成普通 Redis，需改用 pgvector 或 simple，否则会报 `FT._LIST` 不存在。
-  - MCP 场景先启动 server，再以 `MCP_CLIENT_ENABLED=true` 启动 client。旧 `unicorn-ai-mcp-server` 现在也要求 `X-API-Key`（默认 `demo-key`），但仍是单租户 demo；生产 MCP 以 `unicorn-ai-support` 的 `/mcp` 为准（API Key/JWT + 租户隔离）。`unicorn-ai-mcp-client` 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。完整 curl 示例见 `unicorn-ai/README.md` 和 `unicorn-ai/unicorn-ai-support/README.md`。
+  - MCP 场景先启动 server，再以 `MCP_CLIENT_ENABLED=true` 启动 client。旧 `unicorn-ai-mcp-server` 现在也要求 `X-API-Key`（需显式设置 `MCP_API_KEY`），但仍是单租户 demo；生产 MCP 以 `unicorn-ai-support` 的 `/mcp` 为准（API Key/JWT + 租户隔离）。`unicorn-ai-mcp-client` 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。完整 curl 示例见 `unicorn-ai/README.md` 和 `unicorn-ai/unicorn-ai-support/README.md`。
 - **密钥**：RSA、JWT、Redis、RabbitMQ 口令目前明文写在 `application*.yml` 中；不要新增明文密钥，优先用环境变量，也不要把这些值复制到文档/日志。
 - **脚本**：`script/*.sh` 仍使用 `valentine-starter.jar` 和 `JAVA_HOME=jdk-21`，与当前产物 `valentine-starter-kotlin-4.8.4-chi.jar` 和 JDK 25 不一致；只能当模板改后使用。`docker-compose.yml` 的 `valentine-starter:3.0.0` 同样过时。
 
@@ -240,7 +240,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 
 因此：**把 `./gradlew assemble` 作为构建门槛**，不要为了让 `test` 变绿去改业务代码；只有在任务明确要求补测试时，再给 Java 模块加 `useJUnitPlatform()`、JUnit 依赖，并移除环境相关断言。
 
-例外：`unicorn-ai-tools:test`（5 个）、`unicorn-ai-support:test`（10 个通过；Testcontainers 集成测试无 Docker 时 skip；`AI_INFRA_TEST=true` 时外部 PG/Redis/RabbitMQ 测试通过）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
+例外：`unicorn-ai-tools:test`（6 个）、`unicorn-ai-support:test`（11 个通过；Testcontainers 集成测试无 Docker 时 skip；`AI_INFRA_TEST=true` 时外部 PG/Redis/RabbitMQ 测试通过）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（8 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
 `./gradlew :unicorn-core:test :unicorn-beans:test`；`valentine-starter` 的 `KotlinQueryHelpTest`（5 个）可通过 `./gradlew :valentine-starter-kotlin:test --tests com.unicorn.utils.KotlinQueryHelpTest`。AI demo 的独立测试同样可通过；这不改变全量 `test` 仍失败的事实。
 
 ### 8.2 文档与脚本漂移

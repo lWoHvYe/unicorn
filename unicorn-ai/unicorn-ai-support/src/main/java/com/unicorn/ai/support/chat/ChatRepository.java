@@ -16,6 +16,7 @@
 
 package com.unicorn.ai.support.chat;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -107,6 +108,49 @@ public class ChatRepository {
                         rs.getString("trace_id"), rs.getString("status"),
                         toInstant(rs.getTimestamp("created_at"))),
                 tenantId, sessionId);
+    }
+
+    public boolean tryStartRequest(String tenantId, String sessionId, String requestId, String messageId) {
+        try {
+            jdbc.update("""
+                    INSERT INTO ai_chat_request (tenant_id, session_id, request_id, message_id, status)
+                    VALUES (?, ?, ?, ?, 'PROCESSING')
+                    """, tenantId, sessionId, requestId, messageId);
+            return true;
+        } catch (DuplicateKeyException exception) {
+            return false;
+        }
+    }
+
+    public Optional<ChatRecords.Request> findRequest(String tenantId, String sessionId, String requestId) {
+        return jdbc.query("""
+                        SELECT tenant_id, session_id, request_id, message_id, status
+                        FROM ai_chat_request WHERE tenant_id = ? AND session_id = ? AND request_id = ?
+                        """,
+                (rs, rowNum) -> new ChatRecords.Request(rs.getString("tenant_id"), rs.getString("session_id"),
+                        rs.getString("request_id"), rs.getString("message_id"), rs.getString("status")),
+                tenantId, sessionId, requestId).stream().findFirst();
+    }
+
+    public void finishRequest(String tenantId, String sessionId, String requestId, String status) {
+        jdbc.update("""
+                UPDATE ai_chat_request SET status = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND session_id = ? AND request_id = ?
+                """, status, tenantId, sessionId, requestId);
+    }
+
+    public Optional<ChatRecords.Message> findMessage(String tenantId, String id) {
+        return jdbc.query("""
+                        SELECT id, session_id, tenant_id, role, content, citations_json, tool_calls_json,
+                               usage_json, trace_id, status, created_at
+                        FROM ai_chat_message WHERE tenant_id = ? AND id = ?
+                        """,
+                (rs, rowNum) -> new ChatRecords.Message(
+                        rs.getString("id"), rs.getString("session_id"), rs.getString("tenant_id"),
+                        rs.getString("role"), rs.getString("content"), rs.getString("citations_json"),
+                        rs.getString("tool_calls_json"), rs.getString("usage_json"), rs.getString("trace_id"),
+                        rs.getString("status"), toInstant(rs.getTimestamp("created_at"))),
+                tenantId, id).stream().findFirst();
     }
 
     public void saveFeedback(ChatRecords.Feedback feedback) {

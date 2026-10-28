@@ -32,6 +32,7 @@ public record SupportProperties(
         @DefaultValue("200") int minChunkSizeChars,
         @DefaultValue("8000") int maxInputChars,
         @DefaultValue("20") int memoryWindow,
+        @DefaultValue("120000") long streamTimeoutMs,
         @DefaultValue("classpath:prompts/support-system.st") String systemPrompt,
         Storage storage,
         Pgvector pgvector,
@@ -68,7 +69,7 @@ public record SupportProperties(
                         @DefaultValue("2") int multiQueryCount) {
     }
 
-    public record Mmr(@DefaultValue("true") boolean enabled,
+    public record Mmr(@DefaultValue("false") boolean enabled,
                       @DefaultValue("0.7") double lambda) {
     }
 
@@ -86,6 +87,7 @@ public record SupportProperties(
 
     public record RateLimit(@DefaultValue("60") int chatPerMinute,
                             @DefaultValue("100") int ingestPerHour,
+                            @DefaultValue("60") int mcpPerMinute,
                             @DefaultValue("local") String store) {
     }
 

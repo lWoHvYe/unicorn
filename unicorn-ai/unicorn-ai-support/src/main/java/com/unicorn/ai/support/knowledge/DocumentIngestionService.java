@@ -28,7 +28,9 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.json.JsonMapper;
@@ -66,6 +68,7 @@ public class DocumentIngestionService {
         this.metrics = metrics;
     }
 
+    @Transactional
     public IngestResult ingest(MultipartFile file, String tenantId, String kbId, String docType) {
         return ingest(file, tenantId, kbId, docType, null);
     }
@@ -79,6 +82,7 @@ public class DocumentIngestionService {
         return create(tenantId, kbId, source, source, docType, text, aclRoles);
     }
 
+    @Transactional
     public IngestResult ingestText(String tenantId, String kbId, TextIngestRequest request) {
         if (request == null || !StringUtils.hasText(request.text())) {
             throw new IllegalArgumentException("text 不能为空");
@@ -94,6 +98,7 @@ public class DocumentIngestionService {
         return create(tenantId, kbId, source, title, docType, text, null);
     }
 
+    @Transactional
     public IngestResult create(String tenantId, String kbId, String source, String title,
                                String docType, String text, String aclRoles) {
         if (!StringUtils.hasText(text)) {
@@ -111,8 +116,18 @@ public class DocumentIngestionService {
         var documentId = UUID.randomUUID().toString();
         var versionId = UUID.randomUUID().toString();
         var jobId = UUID.randomUUID().toString();
-        repository.createDocument(new KnowledgeRecords.Document(documentId, tenantId, kbId, source, title,
-                docType, normalizedAcl, hash, "PROCESSING", null, Instant.now()));
+        try {
+            repository.createDocument(new KnowledgeRecords.Document(documentId, tenantId, kbId, source, title,
+                    docType, normalizedAcl, hash, "PROCESSING", null, Instant.now()));
+        } catch (DuplicateKeyException race) {
+            var winner = repository.findActiveByHash(tenantId, kbId, hash);
+            if (winner.isPresent()) {
+                var document = winner.get();
+                metrics.ingest(tenantId, "DUPLICATE");
+                return new IngestResult(document.id(), null, document.source(), 0, "DUPLICATE", vectorStore.getName());
+            }
+            throw race;
+        }
         repository.createVersion(new KnowledgeRecords.DocumentVersion(versionId, documentId, 1, hash,
                 text, "PENDING", 0, null, Instant.now()));
         repository.createJob(new KnowledgeRecords.IngestJob(jobId, tenantId, documentId, versionId,
@@ -138,19 +153,24 @@ public class DocumentIngestionService {
             var version = repository.findVersion(versionId)
                     .orElseThrow(() -> new IllegalArgumentException("文档版本不存在"));
             var chunks = split(enrich(version.contentText(), tenantId, document.kbId(), documentId, versionId,
-                    document.source(), document.aclRoles()));
-            vectorStore.add(chunks);
-            repository.saveChunks(toRows(tenantId, documentId, versionId, chunks));
-            var previousVersion = document.currentVersionId();
-            repository.updateVersion(versionId, "ACTIVE", chunks.size(), null);
-            repository.updateDocumentVersion(documentId, versionId, "ACTIVE");
-            if (previousVersion != null && !previousVersion.equals(versionId)) {
-                var oldChunks = repository.findChunksByDocument(tenantId, documentId, previousVersion);
-                vectorStore.delete(oldChunks.stream().map(KnowledgeRecords.Chunk::id).toList());
-                repository.deleteChunksByDocument(tenantId, documentId, previousVersion);
+                    document.source(), document.title(), document.aclRoles()));
+            try {
+                vectorStore.add(chunks);
+                repository.saveChunks(toRows(tenantId, documentId, versionId, chunks));
+                var previousVersion = document.currentVersionId();
+                repository.updateVersion(versionId, "ACTIVE", chunks.size(), null);
+                repository.updateDocumentVersion(documentId, versionId, "ACTIVE");
+                if (previousVersion != null && !previousVersion.equals(versionId)) {
+                    var oldChunks = repository.findChunksByDocument(tenantId, documentId, previousVersion);
+                    vectorStore.delete(oldChunks.stream().map(KnowledgeRecords.Chunk::id).toList());
+                    repository.deleteChunksByDocument(tenantId, documentId, previousVersion);
+                }
+                repository.updateJob(jobId, "COMPLETED", 0, null);
+                metrics.ingest(tenantId, "COMPLETED");
+            } catch (RuntimeException exception) {
+                cleanupVersion(tenantId, documentId, versionId, chunks);
+                throw exception;
             }
-            repository.updateJob(jobId, "COMPLETED", 0, null);
-            metrics.ingest(tenantId, "COMPLETED");
         } catch (RuntimeException exception) {
             repository.updateVersion(versionId, "FAILED", 0, exception.getMessage());
             repository.updateJob(jobId, "FAILED", attempts + 1, exception.getMessage());
@@ -159,14 +179,13 @@ public class DocumentIngestionService {
         }
     }
 
+    @Transactional
     public void delete(String tenantId, String documentId) {
         var document = repository.findDocument(tenantId, documentId)
                 .orElseThrow(() -> new IllegalArgumentException("文档不存在"));
-        if (document.currentVersionId() != null) {
-            var chunks = repository.findChunksByDocument(tenantId, documentId, document.currentVersionId());
-            vectorStore.delete(chunks.stream().map(KnowledgeRecords.Chunk::id).toList());
-            repository.deleteChunksByDocument(tenantId, documentId, document.currentVersionId());
-        }
+        var chunks = repository.findChunksByDocument(tenantId, documentId);
+        vectorStore.delete(chunks.stream().map(KnowledgeRecords.Chunk::id).toList());
+        repository.deleteChunksByDocument(tenantId, documentId);
         repository.markDocumentDeleted(tenantId, documentId);
     }
 
@@ -203,14 +222,14 @@ public class DocumentIngestionService {
     }
 
     private List<Document> enrich(String text, String tenantId, String kbId, String documentId, String versionId,
-                                  String source, String aclRoles) {
+                                  String source, String title, String aclRoles) {
         var metadata = new HashMap<String, Object>();
         metadata.put("tenant", tenantId);
         metadata.put("kbId", kbId);
         metadata.put("documentId", documentId);
         metadata.put("versionId", versionId);
         metadata.put("source", source);
-        metadata.put("title", source);
+        metadata.put("title", title);
         if (StringUtils.hasText(aclRoles)) {
             metadata.put("aclRoles", aclRoles);
         }
@@ -233,11 +252,26 @@ public class DocumentIngestionService {
                 var chunk = chunks.get(i);
                 var metadata = new HashMap<>(chunk.getMetadata());
                 metadata.put("chunkIndex", i);
-                metadata.put("chunkId", UUID.randomUUID().toString());
-                result.add(new Document((String) metadata.get("chunkId"), chunk.getText(), metadata));
+                var chunkId = UUID.nameUUIDFromBytes((metadata.get("documentId") + "|"
+                        + metadata.get("versionId") + "|" + i).getBytes(java.nio.charset.StandardCharsets.UTF_8)).toString();
+                metadata.put("chunkId", chunkId);
+                result.add(new Document(chunkId, chunk.getText(), metadata));
             }
         }
         return result;
+    }
+
+    private void cleanupVersion(String tenantId, String documentId, String versionId, List<Document> chunks) {
+        try {
+            vectorStore.delete(chunks.stream().map(Document::getId).toList());
+        } catch (RuntimeException ignored) {
+            // The retry path also uses deterministic IDs; a stale vector is reported via the job.
+        }
+        try {
+            repository.deleteChunksByDocument(tenantId, documentId, versionId);
+        } catch (RuntimeException ignored) {
+            // The version is still marked FAILED below.
+        }
     }
 
     private List<KnowledgeRecords.Chunk> toRows(String tenantId, String documentId, String versionId,

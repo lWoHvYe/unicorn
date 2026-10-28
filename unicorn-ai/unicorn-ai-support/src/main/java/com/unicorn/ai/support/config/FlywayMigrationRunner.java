@@ -19,6 +19,7 @@ package com.unicorn.ai.support.config;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -30,6 +31,7 @@ import java.util.Arrays;
  * pgvector extension); an ApplicationRunner would run too late.
  */
 @Component
+@ConditionalOnProperty(name = "spring.flyway.enabled", havingValue = "true", matchIfMissing = true)
 public class FlywayMigrationRunner implements InitializingBean {
 
     private final DataSource dataSource;

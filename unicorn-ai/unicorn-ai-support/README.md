@@ -173,13 +173,15 @@ Prompts：`order-support`（按租户订单生成客服回复草稿）。
 - 默认使用 H2 + 进程内向量库，重启丢数据；生产用 `infra`。
 - 中文词法检索用 `LIKE`/`pg_trgm` 近似；接口保留 `LexicalRetriever`，可换 OpenSearch/专用分词。
 - 本地演示模型只用于跑通链路，不用于质量评估。
-- 检索默认启用 MMR；`query.rewrite-enabled` 和 `rerank.enabled` 为可选开关，默认关闭以控制成本。
+- 检索默认关闭 MMR；`query.rewrite-enabled`、`mmr.enabled` 和 `rerank.enabled` 都是可选开关，默认关闭以控制成本。
 - `infra` 限流/API Key 缓存使用 Redis；Redis 故障时限流 fail-closed，缓存需要 Redis 可用（生产应配置高可用）。
 - JWT 需显式设置 `ai.security.mode=jwt` 并提供 `JWT_ISSUER_URI` / `JWT_JWK_SET_URI` / `JWT_HMAC_SECRET` 之一。
 - MCP 旧模块 `unicorn-ai-mcp-server` 已加 API Key（默认 `demo-key`），但不具备租户隔离；生产 MCP 以本模块 `/mcp` 为准。
 - MCP client 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。
 - 领域数据使用 `ai_order`/`ai_inventory`/`ai_product` JDBC 表；本地 demo 由 `DemoDataInitializer` 写入，生产可替换为外部订单/库存服务适配器。
 - `SupportInfraIntegrationTest` 使用 Testcontainers 启动 PostgreSQL/pgvector + RabbitMQ，验证异步入库、job 状态和 citation；无 Docker 时自动 skip。
+- 入库使用确定性 chunkId、version 级唯一索引和失败清理；文档/版本/审批均有并发约束。
+- 聊天请求支持 `Idempotency-Key`（`ai_chat_request` 表），重复请求返回同一 assistant message；工具幂等键按 toolName 隔离。
 - `SupportExternalInfraTest` 可直接连接现有 PostgreSQL/pgvector、Redis、RabbitMQ；显式启用：
   `AI_INFRA_TEST=true ./gradlew :unicorn-ai-support:test --tests com.unicorn.ai.support.SupportExternalInfraTest`
   默认使用 `ai_support_p2_test` schema，不影响已有 schema。

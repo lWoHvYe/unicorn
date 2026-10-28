@@ -61,6 +61,25 @@ public class JdbcToolInvocationRepository implements ToolInvocationRepository {
     }
 
     @Override
+    public boolean claimApproval(String tenantId, String id, String approverId) {
+        var updated = jdbc.update("""
+                UPDATE ai_tool_invocation
+                SET status = 'APPROVING', approval_status = 'APPROVING', updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND id = ?
+                  AND status = 'PENDING_APPROVAL' AND approval_status = 'PENDING'
+                """, tenantId, id);
+        if (updated == 0) {
+            return false;
+        }
+        jdbc.update("""
+                UPDATE ai_approval
+                SET status = 'APPROVING', decided_by = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND tenant_id = ? AND status = 'PENDING'
+                """, approverId, id, tenantId);
+        return true;
+    }
+
+    @Override
     public void save(ToolInvocation invocation) {
         var args = JSON.writeValueAsString(invocation.args());
         var result = invocation.result() == null ? null : JSON.writeValueAsString(invocation.result());

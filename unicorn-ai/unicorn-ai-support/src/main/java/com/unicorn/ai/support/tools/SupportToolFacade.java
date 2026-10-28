@@ -125,11 +125,9 @@ public class SupportToolFacade {
     }
 
     private AiPrincipal principal() {
-        try {
-            return TenantContext.current();
-        } catch (RuntimeException exception) {
-            return new AiPrincipal("demo", "demo-user", Set.of("SUPPORT_AGENT"));
-        }
+        // Fail closed: a tool must never fall back to the demo tenant if the
+        // security context is missing (for example a misconfigured async callback).
+        return TenantContext.current();
     }
 
     private String text(Map<String, Object> values, String key, String fallback) {

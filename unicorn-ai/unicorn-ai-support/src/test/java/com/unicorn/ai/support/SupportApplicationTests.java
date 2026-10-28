@@ -125,6 +125,24 @@ class SupportApplicationTests {
     }
 
     @Test
+    void chatRequestIdempotencyReturnsSameAssistantMessage() {
+        var session = post("/api/ai/support/v1/sessions", "{\"channel\":\"web\"}", "demo-key");
+        var sessionId = JSON.readValue(session.body(), Map.class).get("id");
+        var first = post("/api/ai/support/v1/sessions/" + sessionId + "/messages",
+                "{\"message\":\"Spring Boot 4.1\"}", "demo-key", "chat-idem-1");
+        var second = post("/api/ai/support/v1/sessions/" + sessionId + "/messages",
+                "{\"message\":\"Spring Boot 4.1\"}", "demo-key", "chat-idem-1");
+        assertEquals(HttpStatus.OK.value(), first.statusCode());
+        assertEquals(HttpStatus.OK.value(), second.statusCode());
+        var firstBody = JSON.readValue(first.body(), Map.class);
+        var secondBody = JSON.readValue(second.body(), Map.class);
+        assertEquals(firstBody.get("messageId"), secondBody.get("messageId"));
+        assertEquals(1, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM ai_chat_message WHERE session_id = ? AND role = 'USER'",
+                Integer.class, sessionId));
+    }
+
+    @Test
     void anotherTenantCannotApproveThroughHttp() {
         var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
                 "session-cross", "cross-tenant-approval-1", "trace-cross");
@@ -161,12 +179,17 @@ class SupportApplicationTests {
     }
 
     private HttpResponse<String> post(String path, String body, String apiKey) {
-        var request = HttpRequest.newBuilder(uri(path))
+        return post(path, body, apiKey, null);
+    }
+
+    private HttpResponse<String> post(String path, String body, String apiKey, String idempotencyKey) {
+        var builder = HttpRequest.newBuilder(uri(path))
                 .header("Content-Type", "application/json")
-                .header("X-API-Key", apiKey)
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-        return send(request);
+                .header("X-API-Key", apiKey);
+        if (idempotencyKey != null) {
+            builder.header("Idempotency-Key", idempotencyKey);
+        }
+        return send(builder.POST(HttpRequest.BodyPublishers.ofString(body)).build());
     }
 
     private HttpResponse<String> get(String path, String apiKey) {

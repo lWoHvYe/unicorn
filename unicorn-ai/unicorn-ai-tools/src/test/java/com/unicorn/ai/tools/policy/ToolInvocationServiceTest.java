@@ -89,6 +89,18 @@ class ToolInvocationServiceTest {
     }
 
     @Test
+    void idempotencyKeyIsScopedToTool() {
+        var context = context(Set.of("SUPPORT_MANAGER"), "shared-key");
+        var order = service.execute(context, "get_order",
+                Map.of("tenantId", "demo", "orderId", "A1004"));
+        assertEquals(ToolStatus.COMPLETED, order.status());
+
+        var refund = service.execute(context, "refund_order",
+                Map.of("tenantId", "demo", "orderId", "A1004", "amount", new BigDecimal("899.00")));
+        assertEquals(ToolStatus.PENDING_APPROVAL, refund.status());
+    }
+
+    @Test
     void anotherTenantCannotApprove() {
         var context = context(Set.of("SUPPORT_MANAGER"), "write-3");
         var pending = service.execute(context, "refund_order",

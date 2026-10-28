@@ -55,6 +55,16 @@ public class InMemoryOrderRepository implements OrderRepository {
     }
 
     @Override
+    public synchronized boolean refund(String tenantId, String orderId) {
+        var current = orders.get(key(tenantId, orderId));
+        if (current == null || !"DELIVERED".equals(current.status())) {
+            return false;
+        }
+        orders.put(key(tenantId, orderId), current.refunded());
+        return true;
+    }
+
+    @Override
     public List<Order> findByTenant(String tenantId) {
         return orders.entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(tenantId + ":"))

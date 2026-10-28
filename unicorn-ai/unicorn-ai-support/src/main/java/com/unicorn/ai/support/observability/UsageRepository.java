@@ -16,6 +16,7 @@
 
 package com.unicorn.ai.support.observability;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -37,11 +38,20 @@ public class UsageRepository {
                 WHERE tenant_id = ? AND usage_date = CURRENT_DATE
                 """, promptTokens, completionTokens, total, cost, tenantId);
         if (updated == 0) {
-            jdbc.update("""
-                    INSERT INTO ai_usage_daily
-                        (tenant_id, usage_date, prompt_tokens, completion_tokens, total_tokens, cost, requests)
-                    VALUES (?, CURRENT_DATE, ?, ?, ?, ?, 1)
-                    """, tenantId, promptTokens, completionTokens, total, cost);
+            try {
+                jdbc.update("""
+                        INSERT INTO ai_usage_daily
+                            (tenant_id, usage_date, prompt_tokens, completion_tokens, total_tokens, cost, requests)
+                        VALUES (?, CURRENT_DATE, ?, ?, ?, ?, 1)
+                        """, tenantId, promptTokens, completionTokens, total, cost);
+            } catch (DuplicateKeyException race) {
+                jdbc.update("""
+                        UPDATE ai_usage_daily
+                        SET prompt_tokens = prompt_tokens + ?, completion_tokens = completion_tokens + ?,
+                            total_tokens = total_tokens + ?, cost = cost + ?, requests = requests + 1
+                        WHERE tenant_id = ? AND usage_date = CURRENT_DATE
+                        """, promptTokens, completionTokens, total, cost, tenantId);
+            }
         }
     }
 }

@@ -66,8 +66,9 @@ public class SupportToolService {
         if (!decision.eligible()) {
             return decision;
         }
-        var order = orders.find(tenantId, orderId).orElseThrow();
-        orders.save(order.refunded());
+        if (!orders.refund(tenantId, orderId)) {
+            return new RefundDecision(orderId, false, "订单状态已变化，退款未执行");
+        }
         return new RefundDecision(orderId, true, "退款已受理，订单状态更新为 REFUNDED");
     }
 
@@ -79,19 +80,13 @@ public class SupportToolService {
         return inventory.find(tenantId, sku);
     }
 
-    public synchronized Reservation reserveInventory(String tenantId, String sku, int quantity) {
+    public Reservation reserveInventory(String tenantId, String sku, int quantity) {
         if (quantity <= 0) {
             return new Reservation(tenantId, sku, quantity, null, false, "quantity 必须大于 0");
         }
-        var item = inventory.find(tenantId, sku);
-        if (item.isEmpty()) {
-            return new Reservation(tenantId, sku, quantity, null, false, "SKU 不存在");
+        if (!inventory.reserve(tenantId, sku, quantity)) {
+            return new Reservation(tenantId, sku, quantity, null, false, "库存不足或 SKU 不存在");
         }
-        if (!item.get().canReserve(quantity)) {
-            return new Reservation(tenantId, sku, quantity, null, false, "库存不足");
-        }
-        var updated = item.get().reserved(quantity);
-        inventory.save(updated);
         return new Reservation(tenantId, sku, quantity, UUID.randomUUID().toString(), true, "预留成功");
     }
 

@@ -19,6 +19,7 @@ package com.unicorn.ai.support.mcp;
 import com.unicorn.ai.support.security.AiPrincipal;
 import com.unicorn.ai.support.security.TenantContext;
 import com.unicorn.ai.support.observability.SupportMetrics;
+import com.unicorn.ai.support.ratelimit.RateLimiterService;
 import com.unicorn.ai.tools.domain.SupportToolService;
 import com.unicorn.ai.tools.model.ToolExecutionContext;
 import com.unicorn.ai.tools.model.ToolResult;
@@ -41,11 +42,14 @@ public class SupportMcpTools {
     private final ToolInvocationService invocations;
     private final SupportToolService tools;
     private final SupportMetrics metrics;
+    private final RateLimiterService rateLimiter;
 
-    public SupportMcpTools(ToolInvocationService invocations, SupportToolService tools, SupportMetrics metrics) {
+    public SupportMcpTools(ToolInvocationService invocations, SupportToolService tools, SupportMetrics metrics,
+                           RateLimiterService rateLimiter) {
         this.invocations = invocations;
         this.tools = tools;
         this.metrics = metrics;
+        this.rateLimiter = rateLimiter;
     }
 
     @McpTool(name = "get_order", description = "按订单号查询订单详情",
@@ -99,6 +103,7 @@ public class SupportMcpTools {
     }
 
     private ToolResult execute(ToolExecutionContext context, String tool, Map<String, Object> args) {
+        rateLimiter.checkMcp(context.tenantId());
         var result = invocations.execute(context, tool, args);
         metrics.tool(context.tenantId(), tool, result.status().name());
         return result;

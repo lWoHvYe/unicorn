@@ -27,5 +27,7 @@ public interface InventoryRepository {
 
     InventoryItem save(InventoryItem item);
 
+    boolean reserve(String tenantId, String sku, int quantity);
+
     List<InventoryItem> findByTenant(String tenantId);
 }

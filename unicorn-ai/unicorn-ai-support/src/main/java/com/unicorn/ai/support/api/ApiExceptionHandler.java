@@ -23,6 +23,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.unicorn.ai.support.ratelimit.RateLimitException;
+import com.unicorn.ai.support.chat.ChatRequestConflictException;
+import com.unicorn.ai.tools.policy.ToolConflictException;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -43,6 +45,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> forbidden(AccessDeniedException exception) {
         return error(HttpStatus.FORBIDDEN, "FORBIDDEN", "没有权限访问该资源");
+    }
+
+    @ExceptionHandler(ChatRequestConflictException.class)
+    public ResponseEntity<ApiError> chatConflict(ChatRequestConflictException exception) {
+        return error(HttpStatus.CONFLICT, "CHAT_REQUEST_CONFLICT", exception.getMessage());
+    }
+
+    @ExceptionHandler(ToolConflictException.class)
+    public ResponseEntity<ApiError> conflict(ToolConflictException exception) {
+        return error(HttpStatus.CONFLICT, "TOOL_CONFLICT", exception.getMessage());
     }
 
     @ExceptionHandler(RateLimitException.class)

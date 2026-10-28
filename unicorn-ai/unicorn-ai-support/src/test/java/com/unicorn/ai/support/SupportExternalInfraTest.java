@@ -88,12 +88,14 @@ class SupportExternalInfraTest {
 
     @Test
     void externalInfraProcessesIngestionAndCitation() throws Exception {
+        var marker = java.util.UUID.randomUUID().toString();
         var ingest = post("/api/ai/support/v1/knowledge-bases/demo-kb/documents/text", """
-                {"text":"External PG pgvector RabbitMQ 集成测试文档，端口 8081。",
-                 "source":"integration/external.md","title":"External","docType":"faq"}
-                """, "demo-key");
+                {"text":"External PG pgvector RabbitMQ 集成测试文档 %s，端口 8081。",
+                 "source":"integration/external-%s.md","title":"External","docType":"faq"}
+                """.formatted(marker, marker), "demo-key");
         assertEquals(200, ingest.statusCode());
         var body = JSON.readValue(ingest.body(), Map.class);
+        assertTrue(body.get("jobId") != null, "ingest response: " + ingest.body());
         var jobId = body.get("jobId").toString();
         assertFalse(jobId.isBlank());
 
@@ -112,7 +114,7 @@ class SupportExternalInfraTest {
         var session = post("/api/ai/support/v1/sessions", "{\"channel\":\"web\"}", "demo-key");
         var sessionId = JSON.readValue(session.body(), Map.class).get("id");
         var chat = post("/api/ai/support/v1/sessions/" + sessionId + "/messages",
-                "{\"message\":\"External PG pgvector\"}", "demo-key");
+                "{\"message\":\"External PG pgvector " + marker + "\"}", "demo-key");
         assertEquals(200, chat.statusCode());
         var answer = JSON.readValue(chat.body(), Map.class);
         assertTrue(((java.util.List<?>) answer.get("citations")).size() > 0);

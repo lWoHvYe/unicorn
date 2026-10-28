@@ -60,6 +60,15 @@ public class JdbcInventoryRepository implements InventoryRepository {
     }
 
     @Override
+    public boolean reserve(String tenantId, String sku, int quantity) {
+        return jdbc.update("""
+                UPDATE ai_inventory
+                SET available = available - ?, reserved = reserved + ?, updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND sku = ? AND available >= ?
+                """, quantity, quantity, tenantId, sku, quantity) == 1;
+    }
+
+    @Override
     public List<InventoryItem> findByTenant(String tenantId) {
         return jdbc.query("""
                         SELECT tenant_id, sku, name, available, reserved

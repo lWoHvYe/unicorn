@@ -49,6 +49,16 @@ public class InMemoryInventoryRepository implements InventoryRepository {
     }
 
     @Override
+    public synchronized boolean reserve(String tenantId, String sku, int quantity) {
+        var current = inventory.get(key(tenantId, sku));
+        if (current == null || !current.canReserve(quantity)) {
+            return false;
+        }
+        inventory.put(key(tenantId, sku), current.reserved(quantity));
+        return true;
+    }
+
+    @Override
     public List<InventoryItem> findByTenant(String tenantId) {
         return inventory.entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith(tenantId + ":"))

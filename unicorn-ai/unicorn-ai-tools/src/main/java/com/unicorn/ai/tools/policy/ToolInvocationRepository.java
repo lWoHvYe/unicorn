@@ -29,6 +29,12 @@ public interface ToolInvocationRepository {
 
     Optional<ToolInvocation> findById(String tenantId, String id);
 
+    /**
+     * Atomically moves one PENDING approval to APPROVING. Returns false when another
+     * approver already claimed or completed it.
+     */
+    boolean claimApproval(String tenantId, String id, String approverId);
+
     void save(ToolInvocation invocation);
 
     List<ToolInvocation> findPending(String tenantId);

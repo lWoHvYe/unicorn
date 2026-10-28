@@ -43,7 +43,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedEntryPoint()))
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))

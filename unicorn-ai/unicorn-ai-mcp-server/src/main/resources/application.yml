@@ -37,4 +37,4 @@ demo:
   ai:
     mcp:
       server:
-        api-key: ${MCP_API_KEY:demo-key}
+        api-key: ${MCP_API_KEY:}

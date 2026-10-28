@@ -71,7 +71,9 @@ public class RetrievalService {
 
     public RetrievalResult retrieve(String tenantId, String kbId, String query, Integer topK, Set<String> roles) {
         var limit = topK == null || topK <= 0 ? properties.topK() : Math.min(topK, 20);
-        var candidateK = Math.max(properties.candidateK(), limit);
+        // ACL is applied after vector/lexical retrieval; fetch extra candidates so private
+        // documents cannot crowd every public result out of the topK.
+        var candidateK = Math.max(properties.candidateK(), limit * 5);
 
         var rankedLists = new ArrayList<List<Document>>();
         for (var plannedQuery : queryPlanService.plan(query)) {
@@ -147,10 +149,14 @@ public class RetrievalService {
             return candidates;
         }
         try {
-            var queryVector = embeddingModel.embed(query);
+            var texts = new ArrayList<String>(candidates.size() + 1);
+            texts.add(query);
+            candidates.forEach(candidate -> texts.add(candidate.getText()));
+            var embeddings = embeddingModel.embed(texts);
+            var queryVector = embeddings.getFirst();
             var vectors = new HashMap<String, float[]>();
-            for (var candidate : candidates) {
-                vectors.put(candidate.getId(), embeddingModel.embed(candidate.getText()));
+            for (int i = 0; i < candidates.size(); i++) {
+                vectors.put(candidates.get(i).getId(), embeddings.get(i + 1));
             }
             var remaining = new ArrayList<>(candidates);
             var selected = new ArrayList<Document>();
@@ -208,9 +214,16 @@ public class RetrievalService {
         if (roles == null || roles.isEmpty()) {
             return false;
         }
+        if (roles.contains("TENANT_ADMIN")) {
+            return true;
+        }
+        var effective = new java.util.HashSet<>(roles);
+        if (effective.contains("SUPPORT_MANAGER")) {
+            effective.add("SUPPORT_AGENT");
+        }
         return java.util.Arrays.stream(acl.split(","))
                 .map(String::trim)
-                .anyMatch(roles::contains);
+                .anyMatch(effective::contains);
     }
 
     @SuppressWarnings("unchecked")

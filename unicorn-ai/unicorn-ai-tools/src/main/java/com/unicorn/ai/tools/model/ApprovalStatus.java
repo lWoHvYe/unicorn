@@ -19,6 +19,7 @@ package com.unicorn.ai.tools.model;
 public enum ApprovalStatus {
     NOT_REQUIRED,
     PENDING,
+    APPROVING,
     APPROVED,
     REJECTED,
     EXPIRED

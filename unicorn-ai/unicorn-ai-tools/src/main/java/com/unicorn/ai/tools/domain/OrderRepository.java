@@ -27,5 +27,7 @@ public interface OrderRepository {
 
     Order save(Order order);
 
+    boolean refund(String tenantId, String orderId);
+
     List<Order> findByTenant(String tenantId);
 }

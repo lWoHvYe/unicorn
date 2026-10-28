@@ -64,6 +64,14 @@ public class JdbcOrderRepository implements OrderRepository {
     }
 
     @Override
+    public boolean refund(String tenantId, String orderId) {
+        return jdbc.update("""
+                UPDATE ai_order SET status = 'REFUNDED', updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND order_id = ? AND status = 'DELIVERED'
+                """, tenantId, orderId) == 1;
+    }
+
+    @Override
     public List<Order> findByTenant(String tenantId) {
         return jdbc.query("""
                         SELECT tenant_id, order_id, customer, status, amount, created_at, days_since_purchase

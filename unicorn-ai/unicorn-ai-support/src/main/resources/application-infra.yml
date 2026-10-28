@@ -44,6 +44,7 @@ ai:
       issuer-uri: ${JWT_ISSUER_URI:}
       jwk-set-uri: ${JWT_JWK_SET_URI:}
       hmac-secret: ${JWT_HMAC_SECRET:}
+      audience: ${JWT_AUDIENCE:}
   support:
     demo:
       seed: ${AI_DEMO_SEED:false}

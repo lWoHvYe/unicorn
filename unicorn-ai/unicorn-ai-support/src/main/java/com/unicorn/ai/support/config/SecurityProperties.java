@@ -28,6 +28,7 @@ public record SecurityProperties(
     public record Jwt(@DefaultValue("false") boolean enabled,
                       @DefaultValue("") String issuerUri,
                       @DefaultValue("") String jwkSetUri,
-                      @DefaultValue("") String hmacSecret) {
+                      @DefaultValue("") String hmacSecret,
+                      @DefaultValue("") String audience) {
     }
 }

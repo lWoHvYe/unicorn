@@ -43,11 +43,17 @@ public class ToolInvocationService {
     private static final java.util.Set<String> APPROVER_ROLES = java.util.Set.of("SUPPORT_MANAGER", "TENANT_ADMIN");
 
     private final ToolInvocationRepository repository;
+    private final ToolTransaction transaction;
     private final Map<String, ToolPolicy> policies = new ConcurrentHashMap<>();
     private final Map<String, ToolExecutor> executors = new ConcurrentHashMap<>();
 
     public ToolInvocationService(ToolInvocationRepository repository) {
+        this(repository, null);
+    }
+
+    public ToolInvocationService(ToolInvocationRepository repository, ToolTransaction transaction) {
         this.repository = repository;
+        this.transaction = transaction;
     }
 
     public void register(ToolPolicy policy, ToolExecutor executor) {
@@ -66,9 +72,12 @@ public class ToolInvocationService {
         }
 
         var safeArgs = args == null ? Map.<String, Object>of() : Map.copyOf(args);
+        // The client idempotency key must be scoped to the tool. Otherwise a key used by
+        // get_order would replay that result for refund_order in the same chat turn.
         var idempotencyKey = context.idempotencyKey() == null || context.idempotencyKey().isBlank()
                 ? hash(context.tenantId(), context.sessionId(), toolName, safeArgs)
-                : context.idempotencyKey();
+                : hash(context.tenantId(), context.sessionId(), toolName,
+                        Map.of("clientIdempotencyKey", context.idempotencyKey()));
 
         var existing = repository.findByIdempotencyKey(context.tenantId(), idempotencyKey);
         if (existing.isPresent()) {
@@ -97,11 +106,16 @@ public class ToolInvocationService {
         if (approverRoles == null || approverRoles.stream().noneMatch(APPROVER_ROLES::contains)) {
             return ToolResult.failed("当前用户没有审批权限");
         }
+        if (!repository.claimApproval(tenantId, invocationId, approverId)) {
+            var current = repository.findById(tenantId, invocationId)
+                    .orElseThrow(() -> new java.util.NoSuchElementException("审批单不存在"));
+            if (current.status() == ToolStatus.APPROVING) {
+                throw new ToolConflictException("审批单正在被其他审批人处理");
+            }
+            throw new ToolConflictException("审批单已处理");
+        }
         var invocation = repository.findById(tenantId, invocationId)
                 .orElseThrow(() -> new java.util.NoSuchElementException("审批单不存在"));
-        if (invocation.approvalStatus() != ApprovalStatus.PENDING) {
-            return replay(invocation);
-        }
         var approved = invocation.withApproval(ApprovalStatus.APPROVED);
         var result = runAndSave(approved, executors.get(invocation.toolName()), invocation.args());
         repository.saveApproval(invocationId, tenantId,
@@ -114,11 +128,16 @@ public class ToolInvocationService {
         if (approverRoles == null || approverRoles.stream().noneMatch(APPROVER_ROLES::contains)) {
             return ToolResult.failed("当前用户没有审批权限");
         }
+        if (!repository.claimApproval(tenantId, invocationId, approverId)) {
+            var current = repository.findById(tenantId, invocationId)
+                    .orElseThrow(() -> new java.util.NoSuchElementException("审批单不存在"));
+            if (current.status() == ToolStatus.APPROVING) {
+                throw new ToolConflictException("审批单正在被其他审批人处理");
+            }
+            throw new ToolConflictException("审批单已处理");
+        }
         var invocation = repository.findById(tenantId, invocationId)
                 .orElseThrow(() -> new java.util.NoSuchElementException("审批单不存在"));
-        if (invocation.approvalStatus() != ApprovalStatus.PENDING) {
-            return replay(invocation);
-        }
         var rejected = invocation.withResult(ToolStatus.REJECTED, ApprovalStatus.REJECTED,
                 Map.of("reason", reason == null ? "" : reason), invocation.latencyMs());
         repository.save(rejected);
@@ -134,21 +153,29 @@ public class ToolInvocationService {
     private ToolResult runAndSave(ToolInvocation invocation, ToolExecutor executor, Map<String, Object> args) {
         var started = System.nanoTime();
         try {
-            if (executor == null) {
-                throw new IllegalStateException("工具未注册执行器: " + invocation.toolName());
+            if (transaction != null) {
+                return (ToolResult) transaction.execute(() -> executeAndSave(invocation, executor, args, started));
             }
-            var result = executor.execute(args);
-            var latency = (System.nanoTime() - started) / 1_000_000;
-            var completed = invocation.withResult(result.status(), approvalStatus(invocation),
-                    result.data(), latency);
-            repository.save(completed);
-            return result;
+            return executeAndSave(invocation, executor, args, started);
         } catch (RuntimeException exception) {
             var latency = (System.nanoTime() - started) / 1_000_000;
             repository.save(invocation.withResult(ToolStatus.FAILED, approvalStatus(invocation),
                     Map.of("error", Objects.toString(exception.getMessage(), "tool failed")), latency));
             return ToolResult.failed(Objects.toString(exception.getMessage(), "工具执行失败"));
         }
+    }
+
+    private ToolResult executeAndSave(ToolInvocation invocation, ToolExecutor executor, Map<String, Object> args,
+                                      long started) {
+        if (executor == null) {
+            throw new IllegalStateException("工具未注册执行器: " + invocation.toolName());
+        }
+        var result = executor.execute(args);
+        var latency = (System.nanoTime() - started) / 1_000_000;
+        var completed = invocation.withResult(result.status(), approvalStatus(invocation),
+                result.data(), latency);
+        repository.save(completed);
+        return result;
     }
 
     private ApprovalStatus approvalStatus(ToolInvocation invocation) {

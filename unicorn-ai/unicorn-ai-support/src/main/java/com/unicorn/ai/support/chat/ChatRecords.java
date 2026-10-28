@@ -35,4 +35,7 @@ public final class ChatRecords {
     public record Feedback(String id, String sessionId, String messageId, String tenantId,
                            int rating, String comment) {
     }
+
+    public record Request(String tenantId, String sessionId, String requestId, String messageId, String status) {
+    }
 }

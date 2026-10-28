@@ -40,6 +40,10 @@ public class RateLimiterService {
         check("ingest:" + tenantId, properties.rateLimit().ingestPerHour(), Duration.ofHours(1));
     }
 
+    public void checkMcp(String tenantId) {
+        check("mcp:" + tenantId, properties.rateLimit().mcpPerMinute(), Duration.ofMinutes(1));
+    }
+
     private void check(String key, int limit, Duration window) {
         if (!store.tryAcquire(key, limit, window)) {
             throw new RateLimitException("请求过于频繁，请稍后再试");

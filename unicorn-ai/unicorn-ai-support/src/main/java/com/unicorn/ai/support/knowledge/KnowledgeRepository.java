@@ -193,18 +193,39 @@ public class KnowledgeRepository {
                 tenantId, documentId, versionId);
     }
 
+    public List<KnowledgeRecords.Chunk> findChunksByDocument(String tenantId, String documentId) {
+        return jdbc.query("""
+                        SELECT id, tenant_id, kb_id, document_id, version_id, chunk_index, content,
+                               token_count, metadata_json
+                        FROM ai_chunk WHERE tenant_id = ? AND document_id = ?
+                        ORDER BY version_id, chunk_index
+                        """,
+                (rs, rowNum) -> new KnowledgeRecords.Chunk(
+                        rs.getString("id"), rs.getString("tenant_id"), rs.getString("kb_id"),
+                        rs.getString("document_id"), rs.getString("version_id"), rs.getInt("chunk_index"),
+                        rs.getString("content"), rs.getInt("token_count"), rs.getString("metadata_json")),
+                tenantId, documentId);
+    }
+
     public void deleteChunksByDocument(String tenantId, String documentId, String versionId) {
         jdbc.update("DELETE FROM ai_chunk WHERE tenant_id = ? AND document_id = ? AND version_id = ?",
                 tenantId, documentId, versionId);
     }
 
+    public void deleteChunksByDocument(String tenantId, String documentId) {
+        jdbc.update("DELETE FROM ai_chunk WHERE tenant_id = ? AND document_id = ?", tenantId, documentId);
+    }
+
     public List<KnowledgeRecords.Chunk> lexicalSearch(String tenantId, String kbId, String query, int limit) {
         return jdbc.query("""
-                        SELECT id, tenant_id, kb_id, document_id, version_id, chunk_index, content,
-                               token_count, metadata_json
-                        FROM ai_chunk
-                        WHERE tenant_id = ? AND kb_id = ? AND LOWER(content) LIKE LOWER(?)
-                        ORDER BY chunk_index
+                        SELECT c.id, c.tenant_id, c.kb_id, c.document_id, c.version_id, c.chunk_index,
+                               c.content, c.token_count, c.metadata_json
+                        FROM ai_chunk c
+                        JOIN ai_document d ON d.tenant_id = c.tenant_id
+                            AND d.id = c.document_id AND d.current_version_id = c.version_id
+                            AND d.status = 'ACTIVE'
+                        WHERE c.tenant_id = ? AND c.kb_id = ? AND LOWER(c.content) LIKE LOWER(?)
+                        ORDER BY c.chunk_index
                         LIMIT ?
                         """,
                 (rs, rowNum) -> new KnowledgeRecords.Chunk(

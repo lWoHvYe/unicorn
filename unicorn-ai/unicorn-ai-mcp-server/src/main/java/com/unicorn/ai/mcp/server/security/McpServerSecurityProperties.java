@@ -20,5 +20,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @ConfigurationProperties("demo.ai.mcp.server")
-public record McpServerSecurityProperties(@DefaultValue("demo-key") String apiKey) {
+public record McpServerSecurityProperties(@DefaultValue("") String apiKey) {
 }

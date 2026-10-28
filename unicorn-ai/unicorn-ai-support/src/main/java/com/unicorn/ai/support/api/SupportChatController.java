@@ -39,9 +39,12 @@ import java.util.List;
 public class SupportChatController {
 
     private final SupportChatService chatService;
+    private final com.unicorn.ai.support.config.SupportProperties properties;
 
-    public SupportChatController(SupportChatService chatService) {
+    public SupportChatController(SupportChatService chatService,
+                                 com.unicorn.ai.support.config.SupportProperties properties) {
         this.chatService = chatService;
+        this.properties = properties;
     }
 
     @PostMapping
@@ -71,8 +74,8 @@ public class SupportChatController {
     public SseEmitter stream(@AuthenticationPrincipal AiPrincipal principal,
                              @PathVariable String sessionId,
                              @RequestBody ChatDtos.SendMessageRequest request) {
-        var emitter = new SseEmitter(0L);
-        chatService.stream(principal, sessionId, request.message()).subscribe(
+        var emitter = new SseEmitter(properties.streamTimeoutMs());
+        var disposable = chatService.stream(principal, sessionId, request.message()).subscribe(
                 event -> {
                     try {
                         emitter.send(SseEmitter.event().name(event.event()).data(event.data()));
@@ -82,6 +85,12 @@ public class SupportChatController {
                 },
                 emitter::completeWithError,
                 emitter::complete);
+        emitter.onCompletion(disposable::dispose);
+        emitter.onTimeout(() -> {
+            disposable.dispose();
+            emitter.complete();
+        });
+        emitter.onError(exception -> disposable.dispose());
         return emitter;
     }
 

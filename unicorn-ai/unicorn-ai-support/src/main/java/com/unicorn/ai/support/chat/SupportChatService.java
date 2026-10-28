@@ -43,6 +43,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class SupportChatService {
@@ -99,18 +100,37 @@ public class SupportChatService {
         var started = System.nanoTime();
         var traceId = traceId();
         var history = history(principal.tenantId(), sessionId, session.summary());
+        var messageId = UUID.randomUUID().toString();
+        var requestId = idempotencyKey == null || idempotencyKey.isBlank() ? null : idempotencyKey;
+        if (requestId != null && !chatRepository.tryStartRequest(principal.tenantId(), sessionId, requestId, messageId)) {
+            var existing = chatRepository.findRequest(principal.tenantId(), sessionId, requestId)
+                    .orElseThrow(() -> new ChatRequestConflictException("聊天请求状态不可用"));
+            if ("DONE".equals(existing.status())) {
+                return chatRepository.findMessage(principal.tenantId(), existing.messageId())
+                        .map(this::answerFrom)
+                        .orElseThrow(() -> new ChatRequestConflictException("聊天请求已完成但响应缺失"));
+            }
+            throw new ChatRequestConflictException("相同幂等键的聊天请求正在处理中");
+        }
         var userMessageId = UUID.randomUUID().toString();
         chatRepository.saveMessage(new ChatRecords.Message(userMessageId, sessionId, principal.tenantId(),
                 "USER", message, null, null, null, traceId, "DONE", Instant.now()));
 
-        var retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null, principal.roles());
-        var messageId = UUID.randomUUID().toString();
+        final com.unicorn.ai.support.retrieval.RetrievalResult retrieval;
+        try {
+            retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null,
+                    principal.roles());
+        } catch (RuntimeException exception) {
+            finishRequest(principal, sessionId, requestId, "FAILED");
+            throw exception;
+        }
         if (!retrieval.answerable()) {
             var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
             saveAssistant(principal, sessionId, messageId, refusal, retrieval.citations(),
                     ChatDtos.TokenUsage.empty(), traceId, "REFUSED");
             usageRepository.record(principal.tenantId(), 0, 0, 0);
             metrics.chat(principal.tenantId(), "REFUSED", System.nanoTime() - started);
+            finishRequest(principal, sessionId, requestId, "DONE");
             return new ChatDtos.ChatAnswer(messageId, refusal, retrieval.citations(),
                     ChatDtos.TokenUsage.empty(), traceId, "REFUSED");
         }
@@ -129,11 +149,13 @@ public class SupportChatService {
             usageRepository.record(principal.tenantId(), usage.promptTokens(), usage.completionTokens(),
                     cost(usage));
             metrics.chat(principal.tenantId(), "DONE", System.nanoTime() - started);
+            finishRequest(principal, sessionId, requestId, "DONE");
             return new ChatDtos.ChatAnswer(messageId, answer, retrieval.citations(), usage, traceId, "DONE");
         } catch (RuntimeException exception) {
             saveAssistant(principal, sessionId, messageId, "AI 调用失败，请稍后重试。",
                     retrieval.citations(), ChatDtos.TokenUsage.empty(), traceId, "FAILED");
             metrics.chat(principal.tenantId(), "FAILED", System.nanoTime() - started);
+            finishRequest(principal, sessionId, requestId, "FAILED");
             throw exception;
         }
     }
@@ -148,7 +170,13 @@ public class SupportChatService {
         chatRepository.saveMessage(new ChatRecords.Message(UUID.randomUUID().toString(), sessionId,
                 principal.tenantId(), "USER", message, null, null, null, traceId, "DONE", Instant.now()));
 
-        var retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null, principal.roles());
+        final com.unicorn.ai.support.retrieval.RetrievalResult retrieval;
+        try {
+            retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null,
+                    principal.roles());
+        } catch (RuntimeException exception) {
+            throw exception;
+        }
         if (!retrieval.answerable()) {
             var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
             saveAssistant(principal, sessionId, messageId, refusal, retrieval.citations(),
@@ -160,6 +188,7 @@ public class SupportChatService {
         }
 
         var answer = new StringBuilder();
+        var failed = new AtomicBoolean(false);
         Sinks.Many<ChatDtos.StreamEvent> toolEvents = Sinks.many().unicast().onBackpressureBuffer();
         var tokens = Flux.defer(() -> {
                     ToolEventContext.set(event -> toolEvents.tryEmitNext(event));
@@ -178,9 +207,19 @@ public class SupportChatService {
                                 ToolEventContext.clear();
                                 toolEvents.tryEmitComplete();
                             })
-                            .onErrorResume(exception -> Flux.just(new ChatDtos.StreamEvent("error",
-                                    java.util.Map.of("code", "AI_CALL_FAILED",
-                                            "message", "AI 调用失败，请稍后重试。"))));
+                            .onErrorResume(exception -> {
+                                failed.set(true);
+                                try {
+                                    saveAssistant(principal, sessionId, messageId,
+                                            "AI 调用失败，请稍后重试。", retrieval.citations(),
+                                            ChatDtos.TokenUsage.empty(), traceId, "FAILED");
+                                } catch (RuntimeException saveFailure) {
+                                    // The stream still needs a terminal error event.
+                                }
+                                return Flux.just(new ChatDtos.StreamEvent("error",
+                                        java.util.Map.of("code", "AI_CALL_FAILED",
+                                                "message", "AI 调用失败，请稍后重试。")));
+                            });
                 });
 
         var prefix = new ArrayList<ChatDtos.StreamEvent>();
@@ -192,7 +231,8 @@ public class SupportChatService {
         }
         return Flux.concat(Flux.fromIterable(prefix), Flux.<ChatDtos.StreamEvent>merge(toolEvents.asFlux(), tokens),
                 Flux.just(new ChatDtos.StreamEvent("done",
-                        java.util.Map.of("messageId", messageId, "status", "DONE"))));
+                        java.util.Map.of("messageId", messageId,
+                                "status", failed.get() ? "FAILED" : "DONE"))));
     }
 
     public ChatDtos.SessionView session(AiPrincipal principal, String sessionId) {
@@ -222,6 +262,22 @@ public class SupportChatService {
         var messages = chatRepository.listMessages(principal.tenantId(), sessionId);
         var summary = summarize(messages);
         chatRepository.updateSummary(principal.tenantId(), sessionId, summary, "CLOSED");
+    }
+
+    private void finishRequest(AiPrincipal principal, String sessionId, String requestId, String status) {
+        if (requestId != null) {
+            chatRepository.finishRequest(principal.tenantId(), sessionId, requestId, status);
+        }
+    }
+
+    private ChatDtos.ChatAnswer answerFrom(ChatRecords.Message message) {
+        var citations = message.citationsJson() == null ? List.<Citation>of()
+                : JSON.readValue(message.citationsJson(), new TypeReference<List<Citation>>() {
+                });
+        var usage = message.usageJson() == null ? ChatDtos.TokenUsage.empty()
+                : JSON.readValue(message.usageJson(), ChatDtos.TokenUsage.class);
+        return new ChatDtos.ChatAnswer(message.id(), message.content(), citations, usage,
+                message.traceId(), message.status());
     }
 
     private ChatRecords.Session requireSession(AiPrincipal principal, String sessionId) {

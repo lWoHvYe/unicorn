@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InMemoryToolInvocationRepository implements ToolInvocationRepository {
 
@@ -45,6 +46,22 @@ public class InMemoryToolInvocationRepository implements ToolInvocationRepositor
     @Override
     public Optional<ToolInvocation> findById(String tenantId, String id) {
         return findById(id).filter(invocation -> invocation.tenantId().equals(tenantId));
+    }
+
+    @Override
+    public boolean claimApproval(String tenantId, String id, String approverId) {
+        var claimed = new AtomicBoolean(false);
+        invocations.computeIfPresent(id, (key, current) -> {
+            if (!current.tenantId().equals(tenantId)
+                    || current.status() != com.unicorn.ai.tools.model.ToolStatus.PENDING_APPROVAL
+                    || current.approvalStatus() != ApprovalStatus.PENDING) {
+                return current;
+            }
+            claimed.set(true);
+            return current.withResult(com.unicorn.ai.tools.model.ToolStatus.APPROVING,
+                    ApprovalStatus.APPROVING, current.result(), current.latencyMs());
+        });
+        return claimed.get();
     }
 
     @Override

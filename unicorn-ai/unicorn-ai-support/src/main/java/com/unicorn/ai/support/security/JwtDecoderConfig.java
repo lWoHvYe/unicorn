@@ -23,9 +23,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 @Configuration
 @ConditionalOnProperty(name = "ai.security.mode", havingValue = "jwt")
@@ -34,17 +39,37 @@ public class JwtDecoderConfig {
     @Bean
     JwtDecoder jwtDecoder(SecurityProperties properties) {
         var jwt = properties.jwt();
+        JwtDecoder decoder;
         if (!jwt.hmacSecret().isBlank()) {
-            return NimbusJwtDecoder.withSecretKey(
+            decoder = NimbusJwtDecoder.withSecretKey(
                     new SecretKeySpec(jwt.hmacSecret().getBytes(StandardCharsets.UTF_8), "HmacSHA256")).build();
+        } else if (!jwt.jwkSetUri().isBlank()) {
+            decoder = NimbusJwtDecoder.withJwkSetUri(jwt.jwkSetUri()).build();
+        } else if (!jwt.issuerUri().isBlank()) {
+            decoder = JwtDecoders.fromIssuerLocation(jwt.issuerUri());
+        } else {
+            throw new IllegalStateException(
+                    "ai.security.mode=jwt requires ai.security.jwt.issuer-uri, jwk-set-uri or hmac-secret");
         }
-        if (!jwt.jwkSetUri().isBlank()) {
-            return NimbusJwtDecoder.withJwkSetUri(jwt.jwkSetUri()).build();
-        }
+        return withValidators(decoder, jwt);
+    }
+
+    private JwtDecoder withValidators(JwtDecoder decoder, SecurityProperties.Jwt jwt) {
+        var validators = new ArrayList<OAuth2TokenValidator<org.springframework.security.oauth2.jwt.Jwt>>();
         if (!jwt.issuerUri().isBlank()) {
-            return JwtDecoders.fromIssuerLocation(jwt.issuerUri());
+            validators.add(JwtValidators.createDefaultWithIssuer(jwt.issuerUri()));
+        } else {
+            validators.add(JwtValidators.createDefault());
         }
-        throw new IllegalStateException(
-                "ai.security.mode=jwt requires ai.security.jwt.issuer-uri, jwk-set-uri or hmac-secret");
+        if (!jwt.audience().isBlank()) {
+            validators.add(new JwtClaimValidator<java.util.List<String>>("aud",
+                    audience -> audience != null && audience.contains(jwt.audience())));
+        }
+        var validator = new DelegatingOAuth2TokenValidator<>(validators);
+        return token -> {
+            var decoded = decoder.decode(token);
+            validator.validate(decoded);
+            return decoded;
+        };
     }
 }

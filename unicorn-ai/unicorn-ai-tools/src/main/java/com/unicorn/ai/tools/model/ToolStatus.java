@@ -19,6 +19,7 @@ package com.unicorn.ai.tools.model;
 public enum ToolStatus {
     COMPLETED,
     PENDING_APPROVAL,
+    APPROVING,
     REJECTED,
     FAILED
 }

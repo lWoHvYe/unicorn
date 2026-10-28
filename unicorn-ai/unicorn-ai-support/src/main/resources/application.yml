@@ -66,6 +66,7 @@ ai:
       issuer-uri: ${JWT_ISSUER_URI:}
       jwk-set-uri: ${JWT_JWK_SET_URI:}
       hmac-secret: ${JWT_HMAC_SECRET:}
+      audience: ${JWT_AUDIENCE:}
   support:
     demo:
       seed: true
@@ -78,6 +79,7 @@ ai:
     min-chunk-size-chars: 200
     max-input-chars: 8000
     memory-window: 20
+    stream-timeout-ms: 120000
     async-ingest:
       enabled: false
       exchange: unicorn.ai.support
@@ -96,7 +98,7 @@ ai:
       rewrite-enabled: false
       multi-query-count: 2
     mmr:
-      enabled: true
+      enabled: false
       lambda: 0.7
     rerank:
       enabled: false
@@ -110,6 +112,7 @@ ai:
     rate-limit:
       chat-per-minute: 60
       ingest-per-hour: 100
+      mcp-per-minute: 60
       store: local
     cache:
       store: local

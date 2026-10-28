@@ -23,6 +23,8 @@ import com.unicorn.ai.support.config.SupportProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Configuration
 public class SupportToolConfig {
@@ -36,8 +38,10 @@ public class SupportToolConfig {
     @Bean
     ToolInvocationService toolInvocationService(JdbcToolInvocationRepository repository,
                                                 SupportToolService tools,
-                                                SupportProperties properties) {
-        var service = new ToolInvocationService(repository);
+                                                SupportProperties properties,
+                                                PlatformTransactionManager transactionManager) {
+        var transaction = new TransactionTemplate(transactionManager);
+        var service = new ToolInvocationService(repository, action -> transaction.execute(status -> action.get()));
         SupportToolCatalog.register(service, tools, properties.approval().refundThreshold());
         return service;
     }

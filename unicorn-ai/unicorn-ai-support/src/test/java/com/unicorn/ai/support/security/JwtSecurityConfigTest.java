@@ -35,14 +35,14 @@ class JwtSecurityConfigTest {
     @Test
     void hmacDecoderIsRunnable() {
         var properties = new SecurityProperties("jwt", "X-API-Key",
-                new SecurityProperties.Jwt(true, "", "", SECRET));
+                new SecurityProperties.Jwt(true, "", "", SECRET, ""));
         assertNotNull(new JwtDecoderConfig().jwtDecoder(properties));
     }
 
     @Test
     void missingDecoderConfigurationFailsFast() {
         var properties = new SecurityProperties("jwt", "X-API-Key",
-                new SecurityProperties.Jwt(true, "", "", ""));
+                new SecurityProperties.Jwt(true, "", "", "", ""));
         assertThrows(IllegalStateException.class, () -> new JwtDecoderConfig().jwtDecoder(properties));
     }
 
