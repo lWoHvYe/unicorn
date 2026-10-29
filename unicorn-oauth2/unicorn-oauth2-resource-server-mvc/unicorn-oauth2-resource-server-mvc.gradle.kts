@@ -35,7 +35,7 @@ dependencyManagement {
 }
 
 dependencies {
-    implementation("com.lwohvye:unicorn-beans:4.8.3-chi")
+    implementation("com.lwohvye:unicorn-beans:4.8.4-chi")
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")

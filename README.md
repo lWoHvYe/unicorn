@@ -41,7 +41,7 @@
 
 <project>
 
-    <project.core.version>4.8.3-chi</project.core.version>
+    <project.core.version>4.8.4-chi</project.core.version>
 
     <!--    system模块    -->
     <dependency>
@@ -64,7 +64,7 @@
 ```groovy
 // 4.x系列基于Java 21，4.8开始基于Java 25, 部分module使用Kotlin, 使用Gradle build
 ext { // 这个定义是可以传递的
-    unicornVersion = '4.8.3-chi'
+    unicornVersion = '4.8.4-chi'
 }
 
 implementation "com.lwohvye:unicorn-security:$unicornVersion"
@@ -128,7 +128,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 项目采用按功能分模块的开发方式，结构如下
 
-- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17-21,24,25), 
+- `unicorn-core` 系统的Core模块，BaseClass及各种Util，(基于Multi-Release JAR Files，Support Java 17-21,25,26,27), 
   baseline 为Java 17, 在Runtime = 17 时使用传统threadPool，在Runtime >= 21时使用Virtual Threads
 
 - `unicorn-beans` 基础Beans的Definition及Configuration，To C业务可只引入该dependency
@@ -165,7 +165,6 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
         - XRabbitAbstractProducer, YRabbitAbstractConsumer
         - SecurityUtils, ReactiveSecurityUtils
     - java21/utils Virtual Threads for Java Runtime 21+ (Multi-Release Jar)
-    - java24/utils Virtual Threads for Java Runtime 24+ (Multi-Release Jar)
     - java25/utils Virtual Threads for Java Runtime 25+ (Multi-Release Jar)
     - java26/utils Virtual Threads for Java Runtime 26+ (Multi-Release Jar)
 - unicorn-beans 基础Bean
@@ -205,7 +204,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 
 - Java 25 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
-- Redis 7.2 缓存
+- Redis 8 缓存，支持RAG
 - RabbitMQ 发布-订阅（解耦、异步）
 - ELK 日志系统，config for prod env
 - 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ记得装延迟插件，ES记得装IK
@@ -237,3 +236,4 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 #### TODO
 
 - OAuth 2.0 (_In Progress_)
+- Spring AI (_In Progress_)

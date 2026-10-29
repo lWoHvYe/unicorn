@@ -13,9 +13,8 @@ spring:
       api-key: ${OPENAI_API_KEY:demo-key-not-configured}
       base-url: ${OPENAI_BASE_URL:https://api.openai.com}
       chat:
-        options:
-          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
-          temperature: 0.3
+        model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+        temperature: 0.3
     mcp:
       client:
         # 默认关闭：先启动 unicorn-ai-mcp-server，再用 MCP_CLIENT_ENABLED=true 启动本应用

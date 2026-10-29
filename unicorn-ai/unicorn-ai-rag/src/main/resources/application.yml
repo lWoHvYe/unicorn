@@ -35,12 +35,10 @@ spring:
       api-key: ${OPENAI_API_KEY:demo-key-not-configured}
       base-url: ${OPENAI_BASE_URL:https://api.openai.com}
       chat:
-        options:
-          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
-          temperature: 0.2
+        model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+        temperature: 0.2
       embedding:
-        options:
-          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+        model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
 
 management:
   endpoints:
