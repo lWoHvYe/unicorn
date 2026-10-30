@@ -18,6 +18,7 @@ package com.unicorn.ai.support.eval;
 
 import com.unicorn.ai.support.retrieval.Citation;
 import com.unicorn.ai.support.retrieval.RetrievalService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,9 +27,15 @@ import java.util.List;
 public class EvalService {
 
     private final RetrievalService retrievalService;
+    private final double minRecallAt5;
+    private final double minMrr;
 
-    public EvalService(RetrievalService retrievalService) {
+    public EvalService(RetrievalService retrievalService,
+                       @Value("${ai.support.eval.min-recall-at-5:0.80}") double minRecallAt5,
+                       @Value("${ai.support.eval.min-mrr:0.60}") double minMrr) {
         this.retrievalService = retrievalService;
+        this.minRecallAt5 = minRecallAt5;
+        this.minMrr = minMrr;
     }
 
     public EvalReport run(String tenantId, String kbId, List<EvalCase> cases) {
@@ -53,7 +60,8 @@ public class EvalService {
         }
         var recall = (double) hit / cases.size();
         var mrr = (double) reciprocalRankNumerator / cases.size();
-        return new EvalReport(cases.size(), hit, recall, mrr, details);
+        return new EvalReport(cases.size(), hit, recall, mrr,
+                recall >= minRecallAt5 && mrr >= minMrr, minRecallAt5, minMrr, details);
     }
 
     private int rankOf(List<Citation> citations, String expectedSource) {
@@ -71,6 +79,7 @@ public class EvalService {
     public record EvalCaseResult(String question, String expectedSource, int rank) {
     }
 
-    public record EvalReport(int total, int hits, double recallAt5, double mrr, List<EvalCaseResult> details) {
+    public record EvalReport(int total, int hits, double recallAt5, double mrr, boolean passed,
+                             double minRecallAt5, double minMrr, List<EvalCaseResult> details) {
     }
 }

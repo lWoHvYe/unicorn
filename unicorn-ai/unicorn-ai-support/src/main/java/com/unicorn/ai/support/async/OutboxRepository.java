@@ -43,14 +43,16 @@ public class OutboxRepository {
     }
 
     public List<OutboxEvent> claim(int limit) {
+        var staleBefore = java.sql.Timestamp.from(Instant.now().minusSeconds(300));
         jdbc.update("""
                 UPDATE ai_outbox SET status = 'PUBLISHING', updated_at = CURRENT_TIMESTAMP
                 WHERE id IN (
                     SELECT id FROM ai_outbox
-                    WHERE status = 'PENDING' AND next_attempt_at <= CURRENT_TIMESTAMP
+                    WHERE (status = 'PENDING' AND next_attempt_at <= CURRENT_TIMESTAMP)
+                       OR (status = 'PUBLISHING' AND updated_at < ?)
                     ORDER BY created_at LIMIT ?
                 )
-                """, limit);
+                """, staleBefore, limit);
         return jdbc.query("""
                 SELECT id, tenant_id, aggregate_type, aggregate_id, event_type, payload_json, attempts
                 FROM ai_outbox WHERE status = 'PUBLISHING' ORDER BY created_at LIMIT ?

@@ -202,7 +202,7 @@ Prompts：`order-support`（按租户订单生成客服回复草稿）。
 - `SupportInfraIntegrationTest` 使用 Testcontainers 启动 PostgreSQL/pgvector + RabbitMQ，验证异步入库、job 状态和 citation；无 Docker 时自动 skip。
 - `ai_chat_memory` 保存 Spring AI ChatMemory；`ai_chat_message` 继续作为业务消息/审计。
 - `V5` 增加 PRD 级 IAM/治理/审计/outbox 表；`V6` 增加 ChatMemory 表。
-- 异步入库通过 `ai_outbox` 先落库，再由 `OutboxPublisher` 投递 RabbitMQ；外部测试会断言 outbox 为 `PUBLISHED`。
+- 异步入库通过 `ai_outbox` 先落库，再由 `OutboxPublisher` 投递 RabbitMQ；外部测试会断言 outbox 为 `PUBLISHED`，并支持 5 分钟卡住事件回收。真值门禁可通过 `ai.support.eval.min-recall-at-5`、`ai.support.eval.min-mrr` 配置。
 - 入库使用确定性 chunkId、version 级唯一索引和失败清理；文档/版本/审批均有并发约束。
 - 聊天请求支持 `Idempotency-Key`（`ai_chat_request` 表），重复请求返回同一 assistant message；工具幂等键按 toolName 隔离。
 - `SupportExternalInfraTest` 可直接连接现有 PostgreSQL/pgvector、Redis、RabbitMQ；显式启用：
