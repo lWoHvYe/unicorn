@@ -161,6 +161,9 @@ class SupportApplicationTests {
 
         var forbidden = get("/api/ai/support/v1/admin/users", "agent-key");
         assertEquals(HttpStatus.FORBIDDEN.value(), forbidden.statusCode());
+        assertEquals(1, jdbc.queryForObject("""
+                SELECT COUNT(*) FROM ai_audit_event WHERE tenant_id = 'demo' AND action = 'ADMIN_ASSIGN_ROLE'
+                """, Integer.class));
     }
 
     @Test
@@ -186,6 +189,10 @@ class SupportApplicationTests {
         var closed = post("/api/ai/support/v1/handoffs/" + ticketId + "/close", "{}", "demo-key");
         assertEquals(HttpStatus.OK.value(), closed.statusCode());
         assertTrue(closed.body().contains("CLOSED"));
+        assertEquals(1, jdbc.queryForObject("""
+                SELECT COUNT(*) FROM ai_audit_event WHERE tenant_id = 'demo'
+                AND action = 'HANDOFF_CLOSE' AND resource_id = ?
+                """, Integer.class, ticketId));
     }
 
     @Test

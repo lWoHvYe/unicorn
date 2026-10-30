@@ -16,6 +16,7 @@
 
 package com.unicorn.ai.support.api;
 
+import com.unicorn.ai.support.audit.AuditService;
 import com.unicorn.ai.support.handoff.HandoffDtos;
 import com.unicorn.ai.support.handoff.JdbcHandoffQueryRepository;
 import com.unicorn.ai.support.security.AiPrincipal;
@@ -36,9 +37,11 @@ import java.util.List;
 public class HandoffController {
 
     private final JdbcHandoffQueryRepository repository;
+    private final AuditService audit;
 
-    public HandoffController(JdbcHandoffQueryRepository repository) {
+    public HandoffController(JdbcHandoffQueryRepository repository, AuditService audit) {
         this.repository = repository;
+        this.audit = audit;
     }
 
     @GetMapping
@@ -58,13 +61,17 @@ public class HandoffController {
         if (request == null || request.assigneeId() == null || request.assigneeId().isBlank()) {
             throw new IllegalArgumentException("assigneeId 不能为空");
         }
-        return repository.assign(principal.tenantId(), id, request.assigneeId());
+        var ticket = repository.assign(principal.tenantId(), id, request.assigneeId());
+        audit.record(principal, "HANDOFF_ASSIGN", "ai_handoff_ticket", id, null);
+        return ticket;
     }
 
     @PostMapping("/{id}/close")
     @PreAuthorize("hasAnyRole('TENANT_ADMIN','SUPPORT_MANAGER','SUPPORT_AGENT')")
     public HandoffDtos.HandoffView close(@AuthenticationPrincipal AiPrincipal principal,
                                          @PathVariable String id) {
-        return repository.close(principal.tenantId(), id);
+        var ticket = repository.close(principal.tenantId(), id);
+        audit.record(principal, "HANDOFF_CLOSE", "ai_handoff_ticket", id, null);
+        return ticket;
     }
 }

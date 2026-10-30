@@ -18,6 +18,7 @@ package com.unicorn.ai.support.api;
 
 import com.unicorn.ai.support.admin.AdminDtos;
 import com.unicorn.ai.support.admin.JdbcAdminRepository;
+import com.unicorn.ai.support.audit.AuditService;
 import com.unicorn.ai.support.security.AiPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,9 +37,11 @@ import java.util.List;
 public class AdminController {
 
     private final JdbcAdminRepository repository;
+    private final AuditService audit;
 
-    public AdminController(JdbcAdminRepository repository) {
+    public AdminController(JdbcAdminRepository repository, AuditService audit) {
         this.repository = repository;
+        this.audit = audit;
     }
 
     @GetMapping("/users")
@@ -49,7 +52,9 @@ public class AdminController {
     @PostMapping("/users")
     public AdminDtos.UserView createUser(@AuthenticationPrincipal AiPrincipal principal,
                                          @RequestBody AdminDtos.CreateUserRequest request) {
-        return repository.createUser(principal.tenantId(), request);
+        var user = repository.createUser(principal.tenantId(), request);
+        audit.record(principal, "ADMIN_CREATE_USER", "ai_tenant_user", user.id(), null);
+        return user;
     }
 
     @GetMapping("/roles")
@@ -60,12 +65,16 @@ public class AdminController {
     @PostMapping("/roles")
     public AdminDtos.RoleView createRole(@AuthenticationPrincipal AiPrincipal principal,
                                          @RequestBody AdminDtos.CreateRoleRequest request) {
-        return repository.createRole(principal.tenantId(), request);
+        var role = repository.createRole(principal.tenantId(), request);
+        audit.record(principal, "ADMIN_CREATE_ROLE", "ai_role", role.id(), null);
+        return role;
     }
 
     @PostMapping("/users/{userId}/roles/{roleId}")
     public AdminDtos.UserView assignRole(@AuthenticationPrincipal AiPrincipal principal,
                                          @PathVariable String userId, @PathVariable String roleId) {
-        return repository.assignRole(principal.tenantId(), userId, roleId);
+        var user = repository.assignRole(principal.tenantId(), userId, roleId);
+        audit.record(principal, "ADMIN_ASSIGN_ROLE", "ai_tenant_user", userId, "{\"roleId\":\"" + roleId + "\"}");
+        return user;
     }
 }
