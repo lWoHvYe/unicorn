@@ -19,6 +19,7 @@ package com.unicorn.ai.support.api;
 import com.unicorn.ai.support.admin.AdminDtos;
 import com.unicorn.ai.support.admin.JdbcAdminRepository;
 import com.unicorn.ai.support.audit.AuditService;
+import com.unicorn.ai.support.quota.QuotaService;
 import com.unicorn.ai.support.security.AiPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,10 +39,12 @@ public class AdminController {
 
     private final JdbcAdminRepository repository;
     private final AuditService audit;
+    private final QuotaService quotas;
 
-    public AdminController(JdbcAdminRepository repository, AuditService audit) {
+    public AdminController(JdbcAdminRepository repository, AuditService audit, QuotaService quotas) {
         this.repository = repository;
         this.audit = audit;
+        this.quotas = quotas;
     }
 
     @GetMapping("/users")
@@ -68,6 +71,16 @@ public class AdminController {
         var role = repository.createRole(principal.tenantId(), request);
         audit.record(principal, "ADMIN_CREATE_ROLE", "ai_role", role.id(), null);
         return role;
+    }
+
+    @PostMapping("/quotas")
+    public void setQuota(@AuthenticationPrincipal AiPrincipal principal,
+                         @RequestBody AdminDtos.QuotaRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("quota 不能为空");
+        }
+        quotas.set(principal.tenantId(), request.metric(), request.period(), request.limit());
+        audit.record(principal, "ADMIN_SET_QUOTA", "ai_quota", request.metric(), null);
     }
 
     @PostMapping("/users/{userId}/roles/{roleId}")

@@ -19,6 +19,7 @@ package com.unicorn.ai.support;
 import com.unicorn.ai.tools.model.ToolExecutionContext;
 import com.unicorn.ai.tools.model.ToolStatus;
 import com.unicorn.ai.tools.policy.ToolInvocationService;
+import com.unicorn.ai.support.quota.QuotaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,6 +56,9 @@ class SupportApplicationTests {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @Autowired
+    private QuotaService quotaService;
 
     @Test
     void ingestAndChatReturnCitation() {
@@ -179,6 +183,17 @@ class SupportApplicationTests {
         var revoked = post("/api/ai/support/v1/admin/api-keys/" + keyId + "/revoke", "{}", "demo-key");
         assertEquals(HttpStatus.OK.value(), revoked.statusCode());
         assertEquals(HttpStatus.UNAUTHORIZED.value(), get("/api/ai/support/v1/knowledge-bases", apiKey).statusCode());
+    }
+
+    @Test
+    void quotaConsumesOnlyConfiguredLimit() {
+        quotaService.set("demo", "unit-test", "DAY", 2);
+        quotaService.consumeChat("demo");
+        // consumeChat only checks the chat metric; exercise a configured metric via repository behavior.
+        var quotaRepository = new com.unicorn.ai.support.quota.QuotaRepository(jdbc);
+        assertTrue(quotaRepository.consume("demo", "unit-test", "DAY"));
+        assertTrue(quotaRepository.consume("demo", "unit-test", "DAY"));
+        assertFalse(quotaRepository.consume("demo", "unit-test", "DAY"));
     }
 
     @Test

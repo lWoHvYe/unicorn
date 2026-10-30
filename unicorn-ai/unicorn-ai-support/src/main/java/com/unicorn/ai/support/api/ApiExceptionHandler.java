@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.unicorn.ai.support.ratelimit.RateLimitException;
 import com.unicorn.ai.support.chat.ChatRequestConflictException;
 import com.unicorn.ai.support.model.ModelCallException;
+import com.unicorn.ai.support.quota.QuotaExceededException;
 import com.unicorn.ai.tools.policy.ToolConflictException;
 
 import java.util.NoSuchElementException;
@@ -65,6 +66,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(RateLimitException.class)
     public ResponseEntity<ApiError> rateLimited(RateLimitException exception) {
         return error(HttpStatus.TOO_MANY_REQUESTS, "RATE_LIMITED", exception.getMessage());
+    }
+
+    @ExceptionHandler(QuotaExceededException.class)
+    public ResponseEntity<ApiError> quotaExceeded(QuotaExceededException exception) {
+        return error(HttpStatus.TOO_MANY_REQUESTS, "QUOTA_EXCEEDED", exception.getMessage());
     }
 
     @ExceptionHandler(ModelCallException.class)

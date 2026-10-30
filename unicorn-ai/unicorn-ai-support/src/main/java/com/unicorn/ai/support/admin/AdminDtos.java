@@ -38,4 +38,7 @@ public final class AdminDtos {
 
     public record AssignRoleRequest(String roleId) {
     }
+
+    public record QuotaRequest(String metric, String period, long limit) {
+    }
 }

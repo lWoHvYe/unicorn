@@ -29,6 +29,7 @@ import com.unicorn.ai.support.tools.SupportToolFacade;
 import com.unicorn.ai.support.observability.SupportMetrics;
 import com.unicorn.ai.support.observability.UsageRepository;
 import com.unicorn.ai.support.ratelimit.RateLimiterService;
+import com.unicorn.ai.support.quota.QuotaService;
 import org.slf4j.MDC;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -70,6 +71,7 @@ public class SupportChatService {
     private final SupportModelInvoker modelInvoker;
     private final CitationValidator citationValidator;
     private final ChatClient fallbackChatClient;
+    private final QuotaService quotaService;
 
     public SupportChatService(ChatClient chatClient, ChatRepository chatRepository,
                               RetrievalService retrievalService, SupportProperties properties,
@@ -80,7 +82,8 @@ public class SupportChatService {
                               SafeGuardAdvisor safeGuardAdvisor,
                               SupportModelInvoker modelInvoker,
                               CitationValidator citationValidator,
-                              @Qualifier("fallbackChatClient") ObjectProvider<ChatClient> fallbackChatClient) {
+                              @Qualifier("fallbackChatClient") ObjectProvider<ChatClient> fallbackChatClient,
+                              QuotaService quotaService) {
         this.chatClient = chatClient;
         this.chatRepository = chatRepository;
         this.retrievalService = retrievalService;
@@ -95,6 +98,7 @@ public class SupportChatService {
         this.modelInvoker = modelInvoker;
         this.citationValidator = citationValidator;
         this.fallbackChatClient = fallbackChatClient.getIfAvailable();
+        this.quotaService = quotaService;
     }
 
     public ChatDtos.SessionView createSession(AiPrincipal principal, String channel, String title) {
@@ -120,6 +124,7 @@ public class SupportChatService {
                                     String idempotencyKey) {
         validateMessage(message);
         rateLimiter.checkChat(principal.tenantId());
+        quotaService.consumeChat(principal.tenantId());
         var session = requireSession(principal, sessionId);
         var started = System.nanoTime();
         var traceId = traceId();
@@ -188,6 +193,7 @@ public class SupportChatService {
     public Flux<ChatDtos.StreamEvent> stream(AiPrincipal principal, String sessionId, String message) {
         validateMessage(message);
         rateLimiter.checkChat(principal.tenantId());
+        quotaService.consumeChat(principal.tenantId());
         var session = requireSession(principal, sessionId);
         var traceId = traceId();
         var messageId = UUID.randomUUID().toString();
