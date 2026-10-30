@@ -66,8 +66,9 @@ public class DemoAiModelsConfig {
         public ChatResponse call(Prompt prompt) {
             var userMessage = prompt.getUserMessage();
             var text = userMessage == null ? null : userMessage.getText();
+            var summary = text == null ? "" : text.replaceAll("\\[C\\d+]", "");
             var answer = "【本地演示模型】已收到问题。生产环境请配置 OPENAI_API_KEY。\n问题摘要："
-                    + (text == null ? "" : text.substring(0, Math.min(text.length(), 200)));
+                    + summary.substring(0, Math.min(summary.length(), 200));
             var metadata = ChatResponseMetadata.builder()
                     .usage(new DefaultUsage(10, 20, 30))
                     .build();

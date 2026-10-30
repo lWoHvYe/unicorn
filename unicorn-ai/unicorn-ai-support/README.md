@@ -131,7 +131,8 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
 - ChatMemory 使用 `JdbcChatMemoryRepository` / `MessageWindowChatMemory`，存储于 `ai_chat_memory`。
 - RAG 通过自定义 `SupportDocumentRetriever` 复用现有混合检索/ACL，`SupportQueryAugmenter` 负责 citation 格式和空上下文拒答。
 - 阻塞和流式路径都使用同一 advisor chain；流式路径先做一次检索用于 citation 预览，`RetrievalCapture` 让 advisor 复用该结果，避免重复向量/词法查询。
-- 模型调用由 `SupportModelInvoker` 提供超时/重试边界与 Micrometer observation；流式路径额外使用 Reactor timeout。
+- 模型调用由 `SupportModelInvoker` 提供超时/重试边界与 Micrometer observation；流式路径额外使用 Reactor timeout，并在 `done` 事件返回聚合 usage。
+- 回答中的 `[C1]` 引用会由 `CitationValidator` 校验；越界/不存在的 citation 会改为 REFUSED。
 
 ## 混合检索
 

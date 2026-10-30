@@ -21,6 +21,7 @@ import com.unicorn.ai.support.retrieval.Citation;
 import com.unicorn.ai.support.retrieval.RetrievalResult;
 import com.unicorn.ai.support.retrieval.RetrievalCapture;
 import com.unicorn.ai.support.retrieval.NoContextException;
+import com.unicorn.ai.support.retrieval.CitationValidator;
 import com.unicorn.ai.support.model.SupportModelInvoker;
 import com.unicorn.ai.support.retrieval.RetrievalService;
 import com.unicorn.ai.support.security.AiPrincipal;
@@ -65,6 +66,7 @@ public class SupportChatService {
     private final RetrievalAugmentationAdvisor ragAdvisor;
     private final SafeGuardAdvisor safeGuardAdvisor;
     private final SupportModelInvoker modelInvoker;
+    private final CitationValidator citationValidator;
 
     public SupportChatService(ChatClient chatClient, ChatRepository chatRepository,
                               RetrievalService retrievalService, SupportProperties properties,
@@ -73,7 +75,8 @@ public class SupportChatService {
                               MessageChatMemoryAdvisor memoryAdvisor,
                               RetrievalAugmentationAdvisor ragAdvisor,
                               SafeGuardAdvisor safeGuardAdvisor,
-                              SupportModelInvoker modelInvoker) {
+                              SupportModelInvoker modelInvoker,
+                              CitationValidator citationValidator) {
         this.chatClient = chatClient;
         this.chatRepository = chatRepository;
         this.retrievalService = retrievalService;
@@ -86,6 +89,7 @@ public class SupportChatService {
         this.ragAdvisor = ragAdvisor;
         this.safeGuardAdvisor = safeGuardAdvisor;
         this.modelInvoker = modelInvoker;
+        this.citationValidator = citationValidator;
     }
 
     public ChatDtos.SessionView createSession(AiPrincipal principal, String channel, String title) {
@@ -149,13 +153,18 @@ public class SupportChatService {
                     .chatResponse());
             var retrieval = capture.require();
             var answer = response.getResult().getOutput().getText();
+            var invalidCitations = citationValidator.invalidReferences(answer, retrieval.citations());
+            var status = invalidCitations.isEmpty() ? "DONE" : "REFUSED";
+            if (!invalidCitations.isEmpty()) {
+                answer = citationValidator.refusalFor(invalidCitations);
+            }
             var usage = usage(response);
-            saveAssistant(principal, sessionId, messageId, answer, retrieval.citations(), usage, traceId, "DONE");
+            saveAssistant(principal, sessionId, messageId, answer, retrieval.citations(), usage, traceId, status);
             usageRepository.record(principal.tenantId(), usage.promptTokens(), usage.completionTokens(),
                     cost(usage));
-            metrics.chat(principal.tenantId(), "DONE", System.nanoTime() - started);
+            metrics.chat(principal.tenantId(), status, System.nanoTime() - started);
             finishRequest(principal, sessionId, requestId, "DONE");
-            return new ChatDtos.ChatAnswer(messageId, answer, retrieval.citations(), usage, traceId, "DONE");
+            return new ChatDtos.ChatAnswer(messageId, answer, retrieval.citations(), usage, traceId, status);
         } catch (NoContextException exception) {
             var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
             saveAssistant(principal, sessionId, messageId, refusal, List.of(),
@@ -202,6 +211,8 @@ public class SupportChatService {
 
         var answer = new StringBuilder();
         var failed = new AtomicBoolean(false);
+        var refused = new AtomicBoolean(false);
+        var streamUsage = new java.util.concurrent.atomic.AtomicReference<>(ChatDtos.TokenUsage.empty());
         Sinks.Many<ChatDtos.StreamEvent> toolEvents = Sinks.many().unicast().onBackpressureBuffer();
         Consumer<ChatDtos.StreamEvent> eventSink = toolEvents::tryEmitNext;
         var capture = new RetrievalCapture();
@@ -220,12 +231,39 @@ public class SupportChatService {
                             .tools(toolFacade)
                             .toolContext(toolContext(principal, sessionId, traceId, null, eventSink))
                             .stream()
-                            .content()
+                            .chatResponse()
                             .timeout(modelInvoker.timeout())
-                            .doOnNext(answer::append)
-                            .doOnComplete(() -> saveAssistant(principal, sessionId, messageId, answer.toString(),
-                                    retrieval.citations(), ChatDtos.TokenUsage.empty(), traceId, "DONE"))
-                            .map(delta -> new ChatDtos.StreamEvent("token", java.util.Map.of("delta", delta)))
+                            .doOnNext(response -> {
+                                var usage = usage(response);
+                                if (usage.totalTokens() > 0) {
+                                    streamUsage.set(usage);
+                                }
+                                var text = response.getResult() == null || response.getResult().getOutput() == null
+                                        ? null : response.getResult().getOutput().getText();
+                                if (text != null) {
+                                    answer.append(text);
+                                }
+                            })
+                            .doOnComplete(() -> {
+                                var finalAnswer = answer.toString();
+                                var invalid = citationValidator.invalidReferences(finalAnswer, retrieval.citations());
+                                var status = invalid.isEmpty() ? "DONE" : "REFUSED";
+                                if (!invalid.isEmpty()) {
+                                    refused.set(true);
+                                    finalAnswer = citationValidator.refusalFor(invalid);
+                                }
+                                var usage = streamUsage.get();
+                                saveAssistant(principal, sessionId, messageId, finalAnswer,
+                                        retrieval.citations(), usage, traceId, status);
+                                usageRepository.record(principal.tenantId(), usage.promptTokens(),
+                                        usage.completionTokens(), cost(usage));
+                            })
+                            .mapNotNull(response -> {
+                                var text = response.getResult() == null || response.getResult().getOutput() == null
+                                        ? null : response.getResult().getOutput().getText();
+                                return text == null || text.isEmpty() ? null
+                                        : new ChatDtos.StreamEvent("token", java.util.Map.of("delta", text));
+                            })
                             .doFinally(signal -> toolEvents.tryEmitComplete())
                             .onErrorResume(exception -> {
                                 failed.set(true);
@@ -252,7 +290,8 @@ public class SupportChatService {
         return Flux.concat(Flux.fromIterable(prefix), Flux.<ChatDtos.StreamEvent>merge(toolEvents.asFlux(), tokens),
                 Flux.just(new ChatDtos.StreamEvent("done",
                         java.util.Map.of("messageId", messageId,
-                                "status", failed.get() ? "FAILED" : "DONE"))));
+                                "status", failed.get() ? "FAILED" : refused.get() ? "REFUSED" : "DONE",
+                                "usage", streamUsage.get()))));
     }
 
     public ChatDtos.SessionView session(AiPrincipal principal, String sessionId) {

@@ -75,7 +75,7 @@ class SupportApplicationTests {
                 "{\"message\":\"Spring Boot 4.1\"}", "demo-key");
         assertEquals(HttpStatus.OK.value(), chat.statusCode());
         var body = JSON.readValue(chat.body(), Map.class);
-        assertEquals("DONE", body.get("status"));
+        assertEquals("DONE", body.get("status"), chat.body());
         assertFalse(((java.util.List<?>) body.get("citations")).isEmpty());
         assertTrue(body.get("answer").toString().contains("本地演示模型"));
 
