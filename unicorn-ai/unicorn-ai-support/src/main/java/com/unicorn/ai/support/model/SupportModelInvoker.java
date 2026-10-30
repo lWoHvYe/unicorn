@@ -18,6 +18,8 @@ package com.unicorn.ai.support.model;
 
 import com.unicorn.ai.support.config.SupportProperties;
 import com.unicorn.ai.support.retrieval.NoContextException;
+import com.unicorn.ai.support.security.AiPrincipal;
+import com.unicorn.ai.support.security.TenantContext;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.annotation.PreDestroy;
@@ -61,7 +63,7 @@ public class SupportModelInvoker {
             if (fallback == null) {
                 throw exception;
             }
-            return call(tenantId + "-fallback", fallback);
+            return call(tenantId, fallback);
         }
     }
 
@@ -69,7 +71,8 @@ public class SupportModelInvoker {
         var model = properties.model() == null ? new SupportProperties.Model(30000, 2, "") : properties.model();
         RuntimeException last = null;
         for (int attempt = 1; attempt <= Math.max(1, model.maxAttempts()); attempt++) {
-            var future = CompletableFuture.supplyAsync(action, executor);
+            var future = CompletableFuture.supplyAsync(() -> TenantContext.callUnchecked(
+                    new AiPrincipal(tenantId, "model", java.util.Set.of()), action::get), executor);
             try {
                 return future.get(model.timeoutMs(), TimeUnit.MILLISECONDS);
             } catch (TimeoutException exception) {

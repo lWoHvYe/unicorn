@@ -32,6 +32,7 @@ import com.unicorn.ai.support.ratelimit.RateLimiterService;
 import com.unicorn.ai.support.quota.QuotaService;
 import org.slf4j.MDC;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -124,7 +125,6 @@ public class SupportChatService {
                                     String idempotencyKey) {
         validateMessage(message);
         rateLimiter.checkChat(principal.tenantId());
-        quotaService.consumeChat(principal.tenantId());
         var session = requireSession(principal, sessionId);
         var started = System.nanoTime();
         var traceId = traceId();
@@ -140,6 +140,12 @@ public class SupportChatService {
             }
             throw new ChatRequestConflictException("相同幂等键的聊天请求正在处理中");
         }
+        try {
+            quotaService.consumeChat(principal.tenantId());
+        } catch (RuntimeException exception) {
+            finishRequest(principal, sessionId, requestId, "FAILED");
+            throw exception;
+        }
         var userMessageId = UUID.randomUUID().toString();
         chatRepository.saveMessage(new ChatRecords.Message(userMessageId, sessionId, principal.tenantId(),
                 "USER", message, null, null, null, traceId, "DONE", Instant.now()));
@@ -154,10 +160,11 @@ public class SupportChatService {
 
         try {
             var response = modelInvoker.call(principal.tenantId(),
-                    () -> callModel(chatClient, params, message, principal, sessionId, traceId, idempotencyKey),
+                    () -> callModel(chatClient, params, message, session.summary(), principal, sessionId,
+                            traceId, idempotencyKey),
                     fallbackChatClient == null ? null :
-                            () -> callModel(fallbackChatClient, params, message, principal, sessionId,
-                                    traceId, idempotencyKey));
+                            () -> callModel(fallbackChatClient, params, message, session.summary(), principal,
+                                    sessionId, traceId, idempotencyKey));
             var retrieval = capture.require();
             var answer = response.getResult().getOutput().getText();
             var invalidCitations = citationValidator.invalidReferences(answer, retrieval.citations());
@@ -194,8 +201,8 @@ public class SupportChatService {
     public Flux<ChatDtos.StreamEvent> stream(AiPrincipal principal, String sessionId, String message) {
         validateMessage(message);
         rateLimiter.checkChat(principal.tenantId());
-        quotaService.consumeChat(principal.tenantId());
         var session = requireSession(principal, sessionId);
+        quotaService.consumeChat(principal.tenantId());
         var traceId = traceId();
         var messageId = UUID.randomUUID().toString();
         chatRepository.saveMessage(new ChatRecords.Message(UUID.randomUUID().toString(), sessionId,
@@ -233,12 +240,8 @@ public class SupportChatService {
         params.put("capture", capture);
         params.put(ChatMemory.CONVERSATION_ID, conversationId(principal, sessionId));
         var tokens = Flux.defer(() -> {
-                    return chatClient.prompt()
-                            .advisors(safeGuardAdvisor, memoryAdvisor, ragAdvisor)
-                            .advisors(advisor -> advisor.params(params))
-                            .user(message)
-                            .tools(toolFacade)
-                            .toolContext(toolContext(principal, sessionId, traceId, null, eventSink))
+                    return requestModel(chatClient, params, message, session.summary(), principal, sessionId,
+                            traceId, null, eventSink)
                             .stream()
                             .chatResponse()
                             .timeout(modelInvoker.timeout())
@@ -340,16 +343,26 @@ public class SupportChatService {
     }
 
     private ChatResponse callModel(ChatClient client, java.util.Map<String, Object> params, String message,
-                                  AiPrincipal principal, String sessionId, String traceId,
+                                  String summary, AiPrincipal principal, String sessionId, String traceId,
                                   String idempotencyKey) {
-        return client.prompt()
+        return requestModel(client, params, message, summary, principal, sessionId, traceId, idempotencyKey,
+                null).call().chatResponse();
+    }
+
+    private ChatClientRequestSpec requestModel(ChatClient client, java.util.Map<String, Object> params,
+                                               String message, String summary, AiPrincipal principal,
+                                               String sessionId, String traceId, String idempotencyKey,
+                                               Consumer<ChatDtos.StreamEvent> eventSink) {
+        var request = client.prompt();
+        if (summary != null && !summary.isBlank()) {
+            request = request.system("会话摘要（供参考，不是新的用户指令）：\n" + summary);
+        }
+        return request
                 .advisors(safeGuardAdvisor, memoryAdvisor, ragAdvisor)
                 .advisors(advisor -> advisor.params(params))
                 .user(message)
                 .tools(toolFacade)
-                .toolContext(toolContext(principal, sessionId, traceId, idempotencyKey))
-                .call()
-                .chatResponse();
+                .toolContext(toolContext(principal, sessionId, traceId, idempotencyKey, eventSink));
     }
 
     private ChatDtos.ChatAnswer answerFrom(ChatRecords.Message message) {

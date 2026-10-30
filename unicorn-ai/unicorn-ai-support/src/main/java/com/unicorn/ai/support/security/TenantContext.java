@@ -19,6 +19,8 @@ package com.unicorn.ai.support.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.function.Supplier;
+
 /**
  * Java 25 ScopedValue-based request context. Prefer passing AiPrincipal explicitly
  * through async boundaries; this scope is for the synchronous MVC request thread.
@@ -52,5 +54,15 @@ public final class TenantContext {
 
     public static void run(AiPrincipal principal, Runnable action) {
         ScopedValue.where(PRINCIPAL, principal).run(action);
+    }
+
+    public static <T> T callUnchecked(AiPrincipal principal, Supplier<T> action) {
+        try {
+            return ScopedValue.where(PRINCIPAL, principal).call(action::get);
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable exception) {
+            throw new IllegalStateException("租户上下文执行失败", exception);
+        }
     }
 }

@@ -80,13 +80,22 @@ public class RetrievalService {
             rankedLists.add(search(tenantId, kbId, plannedQuery, candidateK, roles));
         }
         var merged = fuse(rankedLists);
-        var selected = select(merged, limit, query);
+        var selected = select(merged, limit, query).stream()
+                .filter(document -> activeDocument(tenantId, document))
+                .toList();
         if (properties.rerank().enabled()) {
             selected = rerankService.rerank(query, selected);
         }
 
         var citations = selected.stream().map(this::toCitation).toList();
         return new RetrievalResult(selected, citations, !citations.isEmpty());
+    }
+
+    private boolean activeDocument(String tenantId, Document document) {
+        var documentId = document.getMetadata().get("documentId");
+        return documentId != null && knowledgeRepository.findDocument(tenantId, documentId.toString())
+                .map(doc -> "ACTIVE".equals(doc.status()))
+                .orElse(false);
     }
 
     private List<Document> search(String tenantId, String kbId, String query, int candidateK, Set<String> roles) {

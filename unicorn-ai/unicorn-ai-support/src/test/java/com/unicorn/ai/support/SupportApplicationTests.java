@@ -20,6 +20,8 @@ import com.unicorn.ai.tools.model.ToolExecutionContext;
 import com.unicorn.ai.tools.model.ToolStatus;
 import com.unicorn.ai.tools.policy.ToolInvocationService;
 import com.unicorn.ai.support.quota.QuotaService;
+import com.unicorn.ai.support.model.SupportModelInvoker;
+import com.unicorn.ai.support.security.TenantContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,6 +61,9 @@ class SupportApplicationTests {
 
     @Autowired
     private QuotaService quotaService;
+
+    @Autowired
+    private SupportModelInvoker modelInvoker;
 
     @Test
     void ingestAndChatReturnCitation() {
@@ -183,6 +188,12 @@ class SupportApplicationTests {
         var revoked = post("/api/ai/support/v1/admin/api-keys/" + keyId + "/revoke", "{}", "demo-key");
         assertEquals(HttpStatus.OK.value(), revoked.statusCode());
         assertEquals(HttpStatus.UNAUTHORIZED.value(), get("/api/ai/support/v1/knowledge-bases", apiKey).statusCode());
+    }
+
+    @Test
+    void modelInvokerPropagatesTenantToVirtualThread() {
+        var tenant = modelInvoker.call("demo", () -> TenantContext.current().tenantId());
+        assertEquals("demo", tenant);
     }
 
     @Test

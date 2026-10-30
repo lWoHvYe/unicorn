@@ -124,25 +124,24 @@ public class SupportToolFacade {
 
     private ToolExecutionContext context(ToolContext context) {
         var values = context == null || context.getContext() == null ? Map.<String, Object>of() : context.getContext();
-        var principal = principal();
-        var tenantId = text(values, "tenant", principal.tenantId());
-        var userId = text(values, "userId", principal.userId());
-        var roles = roles(values.get("roles"), principal.roles());
+        // The model invocation runs on a virtual thread. ToolContext is the authoritative
+        // source there; ScopedValue is only a fallback when the tool is invoked directly.
+        var principal = TenantContext.optional().orElse(null);
+        var tenantId = text(values, "tenant", principal == null ? "" : principal.tenantId());
+        var userId = text(values, "userId", principal == null ? "" : principal.userId());
+        var roles = roles(values.get("roles"), principal == null ? Set.of() : principal.roles());
         var sessionId = text(values, "sessionId", "");
         var idempotencyKey = text(values, "idempotencyKey", "");
         var traceId = text(values, "traceId", traceId());
+        if (tenantId.isBlank()) {
+            throw new IllegalStateException("缺少租户上下文");
+        }
         var attributes = new java.util.HashMap<String, Object>();
         if (values.get("eventSink") instanceof Consumer<?> sink) {
             attributes.put("eventSink", sink);
         }
         return new ToolExecutionContext(tenantId, userId, roles, sessionId, idempotencyKey, traceId,
                 attributes);
-    }
-
-    private AiPrincipal principal() {
-        // Fail closed: a tool must never fall back to the demo tenant if the
-        // security context is missing (for example a misconfigured async callback).
-        return TenantContext.current();
     }
 
     private String text(Map<String, Object> values, String key, String fallback) {

@@ -20,6 +20,8 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
 import com.unicorn.ai.support.observability.SupportMetrics;
+import com.unicorn.ai.support.security.AiPrincipal;
+import com.unicorn.ai.support.security.TenantContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -53,7 +55,8 @@ public class SupportDocumentRetriever implements DocumentRetriever {
             return retrievalCapture.get().documents();
         }
         var started = System.nanoTime();
-        var result = retrievalService.retrieve(tenantId, kbId, query.text(), null, roles);
+        var result = TenantContext.callUnchecked(new AiPrincipal(tenantId, "retrieval", roles),
+                () -> retrievalService.retrieve(tenantId, kbId, query.text(), null, roles));
         metrics.retrieval(tenantId, result.documents().isEmpty(), System.nanoTime() - started);
         if (capture instanceof RetrievalCapture retrievalCapture) {
             retrievalCapture.set(result);
