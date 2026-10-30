@@ -7,6 +7,9 @@ RUN chmod +x gradlew && ./gradlew :unicorn-ai-support:bootJar --no-daemon
 
 FROM eclipse-temurin:25-jre
 WORKDIR /app
+RUN groupadd --system --gid 10001 app && useradd --system --uid 10001 --gid app app
 COPY --from=build /workspace/unicorn-ai/unicorn-ai-support/build/libs/unicorn-ai-support-*.jar /app/app.jar
+RUN chown -R app:app /app
+USER 10001
 EXPOSE 8096
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar", "--spring.profiles.active=infra"]

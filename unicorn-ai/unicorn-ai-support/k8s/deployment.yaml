@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unicorn-ai-support
+  labels:
+    app: unicorn-ai-support
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: unicorn-ai-support
+  template:
+    metadata:
+      labels:
+        app: unicorn-ai-support
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "8096"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: registry.example.com/unicorn-ai-support:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8096
+          envFrom:
+            - secretRef:
+                name: unicorn-ai-support
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: infra
+            - name: AI_SUPPORT_ASYNC_INGEST_ENABLED
+              value: "true"
+            - name: AI_DEMO_SEED
+              value: "false"
+            - name: AI_DEMO_MODEL
+              value: "false"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 3Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 40
+            periodSeconds: 20
+      volumes:
+        - name: tmp
+          emptyDir: {}

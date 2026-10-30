@@ -70,6 +70,8 @@ docker compose up --build
 
 Compose 会设置 `AI_DEMO_SEED=true`、`AI_DEMO_MODEL=true`，默认使用 `X-API-Key: demo-key`。生产部署请覆盖数据库/Redis/MQ 密码和模型 Key。
 
+Kubernetes 初始资产在 [`k8s/`](k8s/)：Deployment、Service、Ingress、HPA、PDB 和 Secret 示例；CI 在 [`.github/workflows/ai-support.yml`](../../.github/workflows/ai-support.yml)。生产镜像以非 root 用户运行，健康检查使用 `/actuator/health/{liveness,readiness}`。
+
 ## 核心 API
 
 Base：`/api/ai/support/v1`
