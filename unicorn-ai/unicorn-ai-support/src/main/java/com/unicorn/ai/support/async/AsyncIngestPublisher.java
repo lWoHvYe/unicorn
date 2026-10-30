@@ -22,6 +22,7 @@ import com.unicorn.ai.support.knowledge.KnowledgeRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
 
 @Component
@@ -33,12 +34,14 @@ public class AsyncIngestPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final KnowledgeRepository repository;
     private final SupportProperties properties;
+    private final OutboxRepository outbox;
 
     public AsyncIngestPublisher(RabbitTemplate rabbitTemplate, KnowledgeRepository repository,
-                                SupportProperties properties) {
+                                SupportProperties properties, OutboxRepository outbox) {
         this.rabbitTemplate = rabbitTemplate;
         this.repository = repository;
         this.properties = properties;
+        this.outbox = outbox;
     }
 
     public void publishDeadLetter(IngestCommand command, String error) {
@@ -47,11 +50,12 @@ public class AsyncIngestPublisher {
                         "error", error == null ? "" : error)));
     }
 
+    @Transactional
     public AsyncIngestResponse publish(String jobId, String tenantId, String documentId, String versionId) {
         var command = new IngestCommand(jobId, tenantId, documentId, versionId);
         try {
-            rabbitTemplate.convertAndSend(properties.asyncIngest().exchange(),
-                    properties.asyncIngest().routingKey(), JSON.writeValueAsString(command));
+            outbox.enqueue(tenantId, "ingest_job", jobId, "INGEST_REQUESTED",
+                    JSON.writeValueAsString(command));
             var attempts = repository.findJob(tenantId, jobId).map(job -> job.attempts()).orElse(0);
             repository.updateJob(jobId, "QUEUED", attempts, null);
             return new AsyncIngestResponse(jobId, "/api/ai/support/v1/jobs/" + jobId);

@@ -18,7 +18,9 @@ package com.unicorn.ai.support;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -84,6 +86,9 @@ class SupportExternalInfraTest {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private JdbcTemplate jdbc;
+
     private final HttpClient http = HttpClient.newHttpClient();
 
     @Test
@@ -110,6 +115,9 @@ class SupportExternalInfraTest {
             Thread.sleep(500);
         }
         assertEquals("COMPLETED", status);
+        assertEquals(1, jdbc.queryForObject("""
+                SELECT COUNT(*) FROM ai_outbox WHERE aggregate_id = ? AND status = 'PUBLISHED'
+                """, Integer.class, jobId));
 
         var session = post("/api/ai/support/v1/sessions", "{\"channel\":\"web\"}", "demo-key");
         var sessionId = JSON.readValue(session.body(), Map.class).get("id");
