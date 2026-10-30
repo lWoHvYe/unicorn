@@ -143,6 +143,27 @@ class SupportApplicationTests {
     }
 
     @Test
+    void tenantAdminCreatesUserRoleAndAssignsIt() {
+        var user = post("/api/ai/support/v1/admin/users",
+                "{\"externalSubject\":\"user-admin-test\",\"displayName\":\"Admin Test\",\"email\":\"a@example.com\"}",
+                "demo-key");
+        assertEquals(HttpStatus.OK.value(), user.statusCode());
+        var userId = JSON.readValue(user.body(), Map.class).get("id");
+
+        var role = post("/api/ai/support/v1/admin/roles",
+                "{\"name\":\"QA_REVIEWER\",\"scopes\":\"knowledge:read\"}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), role.statusCode());
+        var roleId = JSON.readValue(role.body(), Map.class).get("id");
+
+        var assigned = post("/api/ai/support/v1/admin/users/" + userId + "/roles/" + roleId, "{}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), assigned.statusCode());
+        assertTrue(assigned.body().contains("QA_REVIEWER"));
+
+        var forbidden = get("/api/ai/support/v1/admin/users", "agent-key");
+        assertEquals(HttpStatus.FORBIDDEN.value(), forbidden.statusCode());
+    }
+
+    @Test
     void handoffIsPersistedAndTenantScoped() {
         var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
                 "session-handoff", "handoff-1", "trace-handoff");
