@@ -16,6 +16,7 @@
 
 package com.unicorn.ai.support.security;
 
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -27,9 +28,11 @@ import java.util.Set;
 public class ApiKeyRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final CacheManager cacheManager;
 
-    public ApiKeyRepository(JdbcTemplate jdbcTemplate) {
+    public ApiKeyRepository(JdbcTemplate jdbcTemplate, CacheManager cacheManager) {
         this.jdbcTemplate = jdbcTemplate;
+        this.cacheManager = cacheManager;
     }
 
     @Cacheable(cacheNames = "ai-api-key", key = "#keyHash")
@@ -45,6 +48,32 @@ public class ApiKeyRepository {
                         rs.getString("user_id"),
                         Set.of(rs.getString("roles").split(","))),
                 keyHash).stream().findFirst();
+    }
+
+    public CreatedKey create(String tenantId, String userId, String roles) {
+        var rawKey = java.util.UUID.randomUUID().toString().replace("-", "");
+        var id = java.util.UUID.randomUUID().toString();
+        jdbcTemplate.update("""
+                INSERT INTO ai_api_key (id, tenant_id, user_id, key_hash, roles, enabled)
+                VALUES (?, ?, ?, ?, ?, TRUE)
+                """, id, tenantId, userId, com.unicorn.ai.support.util.Hashing.sha256(rawKey), roles);
+        return new CreatedKey(id, rawKey);
+    }
+
+    public void revoke(String tenantId, String keyId) {
+        var hash = jdbcTemplate.queryForList("""
+                SELECT key_hash FROM ai_api_key WHERE tenant_id = ? AND id = ?
+                """, String.class, tenantId, keyId).stream().findFirst()
+                .orElseThrow(() -> new java.util.NoSuchElementException("API Key 不存在"));
+        jdbcTemplate.update("UPDATE ai_api_key SET enabled = FALSE WHERE tenant_id = ? AND id = ?",
+                tenantId, keyId);
+        var cache = cacheManager.getCache("ai-api-key");
+        if (cache != null && hash != null) {
+            cache.evict(hash);
+        }
+    }
+
+    public record CreatedKey(String id, String apiKey) {
     }
 
     public record ApiKeyPrincipal(String tenantId, String userId, Set<String> roles)

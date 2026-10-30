@@ -167,6 +167,21 @@ class SupportApplicationTests {
     }
 
     @Test
+    void createdApiKeyWorksUntilRevoked() {
+        var created = post("/api/ai/support/v1/admin/api-keys",
+                "{\"userId\":\"rotated-user\",\"roles\":\"TENANT_ADMIN,SUPPORT_AGENT\"}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), created.statusCode());
+        var body = JSON.readValue(created.body(), Map.class);
+        var keyId = body.get("id").toString();
+        var apiKey = body.get("apiKey").toString();
+
+        assertEquals(HttpStatus.OK.value(), get("/api/ai/support/v1/knowledge-bases", apiKey).statusCode());
+        var revoked = post("/api/ai/support/v1/admin/api-keys/" + keyId + "/revoke", "{}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), revoked.statusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), get("/api/ai/support/v1/knowledge-bases", apiKey).statusCode());
+    }
+
+    @Test
     void handoffIsPersistedAndTenantScoped() {
         var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
                 "session-handoff", "handoff-1", "trace-handoff");

@@ -90,6 +90,8 @@ Base：`/api/ai/support/v1`
 | GET/POST | `/admin/users` | 租户用户列表/创建（TENANT_ADMIN） |
 | GET/POST | `/admin/roles` | 租户角色列表/创建（TENANT_ADMIN） |
 | POST | `/admin/users/{userId}/roles/{roleId}` | 分配角色 |
+| POST | `/admin/api-keys` | 创建 API Key（仅返回一次明文） |
+| POST | `/admin/api-keys/{id}/revoke` | 吊销 API Key 并清理认证缓存 |
 | GET/POST | `/knowledge-bases` | 知识库列表/创建 |
 | POST | `/knowledge-bases/{kbId}/documents` | 上传文档（multipart） |
 | POST | `/knowledge-bases/{kbId}/documents/text` | 文本入库 |
