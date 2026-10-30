@@ -31,6 +31,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -138,6 +141,58 @@ class SupportExternalInfraTest {
     private HttpResponse<String> get(String path, String key) throws Exception {
         return http.send(HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
                 .header("X-API-Key", key).GET().build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    @Test
+    void rlsIsolatesRowsForNonOwnerRole() throws Exception {
+        var role = "ai_rls_test";
+        jdbc.execute("""
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'ai_rls_test') THEN
+                        CREATE ROLE ai_rls_test LOGIN PASSWORD 'ai_rls_test_pwd';
+                    END IF;
+                END $$;
+                """);
+        jdbc.execute("ALTER ROLE ai_rls_test PASSWORD 'ai_rls_test_pwd'");
+        jdbc.execute("GRANT CONNECT ON DATABASE vectordb TO ai_rls_test");
+        jdbc.execute("GRANT USAGE ON SCHEMA " + SCHEMA + " TO ai_rls_test");
+        jdbc.execute("GRANT SELECT ON ALL TABLES IN SCHEMA " + SCHEMA + " TO ai_rls_test");
+        jdbc.update("""
+                INSERT INTO ai_chat_session (id, tenant_id, user_id, channel, title)
+                VALUES ('rls-demo', 'demo', 'rls-user', 'test', 'RLS demo')
+                ON CONFLICT (id) DO NOTHING
+                """);
+        jdbc.update("""
+                INSERT INTO ai_chat_session (id, tenant_id, user_id, channel, title)
+                VALUES ('rls-other', 'other', 'rls-user', 'test', 'RLS other')
+                ON CONFLICT (id) DO NOTHING
+                """);
+        try (Connection connection = DriverManager.getConnection(DB_URL, role, "ai_rls_test_pwd")) {
+            assertEquals(List.of("demo"), tenantsVisibleTo(connection, "demo"));
+            assertEquals(List.of("other"), tenantsVisibleTo(connection, "other"));
+            assertTrue(tenantsVisibleTo(connection, "").isEmpty());
+        } finally {
+            jdbc.execute("DROP OWNED BY ai_rls_test");
+            jdbc.execute("DROP ROLE IF EXISTS ai_rls_test");
+            jdbc.update("DELETE FROM ai_chat_session WHERE id IN ('rls-demo', 'rls-other')");
+        }
+    }
+
+    private List<String> tenantsVisibleTo(Connection connection, String tenant) throws Exception {
+        try (var set = connection.prepareStatement("SELECT set_config('app.tenant_id', ?, false)")) {
+            set.setString(1, tenant);
+            set.execute();
+        }
+        try (var statement = connection.prepareStatement(
+                "SELECT DISTINCT tenant_id FROM ai_chat_session ORDER BY tenant_id");
+             var result = statement.executeQuery()) {
+            var tenants = new java.util.ArrayList<String>();
+            while (result.next()) {
+                tenants.add(result.getString(1));
+            }
+            return tenants;
+        }
     }
 
     private static String env(String key, String fallback) {

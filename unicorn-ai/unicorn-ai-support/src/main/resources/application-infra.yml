@@ -55,6 +55,8 @@ ai:
       exchange: unicorn.ai.support
       queue: unicorn.ai.support.ingest
       routing-key: ingest
+    rls:
+      enabled: ${AI_RLS_ENABLED:true}
     rate-limit:
       store: redis
     cache:

@@ -18,6 +18,8 @@ package com.unicorn.ai.support.async;
 
 import com.unicorn.ai.support.knowledge.DocumentIngestionService;
 import com.unicorn.ai.support.knowledge.KnowledgeRepository;
+import com.unicorn.ai.support.security.AiPrincipal;
+import com.unicorn.ai.support.security.TenantContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -53,7 +55,9 @@ public class AsyncIngestConsumer {
             throw new AmqpRejectAndDontRequeueException("Invalid ingest command", exception);
         }
         try {
-            ingestionService.process(command.tenantId(), command.documentId(), command.versionId(), command.jobId());
+            TenantContext.run(new AiPrincipal(command.tenantId(), "ingest-worker", java.util.Set.of("SYSTEM")),
+                    () -> ingestionService.process(command.tenantId(), command.documentId(),
+                            command.versionId(), command.jobId()));
             log.info("Ingest job {} completed", command.jobId());
         } catch (RuntimeException exception) {
             var attempts = repository.findJob(command.tenantId(), command.jobId())

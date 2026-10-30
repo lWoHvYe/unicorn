@@ -41,6 +41,8 @@ spec:
               value: "false"
             - name: AI_DEMO_MODEL
               value: "false"
+            - name: AI_RLS_ENABLED
+              value: "true"
           resources:
             requests:
               cpu: 500m

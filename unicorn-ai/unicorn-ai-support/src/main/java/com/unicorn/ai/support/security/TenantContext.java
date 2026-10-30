@@ -30,15 +30,19 @@ public final class TenantContext {
     private TenantContext() {
     }
 
-    public static AiPrincipal current() {
+    public static java.util.Optional<AiPrincipal> optional() {
         if (PRINCIPAL.isBound()) {
-            return PRINCIPAL.get();
+            return java.util.Optional.of(PRINCIPAL.get());
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof AiPrincipal value) {
-            return value;
+            return java.util.Optional.of(value);
         }
-        throw new IllegalStateException("缺少租户认证上下文");
+        return java.util.Optional.empty();
+    }
+
+    public static AiPrincipal current() {
+        return optional().orElseThrow(() -> new IllegalStateException("缺少租户认证上下文"));
     }
 
     public static <T, X extends Throwable> T call(AiPrincipal principal,

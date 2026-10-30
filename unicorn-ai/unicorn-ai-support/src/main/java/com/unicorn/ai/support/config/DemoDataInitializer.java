@@ -16,6 +16,8 @@
 
 package com.unicorn.ai.support.config;
 
+import com.unicorn.ai.support.security.AiPrincipal;
+import com.unicorn.ai.support.security.TenantContext;
 import com.unicorn.ai.support.util.Hashing;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -23,6 +25,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Order(1)
 @Component
@@ -41,35 +45,36 @@ public class DemoDataInitializer implements ApplicationRunner {
         if (tenants != null && tenants > 0) {
             return;
         }
-        jdbcTemplate.update("INSERT INTO ai_tenant (id, name, status) VALUES (?, ?, ?)",
-                "demo", "Demo Tenant", "ACTIVE");
-        jdbcTemplate.update("""
-                INSERT INTO ai_api_key (id, tenant_id, user_id, key_hash, roles, enabled)
-                VALUES (?, ?, ?, ?, ?, TRUE)
-                """, "demo-key", "demo", "demo-user", Hashing.sha256("demo-key"),
-                "TENANT_ADMIN,SUPPORT_MANAGER,SUPPORT_AGENT");
-        jdbcTemplate.update("""
-                INSERT INTO ai_api_key (id, tenant_id, user_id, key_hash, roles, enabled)
-                VALUES (?, ?, ?, ?, ?, TRUE)
-                """, "agent-key", "demo", "agent-user", Hashing.sha256("agent-key"), "SUPPORT_AGENT");
-        jdbcTemplate.update("""
-                INSERT INTO ai_knowledge_base (id, tenant_id, name, description, status)
-                VALUES (?, ?, ?, ?, 'ACTIVE')
-                """, "demo-kb", "demo", "Demo Knowledge Base", "Seed knowledge base");
+        seedTenant("demo", "demo-key", "demo-user",
+                Set.of("TENANT_ADMIN", "SUPPORT_MANAGER", "SUPPORT_AGENT"), true);
+        seedTenant("other", "other-key", "other-user",
+                Set.of("TENANT_ADMIN", "SUPPORT_MANAGER", "SUPPORT_AGENT"), false);
+    }
 
-        seedDomain("demo");
-
-        jdbcTemplate.update("INSERT INTO ai_tenant (id, name, status) VALUES (?, ?, ?)",
-                "other", "Other Tenant", "ACTIVE");
-        jdbcTemplate.update("""
-                INSERT INTO ai_api_key (id, tenant_id, user_id, key_hash, roles, enabled)
-                VALUES (?, ?, ?, ?, ?, TRUE)
-                """, "other-key", "other", "other-user", Hashing.sha256("other-key"),
-                "TENANT_ADMIN,SUPPORT_MANAGER,SUPPORT_AGENT");
-        jdbcTemplate.update("""
-                INSERT INTO ai_knowledge_base (id, tenant_id, name, description, status)
-                VALUES (?, ?, ?, ?, 'ACTIVE')
-                """, "other-kb", "other", "Other Knowledge Base", "Tenant isolation test");
+    private void seedTenant(String tenantId, String apiKeyId, String userId, Set<String> roles,
+                            boolean seedDomain) {
+        TenantContext.run(new AiPrincipal(tenantId, userId, roles), () -> {
+            jdbcTemplate.update("INSERT INTO ai_tenant (id, name, status) VALUES (?, ?, ?)",
+                    tenantId, tenantId + " Tenant", "ACTIVE");
+            jdbcTemplate.update("""
+                    INSERT INTO ai_api_key (id, tenant_id, user_id, key_hash, roles, enabled)
+                    VALUES (?, ?, ?, ?, ?, TRUE)
+                    """, apiKeyId, tenantId, userId, Hashing.sha256(apiKeyId),
+                    String.join(",", roles));
+            if ("demo".equals(tenantId)) {
+                jdbcTemplate.update("""
+                        INSERT INTO ai_api_key (id, tenant_id, user_id, key_hash, roles, enabled)
+                        VALUES ('agent-key', ?, 'agent-user', ?, 'SUPPORT_AGENT', TRUE)
+                        """, tenantId, Hashing.sha256("agent-key"));
+            }
+            jdbcTemplate.update("""
+                    INSERT INTO ai_knowledge_base (id, tenant_id, name, description, status)
+                    VALUES (?, ?, ?, ?, 'ACTIVE')
+                    """, tenantId + "-kb", tenantId, tenantId + " Knowledge Base", "Seed knowledge base");
+            if (seedDomain) {
+                seedDomain(tenantId);
+            }
+        });
     }
 
     private void seedDomain(String tenantId) {
