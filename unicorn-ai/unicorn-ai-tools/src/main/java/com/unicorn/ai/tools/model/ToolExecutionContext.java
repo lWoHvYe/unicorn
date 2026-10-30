@@ -16,12 +16,26 @@
 
 package com.unicorn.ai.tools.model;
 
+import java.util.Map;
 import java.util.Set;
 
 public record ToolExecutionContext(String tenantId, String userId, Set<String> roles, String sessionId,
-                                  String idempotencyKey, String traceId) {
+                                   String idempotencyKey, String traceId, Map<String, Object> attributes) {
+
+    public ToolExecutionContext(String tenantId, String userId, Set<String> roles, String sessionId,
+                                String idempotencyKey, String traceId) {
+        this(tenantId, userId, roles, sessionId, idempotencyKey, traceId, Map.of());
+    }
+
+    public ToolExecutionContext {
+        attributes = attributes == null ? Map.of() : Map.copyOf(attributes);
+    }
 
     public boolean hasRole(String role) {
         return roles != null && roles.contains(role);
+    }
+
+    public Object attribute(String key) {
+        return attributes.get(key);
     }
 }

@@ -19,21 +19,20 @@ package com.unicorn.ai.support.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * Java 25 ScopedValue-based request context. Prefer passing AiPrincipal explicitly
+ * through async boundaries; this scope is for the synchronous MVC request thread.
+ */
 public final class TenantContext {
 
-    private static final ThreadLocal<AiPrincipal> HOLDER = new ThreadLocal<>();
+    public static final ScopedValue<AiPrincipal> PRINCIPAL = ScopedValue.newInstance();
 
     private TenantContext() {
     }
 
-    public static void set(AiPrincipal principal) {
-        HOLDER.set(principal);
-    }
-
     public static AiPrincipal current() {
-        var principal = HOLDER.get();
-        if (principal != null) {
-            return principal;
+        if (PRINCIPAL.isBound()) {
+            return PRINCIPAL.get();
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof AiPrincipal value) {
@@ -42,7 +41,12 @@ public final class TenantContext {
         throw new IllegalStateException("缺少租户认证上下文");
     }
 
-    public static void clear() {
-        HOLDER.remove();
+    public static <T, X extends Throwable> T call(AiPrincipal principal,
+                                                 ScopedValue.CallableOp<T, X> action) throws X {
+        return ScopedValue.where(PRINCIPAL, principal).call(action);
+    }
+
+    public static void run(AiPrincipal principal, Runnable action) {
+        ScopedValue.where(PRINCIPAL, principal).run(action);
     }
 }

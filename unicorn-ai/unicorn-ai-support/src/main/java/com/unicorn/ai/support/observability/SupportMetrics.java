@@ -42,4 +42,10 @@ public class SupportMetrics {
     public void tool(String tenantId, String tool, String status) {
         registry.counter("ai.support.tool.calls", "tenant", tenantId, "tool", tool, "status", status).increment();
     }
+
+    public void retrieval(String tenantId, boolean empty, long latencyNanos) {
+        registry.timer("ai.support.retrieval", "tenant", tenantId, "empty", Boolean.toString(empty))
+                .record(Duration.ofNanos(latencyNanos));
+    }
+
 }

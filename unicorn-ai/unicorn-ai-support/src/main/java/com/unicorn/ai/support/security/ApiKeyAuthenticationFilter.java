@@ -71,11 +71,16 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
                 .toList();
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(aiPrincipal, null, authorities));
-        TenantContext.set(aiPrincipal);
         try {
-            filterChain.doFilter(request, response);
+            TenantContext.call(aiPrincipal, () -> {
+                filterChain.doFilter(request, response);
+                return null;
+            });
+        } catch (IOException | ServletException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new ServletException(exception);
         } finally {
-            TenantContext.clear();
             SecurityContextHolder.clearContext();
         }
     }

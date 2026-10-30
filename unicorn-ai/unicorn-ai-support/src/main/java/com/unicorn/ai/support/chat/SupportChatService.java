@@ -19,6 +19,8 @@ package com.unicorn.ai.support.chat;
 import com.unicorn.ai.support.config.SupportProperties;
 import com.unicorn.ai.support.retrieval.Citation;
 import com.unicorn.ai.support.retrieval.RetrievalResult;
+import com.unicorn.ai.support.retrieval.RetrievalCapture;
+import com.unicorn.ai.support.retrieval.NoContextException;
 import com.unicorn.ai.support.retrieval.RetrievalService;
 import com.unicorn.ai.support.security.AiPrincipal;
 import com.unicorn.ai.support.tools.SupportToolFacade;
@@ -27,15 +29,14 @@ import com.unicorn.ai.support.observability.UsageRepository;
 import com.unicorn.ai.support.ratelimit.RateLimiterService;
 import org.slf4j.MDC;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
-import com.unicorn.ai.support.tools.ToolEventContext;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 @Service
 public class SupportChatService {
@@ -58,11 +60,17 @@ public class SupportChatService {
     private final UsageRepository usageRepository;
     private final SupportMetrics metrics;
     private final RateLimiterService rateLimiter;
+    private final MessageChatMemoryAdvisor memoryAdvisor;
+    private final RetrievalAugmentationAdvisor ragAdvisor;
+    private final SafeGuardAdvisor safeGuardAdvisor;
 
     public SupportChatService(ChatClient chatClient, ChatRepository chatRepository,
                               RetrievalService retrievalService, SupportProperties properties,
                               SupportToolFacade toolFacade, UsageRepository usageRepository,
-                              SupportMetrics metrics, RateLimiterService rateLimiter) {
+                              SupportMetrics metrics, RateLimiterService rateLimiter,
+                              MessageChatMemoryAdvisor memoryAdvisor,
+                              RetrievalAugmentationAdvisor ragAdvisor,
+                              SafeGuardAdvisor safeGuardAdvisor) {
         this.chatClient = chatClient;
         this.chatRepository = chatRepository;
         this.retrievalService = retrievalService;
@@ -71,6 +79,9 @@ public class SupportChatService {
         this.usageRepository = usageRepository;
         this.metrics = metrics;
         this.rateLimiter = rateLimiter;
+        this.memoryAdvisor = memoryAdvisor;
+        this.ragAdvisor = ragAdvisor;
+        this.safeGuardAdvisor = safeGuardAdvisor;
     }
 
     public ChatDtos.SessionView createSession(AiPrincipal principal, String channel, String title) {
@@ -99,7 +110,6 @@ public class SupportChatService {
         var session = requireSession(principal, sessionId);
         var started = System.nanoTime();
         var traceId = traceId();
-        var history = history(principal.tenantId(), sessionId, session.summary());
         var messageId = UUID.randomUUID().toString();
         var requestId = idempotencyKey == null || idempotencyKey.isBlank() ? null : idempotencyKey;
         if (requestId != null && !chatRepository.tryStartRequest(principal.tenantId(), sessionId, requestId, messageId)) {
@@ -116,33 +126,24 @@ public class SupportChatService {
         chatRepository.saveMessage(new ChatRecords.Message(userMessageId, sessionId, principal.tenantId(),
                 "USER", message, null, null, null, traceId, "DONE", Instant.now()));
 
-        final com.unicorn.ai.support.retrieval.RetrievalResult retrieval;
-        try {
-            retrieval = retrievalService.retrieve(principal.tenantId(), defaultKb(session), message, null,
-                    principal.roles());
-        } catch (RuntimeException exception) {
-            finishRequest(principal, sessionId, requestId, "FAILED");
-            throw exception;
-        }
-        if (!retrieval.answerable()) {
-            var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
-            saveAssistant(principal, sessionId, messageId, refusal, retrieval.citations(),
-                    ChatDtos.TokenUsage.empty(), traceId, "REFUSED");
-            usageRepository.record(principal.tenantId(), 0, 0, 0);
-            metrics.chat(principal.tenantId(), "REFUSED", System.nanoTime() - started);
-            finishRequest(principal, sessionId, requestId, "DONE");
-            return new ChatDtos.ChatAnswer(messageId, refusal, retrieval.citations(),
-                    ChatDtos.TokenUsage.empty(), traceId, "REFUSED");
-        }
+        var capture = new RetrievalCapture();
+        var params = new java.util.HashMap<String, Object>();
+        params.put("tenant", principal.tenantId());
+        params.put("kbId", defaultKb(session));
+        params.put("roles", principal.roles());
+        params.put("capture", capture);
+        params.put(ChatMemory.CONVERSATION_ID, conversationId(principal, sessionId));
 
         try {
             var response = chatClient.prompt()
-                    .messages(history)
-                    .user(user -> user.text("{prompt}").param("prompt", prompt(message, retrieval)))
+                    .advisors(safeGuardAdvisor, memoryAdvisor, ragAdvisor)
+                    .advisors(advisor -> advisor.params(params))
+                    .user(message)
                     .tools(toolFacade)
                     .toolContext(toolContext(principal, sessionId, traceId, idempotencyKey))
                     .call()
                     .chatResponse();
+            var retrieval = capture.require();
             var answer = response.getResult().getOutput().getText();
             var usage = usage(response);
             saveAssistant(principal, sessionId, messageId, answer, retrieval.citations(), usage, traceId, "DONE");
@@ -151,9 +152,18 @@ public class SupportChatService {
             metrics.chat(principal.tenantId(), "DONE", System.nanoTime() - started);
             finishRequest(principal, sessionId, requestId, "DONE");
             return new ChatDtos.ChatAnswer(messageId, answer, retrieval.citations(), usage, traceId, "DONE");
+        } catch (NoContextException exception) {
+            var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
+            saveAssistant(principal, sessionId, messageId, refusal, List.of(),
+                    ChatDtos.TokenUsage.empty(), traceId, "REFUSED");
+            usageRepository.record(principal.tenantId(), 0, 0, 0);
+            metrics.chat(principal.tenantId(), "REFUSED", System.nanoTime() - started);
+            finishRequest(principal, sessionId, requestId, "DONE");
+            return new ChatDtos.ChatAnswer(messageId, refusal, List.of(),
+                    ChatDtos.TokenUsage.empty(), traceId, "REFUSED");
         } catch (RuntimeException exception) {
             saveAssistant(principal, sessionId, messageId, "AI 调用失败，请稍后重试。",
-                    retrieval.citations(), ChatDtos.TokenUsage.empty(), traceId, "FAILED");
+                    List.of(), ChatDtos.TokenUsage.empty(), traceId, "FAILED");
             metrics.chat(principal.tenantId(), "FAILED", System.nanoTime() - started);
             finishRequest(principal, sessionId, requestId, "FAILED");
             throw exception;
@@ -165,7 +175,6 @@ public class SupportChatService {
         rateLimiter.checkChat(principal.tenantId());
         var session = requireSession(principal, sessionId);
         var traceId = traceId();
-        var history = history(principal.tenantId(), sessionId, session.summary());
         var messageId = UUID.randomUUID().toString();
         chatRepository.saveMessage(new ChatRecords.Message(UUID.randomUUID().toString(), sessionId,
                 principal.tenantId(), "USER", message, null, null, null, traceId, "DONE", Instant.now()));
@@ -190,23 +199,22 @@ public class SupportChatService {
         var answer = new StringBuilder();
         var failed = new AtomicBoolean(false);
         Sinks.Many<ChatDtos.StreamEvent> toolEvents = Sinks.many().unicast().onBackpressureBuffer();
+        Consumer<ChatDtos.StreamEvent> eventSink = toolEvents::tryEmitNext;
         var tokens = Flux.defer(() -> {
-                    ToolEventContext.set(event -> toolEvents.tryEmitNext(event));
                     return chatClient.prompt()
-                            .messages(history)
+                            .advisors(safeGuardAdvisor, memoryAdvisor)
+                            .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID,
+                                    conversationId(principal, sessionId)))
                             .user(user -> user.text("{prompt}").param("prompt", prompt(message, retrieval)))
                             .tools(toolFacade)
-                            .toolContext(toolContext(principal, sessionId, traceId, null))
+                            .toolContext(toolContext(principal, sessionId, traceId, null, eventSink))
                             .stream()
                             .content()
                             .doOnNext(answer::append)
                             .doOnComplete(() -> saveAssistant(principal, sessionId, messageId, answer.toString(),
                                     retrieval.citations(), ChatDtos.TokenUsage.empty(), traceId, "DONE"))
                             .map(delta -> new ChatDtos.StreamEvent("token", java.util.Map.of("delta", delta)))
-                            .doFinally(signal -> {
-                                ToolEventContext.clear();
-                                toolEvents.tryEmitComplete();
-                            })
+                            .doFinally(signal -> toolEvents.tryEmitComplete())
                             .onErrorResume(exception -> {
                                 failed.set(true);
                                 try {
@@ -285,6 +293,10 @@ public class SupportChatService {
                 .orElseThrow(() -> new java.util.NoSuchElementException("会话不存在"));
     }
 
+    private String conversationId(AiPrincipal principal, String sessionId) {
+        return principal.tenantId() + ":" + sessionId;
+    }
+
     private String defaultKb(ChatRecords.Session session) {
         return session.kbId() == null || session.kbId().isBlank() ? "demo-kb" : session.kbId();
     }
@@ -300,13 +312,23 @@ public class SupportChatService {
 
     private java.util.Map<String, Object> toolContext(AiPrincipal principal, String sessionId,
                                                       String traceId, String idempotencyKey) {
-        return java.util.Map.of(
-                "tenant", principal.tenantId(),
-                "userId", principal.userId(),
-                "roles", String.join(",", principal.roles()),
-                "sessionId", sessionId,
-                "idempotencyKey", idempotencyKey == null ? "" : idempotencyKey,
-                "traceId", traceId);
+        return toolContext(principal, sessionId, traceId, idempotencyKey, null);
+    }
+
+    private java.util.Map<String, Object> toolContext(AiPrincipal principal, String sessionId,
+                                                      String traceId, String idempotencyKey,
+                                                      java.util.function.Consumer<ChatDtos.StreamEvent> eventSink) {
+        var values = new java.util.HashMap<String, Object>();
+        values.put("tenant", principal.tenantId());
+        values.put("userId", principal.userId());
+        values.put("roles", String.join(",", principal.roles()));
+        values.put("sessionId", sessionId);
+        values.put("idempotencyKey", idempotencyKey == null ? "" : idempotencyKey);
+        values.put("traceId", traceId);
+        if (eventSink != null) {
+            values.put("eventSink", eventSink);
+        }
+        return values;
     }
 
     private String summarize(List<ChatRecords.Message> messages) {
@@ -325,21 +347,6 @@ public class SupportChatService {
         } catch (RuntimeException exception) {
             return transcript.length() <= 300 ? transcript : transcript.substring(0, 300);
         }
-    }
-
-    private List<Message> history(String tenantId, String sessionId, String summary) {
-        var messages = new ArrayList<Message>();
-        if (summary != null && !summary.isBlank()) {
-            messages.add(new SystemMessage("此前会话摘要：" + summary));
-        }
-        for (var row : chatRepository.recentMessages(tenantId, sessionId, properties.memoryWindow())) {
-            if ("USER".equals(row.role())) {
-                messages.add(new UserMessage(row.content()));
-            } else if ("ASSISTANT".equals(row.role())) {
-                messages.add(new AssistantMessage(row.content()));
-            }
-        }
-        return messages;
     }
 
     private String prompt(String question, RetrievalResult retrieval) {

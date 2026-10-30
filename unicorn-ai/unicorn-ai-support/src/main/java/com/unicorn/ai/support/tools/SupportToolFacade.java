@@ -16,6 +16,7 @@
 
 package com.unicorn.ai.support.tools;
 
+import com.unicorn.ai.support.chat.ChatDtos;
 import com.unicorn.ai.support.security.AiPrincipal;
 import com.unicorn.ai.support.security.TenantContext;
 import com.unicorn.ai.support.observability.SupportMetrics;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.UUID;
 
 @Component
@@ -101,15 +103,22 @@ public class SupportToolFacade {
     }
 
     private ToolResult execute(ToolExecutionContext context, String tool, Map<String, Object> args) {
-        ToolEventContext.emit("tool", Map.of("tool", tool, "status", "RUNNING"));
+        emit(context, "tool", Map.of("tool", tool, "status", "RUNNING"));
         var result = invocations.execute(context, tool, args);
         metrics.tool(context.tenantId(), tool, result.status().name());
-        ToolEventContext.emit("tool", Map.of("tool", tool, "status", result.status().name()));
+        emit(context, "tool", Map.of("tool", tool, "status", result.status().name()));
         if (result.status() == com.unicorn.ai.tools.model.ToolStatus.PENDING_APPROVAL) {
-            ToolEventContext.emit("approval", Map.of("tool", tool, "approvalId", result.approvalId(),
+            emit(context, "approval", Map.of("tool", tool, "approvalId", result.approvalId(),
                     "status", "PENDING"));
         }
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void emit(ToolExecutionContext context, String event, Object data) {
+        if (context.attribute("eventSink") instanceof Consumer<?> sink) {
+            ((Consumer<ChatDtos.StreamEvent>) sink).accept(new ChatDtos.StreamEvent(event, data));
+        }
     }
 
     private ToolExecutionContext context(ToolContext context) {
@@ -121,7 +130,12 @@ public class SupportToolFacade {
         var sessionId = text(values, "sessionId", "");
         var idempotencyKey = text(values, "idempotencyKey", "");
         var traceId = text(values, "traceId", traceId());
-        return new ToolExecutionContext(tenantId, userId, roles, sessionId, idempotencyKey, traceId);
+        var attributes = new java.util.HashMap<String, Object>();
+        if (values.get("eventSink") instanceof Consumer<?> sink) {
+            attributes.put("eventSink", sink);
+        }
+        return new ToolExecutionContext(tenantId, userId, roles, sessionId, idempotencyKey, traceId,
+                attributes);
     }
 
     private AiPrincipal principal() {

@@ -2,6 +2,8 @@
 
 面向中等规模生产场景的 **多租户售后客服智能体** 参考实现。它不是另一个 demo，而是把 Chat、RAG、工具调用、审批、MCP、审计和指标串成一条可运行的业务链路。
 
+产品基线与验收标准见 [`docs/prd/support-copilot.md`](docs/prd/support-copilot.md)。
+
 ## 场景
 
 - 租户（商家）维护自己的知识库与订单/库存数据。
@@ -117,11 +119,18 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
   -d '{"message":"Spring Boot 4.1"}'
 ```
 
+## Spring AI 2 编排
+
+- 阻塞问答使用 `MessageChatMemoryAdvisor` + `RetrievalAugmentationAdvisor` + `SafeGuardAdvisor`。
+- ChatMemory 使用 `JdbcChatMemoryRepository` / `MessageWindowChatMemory`，存储于 `ai_chat_memory`。
+- RAG 通过自定义 `SupportDocumentRetriever` 复用现有混合检索/ACL，`SupportQueryAugmenter` 负责 citation 格式和空上下文拒答。
+- `SupportChatService` 的流式路径暂时保留显式检索 + 手工 prompt，后续迁移到同一 advisor chain；阻塞路径已走 advisor。
+
 ## 混合检索
 
 - 向量：`VectorStore.similaritySearch`，过滤 `tenant/kbId`；再按文档 `aclRoles` 过滤。
 - 词法：`ai_chunk` 的 `LOWER(content) LIKE`；Postgres 额外建 `pg_trgm` GIN 索引。
-- RRF：`1/(60+rank)` 合并；默认 MMR 去冗余，`rerank.enabled=true` 时再走 LLM 重排。
+- RRF：`1/(60+rank)` 合并；`mmr.enabled=true` 时做 MMR，`rerank.enabled=true` 时再走 LLM 重排，默认关闭以控制成本。
 - 无结果/低于阈值直接拒答，不调用生成模型。
 - `query.rewrite-enabled=true` 时先做 query rewrite + multi-query。
 - 入库时可用 `aclRoles`（逗号分隔）限制文档可见角色；为空表示租户内公开。
@@ -180,6 +189,8 @@ Prompts：`order-support`（按租户订单生成客服回复草稿）。
 - MCP client 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。
 - 领域数据使用 `ai_order`/`ai_inventory`/`ai_product` JDBC 表；本地 demo 由 `DemoDataInitializer` 写入，生产可替换为外部订单/库存服务适配器。
 - `SupportInfraIntegrationTest` 使用 Testcontainers 启动 PostgreSQL/pgvector + RabbitMQ，验证异步入库、job 状态和 citation；无 Docker 时自动 skip。
+- `ai_chat_memory` 保存 Spring AI ChatMemory；`ai_chat_message` 继续作为业务消息/审计。
+- `V5` 增加 PRD 级 IAM/治理/审计/outbox 表；`V6` 增加 ChatMemory 表。
 - 入库使用确定性 chunkId、version 级唯一索引和失败清理；文档/版本/审批均有并发约束。
 - 聊天请求支持 `Idempotency-Key`（`ai_chat_request` 表），重复请求返回同一 assistant message；工具幂等键按 toolName 隔离。
 - `SupportExternalInfraTest` 可直接连接现有 PostgreSQL/pgvector、Redis、RabbitMQ；显式启用：
