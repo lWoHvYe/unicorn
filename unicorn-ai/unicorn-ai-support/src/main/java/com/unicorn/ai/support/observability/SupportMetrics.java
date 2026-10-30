@@ -48,4 +48,12 @@ public class SupportMetrics {
                 .record(Duration.ofNanos(latencyNanos));
     }
 
+    public void citationInvalid(String tenantId) {
+        registry.counter("ai.support.citation.invalid", "tenant", tenantId).increment();
+    }
+
+    public void quotaExceeded(String tenantId) {
+        registry.counter("ai.support.quota.exceeded", "tenant", tenantId).increment();
+    }
+
 }

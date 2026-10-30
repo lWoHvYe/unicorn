@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unicorn-ai-support
+  labels:
+    app: unicorn-ai-support
+spec:
+  groups:
+    - name: unicorn-ai-support
+      rules:
+        - alert: AiSupportChatErrorRate
+          expr: sum(rate(ai_support_chat_seconds_count{status="FAILED"}[5m]))
+            / clamp_min(sum(rate(ai_support_chat_seconds_count[5m])), 0.001) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: AI support chat error rate > 5%
+        - alert: AiSupportRetrievalEmptyRate
+          expr: sum(rate(ai_support_retrieval_seconds_count{empty="true"}[10m]))
+            / clamp_min(sum(rate(ai_support_retrieval_seconds_count[10m])), 0.001) > 0.30
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: RAG retrieval empty rate > 30%
+        - alert: AiSupportCitationInvalid
+          expr: increase(ai_support_citation_invalid_total[10m]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Invalid citations detected
+        - alert: AiSupportQuotaExceeded
+          expr: increase(ai_support_quota_exceeded_total[10m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Tenant quota exhausted

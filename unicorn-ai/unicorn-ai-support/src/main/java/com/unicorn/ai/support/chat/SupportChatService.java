@@ -163,6 +163,7 @@ public class SupportChatService {
             var invalidCitations = citationValidator.invalidReferences(answer, retrieval.citations());
             var status = invalidCitations.isEmpty() ? "DONE" : "REFUSED";
             if (!invalidCitations.isEmpty()) {
+                metrics.citationInvalid(principal.tenantId());
                 answer = citationValidator.refusalFor(invalidCitations);
             }
             var usage = usage(response);
@@ -258,6 +259,7 @@ public class SupportChatService {
                                 var status = invalid.isEmpty() ? "DONE" : "REFUSED";
                                 if (!invalid.isEmpty()) {
                                     refused.set(true);
+                                    metrics.citationInvalid(principal.tenantId());
                                     finalAnswer = citationValidator.refusalFor(invalid);
                                 }
                                 var usage = streamUsage.get();
