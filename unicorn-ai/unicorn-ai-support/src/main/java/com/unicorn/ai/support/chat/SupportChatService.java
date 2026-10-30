@@ -204,12 +204,19 @@ public class SupportChatService {
         var failed = new AtomicBoolean(false);
         Sinks.Many<ChatDtos.StreamEvent> toolEvents = Sinks.many().unicast().onBackpressureBuffer();
         Consumer<ChatDtos.StreamEvent> eventSink = toolEvents::tryEmitNext;
+        var capture = new RetrievalCapture();
+        capture.set(retrieval);
+        var params = new java.util.HashMap<String, Object>();
+        params.put("tenant", principal.tenantId());
+        params.put("kbId", defaultKb(session));
+        params.put("roles", principal.roles());
+        params.put("capture", capture);
+        params.put(ChatMemory.CONVERSATION_ID, conversationId(principal, sessionId));
         var tokens = Flux.defer(() -> {
                     return chatClient.prompt()
-                            .advisors(safeGuardAdvisor, memoryAdvisor)
-                            .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID,
-                                    conversationId(principal, sessionId)))
-                            .user(user -> user.text("{prompt}").param("prompt", prompt(message, retrieval)))
+                            .advisors(safeGuardAdvisor, memoryAdvisor, ragAdvisor)
+                            .advisors(advisor -> advisor.params(params))
+                            .user(message)
                             .tools(toolFacade)
                             .toolContext(toolContext(principal, sessionId, traceId, null, eventSink))
                             .stream()
@@ -352,26 +359,6 @@ public class SupportChatService {
         } catch (RuntimeException exception) {
             return transcript.length() <= 300 ? transcript : transcript.substring(0, 300);
         }
-    }
-
-    private String prompt(String question, RetrievalResult retrieval) {
-        var context = new StringBuilder();
-        for (int i = 0; i < retrieval.documents().size(); i++) {
-            var document = retrieval.documents().get(i);
-            context.append("[C").append(i + 1).append("] source=")
-                    .append(document.getMetadata().getOrDefault("source", "unknown")).append('\n')
-                    .append(document.getText()).append("\n\n");
-        }
-        return """
-                请只依据下面的资料回答用户问题；资料不足时明确说明“资料中没有足够信息”。
-                引用资料时使用 [C1]、[C2] 标记。
-
-                <context>
-                %s
-                </context>
-
-                用户问题：%s
-                """.formatted(context, question);
     }
 
     private double cost(ChatDtos.TokenUsage usage) {

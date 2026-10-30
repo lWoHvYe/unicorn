@@ -18,7 +18,10 @@ package com.unicorn.ai.support.model;
 
 import com.unicorn.ai.support.config.SupportProperties;
 import com.unicorn.ai.support.retrieval.NoContextException;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
 import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -37,13 +40,21 @@ import java.util.function.Supplier;
 public class SupportModelInvoker {
 
     private final SupportProperties properties;
+    private final ObservationRegistry observations;
     private final java.util.concurrent.ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-    public SupportModelInvoker(SupportProperties properties) {
+    public SupportModelInvoker(SupportProperties properties, ObjectProvider<ObservationRegistry> observations) {
         this.properties = properties;
+        this.observations = observations.getIfAvailable(() -> ObservationRegistry.NOOP);
     }
 
     public <T> T call(String tenantId, Supplier<T> action) {
+        return Observation.createNotStarted("ai.support.model", observations)
+                .lowCardinalityKeyValue("tenant", tenantId)
+                .observe(() -> invoke(tenantId, action));
+    }
+
+    private <T> T invoke(String tenantId, Supplier<T> action) {
         var model = properties.model() == null ? new SupportProperties.Model(30000, 2) : properties.model();
         RuntimeException last = null;
         for (int attempt = 1; attempt <= Math.max(1, model.maxAttempts()); attempt++) {

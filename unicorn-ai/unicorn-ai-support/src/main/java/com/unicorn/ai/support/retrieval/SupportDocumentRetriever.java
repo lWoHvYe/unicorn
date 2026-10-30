@@ -49,6 +49,9 @@ public class SupportDocumentRetriever implements DocumentRetriever {
         var roles = context.get("roles") instanceof Set<?> set
                 ? (Set<String>) set : Set.<String>of();
         var capture = context.get("capture");
+        if (capture instanceof RetrievalCapture retrievalCapture && retrievalCapture.get() != null) {
+            return retrievalCapture.get().documents();
+        }
         var started = System.nanoTime();
         var result = retrievalService.retrieve(tenantId, kbId, query.text(), null, roles);
         metrics.retrieval(tenantId, result.documents().isEmpty(), System.nanoTime() - started);

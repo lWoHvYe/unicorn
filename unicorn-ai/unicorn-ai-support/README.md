@@ -130,8 +130,8 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
 - 阻塞问答使用 `MessageChatMemoryAdvisor` + `RetrievalAugmentationAdvisor` + `SafeGuardAdvisor`。
 - ChatMemory 使用 `JdbcChatMemoryRepository` / `MessageWindowChatMemory`，存储于 `ai_chat_memory`。
 - RAG 通过自定义 `SupportDocumentRetriever` 复用现有混合检索/ACL，`SupportQueryAugmenter` 负责 citation 格式和空上下文拒答。
-- `SupportChatService` 的流式路径暂时保留显式检索 + 手工 prompt，后续迁移到同一 advisor chain；阻塞路径已走 advisor。
-- 阻塞模型调用由 `SupportModelInvoker` 提供超时/重试边界；流式路径使用 Reactor timeout。
+- 阻塞和流式路径都使用同一 advisor chain；流式路径先做一次检索用于 citation 预览，`RetrievalCapture` 让 advisor 复用该结果，避免重复向量/词法查询。
+- 模型调用由 `SupportModelInvoker` 提供超时/重试边界与 Micrometer observation；流式路径额外使用 Reactor timeout。
 
 ## 混合检索
 
