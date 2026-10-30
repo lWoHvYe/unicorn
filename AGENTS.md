@@ -4,13 +4,13 @@
 
 `CLAUDE.md` 是早期说明，已在顶部标注以本文件为准；发生冲突时，以本文件、`settings.gradle.kts`、`build-logic/` 和实际构建结果为准。
 
-> 最近核对：2026-10-28（工作区）。`./gradlew assemble` 通过；AI 新增生产参考 `unicorn-ai-support`（H2 本地 profile + PostgreSQL/pgvector/Redis/RabbitMQ infra profile、多租户、RAG citations、工具审批、MCP、指标）及 `unicorn-ai-tools` 领域/策略库；核心模块保留 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试；support 已补 ACL、Redis 限流/缓存、JWT、SSE 工具事件、摘要、MMR/rerank、MCP 客户端认证与审批审计；P2 已补 JDBC 订单/库存/商品适配、token 成本、Docker 资产和 Testcontainers 集成测试；当前正在按 PRD 推进 Java 25 ScopedValue、Spring AI 2 ChatMemory/RAG advisor、IAM/RLS 和治理表。`./gradlew test` 全量仍失败属于预期，见 §8。
+> 最近核对：2026-10-30（工作区）。`./gradlew assemble` 通过；AI 新增生产参考 `unicorn-ai-support`（H2 本地 profile + PostgreSQL/pgvector/Redis/RabbitMQ infra profile、多租户、RAG citations、工具审批、MCP、指标）及 `unicorn-ai-tools` 领域/策略库；核心模块保留 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试；support 已补 ACL、Redis 限流/缓存、JWT、SSE 工具事件、摘要、MMR/rerank、MCP 客户端认证与审批审计；P2 已补 JDBC 订单/库存/商品适配、token 成本、Docker 资产和 Testcontainers 集成测试；当前正在按 PRD 推进 Java 25 ScopedValue、Spring AI 2 ChatMemory/RAG advisor、IAM/RLS 和治理表。`./gradlew test` 全量仍失败属于预期，见 §8。
 
 ## 1. 项目速览
 
 - **定位**：基于 eladmin 扩展的企业级 Java 脚手架/框架，模块可插拔；同时包含 To B 后台与 OAuth2 To C 样例。
 - **Java**：`unicorn-core` 字节码基线为 **17**（Multi-Release JAR）；其余模块按当前 JDK（**25**）编译，无 MR-JAR。日常构建/运行使用 **JDK 25**。
-- **关键版本**：Spring Boot **4.1.0**、Spring Cloud **2025.1.2**、Spring AI **2.0.1**、Gradle **9.8.0**、Kotlin **2.4.20**、Lombok 1.18.48、MapStruct 1.6.3、Redisson 4.8.0、jjwt 0.13.0。
+- **关键版本**：Spring Boot **4.1.2**、Spring Cloud **2025.1.2**、Spring AI **2.0.1**、Gradle **9.8.2**、Kotlin **2.4.20**、Lombok 1.18.48、MapStruct 1.6.3、Redisson 4.8.0、jjwt 0.13.0。
 - **坐标**：`com.lwohvye:*:4.8.4-chi`；rootProject 名称是 `valentine-p2p`（不是 `unicorn`）。
 - **入口**：`com.unicorn.UnicornAppRun`，工程 `:valentine-starter-kotlin`。
 - **硬约束**：所有 Java 编译任务带 `--enable-preview`；所有库模块都是 JPMS 模块（`module-info.java`），jar 同时带 `Automatic-Module-Name`。
