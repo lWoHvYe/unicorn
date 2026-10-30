@@ -36,6 +36,8 @@ import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
@@ -67,6 +69,7 @@ public class SupportChatService {
     private final SafeGuardAdvisor safeGuardAdvisor;
     private final SupportModelInvoker modelInvoker;
     private final CitationValidator citationValidator;
+    private final ChatClient fallbackChatClient;
 
     public SupportChatService(ChatClient chatClient, ChatRepository chatRepository,
                               RetrievalService retrievalService, SupportProperties properties,
@@ -76,7 +79,8 @@ public class SupportChatService {
                               RetrievalAugmentationAdvisor ragAdvisor,
                               SafeGuardAdvisor safeGuardAdvisor,
                               SupportModelInvoker modelInvoker,
-                              CitationValidator citationValidator) {
+                              CitationValidator citationValidator,
+                              @Qualifier("fallbackChatClient") ObjectProvider<ChatClient> fallbackChatClient) {
         this.chatClient = chatClient;
         this.chatRepository = chatRepository;
         this.retrievalService = retrievalService;
@@ -90,6 +94,7 @@ public class SupportChatService {
         this.safeGuardAdvisor = safeGuardAdvisor;
         this.modelInvoker = modelInvoker;
         this.citationValidator = citationValidator;
+        this.fallbackChatClient = fallbackChatClient.getIfAvailable();
     }
 
     public ChatDtos.SessionView createSession(AiPrincipal principal, String channel, String title) {
@@ -143,14 +148,11 @@ public class SupportChatService {
         params.put(ChatMemory.CONVERSATION_ID, conversationId(principal, sessionId));
 
         try {
-            var response = modelInvoker.call(principal.tenantId(), () -> chatClient.prompt()
-                    .advisors(safeGuardAdvisor, memoryAdvisor, ragAdvisor)
-                    .advisors(advisor -> advisor.params(params))
-                    .user(message)
-                    .tools(toolFacade)
-                    .toolContext(toolContext(principal, sessionId, traceId, idempotencyKey))
-                    .call()
-                    .chatResponse());
+            var response = modelInvoker.call(principal.tenantId(),
+                    () -> callModel(chatClient, params, message, principal, sessionId, traceId, idempotencyKey),
+                    fallbackChatClient == null ? null :
+                            () -> callModel(fallbackChatClient, params, message, principal, sessionId,
+                                    traceId, idempotencyKey));
             var retrieval = capture.require();
             var answer = response.getResult().getOutput().getText();
             var invalidCitations = citationValidator.invalidReferences(answer, retrieval.citations());
@@ -327,6 +329,19 @@ public class SupportChatService {
         if (requestId != null) {
             chatRepository.finishRequest(principal.tenantId(), sessionId, requestId, status);
         }
+    }
+
+    private ChatResponse callModel(ChatClient client, java.util.Map<String, Object> params, String message,
+                                  AiPrincipal principal, String sessionId, String traceId,
+                                  String idempotencyKey) {
+        return client.prompt()
+                .advisors(safeGuardAdvisor, memoryAdvisor, ragAdvisor)
+                .advisors(advisor -> advisor.params(params))
+                .user(message)
+                .tools(toolFacade)
+                .toolContext(toolContext(principal, sessionId, traceId, idempotencyKey))
+                .call()
+                .chatResponse();
     }
 
     private ChatDtos.ChatAnswer answerFrom(ChatRecords.Message message) {

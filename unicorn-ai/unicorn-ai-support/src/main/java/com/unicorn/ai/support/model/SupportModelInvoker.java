@@ -54,8 +54,19 @@ public class SupportModelInvoker {
                 .observe(() -> invoke(tenantId, action));
     }
 
+    public <T> T call(String tenantId, Supplier<T> primary, Supplier<T> fallback) {
+        try {
+            return call(tenantId, primary);
+        } catch (ModelCallException exception) {
+            if (fallback == null) {
+                throw exception;
+            }
+            return call(tenantId + "-fallback", fallback);
+        }
+    }
+
     private <T> T invoke(String tenantId, Supplier<T> action) {
-        var model = properties.model() == null ? new SupportProperties.Model(30000, 2) : properties.model();
+        var model = properties.model() == null ? new SupportProperties.Model(30000, 2, "") : properties.model();
         RuntimeException last = null;
         for (int attempt = 1; attempt <= Math.max(1, model.maxAttempts()); attempt++) {
             var future = CompletableFuture.supplyAsync(action, executor);
@@ -78,7 +89,8 @@ public class SupportModelInvoker {
     }
 
     public Duration timeout() {
-        return Duration.ofMillis(properties.model().timeoutMs());
+        var model = properties.model() == null ? new SupportProperties.Model(30000, 2, "") : properties.model();
+        return Duration.ofMillis(model.timeoutMs());
     }
 
     @PreDestroy

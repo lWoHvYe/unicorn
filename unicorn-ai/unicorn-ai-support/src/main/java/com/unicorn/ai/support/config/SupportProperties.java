@@ -96,6 +96,7 @@ public record SupportProperties(
     }
 
     public record Model(@DefaultValue("30000") long timeoutMs,
-                        @DefaultValue("2") int maxAttempts) {
+                        @DefaultValue("2") int maxAttempts,
+                        @DefaultValue("") String fallbackModel) {
     }
 }

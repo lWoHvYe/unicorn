@@ -135,7 +135,7 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
 - ChatMemory 使用 `JdbcChatMemoryRepository` / `MessageWindowChatMemory`，存储于 `ai_chat_memory`。
 - RAG 通过自定义 `SupportDocumentRetriever` 复用现有混合检索/ACL，`SupportQueryAugmenter` 负责 citation 格式和空上下文拒答。
 - 阻塞和流式路径都使用同一 advisor chain；流式路径先做一次检索用于 citation 预览，`RetrievalCapture` 让 advisor 复用该结果，避免重复向量/词法查询。
-- 模型调用由 `SupportModelInvoker` 提供超时/重试边界与 Micrometer observation；流式路径额外使用 Reactor timeout，并在 `done` 事件返回聚合 usage。
+- 模型调用由 `SupportModelInvoker` 提供超时/重试边界、可选 `ai.support.model.fallback-model` 降级与 Micrometer observation；流式路径额外使用 Reactor timeout，并在 `done` 事件返回聚合 usage。
 - 回答中的 `[C1]` 引用会由 `CitationValidator` 校验；越界/不存在的 citation 会改为 REFUSED。
 - `ai.support.rls.enabled=true` 时，`TenantAwareDataSource` 在每次借出连接时设置 `app.tenant_id`，PostgreSQL `V7` 策略用 `FORCE ROW LEVEL SECURITY` 兜底。生产数据库账号必须是非 owner、非 superuser，并只授予业务所需权限；`ai_api_key`、`ai_outbox`、`ai_chat_memory` 等系统/无 tenant 列表不做 RLS。
 

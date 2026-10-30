@@ -17,6 +17,8 @@
 package com.unicorn.ai.support.config;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
@@ -30,6 +32,21 @@ public class SupportChatClientConfig {
     @Bean
     ChatClient supportChatClient(ChatClient.Builder builder, SupportProperties properties,
                                  ResourceLoader resourceLoader) throws IOException {
+        return build(builder, properties, resourceLoader);
+    }
+
+    @Bean(name = "fallbackChatClient")
+    @ConditionalOnProperty(name = "ai.support.model.fallback-model")
+    ChatClient fallbackChatClient(ChatClient.Builder builder, SupportProperties properties,
+                                  ResourceLoader resourceLoader) throws IOException {
+        var fallback = builder.clone()
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(properties.model().fallbackModel()));
+        return build(fallback, properties, resourceLoader);
+    }
+
+    private ChatClient build(ChatClient.Builder builder, SupportProperties properties,
+                             ResourceLoader resourceLoader) throws IOException {
         var resource = resourceLoader.getResource(properties.systemPrompt());
         var systemPrompt = resource.exists()
                 ? resource.getContentAsString(StandardCharsets.UTF_8)
