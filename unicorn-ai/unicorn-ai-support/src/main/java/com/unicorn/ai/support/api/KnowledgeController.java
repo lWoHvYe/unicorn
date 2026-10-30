@@ -22,6 +22,7 @@ import com.unicorn.ai.support.knowledge.KnowledgeDtos;
 import com.unicorn.ai.support.knowledge.KnowledgeRecords;
 import com.unicorn.ai.support.knowledge.KnowledgeRepository;
 import com.unicorn.ai.support.knowledge.TextIngestRequest;
+import com.unicorn.ai.support.audit.AuditService;
 import com.unicorn.ai.support.security.AiPrincipal;
 import com.unicorn.ai.support.ratelimit.RateLimiterService;
 import org.springframework.http.MediaType;
@@ -48,12 +49,14 @@ public class KnowledgeController {
     private final KnowledgeRepository repository;
     private final DocumentIngestionService ingestionService;
     private final RateLimiterService rateLimiter;
+    private final AuditService audit;
 
     public KnowledgeController(KnowledgeRepository repository, DocumentIngestionService ingestionService,
-                               RateLimiterService rateLimiter) {
+                               RateLimiterService rateLimiter, AuditService audit) {
         this.repository = repository;
         this.ingestionService = ingestionService;
         this.rateLimiter = rateLimiter;
+        this.audit = audit;
     }
 
     @GetMapping("/knowledge-bases")
@@ -113,6 +116,21 @@ public class KnowledgeController {
     @PreAuthorize("hasAnyRole('TENANT_ADMIN','SUPPORT_MANAGER')")
     public IngestResult reindex(@AuthenticationPrincipal AiPrincipal principal, @PathVariable String documentId) {
         return ingestionService.reindex(principal.tenantId(), documentId);
+    }
+
+    @PostMapping("/documents/{documentId}/status")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN','SUPPORT_MANAGER')")
+    public void updateStatus(@AuthenticationPrincipal AiPrincipal principal, @PathVariable String documentId,
+                             @RequestBody StatusRequest request) {
+        if (request == null || request.status() == null || request.status().isBlank()) {
+            throw new IllegalArgumentException("status 不能为空");
+        }
+        ingestionService.setStatus(principal.tenantId(), documentId, request.status());
+        audit.record(principal, "KNOWLEDGE_STATUS", "ai_document", documentId,
+                "{\"status\":\"" + request.status() + "\"}");
+    }
+
+    public record StatusRequest(String status) {
     }
 
     @DeleteMapping("/documents/{documentId}")

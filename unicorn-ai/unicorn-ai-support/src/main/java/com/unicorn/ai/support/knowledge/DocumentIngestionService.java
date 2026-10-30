@@ -189,6 +189,28 @@ public class DocumentIngestionService {
         repository.markDocumentDeleted(tenantId, documentId);
     }
 
+    public void retire(String tenantId, String documentId) {
+        var document = repository.findDocument(tenantId, documentId)
+                .orElseThrow(() -> new IllegalArgumentException("文档不存在"));
+        var chunks = repository.findChunksByDocument(tenantId, documentId);
+        vectorStore.delete(chunks.stream().map(KnowledgeRecords.Chunk::id).toList());
+        repository.deleteChunksByDocument(tenantId, documentId);
+        repository.updateDocumentStatus(tenantId, documentId, "RETIRED");
+    }
+
+    public void setStatus(String tenantId, String documentId, String status) {
+        if (!"ACTIVE".equals(status) && !"RETIRED".equals(status) && !"REVIEW".equals(status)) {
+            throw new IllegalArgumentException("status 只支持 ACTIVE/REVIEW/RETIRED");
+        }
+        if ("RETIRED".equals(status)) {
+            retire(tenantId, documentId);
+            return;
+        }
+        if (repository.updateDocumentStatus(tenantId, documentId, status) == 0) {
+            throw new IllegalArgumentException("文档不存在");
+        }
+    }
+
     public IngestResult reindex(String tenantId, String documentId) {
         var document = repository.findDocument(tenantId, documentId)
                 .orElseThrow(() -> new IllegalArgumentException("文档不存在"));

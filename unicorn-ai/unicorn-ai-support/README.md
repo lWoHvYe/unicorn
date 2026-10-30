@@ -98,6 +98,7 @@ Base：`/api/ai/support/v1`
 | POST | `/knowledge-bases/{kbId}/documents/text` | 文本入库 |
 | GET | `/knowledge-bases/{kbId}/documents` | 文档列表 |
 | POST | `/documents/{id}/reindex` | 重建索引 |
+| POST | `/documents/{id}/status` | 文档审核/上线/退役（RETIRED 会清理向量与 chunk） |
 | DELETE | `/documents/{id}` | 删除 |
 | GET | `/jobs/{id}`、`/jobs` | 入库任务 |
 | GET | `/approvals` | 待审批工具调用 |

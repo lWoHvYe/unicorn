@@ -197,6 +197,28 @@ class SupportApplicationTests {
     }
 
     @Test
+    void documentCanBeRetiredAndRemovedFromChunks() {
+        var marker = java.util.UUID.randomUUID().toString();
+        var ingest = post("/api/ai/support/v1/knowledge-bases/demo-kb/documents/text", """
+                {"text":"生命周期测试文档 %s，端口 8081。","source":"lifecycle/%s.md",
+                 "title":"Lifecycle","docType":"faq"}
+                """.formatted(marker, marker), "demo-key");
+        assertEquals(HttpStatus.OK.value(), ingest.statusCode());
+        var documentId = JSON.readValue(ingest.body(), Map.class).get("documentId").toString();
+
+        var retired = post("/api/ai/support/v1/documents/" + documentId + "/status",
+                "{\"status\":\"RETIRED\"}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), retired.statusCode());
+
+        var documents = get("/api/ai/support/v1/knowledge-bases/demo-kb/documents", "demo-key");
+        var list = (java.util.List<Map<?, ?>>) JSON.readValue(documents.body(), java.util.List.class);
+        assertTrue(list.stream().anyMatch(doc -> documentId.equals(doc.get("id"))
+                && "RETIRED".equals(doc.get("status"))));
+        assertEquals(0, jdbc.queryForObject(
+                "SELECT COUNT(*) FROM ai_chunk WHERE document_id = ?", Integer.class, documentId));
+    }
+
+    @Test
     void handoffIsPersistedAndTenantScoped() {
         var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
                 "session-handoff", "handoff-1", "trace-handoff");

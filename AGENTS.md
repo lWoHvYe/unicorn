@@ -241,7 +241,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 
 因此：**把 `./gradlew assemble` 作为构建门槛**，不要为了让 `test` 变绿去改业务代码；只有在任务明确要求补测试时，再给 Java 模块加 `useJUnitPlatform()`、JUnit 依赖，并移除环境相关断言。
 
-例外：`unicorn-ai-tools:test`（6 个）、`unicorn-ai-support:test`（20 个通过；Testcontainers/外部 PG/Redis/RabbitMQ 测试默认 skip；`AI_INFRA_TEST=true` 时外部集成与 RLS 非 owner 测试通过）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（9 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
+例外：`unicorn-ai-tools:test`（6 个）、`unicorn-ai-support:test`（21 个通过；Testcontainers/外部 PG/Redis/RabbitMQ 测试默认 skip；`AI_INFRA_TEST=true` 时外部集成与 RLS 非 owner 测试通过）和 `unicorn-ai-mcp-client:test`（1 个）不依赖真实模型 key；`unicorn-core` 的 `QueryHelpTest`（9 个）、`unicorn-beans` 的 `RedisConfigTest`（3 个）和 `ResponseResultBodyAdviceTest`（5 个）不依赖外部服务，可通过：
 `./gradlew :unicorn-core:test :unicorn-beans:test`；`valentine-starter` 的 `KotlinQueryHelpTest`（5 个）可通过 `./gradlew :valentine-starter-kotlin:test --tests com.unicorn.utils.KotlinQueryHelpTest`。AI demo 的独立测试同样可通过；这不改变全量 `test` 仍失败的事实。
 
 ### 8.2 文档与脚本漂移

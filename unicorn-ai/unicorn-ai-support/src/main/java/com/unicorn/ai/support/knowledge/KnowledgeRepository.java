@@ -160,6 +160,13 @@ public class KnowledgeRepository {
                 """, versionId, status, documentId);
     }
 
+    public int updateDocumentStatus(String tenantId, String documentId, String status) {
+        return jdbc.update("""
+                UPDATE ai_document SET status = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND id = ?
+                """, status, tenantId, documentId);
+    }
+
     public void markDocumentDeleted(String tenantId, String documentId) {
         jdbc.update("""
                 UPDATE ai_document SET status = 'DELETED', updated_at = CURRENT_TIMESTAMP
