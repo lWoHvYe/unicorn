@@ -2,7 +2,7 @@
 
 面向中等规模生产场景的 **多租户售后客服智能体** 参考实现。它不是另一个 demo，而是把 Chat、RAG、工具调用、审批、MCP、审计和指标串成一条可运行的业务链路。
 
-产品基线与验收标准见 [`docs/prd/support-copilot.md`](docs/prd/support-copilot.md)；完整架构、数据模型、安全模型与实现说明见 [`docs/architecture-and-implementation.md`](docs/architecture-and-implementation.md)。
+产品基线与验收标准见 [`docs/prd/support-copilot.md`](docs/prd/support-copilot.md)；完整架构、数据模型、安全模型与实现说明见 [`docs/architecture-and-implementation.md`](docs/architecture-and-implementation.md)；实现复核与剩余问题见 [`docs/implementation-review.md`](docs/implementation-review.md)。
 
 ## 场景
 
