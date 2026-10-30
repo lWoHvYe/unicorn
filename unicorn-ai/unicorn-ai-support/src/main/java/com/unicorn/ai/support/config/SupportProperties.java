@@ -43,7 +43,8 @@ public record SupportProperties(
         Pricing pricing,
         Approval approval,
         RateLimit rateLimit,
-        Cache cache) {
+        Cache cache,
+        @DefaultValue Model model) {
 
     public record Demo(@DefaultValue("false") boolean seed, @DefaultValue("false") boolean model) {
     }
@@ -92,5 +93,9 @@ public record SupportProperties(
     }
 
     public record Cache(@DefaultValue("local") String store) {
+    }
+
+    public record Model(@DefaultValue("30000") long timeoutMs,
+                        @DefaultValue("2") int maxAttempts) {
     }
 }

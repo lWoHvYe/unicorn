@@ -35,11 +35,19 @@ public class SupportToolService {
     private final OrderRepository orders;
     private final InventoryRepository inventory;
     private final ProductRepository products;
+    private final HandoffRepository handoffs;
 
     public SupportToolService(OrderRepository orders, InventoryRepository inventory, ProductRepository products) {
+        this(orders, inventory, products, (tenantId, sessionId, requesterId, reason) ->
+                new HandoffTicket(UUID.randomUUID().toString(), tenantId, reason, "OPEN"));
+    }
+
+    public SupportToolService(OrderRepository orders, InventoryRepository inventory, ProductRepository products,
+                              HandoffRepository handoffs) {
         this.orders = orders;
         this.inventory = inventory;
         this.products = products;
+        this.handoffs = handoffs;
     }
 
     public Optional<Order> getOrder(String tenantId, String orderId) {
@@ -91,6 +99,10 @@ public class SupportToolService {
     }
 
     public HandoffTicket handoff(String tenantId, String reason) {
-        return new HandoffTicket(UUID.randomUUID().toString(), tenantId, reason, "OPEN");
+        return handoff(tenantId, "", "", reason);
+    }
+
+    public HandoffTicket handoff(String tenantId, String sessionId, String requesterId, String reason) {
+        return handoffs.create(tenantId, sessionId, requesterId, reason);
     }
 }

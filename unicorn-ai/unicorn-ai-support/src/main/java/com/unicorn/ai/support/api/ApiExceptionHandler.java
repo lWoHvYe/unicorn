@@ -16,6 +16,8 @@
 
 package com.unicorn.ai.support.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.unicorn.ai.support.ratelimit.RateLimitException;
 import com.unicorn.ai.support.chat.ChatRequestConflictException;
+import com.unicorn.ai.support.model.ModelCallException;
 import com.unicorn.ai.tools.policy.ToolConflictException;
 
 import java.util.NoSuchElementException;
@@ -31,6 +34,8 @@ import java.util.UUID;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiError> badRequest(IllegalArgumentException exception) {
@@ -62,8 +67,17 @@ public class ApiExceptionHandler {
         return error(HttpStatus.TOO_MANY_REQUESTS, "RATE_LIMITED", exception.getMessage());
     }
 
+    @ExceptionHandler(ModelCallException.class)
+    public ResponseEntity<ApiError> modelFailure(ModelCallException exception) {
+        log.warn("Model call failed: {}", exception.code());
+        var status = "MODEL_TIMEOUT".equals(exception.code())
+                ? HttpStatus.GATEWAY_TIMEOUT : HttpStatus.SERVICE_UNAVAILABLE;
+        return error(status, exception.code(), "模型服务暂时不可用，请稍后重试");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> failed(Exception exception) {
+        log.error("Unhandled AI support request failure", exception);
         return error(HttpStatus.BAD_GATEWAY, "AI_SUPPORT_FAILED", "服务暂时不可用，请稍后重试");
     }
 

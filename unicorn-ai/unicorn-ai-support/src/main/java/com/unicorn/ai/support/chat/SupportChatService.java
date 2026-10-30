@@ -21,6 +21,7 @@ import com.unicorn.ai.support.retrieval.Citation;
 import com.unicorn.ai.support.retrieval.RetrievalResult;
 import com.unicorn.ai.support.retrieval.RetrievalCapture;
 import com.unicorn.ai.support.retrieval.NoContextException;
+import com.unicorn.ai.support.model.SupportModelInvoker;
 import com.unicorn.ai.support.retrieval.RetrievalService;
 import com.unicorn.ai.support.security.AiPrincipal;
 import com.unicorn.ai.support.tools.SupportToolFacade;
@@ -63,6 +64,7 @@ public class SupportChatService {
     private final MessageChatMemoryAdvisor memoryAdvisor;
     private final RetrievalAugmentationAdvisor ragAdvisor;
     private final SafeGuardAdvisor safeGuardAdvisor;
+    private final SupportModelInvoker modelInvoker;
 
     public SupportChatService(ChatClient chatClient, ChatRepository chatRepository,
                               RetrievalService retrievalService, SupportProperties properties,
@@ -70,7 +72,8 @@ public class SupportChatService {
                               SupportMetrics metrics, RateLimiterService rateLimiter,
                               MessageChatMemoryAdvisor memoryAdvisor,
                               RetrievalAugmentationAdvisor ragAdvisor,
-                              SafeGuardAdvisor safeGuardAdvisor) {
+                              SafeGuardAdvisor safeGuardAdvisor,
+                              SupportModelInvoker modelInvoker) {
         this.chatClient = chatClient;
         this.chatRepository = chatRepository;
         this.retrievalService = retrievalService;
@@ -82,6 +85,7 @@ public class SupportChatService {
         this.memoryAdvisor = memoryAdvisor;
         this.ragAdvisor = ragAdvisor;
         this.safeGuardAdvisor = safeGuardAdvisor;
+        this.modelInvoker = modelInvoker;
     }
 
     public ChatDtos.SessionView createSession(AiPrincipal principal, String channel, String title) {
@@ -135,14 +139,14 @@ public class SupportChatService {
         params.put(ChatMemory.CONVERSATION_ID, conversationId(principal, sessionId));
 
         try {
-            var response = chatClient.prompt()
+            var response = modelInvoker.call(principal.tenantId(), () -> chatClient.prompt()
                     .advisors(safeGuardAdvisor, memoryAdvisor, ragAdvisor)
                     .advisors(advisor -> advisor.params(params))
                     .user(message)
                     .tools(toolFacade)
                     .toolContext(toolContext(principal, sessionId, traceId, idempotencyKey))
                     .call()
-                    .chatResponse();
+                    .chatResponse());
             var retrieval = capture.require();
             var answer = response.getResult().getOutput().getText();
             var usage = usage(response);
@@ -210,6 +214,7 @@ public class SupportChatService {
                             .toolContext(toolContext(principal, sessionId, traceId, null, eventSink))
                             .stream()
                             .content()
+                            .timeout(modelInvoker.timeout())
                             .doOnNext(answer::append)
                             .doOnComplete(() -> saveAssistant(principal, sessionId, messageId, answer.toString(),
                                     retrieval.citations(), ChatDtos.TokenUsage.empty(), traceId, "DONE"))

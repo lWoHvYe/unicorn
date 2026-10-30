@@ -143,6 +143,31 @@ class SupportApplicationTests {
     }
 
     @Test
+    void handoffIsPersistedAndTenantScoped() {
+        var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
+                "session-handoff", "handoff-1", "trace-handoff");
+        var result = toolInvocations.execute(context, "create_handoff",
+                Map.of("tenantId", "demo", "sessionId", "session-handoff", "userId", "manager",
+                        "reason", "需要人工客服"));
+        assertEquals(ToolStatus.COMPLETED, result.status());
+        var ticketId = ((com.unicorn.ai.tools.model.HandoffTicket) result.data()).id();
+        assertNotNull(ticketId);
+
+        var list = get("/api/ai/support/v1/handoffs", "demo-key");
+        assertEquals(HttpStatus.OK.value(), list.statusCode());
+        assertTrue(list.body().contains(ticketId));
+
+        var assigned = post("/api/ai/support/v1/handoffs/" + ticketId + "/assign",
+                "{\"assigneeId\":\"agent-1\"}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), assigned.statusCode());
+        assertTrue(assigned.body().contains("ASSIGNED"));
+
+        var closed = post("/api/ai/support/v1/handoffs/" + ticketId + "/close", "{}", "demo-key");
+        assertEquals(HttpStatus.OK.value(), closed.statusCode());
+        assertTrue(closed.body().contains("CLOSED"));
+    }
+
+    @Test
     void anotherTenantCannotApproveThroughHttp() {
         var context = new ToolExecutionContext("demo", "manager", Set.of("SUPPORT_MANAGER"),
                 "session-cross", "cross-tenant-approval-1", "trace-cross");

@@ -53,7 +53,8 @@ public final class SupportToolCatalog {
                         .orElseGet(() -> ToolResult.completed(Map.of("sku", text(args, "sku"), "available", 0))));
 
         invocations.register(new ToolPolicy("create_handoff", true, AGENT_ROLES, false, null),
-                args -> ToolResult.completed(tools.handoff(text(args, "tenantId"), text(args, "reason"))));
+                args -> ToolResult.completed(tools.handoff(text(args, "tenantId"), text(args, "sessionId"),
+                        text(args, "userId"), text(args, "reason"))));
 
         invocations.register(new ToolPolicy("refund_order", true, AGENT_ROLES, false, refundThreshold),
                 args -> ToolResult.completed(tools.refund(text(args, "tenantId"), text(args, "orderId"))));

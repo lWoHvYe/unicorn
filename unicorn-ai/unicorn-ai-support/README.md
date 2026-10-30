@@ -82,6 +82,9 @@ Base：`/api/ai/support/v1`
 | GET | `/sessions/{id}/messages` | 历史消息 |
 | POST | `/sessions/{id}/feedback` | 反馈 |
 | POST | `/sessions/{id}/close` | 关闭 |
+| GET | `/handoffs` | 工单列表（租户隔离、分页） |
+| POST | `/handoffs/{id}/assign` | 分配坐席 |
+| POST | `/handoffs/{id}/close` | 关闭工单 |
 | GET/POST | `/knowledge-bases` | 知识库列表/创建 |
 | POST | `/knowledge-bases/{kbId}/documents` | 上传文档（multipart） |
 | POST | `/knowledge-bases/{kbId}/documents/text` | 文本入库 |
@@ -125,6 +128,7 @@ curl -N -X POST localhost:8096/api/ai/support/v1/sessions/$SESSION/messages/stre
 - ChatMemory 使用 `JdbcChatMemoryRepository` / `MessageWindowChatMemory`，存储于 `ai_chat_memory`。
 - RAG 通过自定义 `SupportDocumentRetriever` 复用现有混合检索/ACL，`SupportQueryAugmenter` 负责 citation 格式和空上下文拒答。
 - `SupportChatService` 的流式路径暂时保留显式检索 + 手工 prompt，后续迁移到同一 advisor chain；阻塞路径已走 advisor。
+- 阻塞模型调用由 `SupportModelInvoker` 提供超时/重试边界；流式路径使用 Reactor timeout。
 
 ## 混合检索
 

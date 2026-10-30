@@ -30,9 +30,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 public class SupportToolConfig {
 
     @Bean
-    SupportToolService supportToolService(JdbcTemplate jdbc) {
+    SupportToolService supportToolService(JdbcTemplate jdbc, JdbcHandoffRepository handoffs) {
         return new SupportToolService(new JdbcOrderRepository(jdbc), new JdbcInventoryRepository(jdbc),
-                new JdbcProductRepository(jdbc));
+                new JdbcProductRepository(jdbc), handoffs);
     }
 
     @Bean

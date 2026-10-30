@@ -80,7 +80,8 @@ public class SupportToolFacade {
     public ToolResult handoff(@ToolParam(description = "转人工原因") String reason, ToolContext context) {
         var ctx = context(context);
         return execute(ctx, "create_handoff",
-                Map.of("tenantId", ctx.tenantId(), "reason", reason));
+                Map.of("tenantId", ctx.tenantId(), "sessionId", ctx.sessionId(), "userId", ctx.userId(),
+                        "reason", reason));
     }
 
     @Tool(description = "对满足条件的订单发起退款。写操作，可能需要人工审批")
