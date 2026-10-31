@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SupportApplicationRoleRlsTest {
 
-    private static final String SCHEMA = "ai_support_p2_test";
+    private static final String SCHEMA = "ai_support_app_role_test";
     private static final String DB_URL = env("AI_DB_URL",
             "jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=" + SCHEMA + ",public");
     private static final String ADMIN_URL = env("AI_DB_URL",
