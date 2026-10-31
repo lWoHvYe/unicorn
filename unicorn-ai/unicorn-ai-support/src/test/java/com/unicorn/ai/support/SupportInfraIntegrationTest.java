@@ -55,6 +55,7 @@ class SupportInfraIntegrationTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
+        installExtensionsInPublic();
         registry.add("spring.datasource.url", () -> POSTGRES.getJdbcUrl() + "?currentSchema=ai_support,public");
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
@@ -74,6 +75,19 @@ class SupportInfraIntegrationTest {
         registry.add("spring.rabbitmq.password", () -> "admin");
         registry.add("spring.rabbitmq.virtual-host", () -> "/unicorn");
         registry.add("management.health.rabbit.enabled", () -> false);
+    }
+
+    private static void installExtensionsInPublic() {
+        try (var connection = java.sql.DriverManager.getConnection(
+                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+             var statement = connection.createStatement()) {
+            // Keep extension operator classes in public so Flyway's schema-local
+            // search_path can resolve gin_trgm_ops.
+            statement.execute("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public");
+            statement.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public");
+        } catch (Exception exception) {
+            throw new IllegalStateException("Could not install PostgreSQL extensions", exception);
+        }
     }
 
     @LocalServerPort
