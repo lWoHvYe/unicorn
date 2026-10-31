@@ -19,7 +19,6 @@ package com.unicorn.ai.support.config;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -31,26 +30,31 @@ import java.util.Arrays;
  * pgvector extension); an ApplicationRunner would run too late.
  */
 @Component
-@ConditionalOnProperty(name = "spring.flyway.enabled", havingValue = "true", matchIfMissing = true)
 public class FlywayMigrationRunner implements InitializingBean {
 
     private final DataSource dataSource;
     private final String locations;
     private final String schemas;
     private final String defaultSchema;
+    private final boolean enabled;
 
     public FlywayMigrationRunner(DataSource dataSource,
                                  @Value("${spring.flyway.locations:classpath:db/migration/common}") String locations,
                                  @Value("${spring.flyway.schemas:}") String schemas,
-                                 @Value("${spring.flyway.default-schema:}") String defaultSchema) {
+                                 @Value("${spring.flyway.default-schema:}") String defaultSchema,
+                                 @Value("${spring.flyway.enabled:true}") boolean enabled) {
         this.dataSource = dataSource;
         this.locations = locations;
         this.schemas = schemas;
         this.defaultSchema = defaultSchema;
+        this.enabled = enabled;
     }
 
     @Override
     public void afterPropertiesSet() {
+        if (!enabled) {
+            return;
+        }
         var configuration = Flyway.configure()
                 .dataSource(dataSource)
                 .locations(Arrays.stream(locations.split(",")).map(String::trim).toArray(String[]::new))

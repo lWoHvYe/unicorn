@@ -53,20 +53,18 @@ public class SupportModelInvoker {
     private final SupportProperties properties;
     private final ObservationRegistry observations;
     private final java.util.concurrent.ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-    private final CircuitBreaker circuitBreaker;
+    private final CircuitBreaker primaryCircuit;
+    private final CircuitBreaker fallbackCircuit;
     private final Retry retry;
-    private final Bulkhead bulkhead;
+    private final Bulkhead primaryBulkhead;
+    private final Bulkhead fallbackBulkhead;
 
     public SupportModelInvoker(SupportProperties properties, ObjectProvider<ObservationRegistry> observations) {
         this.properties = properties;
         this.observations = observations.getIfAvailable(() -> ObservationRegistry.NOOP);
         var model = properties.model() == null ? new SupportProperties.Model(30000, 2, "") : properties.model();
-        this.circuitBreaker = CircuitBreaker.of("support-model", CircuitBreakerConfig.custom()
-                .failureRateThreshold(50)
-                .slidingWindowSize(20)
-                .minimumNumberOfCalls(10)
-                .waitDurationInOpenState(Duration.ofSeconds(30))
-                .build());
+        this.primaryCircuit = circuit("support-model-primary");
+        this.fallbackCircuit = circuit("support-model-fallback");
         this.retry = Retry.of("support-model", RetryConfig.custom()
                 .maxAttempts(Math.max(1, model.maxAttempts()))
                 .waitDuration(Duration.ofMillis(200))
@@ -74,10 +72,8 @@ public class SupportModelInvoker {
                         && failure.retryable())
                 .ignoreExceptions(NoContextException.class)
                 .build());
-        this.bulkhead = Bulkhead.of("support-model", BulkheadConfig.custom()
-                .maxConcurrentCalls(16)
-                .maxWaitDuration(Duration.ZERO)
-                .build());
+        this.primaryBulkhead = bulkhead("support-model-primary");
+        this.fallbackBulkhead = bulkhead("support-model-fallback");
     }
 
     public <T> T call(String tenantId, Supplier<T> action) {
@@ -101,15 +97,17 @@ public class SupportModelInvoker {
     }
 
     private <T> T invoke(String tenantId, Supplier<T> action) {
-        return Bulkhead.decorateSupplier(bulkhead,
+        return Bulkhead.decorateSupplier(primaryBulkhead,
                 Retry.decorateSupplier(retry,
-                        CircuitBreaker.decorateSupplier(circuitBreaker,
+                        CircuitBreaker.decorateSupplier(primaryCircuit,
                                 () -> executeOnce(tenantId, action)))).get();
     }
 
     private <T> T invokeFallback(String tenantId, Supplier<T> action) {
-        return Bulkhead.decorateSupplier(bulkhead,
-                Retry.decorateSupplier(retry, () -> executeOnce(tenantId, action))).get();
+        return Bulkhead.decorateSupplier(fallbackBulkhead,
+                Retry.decorateSupplier(retry,
+                        CircuitBreaker.decorateSupplier(fallbackCircuit,
+                                () -> executeOnce(tenantId, action)))).get();
     }
 
     private <T> T executeOnce(String tenantId, Supplier<T> action) {
@@ -131,6 +129,22 @@ public class SupportModelInvoker {
             throw new ModelCallException("MODEL_FAILED", "模型调用失败", exception.getCause(),
                     retryable(exception.getCause()));
         }
+    }
+
+    private CircuitBreaker circuit(String name) {
+        return CircuitBreaker.of(name, CircuitBreakerConfig.custom()
+                .failureRateThreshold(50)
+                .slidingWindowSize(20)
+                .minimumNumberOfCalls(10)
+                .waitDurationInOpenState(Duration.ofSeconds(30))
+                .build());
+    }
+
+    private Bulkhead bulkhead(String name) {
+        return Bulkhead.of(name, BulkheadConfig.custom()
+                .maxConcurrentCalls(16)
+                .maxWaitDuration(Duration.ZERO)
+                .build());
     }
 
     private boolean retryable(Throwable cause) {

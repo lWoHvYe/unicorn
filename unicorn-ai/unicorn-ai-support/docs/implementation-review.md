@@ -121,7 +121,9 @@
 
 **本轮补充**：`ai_document_version` 已补 tenant/RLS；模型错误已按 4xx/auth 与 429/5xx/timeout 分类重试；`RETIRED` 文档禁止直接激活。
 
-**仍未完成**：非 owner 应用角色启动完整应用的端到端测试、provider 级独立熔断、SSE Last-Event-ID 续传、Grafana/SLO、MapStruct 未引入（ADR 决策）。
+**本轮补充**：新增 `SupportApplicationRoleRlsTest`，以非 owner 应用角色启动完整应用并完成 chat；Resilience4j 主/fallback circuit 已拆分；`FlywayMigrationRunner` 在 `spring.flyway.enabled=false` 时保留 no-op bean，避免 `@DependsOn` 启动失败。
+
+**仍未完成**：SSE Last-Event-ID 续传、Grafana/SLO、MapStruct 未引入（ADR 决策）。
 
 ## 4. 仍存在的问题与优化项
 
@@ -198,7 +200,7 @@ AI_INFRA_TEST=true ./gradlew :unicorn-ai-support:test \
 
 - `unicorn-ai-tools:test`：6 个通过。
 - `unicorn-ai-support:test`：27 个通过；Testcontainers/外部测试默认 skip。
-- 外部 PG/Redis/RabbitMQ：2 个通过（异步入库 + RLS 非 owner）。
+- 外部 PG/Redis/RabbitMQ：3 个通过（异步入库、RLS 非 owner、应用角色完整应用）。
 - `./gradlew assemble`：BUILD SUCCESSFUL。
 
 ## 7. 结论

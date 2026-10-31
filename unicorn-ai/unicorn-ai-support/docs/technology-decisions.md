@@ -130,3 +130,9 @@ JDK 25 中 `StructuredTaskScope` 仍为 preview。当前使用虚拟线程/固�
 
 - 模型 4xx/auth 错误标记为不可重试；429/5xx/超时/中断分类重试。
 - `RETIRED` 文档不能直接 `ACTIVE`，必须 reindex，避免“状态已激活但向量不存在”。
+
+
+## ADR-014：应用角色 RLS 测试与主/备熔断
+
+- `SupportApplicationRoleRlsTest` 使用非 owner `unicorn_support_app` 角色启动完整应用，验证 `RlsRoleVerifier`、`TenantAwareDataSource` 和实际 chat 路径。
+- 主/fallback 模型调用使用独立 CircuitBreaker，避免主 circuit open 时 fallback 被一起拒绝。
