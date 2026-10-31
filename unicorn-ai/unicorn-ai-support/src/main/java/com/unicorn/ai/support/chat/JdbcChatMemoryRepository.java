@@ -24,6 +24,7 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,7 @@ public class JdbcChatMemoryRepository implements ChatMemoryRepository {
     }
 
     @Override
+    @Transactional
     public void saveAll(String conversationId, List<Message> messages) {
         jdbc.update("DELETE FROM ai_chat_memory WHERE conversation_id = ?", conversationId);
         var rows = new ArrayList<Object[]>();

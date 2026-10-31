@@ -20,19 +20,23 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @ConditionalOnProperty(name = "ai.support.rate-limit.store", havingValue = "local", matchIfMissing = true)
 public class LocalRateLimitStore implements RateLimitStore {
 
-    private final ConcurrentMap<String, Window> windows = new ConcurrentHashMap<>();
+    private final Cache<String, Window> windows = Caffeine.newBuilder()
+            .maximumSize(100_000)
+            .expireAfterWrite(java.time.Duration.ofHours(2))
+            .build();
 
     @Override
     public boolean tryAcquire(String key, int limit, Duration window) {
-        var current = windows.computeIfAbsent(key, ignored -> new Window(System.nanoTime()));
+        var current = windows.get(key, ignored -> new Window(System.nanoTime()));
         synchronized (current) {
             var now = System.nanoTime();
             if (now - current.startedAt > window.toNanos()) {

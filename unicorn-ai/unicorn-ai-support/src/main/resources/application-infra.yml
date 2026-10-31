@@ -57,6 +57,7 @@ ai:
       routing-key: ingest
     rls:
       enabled: ${AI_RLS_ENABLED:true}
+      fail-fast: ${AI_RLS_FAIL_FAST:false}
     rate-limit:
       store: redis
     cache:

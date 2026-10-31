@@ -17,6 +17,7 @@
 package com.unicorn.ai.support.knowledge;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -99,6 +100,23 @@ public class KnowledgeRepository {
                         rs.getString("acl_roles"), rs.getString("content_hash"), rs.getString("status"),
                         rs.getString("current_version_id"), toInstant(rs.getTimestamp("created_at"))),
                 tenantId, kbId, hash).stream().findFirst();
+    }
+
+    public java.util.Map<String, String> findDocumentStatuses(String tenantId,
+                                                               java.util.Collection<String> documentIds) {
+        if (documentIds == null || documentIds.isEmpty()) {
+            return java.util.Map.of();
+        }
+        var ids = new java.util.ArrayList<>(new java.util.LinkedHashSet<>(documentIds));
+        var placeholders = String.join(",", java.util.Collections.nCopies(ids.size(), "?"));
+        var sql = "SELECT id, status FROM ai_document WHERE tenant_id = ? AND id IN (" + placeholders + ")";
+        var args = new java.util.ArrayList<Object>();
+        args.add(tenantId);
+        args.addAll(ids);
+        var result = new java.util.HashMap<String, String>();
+        jdbc.query(sql, (RowCallbackHandler) rs -> result.put(rs.getString("id"), rs.getString("status")),
+                args.toArray());
+        return result;
     }
 
     public List<KnowledgeRecords.Document> listDocuments(String tenantId, String kbId) {

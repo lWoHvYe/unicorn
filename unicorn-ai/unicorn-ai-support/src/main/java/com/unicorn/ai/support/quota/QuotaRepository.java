@@ -35,16 +35,25 @@ public class QuotaRepository {
                 """, limit, tenantId, metric, period);
         if (updated == 0) {
             jdbc.update("""
-                    INSERT INTO ai_quota (tenant_id, metric, period, quota_limit, used)
-                    VALUES (?, ?, ?, ?, 0)
+                    INSERT INTO ai_quota (tenant_id, metric, period, quota_limit, used, period_start)
+                    VALUES (?, ?, ?, ?, 0, CURRENT_DATE)
                     """, tenantId, metric, period, limit);
         }
     }
 
     public boolean consume(String tenantId, String metric, String period) {
         var updated = jdbc.update("""
-                UPDATE ai_quota SET used = used + 1, updated_at = CURRENT_TIMESTAMP
-                WHERE tenant_id = ? AND metric = ? AND period = ? AND used < quota_limit
+                UPDATE ai_quota
+                SET used = CASE
+                        WHEN period = 'DAY' AND (period_start IS NULL OR period_start <> CURRENT_DATE)
+                            THEN 1
+                        ELSE used + 1
+                    END,
+                    period_start = CASE WHEN period = 'DAY' THEN CURRENT_DATE ELSE period_start END,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND metric = ? AND period = ?
+                  AND (period = 'DAY' AND (period_start IS NULL OR period_start <> CURRENT_DATE)
+                       OR used < quota_limit)
                 """, tenantId, metric, period);
         if (updated > 0) {
             return true;

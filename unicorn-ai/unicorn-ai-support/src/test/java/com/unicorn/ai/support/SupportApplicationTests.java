@@ -20,6 +20,8 @@ import com.unicorn.ai.tools.model.ToolExecutionContext;
 import com.unicorn.ai.tools.model.ToolStatus;
 import com.unicorn.ai.tools.policy.ToolInvocationService;
 import com.unicorn.ai.support.quota.QuotaService;
+import com.unicorn.ai.support.quota.QuotaRepository;
+import com.unicorn.ai.support.async.OutboxRepository;
 import com.unicorn.ai.support.model.SupportModelInvoker;
 import com.unicorn.ai.support.security.TenantContext;
 import org.junit.jupiter.api.Test;
@@ -64,6 +66,9 @@ class SupportApplicationTests {
 
     @Autowired
     private SupportModelInvoker modelInvoker;
+
+    @Autowired
+    private OutboxRepository outbox;
 
     @Test
     void ingestAndChatReturnCitation() {
@@ -194,6 +199,33 @@ class SupportApplicationTests {
     void modelInvokerPropagatesTenantToVirtualThread() {
         var tenant = modelInvoker.call("demo", () -> TenantContext.current().tenantId());
         assertEquals("demo", tenant);
+    }
+
+    @Test
+    void outboxClaimIsOwnedByOnePublisher() {
+        jdbc.update("UPDATE ai_outbox SET status = 'PUBLISHED' WHERE status <> 'PUBLISHED'");
+        outbox.enqueue("demo", "ingest_job", "claim-test", "INGEST_REQUESTED", "{}");
+        var first = outbox.claim("owner-a", 10);
+        var eventId = first.stream().filter(event -> "claim-test".equals(event.aggregateId()))
+                .findFirst().orElseThrow().id();
+        var second = outbox.claim("owner-b", 10);
+        assertTrue(second.stream().noneMatch(event -> eventId.equals(event.id())));
+        outbox.published(eventId, "owner-a");
+        assertEquals("PUBLISHED", jdbc.queryForObject(
+                "SELECT status FROM ai_outbox WHERE id = ?", String.class, eventId));
+    }
+
+    @Test
+    void dailyQuotaResetsWhenPeriodChanges() {
+        quotaService.set("demo", "reset-test", "DAY", 2);
+        jdbc.update("""
+                UPDATE ai_quota SET used = 2, period_start = DATE '2000-01-01'
+                WHERE tenant_id = 'demo' AND metric = 'reset-test' AND period = 'DAY'
+                """);
+        assertTrue(new QuotaRepository(jdbc).consume("demo", "reset-test", "DAY"));
+        assertEquals(1, jdbc.queryForObject("""
+                SELECT used FROM ai_quota WHERE tenant_id = 'demo' AND metric = 'reset-test' AND period = 'DAY'
+                """, Integer.class));
     }
 
     @Test

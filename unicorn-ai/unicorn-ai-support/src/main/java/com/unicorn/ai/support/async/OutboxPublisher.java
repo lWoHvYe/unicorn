@@ -31,6 +31,7 @@ public class OutboxPublisher {
     private final OutboxRepository repository;
     private final RabbitTemplate rabbitTemplate;
     private final SupportProperties properties;
+    private final String owner = java.util.UUID.randomUUID().toString();
 
     public OutboxPublisher(OutboxRepository repository, RabbitTemplate rabbitTemplate,
                            SupportProperties properties) {
@@ -41,7 +42,7 @@ public class OutboxPublisher {
 
     @Scheduled(fixedDelayString = "${ai.support.outbox.poll-ms:1000}")
     public void publishPending() {
-        for (var event : repository.claim(20)) {
+        for (var event : repository.claim(owner, 20)) {
             try {
                 if ("INGEST_REQUESTED".equals(event.eventType())) {
                     rabbitTemplate.convertAndSend(properties.asyncIngest().exchange(),
@@ -49,9 +50,9 @@ public class OutboxPublisher {
                 } else {
                     log.warn("Unknown outbox event type: {}", event.eventType());
                 }
-                repository.published(event.id());
+                repository.published(event.id(), owner);
             } catch (RuntimeException exception) {
-                repository.failed(event.id(), event.attempts());
+                repository.failed(event.id(), owner, event.attempts());
                 log.warn("Outbox event {} publish failed, retry scheduled", event.id(), exception);
             }
         }

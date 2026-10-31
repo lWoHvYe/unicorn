@@ -80,8 +80,17 @@ public class RetrievalService {
             rankedLists.add(search(tenantId, kbId, plannedQuery, candidateK, roles));
         }
         var merged = fuse(rankedLists);
-        var selected = select(merged, limit, query).stream()
-                .filter(document -> activeDocument(tenantId, document))
+        var selected = select(merged, limit, query);
+        var documentIds = selected.stream()
+                .map(document -> document.getMetadata().get("documentId"))
+                .filter(java.util.Objects::nonNull)
+                .map(Object::toString)
+                .distinct()
+                .toList();
+        var statuses = knowledgeRepository.findDocumentStatuses(tenantId, documentIds);
+        selected = selected.stream()
+                .filter(document -> "ACTIVE".equals(statuses.get(
+                        String.valueOf(document.getMetadata().get("documentId")))))
                 .toList();
         if (properties.rerank().enabled()) {
             selected = rerankService.rerank(query, selected);
@@ -89,13 +98,6 @@ public class RetrievalService {
 
         var citations = selected.stream().map(this::toCitation).toList();
         return new RetrievalResult(selected, citations, !citations.isEmpty());
-    }
-
-    private boolean activeDocument(String tenantId, Document document) {
-        var documentId = document.getMetadata().get("documentId");
-        return documentId != null && knowledgeRepository.findDocument(tenantId, documentId.toString())
-                .map(doc -> "ACTIVE".equals(doc.status()))
-                .orElse(false);
     }
 
     private List<Document> search(String tenantId, String kbId, String query, int candidateK, Set<String> roles) {

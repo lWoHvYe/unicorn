@@ -42,37 +42,42 @@ public class OutboxRepository {
                 """, UUID.randomUUID().toString(), tenantId, aggregateType, aggregateId, eventType, payloadJson);
     }
 
-    public List<OutboxEvent> claim(int limit) {
-        var staleBefore = java.sql.Timestamp.from(Instant.now().minusSeconds(300));
+    public List<OutboxEvent> claim(String owner, int limit) {
+        var staleBefore = Timestamp.from(Instant.now().minusSeconds(300));
         jdbc.update("""
-                UPDATE ai_outbox SET status = 'PUBLISHING', updated_at = CURRENT_TIMESTAMP
+                UPDATE ai_outbox
+                SET status = 'PUBLISHING', claimed_by = ?, claimed_at = CURRENT_TIMESTAMP,
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id IN (
                     SELECT id FROM ai_outbox
                     WHERE (status = 'PENDING' AND next_attempt_at <= CURRENT_TIMESTAMP)
-                       OR (status = 'PUBLISHING' AND updated_at < ?)
+                       OR (status = 'PUBLISHING' AND (claimed_at IS NULL OR claimed_at < ?))
                     ORDER BY created_at LIMIT ?
                 )
-                """, staleBefore, limit);
+                """, owner, staleBefore, limit);
         return jdbc.query("""
                 SELECT id, tenant_id, aggregate_type, aggregate_id, event_type, payload_json, attempts
-                FROM ai_outbox WHERE status = 'PUBLISHING' ORDER BY created_at LIMIT ?
+                FROM ai_outbox WHERE status = 'PUBLISHING' AND claimed_by = ?
+                ORDER BY created_at LIMIT ?
                 """, (rs, rowNum) -> new OutboxEvent(rs.getString("id"), rs.getString("tenant_id"),
                 rs.getString("aggregate_type"), rs.getString("aggregate_id"), rs.getString("event_type"),
-                rs.getString("payload_json"), rs.getInt("attempts")), limit);
+                rs.getString("payload_json"), rs.getInt("attempts")), owner, limit);
     }
 
-    public void published(String id) {
+    public void published(String id, String owner) {
         jdbc.update("""
-                UPDATE ai_outbox SET status = 'PUBLISHED', updated_at = CURRENT_TIMESTAMP WHERE id = ?
-                """, id);
+                UPDATE ai_outbox SET status = 'PUBLISHED', claimed_by = NULL, claimed_at = NULL,
+                    updated_at = CURRENT_TIMESTAMP WHERE id = ? AND claimed_by = ?
+                """, id, owner);
     }
 
-    public void failed(String id, int attempts) {
+    public void failed(String id, String owner, int attempts) {
         var next = Timestamp.from(Instant.now().plusSeconds(Math.min(300, 5L * (attempts + 1))));
         jdbc.update("""
                 UPDATE ai_outbox SET status = 'PENDING', attempts = attempts + 1,
-                    next_attempt_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-                """, next, id);
+                    claimed_by = NULL, claimed_at = NULL,
+                    next_attempt_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND claimed_by = ?
+                """, next, id, owner);
     }
 
     public record OutboxEvent(String id, String tenantId, String aggregateType, String aggregateId,
