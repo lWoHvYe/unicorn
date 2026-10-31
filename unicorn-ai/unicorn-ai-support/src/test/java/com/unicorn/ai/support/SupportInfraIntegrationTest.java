@@ -50,11 +50,12 @@ class SupportInfraIntegrationTest {
 
     @Container
     static final RabbitMQContainer RABBIT = new RabbitMQContainer("rabbitmq:4-management")
-            .withUser("admin", "admin")
-            .withVhost("/unicorn")
-            // withUser creates the user, but RabbitMQ denies all resources until a
-            // vhost permission is explicitly granted.
-            .withPermission("/unicorn", "admin", ".*", ".*", ".*");
+            // RabbitMQContainer's withUser/withVhost helpers call rabbitmqadmin, which is
+            // not installed in the official rabbitmq:4-management image. Use the image's
+            // bootstrap environment so the default user and vhost are created together.
+            .withAdminUser("admin")
+            .withAdminPassword("admin")
+            .withEnv("RABBITMQ_DEFAULT_VHOST", "/unicorn");
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
