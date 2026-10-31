@@ -143,22 +143,25 @@ public class KnowledgeRepository {
     public void createVersion(KnowledgeRecords.DocumentVersion version) {
         jdbc.update("""
                 INSERT INTO ai_document_version
-                    (id, document_id, version_no, content_hash, content_text, status, chunk_count, error)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, version.id(), version.documentId(), version.versionNo(), version.contentHash(),
-                version.contentText(), version.status(), version.chunkCount(), version.error());
+                    (id, tenant_id, document_id, version_no, content_hash, content_text, status,
+                     chunk_count, error)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, version.id(), version.tenantId(), version.documentId(), version.versionNo(),
+                version.contentHash(), version.contentText(), version.status(), version.chunkCount(),
+                version.error());
     }
 
     public Optional<KnowledgeRecords.DocumentVersion> findVersion(String id) {
         return jdbc.query("""
-                        SELECT id, document_id, version_no, content_hash, content_text, status, chunk_count,
-                               error, created_at
+                        SELECT id, tenant_id, document_id, version_no, content_hash, content_text, status,
+                               chunk_count, error, created_at
                         FROM ai_document_version WHERE id = ?
                         """,
                 (rs, rowNum) -> new KnowledgeRecords.DocumentVersion(
-                        rs.getString("id"), rs.getString("document_id"), rs.getInt("version_no"),
-                        rs.getString("content_hash"), rs.getString("content_text"), rs.getString("status"),
-                        rs.getInt("chunk_count"), rs.getString("error"), toInstant(rs.getTimestamp("created_at"))),
+                        rs.getString("id"), rs.getString("tenant_id"), rs.getString("document_id"),
+                        rs.getInt("version_no"), rs.getString("content_hash"), rs.getString("content_text"),
+                        rs.getString("status"), rs.getInt("chunk_count"), rs.getString("error"),
+                        toInstant(rs.getTimestamp("created_at"))),
                 id).stream().findFirst();
     }
 

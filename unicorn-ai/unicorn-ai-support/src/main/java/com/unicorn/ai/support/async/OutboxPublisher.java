@@ -52,7 +52,7 @@ public class OutboxPublisher {
                 }
                 repository.published(event.id(), owner);
             } catch (RuntimeException exception) {
-                repository.failed(event.id(), owner, event.attempts());
+                repository.failed(event.id(), owner, event.attempts(), exception.getMessage());
                 log.warn("Outbox event {} publish failed, retry scheduled", event.id(), exception);
             }
         }

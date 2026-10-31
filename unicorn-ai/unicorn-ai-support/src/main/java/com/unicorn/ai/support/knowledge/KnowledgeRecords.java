@@ -32,9 +32,9 @@ public final class KnowledgeRecords {
                            String currentVersionId, Instant createdAt) {
     }
 
-    public record DocumentVersion(String id, String documentId, int versionNo, String contentHash,
-                                  String contentText, String status, int chunkCount, String error,
-                                  Instant createdAt) {
+    public record DocumentVersion(String id, String tenantId, String documentId, int versionNo,
+                                  String contentHash, String contentText, String status, int chunkCount,
+                                  String error, Instant createdAt) {
     }
 
     public record Chunk(String id, String tenantId, String kbId, String documentId, String versionId,

@@ -131,8 +131,8 @@ public class DocumentIngestionService {
             }
             throw race;
         }
-        repository.createVersion(new KnowledgeRecords.DocumentVersion(versionId, documentId, 1, hash,
-                text, "PENDING", 0, null, Instant.now()));
+        repository.createVersion(new KnowledgeRecords.DocumentVersion(versionId, tenantId, documentId, 1,
+                hash, text, "PENDING", 0, null, Instant.now()));
         repository.createJob(new KnowledgeRecords.IngestJob(jobId, tenantId, documentId, versionId,
                 "PENDING", 0, null, Instant.now(), Instant.now()));
 
@@ -229,7 +229,7 @@ public class DocumentIngestionService {
                 .orElseThrow(() -> new IllegalArgumentException("文档版本不存在"));
         var versionId = UUID.randomUUID().toString();
         var jobId = UUID.randomUUID().toString();
-        repository.createVersion(new KnowledgeRecords.DocumentVersion(versionId, documentId,
+        repository.createVersion(new KnowledgeRecords.DocumentVersion(versionId, tenantId, documentId,
                 repository.nextVersionNo(documentId), old.contentHash(), old.contentText(), "PENDING", 0, null,
                 Instant.now()));
         repository.createJob(new KnowledgeRecords.IngestJob(jobId, tenantId, documentId, versionId,

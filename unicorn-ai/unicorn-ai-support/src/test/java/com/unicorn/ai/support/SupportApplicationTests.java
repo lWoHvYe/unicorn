@@ -20,6 +20,7 @@ import com.unicorn.ai.tools.model.ToolExecutionContext;
 import com.unicorn.ai.tools.model.ToolStatus;
 import com.unicorn.ai.tools.policy.ToolInvocationService;
 import com.unicorn.ai.support.quota.QuotaService;
+import com.unicorn.ai.support.chat.ChatRepository;
 import com.unicorn.ai.support.quota.QuotaRepository;
 import com.unicorn.ai.support.async.OutboxRepository;
 import com.unicorn.ai.support.model.SupportModelInvoker;
@@ -69,6 +70,9 @@ class SupportApplicationTests {
 
     @Autowired
     private OutboxRepository outbox;
+
+    @Autowired
+    private ChatRepository chatRepository;
 
     @Test
     void ingestAndChatReturnCitation() {
@@ -199,6 +203,20 @@ class SupportApplicationTests {
     void modelInvokerPropagatesTenantToVirtualThread() {
         var tenant = modelInvoker.call("demo", () -> TenantContext.current().tenantId());
         assertEquals("demo", tenant);
+    }
+
+    @Test
+    void expiredChatLeaseCanBeReclaimed() {
+        var session = post("/api/ai/support/v1/sessions", "{\"channel\":\"web\"}", "demo-key");
+        var sessionId = JSON.readValue(session.body(), Map.class).get("id").toString();
+        assertTrue(chatRepository.tryStartRequest("demo", sessionId, "lease-key", "message-a", "owner-a", 300));
+        jdbc.update("""
+                UPDATE ai_chat_request SET expires_at = DATEADD('SECOND', -1, CURRENT_TIMESTAMP)
+                WHERE tenant_id = 'demo' AND session_id = ? AND request_id = 'lease-key'
+                """, sessionId);
+        assertTrue(chatRepository.tryStartRequest("demo", sessionId, "lease-key", "message-b", "owner-b", 300));
+        assertEquals("message-b", chatRepository.findRequest("demo", sessionId, "lease-key")
+                .orElseThrow().messageId());
     }
 
     @Test

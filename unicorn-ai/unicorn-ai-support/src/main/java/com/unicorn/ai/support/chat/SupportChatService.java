@@ -130,7 +130,8 @@ public class SupportChatService {
         var traceId = traceId();
         var messageId = UUID.randomUUID().toString();
         var requestId = idempotencyKey == null || idempotencyKey.isBlank() ? null : idempotencyKey;
-        if (requestId != null && !chatRepository.tryStartRequest(principal.tenantId(), sessionId, requestId, messageId)) {
+        if (requestId != null && !chatRepository.tryStartRequest(principal.tenantId(), sessionId, requestId,
+                messageId, messageId, 300)) {
             var existing = chatRepository.findRequest(principal.tenantId(), sessionId, requestId)
                     .orElseThrow(() -> new ChatRequestConflictException("聊天请求状态不可用"));
             if ("DONE".equals(existing.status())) {
@@ -210,7 +211,8 @@ public class SupportChatService {
         var traceId = traceId();
         var messageId = UUID.randomUUID().toString();
         var requestId = idempotencyKey == null || idempotencyKey.isBlank() ? null : idempotencyKey;
-        if (requestId != null && !chatRepository.tryStartRequest(principal.tenantId(), sessionId, requestId, messageId)) {
+        if (requestId != null && !chatRepository.tryStartRequest(principal.tenantId(), sessionId, requestId,
+                messageId, messageId, 300)) {
             var existing = chatRepository.findRequest(principal.tenantId(), sessionId, requestId)
                     .orElseThrow(() -> new ChatRequestConflictException("聊天请求状态不可用"));
             if ("DONE".equals(existing.status())) {

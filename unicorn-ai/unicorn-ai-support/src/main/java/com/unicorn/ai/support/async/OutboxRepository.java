@@ -71,13 +71,54 @@ public class OutboxRepository {
                 """, id, owner);
     }
 
-    public void failed(String id, String owner, int attempts) {
-        var next = Timestamp.from(Instant.now().plusSeconds(Math.min(300, 5L * (attempts + 1))));
+    public void failed(String id, String owner, int attempts, String error) {
+        var nextAttempts = attempts + 1;
+        if (nextAttempts >= 5) {
+            jdbc.update("""
+                    UPDATE ai_outbox SET status = 'DEAD', attempts = ?, last_error = ?, dead_at = CURRENT_TIMESTAMP,
+                        claimed_by = NULL, claimed_at = NULL, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ? AND claimed_by = ?
+                    """, nextAttempts, truncate(error), id, owner);
+            return;
+        }
+        var next = Timestamp.from(Instant.now().plusSeconds(Math.min(300, 5L * nextAttempts)));
         jdbc.update("""
-                UPDATE ai_outbox SET status = 'PENDING', attempts = attempts + 1,
+                UPDATE ai_outbox SET status = 'PENDING', attempts = ?, last_error = ?,
                     claimed_by = NULL, claimed_at = NULL,
                     next_attempt_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND claimed_by = ?
-                """, next, id, owner);
+                """, nextAttempts, truncate(error), next, id, owner);
+    }
+
+    public void replay(String tenantId, String id) {
+        jdbc.update("""
+                UPDATE ai_outbox SET status = 'PENDING', attempts = 0, claimed_by = NULL, claimed_at = NULL,
+                    next_attempt_at = CURRENT_TIMESTAMP, last_error = NULL, dead_at = NULL,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND id = ? AND status IN ('DEAD', 'FAILED')
+                """, tenantId, id);
+    }
+
+    public void discard(String tenantId, String id) {
+        jdbc.update("""
+                UPDATE ai_outbox SET status = 'DISCARDED', claimed_by = NULL, claimed_at = NULL,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND id = ? AND status IN ('DEAD', 'FAILED', 'PENDING')
+                """, tenantId, id);
+    }
+
+    public List<OutboxEvent> list(String tenantId, String status, int limit) {
+        return jdbc.query("""
+                SELECT id, tenant_id, aggregate_type, aggregate_id, event_type, payload_json, attempts
+                FROM ai_outbox WHERE tenant_id = ? AND (? IS NULL OR status = ?)
+                ORDER BY created_at LIMIT ?
+                """, (rs, rowNum) -> new OutboxEvent(rs.getString("id"), rs.getString("tenant_id"),
+                rs.getString("aggregate_type"), rs.getString("aggregate_id"), rs.getString("event_type"),
+                rs.getString("payload_json"), rs.getInt("attempts")), tenantId, status, status,
+                Math.min(Math.max(limit, 1), 200));
+    }
+
+    private String truncate(String value) {
+        return value == null ? null : value.substring(0, Math.min(value.length(), 2000));
     }
 
     public record OutboxEvent(String id, String tenantId, String aggregateType, String aggregateId,

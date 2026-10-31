@@ -117,3 +117,10 @@ JDK 25 中 `StructuredTaskScope` 仍为 preview。当前使用虚拟线程/固�
 **状态：接受**
 
 `RetrievalService` 增加 30 秒 Caffeine 缓存，key 包含 tenant/kb/query/topK/roles；入库、删除、状态变更显式失效。目的为降低重复 embedding/向量查询，不替代 source of truth。
+
+
+## ADR-012：Chat 幂等租约与 Outbox 死信
+
+- `ai_chat_request` 增加 `lease_owner/expires_at`；崩溃后租约过期可被新请求接管，定时任务把长期 PROCESSING 标记 FAILED。
+- `ai_outbox` 增加 `last_error/dead_at`；5 次失败进入 DEAD，提供 tenant 范围 replay/discard API。
+- SSE 异步 dispatch 允许 `ASYNC/ERROR` 通过安全链，避免完成时 SecurityContext 清理导致 403。

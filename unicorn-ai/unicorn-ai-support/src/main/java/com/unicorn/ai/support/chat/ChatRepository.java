@@ -110,16 +110,38 @@ public class ChatRepository {
                 tenantId, sessionId);
     }
 
-    public boolean tryStartRequest(String tenantId, String sessionId, String requestId, String messageId) {
+    public boolean tryStartRequest(String tenantId, String sessionId, String requestId, String messageId,
+                                   String leaseOwner, long leaseSeconds) {
+        var expiresAt = Timestamp.from(Instant.now().plusSeconds(leaseSeconds));
+        // A crashed node leaves PROCESSING behind. Reclaim only after its lease expires.
+        var reclaimed = jdbc.update("""
+                UPDATE ai_chat_request
+                SET status = 'PROCESSING', message_id = ?, lease_owner = ?, expires_at = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE tenant_id = ? AND session_id = ? AND request_id = ?
+                  AND status = 'PROCESSING' AND (expires_at IS NULL OR expires_at < CURRENT_TIMESTAMP)
+                """, messageId, leaseOwner, expiresAt, tenantId, sessionId, requestId);
+        if (reclaimed > 0) {
+            return true;
+        }
         try {
             jdbc.update("""
-                    INSERT INTO ai_chat_request (tenant_id, session_id, request_id, message_id, status)
-                    VALUES (?, ?, ?, ?, 'PROCESSING')
-                    """, tenantId, sessionId, requestId, messageId);
+                    INSERT INTO ai_chat_request
+                        (tenant_id, session_id, request_id, message_id, status, lease_owner, expires_at)
+                    VALUES (?, ?, ?, ?, 'PROCESSING', ?, ?)
+                    """, tenantId, sessionId, requestId, messageId, leaseOwner, expiresAt);
             return true;
         } catch (DuplicateKeyException exception) {
             return false;
         }
+    }
+
+    public int failExpiredRequests() {
+        return jdbc.update("""
+                UPDATE ai_chat_request SET status = 'FAILED', lease_owner = NULL, expires_at = NULL,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE status = 'PROCESSING' AND expires_at IS NOT NULL AND expires_at < CURRENT_TIMESTAMP
+                """);
     }
 
     public Optional<ChatRecords.Request> findRequest(String tenantId, String sessionId, String requestId) {
@@ -134,7 +156,8 @@ public class ChatRepository {
 
     public void finishRequest(String tenantId, String sessionId, String requestId, String status) {
         jdbc.update("""
-                UPDATE ai_chat_request SET status = ?, updated_at = CURRENT_TIMESTAMP
+                UPDATE ai_chat_request SET status = ?, lease_owner = NULL, expires_at = NULL,
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE tenant_id = ? AND session_id = ? AND request_id = ?
                 """, status, tenantId, sessionId, requestId);
     }

@@ -574,7 +574,7 @@ AI_INFRA_TEST=true ./gradlew :unicorn-ai-support:test \
 ### 12.3 当前结果
 
 - `unicorn-ai-tools:test`：6 个通过。
-- `unicorn-ai-support:test`：26 个通过；Testcontainers/外部测试默认 skip。
+- `unicorn-ai-support:test`：27 个通过；Testcontainers/外部测试默认 skip。
 - 外部 PG/Redis/RabbitMQ：2 个通过（异步入库 + RLS）。
 - `./gradlew assemble`：BUILD SUCCESSFUL。
 
