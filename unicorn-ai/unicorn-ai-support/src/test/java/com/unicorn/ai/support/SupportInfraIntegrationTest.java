@@ -85,10 +85,11 @@ class SupportInfraIntegrationTest {
         try (var connection = java.sql.DriverManager.getConnection(
                 POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
              var statement = connection.createStatement()) {
-            // Keep extension operator classes in public so Flyway's schema-local
-            // search_path can resolve gin_trgm_ops.
-            statement.execute("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public");
-            statement.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public");
+            // Flyway's default schema is ai_support. Install extensions in that schema
+            // so Play's schema-local search_path can resolve gin_trgm_ops.
+            statement.execute("CREATE SCHEMA IF NOT EXISTS ai_support");
+            statement.execute("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA ai_support");
+            statement.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA ai_support");
         } catch (Exception exception) {
             throw new IllegalStateException("Could not install PostgreSQL extensions", exception);
         }
