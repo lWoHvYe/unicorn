@@ -103,6 +103,22 @@
 - 再消耗配额；配额失败时将 request 标记 `FAILED`。
 - 流式路径在 session 校验后消耗配额。
 
+## 3.5 2026-10-31 优化落地
+
+本轮已继续处理以下问题：
+
+- **Outbox 多实例 claim**：新增 `claimed_by/claimed_at` 与 owner 条件，避免两个实例重复发布；新增 `claim-test` 测试。
+- **配额日重置**：`ai_quota.period_start` + 原子重置；新增跨日测试。
+- **ChatMemory 并发**：`saveAll` 增加事务。
+- **RLS 角色自检**：`RlsRoleVerifier` 检测 superuser，可通过 `ai.support.rls.fail-fast` 选择 fail-fast。
+- **检索状态 N+1**：`KnowledgeRepository.findDocumentStatuses` 批量查询。
+- **本地限流内存增长**：`LocalRateLimitStore` 改用 Caffeine。
+- **模型韧性**：`SupportModelInvoker` 增加 Resilience4j Bulkhead/Retry/CircuitBreaker。
+- **OTel**：接入 `micrometer-tracing-bridge-otel` + OTLP exporter。
+- **技术 ADR**：新增 `docs/technology-decisions.md`，记录 Netty/Redisson/Modulith/ShedLock 取舍。
+
+**仍未完成**：非 owner 应用角色启动完整应用的端到端测试、`ai_document_version` RLS、模型 4xx/5xx 分类重试、provider 级独立熔断、Grafana/SLO。
+
 ## 4. 仍存在的问题与优化项
 
 ### 4.1 高优先级
