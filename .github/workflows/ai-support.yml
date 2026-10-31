@@ -37,6 +37,15 @@ jobs:
           gradle-version: '9.8.2'
       - name: Unit and integration tests
         run: ./gradlew :unicorn-ai-tools:test :unicorn-ai-support:test :unicorn-ai-mcp-client:test :unicorn-ai-mcp-server:test --no-daemon
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-support-test-results
+          path: |
+            unicorn-ai/unicorn-ai-support/build/test-results/test
+            unicorn-ai/unicorn-ai-support/build/reports/tests/test
+          if-no-files-found: ignore
       - name: Build
         run: ./gradlew :unicorn-ai-support:assemble :unicorn-ai-tools:assemble --no-daemon
       - name: Build container
