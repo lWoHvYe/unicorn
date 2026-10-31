@@ -76,10 +76,12 @@ public class SupportChatController {
                              @RequestBody ChatDtos.SendMessageRequest request,
                              @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
         var emitter = new SseEmitter(properties.streamTimeoutMs());
+        var eventId = new java.util.concurrent.atomic.AtomicLong();
         var disposable = chatService.stream(principal, sessionId, request.message(), idempotencyKey).subscribe(
                 event -> {
                     try {
-                        emitter.send(SseEmitter.event().name(event.event()).data(event.data()));
+                        emitter.send(SseEmitter.event().id(Long.toString(eventId.incrementAndGet()))
+                                .name(event.event()).data(event.data()));
                     } catch (IOException exception) {
                         emitter.completeWithError(exception);
                     }

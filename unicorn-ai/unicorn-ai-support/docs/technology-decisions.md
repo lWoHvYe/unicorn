@@ -136,3 +136,8 @@ JDK 25 中 `StructuredTaskScope` 仍为 preview。当前使用虚拟线程/固�
 
 - `SupportApplicationRoleRlsTest` 使用非 owner `unicorn_support_app` 角色启动完整应用，验证 `RlsRoleVerifier`、`TenantAwareDataSource` 和实际 chat 路径。
 - 主/fallback 模型调用使用独立 CircuitBreaker，避免主 circuit open 时 fallback 被一起拒绝。
+
+
+## ADR-015：SSE 事件 ID
+
+每个 SSE 事件生成单调递增 `id`，为后续 `Last-Event-ID` 断线续传提供协议基础；当前幂等重放仍以 `Idempotency-Key` 为准。

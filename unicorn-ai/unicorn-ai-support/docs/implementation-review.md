@@ -123,7 +123,7 @@
 
 **本轮补充**：新增 `SupportApplicationRoleRlsTest`，以非 owner 应用角色启动完整应用并完成 chat；Resilience4j 主/fallback circuit 已拆分；`FlywayMigrationRunner` 在 `spring.flyway.enabled=false` 时保留 no-op bean，避免 `@DependsOn` 启动失败。
 
-**仍未完成**：SSE Last-Event-ID 续传、Grafana/SLO、MapStruct 未引入（ADR 决策）。
+**仍未完成**：SSE Last-Event-ID 续传（事件 ID 已补，恢复逻辑未做）、Grafana/SLO、MapStruct 未引入（ADR 决策）。
 
 ## 4. 仍存在的问题与优化项
 
