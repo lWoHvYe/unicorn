@@ -23,6 +23,7 @@ description = "Production reference: multi-tenant support copilot with RAG, tool
 
 dependencies {
     implementation(platform(libs.spring.ai.bom))
+    implementation(platform(libs.resilience4j.bom))
     implementation(project(":unicorn-ai-tools"))
 
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
@@ -35,6 +36,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("io.github.resilience4j:resilience4j-circuitbreaker")
+    implementation("io.github.resilience4j:resilience4j-retry")
+    implementation("io.github.resilience4j:resilience4j-bulkhead")
 
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
     implementation("org.springframework.ai:spring-ai-vector-store")

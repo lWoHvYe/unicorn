@@ -25,6 +25,7 @@ nexusPublish = "2.0.0"
 oshiCore = "6.4.2"
 poi = "6.0.0"
 redisson = "4.8.0"
+resilience4j = "2.3.0"
 springBoot = "4.1.2"
 springCloudVersion = "2025.1.2"
 springAi = "2.0.1"
@@ -61,6 +62,7 @@ poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" 
 redisson = { group = "org.redisson", name = "redisson-spring-boot-starter", version.ref = "redisson" }
 spring-ai-bom = { group = "org.springframework.ai", name = "spring-ai-bom", version.ref = "springAi" }
 redisson-cache = { group = "org.redisson", name = "redisson-spring-cache", version.ref = "redisson" }
+resilience4j-bom = { group = "io.github.resilience4j", name = "resilience4j-bom", version.ref = "resilience4j" }
 springdoc-webflux-ui = { group = "org.springdoc", name = "springdoc-openapi-starter-webflux-ui", version.ref = "springdoc" }
 springdoc-webmvc-ui = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdoc" }
 thumbnailator = { group = "net.coobird", name = "thumbnailator", version.ref = "thumbnailator" }
