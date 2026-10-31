@@ -80,7 +80,7 @@ Base：`/api/ai/support/v1`
 | --- | --- | --- |
 | POST | `/sessions` | 创建会话，可带 `kbId` |
 | POST | `/sessions/{id}/messages` | 阻塞问答，返回 citations/usage |
-| POST | `/sessions/{id}/messages/stream` | SSE：`meta/token/citation/tool/approval/done/error` |
+| POST | `/sessions/{id}/messages/stream` | SSE：`meta/token/citation/tool/approval/done/error`；支持 `Idempotency-Key` 重放 |
 | GET | `/sessions/{id}/messages` | 历史消息 |
 | POST | `/sessions/{id}/feedback` | 反馈 |
 | POST | `/sessions/{id}/close` | 关闭 |

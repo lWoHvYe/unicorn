@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -32,13 +33,16 @@ public class RedisRateLimitStore implements RateLimitStore {
 
     private static final String PREFIX = "ai:support:rate:";
     private static final DefaultRedisScript<Long> SCRIPT = new DefaultRedisScript<>("""
-            local current = redis.call('INCR', KEYS[1])
-            if current == 1 then
-              redis.call('PEXPIRE', KEYS[1], ARGV[1])
-            end
-            if current > tonumber(ARGV[2]) then
+            local now = tonumber(ARGV[1])
+            local window = tonumber(ARGV[2])
+            local limit = tonumber(ARGV[3])
+            redis.call('ZREMRANGEBYSCORE', KEYS[1], 0, now - window)
+            local current = redis.call('ZCARD', KEYS[1])
+            if current >= limit then
               return 0
             end
+            redis.call('ZADD', KEYS[1], now, ARGV[4])
+            redis.call('PEXPIRE', KEYS[1], window)
             return 1
             """, Long.class);
 
@@ -51,8 +55,10 @@ public class RedisRateLimitStore implements RateLimitStore {
     @Override
     public boolean tryAcquire(String key, int limit, Duration window) {
         try {
+            var now = System.currentTimeMillis();
             var result = redis.execute(SCRIPT, List.of(PREFIX + key),
-                    String.valueOf(window.toMillis()), String.valueOf(limit));
+                    String.valueOf(now), String.valueOf(window.toMillis()), String.valueOf(limit),
+                    UUID.randomUUID().toString());
             return result != null && result == 1L;
         } catch (RuntimeException exception) {
             // Fail closed: a Redis outage must not silently remove tenant protection.

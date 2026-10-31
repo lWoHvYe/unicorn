@@ -21,6 +21,7 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -78,6 +79,10 @@ class SupportExternalInfraTest {
         registry.add("ai.support.demo.model", () -> true);
         registry.add("ai.support.async-ingest.enabled", () -> true);
         registry.add("ai.support.rate-limit.store", () -> "redis");
+        // This test may run repeatedly against the same Redis; avoid cross-run 429 noise.
+        registry.add("ai.support.rate-limit.chat-per-minute", () -> 100000);
+        registry.add("ai.support.rate-limit.ingest-per-hour", () -> 100000);
+        registry.add("ai.support.rate-limit.mcp-per-minute", () -> 100000);
         registry.add("ai.support.cache.store", () -> "redis");
         registry.add("spring.rabbitmq.host", () -> MQ_HOST);
         registry.add("spring.rabbitmq.port", () -> MQ_PORT);
@@ -92,10 +97,15 @@ class SupportExternalInfraTest {
     @Autowired
     private JdbcTemplate jdbc;
 
+    @Autowired
+    private StringRedisTemplate redis;
+
     private final HttpClient http = HttpClient.newHttpClient();
 
     @Test
     void externalInfraProcessesIngestionAndCitation() throws Exception {
+        redis.delete(java.util.List.of("ai:support:rate:ingest:demo", "ai:support:rate:chat:demo",
+                "ai:support:rate:mcp:demo"));
         var marker = java.util.UUID.randomUUID().toString();
         var ingest = post("/api/ai/support/v1/knowledge-bases/demo-kb/documents/text", """
                 {"text":"External PG pgvector RabbitMQ 集成测试文档 %s，端口 8081。",

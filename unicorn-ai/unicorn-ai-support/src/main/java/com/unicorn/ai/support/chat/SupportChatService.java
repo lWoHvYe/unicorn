@@ -199,12 +199,32 @@ public class SupportChatService {
     }
 
     public Flux<ChatDtos.StreamEvent> stream(AiPrincipal principal, String sessionId, String message) {
+        return stream(principal, sessionId, message, null);
+    }
+
+    public Flux<ChatDtos.StreamEvent> stream(AiPrincipal principal, String sessionId, String message,
+                                             String idempotencyKey) {
         validateMessage(message);
         rateLimiter.checkChat(principal.tenantId());
         var session = requireSession(principal, sessionId);
-        quotaService.consumeChat(principal.tenantId());
         var traceId = traceId();
         var messageId = UUID.randomUUID().toString();
+        var requestId = idempotencyKey == null || idempotencyKey.isBlank() ? null : idempotencyKey;
+        if (requestId != null && !chatRepository.tryStartRequest(principal.tenantId(), sessionId, requestId, messageId)) {
+            var existing = chatRepository.findRequest(principal.tenantId(), sessionId, requestId)
+                    .orElseThrow(() -> new ChatRequestConflictException("聊天请求状态不可用"));
+            if ("DONE".equals(existing.status())) {
+                return replayStream(principal, existing.messageId());
+            }
+            throw new ChatRequestConflictException("相同幂等键的聊天请求正在处理中");
+        }
+        try {
+            quotaService.consumeChat(principal.tenantId());
+        } catch (RuntimeException exception) {
+            finishRequest(principal, sessionId, requestId, "FAILED");
+            throw exception;
+        }
+        var terminal = new AtomicBoolean(false);
         chatRepository.saveMessage(new ChatRecords.Message(UUID.randomUUID().toString(), sessionId,
                 principal.tenantId(), "USER", message, null, null, null, traceId, "DONE", Instant.now()));
 
@@ -219,6 +239,7 @@ public class SupportChatService {
             var refusal = "资料中没有足够信息，无法基于当前知识库回答。请补充文档或转人工客服。";
             saveAssistant(principal, sessionId, messageId, refusal, retrieval.citations(),
                     ChatDtos.TokenUsage.empty(), traceId, "REFUSED");
+            finishRequest(principal, sessionId, requestId, "DONE");
             return Flux.just(
                     new ChatDtos.StreamEvent("meta", java.util.Map.of("messageId", messageId, "traceId", traceId)),
                     new ChatDtos.StreamEvent("token", java.util.Map.of("delta", refusal)),
@@ -270,6 +291,8 @@ public class SupportChatService {
                                         retrieval.citations(), usage, traceId, status);
                                 usageRepository.record(principal.tenantId(), usage.promptTokens(),
                                         usage.completionTokens(), cost(usage));
+                                terminal.set(true);
+                                finishRequest(principal, sessionId, requestId, "DONE");
                             })
                             .mapNotNull(response -> {
                                 var text = response.getResult() == null || response.getResult().getOutput() == null
@@ -277,7 +300,13 @@ public class SupportChatService {
                                 return text == null || text.isEmpty() ? null
                                         : new ChatDtos.StreamEvent("token", java.util.Map.of("delta", text));
                             })
-                            .doFinally(signal -> toolEvents.tryEmitComplete())
+                            .doFinally(signal -> {
+                                toolEvents.tryEmitComplete();
+                                if (signal == reactor.core.publisher.SignalType.CANCEL && !terminal.get()) {
+                                    terminal.set(true);
+                                    finishRequest(principal, sessionId, requestId, "FAILED");
+                                }
+                            })
                             .onErrorResume(exception -> {
                                 failed.set(true);
                                 try {
@@ -287,6 +316,8 @@ public class SupportChatService {
                                 } catch (RuntimeException saveFailure) {
                                     // The stream still needs a terminal error event.
                                 }
+                                terminal.set(true);
+                                finishRequest(principal, sessionId, requestId, "FAILED");
                                 return Flux.just(new ChatDtos.StreamEvent("error",
                                         java.util.Map.of("code", "AI_CALL_FAILED",
                                                 "message", "AI 调用失败，请稍后重试。")));
@@ -305,6 +336,23 @@ public class SupportChatService {
                         java.util.Map.of("messageId", messageId,
                                 "status", failed.get() ? "FAILED" : refused.get() ? "REFUSED" : "DONE",
                                 "usage", streamUsage.get()))));
+    }
+
+    private Flux<ChatDtos.StreamEvent> replayStream(AiPrincipal principal, String messageId) {
+        var message = chatRepository.findMessage(principal.tenantId(), messageId)
+                .orElseThrow(() -> new ChatRequestConflictException("聊天请求已完成但响应缺失"));
+        var answer = answerFrom(message);
+        var events = new ArrayList<ChatDtos.StreamEvent>();
+        events.add(new ChatDtos.StreamEvent("meta", java.util.Map.of("messageId", messageId,
+                "traceId", answer.traceId())));
+        for (int i = 0; i < answer.citations().size(); i++) {
+            events.add(new ChatDtos.StreamEvent("citation",
+                    java.util.Map.of("index", i + 1, "citation", answer.citations().get(i))));
+        }
+        events.add(new ChatDtos.StreamEvent("token", java.util.Map.of("delta", answer.answer())));
+        events.add(new ChatDtos.StreamEvent("done", java.util.Map.of("messageId", messageId,
+                "status", answer.status(), "usage", answer.usage())));
+        return Flux.fromIterable(events);
     }
 
     public ChatDtos.SessionView session(AiPrincipal principal, String sessionId) {

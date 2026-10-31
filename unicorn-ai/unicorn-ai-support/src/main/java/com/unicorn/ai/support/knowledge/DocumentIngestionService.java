@@ -56,16 +56,19 @@ public class DocumentIngestionService {
     private final SupportProperties properties;
     private final ObjectProvider<AsyncIngestPublisher> asyncPublisher;
     private final SupportMetrics metrics;
+    private final com.unicorn.ai.support.retrieval.RetrievalCache retrievalCache;
 
     public DocumentIngestionService(KnowledgeRepository repository, VectorStore vectorStore,
                                     SupportProperties properties,
                                     ObjectProvider<AsyncIngestPublisher> asyncPublisher,
-                                    SupportMetrics metrics) {
+                                    SupportMetrics metrics,
+                                    com.unicorn.ai.support.retrieval.RetrievalCache retrievalCache) {
         this.repository = repository;
         this.vectorStore = vectorStore;
         this.properties = properties;
         this.asyncPublisher = asyncPublisher;
         this.metrics = metrics;
+        this.retrievalCache = retrievalCache;
     }
 
     @Transactional
@@ -165,6 +168,7 @@ public class DocumentIngestionService {
                     vectorStore.delete(oldChunks.stream().map(KnowledgeRecords.Chunk::id).toList());
                     repository.deleteChunksByDocument(tenantId, documentId, previousVersion);
                 }
+                retrievalCache.invalidate(tenantId, document.kbId());
                 repository.updateJob(jobId, "COMPLETED", 0, null);
                 metrics.ingest(tenantId, "COMPLETED");
             } catch (RuntimeException exception) {
@@ -187,6 +191,7 @@ public class DocumentIngestionService {
         vectorStore.delete(chunks.stream().map(KnowledgeRecords.Chunk::id).toList());
         repository.deleteChunksByDocument(tenantId, documentId);
         repository.markDocumentDeleted(tenantId, documentId);
+        retrievalCache.invalidate(tenantId, document.kbId());
     }
 
     public void retire(String tenantId, String documentId) {
@@ -196,6 +201,7 @@ public class DocumentIngestionService {
         vectorStore.delete(chunks.stream().map(KnowledgeRecords.Chunk::id).toList());
         repository.deleteChunksByDocument(tenantId, documentId);
         repository.updateDocumentStatus(tenantId, documentId, "RETIRED");
+        retrievalCache.invalidate(tenantId, document.kbId());
     }
 
     public void setStatus(String tenantId, String documentId, String status) {
@@ -209,6 +215,8 @@ public class DocumentIngestionService {
         if (repository.updateDocumentStatus(tenantId, documentId, status) == 0) {
             throw new IllegalArgumentException("文档不存在");
         }
+        repository.findDocument(tenantId, documentId)
+                .ifPresent(document -> retrievalCache.invalidate(tenantId, document.kbId()));
     }
 
     public IngestResult reindex(String tenantId, String documentId) {

@@ -117,7 +117,9 @@
 - **OTel**：接入 `micrometer-tracing-bridge-otel` + OTLP exporter。
 - **技术 ADR**：新增 `docs/technology-decisions.md`，记录 Netty/Redisson/Modulith/ShedLock 取舍。
 
-**仍未完成**：非 owner 应用角色启动完整应用的端到端测试、`ai_document_version` RLS、模型 4xx/5xx 分类重试、provider 级独立熔断、Grafana/SLO。
+**本轮追加**：Redis/本地限流改为滑动窗口；SSE 增加 `Idempotency-Key` 重放；`RetrievalService` 增加 30 秒 Caffeine 缓存并显式失效；修复 SSE 异步 dispatch 被安全链拒绝的问题；Resilience4j/OTel/Caffeine 已接入。
+
+**仍未完成**：非 owner 应用角色启动完整应用的端到端测试、`ai_document_version` RLS、模型 4xx/5xx 分类重试、provider 级独立熔断、Grafana/SLO、MapStruct 未引入（ADR 决策）。
 
 ## 4. 仍存在的问题与优化项
 
@@ -193,7 +195,7 @@ AI_INFRA_TEST=true ./gradlew :unicorn-ai-support:test \
 当前结果：
 
 - `unicorn-ai-tools:test`：6 个通过。
-- `unicorn-ai-support:test`：24 个通过；Testcontainers/外部测试默认 skip。
+- `unicorn-ai-support:test`：26 个通过；Testcontainers/外部测试默认 skip。
 - 外部 PG/Redis/RabbitMQ：2 个通过（异步入库 + RLS 非 owner）。
 - `./gradlew assemble`：BUILD SUCCESSFUL。
 

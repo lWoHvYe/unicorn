@@ -202,6 +202,26 @@ class SupportApplicationTests {
     }
 
     @Test
+    void streamRequestIdempotencyReplaysSameMessage() {
+        var session = post("/api/ai/support/v1/sessions", "{\"channel\":\"web\"}", "demo-key");
+        var sessionId = JSON.readValue(session.body(), Map.class).get("id");
+        var path = "/api/ai/support/v1/sessions/" + sessionId + "/messages/stream";
+        var first = post(path, "{\"message\":\"Spring Boot 4.1\"}", "demo-key", "stream-idem-1");
+        var second = post(path, "{\"message\":\"Spring Boot 4.1\"}", "demo-key", "stream-idem-1");
+        assertEquals(HttpStatus.OK.value(), first.statusCode());
+        assertEquals(HttpStatus.OK.value(), second.statusCode());
+        assertTrue(first.body().contains("meta"));
+        assertTrue(second.body().contains("meta"));
+        assertEquals(1, jdbc.queryForObject("""
+                SELECT COUNT(*) FROM ai_chat_request
+                WHERE tenant_id = 'demo' AND session_id = ? AND request_id = 'stream-idem-1'
+                """, Integer.class, sessionId));
+        assertEquals(1, jdbc.queryForObject("""
+                SELECT COUNT(*) FROM ai_chat_message WHERE session_id = ? AND role = 'USER'
+                """, Integer.class, sessionId));
+    }
+
+    @Test
     void outboxClaimIsOwnedByOnePublisher() {
         jdbc.update("UPDATE ai_outbox SET status = 'PUBLISHED' WHERE status <> 'PUBLISHED'");
         outbox.enqueue("demo", "ingest_job", "claim-test", "INGEST_REQUESTED", "{}");

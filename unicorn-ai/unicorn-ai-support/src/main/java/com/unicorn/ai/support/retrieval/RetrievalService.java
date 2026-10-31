@@ -53,16 +53,19 @@ public class RetrievalService {
     private final QueryPlanService queryPlanService;
     private final EmbeddingModel embeddingModel;
     private final RerankService rerankService;
+    private final RetrievalCache cache;
 
     public RetrievalService(VectorStore vectorStore, KnowledgeRepository knowledgeRepository,
                             SupportProperties properties, QueryPlanService queryPlanService,
-                            EmbeddingModel embeddingModel, RerankService rerankService) {
+                            EmbeddingModel embeddingModel, RerankService rerankService,
+                            RetrievalCache cache) {
         this.vectorStore = vectorStore;
         this.knowledgeRepository = knowledgeRepository;
         this.properties = properties;
         this.queryPlanService = queryPlanService;
         this.embeddingModel = embeddingModel;
         this.rerankService = rerankService;
+        this.cache = cache;
     }
 
     public RetrievalResult retrieve(String tenantId, String kbId, String query, Integer topK) {
@@ -71,6 +74,10 @@ public class RetrievalService {
 
     public RetrievalResult retrieve(String tenantId, String kbId, String query, Integer topK, Set<String> roles) {
         var limit = topK == null || topK <= 0 ? properties.topK() : Math.min(topK, 20);
+        var cached = cache.get(tenantId, kbId, query, limit, roles);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
         // ACL is applied after vector/lexical retrieval; fetch extra candidates so private
         // documents cannot crowd every public result out of the topK.
         var candidateK = Math.max(properties.candidateK(), limit * 5);
@@ -97,7 +104,9 @@ public class RetrievalService {
         }
 
         var citations = selected.stream().map(this::toCitation).toList();
-        return new RetrievalResult(selected, citations, !citations.isEmpty());
+        var result = new RetrievalResult(selected, citations, !citations.isEmpty());
+        cache.put(tenantId, kbId, query, limit, roles, result);
+        return result;
     }
 
     private List<Document> search(String tenantId, String kbId, String query, int candidateK, Set<String> roles) {

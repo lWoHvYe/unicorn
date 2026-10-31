@@ -16,14 +16,13 @@
 
 package com.unicorn.ai.support.ratelimit;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayDeque;
 
 @Component
 @ConditionalOnProperty(name = "ai.support.rate-limit.store", havingValue = "local", matchIfMissing = true)
@@ -31,28 +30,26 @@ public class LocalRateLimitStore implements RateLimitStore {
 
     private final Cache<String, Window> windows = Caffeine.newBuilder()
             .maximumSize(100_000)
-            .expireAfterWrite(java.time.Duration.ofHours(2))
+            .expireAfterWrite(Duration.ofHours(2))
             .build();
 
     @Override
     public boolean tryAcquire(String key, int limit, Duration window) {
-        var current = windows.get(key, ignored -> new Window(System.nanoTime()));
+        var current = windows.get(key, ignored -> new Window());
         synchronized (current) {
-            var now = System.nanoTime();
-            if (now - current.startedAt > window.toNanos()) {
-                current.startedAt = now;
-                current.count.set(0);
+            var cutoff = System.nanoTime() - window.toNanos();
+            while (!current.timestamps.isEmpty() && current.timestamps.peekFirst() <= cutoff) {
+                current.timestamps.removeFirst();
             }
-            return current.count.incrementAndGet() <= limit;
+            if (current.timestamps.size() >= limit) {
+                return false;
+            }
+            current.timestamps.addLast(System.nanoTime());
+            return true;
         }
     }
 
     private static final class Window {
-        private long startedAt;
-        private final AtomicInteger count = new AtomicInteger();
-
-        private Window(long startedAt) {
-            this.startedAt = startedAt;
-        }
+        private final ArrayDeque<Long> timestamps = new ArrayDeque<>();
     }
 }

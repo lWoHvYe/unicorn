@@ -92,3 +92,28 @@ JDK 25 中 `StructuredTaskScope` 仍为 preview。当前使用虚拟线程/固�
 - 提供 ExecutorService fallback；
 - 明确 preview 运行时参数；
 - 有取消/超时/异常测试。
+
+## ADR-009：MapStruct 暂不引入
+
+**状态：接受**
+
+当前 DTO/领域映射主要是 records、小规模和显式构造；MapStruct 会增加注解处理器、生成代码和调试成本，收益不足。
+
+**重新评估条件**：实体/DTO 映射数量显著增长、字段映射错误成为主要缺陷来源时再引入。
+
+## ADR-010：滑动窗口限流与流式幂等
+
+**状态：接受**
+
+- Redis 限流从固定窗口改为 ZSET 滑动窗口 Lua；本地限流使用 Caffeine + 时间戳队列。
+- SSE 增加 `Idempotency-Key`：
+  - 已完成请求重放已存储的 assistant 消息；
+  - 处理中请求返回 409；
+  - 取消/错误将 request 标记 FAILED。
+- 异步 dispatch 允许 `DispatcherType.ASYNC/ERROR` 通过安全链，避免 SSE 完成时 SecurityContext 已清理导致 403；初始请求仍必须认证。
+
+## ADR-011：检索结果本地缓存
+
+**状态：接受**
+
+`RetrievalService` 增加 30 秒 Caffeine 缓存，key 包含 tenant/kb/query/topK/roles；入库、删除、状态变更显式失效。目的为降低重复 embedding/向量查询，不替代 source of truth。

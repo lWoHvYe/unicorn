@@ -73,9 +73,10 @@ public class SupportChatController {
     @PostMapping(value = "/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter stream(@AuthenticationPrincipal AiPrincipal principal,
                              @PathVariable String sessionId,
-                             @RequestBody ChatDtos.SendMessageRequest request) {
+                             @RequestBody ChatDtos.SendMessageRequest request,
+                             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
         var emitter = new SseEmitter(properties.streamTimeoutMs());
-        var disposable = chatService.stream(principal, sessionId, request.message()).subscribe(
+        var disposable = chatService.stream(principal, sessionId, request.message(), idempotencyKey).subscribe(
                 event -> {
                     try {
                         emitter.send(SseEmitter.event().name(event.event()).data(event.data()));
