@@ -17,8 +17,7 @@ package com.lwohvye.api.modules.system.service.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.util.List;
@@ -36,7 +35,7 @@ public class ResourceDto implements Serializable {
     /**
      * 防止精度丢失，当使用雪花生成Id时，因为长度问题，添加了个这个
      */
-    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long resourceId;
 
     /**

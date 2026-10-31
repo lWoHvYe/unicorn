@@ -24,8 +24,7 @@ import java.math.BigDecimal;
 </#if>
 import java.io.Serializable;
 <#if !auto && pkColumnType = 'Long'>
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 </#if>
 
 /**
@@ -45,7 +44,7 @@ public class ${className}Dto implements Serializable {
     <#if column.columnKey = 'PRI'>
     <#if !auto && pkColumnType = 'Long'>
     /** 防止精度丢失 */
-    @JsonSerialize(using = ToStringSerializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     </#if>
     </#if>
     private ${column.columnType} ${column.changeColumnName};
