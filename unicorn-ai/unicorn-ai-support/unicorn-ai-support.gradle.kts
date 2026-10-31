@@ -35,6 +35,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("io.github.resilience4j:resilience4j-circuitbreaker")
     implementation("io.github.resilience4j:resilience4j-retry")

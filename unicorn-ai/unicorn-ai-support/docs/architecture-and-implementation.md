@@ -427,6 +427,7 @@ chatClient.prompt()
 - `timeoutMs`、`maxAttempts`。
 - 可选 `fallback-model`，主模型失败后切换 fallback ChatClient。
 - Micrometer `Observation("ai.support.model")`。
+- Resilience4j Bulkhead/CircuitBreaker/Retry 包装模型调用；Retry 只重试模型失败，`NoContextException` 不重试。
 - `NoContextException` 不重试，直接用于拒答。
 
 ---
@@ -454,6 +455,7 @@ chatClient.prompt()
 | `ai.support.citation.invalid` | citation 校验失败 |
 | `ai.support.quota.exceeded` | 配额耗尽 |
 | `ai.support.model` | 模型调用 observation |
+| OTel | Micrometer Tracing + OTLP exporter，采样率 0.1 |
 
 ### 9.2 告警
 
@@ -505,6 +507,7 @@ ai:
 ### 10.3 Docker / K8s
 
 - Dockerfile：Java 25 JRE，非 root 用户。
+- OTel：`micrometer-tracing-bridge-otel` + `opentelemetry-exporter-otlp`，OTLP endpoint 通过 `OTEL_EXPORTER_OTLP_ENDPOINT` 配置。
 - `compose.yaml`：PG/pgvector、Redis、RabbitMQ、support。
 - `k8s/`：Deployment、Service、Ingress、HPA、PDB、Secret 示例。
 - health：`/actuator/health/liveness`、`/actuator/health/readiness`。

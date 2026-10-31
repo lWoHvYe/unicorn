@@ -135,7 +135,7 @@
 - 无完整管理端 UI，仅管理 API。
 - 知识原文仍走上传/Tika，无对象存储、OCR、表格抽取、病毒扫描。
 - 订单/库存/商品仍是 JDBC demo，无真实服务 adapter 和契约测试。
-- 无 OpenTelemetry 全链路 tracing、Grafana dashboard、SLO error budget。
+- 已接入 OTel bridge/OTLP exporter 与采样配置；Grafana dashboard、SLO error budget 仍待补齐。
 - 无 golden dataset 持久化、CI 评测任务、模型/prompt A/B。
 - 无负载/安全/混沌测试、备份恢复/DR 演练。
 - MCP legacy server 仍是单租户 demo。

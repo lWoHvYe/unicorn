@@ -4,7 +4,7 @@
 
 `CLAUDE.md` 是早期说明，已在顶部标注以本文件为准；发生冲突时，以本文件、`settings.gradle.kts`、`build-logic/` 和实际构建结果为准。
 
-> 最近核对：2026-10-30（工作区）。`./gradlew assemble` 通过；AI 新增生产参考 `unicorn-ai-support`（H2 本地 profile + PostgreSQL/pgvector/Redis/RabbitMQ infra profile、多租户、RAG citations、工具审批、MCP、指标）及 `unicorn-ai-tools` 领域/策略库；核心模块保留 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试；support 已补 ACL、Redis 限流/缓存、JWT、SSE 工具事件、摘要、MMR/rerank、MCP 客户端认证与审批审计；P2 已补 JDBC 订单/库存/商品适配、token 成本、Docker 资产和 Testcontainers 集成测试；当前已落地 Java 25 ScopedValue、Spring AI 2 ChatMemory/RAG advisor、IAM/RLS、审计/outbox 和治理表。`./gradlew test` 全量仍失败属于预期，见 §8。
+> 最近核对：2026-10-30（工作区）。`./gradlew assemble` 通过；AI 新增生产参考 `unicorn-ai-support`（H2 本地 profile + PostgreSQL/pgvector/Redis/RabbitMQ infra profile、多租户、RAG citations、工具审批、MCP、指标）及 `unicorn-ai-tools` 领域/策略库；核心模块保留 `QueryHelp`/Redis 序列化/异常脱敏的针对性测试；support 已补 ACL、Redis 限流/缓存、JWT、SSE 工具事件、摘要、MMR/rerank、MCP 客户端认证与审批审计；P2 已补 JDBC 订单/库存/商品适配、token 成本、Docker 资产和 Testcontainers 集成测试；当前已落地 Java 25 ScopedValue、Spring AI 2 ChatMemory/RAG advisor、IAM/RLS、审计/outbox、Caffeine/Resilience4j/OTel 和治理表。`./gradlew test` 全量仍失败属于预期，见 §8。
 
 ## 1. 项目速览
 
