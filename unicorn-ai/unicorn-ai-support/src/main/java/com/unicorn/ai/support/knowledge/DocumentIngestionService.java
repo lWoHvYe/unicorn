@@ -212,6 +212,11 @@ public class DocumentIngestionService {
             retire(tenantId, documentId);
             return;
         }
+        var current = repository.findDocument(tenantId, documentId)
+                .orElseThrow(() -> new IllegalArgumentException("文档不存在"));
+        if ("RETIRED".equals(current.status()) && "ACTIVE".equals(status)) {
+            throw new IllegalArgumentException("已退役文档不能直接激活，请先 reindex");
+        }
         if (repository.updateDocumentStatus(tenantId, documentId, status) == 0) {
             throw new IllegalArgumentException("文档不存在");
         }

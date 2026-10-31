@@ -19,13 +19,23 @@ package com.unicorn.ai.support.model;
 public class ModelCallException extends RuntimeException {
 
     private final String code;
+    private final boolean retryable;
 
     public ModelCallException(String code, String message, Throwable cause) {
+        this(code, message, cause, true);
+    }
+
+    public ModelCallException(String code, String message, Throwable cause, boolean retryable) {
         super(message, cause);
         this.code = code;
+        this.retryable = retryable;
     }
 
     public String code() {
         return code;
+    }
+
+    public boolean retryable() {
+        return retryable;
     }
 }

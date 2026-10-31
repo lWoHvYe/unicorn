@@ -32,6 +32,7 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -69,7 +70,8 @@ public class SupportModelInvoker {
         this.retry = Retry.of("support-model", RetryConfig.custom()
                 .maxAttempts(Math.max(1, model.maxAttempts()))
                 .waitDuration(Duration.ofMillis(200))
-                .retryExceptions(ModelCallException.class)
+                .retryOnException(throwable -> throwable instanceof ModelCallException failure
+                        && failure.retryable())
                 .ignoreExceptions(NoContextException.class)
                 .build());
         this.bulkhead = Bulkhead.of("support-model", BulkheadConfig.custom()
@@ -121,13 +123,23 @@ public class SupportModelInvoker {
             throw new ModelCallException("MODEL_TIMEOUT", "模型调用超时", exception);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new ModelCallException("MODEL_INTERRUPTED", "模型调用被中断", exception);
+            throw new ModelCallException("MODEL_INTERRUPTED", "模型调用被中断", exception, false);
         } catch (ExecutionException exception) {
             if (exception.getCause() instanceof NoContextException noContext) {
                 throw noContext;
             }
-            throw new ModelCallException("MODEL_FAILED", "模型调用失败", exception.getCause());
+            throw new ModelCallException("MODEL_FAILED", "模型调用失败", exception.getCause(),
+                    retryable(exception.getCause()));
         }
+    }
+
+    private boolean retryable(Throwable cause) {
+        if (cause instanceof RestClientResponseException response) {
+            var status = response.getStatusCode().value();
+            return status == 429 || status >= 500;
+        }
+        var name = cause == null ? "" : cause.getClass().getName();
+        return !name.contains("NonTransient") && !name.contains("Authentication");
     }
 
     public Duration timeout() {

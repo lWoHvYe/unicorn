@@ -124,3 +124,9 @@ JDK 25 中 `StructuredTaskScope` 仍为 preview。当前使用虚拟线程/固�
 - `ai_chat_request` 增加 `lease_owner/expires_at`；崩溃后租约过期可被新请求接管，定时任务把长期 PROCESSING 标记 FAILED。
 - `ai_outbox` 增加 `last_error/dead_at`；5 次失败进入 DEAD，提供 tenant 范围 replay/discard API。
 - SSE 异步 dispatch 允许 `ASYNC/ERROR` 通过安全链，避免完成时 SecurityContext 清理导致 403。
+
+
+## ADR-013：模型错误分类与知识状态约束
+
+- 模型 4xx/auth 错误标记为不可重试；429/5xx/超时/中断分类重试。
+- `RETIRED` 文档不能直接 `ACTIVE`，必须 reindex，避免“状态已激活但向量不存在”。

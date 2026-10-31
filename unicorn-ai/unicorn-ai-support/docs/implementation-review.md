@@ -119,7 +119,9 @@
 
 **本轮追加**：Redis/本地限流改为滑动窗口；SSE 增加 `Idempotency-Key` 重放；`RetrievalService` 增加 30 秒 Caffeine 缓存并显式失效；修复 SSE 异步 dispatch 被安全链拒绝的问题；Resilience4j/OTel/Caffeine 已接入。
 
-**仍未完成**：非 owner 应用角色启动完整应用的端到端测试、`ai_document_version` RLS、模型 4xx/5xx 分类重试、provider 级独立熔断、Grafana/SLO、MapStruct 未引入（ADR 决策）。
+**本轮补充**：`ai_document_version` 已补 tenant/RLS；模型错误已按 4xx/auth 与 429/5xx/timeout 分类重试；`RETIRED` 文档禁止直接激活。
+
+**仍未完成**：非 owner 应用角色启动完整应用的端到端测试、provider 级独立熔断、SSE Last-Event-ID 续传、Grafana/SLO、MapStruct 未引入（ADR 决策）。
 
 ## 4. 仍存在的问题与优化项
 
