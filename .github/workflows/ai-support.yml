@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew :unicorn-ai-tools:test :unicorn-ai-support:test :unicorn-ai-mcp-client:test :unicorn-ai-mcp-server:test --no-daemon
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ai-support-test-results
           path: |
