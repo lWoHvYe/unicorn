@@ -207,7 +207,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - Redis 8 缓存，支持RAG
 - RabbitMQ 发布-订阅（解耦、异步）
 - ELK 日志系统，config for prod env
-- 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ记得装延迟插件，ES记得装IK
+- 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ 4.4+ 使用 quorum queue 原生延迟，无需延迟插件；ES 记得装 IK
 - 若想搭建k8s版，可[参照](https://github.com/lWoHvYe/mall-swarm/tree/main/document/kubernetes/env) ,这个是基于NFS挂载的。
 
 #### 特别鸣谢

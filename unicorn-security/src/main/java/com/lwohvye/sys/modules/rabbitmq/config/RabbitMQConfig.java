@@ -19,7 +19,6 @@ import org.springframework.amqp.core.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
@@ -34,11 +33,8 @@ public class RabbitMQConfig {
     public static final String FANOUT_SIMPLE_EXCHANGE = "simple_fanout_exchange";
     public static final String FANOUT_SYNC_EXCHANGE = "sync_fanout_exchange";
 
-    // 延迟队列交换机
+    // 延迟队列交换机（TTL + 死信；保留兼容）
     public static final String DIRECT_SYNC_TTL_EXCHANGE = "sync_direct_ttl_exchange";
-    // 延迟队列交换机-插件版
-    public static final String DIRECT_SYNC_DELAY_EXCHANGE = "sync_delay_direct_exchange";
-    public static final String TOPIC_SYNC_DELAY_EXCHANGE = "sync_delay_topic_exchange";
     // endregion
 
     // region 路由键
@@ -58,7 +54,9 @@ public class RabbitMQConfig {
 
     public static final String DATA_SYNC_TTL_QUEUE = "data.sync.ttl.queue";
 
-    public static final String DATA_COMMON_DELAY_QUEUE = "data.common.delay.queue";
+    // New name avoids PRECONDITION_FAILED when upgrading an existing classic queue
+    // with the same name; drain/delete the legacy data.common.delay.queue after migration.
+    public static final String DATA_COMMON_DELAY_QUEUE = "data.common.delay.quorum.queue";
 
     public static final String AUTH_LOG_QUEUE = "auth.log.queue";
 
@@ -144,40 +142,28 @@ public class RabbitMQConfig {
     }
 
     /**
-     * 延迟队列-插件
+     * 延迟队列。RabbitMQ 4.4+ 使用 quorum queue 原生延迟：
+     * 生产者设置 long 型 x-opt-delivery-time（绝对 Unix 毫秒），队列无需插件。
      *
      * @return q
      */
     @Bean
     public Queue dataDelayQueue() {
-        return QueueBuilder.durable(DATA_COMMON_DELAY_QUEUE).build();
+        return QueueBuilder.durable(DATA_COMMON_DELAY_QUEUE).quorum().build();
     }
 
     /**
-     * 延迟队列交换机-插件
-     * direct模式
-     *
-     * @return ex
-     */
-    @Bean
-    public CustomExchange dataDelayExchange() {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-delayed-type", "direct");
-        return new CustomExchange(DIRECT_SYNC_DELAY_EXCHANGE, "x-delayed-message", true, false, args);
-    }
-
-    /**
-     * 给延时队列绑定交换机-插件
+     * 延迟队列绑定到普通 direct 交换机。延迟由队列的 x-opt-delivery-time 处理，
+     * 不再需要 x-delayed-message 插件交换机。
      *
      * @return binding
      */
     @Bean
-    public Binding delayBinding(CustomExchange dataDelayExchange, Queue dataDelayQueue) {
+    public Binding delayBinding(DirectExchange dataSyncDirect, Queue dataDelayQueue) {
         return BindingBuilder
                 .bind(dataDelayQueue)
-                .to(dataDelayExchange)
-                .with(DATA_COMMON_DELAY_ROUTE_KEY)
-                .noargs();
+                .to(dataSyncDirect)
+                .with(DATA_COMMON_DELAY_ROUTE_KEY);
     }
 
     @Bean
@@ -200,20 +186,6 @@ public class RabbitMQConfig {
                 .topicExchange(TOPIC_SYNC_EXCHANGE)
                 .durable(true)
                 .build();
-    }
-
-    /**
-     * 延迟队列交换机-插件
-     * topic模式
-     * https://github.com/rabbitmq/rabbitmq-delayed-message-exchange
-     *
-     * @return ex
-     */
-    @Bean
-    public CustomExchange topicDelayExchange() {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-delayed-type", "topic");
-        return new CustomExchange(TOPIC_SYNC_DELAY_EXCHANGE, "x-delayed-message", true, false, args);
     }
 
     // 这里用Fanout + AnonymousQueue实现集群广播事件，比原topic的方式更灵活简单，注意广播后还是同一消息id

@@ -172,7 +172,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 
 ### 5.6 消息队列
 
-- 交换机/队列/绑定集中在 `unicorn-security` 的 `RabbitMQConfig`；延迟消息依赖 RabbitMQ 的 `x-delayed-message` 插件。
+- 交换机/队列/绑定集中在 `unicorn-security` 的 `RabbitMQConfig`；延迟消息使用 RabbitMQ 4.4+ quorum queue 的 `x-opt-delivery-time`（long 绝对毫秒），不再依赖 `x-delayed-message` 插件。
 - 生产端继承 `XRabbitAbstractProducer`；`SimpleMQProducerService` 是 `sealed`，用户可继承 `ExtensionProducerService` 覆盖默认 producer。
 - 消费端继承 `YRabbitAbstractConsumer`：按 `msgType` 过滤、忽略本实例消息、失败只重投一次。
 - 登录成功/失败、操作日志、business log 都走 MQ；没有 RabbitMQ 时相关功能不可用（本地起服务前先确认 broker）。
@@ -205,7 +205,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 - **profile**：只有 `application-dev.yml` 和 `application-sit.yml`，没有 prod。外部依赖默认指向 `10.211.55.x`，可用 `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PWD`、`CACHE_PORT`、`MQ_PORT` 覆盖。
 - **读写分离**：只有 Redis 主从（`sit` 的 `masterSlaveServersConfig`，`readMode: SLAVE`），**没有 ShardingSphere**，数据库是单数据源。
 - **数据库**：`sql/unicorn.sql`（19 张表 + 种子数据，含 admin 用户、角色、菜单、资源、定时任务）。首次启动前先建库导入。
-- **基础设施**：`document/docker/docker-compose-env.yml`（MySQL 主 + 2 从、Redis 主从、RabbitMQ 集群）或 `docker-compose-env-sim.yml`（单机）。RabbitMQ 需安装延迟插件。
+- **基础设施**：`document/docker/docker-compose-env.yml`（MySQL 主 + 2 从、Redis 主从、RabbitMQ 集群）或 `docker-compose-env-sim.yml`（单机）。RabbitMQ 使用 4.4+（quorum queue 原生延迟，无需插件）。
 - **OAuth2 样例拓扑**：`authorizationserver:9000`（授权状态存 Redis db4）→ `gateway-client:8080`（Session + TokenRelay）→ `resource-server-mvc:8090` / `resource-server-flux:8091`。
 - **AI Demo（Spring AI 2.0.1）**：`unicorn-ai/` 下 4 个独立 demo，Chat 8092、RAG 8093、MCP Server 8094、MCP Client 8095；`unicorn-ai-support` 8096 是生产参考（多租户、citations、工具审批、审计、MCP）。模型通过 `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_CHAT_MODEL` 配置；support 的 local profile 使用 H2 + SimpleVectorStore + 本地演示模型，无需 key。
   - `--spring.profiles.active=infra` 连接现有 dev 基础设施：Chat 用 Redis（10.211.55.29:6379 / redis-psd，db 6）持久化对话记忆；RAG 用 Redis Stack 向量库（索引 `unicorn-ai-rag`，维度 1536）、MySQL（10.211.55.29:3306/unicorn，root/root）做异步入库任务审计、RabbitMQ（10.211.55.29:5672，admin/admin，vhost /unicorn）做异步入库。

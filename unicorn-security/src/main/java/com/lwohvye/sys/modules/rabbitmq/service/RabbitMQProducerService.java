@@ -73,7 +73,7 @@ public class RabbitMQProducerService extends ExtensionProducerService {
      * @date 2021/7/26 1:17 下午
      */
     public void sendDelayMsg(AmqpMsgEntity commonEntity) {
-        sendDelayMsg(RabbitMQConfig.DIRECT_SYNC_DELAY_EXCHANGE, RabbitMQConfig.DATA_COMMON_DELAY_ROUTE_KEY, commonEntity);
+        sendDelayMsg(RabbitMQConfig.DIRECT_SYNC_EXCHANGE, RabbitMQConfig.DATA_COMMON_DELAY_ROUTE_KEY, commonEntity);
     }
 
     /**
@@ -86,13 +86,13 @@ public class RabbitMQProducerService extends ExtensionProducerService {
     public void sendSyncDelayMsg(String routeKey, AmqpMsgEntity commonEntity) {
         // 延时500ms
         commonEntity.setExpire(500L).setTimeUnit(TimeUnit.MILLISECONDS);
-        sendDelayMsg(RabbitMQConfig.TOPIC_SYNC_DELAY_EXCHANGE, routeKey, commonEntity);
+        sendDelayMsg(RabbitMQConfig.TOPIC_SYNC_EXCHANGE, routeKey, commonEntity);
     }
 
     public void sendSyncDelayMsgEntity(String routeKey, AmqpMsgEntity commonEntity) {
         // 延时500ms
         commonEntity.setExpire(500L).setTimeUnit(TimeUnit.MILLISECONDS);
-        sendDelayMsgEntity(RabbitMQConfig.TOPIC_SYNC_DELAY_EXCHANGE, routeKey, commonEntity);
+        sendDelayMsgEntity(RabbitMQConfig.TOPIC_SYNC_EXCHANGE, routeKey, commonEntity);
     }
 
     public void sendSyncFanoutMsg(AmqpMsgEntity commonEntity) {

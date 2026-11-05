@@ -28,6 +28,12 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class XRabbitAbstractProducer {
 
+    /**
+     * RabbitMQ 4.4 quorum-queue delayed delivery header: absolute Unix epoch milliseconds.
+     * The value must be a Long; a String or the legacy x-delay header is silently ignored.
+     */
+    public static final String DELIVERY_TIME_HEADER = "x-opt-delivery-time";
+
     protected AmqpTemplate amqpTemplate;
 
     /**
@@ -86,9 +92,10 @@ public abstract class XRabbitAbstractProducer {
                     var expire = commonEntity.getExpire();
                     var timeUnit = commonEntity.getTimeUnit();
                     if (Objects.nonNull(expire) && Objects.nonNull(timeUnit)) {
-                        Long expireMill = TimeUnit.MILLISECONDS.convert(expire, timeUnit);
-                        //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
-                        message.getMessageProperties().setHeader(MessageProperties.X_DELAY, expireMill);
+                        var expireMill = TimeUnit.MILLISECONDS.convert(expire, timeUnit);
+                        // RabbitMQ 4.4 quorum queue expects an absolute timestamp in a Long.
+                        message.getMessageProperties().setHeader(DELIVERY_TIME_HEADER,
+                                System.currentTimeMillis() + expireMill);
                     }
                     return message;
                 });
@@ -102,8 +109,9 @@ public abstract class XRabbitAbstractProducer {
         var message = MessageBuilder.withBody(JsonUtils.toJSONString(commonEntity).getBytes())
                 .setContentType(MessageProperties.CONTENT_TYPE_JSON)
                 .setContentEncoding("utf-8")
-                //通过给消息设置x-delay头来设置消息从交换机发送到队列的延迟时间；
-                .setHeader(MessageProperties.X_DELAY, TimeUnit.MILLISECONDS.convert(expire, timeUnit))
+                // RabbitMQ 4.4 quorum queue expects an absolute timestamp in a Long.
+                .setHeader(DELIVERY_TIME_HEADER, System.currentTimeMillis()
+                        + TimeUnit.MILLISECONDS.convert(expire, timeUnit))
                 .setMessageId(String.valueOf(IdUtil.getSnowflakeNextId()))
                 .build();
         amqpTemplate.send(exchangeName, routeKey, message);
