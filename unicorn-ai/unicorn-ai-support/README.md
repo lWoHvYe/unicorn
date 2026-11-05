@@ -42,12 +42,12 @@ X-API-Key: other-key       # tenant=other，用于隔离测试
 使用现有 PostgreSQL/pgvector、Redis、RabbitMQ：
 
 ```bash
-export AI_DB_URL='jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=ai_support,public'
+export AI_DB_URL='jdbc:postgresql://localhost:5432/vectordb?currentSchema=ai_support,public'
 export AI_DB_USER=postgres
 export AI_DB_PWD=postgres
-export REDIS_HOST=10.211.55.29
+export REDIS_HOST=localhost
 export REDIS_PASSWORD=redis-psd
-export MQ_HOST=10.211.55.29
+export MQ_HOST=localhost
 export MQ_USER=admin
 export MQ_PWD=admin
 

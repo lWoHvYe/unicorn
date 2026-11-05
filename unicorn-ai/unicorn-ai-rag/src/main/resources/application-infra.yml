@@ -1,8 +1,8 @@
 # 使用 Unicorn 现有基础设施：
-# - Redis Stack: 10.211.55.29:6379 / redis-psd（RAG 向量库 + Chat 对话记忆）
-# - MySQL:      10.211.55.29:3306/unicorn / root:root（异步任务审计）
-# - RabbitMQ:   10.211.55.29:5672 / admin:admin，vhost /unicorn（异步入库）
-# - pgvector:   10.211.55.29:5434/vectordb / postgres:postgres（备选向量库）
+# - Redis Stack: localhost:6379 / redis-psd（RAG 向量库 + Chat 对话记忆）
+# - MySQL:      localhost:3306/unicorn / root:root（异步任务审计）
+# - RabbitMQ:   localhost:5672 / admin:admin，vhost /unicorn（异步入库）
+# - pgvector:   localhost:5432/vectordb / postgres:postgres（备选向量库）
 #
 # 用法：--spring.profiles.active=infra
 # 注意：infra 启动时会连接上述服务；默认 profile 仍是零依赖 demo。
@@ -14,7 +14,7 @@ spring:
     init:
       mode: always
   rabbitmq:
-    host: ${MQ_HOST:10.211.55.29}
+    host: ${MQ_HOST:localhost}
     port: ${MQ_PORT:5672}
     username: ${MQ_USER:admin}
     password: ${MQ_PWD:admin}
@@ -37,7 +37,7 @@ demo:
       vector-store: redis
       job-store: jdbc
       redis:
-        host: ${REDIS_HOST:10.211.55.29}
+        host: ${REDIS_HOST:localhost}
         port: ${REDIS_PORT:6379}
         password: ${REDIS_PASSWORD:redis-psd}
         index-name: unicorn-ai-rag
@@ -45,7 +45,7 @@ demo:
         dimensions: ${EMBEDDING_DIMENSIONS:1536}
       # 备选：--demo.ai.rag.vector-store=pgvector
       pgvector:
-        url: ${PGVECTOR_URL:jdbc:postgresql://10.211.55.29:5434/vectordb}
+        url: ${PGVECTOR_URL:jdbc:postgresql://localhost:5432/vectordb}
         username: ${PGVECTOR_USER:postgres}
         password: ${PGVECTOR_PWD:postgres}
         table-name: unicorn_ai_rag

@@ -5,7 +5,7 @@ spring:
     activate:
       on-profile: infra
   datasource:
-    url: ${AI_DB_URL:jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=ai_support,public}
+    url: ${AI_DB_URL:jdbc:postgresql://localhost:5432/vectordb?currentSchema=ai_support,public}
     username: ${AI_DB_USER:postgres}
     password: ${AI_DB_PWD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -17,12 +17,12 @@ spring:
     create-schemas: true
   data:
     redis:
-      host: ${REDIS_HOST:10.211.55.29}
+      host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:redis-psd}
       database: ${AI_REDIS_DATABASE:7}
   rabbitmq:
-    host: ${MQ_HOST:10.211.55.29}
+    host: ${MQ_HOST:localhost}
     port: ${MQ_PORT:5672}
     username: ${MQ_USER:admin}
     password: ${MQ_PWD:admin}

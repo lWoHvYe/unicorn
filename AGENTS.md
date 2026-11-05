@@ -203,15 +203,15 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 ## 6. 运行与配置
 
 - **starter**：`server.port=8081`，默认 **HTTPS**（`server.ssl.bundle: my-pem-bundle`，证书在 `src/main/resources/crt/`），默认 profile `dev`，`spring.jpa.hibernate.ddl-auto=none`。
-- **profile**：只有 `application-dev.yml` 和 `application-sit.yml`，没有 prod。外部依赖默认指向 `10.211.55.x`，可用 `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PWD`、`CACHE_PORT`、`MQ_PORT` 覆盖。
-- **读写分离**：只有 Redis 主从（`sit` 的 `masterSlaveServersConfig`，`readMode: SLAVE`），**没有 ShardingSphere**，数据库是单数据源。
+- **profile**：只有 `application-dev.yml` 和 `application-sit.yml`，没有 prod。外部依赖默认指向 `localhost`（本地 Docker），可用 `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PWD`、`CACHE_PORT`、`MQ_PORT` 覆盖。
+- **Redis**：`sit` 默认使用本地单机 Redis（`singleServerConfig`，localhost:6379）；**没有 ShardingSphere**，数据库是单数据源。
 - **数据库**：`sql/unicorn.sql`（19 张表 + 种子数据，含 admin 用户、角色、菜单、资源、定时任务）。首次启动前先建库导入。
-- **基础设施**：`document/docker/docker-compose-env.yml`（MySQL 主 + 2 从、Redis 主从、RabbitMQ 集群）或 `docker-compose-env-sim.yml`（单机）。RabbitMQ 使用 4.4+（quorum queue 原生延迟，无需插件）。
+- **基础设施**：`document/docker/docker-compose-env.yml`（MySQL 主 + 2 从、Redis 主从、RabbitMQ 集群）或 `docker-compose-env-sim.yml`（本地单机，当前主环境）。本地端口：MySQL 3306 root/root、Redis 6379 redis-psd、RabbitMQ 5672 admin/admin vhost `/unicorn`、pgvector 5432 vectordb postgres/postgres。RabbitMQ 使用 4.4+（quorum queue 原生延迟，无需插件）。
 - **OAuth2 样例拓扑**：`authorizationserver:9000`（授权状态存 Redis db4）→ `gateway-client:8080`（Session + TokenRelay）→ `resource-server-mvc:8090` / `resource-server-flux:8091`。
 - **AI Demo（Spring AI 2.0.1）**：`unicorn-ai/` 下 4 个独立 demo，Chat 8092、RAG 8093、MCP Server 8094、MCP Client 8095；`unicorn-ai-support` 8096 是生产参考（多租户、citations、工具审批、审计、MCP）。模型通过 `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `OPENAI_CHAT_MODEL` 配置；support 的 local profile 使用 H2 + SimpleVectorStore + 本地演示模型，无需 key。
-  - `--spring.profiles.active=infra` 连接现有 dev 基础设施：Chat 用 Redis（10.211.55.29:6379 / redis-psd，db 6）持久化对话记忆；RAG 用 Redis Stack 向量库（索引 `unicorn-ai-rag`，维度 1536）、MySQL（10.211.55.29:3306/unicorn，root/root）做异步入库任务审计、RabbitMQ（10.211.55.29:5672，admin/admin，vhost /unicorn）做异步入库。
+  - `--spring.profiles.active=infra` 连接现有 dev 基础设施：Chat 用 Redis（localhost:6379 / redis-psd，db 6）持久化对话记忆；RAG 用本地 Redis 的 RediSearch 向量库（索引 `unicorn-ai-rag`，维度 1536）、MySQL（localhost:3306/unicorn，root/root）做异步入库任务审计、RabbitMQ（localhost:5672，admin/admin，vhost /unicorn）做异步入库。
   - RAG 向量库可选 `simple` / `redis` / `pgvector`；infra 默认 `redis`，备选 pgvector 用 `--demo.ai.rag.vector-store=pgvector`。RedisVectorStore 启动时通过固定维度包装避免调用 embedding API。
-  - 当前 Redis Stack 已加载 search/ReJSON；若换成普通 Redis，需改用 pgvector 或 simple，否则会报 `FT._LIST` 不存在。
+  - 本地 `redis:latest` 已加载 search/ReJSON；若换成不带 RediSearch 的 Redis，需改用 pgvector 或 simple，否则会报 `FT._LIST` 不存在。
   - MCP 场景先启动 server，再以 `MCP_CLIENT_ENABLED=true` 启动 client。旧 `unicorn-ai-mcp-server` 现在也要求 `X-API-Key`（需显式设置 `MCP_API_KEY`），但仍是单租户 demo；生产 MCP 以 `unicorn-ai-support` 的 `/mcp` 为准（API Key/JWT + 租户隔离）。`unicorn-ai-mcp-client` 支持 `DEMO_AI_MCP_CLIENT_API_KEY` 和 `DEMO_AI_MCP_CLIENT_ALLOWLIST`。完整 curl 示例见 `unicorn-ai/README.md` 和 `unicorn-ai/unicorn-ai-support/README.md`。
 - **密钥**：RSA、JWT、Redis、RabbitMQ 口令目前明文写在 `application*.yml` 中；不要新增明文密钥，优先用环境变量，也不要把这些值复制到文档/日志。
 - **脚本**：`script/*.sh` 仍使用 `valentine-starter.jar` 和 `JAVA_HOME=jdk-21`，与当前产物 `valentine-starter-kotlin-4.8.4-chi.jar` 和 JDK 25 不一致；只能当模板改后使用。`docker-compose.yml` 的 `valentine-starter:3.0.0` 同样过时。

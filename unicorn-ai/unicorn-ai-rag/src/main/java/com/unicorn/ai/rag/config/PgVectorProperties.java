@@ -21,11 +21,11 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
  * docker-compose-env-sim.yml 中的 pgvector 服务：
- * jdbc:postgresql://10.211.55.29:5434/vectordb，postgres/postgres。
+ * jdbc:postgresql://localhost:5432/vectordb，postgres/postgres。
  */
 @ConfigurationProperties("demo.ai.rag.pgvector")
 public record PgVectorProperties(
-        @DefaultValue("jdbc:postgresql://10.211.55.29:5434/vectordb") String url,
+        @DefaultValue("jdbc:postgresql://localhost:5432/vectordb") String url,
         @DefaultValue("postgres") String username,
         @DefaultValue("postgres") String password,
         @DefaultValue("unicorn_ai_rag") String tableName,

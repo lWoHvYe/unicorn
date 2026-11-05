@@ -62,10 +62,10 @@ MCP_API_KEY=demo-key ./gradlew :unicorn-ai-mcp-server:bootRun & MCP_CLIENT_ENABL
 
 | 服务 | 地址 | 认证 | 用途 |
 | --- | --- | --- | --- |
-| Redis Stack | `10.211.55.29:6379` | `redis-psd` | Chat 对话记忆（db 6）+ RAG 向量库（索引 `unicorn-ai-rag`，db 0） |
-| pgvector | `10.211.55.29:5434/vectordb` | `postgres/postgres` | 备选 RAG 向量库（表 `unicorn_ai_rag`） |
-| MySQL | `10.211.55.29:3306/unicorn` | `root/root` | RAG 异步任务审计（表 `ai_rag_ingest_job`） |
-| RabbitMQ | `10.211.55.29:5672`，vhost `/unicorn` | `admin/admin` | RAG 异步入库队列 |
+| Redis Stack | `localhost:6379` | `redis-psd` | Chat 对话记忆（db 6）+ RAG 向量库（索引 `unicorn-ai-rag`，db 0） |
+| pgvector | `localhost:5432/vectordb` | `postgres/postgres` | 备选 RAG 向量库（表 `unicorn_ai_rag`） |
+| MySQL | `localhost:3306/unicorn` | `root/root` | RAG 异步任务审计（表 `ai_rag_ingest_job`） |
+| RabbitMQ | `localhost:5672`，vhost `/unicorn` | `admin/admin` | RAG 异步入库队列 |
 
 说明：
 
@@ -191,7 +191,7 @@ curl -s localhost:8093/api/ai/rag/jobs/<jobId>
 
 - 默认 `demo.ai.rag.vector-store=simple`，使用进程内 `SimpleVectorStore`，零外部依赖，重启丢数据。
 - `infra` profile 使用 Redis Stack：索引 `unicorn-ai-rag`，HNSW + COSINE，维度 1536；启动时用固定维度包装避免调用 embedding。
-- 备选 pgvector：`--demo.ai.rag.vector-store=pgvector`，连接 `jdbc:postgresql://10.211.55.29:5434/vectordb`，自动创建 `unicorn_ai_rag` 表。
+- 备选 pgvector：`--demo.ai.rag.vector-store=pgvector`，连接 `jdbc:postgresql://localhost:5432/vectordb`，自动创建 `unicorn_ai_rag` 表。
 - 文档 metadata 会补齐 `source`、`tenant`、`docType`、`ingestedAt`、`contentHash`，可用于 `filter` 表达式。
 - 切分使用 `TokenTextSplitter`，中文标点参与断句；chunk 大小、阈值、topK 都在 `application.yml` 中可调。
 

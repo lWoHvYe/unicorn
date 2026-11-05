@@ -53,10 +53,10 @@ class SupportExternalInfraTest {
     private static final JsonMapper JSON = JsonMapper.builder().build();
     private static final String SCHEMA = "ai_support_p2_test";
     private static final String DB_URL = env("AI_DB_URL",
-            "jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=" + SCHEMA + ",public");
+            "jdbc:postgresql://localhost:5432/vectordb?currentSchema=" + SCHEMA + ",public");
     private static final String DB_USER = env("AI_DB_USER", "postgres");
     private static final String DB_PWD = env("AI_DB_PWD", "postgres");
-    private static final String MQ_HOST = env("MQ_HOST", "10.211.55.29");
+    private static final String MQ_HOST = env("MQ_HOST", "localhost");
     private static final String MQ_PORT = env("MQ_PORT", "5672");
     private static final String MQ_USER = env("MQ_USER", "admin");
     private static final String MQ_PWD = env("MQ_PWD", "admin");

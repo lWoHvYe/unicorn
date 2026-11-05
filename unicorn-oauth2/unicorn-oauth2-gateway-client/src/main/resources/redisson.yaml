@@ -9,7 +9,7 @@ singleServerConfig:
   password: redis-psd
   subscriptionsPerConnection: 5
   clientName: null
-  address: "redis://10.211.55.29:${CACHE_PORT:-6379}"
+  address: "redis://localhost:${CACHE_PORT:-6379}"
   subscriptionConnectionMinimumIdleSize: 1
   subscriptionConnectionPoolSize: 16
   connectionMinimumIdleSize: 8

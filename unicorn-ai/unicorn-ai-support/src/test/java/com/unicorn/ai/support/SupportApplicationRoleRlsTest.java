@@ -46,9 +46,9 @@ class SupportApplicationRoleRlsTest {
 
     private static final String SCHEMA = "ai_support_app_role_test";
     private static final String DB_URL = env("AI_DB_URL",
-            "jdbc:postgresql://10.211.55.29:5434/vectordb?currentSchema=" + SCHEMA + ",public");
+            "jdbc:postgresql://localhost:5432/vectordb?currentSchema=" + SCHEMA + ",public");
     private static final String ADMIN_URL = env("AI_DB_URL",
-            "jdbc:postgresql://10.211.55.29:5434/vectordb");
+            "jdbc:postgresql://localhost:5432/vectordb");
     private static final String DB_USER = env("AI_DB_USER", "postgres");
     private static final String DB_PWD = env("AI_DB_PWD", "postgres");
     private static final String APP_ROLE = "unicorn_support_app";
@@ -103,8 +103,7 @@ class SupportApplicationRoleRlsTest {
              var statement = connection.createStatement()) {
             // Extensions live in public so GIN operator classes resolve during Flyway.
             statement.execute("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA public");
-            // pg_trgm is installed by the external infra schema; creating it in another
-            // schema would make gin_trgm_ops unavailable to Flyway's search path.
+            statement.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public");
         } catch (Exception exception) {
             throw new IllegalStateException("Could not prepare PostgreSQL extensions", exception);
         }

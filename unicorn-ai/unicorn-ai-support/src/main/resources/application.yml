@@ -88,7 +88,7 @@ ai:
     storage:
       root: ${AI_STORAGE_ROOT:${java.io.tmpdir}/unicorn-ai-support}
     pgvector:
-      url: ${PGVECTOR_URL:jdbc:postgresql://10.211.55.29:5434/vectordb}
+      url: ${PGVECTOR_URL:jdbc:postgresql://localhost:5432/vectordb}
       username: ${PGVECTOR_USER:postgres}
       password: ${PGVECTOR_PWD:postgres}
       schema-name: ai_support

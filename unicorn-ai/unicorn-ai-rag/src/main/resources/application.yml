@@ -15,7 +15,7 @@ spring:
   # 以下连接信息与 valentine-starter application-dev.yml 对齐；默认不主动连接，
   # 只有 infra profile 才启用 JDBC 任务审计 / RabbitMQ 异步入库 / Redis 向量库。
   datasource:
-    url: jdbc:mysql://${DB_HOST:10.211.55.29}:${DB_PORT:3306}/${DB_NAME:unicorn}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:unicorn}
     username: ${DB_USER:root}
     password: ${DB_PWD:root}
     hikari:
@@ -25,7 +25,7 @@ spring:
     init:
       mode: never
   rabbitmq:
-    host: ${MQ_HOST:10.211.55.29}
+    host: ${MQ_HOST:localhost}
     port: ${MQ_PORT:5672}
     username: ${MQ_USER:admin}
     password: ${MQ_PWD:admin}
@@ -76,7 +76,7 @@ demo:
         queue: unicorn.ai.rag.ingest
         routing-key: ingest
       pgvector:
-        url: ${PGVECTOR_URL:jdbc:postgresql://10.211.55.29:5434/vectordb}
+        url: ${PGVECTOR_URL:jdbc:postgresql://localhost:5432/vectordb}
         username: ${PGVECTOR_USER:postgres}
         password: ${PGVECTOR_PWD:postgres}
         table-name: unicorn_ai_rag
@@ -87,7 +87,7 @@ demo:
         只能使用 <context> 中的信息；如果资料不足，直接说明“资料中没有足够信息”，不要编造。
         回答后列出实际使用到的来源（source）。
       redis:
-        host: ${REDIS_HOST:10.211.55.29}
+        host: ${REDIS_HOST:localhost}
         port: ${REDIS_PORT:6379}
         password: ${REDIS_PASSWORD:redis-psd}
         index-name: unicorn-ai-rag

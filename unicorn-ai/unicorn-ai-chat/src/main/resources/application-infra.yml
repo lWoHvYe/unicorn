@@ -1,4 +1,4 @@
-# 使用 Unicorn 现有基础设施：Redis 10.211.55.29:6379 / redis-psd
+# 使用 Unicorn 现有基础设施：Redis localhost:6379 / redis-psd
 # 用法：--spring.profiles.active=infra
 spring:
   config:
@@ -6,7 +6,7 @@ spring:
       on-profile: infra
   data:
     redis:
-      host: ${REDIS_HOST:10.211.55.29}
+      host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:redis-psd}
       # 与主应用缓存 db 6 共用实例，但使用独立 key 前缀，避免冲突
