@@ -173,6 +173,7 @@ unicorn-ai-*：独立 Spring AI 样例，不依赖框架库；`unicorn-ai-suppor
 ### 5.6 消息队列
 
 - 交换机/队列/绑定集中在 `unicorn-security` 的 `RabbitMQConfig`；延迟消息使用 RabbitMQ 4.4+ quorum queue 的 `x-opt-delivery-time`（long 绝对毫秒），不再依赖 `x-delayed-message` 插件。
+- 延迟队列已改名为 `data.common.delay.quorum.queue`，避免与已有 classic `data.common.delay.queue` 同名导致 `PRECONDITION_FAILED`；升级时先排空/删除旧队列。broker 必须为 4.4+，否则该 header 会被忽略并立即投递。
 - 生产端继承 `XRabbitAbstractProducer`；`SimpleMQProducerService` 是 `sealed`，用户可继承 `ExtensionProducerService` 覆盖默认 producer。
 - 消费端继承 `YRabbitAbstractConsumer`：按 `msgType` 过滤、忽略本实例消息、失败只重投一次。
 - 登录成功/失败、操作日志、business log 都走 MQ；没有 RabbitMQ 时相关功能不可用（本地起服务前先确认 broker）。

@@ -205,7 +205,7 @@ implementation("com.lwohvye:unicorn-security:$unicornVersion") {
 - Java 25 基础运行环境
 - Mysql 5.7/8.0 数据库 读写分离/单数据源-通过配置数据源的方式切换
 - Redis 8 缓存，支持RAG
-- RabbitMQ 发布-订阅（解耦、异步）
+- RabbitMQ 发布-订阅（解耦、异步）；延迟消息使用 4.4+ quorum queue 的 `x-opt-delivery-time`
 - ELK 日志系统，config for prod env
 - 可基于docker [一键搭建](document/docker/docker-compose-env.yml)。当然目录还是要自己建的，另外RabbitMQ 4.4+ 使用 quorum queue 原生延迟，无需延迟插件；ES 记得装 IK
 - 若想搭建k8s版，可[参照](https://github.com/lWoHvYe/mall-swarm/tree/main/document/kubernetes/env) ,这个是基于NFS挂载的。
