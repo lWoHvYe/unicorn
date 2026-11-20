@@ -25,7 +25,7 @@ dependencies {
     implementation(platform(libs.spring.ai.bom))
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("org.springframework.boot:spring-boot-starter-rabbitmq")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     runtimeOnly("com.mysql:mysql-connector-j")
     implementation("org.springframework.ai:spring-ai-starter-model-openai")

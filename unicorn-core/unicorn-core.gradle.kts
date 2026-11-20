@@ -74,7 +74,7 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-access")
     implementation("org.springframework.security:spring-security-oauth2-jose")
-    api("org.springframework.boot:spring-boot-starter-amqp")
+    api("org.springframework.boot:spring-boot-starter-rabbitmq")
     api("org.springframework.boot:spring-boot-starter-cache")
     api("org.springframework.boot:spring-boot-starter-data-redis")
     api(libs.redisson)
